@@ -16,13 +16,17 @@ for /f "tokens=5" %%a in ('netstat -aon ^| findstr :3001 ^| findstr LISTENING') 
 )
 
 :: 2. Проверка Node.js
-node -v >nul 2>&1
+node -v >node_v.txt 2>&1
 if %errorlevel% neq 0 (
     echo [ОШИБКА] Node.js не найден! 
     echo Пожалуйста, установите его с https://nodejs.org/
+    if exist node_v.txt del node_v.txt
     pause
     exit /b
 )
+set /p NODE_VER=<node_v.txt
+echo [ИНФО] Используется Node.js: %NODE_VER%
+if exist node_v.txt del node_v.txt
 
 :: 3. Поиск Unity в стандартных путях Unity Hub
 set "UNITY_PATH="

@@ -1,5 +1,5 @@
 {
-  "name": "Claude Code Game Studios (CCGS)",
-  "description": "Multi-agent game development environment with 48 specialized AI agents and Unity integration.",
+  "name": "Unity & Blender AI Assistant",
+  "description": "Professional AI assistant for Unity (C#) and Blender (Python) development. Generate scripts, optimize logic, and get expert advice.",
   "requestFramePermissions": []
 }
