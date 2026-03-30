@@ -31,11 +31,27 @@ if defined UNITY_PATH (
     if exist unity_version.txt del unity_version.txt
 )
 
-echo [CCGS] Установка зависимостей (если необходимо)...
-call npm install
+echo [CCGS] Проверка окружения Node.js...
+node -v >nul 2>&1
+if %errorlevel% neq 0 (
+    echo [CCGS] ОШИБКА: Node.js не установлен или не добавлен в PATH.
+    echo [CCGS] Пожалуйста, установите Node.js с сайта https://nodejs.org/
+    pause
+    exit /b
+)
+
+echo [CCGS] Установка зависимостей (может занять время)...
+if not exist node_modules (
+    call npm install
+)
 
 echo [CCGS] Запуск сервера приложения...
-echo [CCGS] Откройте http://localhost:3000 в вашем браузере.
+echo [CCGS] Автоматическое открытие браузера: http://localhost:3000
+start http://localhost:3000
+
 npm run dev
 
-pause
+if %errorlevel% neq 0 (
+    echo [CCGS] ОШИБКА при запуске сервера.
+    pause
+)
