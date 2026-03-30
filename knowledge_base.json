@@ -1,0 +1,84 @@
+{
+  "version": "0.3.0",
+  "levels": [
+    {
+      "id": 1,
+      "name": "Директора (Claude Opus)",
+      "agents": [
+        { "id": "creative_dir", "name": "Креативный директор", "role": "Стратегические решения, видение проекта", "model": "Claude Opus" },
+        { "id": "tech_dir", "name": "Технический директор", "role": "Архитектура, разрешение технических конфликтов", "model": "Claude Opus" },
+        { "id": "producer", "name": "Продюсер", "role": "Сроки, ресурсы, управление отделами", "model": "Claude Opus" }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Руководители отделов (Claude Sonnet)",
+      "agents": [
+        { "id": "game_designer", "name": "Геймдизайнер", "role": "Механики, баланс", "model": "Claude Sonnet" },
+        { "id": "lead_prog", "name": "Лид-программист", "role": "Код-ревью, архитектура систем", "model": "Claude Sonnet" },
+        { "id": "art_dir", "name": "Арт-директор", "role": "Визуальный стиль", "model": "Claude Sonnet" },
+        { "id": "audio_dir", "name": "Директор по звуку", "role": "Звуковой ландшафт", "model": "Claude Sonnet" },
+        { "id": "narrative_dir", "name": "Нарративный директор", "role": "Сюжет, диалоги", "model": "Claude Sonnet" },
+        { "id": "qa_lead", "name": "QA-лид", "role": "Тестирование, баг-трекинг", "model": "Claude Sonnet" },
+        { "id": "release_mgr", "name": "Релиз-менеджер", "role": "Сборки, деплой", "model": "Claude Sonnet" },
+        { "id": "loc_lead", "name": "Руководитель локализации", "role": "Переводы, культурная адаптация", "model": "Claude Sonnet" }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Специалисты (Sonnet/Haiku)",
+      "agents": [
+        { "id": "gameplay_prog", "name": "Геймплей-программист", "role": "Логика игрока, враги", "model": "Claude Sonnet" },
+        { "id": "economy_dsgn", "name": "Дизайнер экономики", "role": "Математика, прогрессия", "model": "Claude Sonnet" },
+        { "id": "devops", "name": "DevOps-инженер", "role": "CI/CD, серверы", "model": "Claude Sonnet" },
+        { "id": "accessibility", "name": "Специалист по accessibility", "role": "Доступность для всех", "model": "Claude Sonnet" },
+        { "id": "ui_ux", "name": "UI/UX-дизайнер", "role": "Интерфейсы, опыт пользователя", "model": "Claude Sonnet" },
+        { "id": "level_dsgn", "name": "Level-дизайнер", "role": "Проектирование уровней", "model": "Claude Sonnet" },
+        { "id": "char_artist", "name": "Character Artist", "role": "Модели персонажей", "model": "Claude Sonnet" },
+        { "id": "env_artist", "name": "Environment Artist", "role": "Окружение", "model": "Claude Sonnet" },
+        { "id": "tech_artist", "name": "Technical Artist", "role": "Шейдеры, риггинг", "model": "Claude Sonnet" },
+        { "id": "vfx_artist", "name": "VFX Artist", "role": "Эффекты", "model": "Claude Sonnet" },
+        { "id": "animator", "name": "Аниматор", "role": "Движение", "model": "Claude Sonnet" },
+        { "id": "sound_dsgn", "name": "Sound Designer", "role": "Звуковые эффекты", "model": "Claude Sonnet" },
+        { "id": "composer", "name": "Композитор", "role": "Музыка", "model": "Claude Sonnet" },
+        { "id": "writer", "name": "Писатель", "role": "Тексты", "model": "Claude Sonnet" },
+        { "id": "editor", "name": "Редактор", "role": "Правка текстов", "model": "Claude Sonnet" },
+        { "id": "tools_prog", "name": "Tools Programmer", "role": "Инструментарий", "model": "Claude Sonnet" },
+        { "id": "engine_prog", "name": "Engine Programmer", "role": "Ядро движка", "model": "Claude Sonnet" },
+        { "id": "network_prog", "name": "Network Programmer", "role": "Сетевой код", "model": "Claude Sonnet" },
+        { "id": "physics_prog", "name": "Physics Programmer", "role": "Физика", "model": "Claude Sonnet" },
+        { "id": "graphics_prog", "name": "Graphics Programmer", "role": "Рендеринг", "model": "Claude Sonnet" },
+        { "id": "ai_prog", "name": "AI Programmer", "role": "Искусственный интеллект", "model": "Claude Sonnet" },
+        { "id": "build_eng", "name": "Build Engineer", "role": "Сборка проекта", "model": "Claude Sonnet" },
+        { "id": "security_eng", "name": "Security Engineer", "role": "Безопасность", "model": "Claude Sonnet" },
+        { "id": "data_analyst", "name": "Data Analyst", "role": "Аналитика данных", "model": "Claude Sonnet" },
+        { "id": "community_mgr", "name": "Community Manager", "role": "Работа с сообществом", "model": "Claude Sonnet" },
+        { "id": "marketing", "name": "Marketing Specialist", "role": "Маркетинг", "model": "Claude Sonnet" },
+        { "id": "pr_mgr", "name": "PR Manager", "role": "Связи с общественностью", "model": "Claude Sonnet" },
+        { "id": "legal", "name": "Legal Consultant", "role": "Юридические вопросы", "model": "Claude Sonnet" },
+        { "id": "hr", "name": "HR Specialist", "role": "Кадры", "model": "Claude Sonnet" },
+        { "id": "it_support", "name": "IT Support", "role": "Техподдержка", "model": "Claude Sonnet" },
+        { "id": "concept_artist", "name": "Concept Artist", "role": "Концепт-арт", "model": "Claude Sonnet" },
+        { "id": "scripter", "name": "Скриптер", "role": "Скриптование событий", "model": "Claude Sonnet" },
+        { "id": "sys_dsgn", "name": "Systems Designer", "role": "Системный дизайн", "model": "Claude Sonnet" },
+        { "id": "combat_dsgn", "name": "Combat Designer", "role": "Боевая система", "model": "Claude Sonnet" },
+        { "id": "balance_dsgn", "name": "Balance Designer", "role": "Балансировка", "model": "Claude Sonnet" },
+        { "id": "tech_writer", "name": "Technical Writer", "role": "Техдокументация", "model": "Claude Sonnet" },
+        { "id": "support", "name": "Support Specialist", "role": "Поддержка", "model": "Claude Sonnet" }
+      ]
+    }
+  ],
+  "commands": [
+    { "cmd": "/start", "desc": "Запуск сессии CCGS" },
+    { "cmd": "/sprint-plan", "desc": "Планирование спринта" },
+    { "cmd": "/code-review", "desc": "Ревью кода" },
+    { "cmd": "/release-checklist", "desc": "Чек-лист перед релизом" },
+    { "cmd": "/unity-sync", "desc": "Синхронизация с Unity" },
+    { "cmd": "/update", "desc": "Обновление версии CCGS" }
+  ],
+  "unity_status": {
+    "is_running": false,
+    "version": "unknown",
+    "project_path": "none"
+  }
+}
