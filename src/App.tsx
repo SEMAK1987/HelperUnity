@@ -78,7 +78,7 @@ export default function App() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [logs, setLogs] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState<'studio' | 'kb' | 'commands' | 'files'>('studio');
+  const [activeTab, setActiveTab] = useState<'studio' | 'kb' | 'commands' | 'files' | 'recovery'>('studio');
   const [showHierarchy, setShowHierarchy] = useState(false);
   const [chatInput, setChatInput] = useState('');
   const [messages, setMessages] = useState<{role: string, content: string, agent?: string, files?: any[]}[]>([]);
@@ -86,6 +86,8 @@ export default function App() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
+  const [recoveryBlueprint, setRecoveryBlueprint] = useState<string>('');
+  const [isRecovering, setIsRecovering] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const addLog = (msg: string, type: 'info' | 'error' | 'process' | 'success' = 'info') => {
@@ -123,19 +125,44 @@ export default function App() {
     };
   }, []);
 
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     setIsUpdating(true);
-    addLog("Инициализация глобального обновления CCGS...", 'process');
-    setTimeout(() => {
-      addLog("Синхронизация с репозиторием GitHub...", 'process');
-      setTimeout(() => {
-        addLog("Обновление файлов ядра и базы знаний...", 'process');
-        setTimeout(() => {
-          addLog("CCGS успешно обновлен до версии v0.3.1-HOTFIX", 'success');
-          setIsUpdating(false);
-        }, 2000);
-      }, 1500);
-    }, 1000);
+    addLog("Запрос на обновление системы...", 'process');
+    try {
+      const res = await fetch('/api/kb');
+      const data = await res.json();
+      setKb(data);
+      addLog("Система успешно синхронизирована", 'success');
+    } catch (error) {
+      addLog("Ошибка при обновлении данных", 'error');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleRecovery = async () => {
+    if (!recoveryBlueprint.trim()) return;
+    setIsRecovering(true);
+    addLog("Запуск процесса восстановления из Blueprint...", 'process');
+    try {
+      const blueprint = JSON.parse(recoveryBlueprint);
+      const res = await fetch('/api/recovery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ blueprint })
+      });
+      const data = await res.json();
+      if (data.success) {
+        addLog("Проект успешно восстановлен!", 'success');
+        window.location.reload();
+      } else {
+        addLog("Ошибка восстановления: " + data.error, 'error');
+      }
+    } catch (error) {
+      addLog("Некорректный формат Blueprint JSON", 'error');
+    } finally {
+      setIsRecovering(false);
+    }
   };
 
   const validateFiles = (files: FileList): { valid: boolean, error?: string } => {
@@ -362,6 +389,9 @@ export default function App() {
           <button onClick={() => setActiveTab('files')} className={`p-2 rounded-md transition-all ${activeTab === 'files' ? 'bg-white/10 text-white' : 'hover:text-white'}`}>
             <Paperclip className="w-4 h-4" />
           </button>
+          <button onClick={() => setActiveTab('recovery')} className={`p-2 rounded-md transition-all ${activeTab === 'recovery' ? 'bg-white/10 text-white' : 'hover:text-white'}`}>
+            <RefreshCw className="w-4 h-4" />
+          </button>
         </div>
 
         <div className="mt-auto flex flex-col gap-3 items-center pb-4">
@@ -556,6 +586,56 @@ export default function App() {
                     <p>Нет загруженных файлов. Используйте кнопку выше для добавления.</p>
                   </div>
                 )}
+              </div>
+            )}
+
+            {activeTab === 'recovery' && (
+              <div className="flex-1 p-6 overflow-auto scrollbar-thin scrollbar-thumb-white/5">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex flex-col">
+                    <h2 className="text-xl font-bold text-white">Восстановление Проекта</h2>
+                    <p className="text-[10px] text-slate-500 mt-1 uppercase tracking-wider">Используйте файл Blueprint для восстановления всех данных</p>
+                  </div>
+                </div>
+                
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                  <p className="text-slate-400 mb-4">Вставьте содержимое файла <code className="text-blue-400">ccgs_project_blueprint.json</code> ниже, чтобы полностью восстановить структуру проекта, агентов и настройки.</p>
+                  <textarea 
+                    value={recoveryBlueprint}
+                    onChange={(e) => setRecoveryBlueprint(e.target.value)}
+                    placeholder='{"project_name": "...", "knowledge_base": {...}, ...}'
+                    className="w-full h-64 bg-black/40 border border-white/10 rounded-xl p-4 font-mono text-[10px] text-blue-400 focus:outline-none focus:border-blue-500/50 transition-all mb-4"
+                  />
+                  <button 
+                    onClick={handleRecovery}
+                    disabled={isRecovering || !recoveryBlueprint.trim()}
+                    className={`w-full py-3 rounded-xl font-bold uppercase tracking-widest transition-all ${isRecovering || !recoveryBlueprint.trim() ? 'bg-slate-800 text-slate-600 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/20'}`}
+                  >
+                    {isRecovering ? 'Восстановление...' : 'Запустить Восстановление'}
+                  </button>
+                </div>
+
+                <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                    <h3 className="text-white font-bold mb-2 flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 text-green-500" /> Что восстановится?
+                    </h3>
+                    <ul className="space-y-2 text-[10px] text-slate-500 list-disc list-inside">
+                      <li>Все 48 специализированных AI-агентов</li>
+                      <li>Иерархия и роли отделов</li>
+                      <li>Название и описание проекта</li>
+                      <li>Связи с Unity и настройки окружения</li>
+                    </ul>
+                  </div>
+                  <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                    <h3 className="text-white font-bold mb-2 flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-yellow-500" /> Важное примечание
+                    </h3>
+                    <p className="text-[10px] text-slate-500 leading-relaxed">
+                      Восстановление перезапишет текущую базу знаний. Убедитесь, что у вас есть актуальная копия Blueprint перед началом процесса.
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
 

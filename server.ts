@@ -29,7 +29,7 @@ const upload = multer({
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = process.env.PORT || 3000; // Dynamic port: 3000 for cloud, overrideable for local
 
   app.use(cors());
   app.use(express.json());
@@ -135,8 +135,30 @@ async function startServer() {
     res.json({
       apiKey: process.env.GEMINI_API_KEY || providedApiKey,
       version: "0.3.0",
-      appUrl: process.env.APP_URL
+      appUrl: process.env.APP_URL,
+      port: 3001
     });
+  });
+
+  // Recovery Endpoint
+  app.post("/api/recovery", async (req, res) => {
+    try {
+      const { blueprint } = req.body;
+      if (!blueprint || !blueprint.knowledge_base) {
+        return res.status(400).json({ error: "Invalid blueprint data" });
+      }
+
+      await fs.writeJson(kbPath, blueprint.knowledge_base, { spaces: 2 });
+      await fs.writeJson(path.join(process.cwd(), "metadata.json"), {
+        name: blueprint.project_name,
+        description: blueprint.description,
+        requestFramePermissions: []
+      }, { spaces: 2 });
+
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Recovery failed" });
+    }
   });
 
   // Unity Detection
