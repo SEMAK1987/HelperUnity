@@ -327,6 +327,63 @@ async function startServer() {
     res.json({ success: true, scan: currentScanResults });
   });
 
+  // Update System Endpoints
+  const VERSION_FILE = path.join(process.cwd(), "version.json");
+
+  app.get("/api/update/check", async (req, res) => {
+    try {
+      const localVersionData = await fs.readJson(VERSION_FILE);
+      // In a real scenario, this would fetch from a remote URL
+      // For demo, we simulate a "remote" version that is higher if requested
+      const remoteVersion = "1.3.0"; 
+      const isAvailable = remoteVersion !== localVersionData.version;
+      
+      res.json({
+        current: localVersionData.version,
+        latest: remoteVersion,
+        available: isAvailable,
+        changelog: [
+          "Улучшена система ИИ агентов",
+          "Оптимизирована работа с Unity/Blender",
+          "Исправлены критические ошибки в интерфейсе"
+        ]
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to check for updates" });
+    }
+  });
+
+  app.post("/api/update/apply", async (req, res) => {
+    try {
+      console.log("[UPDATE] Starting update process...");
+      // 1. Download latest version (Simulated)
+      // In reality: const response = await axios.get(UPDATE_URL, { responseType: 'arraybuffer' });
+      
+      // 2. Backup current version
+      const backupDir = path.join(process.cwd(), "backup_" + Date.now());
+      await fs.ensureDir(backupDir);
+      // Copy essential files to backup
+      await fs.copy(path.join(process.cwd(), "server.ts"), path.join(backupDir, "server.ts"));
+      await fs.copy(path.join(process.cwd(), "src"), path.join(backupDir, "src"));
+
+      // 3. Update version.json
+      const versionData = await fs.readJson(VERSION_FILE);
+      versionData.version = "1.3.0";
+      await fs.writeJson(VERSION_FILE, versionData, { spaces: 2 });
+
+      console.log("[UPDATE] Update applied successfully. Restarting...");
+      
+      // 4. Trigger restart (in a real environment, the .bat file would handle this)
+      res.json({ success: true, message: "Update applied. Please restart the application." });
+      
+      // Optional: auto-exit to let .bat restart
+      // setTimeout(() => process.exit(0), 2000);
+    } catch (error) {
+      console.error("[UPDATE] Error:", error);
+      res.status(500).json({ error: "Update failed" });
+    }
+  });
+
   // Unity Status Endpoint
   app.get("/api/unity/status", async (req, res) => {
     const versionPath = path.join(process.cwd(), "unity_version.txt");

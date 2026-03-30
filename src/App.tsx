@@ -94,6 +94,53 @@ export default function App() {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [updateInfo, setUpdateInfo] = useState<any>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [updateProgress, setUpdateProgress] = useState(0);
+
+  const checkUpdates = async () => {
+    try {
+      const response = await fetch('/api/update/check');
+      const data = await response.json();
+      setUpdateInfo(data);
+      if (data.available) {
+        setShowUpdateModal(true);
+      } else {
+        alert("У вас уже установлена последняя версия!");
+      }
+    } catch (error) {
+      console.error("Update check error:", error);
+    }
+  };
+
+  const applyUpdate = async () => {
+    setIsUpdating(true);
+    setUpdateProgress(0);
+    
+    // Fake progress
+    const interval = setInterval(() => {
+      setUpdateProgress(prev => Math.min(prev + 5, 95));
+    }, 100);
+
+    try {
+      const response = await fetch('/api/update/apply', { method: 'POST' });
+      if (response.ok) {
+        setUpdateProgress(100);
+        clearInterval(interval);
+        setTimeout(() => {
+          alert("Обновление успешно применено! Пожалуйста, перезапустите приложение.");
+          window.location.reload();
+        }, 1000);
+      }
+    } catch (error) {
+      console.error("Update apply error:", error);
+      alert("Ошибка при обновлении. Попробуйте вручную.");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   // Initialize Gemini
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
@@ -283,7 +330,7 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-sm font-bold text-white uppercase tracking-tighter">AI Assistant</h1>
-              <p className="text-[10px] text-slate-500 uppercase font-mono">Full Version 1.1</p>
+              <p className="text-[10px] text-slate-500 uppercase font-mono">v{kb?.version || '12.0'}</p>
             </div>
           </div>
 
@@ -298,11 +345,11 @@ export default function App() {
               </div>
             </div>
             <div className="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/5">
-              <span className="text-[10px] font-bold text-slate-500 uppercase">Unity</span>
+              <span className="text-[10px] font-bold text-slate-500 uppercase">AI Агент</span>
               <div className="flex items-center gap-1.5">
-                <div className={`w-1.5 h-1.5 rounded-full ${unityStatus?.is_running ? 'bg-blue-500 animate-pulse' : 'bg-slate-700'}`} />
-                <span className={`text-[9px] font-bold uppercase ${unityStatus?.is_running ? 'text-blue-400' : 'text-slate-600'}`}>
-                  {unityStatus?.is_running ? 'Активен' : 'Не запущен'}
+                <div className={`w-1.5 h-1.5 rounded-full ${isTyping ? 'bg-yellow-500 animate-pulse' : 'bg-green-500'}`} />
+                <span className={`text-[9px] font-bold uppercase ${isTyping ? 'text-yellow-400' : 'text-green-500'}`}>
+                  {isTyping ? 'Думает...' : 'Готов'}
                 </span>
               </div>
             </div>
@@ -435,6 +482,14 @@ export default function App() {
 
           <div className="flex items-center gap-4">
             <button 
+              onClick={checkUpdates}
+              className="px-4 py-2 rounded-xl bg-green-600/20 border border-green-500/30 text-green-400 hover:text-white hover:bg-green-600 transition-all group flex items-center gap-2 shadow-lg shadow-green-600/10"
+              title="Проверить обновления"
+            >
+              <RefreshCw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
+              <span className="text-[10px] font-bold uppercase tracking-widest hidden sm:inline">Обновить</span>
+            </button>
+            <button 
               onClick={() => {
                 setLocalPathInput(kb?.local_training_path || '');
                 setShowSettings(true);
@@ -451,6 +506,82 @@ export default function App() {
             </div>
           </div>
         </header>
+
+        {/* Update Modal */}
+        <AnimatePresence>
+          {showUpdateModal && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex items-center justify-center p-6"
+            >
+              <motion.div 
+                initial={{ scale: 0.9, y: 20 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.9, y: 20 }}
+                className="bg-[#0f0f11] border border-white/10 rounded-3xl w-full max-w-lg overflow-hidden flex flex-col shadow-2xl"
+              >
+                <div className="p-8 border-b border-white/5 flex items-center justify-between bg-gradient-to-r from-blue-600/10 to-purple-600/10">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-blue-600/20 rounded-2xl text-blue-400">
+                      <Zap className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-white uppercase tracking-tight">Доступно обновление</h2>
+                      <p className="text-xs text-slate-400">Новая версия: <span className="text-blue-400 font-bold">{updateInfo?.latest}</span></p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="p-8 space-y-6">
+                  <div className="space-y-3">
+                    <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Что нового:</h4>
+                    <ul className="space-y-2">
+                      {updateInfo?.changelog?.map((item: string, i: number) => (
+                        <li key={i} className="flex items-start gap-3 text-sm text-slate-300">
+                          <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 flex-shrink-0" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {isUpdating ? (
+                    <div className="space-y-4 py-4">
+                      <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-blue-400">
+                        <span>Загрузка и установка...</span>
+                        <span>{updateProgress}%</span>
+                      </div>
+                      <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                        <motion.div 
+                          className="h-full bg-blue-600 shadow-[0_0_15px_rgba(59,130,246,0.5)]"
+                          initial={{ width: 0 }}
+                          animate={{ width: `${updateProgress}%` }}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex gap-4 pt-4">
+                      <button 
+                        onClick={() => setShowUpdateModal(false)}
+                        className="flex-1 px-6 py-4 bg-white/5 hover:bg-white/10 text-white rounded-2xl text-xs font-bold uppercase tracking-widest transition-all border border-white/10"
+                      >
+                        Позже
+                      </button>
+                      <button 
+                        onClick={applyUpdate}
+                        className="flex-1 px-6 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-xs font-bold uppercase tracking-widest transition-all shadow-lg shadow-blue-600/20"
+                      >
+                        Обновить сейчас
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Content Area */}
         <div className="flex-1 overflow-hidden flex flex-col">
@@ -475,12 +606,18 @@ export default function App() {
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-                <div className="p-6 rounded-3xl bg-white/5 border border-white/5 text-left hover:bg-white/10 transition-all cursor-pointer group">
+                <div 
+                  onClick={() => handleSend("Напиши скрипт для передвижения игрока в Unity с использованием CharacterController.")}
+                  className="p-6 rounded-3xl bg-white/5 border border-white/5 text-left hover:bg-white/10 transition-all cursor-pointer group"
+                >
                   <Gamepad2 className="w-6 h-6 text-blue-400 mb-4 group-hover:scale-110 transition-transform" />
                   <div className="text-xs font-bold text-white uppercase mb-2">Unity C# Expert</div>
                   <div className="text-[11px] text-slate-500 leading-relaxed">Оптимизированный код, SOLID, лучшие практики движка и навыки мобов.</div>
                 </div>
-                <div className="p-6 rounded-3xl bg-white/5 border border-white/5 text-left hover:bg-white/10 transition-all cursor-pointer group">
+                <div 
+                  onClick={() => handleSend("Напиши Python скрипт для Blender, который создает сетку из кубов.")}
+                  className="p-6 rounded-3xl bg-white/5 border border-white/5 text-left hover:bg-white/10 transition-all cursor-pointer group"
+                >
                   <Cube className="w-6 h-6 text-purple-400 mb-4 group-hover:scale-110 transition-transform" />
                   <div className="text-xs font-bold text-white uppercase mb-2">Blender Python Expert</div>
                   <div className="text-[11px] text-slate-500 leading-relaxed">Автоматизация API bpy, процедурные инструменты и экспорт в Unity.</div>

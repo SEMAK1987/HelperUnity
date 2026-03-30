@@ -20,6 +20,10 @@ if not exist node_modules (
     call npm install
 )
 
+:: 2.5 Проверка обновлений
+echo [ИНФО] Проверка обновлений...
+node check_update.js
+
 :: 3. Запуск
 echo [ИНФО] Запуск сервера на порту 3000...
 echo [ИНФО] Откройте в браузере: http://localhost:3000
