@@ -115,11 +115,16 @@ async function performScan() {
         const stat = await fs.stat(fullPath);
         
         if (stat.isDirectory()) {
-          const excludedDirs = ['node_modules', '.git', 'dist', 'Library', 'Temp', 'Obj', 'Build', 'Logs'];
-          if (!excludedDirs.includes(file)) {
-            await scanDir(fullPath);
+          const excludedDirs = ['node_modules', '.git', 'dist', 'Library', 'Temp', 'Obj', 'Build', 'Logs', 'local_storage', 'uploads', 'backup_*'];
+          // Simple check for backup directories
+          if (excludedDirs.some(d => d.includes('*') ? file.startsWith(d.replace('*', '')) : d === file)) {
+            continue;
           }
+          await scanDir(fullPath);
         } else {
+          const excludedFiles = ['project_stats.json', 'PROJECT_MASTER_BLUEPRINT.md', 'ccgs_project_blueprint.json', 'knowledge_base.json', 'version.json', 'unity_version.txt', 'package.json', 'package-lock.json', 'tsconfig.json'];
+          if (excludedFiles.includes(file)) continue;
+
           results.total_files++;
           const ext = path.extname(file).toLowerCase();
           const relativePath = path.relative(rootDir, fullPath);
@@ -187,7 +192,13 @@ async function startServer() {
         '**/Temp/**',
         '**/Obj/**',
         '**/Build/**',
-        '**/Logs/**'
+        '**/Logs/**',
+        '**/project_stats.json',
+        '**/PROJECT_MASTER_BLUEPRINT.md',
+        '**/ccgs_project_blueprint.json',
+        '**/knowledge_base.json',
+        '**/version.json',
+        '**/unity_version.txt'
       ],
       persistent: true,
       ignoreInitial: true
