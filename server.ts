@@ -145,11 +145,57 @@ async function performScan() {
     results.last_updated = new Date().toISOString();
     currentScanResults = results;
     await saveStats();
+
+    // Sync with Blueprint
+    try {
+      const blueprintPath = path.join(process.cwd(), "ccgs_project_blueprint.json");
+      if (await fs.pathExists(blueprintPath)) {
+        const blueprint = await fs.readJson(blueprintPath);
+        blueprint.project_assets = {
+          scripts_count: results.scripts.length,
+          prefabs_count: results.prefabs.length,
+          videos_count: results.videos.length,
+          total_files: results.total_files,
+          video_list: results.videos,
+          script_list: results.scripts
+        };
+        blueprint.last_scan = results.last_updated;
+        await fs.writeJson(blueprintPath, blueprint, { spaces: 2 });
+      }
+    } catch (e) {
+      console.error("Failed to sync scan results with blueprint", e);
+    }
+
     console.log("Project scan completed successfully.");
+    await checkProjectIntegrity();
   } catch (error) {
     console.error("Project scan failed:", error);
   } finally {
     isScanning = false;
+  }
+}
+
+async function checkProjectIntegrity() {
+  const files = [
+    { name: "knowledge_base.json", default: { project_name: "Unity Assistant", project_path: process.cwd(), system_instruction: "You are a helpful assistant." } },
+    { name: "ccgs_project_blueprint.json", default: { project_name: "Unity Assistant", version: "1.1.0", interface_structure: { tabs: ["studio", "kb", "commands", "files"] }, agents_count: 49 } },
+    { name: "version.json", default: { version: "1.2.0" } }
+  ];
+
+  for (const file of files) {
+    const filePath = path.join(process.cwd(), file.name);
+    try {
+      if (!(await fs.pathExists(filePath))) {
+        console.log(`[INTEGRITY] Restoring missing file: ${file.name}`);
+        await fs.writeJson(filePath, file.default, { spaces: 2 });
+      } else {
+        // Try to parse to check for corruption
+        await fs.readJson(filePath);
+      }
+    } catch (e) {
+      console.error(`[INTEGRITY] File ${file.name} is corrupted. Resetting to default.`);
+      await fs.writeJson(filePath, file.default, { spaces: 2 });
+    }
   }
 }
 
@@ -266,7 +312,19 @@ async function startServer() {
       md += `\n### Системные инструкции\n`;
       md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-      md += `## 5. Инструкции по восстановлению\n`;
+      md += `## 5. Статистика файлов проекта\n`;
+      md += `- **Всего файлов:** ${currentScanResults.total_files}\n`;
+      md += `- **Скрипты (C#):** ${currentScanResults.scripts.length}\n`;
+      md += `- **Префабы:** ${currentScanResults.prefabs.length}\n`;
+      md += `- **Видео:** ${currentScanResults.videos.length}\n\n`;
+
+      if (currentScanResults.videos.length > 0) {
+        md += `### Список видео-файлов\n`;
+        currentScanResults.videos.forEach((v: string) => md += `- ${v}\n`);
+        md += `\n`;
+      }
+
+      md += `## 6. Инструкции по восстановлению\n`;
       md += `1. Установите Node.js (v18+).\n`;
       md += `2. Склонируйте репозиторий: \`git clone https://github.com/SEMAK1987/unity-ai-assistant.git\`\n`;
       md += `3. Запустите \`RUN.bat\` для автоматической установки зависимостей и запуска.\n`;
@@ -453,7 +511,8 @@ async function startServer() {
     
     // Run initial tasks after server is up
     setTimeout(async () => {
-      console.log("Running initial project scan and blueprint generation...");
+      console.log("Running initial project integrity check, scan and blueprint generation...");
+      await checkProjectIntegrity();
       await performScan();
       await generateMasterBlueprint();
     }, 1000);

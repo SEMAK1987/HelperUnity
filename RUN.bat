@@ -27,7 +27,8 @@ echo [INFO] Running 'npm install'...
 call npm install
 
 echo [INFO] Starting server on port 3001...
-echo [INFO] Open in browser: http://localhost:3001
+echo [INFO] Opening browser: http://localhost:3001
+start http://localhost:3001
 set PORT=3001
 echo [INFO] Running 'npm run dev'...
 npm run dev
