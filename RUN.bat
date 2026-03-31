@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 echo ============================================================
-echo [AI Assistant] Unity & Blender Assistant - ЗАПУСК
+echo [AI Assistant] Unity ^& Blender Assistant - ЗАПУСК
 echo ============================================================
 
 :: 1. Проверка Node.js

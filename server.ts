@@ -110,7 +110,8 @@ async function performScan() {
         const stat = await fs.stat(fullPath);
         
         if (stat.isDirectory()) {
-          if (file !== 'node_modules' && file !== '.git' && file !== 'dist') {
+          const excludedDirs = ['node_modules', '.git', 'dist', 'Library', 'Temp', 'Obj', 'Build', 'Logs'];
+          if (!excludedDirs.includes(file)) {
             await scanDir(fullPath);
           }
         } else {
@@ -142,7 +143,7 @@ async function performScan() {
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = Number(process.env.PORT) || 3000;
 
   app.use(cors());
   app.use(express.json({ limit: '50mb' }));
@@ -170,7 +171,17 @@ async function startServer() {
 
     console.log(`Starting watcher on: ${watchPath}`);
     watcher = chokidar.watch(watchPath, {
-      ignored: [/(^|[\/\\])\../, '**/node_modules/**', '**/dist/**', '**/local_storage/**'],
+      ignored: [
+        /(^|[\/\\])\../, 
+        '**/node_modules/**', 
+        '**/dist/**', 
+        '**/local_storage/**',
+        '**/Library/**',
+        '**/Temp/**',
+        '**/Obj/**',
+        '**/Build/**',
+        '**/Logs/**'
+      ],
       persistent: true,
       ignoreInitial: true
     });
@@ -190,9 +201,6 @@ async function startServer() {
   }
 
   await initWatcher();
-
-  // Initial scan
-  await performScan();
 
   const generateMasterBlueprint = async () => {
     try {
@@ -425,8 +433,16 @@ async function startServer() {
 
   app.listen(PORT, "0.0.0.0", async () => {
     console.log(`Server running on http://localhost:${PORT}`);
-    await generateMasterBlueprint();
+    
+    // Run initial tasks after server is up
+    setTimeout(async () => {
+      console.log("Running initial project scan and blueprint generation...");
+      await performScan();
+      await generateMasterBlueprint();
+    }, 1000);
   });
 }
 
-startServer();
+startServer().catch(err => {
+  console.error("CRITICAL SERVER ERROR:", err);
+});
