@@ -183,23 +183,21 @@ async function startServer() {
 
     console.log(`Starting watcher on: ${watchPath}`);
     watcher = chokidar.watch(watchPath, {
-      ignored: [
-        /(^|[\/\\])\../, 
-        '**/node_modules/**', 
-        '**/dist/**', 
-        '**/local_storage/**',
-        '**/Library/**',
-        '**/Temp/**',
-        '**/Obj/**',
-        '**/Build/**',
-        '**/Logs/**',
-        '**/project_stats.json',
-        '**/PROJECT_MASTER_BLUEPRINT.md',
-        '**/ccgs_project_blueprint.json',
-        '**/knowledge_base.json',
-        '**/version.json',
-        '**/unity_version.txt'
-      ],
+      ignored: (path: string) => {
+        const basename = path.split(/[\\/]/).pop();
+        if (!basename) return false;
+        
+        const ignoredNames = [
+          'node_modules', 'dist', 'local_storage', 'Library', 'Temp', 'Obj', 'Build', 'Logs', 'uploads',
+          'project_stats.json', 'PROJECT_MASTER_BLUEPRINT.md', 'ccgs_project_blueprint.json',
+          'knowledge_base.json', 'version.json', 'unity_version.txt'
+        ];
+        
+        if (basename.startsWith('.')) return true;
+        if (ignoredNames.includes(basename)) return true;
+        
+        return false;
+      },
       persistent: true,
       ignoreInitial: true
     });
@@ -207,8 +205,9 @@ async function startServer() {
     const debouncedScan = (() => {
       let timeout: NodeJS.Timeout;
       return () => {
+        if (isScanning) return;
         clearTimeout(timeout);
-        timeout = setTimeout(() => performScan(), 1000);
+        timeout = setTimeout(() => performScan(), 2000);
       };
     })();
 
