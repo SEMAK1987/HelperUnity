@@ -1,75 +1,52 @@
 @echo off
-setlocal enabledelayedexpansion
+chcp 65001 >nul
+setlocal
 
-:: Переходим в папку, где лежит сам батник
+:: Go to the folder where the script is located
 cd /d "%~dp0"
 
 echo ============================================================
 echo [CCGS] Claude Code Game Studios - START (PORT 3001)
 echo ============================================================
 
-:: 1. Clear port 3001 (if occupied)
-echo [INFO] Checking port 3001...
-for /f "tokens=5" %%a in ('netstat -aon ^| findstr :3001 ^| findstr LISTENING') do (
-    echo [INFO] Found old process (PID: %%a). Terminating...
-    taskkill /F /PID %%a >nul 2>&1
-)
-
-:: 2. Проверка Node.js
-node -v >node_v.txt 2>&1
-if %errorlevel% neq 0 (
-    echo [ОШИБКА] Node.js не найден! 
-    echo Пожалуйста, установите его с https://nodejs.org/
-    if exist node_v.txt del node_v.txt
+:: 1. Check Node.js
+echo [INFO] Checking Node.js...
+node -v
+if errorlevel 1 (
+    echo [ERROR] Node.js not found. Please install it from https://nodejs.org/
     pause
     exit /b
 )
-set /p NODE_VER=<node_v.txt
-echo [ИНФО] Используется Node.js: %NODE_VER%
-if exist node_v.txt del node_v.txt
 
-:: 3. Поиск Unity в стандартных путях Unity Hub
+:: 2. Check for Unity
 set "UNITY_PATH="
 set "HUB_PATH=C:\Program Files\Unity\Hub\Editor"
-
-echo [ИНФО] Поиск установленных версий Unity...
-
+echo [INFO] Searching for Unity...
 if exist "%HUB_PATH%" (
     for /d %%i in ("%HUB_PATH%\*") do (
         if exist "%%i\Editor\Unity.exe" (
             set "UNITY_PATH=%%i\Editor\Unity.exe"
             set "VERSION=%%~nxi"
-            echo [УСПЕХ] Найдена версия: !VERSION!
+            echo [SUCCESS] Found Unity version: !VERSION!
         )
     )
 )
 
-if defined UNITY_PATH (
-    echo %VERSION% > unity_version.txt
-) else (
-    echo [ИНФО] Unity не найдена в стандартных путях Hub.
-    if exist unity_version.txt del unity_version.txt
-)
-
-:: 4. Установка зависимостей
+:: 3. Install dependencies
 if not exist node_modules (
-    echo [ИНФО] Установка компонентов (может занять время)...
+    echo [INFO] Installing dependencies (this may take a minute)...
     call npm install
 )
 
-:: 4.5 Проверка обновлений
-echo [ИНФО] Проверка обновлений...
-node check_update.js
-
-:: 5. Start
+:: 4. Start server
 echo [INFO] Opening browser: http://localhost:3001
 start http://localhost:3001
 
-echo [INFO] Starting application server...
+echo [INFO] Starting server on port 3001...
 set PORT=3001
 npm run dev
 
-if %errorlevel% neq 0 (
+if errorlevel 1 (
     echo [ERROR] Server failed to start.
     pause
 )
