@@ -1,36 +1,40 @@
 @echo off
+chcp 65001 >nul
 setlocal enabledelayedexpansion
 
 echo ============================================================
-echo [AI Assistant] Unity ^& Blender Assistant - ЗАПУСК
+echo [AI Assistant] Unity & Blender Assistant - START
 echo ============================================================
 
-:: 1. Проверка Node.js
-node -v >nul 2>&1
+:: 1. Check Node.js
+echo [INFO] Checking Node.js...
+node -v
 if %errorlevel% neq 0 (
-    echo [ОШИБКА] Node.js не найден! 
-    echo Пожалуйста, установите его с https://nodejs.org/ (версия 18+)
+    echo [ERROR] Node.js not found!
+    echo Please install it from https://nodejs.org/ (v18+)
     pause
     exit /b
 )
 
-:: 2. Установка зависимостей
+:: 2. Install dependencies
 if not exist node_modules (
-    echo [ИНФО] Установка компонентов...
+    echo [INFO] Installing dependencies (first run)...
     call npm install
 )
 
-:: 2.5 Проверка обновлений
-echo [ИНФО] Проверка обновлений...
-node check_update.js
+:: 2.5 Check for updates
+if exist check_update.js (
+    echo [INFO] Checking for updates...
+    node check_update.js
+)
 
-:: 3. Запуск
-echo [ИНФО] Запуск сервера на порту 3000...
-echo [ИНФО] Откройте в браузере: http://localhost:3000
+:: 3. Start server
+echo [INFO] Starting server on port 3000...
+echo [INFO] Open in browser: http://localhost:3000
 set PORT=3000
 npm run dev
 
 if %errorlevel% neq 0 (
-    echo [ОШИБКА] Ошибка при запуске.
+    echo [ERROR] Server failed to start.
     pause
 )

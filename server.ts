@@ -74,7 +74,12 @@ async function saveStats() {
   }
 }
 
+let isScanning = false;
+
 async function performScan() {
+  if (isScanning) return;
+  isScanning = true;
+  
   const kbPath = path.join(process.cwd(), "knowledge_base.json");
   let rootDir = process.cwd();
   
@@ -138,6 +143,8 @@ async function performScan() {
     console.log("Project scan completed successfully.");
   } catch (error) {
     console.error("Project scan failed:", error);
+  } finally {
+    isScanning = false;
   }
 }
 
