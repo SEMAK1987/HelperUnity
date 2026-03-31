@@ -5,13 +5,13 @@ setlocal enabledelayedexpansion
 cd /d "%~dp0"
 
 echo ============================================================
-echo [CCGS] Claude Code Game Studios - ЗАПУСК (ПОРТ 3000)
+echo [CCGS] Claude Code Game Studios - START (PORT 3001)
 echo ============================================================
 
-:: 1. Очистка порта 3000 (на случай если он занят)
-echo [ИНФО] Проверка порта 3000...
-for /f "tokens=5" %%a in ('netstat -aon ^| findstr :3000 ^| findstr LISTENING') do (
-    echo [ИНФО] Обнаружен старый процесс (PID: %%a). Завершение...
+:: 1. Clear port 3001 (if occupied)
+echo [INFO] Checking port 3001...
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr :3001 ^| findstr LISTENING') do (
+    echo [INFO] Found old process (PID: %%a). Terminating...
     taskkill /F /PID %%a >nul 2>&1
 )
 
@@ -61,15 +61,15 @@ if not exist node_modules (
 echo [ИНФО] Проверка обновлений...
 node check_update.js
 
-:: 5. Запуск
-echo [ИНФО] Автоматическое открытие браузера: http://localhost:3000
-start http://localhost:3000
+:: 5. Start
+echo [INFO] Opening browser: http://localhost:3001
+start http://localhost:3001
 
-echo [ИНФО] Запуск сервера приложения...
-set PORT=3000
+echo [INFO] Starting application server...
+set PORT=3001
 npm run dev
 
 if %errorlevel% neq 0 (
-    echo [ОШИБКА] Ошибка при запуске сервера.
+    echo [ERROR] Server failed to start.
     pause
 )
