@@ -65,7 +65,9 @@ let currentScanResults: any = {
 
 const statsPath = path.join(process.cwd(), "project_stats.json");
 const historyPath = path.join(process.cwd(), "history.json");
-const KB_FILE = path.join(process.cwd(), "knowledge_base.json");
+const kbPath = path.join(process.cwd(), "knowledge_base.json");
+const blueprintJsonPath = path.join(process.cwd(), "ccgs_project_blueprint.json");
+const masterBlueprintMdPath = path.join(process.cwd(), "PROJECT_MASTER_BLUEPRINT.md");
 const UNITY_API_FILE = path.join(process.cwd(), "unity_api_ref.json");
 const BLENDER_API_FILE = path.join(process.cwd(), "blender_api_ref.json");
 const TROUBLESHOOTING_FILE = path.join(process.cwd(), "troubleshooting_db.json");
@@ -333,8 +335,8 @@ async function checkProjectIntegrity() {
 
 async function generateMasterBlueprint() {
   try {
-    const kb = await fs.readJson(KB_FILE);
-    const blueprint = await fs.readJson(BLUEPRINT_JSON_PATH);
+    const kb = await fs.readJson(kbPath);
+    const blueprint = await fs.readJson(blueprintJsonPath);
     
     let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"}\n\n`;
     md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов и инструкции по восстановлению.\n\n`;
@@ -405,14 +407,20 @@ async function generateMasterBlueprint() {
     md += `- **Unity Bridge:** Автоматическая конвертация материалов Blender -> Unity (URP/HDRP).\n`;
     md += `- **Blender Automation:** Пакетный экспорт объектов, очистка сцен, настройка освещения.\n`;
     md += `- **Git LFS:** Автоматическая генерация конфигурации для тяжелых ассетов.\n`;
-    md += `- **Offline API Docs:** Локальные справочники Unity API и Blender Python.\n\n`;
+    md += `- **Offline API Docs:** Локальные справочники Unity API и Blender Python.\n`;
+    md += `- **Inventory Expert:** Проектирование систем инвентаря (Слоты, Сетки, Списки).\n\n`;
 
-    md += `## 7. Инструкции по восстановлению\n`;
+    md += `## 7. База знаний: Системы инвентаря\n`;
+    md += `- **Типы:** Слоты (шутеры), Сетка (тетрис), Список (MMORPG), Категории.\n`;
+    md += `- **Компоненты:** Контейнеры, ItemData, Слоты, Действия (CRUD).\n`;
+    md += `- **Оптимизация:** Складывание (stacking), ограничения по весу, горячие клавиши.\n\n`;
+
+    md += `## 8. Инструкции по восстановлению\n`;
     md += `1. Установите Node.js (v18+).\n`;
     md += `2. Склонируйте репозиторий: \`git clone https://github.com/SEMAK1987/unity-ai-assistant.git\`\n`;
     md += `3. Запустите \`RUN.bat\` для автоматической установки зависимостей и запуска.\n`;
 
-    await fs.writeFile(MASTER_BLUEPRINT_MD_PATH, md);
+    await fs.writeFile(masterBlueprintMdPath, md);
     console.log("Master blueprint generated successfully.");
   } catch (e) {
     console.error("Failed to generate master blueprint", e);
@@ -425,10 +433,6 @@ async function startServer() {
 
   app.use(cors());
   app.use(express.json({ limit: '50mb' }));
-
-  const kbPath = path.join(process.cwd(), "knowledge_base.json");
-  const blueprintJsonPath = path.join(process.cwd(), "ccgs_project_blueprint.json");
-  const masterBlueprintMdPath = path.join(process.cwd(), "PROJECT_MASTER_BLUEPRINT.md");
 
   await loadStats();
 
@@ -787,6 +791,10 @@ async function startServer() {
         {
           title: "Самовосстановление",
           desc: "Автоматическое исправление ошибок в конфигурации, восстановление серверов и регенерация Master Blueprint для защиты проекта."
+        },
+        {
+          title: "Системы инвентаря (Unity)",
+          desc: "Проектирование и реализация различных типов инвентаря: слоты, сетки (тетрис), списки с группировкой, системы веса и крафта."
         }
       ],
       files_handled: [
@@ -801,7 +809,13 @@ async function startServer() {
         "Action / Shooter (FPS камера, системы оружия)",
         "Simulation (Экономика, профессии, инвентарь)",
         "Multiplayer (Основы сетевого взаимодействия и синхронизации)"
-      ]
+      ],
+      inventory_guide: {
+        types: ["Слоты (Шутеры)", "Сетка / Тетрис (Diablo-style)", "Список (MMORPG)", "Кукла экипировки (Paper Doll)"],
+        components: ["Контейнеры & Сундуки", "ScriptableObjects (ItemData)", "Drag & Drop (IDragHandler)", "Tooltips & Context Menus"],
+        features: ["Редкость (Common-Legendary)", "Вес и Ограничения", "Складывание (Stacking)", "Сохранение (JSON/Binary)", "Крафт"],
+        unity_implementation: ["InventoryManager (Singleton)", "UI Object Pooling", "CanvasGroup Logic", "Persistence System"]
+      }
     };
     res.json(capabilities);
   });

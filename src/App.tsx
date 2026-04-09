@@ -1506,6 +1506,48 @@ export default function App() {
                       ))}
                     </div>
                   </div>
+
+                  {capabilities.inventory_guide && (
+                    <div className="space-y-6">
+                      <h3 className="text-xs font-bold text-white uppercase tracking-widest flex items-center gap-3">
+                        <Box className="w-4 h-4 text-orange-400" /> Системы инвентаря
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="p-5 rounded-3xl bg-white/5 border border-white/5 space-y-3">
+                          <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Типы</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {capabilities.inventory_guide.types.map((t: string, i: number) => (
+                              <span key={i} className="px-3 py-1 rounded-lg bg-black/40 text-[10px] text-slate-300">{t}</span>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="p-5 rounded-3xl bg-white/5 border border-white/5 space-y-3">
+                          <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Компоненты</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {capabilities.inventory_guide.components.map((c: string, i: number) => (
+                              <span key={i} className="px-3 py-1 rounded-lg bg-black/40 text-[10px] text-slate-300">{c}</span>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="p-5 rounded-3xl bg-white/5 border border-white/5 space-y-3">
+                          <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Особенности</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {capabilities.inventory_guide.features.map((f: string, i: number) => (
+                              <span key={i} className="px-3 py-1 rounded-lg bg-black/40 text-[10px] text-slate-300">{f}</span>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="p-5 rounded-3xl bg-white/5 border border-white/5 space-y-3">
+                          <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Реализация Unity</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {capabilities.inventory_guide.unity_implementation.map((u: string, i: number) => (
+                              <span key={i} className="px-3 py-1 rounded-lg bg-black/40 text-[10px] text-slate-300">{u}</span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="p-8 bg-white/5 border-t border-white/5 flex justify-center">
