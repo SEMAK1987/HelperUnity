@@ -26,12 +26,17 @@ echo [INFO] Installing dependencies (this may take a minute)...
 echo [INFO] Running 'npm install'...
 call npm install
 
+:start_server
 echo [INFO] Starting server on port 3001...
 echo [INFO] Opening browser: http://localhost:3001
 start http://localhost:3001
 set PORT=3001
 echo [INFO] Running 'npm run dev'...
 npm run dev
+
+echo [WARNING] Server crashed or stopped. Restarting in 5 seconds...
+timeout /t 5
+goto start_server
 
 if errorlevel 1 (
     echo [ERROR] Server failed to start or was stopped.

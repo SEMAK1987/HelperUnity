@@ -65,6 +65,28 @@ interface ProjectScan {
   others: string[];
   total_files: number;
   last_updated?: string;
+  analysis: {
+    audit_issues: { file: string; type: string; message: string }[];
+    todos: { file: string; type: string; text: string }[];
+    asset_stats: {
+      total_size: number;
+      large_files: { path: string; size: string }[];
+    };
+    dependencies: Record<string, string[]>;
+  };
+}
+
+interface HistoryItem {
+  event: string;
+  path: string;
+  timestamp: string;
+}
+
+interface BlenderPreset {
+  id: string;
+  name: string;
+  desc: string;
+  code: string;
 }
 
 interface UnityStatus {
@@ -73,10 +95,15 @@ interface UnityStatus {
   project_path: string;
 }
 
+interface BlenderStatus {
+  is_running: boolean;
+  version: string;
+}
+
 // --- App Component ---
 export default function App() {
   const [kb, setKb] = useState<KBData | null>(null);
-  const [activeTab, setActiveTab] = useState<'chat' | 'project_info'>('chat');
+  const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info'>('chat');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -84,6 +111,10 @@ export default function App() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [projectScan, setProjectScan] = useState<ProjectScan | null>(null);
   const [unityStatus, setUnityStatus] = useState<UnityStatus | null>(null);
+  const [blenderStatus, setBlenderStatus] = useState<BlenderStatus | null>(null);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [blenderPresets, setBlenderPresets] = useState<BlenderPreset[]>([]);
+  const [isRepairing, setIsRepairing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [showGithubGuide, setShowGithubGuide] = useState(false);
@@ -158,10 +189,22 @@ export default function App() {
       .then(res => res.json())
       .then(data => data.success && setProjectScan(data.scan));
 
+    fetch('/api/blender/presets')
+      .then(res => res.json())
+      .then(data => setBlenderPresets(data));
+
     const statusInterval = setInterval(() => {
       fetch('/api/unity/status')
         .then(res => res.json())
         .then(status => setUnityStatus(status));
+      
+      fetch('/api/blender/status')
+        .then(res => res.json())
+        .then(status => setBlenderStatus(status));
+      
+      fetch('/api/project/history')
+        .then(res => res.json())
+        .then(data => setHistory(data));
       
       fetch('/api/project/scan')
         .then(res => res.json())
@@ -227,6 +270,22 @@ export default function App() {
     setIsTyping(true);
 
     try {
+      // Offline Fallback Check
+      if (!isOnline) {
+        const localRes = await fetch('/api/ai/local-search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: text })
+        });
+        const localData = await localRes.json();
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: `[ОФЛАЙН РЕЖИМ]\n\n${localData.answer}`,
+          timestamp: Date.now()
+        }]);
+        return;
+      }
+
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: text,
@@ -244,13 +303,44 @@ export default function App() {
       setMessages(prev => [...prev, aiMsg]);
     } catch (error) {
       console.error("Gemini Error:", error);
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: "Ошибка: Не удалось подключиться к ИИ. Пожалуйста, проверьте ваш API ключ.",
-        timestamp: Date.now()
-      }]);
+      // Fallback to local search on error
+      try {
+        const localRes = await fetch('/api/ai/local-search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: text })
+        });
+        const localData = await localRes.json();
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: `[ОШИБКА СЕТИ - ЛОКАЛЬНЫЙ ПОИСК]\n\n${localData.answer}`,
+          timestamp: Date.now()
+        }]);
+      } catch (e) {
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: "Ошибка: Не удалось подключиться к ИИ и локальный поиск недоступен.",
+          timestamp: Date.now()
+        }]);
+      }
     } finally {
       setIsTyping(false);
+    }
+  };
+
+  const handleRepair = async () => {
+    setIsRepairing(true);
+    try {
+      const res = await fetch('/api/system/repair', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        alert(data.message);
+        window.location.reload();
+      }
+    } catch (error) {
+      alert("Ошибка при восстановлении системы.");
+    } finally {
+      setIsRepairing(false);
     }
   };
 
@@ -424,6 +514,44 @@ export default function App() {
             )}
           </div>
 
+          {/* Software Status */}
+          <div className="space-y-4">
+            <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+              <Settings className="w-3 h-3" /> Статус ПО
+            </h3>
+            <div className="space-y-2">
+              <div className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Gamepad2 className="w-3.5 h-3.5 text-blue-400" />
+                  <span className="text-[10px] text-slate-300">Unity</span>
+                </div>
+                <span className="text-[9px] font-mono text-slate-500">{unityStatus?.version || '---'}</span>
+              </div>
+              <div className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Cube className="w-3.5 h-3.5 text-purple-400" />
+                  <span className="text-[10px] text-slate-300">Blender</span>
+                </div>
+                <span className="text-[9px] font-mono text-slate-500">{blenderStatus?.version || '---'}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* System Repair Button */}
+          <button 
+            onClick={handleRepair}
+            disabled={isRepairing}
+            className="w-full p-4 rounded-2xl bg-red-600/10 border border-red-500/20 hover:bg-red-600/20 hover:border-red-500/40 transition-all group text-left"
+          >
+            <div className="flex items-center gap-3 mb-1">
+              <div className={`p-2 bg-black/40 rounded-lg group-hover:text-red-400 transition-colors ${isRepairing ? 'animate-spin' : ''}`}>
+                <RefreshCw className="w-4 h-4" />
+              </div>
+              <span className="text-[11px] font-bold text-white uppercase">Самоочистка</span>
+            </div>
+            <p className="text-[9px] text-slate-500 leading-relaxed">Исправить ошибки и восстановить целостность системы.</p>
+          </button>
+
           {/* GitHub Guide Button */}
           <button 
             onClick={() => setShowGithubGuide(true)}
@@ -468,6 +596,14 @@ export default function App() {
                 }`}
               >
                 <Send className="w-3.5 h-3.5" /> Чат
+              </button>
+              <button 
+                onClick={() => setActiveTab('dashboard')}
+                className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 ${
+                  activeTab === 'dashboard' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-500 hover:text-slate-300'
+                }`}
+              >
+                <Layers className="w-3.5 h-3.5" /> Дашборд
               </button>
               <button 
                 onClick={() => setActiveTab('project_info')}
@@ -780,7 +916,172 @@ export default function App() {
           </p>
         </div>
             </>
-          ) : (
+          ) : activeTab === 'dashboard' ? (
+            <div className="flex-1 overflow-y-auto p-8 scrollbar-thin scrollbar-thumb-white/5 space-y-8">
+              <div className="max-w-6xl mx-auto space-y-8">
+                
+                {/* Top Stats Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="p-6 rounded-3xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="p-3 bg-blue-600/20 rounded-2xl text-blue-400">
+                        <AlertTriangle className="w-5 h-5" />
+                      </div>
+                      <h3 className="text-xs font-bold text-white uppercase tracking-widest">Аудит кода</h3>
+                    </div>
+                    <div className="text-2xl font-bold text-white mb-1">{projectScan?.analysis.audit_issues.length || 0}</div>
+                    <p className="text-[10px] text-slate-500 uppercase">Проблем производительности</p>
+                  </div>
+                  
+                  <div className="p-6 rounded-3xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="p-3 bg-purple-600/20 rounded-2xl text-purple-400">
+                        <Check className="w-5 h-5" />
+                      </div>
+                      <h3 className="text-xs font-bold text-white uppercase tracking-widest">Задачи (TODO)</h3>
+                    </div>
+                    <div className="text-2xl font-bold text-white mb-1">{projectScan?.analysis.todos.length || 0}</div>
+                    <p className="text-[10px] text-slate-500 uppercase">Активных задач в коде</p>
+                  </div>
+
+                  <div className="p-6 rounded-3xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="p-3 bg-green-600/20 rounded-2xl text-green-400">
+                        <Box className="w-5 h-5" />
+                      </div>
+                      <h3 className="text-xs font-bold text-white uppercase tracking-widest">Оптимизация</h3>
+                    </div>
+                    <div className="text-2xl font-bold text-white mb-1">
+                      {(projectScan?.analysis.asset_stats.total_size ? (projectScan.analysis.asset_stats.total_size / 1024 / 1024).toFixed(1) : 0)} MB
+                    </div>
+                    <p className="text-[10px] text-slate-500 uppercase">Общий вес ассетов</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {/* Audit & Todos */}
+                  <div className="space-y-8">
+                    <section className="p-8 rounded-[2.5rem] bg-black/40 border border-white/5">
+                      <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6 flex items-center gap-3">
+                        <Terminal className="w-4 h-4 text-blue-400" /> Результаты аудита
+                      </h3>
+                      <div className="space-y-4">
+                        {projectScan?.analysis.audit_issues.map((issue, i) => (
+                          <div key={i} className="p-4 rounded-2xl bg-red-600/5 border border-red-500/20 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-bold text-red-400 uppercase">{issue.type}</span>
+                              <span className="text-[9px] text-slate-500 font-mono">{issue.file}</span>
+                            </div>
+                            <p className="text-xs text-slate-300 leading-relaxed">{issue.message}</p>
+                          </div>
+                        ))}
+                        {(!projectScan?.analysis.audit_issues.length) && (
+                          <p className="text-xs text-slate-600 italic">Проблем не обнаружено. Ваш код оптимизирован!</p>
+                        )}
+                      </div>
+                    </section>
+
+                    <section className="p-8 rounded-[2.5rem] bg-black/40 border border-white/5">
+                      <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6 flex items-center gap-3">
+                        <Check className="w-4 h-4 text-purple-400" /> Список задач (AI To-Do)
+                      </h3>
+                      <div className="space-y-3">
+                        {projectScan?.analysis.todos.map((todo, i) => (
+                          <div key={i} className="flex items-start gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 group hover:bg-white/10 transition-all">
+                            <div className={`mt-1 w-2 h-2 rounded-full flex-shrink-0 ${todo.type === 'FIXME' ? 'bg-red-500' : 'bg-yellow-500'}`} />
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase">{todo.type}</span>
+                                <span className="text-[9px] text-slate-600 font-mono">{todo.file}</span>
+                              </div>
+                              <p className="text-xs text-slate-200">{todo.text}</p>
+                            </div>
+                          </div>
+                        ))}
+                        {(!projectScan?.analysis.todos.length) && (
+                          <p className="text-xs text-slate-600 italic">Задач TODO не найдено.</p>
+                        )}
+                      </div>
+                    </section>
+                  </div>
+
+                  {/* Assets & History */}
+                  <div className="space-y-8">
+                    <section className="p-8 rounded-[2.5rem] bg-black/40 border border-white/5">
+                      <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6 flex items-center gap-3">
+                        <Cube className="w-4 h-4 text-green-400" /> Тяжелые ассеты
+                      </h3>
+                      <div className="space-y-3">
+                        {projectScan?.analysis.asset_stats.large_files.map((asset, i) => (
+                          <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
+                            <div className="flex items-center gap-3 overflow-hidden">
+                              <ImageIcon className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                              <span className="text-xs text-slate-300 truncate">{asset.path}</span>
+                            </div>
+                            <span className="text-[10px] font-mono text-red-400 font-bold ml-4">{asset.size}</span>
+                          </div>
+                        ))}
+                        {(!projectScan?.analysis.asset_stats.large_files.length) && (
+                          <p className="text-xs text-slate-600 italic">Все ассеты в пределах нормы (до 10MB).</p>
+                        )}
+                      </div>
+                    </section>
+
+                    <section className="p-8 rounded-[2.5rem] bg-black/40 border border-white/5">
+                      <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6 flex items-center gap-3">
+                        <RefreshCw className="w-4 h-4 text-blue-400" /> История изменений (Mini-Git)
+                      </h3>
+                      <div className="space-y-4 max-h-[400px] overflow-y-auto scrollbar-none pr-2">
+                        {history.map((item, i) => (
+                          <div key={i} className="relative pl-6 border-l border-white/10 pb-4 last:pb-0">
+                            <div className={`absolute left-[-4px] top-0 w-2 h-2 rounded-full ${
+                              item.event === 'add' ? 'bg-green-500' : 
+                              item.event === 'change' ? 'bg-blue-500' : 
+                              'bg-red-500'
+                            }`} />
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-[10px] font-bold text-white uppercase">{item.event}</span>
+                              <span className="text-[9px] text-slate-600">{new Date(item.timestamp).toLocaleTimeString()}</span>
+                            </div>
+                            <p className="text-[11px] text-slate-400 truncate">{item.path}</p>
+                          </div>
+                        ))}
+                        {history.length === 0 && (
+                          <p className="text-xs text-slate-600 italic">История пуста. Начните работу с файлами!</p>
+                        )}
+                      </div>
+                    </section>
+
+                    {/* Blender Presets */}
+                    <section className="p-8 rounded-[2.5rem] bg-gradient-to-br from-purple-600/10 to-blue-600/10 border border-white/10">
+                      <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6 flex items-center gap-3">
+                        <Cube className="w-4 h-4 text-purple-400" /> Пресеты Blender
+                      </h3>
+                      <div className="grid grid-cols-1 gap-4">
+                        {blenderPresets.map((preset) => (
+                          <div key={preset.id} className="p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-purple-500/30 transition-all group">
+                            <div className="flex items-center justify-between mb-2">
+                              <h4 className="text-xs font-bold text-white uppercase">{preset.name}</h4>
+                              <button 
+                                onClick={() => copyToClipboard(preset.code, preset.id)}
+                                className="p-1.5 hover:bg-white/5 rounded-md text-slate-500 hover:text-white transition-all"
+                              >
+                                {copiedId === preset.id ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
+                              </button>
+                            </div>
+                            <p className="text-[10px] text-slate-500 mb-3">{preset.desc}</p>
+                            <div className="bg-black/60 rounded-lg p-3 font-mono text-[9px] text-purple-400 overflow-x-auto">
+                              {preset.code.split('\n')[0]}...
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : activeTab === 'project_info' ? (
             <div className="flex-1 overflow-y-auto p-8 scrollbar-thin scrollbar-thumb-white/5">
               <div className="max-w-4xl mx-auto">
                 <div className="bg-white/5 border border-white/5 rounded-[2.5rem] p-10 shadow-2xl relative overflow-hidden group">
@@ -815,7 +1116,7 @@ export default function App() {
                 </div>
               </div>
             </div>
-          )}
+          ) : null}
         </div>
       </main>
 

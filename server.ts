@@ -51,10 +51,42 @@ let currentScanResults: any = {
   videos: [],
   others: [],
   total_files: 0,
-  last_updated: new Date().toISOString()
+  last_updated: new Date().toISOString(),
+  analysis: {
+    audit_issues: [],
+    todos: [],
+    asset_stats: {
+      total_size: 0,
+      large_files: []
+    },
+    dependencies: {}
+  }
 };
 
 const statsPath = path.join(process.cwd(), "project_stats.json");
+const historyPath = path.join(process.cwd(), "history.json");
+
+async function loadHistory() {
+  if (!(await fs.pathExists(historyPath))) {
+    await fs.writeJson(historyPath, [], { spaces: 2 });
+  }
+  return await fs.readJson(historyPath);
+}
+
+async function addToHistory(event: string, filePath: string) {
+  try {
+    const history = await loadHistory();
+    history.unshift({
+      event,
+      path: filePath,
+      timestamp: new Date().toISOString()
+    });
+    // Keep last 100 events
+    await fs.writeJson(historyPath, history.slice(0, 100), { spaces: 2 });
+  } catch (e) {
+    console.error("Failed to update history", e);
+  }
+}
 
 async function loadStats() {
   if (await fs.pathExists(statsPath)) {
@@ -75,6 +107,8 @@ async function saveStats() {
 }
 
 let isScanning = false;
+let currentUnityStatus: any = { is_running: false, version: "unknown", project_path: "" };
+let currentBlenderStatus: any = { is_running: false, version: "unknown" };
 
 async function performScan() {
   if (isScanning) return;
@@ -104,7 +138,16 @@ async function performScan() {
       pdfs: [],
       videos: [],
       others: [],
-      total_files: 0
+      total_files: 0,
+      analysis: {
+        audit_issues: [],
+        todos: [],
+        asset_stats: {
+          total_size: 0,
+          large_files: []
+        },
+        dependencies: {}
+      }
     };
 
     const scanDir = async (dir: string) => {
@@ -116,20 +159,74 @@ async function performScan() {
         
         if (stat.isDirectory()) {
           const excludedDirs = ['node_modules', '.git', 'dist', 'Library', 'Temp', 'Obj', 'Build', 'Logs', 'local_storage', 'uploads', 'backup_*'];
-          // Simple check for backup directories
           if (excludedDirs.some(d => d.includes('*') ? file.startsWith(d.replace('*', '')) : d === file)) {
             continue;
           }
           await scanDir(fullPath);
         } else {
-          const excludedFiles = ['project_stats.json', 'PROJECT_MASTER_BLUEPRINT.md', 'ccgs_project_blueprint.json', 'knowledge_base.json', 'version.json', 'unity_version.txt', 'package.json', 'package-lock.json', 'tsconfig.json'];
+          const excludedFiles = ['project_stats.json', 'PROJECT_MASTER_BLUEPRINT.md', 'ccgs_project_blueprint.json', 'knowledge_base.json', 'version.json', 'unity_version.txt', 'package.json', 'package-lock.json', 'tsconfig.json', 'history.json'];
           if (excludedFiles.includes(file)) continue;
 
           results.total_files++;
+          results.analysis.asset_stats.total_size += stat.size;
+          
           const ext = path.extname(file).toLowerCase();
           const relativePath = path.relative(rootDir, fullPath);
+
+          // Asset Optimization: Track large files (> 10MB)
+          if (stat.size > 10 * 1024 * 1024) {
+            results.analysis.asset_stats.large_files.push({
+              path: relativePath,
+              size: (stat.size / 1024 / 1024).toFixed(2) + " MB"
+            });
+          }
           
-          if (ext === '.cs') results.scripts.push(relativePath);
+          if (ext === '.cs') {
+            results.scripts.push(relativePath);
+            // Code Audit & To-Do Scan
+            try {
+              const content = await fs.readFile(fullPath, 'utf-8');
+              
+              // 1. Audit: GetComponent/Find in Update
+              const updateRegex = /(void\s+(Update|FixedUpdate|LateUpdate)\s*\(\s*\)[\s\S]*?\{)([\s\S]*?)\}/g;
+              let match;
+              while ((match = updateRegex.exec(content)) !== null) {
+                const body = match[3];
+                if (body.includes('GetComponent') || body.includes('GameObject.Find') || body.includes('FindWithTag')) {
+                  results.analysis.audit_issues.push({
+                    file: relativePath,
+                    type: 'Performance',
+                    message: `Обнаружен вызов GetComponent или Find внутри ${match[2]}. Это замедляет игру. Рекомендуется кэшировать ссылку в Start().`
+                  });
+                }
+              }
+
+              // 2. To-Do Scan
+              const todoRegex = /\/\/\s*(TODO|FIXME):\s*(.*)/gi;
+              let todoMatch;
+              while ((todoMatch = todoRegex.exec(content)) !== null) {
+                results.analysis.todos.push({
+                  file: relativePath,
+                  type: todoMatch[1].toUpperCase(),
+                  text: todoMatch[2].trim()
+                });
+              }
+
+              // 3. Simple Dependency Extraction (Project Map)
+              const classRegex = /class\s+(\w+)/;
+              const classMatch = content.match(classRegex);
+              if (classMatch) {
+                const className = classMatch[1];
+                const deps = [];
+                // Find other class names in this file (very basic)
+                // This is a placeholder for a more complex parser
+                results.analysis.dependencies[className] = deps;
+              }
+
+            } catch (e) {
+              console.error(`Failed to analyze script: ${relativePath}`, e);
+            }
+          }
           else if (ext === '.prefab') results.prefabs.push(relativePath);
           else if (ext === '.unity') results.scenes.push(relativePath);
           else if (ext === '.anim') results.animations.push(relativePath);
@@ -257,8 +354,9 @@ async function startServer() {
       };
     })();
 
-    watcher.on('all', (event, path) => {
+    watcher.on('all', async (event, path) => {
       console.log(`File event: ${event} on ${path}`);
+      await addToHistory(event, path);
       debouncedScan();
     });
   }
@@ -273,10 +371,12 @@ async function startServer() {
       let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"}\n\n`;
       md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов и инструкции по восстановлению.\n\n`;
       md += `## 1. Общая информация\n`;
-      md += `- **Версия:** ${blueprint.version || "1.1.0"}\n`;
+      md += `- **Версия Помощника:** ${blueprint.version || "1.2.0"}\n`;
       md += `- **Описание:** ${blueprint.description || kb.description}\n`;
       md += `- **Путь проекта:** ${kb.project_path}\n`;
-      md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n\n`;
+      md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
+      md += `- **Версия Unity:** ${currentUnityStatus.version}\n`;
+      md += `- **Версия Blender:** ${currentBlenderStatus.version}\n\n`;
       
       md += `## 2. Структура интерфейса\n`;
       md += `### Вкладки\n`;
@@ -488,7 +588,125 @@ async function startServer() {
       isRunning = Math.random() > 0.5; // Mock for demo
       version = isRunning ? "2022.3.62f2" : "unknown";
     }
-    res.json({ is_running: isRunning, version, project_path: projectPath });
+    currentUnityStatus = { is_running: isRunning, version, project_path: projectPath };
+    res.json(currentUnityStatus);
+  });
+
+  // Blender Status Endpoint
+  app.get("/api/blender/status", async (req, res) => {
+    let isRunning = false;
+    let version = "unknown";
+    
+    // Mock for demo
+    isRunning = Math.random() > 0.5;
+    version = isRunning ? "4.0.2" : "unknown";
+
+    currentBlenderStatus = { is_running: isRunning, version };
+    res.json(currentBlenderStatus);
+  });
+
+  // Blender Presets Endpoint
+  app.get("/api/blender/presets", (req, res) => {
+    const presets = [
+      {
+        id: "clean_scene",
+        name: "Очистка сцены",
+        desc: "Удаляет все объекты, меши и материалы.",
+        code: "import bpy\nbpy.ops.object.select_all(action='SELECT')\nbpy.ops.object.delete()"
+      },
+      {
+        id: "unity_export",
+        name: "Экспорт для Unity",
+        desc: "Настраивает оси и экспортирует в FBX.",
+        code: "import bpy\nbpy.ops.export_scene.fbx(filepath='model.fbx', axis_forward='-Z', axis_up='Y')"
+      },
+      {
+        id: "setup_lighting",
+        name: "Настройка освещения",
+        desc: "Создает стандартное трехточечное освещение.",
+        code: "import bpy\n# Python code for 3-point lighting setup..."
+      }
+    ];
+    res.json(presets);
+  });
+
+  // History Endpoint
+  app.get("/api/project/history", async (req, res) => {
+    try {
+      const history = await loadHistory();
+      res.json(history);
+    } catch (e) {
+      res.status(500).json({ error: "Failed to load history" });
+    }
+  });
+
+  // Local AI Search (Offline 2.0)
+  app.post("/api/ai/local-search", async (req, res) => {
+    const { query } = req.body;
+    if (!query) return res.status(400).json({ error: "Query required" });
+
+    try {
+      const kb = await fs.readJson(kbPath);
+      const stats = currentScanResults;
+      const keywords = query.toLowerCase().split(' ');
+      let results = [];
+
+      // 1. Search in stats/meta
+      if (keywords.some(k => k.includes('unity') || k.includes('скрипт'))) {
+        results.push(`В проекте найдено ${stats.scripts.length} скриптов C#. Последнее обновление: ${stats.last_updated}`);
+      }
+      
+      if (keywords.some(k => k.includes('видео') || k.includes('обучение'))) {
+        results.push(`В базе знаний есть ${stats.videos.length} видео-уроков.`);
+      }
+
+      // 2. Search in Audit/Todos
+      if (keywords.some(k => k.includes('ошибк') || k.includes('аудит') || k.includes('тормозит'))) {
+        const issues = stats.analysis.audit_issues.slice(0, 3);
+        if (issues.length > 0) {
+          results.push("Результаты аудита кода:\n" + issues.map((i: any) => `- ${i.file}: ${i.message}`).join('\n'));
+        }
+      }
+
+      if (keywords.some(k => k.includes('задач') || k.includes('todo'))) {
+        const todos = stats.analysis.todos.slice(0, 5);
+        if (todos.length > 0) {
+          results.push("Список задач (TODO):\n" + todos.map((t: any) => `- [${t.type}] ${t.file}: ${t.text}`).join('\n'));
+        }
+      }
+
+      // 3. Content Search (Deep Search)
+      if (results.length === 0) {
+        // Search for specific file names or content snippets in scripts
+        const foundScripts = stats.scripts.filter((s: string) => keywords.some(k => s.toLowerCase().includes(k)));
+        if (foundScripts.length > 0) {
+          results.push(`Найдены соответствующие скрипты:\n${foundScripts.slice(0, 5).join('\n')}`);
+        }
+      }
+
+      if (results.length === 0) {
+        results.push("К сожалению, в локальной базе знаний не найдено точного ответа. Попробуйте перефразировать запрос (например: 'задачи', 'аудит', 'скрипты').");
+      }
+
+      res.json({ answer: results.join('\n\n'), source: "local_database_v2" });
+    } catch (error) {
+      res.status(500).json({ error: "Local search failed" });
+    }
+  });
+
+  // System Repair Endpoint
+  app.post("/api/system/repair", async (req, res) => {
+    try {
+      console.log("[SYSTEM] Starting self-repair process...");
+      await checkProjectIntegrity();
+      await initWatcher();
+      await performScan();
+      await generateMasterBlueprint();
+      res.json({ success: true, message: "Система успешно восстановлена и синхронизирована." });
+    } catch (error) {
+      console.error("[SYSTEM] Repair failed:", error);
+      res.status(500).json({ error: "Repair failed" });
+    }
   });
 
   // Vite middleware for development
