@@ -27,7 +27,10 @@ import {
   WifiOff,
   ChevronRight,
   AlertTriangle,
-  ExternalLink
+  ExternalLink,
+  GitBranch,
+  Type,
+  FileCode
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenAI } from "@google/genai";
@@ -121,6 +124,10 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [localPathInput, setLocalPathInput] = useState('');
   const [isGeneratingBlueprint, setIsGeneratingBlueprint] = useState(false);
+  const [isUpdatingKB, setIsUpdatingKB] = useState(false);
+  const [showCapabilities, setShowCapabilities] = useState(false);
+  const [capabilities, setCapabilities] = useState<any>(null);
+  const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
   
   const chatEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -130,6 +137,11 @@ export default function App() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateProgress, setUpdateProgress] = useState(0);
 
+  const showNotification = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 4000);
+  };
+
   const checkUpdates = async () => {
     try {
       const response = await fetch('/api/update/check');
@@ -138,7 +150,7 @@ export default function App() {
       if (data.available) {
         setShowUpdateModal(true);
       } else {
-        alert("У вас уже установлена последняя версия!");
+        showNotification("У вас уже установлена последняя версия!", "info");
       }
     } catch (error) {
       console.error("Update check error:", error);
@@ -247,7 +259,7 @@ export default function App() {
         method: 'POST'
       });
       if (response.ok) {
-        alert("Master Blueprint (PROJECT_MASTER_BLUEPRINT.md) успешно обновлен!");
+        showNotification("Master Blueprint (PROJECT_MASTER_BLUEPRINT.md) успешно обновлен!", "success");
       }
     } catch (error) {
       console.error("Failed to generate blueprint", error);
@@ -328,17 +340,66 @@ export default function App() {
     }
   };
 
+  const handleUpdateKB = async () => {
+    setIsUpdatingKB(true);
+    try {
+      const res = await fetch('/api/kb/update-api-refs', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        showNotification(data.message, "success");
+      }
+    } catch (error) {
+      showNotification("Ошибка при обновлении баз знаний.", "error");
+    } finally {
+      setIsUpdatingKB(false);
+    }
+  };
+
+  const fetchCapabilities = async () => {
+    try {
+      const res = await fetch('/api/ai/capabilities');
+      const data = await res.json();
+      setCapabilities(data);
+      setShowCapabilities(true);
+    } catch (error) {
+      showNotification("Не удалось загрузить информацию о возможностях.", "error");
+    }
+  };
+
+  const handleGetMaterialConverter = async () => {
+    try {
+      const res = await fetch('/api/unity/material-converter');
+      const data = await res.json();
+      // Copy to clipboard
+      await navigator.clipboard.writeText(data.snippet);
+      showNotification("C# скрипт конвертера скопирован в буфер обмена!", "success");
+    } catch (error) {
+      showNotification("Ошибка при получении скрипта.", "error");
+    }
+  };
+
+  const handleGetGitLFS = async () => {
+    try {
+      const res = await fetch('/api/git/lfs-setup');
+      const data = await res.json();
+      await navigator.clipboard.writeText(data.content);
+      showNotification(".gitattributes для LFS скопирован!", "success");
+    } catch (error) {
+      showNotification("Ошибка при получении конфигурации.", "error");
+    }
+  };
+
   const handleRepair = async () => {
     setIsRepairing(true);
     try {
       const res = await fetch('/api/system/repair', { method: 'POST' });
       const data = await res.json();
       if (data.success) {
-        alert(data.message);
-        window.location.reload();
+        showNotification(data.message, "success");
+        setTimeout(() => window.location.reload(), 2000);
       }
     } catch (error) {
-      alert("Ошибка при восстановлении системы.");
+      showNotification("Ошибка при восстановлении системы.", "error");
     } finally {
       setIsRepairing(false);
     }
@@ -552,6 +613,20 @@ export default function App() {
             <p className="text-[9px] text-slate-500 leading-relaxed">Исправить ошибки и восстановить целостность системы.</p>
           </button>
 
+          {/* About AI Button */}
+          <button 
+            onClick={fetchCapabilities}
+            className="w-full p-4 rounded-2xl bg-blue-600/10 border border-blue-500/20 hover:bg-blue-600/20 hover:border-blue-500/40 transition-all group text-left"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-black/40 rounded-lg group-hover:text-blue-400 transition-colors">
+                <Info className="w-4 h-4" />
+              </div>
+              <span className="text-[11px] font-bold text-white uppercase">О возможностях ИИ</span>
+            </div>
+            <p className="text-[9px] text-slate-500 leading-relaxed">Всё о том, что умеет наш ИИ и как он работает с проектом.</p>
+          </button>
+
           {/* GitHub Guide Button */}
           <button 
             onClick={() => setShowGithubGuide(true)}
@@ -617,6 +692,14 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-4">
+            <button 
+              onClick={fetchCapabilities}
+              className="px-4 py-2 rounded-xl bg-purple-600/20 border border-purple-500/30 text-purple-400 hover:text-white hover:bg-purple-600 transition-all group flex items-center gap-2 shadow-lg shadow-purple-600/10"
+              title="О возможностях ИИ"
+            >
+              <Zap className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              <span className="text-[10px] font-bold uppercase tracking-widest hidden sm:inline">ИИ Моде</span>
+            </button>
             <button 
               onClick={checkUpdates}
               className="px-4 py-2 rounded-xl bg-green-600/20 border border-green-500/30 text-green-400 hover:text-white hover:bg-green-600 transition-all group flex items-center gap-2 shadow-lg shadow-green-600/10"
@@ -836,6 +919,27 @@ export default function App() {
         </div>
 
         {/* Upload Progress Overlay */}
+        {/* Notifications */}
+        <AnimatePresence>
+          {notification && (
+            <motion.div 
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 50 }}
+              className={`fixed top-8 right-8 z-[200] p-4 rounded-2xl shadow-2xl border flex items-center gap-3 min-w-[300px] ${
+                notification.type === 'success' ? 'bg-green-600/10 border-green-500/20 text-green-400' :
+                notification.type === 'error' ? 'bg-red-600/10 border-red-500/20 text-red-400' :
+                'bg-blue-600/10 border-blue-500/20 text-blue-400'
+              }`}
+            >
+              {notification.type === 'success' ? <Check className="w-5 h-5" /> : 
+               notification.type === 'error' ? <AlertTriangle className="w-5 h-5" /> : 
+               <Info className="w-5 h-5" />}
+              <span className="text-xs font-bold uppercase tracking-tight">{notification.message}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <AnimatePresence>
           {isUploading && (
             <motion.div 
@@ -955,6 +1059,110 @@ export default function App() {
                       {(projectScan?.analysis.asset_stats.total_size ? (projectScan.analysis.asset_stats.total_size / 1024 / 1024).toFixed(1) : 0)} MB
                     </div>
                     <p className="text-[10px] text-slate-500 uppercase">Общий вес ассетов</p>
+                  </div>
+                </div>
+
+                {/* Knowledge Base Section */}
+                <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-blue-600/10 to-purple-600/10 border border-white/10">
+                  <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div className="flex items-center gap-6">
+                      <div className="w-16 h-16 bg-blue-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-blue-600/40">
+                        <Layers className="w-8 h-8 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold text-white uppercase tracking-tighter">Расширение Базы Знаний</h3>
+                        <p className="text-xs text-slate-400 max-w-md">
+                          Обновите локальные справочники Unity API, Blender Python и Troubleshooting для более точной помощи в офлайн-режиме.
+                        </p>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={handleUpdateKB}
+                      disabled={isUpdatingKB}
+                      className={`px-8 py-4 rounded-2xl font-bold uppercase tracking-widest text-xs transition-all flex items-center gap-3 ${
+                        isUpdatingKB 
+                        ? 'bg-white/5 text-slate-500' 
+                        : 'bg-white text-black hover:bg-blue-500 hover:text-white shadow-xl shadow-white/10'
+                      }`}
+                    >
+                      {isUpdatingKB ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                      {isUpdatingKB ? 'Обновление...' : 'Обновить Базы'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* New Features Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="p-8 rounded-[2.5rem] bg-black/40 border border-white/5 space-y-6">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 bg-orange-600/20 rounded-2xl text-orange-400">
+                        <RefreshCw className="w-5 h-5" />
+                      </div>
+                      <h3 className="text-sm font-bold text-white uppercase tracking-widest">Unity Bridge</h3>
+                    </div>
+                    <p className="text-xs text-slate-400">
+                      Автоматическая настройка материалов при импорте из Blender. Конвертация Standard материалов в URP/HDRP.
+                    </p>
+                    <button 
+                      onClick={handleGetMaterialConverter}
+                      className="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-[10px] font-bold text-white uppercase tracking-widest transition-all"
+                    >
+                      Получить C# Скрипт
+                    </button>
+                  </div>
+
+                  <div className="p-8 rounded-[2.5rem] bg-black/40 border border-white/5 space-y-6">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 bg-blue-600/20 rounded-2xl text-blue-400">
+                        <GitBranch className="w-5 h-5" />
+                      </div>
+                      <h3 className="text-sm font-bold text-white uppercase tracking-widest">Git LFS Setup</h3>
+                    </div>
+                    <p className="text-xs text-slate-400">
+                      Генерация правильного .gitattributes для Unity проекта. Защита от раздувания репозитория тяжелыми ассетами.
+                    </p>
+                    <button 
+                      onClick={handleGetGitLFS}
+                      className="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-[10px] font-bold text-white uppercase tracking-widest transition-all"
+                    >
+                      Копировать .gitattributes
+                    </button>
+                  </div>
+
+                  <div className="p-8 rounded-[2.5rem] bg-black/40 border border-white/5 space-y-6">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 bg-green-600/20 rounded-2xl text-green-400">
+                        <Type className="w-5 h-5" />
+                      </div>
+                      <h3 className="text-sm font-bold text-white uppercase tracking-widest">Naming Standard</h3>
+                    </div>
+                    <p className="text-xs text-slate-400">
+                      Генератор имен по стандарту (T_Texture, M_Material, P_Prefab). Помогает поддерживать порядок в проекте.
+                    </p>
+                    <button 
+                      onClick={() => showNotification("Стандарты именования: T_ (Texture), M_ (Material), P_ (Prefab), S_ (Script)", "info")}
+                      className="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-[10px] font-bold text-white uppercase tracking-widest transition-all"
+                    >
+                      Показать стандарт
+                    </button>
+                  </div>
+
+                  <div className="p-8 rounded-[2.5rem] bg-black/40 border border-white/5 space-y-6">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 bg-pink-600/20 rounded-2xl text-pink-400">
+                        <Sparkles className="w-5 h-5" />
+                      </div>
+                      <h3 className="text-sm font-bold text-white uppercase tracking-widest">Shader Assistant</h3>
+                    </div>
+                    <p className="text-xs text-slate-400">
+                      Библиотека готовых решений для Shader Graph и HLSL. Офлайн-подсказки по созданию эффектов.
+                    </p>
+                    <button 
+                      onClick={() => showNotification("Функция в разработке. Используйте чат для запроса шейдеров.", "info")}
+                      className="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-[10px] font-bold text-white uppercase tracking-widest transition-all"
+                    >
+                      Открыть библиотеку
+                    </button>
                   </div>
                 </div>
 
@@ -1229,6 +1437,89 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
+
+        {/* Capabilities Modal */}
+        <AnimatePresence>
+          {showCapabilities && capabilities && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl"
+            >
+              <motion.div 
+                initial={{ scale: 0.9, y: 20 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.9, y: 20 }}
+                className="bg-[#0a0a0c] border border-white/10 rounded-[3rem] w-full max-w-3xl max-h-[85vh] overflow-hidden shadow-2xl flex flex-col"
+              >
+                <div className="p-8 border-b border-white/5 flex items-center justify-between bg-gradient-to-r from-blue-600/10 to-transparent">
+                  <div className="flex items-center gap-4">
+                    <div className="p-4 bg-blue-600 rounded-3xl shadow-xl shadow-blue-600/20">
+                      <Zap className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-white tracking-tighter">{capabilities.name}</h2>
+                      <p className="text-xs text-slate-400">{capabilities.description}</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setShowCapabilities(false)}
+                    className="p-3 hover:bg-white/5 rounded-2xl text-slate-500 hover:text-white transition-all"
+                  >
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-8 space-y-10 scrollbar-thin scrollbar-thumb-white/5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {capabilities.core_functions.map((func: any, i: number) => (
+                      <div key={i} className="p-6 rounded-3xl bg-white/5 border border-white/5 space-y-3">
+                        <h4 className="text-xs font-bold text-blue-400 uppercase tracking-widest">{func.title}</h4>
+                        <p className="text-xs text-slate-400 leading-relaxed">{func.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="space-y-6">
+                    <h3 className="text-xs font-bold text-white uppercase tracking-widest flex items-center gap-3">
+                      <FileCode className="w-4 h-4 text-purple-400" /> Обрабатываемые файлы
+                    </h3>
+                    <div className="grid grid-cols-1 gap-3">
+                      {capabilities.files_handled.map((file: string, i: number) => (
+                        <div key={i} className="px-5 py-3 rounded-2xl bg-white/5 border border-white/5 text-[11px] text-slate-300 font-mono">
+                          {file}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <h3 className="text-xs font-bold text-white uppercase tracking-widest flex items-center gap-3">
+                      <Gamepad2 className="w-4 h-4 text-green-400" /> Поддерживаемые жанры
+                    </h3>
+                    <div className="flex flex-wrap gap-3">
+                      {capabilities.game_genres.map((genre: string, i: number) => (
+                        <div key={i} className="px-4 py-2 rounded-full bg-green-600/10 border border-green-500/20 text-[10px] font-bold text-green-400 uppercase tracking-widest">
+                          {genre}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-8 bg-white/5 border-t border-white/5 flex justify-center">
+                  <button 
+                    onClick={() => setShowCapabilities(false)}
+                    className="px-10 py-4 bg-white text-black rounded-2xl font-bold uppercase tracking-widest text-xs hover:bg-blue-600 hover:text-white transition-all shadow-xl shadow-white/5"
+                  >
+                    Понятно
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
       {/* Settings Modal */}
       <AnimatePresence>

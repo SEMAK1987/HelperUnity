@@ -65,6 +65,11 @@ let currentScanResults: any = {
 
 const statsPath = path.join(process.cwd(), "project_stats.json");
 const historyPath = path.join(process.cwd(), "history.json");
+const KB_FILE = path.join(process.cwd(), "knowledge_base.json");
+const UNITY_API_FILE = path.join(process.cwd(), "unity_api_ref.json");
+const BLENDER_API_FILE = path.join(process.cwd(), "blender_api_ref.json");
+const TROUBLESHOOTING_FILE = path.join(process.cwd(), "troubleshooting_db.json");
+const VERSION_FILE = path.join(process.cwd(), "version.json");
 
 async function loadHistory() {
   if (!(await fs.pathExists(historyPath))) {
@@ -91,7 +96,16 @@ async function addToHistory(event: string, filePath: string) {
 async function loadStats() {
   if (await fs.pathExists(statsPath)) {
     try {
-      currentScanResults = await fs.readJson(statsPath);
+      const loaded = await fs.readJson(statsPath);
+      // Ensure structure integrity
+      currentScanResults = {
+        ...currentScanResults,
+        ...loaded,
+        analysis: {
+          ...currentScanResults.analysis,
+          ...(loaded.analysis || {})
+        }
+      };
     } catch (e) {
       console.error("Failed to load project stats", e);
     }
@@ -217,9 +231,15 @@ async function performScan() {
               const classMatch = content.match(classRegex);
               if (classMatch) {
                 const className = classMatch[1];
-                const deps = [];
-                // Find other class names in this file (very basic)
-                // This is a placeholder for a more complex parser
+                const deps: string[] = [];
+                
+                // Find 'using' statements
+                const usingRegex = /using\s+([\w.]+);/g;
+                let usingMatch;
+                while ((usingMatch = usingRegex.exec(content)) !== null) {
+                  deps.push(usingMatch[1]);
+                }
+                
                 results.analysis.dependencies[className] = deps;
               }
 
@@ -227,8 +247,22 @@ async function performScan() {
               console.error(`Failed to analyze script: ${relativePath}`, e);
             }
           }
-          else if (ext === '.prefab') results.prefabs.push(relativePath);
-          else if (ext === '.unity') results.scenes.push(relativePath);
+          else if (ext === '.prefab' || ext === '.unity') {
+            if (ext === '.prefab') results.prefabs.push(relativePath);
+            else results.scenes.push(relativePath);
+            
+            // Check for Missing Scripts (fileID: 0)
+            try {
+              const content = await fs.readFile(fullPath, 'utf-8');
+              if (content.includes('m_Script: {fileID: 0}')) {
+                results.analysis.audit_issues.push({
+                  file: relativePath,
+                  type: 'MissingScript',
+                  message: `Обнаружена битая ссылка на скрипт (Missing Script). Это может вызвать ошибки при запуске игры.`
+                });
+              }
+            } catch (e) {}
+          }
           else if (ext === '.anim') results.animations.push(relativePath);
           else if (ext === '.controller') results.animators.push(relativePath);
           else if (ext === '.pdf') results.pdfs.push(relativePath);
@@ -265,6 +299,7 @@ async function performScan() {
 
     console.log("Project scan completed successfully.");
     await checkProjectIntegrity();
+    await generateMasterBlueprint();
   } catch (error) {
     console.error("Project scan failed:", error);
   } finally {
@@ -293,6 +328,94 @@ async function checkProjectIntegrity() {
       console.error(`[INTEGRITY] File ${file.name} is corrupted. Resetting to default.`);
       await fs.writeJson(filePath, file.default, { spaces: 2 });
     }
+  }
+}
+
+async function generateMasterBlueprint() {
+  try {
+    const kb = await fs.readJson(KB_FILE);
+    const blueprint = await fs.readJson(BLUEPRINT_JSON_PATH);
+    
+    let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"}\n\n`;
+    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов и инструкции по восстановлению.\n\n`;
+    md += `## 1. Общая информация\n`;
+    md += `- **Версия Помощника:** ${blueprint.version || "1.2.0"}\n`;
+    md += `- **Описание:** ${blueprint.description || kb.description}\n`;
+    md += `- **Путь проекта:** ${kb.project_path}\n`;
+    md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
+    md += `- **Версия Unity:** ${currentUnityStatus.version}\n`;
+    md += `- **Версия Blender:** ${currentBlenderStatus.version}\n\n`;
+    
+    md += `## 2. Структура интерфейса\n`;
+    md += `### Вкладки\n`;
+    if (blueprint.interface_structure?.tabs) {
+      blueprint.interface_structure.tabs.forEach((tab: string) => {
+        md += `- **${tab.toUpperCase()}**: ${tab === 'studio' ? 'Главная студия разработки' : tab === 'kb' ? 'База знаний' : tab === 'commands' ? 'Командный центр' : 'Файловый менеджер'}\n`;
+      });
+    }
+    md += `\n### Компоненты\n`;
+    md += `- **Sidebar**: ${blueprint.interface_structure?.sidebar || "Мини-панель навигации"}\n`;
+    md += `- **Top Bar**: ${blueprint.interface_structure?.top_bar || "Панель управления и статуса"}\n`;
+    md += `- **Right Sidebar**: ${blueprint.interface_structure?.right_sidebar || "Логи и статус Unity"}\n\n`;
+
+    md += `## 3. Иерархия ИИ-Агентов (${blueprint.agents_count || 49} агентов)\n`;
+    if (blueprint.knowledge_base?.levels) {
+      blueprint.knowledge_base.levels.forEach((level: any) => {
+        md += `### Уровень ${level.id}: ${level.name}\n`;
+        level.agents.forEach((agent: any) => {
+          md += `- **${agent.name}** (${agent.model}): ${agent.role}\n`;
+        });
+        md += `\n`;
+      });
+    }
+
+    md += `## 4. База знаний и Команды\n`;
+    md += `### Доступные команды\n`;
+    if (blueprint.interface_structure?.commands) {
+      blueprint.interface_structure.commands.forEach((cmd: any) => {
+        md += `- \`${cmd.cmd}\`: ${cmd.desc}\n`;
+      });
+    }
+    
+    md += `\n### Системные инструкции\n`;
+    md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
+
+    md += `## 5. Анализ и Аудит Проекта\n`;
+    md += `- **Всего файлов:** ${currentScanResults.total_files}\n`;
+    md += `- **Скрипты (C#):** ${currentScanResults.scripts.length}\n`;
+    md += `- **Префабы:** ${currentScanResults.prefabs.length}\n`;
+    md += `- **Видео:** ${currentScanResults.videos.length}\n`;
+    md += `- **Общий вес ассетов:** ${(currentScanResults.analysis.asset_stats.total_size / 1024 / 1024).toFixed(1)} MB\n\n`;
+
+    md += `### Найденные проблемы (Аудит):\n`;
+    if (currentScanResults.analysis.audit_issues.length > 0) {
+      currentScanResults.analysis.audit_issues.forEach((i: any) => md += `- [${i.type}] ${i.file}: ${i.message}\n`);
+    } else {
+      md += `Проблем не обнаружено.\n`;
+    }
+
+    md += `\n### Список задач (TODO):\n`;
+    if (currentScanResults.analysis.todos.length > 0) {
+      currentScanResults.analysis.todos.forEach((t: any) => md += `- [${t.type}] ${t.file}: ${t.text}\n`);
+    } else {
+      md += `Задач не найдено.\n`;
+    }
+
+    md += `\n## 6. Новые возможности ИИ (v13.0)\n`;
+    md += `- **Unity Bridge:** Автоматическая конвертация материалов Blender -> Unity (URP/HDRP).\n`;
+    md += `- **Blender Automation:** Пакетный экспорт объектов, очистка сцен, настройка освещения.\n`;
+    md += `- **Git LFS:** Автоматическая генерация конфигурации для тяжелых ассетов.\n`;
+    md += `- **Offline API Docs:** Локальные справочники Unity API и Blender Python.\n\n`;
+
+    md += `## 7. Инструкции по восстановлению\n`;
+    md += `1. Установите Node.js (v18+).\n`;
+    md += `2. Склонируйте репозиторий: \`git clone https://github.com/SEMAK1987/unity-ai-assistant.git\`\n`;
+    md += `3. Запустите \`RUN.bat\` для автоматической установки зависимостей и запуска.\n`;
+
+    await fs.writeFile(MASTER_BLUEPRINT_MD_PATH, md);
+    console.log("Master blueprint generated successfully.");
+  } catch (e) {
+    console.error("Failed to generate master blueprint", e);
   }
 }
 
@@ -362,83 +485,6 @@ async function startServer() {
   }
 
   await initWatcher();
-
-  const generateMasterBlueprint = async () => {
-    try {
-      const kb = await fs.readJson(kbPath);
-      const blueprint = await fs.readJson(blueprintJsonPath);
-      
-      let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"}\n\n`;
-      md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов и инструкции по восстановлению.\n\n`;
-      md += `## 1. Общая информация\n`;
-      md += `- **Версия Помощника:** ${blueprint.version || "1.2.0"}\n`;
-      md += `- **Описание:** ${blueprint.description || kb.description}\n`;
-      md += `- **Путь проекта:** ${kb.project_path}\n`;
-      md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
-      md += `- **Версия Unity:** ${currentUnityStatus.version}\n`;
-      md += `- **Версия Blender:** ${currentBlenderStatus.version}\n\n`;
-      
-      md += `## 2. Структура интерфейса\n`;
-      md += `### Вкладки\n`;
-      if (blueprint.interface_structure?.tabs) {
-        blueprint.interface_structure.tabs.forEach((tab: string) => {
-          md += `- **${tab.toUpperCase()}**: ${tab === 'studio' ? 'Главная студия разработки' : tab === 'kb' ? 'База знаний' : tab === 'commands' ? 'Командный центр' : 'Файловый менеджер'}\n`;
-        });
-      }
-      md += `\n### Компоненты\n`;
-      md += `- **Sidebar**: ${blueprint.interface_structure?.sidebar || "Мини-панель навигации"}\n`;
-      md += `- **Top Bar**: ${blueprint.interface_structure?.top_bar || "Панель управления и статуса"}\n`;
-      md += `- **Right Sidebar**: ${blueprint.interface_structure?.right_sidebar || "Логи и статус Unity"}\n\n`;
-
-      md += `## 3. Иерархия ИИ-Агентов (${blueprint.agents_count || 49} агентов)\n`;
-      if (blueprint.knowledge_base?.levels) {
-        blueprint.knowledge_base.levels.forEach((level: any) => {
-          md += `### Уровень ${level.id}: ${level.name}\n`;
-          level.agents.forEach((agent: any) => {
-            md += `- **${agent.name}** (${agent.model}): ${agent.role}\n`;
-          });
-          md += `\n`;
-        });
-      }
-
-      md += `## 4. База знаний и Команды\n`;
-      md += `### Доступные команды\n`;
-      if (blueprint.interface_structure?.commands) {
-        blueprint.interface_structure.commands.forEach((cmd: any) => {
-          md += `- \`${cmd.cmd}\`: ${cmd.desc}\n`;
-        });
-      }
-      
-      md += `\n### Системные инструкции\n`;
-      md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
-
-      md += `## 5. Статистика файлов проекта\n`;
-      md += `- **Всего файлов:** ${currentScanResults.total_files}\n`;
-      md += `- **Скрипты (C#):** ${currentScanResults.scripts.length}\n`;
-      md += `- **Префабы:** ${currentScanResults.prefabs.length}\n`;
-      md += `- **Видео:** ${currentScanResults.videos.length}\n\n`;
-
-      if (currentScanResults.videos.length > 0) {
-        md += `### Список видео-файлов\n`;
-        currentScanResults.videos.forEach((v: string) => md += `- ${v}\n`);
-        md += `\n`;
-      }
-
-      md += `## 6. Инструкции по восстановлению\n`;
-      md += `1. Установите Node.js (v18+).\n`;
-      md += `2. Склонируйте репозиторий: \`git clone https://github.com/SEMAK1987/unity-ai-assistant.git\`\n`;
-      md += `3. Запустите \`RUN.bat\` для автоматической установки зависимостей и запуска.\n`;
-      md += `4. Убедитесь, что файлы \`knowledge_base.json\` и \`ccgs_project_blueprint.json\` находятся в корневой папке.\n`;
-      md += `5. Если интерфейс поврежден, используйте данные из этого файла для воссоздания компонентов React.\n\n`;
-      
-      md += `---\n*Документ обновлен автоматически: ${new Date().toLocaleString()}*\n`;
-
-      await fs.writeFile(masterBlueprintMdPath, md, "utf-8");
-      console.log("Master Blueprint updated successfully.");
-    } catch (error) {
-      console.error("Failed to generate master blueprint:", error);
-    }
-  };
 
   // API: Get Knowledge Base
   app.get("/api/kb", async (req, res) => {
@@ -621,6 +667,12 @@ async function startServer() {
         code: "import bpy\nbpy.ops.export_scene.fbx(filepath='model.fbx', axis_forward='-Z', axis_up='Y')"
       },
       {
+        id: "batch_export",
+        name: "Пакетный экспорт",
+        desc: "Экспортирует каждый объект в отдельный FBX с применением трансформаций.",
+        code: "import bpy\nimport os\n\npath = bpy.path.abspath('//')\nfor obj in bpy.context.scene.objects:\n    if obj.type == 'MESH':\n        bpy.ops.object.select_all(action='DESELECT')\n        obj.select_set(True)\n        bpy.context.view_layer.objects.active = obj\n        bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)\n        name = bpy.path.clean_name(obj.name)\n        fn = os.path.join(path, name)\n        bpy.ops.export_scene.fbx(filepath=fn + '.fbx', use_selection=True, axis_forward='-Z', axis_up='Y')"
+      },
+      {
         id: "setup_lighting",
         name: "Настройка освещения",
         desc: "Создает стандартное трехточечное освещение.",
@@ -646,12 +698,32 @@ async function startServer() {
     if (!query) return res.status(400).json({ error: "Query required" });
 
     try {
-      const kb = await fs.readJson(kbPath);
       const stats = currentScanResults;
-      const keywords = query.toLowerCase().split(' ');
+      const unityApi = await fs.pathExists(UNITY_API_FILE) ? await fs.readJson(UNITY_API_FILE) : [];
+      const blenderApi = await fs.pathExists(BLENDER_API_FILE) ? await fs.readJson(BLENDER_API_FILE) : [];
+      const troubleshooting = await fs.pathExists(TROUBLESHOOTING_FILE) ? await fs.readJson(TROUBLESHOOTING_FILE) : [];
+
+      const q = query.toLowerCase();
+      const keywords = q.split(' ');
       let results = [];
 
-      // 1. Search in stats/meta
+      // 1. Search in API Refs
+      const foundUnity = unityApi.find((a: any) => a.name.toLowerCase().includes(q) || keywords.some(k => a.name.toLowerCase().includes(k)));
+      if (foundUnity) {
+        results.push(`[Unity API] ${foundUnity.name}: ${foundUnity.desc}\nМетоды: ${foundUnity.methods.join(", ")}`);
+      }
+
+      const foundBlender = blenderApi.find((a: any) => a.name.toLowerCase().includes(q) || keywords.some(k => a.name.toLowerCase().includes(k)));
+      if (foundBlender) {
+        results.push(`[Blender API] ${foundBlender.name}: ${foundBlender.desc}\nЭлементы: ${foundBlender.items.join(", ")}`);
+      }
+
+      const foundTrouble = troubleshooting.find((t: any) => t.issue.toLowerCase().includes(q) || keywords.some(k => t.issue.toLowerCase().includes(k)));
+      if (foundTrouble) {
+        results.push(`[Решение проблемы] ${foundTrouble.issue}: ${foundTrouble.solution}`);
+      }
+
+      // 2. Search in stats/meta
       if (keywords.some(k => k.includes('unity') || k.includes('скрипт'))) {
         results.push(`В проекте найдено ${stats.scripts.length} скриптов C#. Последнее обновление: ${stats.last_updated}`);
       }
@@ -660,7 +732,7 @@ async function startServer() {
         results.push(`В базе знаний есть ${stats.videos.length} видео-уроков.`);
       }
 
-      // 2. Search in Audit/Todos
+      // 3. Search in Audit/Todos
       if (keywords.some(k => k.includes('ошибк') || k.includes('аудит') || k.includes('тормозит'))) {
         const issues = stats.analysis.audit_issues.slice(0, 3);
         if (issues.length > 0) {
@@ -675,9 +747,8 @@ async function startServer() {
         }
       }
 
-      // 3. Content Search (Deep Search)
+      // 4. Content Search (Deep Search)
       if (results.length === 0) {
-        // Search for specific file names or content snippets in scripts
         const foundScripts = stats.scripts.filter((s: string) => keywords.some(k => s.toLowerCase().includes(k)));
         if (foundScripts.length > 0) {
           results.push(`Найдены соответствующие скрипты:\n${foundScripts.slice(0, 5).join('\n')}`);
@@ -688,9 +759,127 @@ async function startServer() {
         results.push("К сожалению, в локальной базе знаний не найдено точного ответа. Попробуйте перефразировать запрос (например: 'задачи', 'аудит', 'скрипты').");
       }
 
-      res.json({ answer: results.join('\n\n'), source: "local_database_v2" });
+      res.json({ answer: results.join('\n\n'), source: "local_database_v3" });
     } catch (error) {
+      console.error("Local search error:", error);
       res.status(500).json({ error: "Local search failed" });
+    }
+  });
+
+  // AI Capabilities Endpoint
+  app.get("/api/ai/capabilities", (req, res) => {
+    const capabilities = {
+      name: "Unity & Blender AI Assistant v13.0",
+      description: "Ваш персональный эксперт по разработке игр, 3D-моделированию и автоматизации.",
+      core_functions: [
+        {
+          title: "Работа с проектами Unity",
+          desc: "Анализ C# кода, поиск ошибок производительности (GetComponent в Update), отслеживание TODO задач, аудит ассетов и веса проекта."
+        },
+        {
+          title: "Интеграция с Blender",
+          desc: "Генерация Python-скриптов для автоматизации моделирования, пакетный экспорт объектов, настройка освещения и очистка сцен."
+        },
+        {
+          title: "Офлайн-режим (Offline 2.0)",
+          desc: "Работа без интернета на основе накопленной базы знаний, локальных справочников API Unity/Blender и истории изменений проекта."
+        },
+        {
+          title: "Самовосстановление",
+          desc: "Автоматическое исправление ошибок в конфигурации, восстановление серверов и регенерация Master Blueprint для защиты проекта."
+        }
+      ],
+      files_handled: [
+        "knowledge_base.json - База знаний и инструкции ИИ",
+        "project_stats.json - Статистика, аудит и задачи",
+        "history.json - История изменений файлов",
+        "PROJECT_MASTER_BLUEPRINT.md - Полный слепок проекта для восстановления",
+        "unity_api_ref.json / blender_api_ref.json - Локальные справочники API"
+      ],
+      game_genres: [
+        "RPG / Cultivation (Система стадий, мобов, характеристик)",
+        "Action / Shooter (FPS камера, системы оружия)",
+        "Simulation (Экономика, профессии, инвентарь)",
+        "Multiplayer (Основы сетевого взаимодействия и синхронизации)"
+      ]
+    };
+    res.json(capabilities);
+  });
+
+  // Unity Bridge: Material Converter Snippet
+  app.get("/api/unity/material-converter", (req, res) => {
+    const snippet = `
+using UnityEngine;
+using UnityEditor;
+
+public class MaterialConverter : EditorWindow {
+    [MenuItem("Tools/AI Assistant/Convert Blender Materials")]
+    public static void Convert() {
+        foreach (Material mat in Selection.GetFiltered<Material>(SelectionMode.Deep)) {
+            if (mat.shader.name == "Standard") {
+                // Convert to URP Lit if available
+                Shader urpShader = Shader.Find("Universal Render Pipeline/Lit");
+                if (urpShader != null) {
+                    mat.shader = urpShader;
+                    Debug.Log("Converted " + mat.name + " to URP Lit");
+                }
+            }
+        }
+    }
+}`;
+    res.json({ snippet });
+  });
+
+  // Git LFS Setup Snippet
+  app.get("/api/git/lfs-setup", (req, res) => {
+    const content = `
+# Unity LFS Configuration
+*.unitypackage filter=lfs diff=lfs merge=lfs -text
+*.fbx filter=lfs diff=lfs merge=lfs -text
+*.obj filter=lfs diff=lfs merge=lfs -text
+*.png filter=lfs diff=lfs merge=lfs -text
+*.jpg filter=lfs diff=lfs merge=lfs -text
+*.tga filter=lfs diff=lfs merge=lfs -text
+*.psd filter=lfs diff=lfs merge=lfs -text
+*.wav filter=lfs diff=lfs merge=lfs -text
+*.mp3 filter=lfs diff=lfs merge=lfs -text
+*.blend filter=lfs diff=lfs merge=lfs -text
+*.zip filter=lfs diff=lfs merge=lfs -text
+`;
+    res.json({ content });
+  });
+
+  // Knowledge Base Expansion Endpoints
+  app.post("/api/kb/update-api-refs", async (req, res) => {
+    try {
+      const unityApi = [
+        { name: "GameObject", desc: "Базовый класс для всех сущностей в сценах Unity.", methods: ["AddComponent", "GetComponent", "SetActive", "Find"] },
+        { name: "Transform", desc: "Позиция, вращение и масштаб объекта.", methods: ["Translate", "Rotate", "LookAt", "SetParent"] },
+        { name: "Vector3", desc: "Представление 3D векторов и точек.", methods: ["Distance", "Lerp", "Normalize", "Dot", "Cross"] },
+        { name: "Quaternion", desc: "Представление вращений.", methods: ["Euler", "LookRotation", "Slerp", "Identity"] },
+        { name: "MonoBehaviour", desc: "Базовый класс, от которого наследуются все скрипты Unity.", methods: ["Start", "Update", "FixedUpdate", "OnTriggerEnter"] }
+      ];
+
+      const blenderApi = [
+        { name: "bpy.context", desc: "Доступ к текущему состоянию Blender.", items: ["active_object", "selected_objects", "scene"] },
+        { name: "bpy.ops", desc: "Операторы для выполнения действий.", items: ["mesh.primitive_cube_add", "object.delete", "export_scene.fbx"] },
+        { name: "bpy.data", desc: "Доступ к внутренним данным Blender.", items: ["objects", "meshes", "materials", "textures"] }
+      ];
+
+      const troubleshooting = [
+        { issue: "NullReferenceException", solution: "Проверьте, назначен ли объект в Инспекторе или инициализирован ли он в Start/Awake." },
+        { issue: "Pink Textures", solution: "Шейдер несовместим с текущим Render Pipeline (URP/HDRP). Используйте Material Upgrader." },
+        { issue: "Blender Export Rotation", solution: "Используйте -Z Forward и Y Up в настройках экспорта FBX, чтобы соответствовать системе координат Unity." },
+        { issue: "Missing Script", solution: "Компонент ссылается на удаленный или перемещенный скрипт. Используйте 'Unity Cleanup' для удаления битых ссылок." }
+      ];
+
+      await fs.writeJson(UNITY_API_FILE, unityApi, { spaces: 2 });
+      await fs.writeJson(BLENDER_API_FILE, blenderApi, { spaces: 2 });
+      await fs.writeJson(TROUBLESHOOTING_FILE, troubleshooting, { spaces: 2 });
+
+      res.json({ success: true, message: "Базы знаний API и Troubleshooting успешно обновлены!" });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update API refs" });
     }
   });
 
