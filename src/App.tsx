@@ -627,8 +627,7 @@ export default function App() {
     <div className="h-screen bg-[#0a0a0c] text-slate-300 font-sans flex overflow-hidden">
       
       {/* Sidebar for Stats and Status */}
-      {messages.length > 0 && (
-        <aside className="w-64 border-r border-white/5 bg-black/40 flex flex-col z-50 overflow-y-auto scrollbar-none">
+      <aside className="w-64 border-r border-white/5 bg-black/40 flex flex-col z-50 overflow-y-auto scrollbar-none">
         <div className="p-6 border-b border-white/5">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20">
@@ -810,7 +809,6 @@ export default function App() {
           </div>
         </div>
       </aside>
-      )}
 
       {/* Main Chat Area */}
       <main className="flex-1 flex flex-col relative overflow-hidden">
@@ -825,34 +823,32 @@ export default function App() {
               <span className="text-[9px] text-slate-500 uppercase tracking-widest mt-0.5">Unity & Blender Expert</span>
             </div>
 
-            {messages.length > 0 && (
-              <nav className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/5">
-                <button 
-                  onClick={() => setActiveTab('chat')}
-                  className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 ${
-                    activeTab === 'chat' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-500 hover:text-slate-300'
-                  }`}
-                >
-                  <Send className="w-3.5 h-3.5" /> Чат
-                </button>
-                <button 
-                  onClick={() => setActiveTab('dashboard')}
-                  className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 ${
-                    activeTab === 'dashboard' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-500 hover:text-slate-300'
-                  }`}
-                >
-                  <Layers className="w-3.5 h-3.5" /> Дашборд
-                </button>
-                <button 
-                  onClick={() => setActiveTab('project_info')}
-                  className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 ${
-                    activeTab === 'project_info' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-500 hover:text-slate-300'
-                  }`}
-                >
-                  <Info className="w-3.5 h-3.5" /> О проекте
-                </button>
-              </nav>
-            )}
+            <nav className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/5">
+              <button 
+                onClick={() => setActiveTab('chat')}
+                className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 ${
+                  activeTab === 'chat' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-500 hover:text-slate-300'
+                }`}
+              >
+                <Send className="w-3.5 h-3.5" /> Чат
+              </button>
+              <button 
+                onClick={() => setActiveTab('dashboard')}
+                className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 ${
+                  activeTab === 'dashboard' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-500 hover:text-slate-300'
+                }`}
+              >
+                <Layers className="w-3.5 h-3.5" /> Дашборд
+              </button>
+              <button 
+                onClick={() => setActiveTab('project_info')}
+                className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 ${
+                  activeTab === 'project_info' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-500 hover:text-slate-300'
+                }`}
+              >
+                <Info className="w-3.5 h-3.5" /> О проекте
+              </button>
+            </nav>
           </div>
 
           <div className="flex items-center gap-4">
@@ -1830,6 +1826,33 @@ export default function App() {
                       ))}
                     </div>
                   </div>
+
+                  {capabilities.video_knowledge_base && (
+                    <div className="space-y-8">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-xs font-bold text-white uppercase tracking-widest flex items-center gap-3">
+                          <Zap className="w-4 h-4 text-yellow-400" /> База знаний из {capabilities.video_knowledge_base.total_videos} видео
+                        </h3>
+                        <span className="text-[10px] text-slate-500 font-mono uppercase">Обновлено: {capabilities.video_knowledge_base.update_date}</span>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {capabilities.video_knowledge_base.categories.map((cat: any, i: number) => (
+                          <div key={i} className="p-6 rounded-3xl bg-white/5 border border-white/5 space-y-4 group hover:bg-white/10 transition-all">
+                            <h4 className="text-[11px] font-bold text-blue-400 uppercase tracking-wider border-b border-white/5 pb-2">{cat.name}</h4>
+                            <ul className="space-y-2">
+                              {cat.items.map((item: string, j: number) => (
+                                <li key={j} className="text-[11px] text-slate-400 flex items-start gap-2">
+                                  <span className="text-blue-500 mt-1">•</span>
+                                  <span>{item}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   <div className="space-y-6">
                     <h3 className="text-xs font-bold text-white uppercase tracking-widest flex items-center gap-3">
