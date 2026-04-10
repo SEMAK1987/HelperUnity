@@ -30,7 +30,8 @@ import {
   ExternalLink,
   GitBranch,
   Type,
-  FileCode
+  FileCode,
+  Trash2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenAI } from "@google/genai";
@@ -136,6 +137,38 @@ export default function App() {
   const [updateInfo, setUpdateInfo] = useState<any>(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateProgress, setUpdateProgress] = useState(0);
+  const [ollamaRunning, setOllamaRunning] = useState(false);
+
+  const [showOllamaGuide, setShowOllamaGuide] = useState(false);
+  const [showMigrationModal, setShowMigrationModal] = useState(false);
+  const [migrationGuide, setMigrationGuide] = useState('');
+  const [unityPackages, setUnityPackages] = useState<any[]>([]);
+  const [isMigrating, setIsMigrating] = useState(false);
+
+  const fetchPackagesInfo = async () => {
+    try {
+      const res = await fetch('/api/unity/packages-info');
+      const data = await res.json();
+      setUnityPackages(data);
+    } catch (e) {}
+  };
+
+  const handleMigrate = async () => {
+    setIsMigrating(true);
+    try {
+      const res = await fetch('/api/unity/migrate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ from: '2022.3.62f2', to: '6000.3.10f1' })
+      });
+      const data = await res.json();
+      setMigrationGuide(data.guide);
+    } catch (e) {
+      showNotification("Ошибка при генерации руководства.", "error");
+    } finally {
+      setIsMigrating(false);
+    }
+  };
 
   const showNotification = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
     setNotification({ message, type });
@@ -161,24 +194,46 @@ export default function App() {
     setIsUpdating(true);
     setUpdateProgress(0);
     
-    // Fake progress
+    // Detailed sync steps for UI
+    const syncSteps = [
+      "Проверка целостности файлов...",
+      "Глубокое сканирование проекта (Аудит)...",
+      "Синхронизация с локальным хранилищем...",
+      "Исправление найденных ошибок...",
+      "Обновление версии до 13.2.0...",
+      "Регенерация PROJECT_MASTER_BLUEPRINT.md..."
+    ];
+
+    let step = 0;
     const interval = setInterval(() => {
-      setUpdateProgress(prev => Math.min(prev + 5, 95));
-    }, 100);
+      if (step < syncSteps.length) {
+        setUpdateProgress(Math.floor(((step + 1) / syncSteps.length) * 90));
+        step++;
+      }
+    }, 800);
 
     try {
       const response = await fetch('/api/update/apply', { method: 'POST' });
-      if (response.ok) {
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
         setUpdateProgress(100);
         clearInterval(interval);
         setTimeout(() => {
-          alert("Обновление успешно применено! Пожалуйста, перезапустите приложение.");
-          window.location.reload();
+          showNotification(data.message, "success");
+          setShowUpdateModal(false);
+          // Refresh KB to show new version
+          fetch('/api/kb')
+            .then(res => res.json())
+            .then(data => setKb(data));
         }, 1000);
+      } else {
+        throw new Error(data.error || "Sync failed");
       }
     } catch (error) {
       console.error("Update apply error:", error);
-      alert("Ошибка при обновлении. Попробуйте вручную.");
+      clearInterval(interval);
+      showNotification("Ошибка при синхронизации. Попробуйте еще раз.", "error");
     } finally {
       setIsUpdating(false);
     }
@@ -188,6 +243,13 @@ export default function App() {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
   useEffect(() => {
+    // Load chat history
+    fetch('/api/chat/history')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.length > 0) setMessages(data);
+      });
+
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
     window.addEventListener('online', handleOnline);
@@ -214,6 +276,10 @@ export default function App() {
         .then(res => res.json())
         .then(status => setBlenderStatus(status));
       
+      fetch('/api/ai/ollama-status')
+        .then(res => res.json())
+        .then(data => setOllamaRunning(data.isRunning));
+
       fetch('/api/project/history')
         .then(res => res.json())
         .then(data => setHistory(data));
@@ -232,7 +298,41 @@ export default function App() {
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // Save chat history when messages change
+    if (messages.length > 0) {
+      fetch('/api/chat/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages })
+      });
+    }
   }, [messages]);
+
+  const handleClearChat = async () => {
+    try {
+      const res = await fetch('/api/chat/clear', { method: 'POST' });
+      if (res.ok) {
+        setMessages([]);
+        showNotification("Чат очищен.", "info");
+      }
+    } catch (e) {
+      showNotification("Ошибка при очистке чата.", "error");
+    }
+  };
+
+  const handleLaunchOllama = async () => {
+    try {
+      const res = await fetch('/api/ai/ollama-launch', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        showNotification(data.message, "success");
+      } else {
+        showNotification(data.message, "info");
+      }
+    } catch (e) {
+      showNotification("Не удалось связаться с сервисом Ollama.", "error");
+    }
+  };
 
   const handleSaveSettings = async () => {
     if (!kb) return;
@@ -284,6 +384,27 @@ export default function App() {
     try {
       // Offline Fallback Check
       if (!isOnline) {
+        if (ollamaRunning) {
+          const ollamaRes = await fetch('/api/ai/ollama-chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              prompt: text, 
+              systemInstruction: kb.system_instruction 
+            })
+          });
+          const ollamaData = await ollamaRes.json();
+          if (ollamaRes.ok) {
+            setMessages(prev => [...prev, {
+              role: 'assistant',
+              content: `[OLLAMA - OFFLINE]\n\n${ollamaData.answer}`,
+              timestamp: Date.now()
+            }]);
+            return;
+          }
+        }
+
+        // Fallback to local database search if Ollama fails or is not running
         const localRes = await fetch('/api/ai/local-search', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -292,7 +413,7 @@ export default function App() {
         const localData = await localRes.json();
         setMessages(prev => [...prev, {
           role: 'assistant',
-          content: `[ОФЛАЙН РЕЖИМ]\n\n${localData.answer}`,
+          content: `[LOCAL DB - OFFLINE]\n\n${localData.answer}`,
           timestamp: Date.now()
         }]);
         return;
@@ -693,6 +814,31 @@ export default function App() {
 
           <div className="flex items-center gap-4">
             <button 
+              onClick={() => {
+                fetchPackagesInfo();
+                setShowMigrationModal(true);
+              }}
+              className="px-4 py-2 rounded-xl bg-orange-600/20 border border-orange-500/30 text-orange-400 hover:text-white hover:bg-orange-600 transition-all group flex items-center gap-2 shadow-lg shadow-orange-600/10"
+              title="Миграция Unity"
+            >
+              <GitBranch className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              <span className="text-[10px] font-bold uppercase tracking-widest hidden sm:inline">Миграция</span>
+            </button>
+            <button 
+              onClick={handleLaunchOllama}
+              className={`px-4 py-2 rounded-xl border transition-all group flex items-center gap-2 shadow-lg ${
+                ollamaRunning 
+                ? 'bg-cyan-600/20 border-cyan-500/50 text-cyan-400 shadow-cyan-600/20' 
+                : 'bg-slate-800/20 border-white/5 text-slate-500 shadow-none'
+              }`}
+              title={ollamaRunning ? "Ollama активна (Offline AI готов)" : "Нажмите, чтобы проверить статус Ollama"}
+            >
+              <Cpu className={`w-4 h-4 group-hover:scale-110 transition-transform ${ollamaRunning ? 'animate-pulse' : ''}`} />
+              <span className="text-[10px] font-bold uppercase tracking-widest hidden sm:inline">
+                {ollamaRunning ? 'Ollama: OK' : 'Ollama: Off'}
+              </span>
+            </button>
+            <button 
               onClick={fetchCapabilities}
               className="px-4 py-2 rounded-xl bg-purple-600/20 border border-purple-500/30 text-purple-400 hover:text-white hover:bg-purple-600 transition-all group flex items-center gap-2 shadow-lg shadow-purple-600/10"
               title="О возможностях ИИ"
@@ -806,6 +952,31 @@ export default function App() {
         <div className="flex-1 overflow-hidden flex flex-col">
           {activeTab === 'chat' ? (
             <>
+              {/* Chat Header */}
+              <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-black/20">
+                <div className="flex items-center gap-3">
+                  <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-red-500'}`} />
+                  <span className="text-[10px] font-bold text-white uppercase tracking-widest">
+                    {isOnline ? 'Online Mode' : 'Offline Mode'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={handleClearChat}
+                    className="p-2 hover:bg-white/5 rounded-lg text-slate-500 hover:text-red-400 transition-all flex items-center gap-2"
+                    title="Очистить историю чата"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    <span className="text-[9px] font-bold uppercase hidden sm:inline">Очистить</span>
+                  </button>
+                  <button 
+                    onClick={() => setShowSettings(true)}
+                    className="p-2 hover:bg-white/5 rounded-lg text-slate-500 hover:text-white transition-all"
+                  >
+                    <Settings className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
               {/* Messages */}
         <div className="flex-1 overflow-y-auto p-6 space-y-8 scrollbar-thin scrollbar-thumb-white/5">
           {messages.length === 0 && (
@@ -818,7 +989,7 @@ export default function App() {
                 <Cpu className="w-12 h-12 text-blue-500" />
               </motion.div>
               
-              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v12.0</h2>
+              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v13.2</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg">
                 Я полностью осведомлен о вашем проекте по пути <code className="text-blue-400">C:\Users\user\Desktop\HelperUnity-main\HelperUnity-main</code>. 
                 Задавайте любые вопросы по Unity или Blender на русском языке.
@@ -1327,6 +1498,122 @@ export default function App() {
           ) : null}
         </div>
       </main>
+
+      {/* Ollama Guide Modal */}
+      <AnimatePresence>
+        {showOllamaGuide && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-[#121214] border border-white/10 rounded-3xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col shadow-2xl"
+            >
+              <div className="p-6 border-b border-white/5 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-cyan-600/20 rounded-lg text-cyan-400">
+                    <Cpu className="w-5 h-5" />
+                  </div>
+                  <h2 className="text-lg font-bold text-white uppercase tracking-tight">Ollama (Offline AI) Guide</h2>
+                </div>
+                <button onClick={() => setShowOllamaGuide(false)} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-8 space-y-6 scrollbar-thin scrollbar-thumb-white/5">
+                <div className="space-y-4">
+                  <h4 className="text-sm font-bold text-white uppercase">1. Установка</h4>
+                  <p className="text-xs text-slate-400">Скачайте Ollama с официального сайта <a href="https://ollama.com" target="_blank" className="text-cyan-400 underline">ollama.com</a> и установите её.</p>
+                  
+                  <h4 className="text-sm font-bold text-white uppercase">2. Загрузка модели</h4>
+                  <p className="text-xs text-slate-400">Откройте терминал (CMD) и введите команду для загрузки Llama 3:</p>
+                  <div className="bg-black/40 rounded-xl p-4 font-mono text-[11px] text-cyan-400 border border-white/5">
+                    ollama run llama3
+                  </div>
+
+                  <h4 className="text-sm font-bold text-white uppercase">3. Интеграция с проектом</h4>
+                  <p className="text-xs text-slate-400">Наш проект автоматически обнаружит Ollama на порту 11434. Если интернет пропадет, чат переключится на локальную модель.</p>
+                  
+                  <div className="p-4 bg-yellow-600/10 border border-yellow-500/20 rounded-xl">
+                    <p className="text-[10px] text-yellow-500 leading-relaxed">
+                      <strong>Важно:</strong> Для работы Ollama требуется минимум 8ГБ оперативной памяти (рекомендуется 16ГБ+ и видеокарта NVIDIA).
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Migration Modal */}
+      <AnimatePresence>
+        {showMigrationModal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-[#121214] border border-white/10 rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl"
+            >
+              <div className="p-6 border-b border-white/5 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-orange-600/20 rounded-lg text-orange-400">
+                    <GitBranch className="w-5 h-5" />
+                  </div>
+                  <h2 className="text-lg font-bold text-white uppercase tracking-tight">Unity Migration Center</h2>
+                </div>
+                <button onClick={() => setShowMigrationModal(false)} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-8 space-y-8 scrollbar-thin scrollbar-thumb-white/5">
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Текущие пакеты:</h4>
+                    <div className="space-y-2">
+                      {unityPackages.map((pkg, i) => (
+                        <div key={i} className="p-3 rounded-xl bg-white/5 border border-white/5">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs font-bold text-white">{pkg.name}</span>
+                            <span className="text-[9px] text-slate-500">{pkg.version}</span>
+                          </div>
+                          <p className="text-[9px] text-slate-400 italic">{pkg.action}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Действие:</h4>
+                    <button 
+                      onClick={handleMigrate}
+                      disabled={isMigrating}
+                      className="w-full py-4 bg-orange-600 hover:bg-orange-500 text-white rounded-2xl text-xs font-bold uppercase tracking-widest transition-all shadow-lg shadow-orange-600/20"
+                    >
+                      {isMigrating ? 'Генерация...' : 'Создать план миграции на Unity 6'}
+                    </button>
+                    {migrationGuide && (
+                      <div className="p-4 rounded-xl bg-black/40 border border-white/5 font-sans text-xs text-slate-300 leading-relaxed">
+                        <Markdown>{migrationGuide}</Markdown>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* GitHub Guide Modal */}
       <AnimatePresence>
