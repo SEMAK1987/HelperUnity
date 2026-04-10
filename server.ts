@@ -13,13 +13,13 @@ dotenv.config();
 
 // Configure storage for uploads
 const storage = multer.diskStorage({
-  destination: async (req, file, cb) => {
+  destination: (req, file, cb) => {
     const kbPath = path.join(process.cwd(), "knowledge_base.json");
     let uploadDir = path.join(process.cwd(), "uploads");
     
     try {
-      if (await fs.pathExists(kbPath)) {
-        const kb = await fs.readJson(kbPath);
+      if (fs.pathExistsSync(kbPath)) {
+        const kb = fs.readJsonSync(kbPath);
         if (kb.local_training_path) {
           uploadDir = path.join(process.cwd(), "local_storage", path.basename(kb.local_training_path));
         }
@@ -28,7 +28,7 @@ const storage = multer.diskStorage({
       console.error("Error reading KB for upload path", e);
     }
     
-    await fs.ensureDir(uploadDir);
+    fs.ensureDirSync(uploadDir);
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
@@ -634,6 +634,29 @@ async function startServer() {
       res.json({ success: true, files: results });
     } catch (error) {
       res.status(500).json({ error: "Upload failed" });
+    }
+  });
+
+  // System Status Endpoint
+  app.get("/api/system/status", async (req, res) => {
+    try {
+      const stats = await fs.stat(process.cwd());
+      const kb = await fs.readJson(kbPath).catch(() => ({}));
+      const ollamaActive = await checkOllamaStatus();
+      
+      res.json({
+        success: true,
+        status: "Online",
+        version: "13.3.3",
+        ollama: ollamaActive ? "Active" : "Offline",
+        storage: {
+          uploads: (await fs.readdir(path.join(process.cwd(), "uploads"))).length,
+          kb_version: kb.version || "unknown"
+        },
+        environment: process.env.NODE_ENV || "development"
+      });
+    } catch (error) {
+      res.status(500).json({ success: false, error: "Failed to get system status" });
     }
   });
 

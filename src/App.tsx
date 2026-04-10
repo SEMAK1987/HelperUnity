@@ -644,10 +644,9 @@ export default function App() {
             if (remainingTimeSeconds > 0 && isFinite(remainingTimeSeconds)) {
               const minutes = Math.floor(remainingTimeSeconds / 60);
               const seconds = Math.floor(remainingTimeSeconds % 60);
+              const speedMB = (uploadSpeed / (1024 * 1024)).toFixed(2);
               setUploadTimeRemaining(
-                minutes > 0 
-                ? `${minutes} мин ${seconds} сек` 
-                : `${seconds} сек`
+                `${minutes > 0 ? `${minutes} мин ` : ""}${seconds} сек (${speedMB} MB/s)`
               );
             }
           }
