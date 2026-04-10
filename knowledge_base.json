@@ -32,6 +32,23 @@
     "https://archive.blender.org/wiki/2015/index.php/Doc:2.6/Manual/",
     "https://archive.blender.org/wiki/2015/index.php/Doc:2.4/Manual/"
   ],
+  "emergency_procedures": {
+    "unity_no_internet": [
+      "Использовать Manual Activation в Unity Hub для офлайн-лицензии.",
+      "Запускать Unity.exe напрямую из папки Editor, минуя Hub.",
+      "Убедиться, что все ассеты из Asset Store скачаны заранее."
+    ],
+    "unity_crash_fix": [
+      "Удалить папку Library в корне проекта для сброса кэша импорта.",
+      "Проверить Editor.log по пути %LOCALAPPDATA%/Unity/Editor/Editor.log.",
+      "Запустить проект в Safe Mode для исправления ошибок в скриптах."
+    ],
+    "ai_offline_mode": [
+      "Переключиться на локальный Ollama (Hybrid Sync).",
+      "Использовать PROJECT_MASTER_BLUEPRINT.md как источник структуры проекта.",
+      "Обращаться к локальным справочникам unity_api_ref.json и blender_api_ref.json."
+    ]
+  },
   "videos": [
     "https://www.youtube.com/watch?v=yt0UdVntOQc&t=6s",
     "https://www.youtube.com/watch?v=2REc4MYeRIU&t=6s",

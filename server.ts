@@ -455,7 +455,18 @@ async function generateMasterBlueprint() {
     }
     md += `\n`;
 
-    md += `## 10. Инструкции по восстановлению\n`;
+    md += `## 10. Аварийные процедуры (Emergency)\n`;
+    if (kb.emergency_procedures) {
+      md += `### Unity без интернета\n`;
+      kb.emergency_procedures.unity_no_internet.forEach((step: string) => md += `- ${step}\n`);
+      md += `\n### Исправление вылетов Unity\n`;
+      kb.emergency_procedures.unity_crash_fix.forEach((step: string) => md += `- ${step}\n`);
+      md += `\n### ИИ в Офлайне\n`;
+      kb.emergency_procedures.ai_offline_mode.forEach((step: string) => md += `- ${step}\n`);
+    }
+    md += `\n`;
+
+    md += `## 11. Инструкции по восстановлению\n`;
     md += `1. Установите Node.js (v18+).\n`;
     md += `2. Склонируйте репозиторий: \`git clone https://github.com/SEMAK1987/unity-ai-assistant.git\`\n`;
     md += `3. Запустите \`RUN.bat\` для автоматической установки зависимостей и запуска.\n`;
