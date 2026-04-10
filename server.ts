@@ -469,7 +469,11 @@ async function generateMasterBlueprint() {
     md += `## 11. Инструкции по восстановлению\n`;
     md += `1. Установите Node.js (v18+).\n`;
     md += `2. Склонируйте репозиторий: \`git clone https://github.com/SEMAK1987/unity-ai-assistant.git\`\n`;
-    md += `3. Запустите \`RUN.bat\` для автоматической установки зависимостей и запуска.\n`;
+    md += `3. Запустите \`RUN.bat\` для автоматической установки зависимостей и запуска.\n\n`;
+
+    md += `## 12. Известные ошибки и решения\n`;
+    md += `- **WebSocket Error:** Ошибка \`[vite] failed to connect to websocket\` является ожидаемой в данной среде разработки и не влияет на работу приложения. Её можно игнорировать.\n`;
+    md += `- **Unexpected token '<':** Обычно означает, что сервер вернул HTML вместо JSON. Проверьте статус сервера и корректность API путей.\n`;
 
     await fs.writeFile(masterBlueprintMdPath, md);
     console.log("Master blueprint generated successfully.");
@@ -480,10 +484,11 @@ async function generateMasterBlueprint() {
 
 async function startServer() {
   const app = express();
-  const PORT = Number(process.env.PORT) || 3001;
+  const PORT = 3000;
 
   app.use(cors());
-  app.use(express.json({ limit: '50mb' }));
+  app.use(express.json({ limit: '500mb' }));
+  app.use(express.urlencoded({ limit: '500mb', extended: true }));
 
   await loadStats();
 
@@ -1214,6 +1219,16 @@ public class MaterialConverter : EditorWindow {
       res.sendFile(path.join(distPath, "index.html"));
     });
   }
+
+  // Global Error Handler to ensure JSON responses
+  app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.error("Global Error Handler:", err);
+    res.status(err.status || 500).json({
+      success: false,
+      error: err.message || "Internal Server Error",
+      code: err.code
+    });
+  });
 
   app.listen(PORT, "0.0.0.0", async () => {
     console.log(`Server running on http://localhost:${PORT}`);

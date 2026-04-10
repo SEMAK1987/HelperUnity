@@ -125,6 +125,7 @@ export default function App() {
   const [isClearingChat, setIsClearingChat] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadTimeRemaining, setUploadTimeRemaining] = useState<string | null>(null);
   const [showGithubGuide, setShowGithubGuide] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [localPathInput, setLocalPathInput] = useState('');
@@ -565,28 +566,66 @@ export default function App() {
 
     setIsUploading(true);
     setUploadProgress(0);
+    setUploadTimeRemaining(null);
 
     const formData = new FormData();
+    const totalSize = Array.from(files).reduce((acc, f) => acc + f.size, 0);
     Array.from(files).forEach(f => formData.append('files', f));
 
     try {
-      // Fake progress for visual feedback
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += Math.random() * 15;
-        if (progress > 95) progress = 95;
-        setUploadProgress(Math.floor(progress));
-      }, 300);
+      const startTime = Date.now();
+      
+      const xhr = new XMLHttpRequest();
+      
+      const uploadPromise = new Promise((resolve, reject) => {
+        xhr.upload.addEventListener('progress', (event) => {
+          if (event.lengthComputable) {
+            const percentComplete = (event.loaded / event.total) * 100;
+            setUploadProgress(Math.floor(percentComplete));
+            
+            // Calculate time remaining
+            const elapsedTime = (Date.now() - startTime) / 1000; // in seconds
+            const uploadSpeed = event.loaded / elapsedTime; // bytes per second
+            const remainingBytes = event.total - event.loaded;
+            const remainingTimeSeconds = remainingBytes / uploadSpeed;
+            
+            if (remainingTimeSeconds > 0 && isFinite(remainingTimeSeconds)) {
+              const minutes = Math.floor(remainingTimeSeconds / 60);
+              const seconds = Math.floor(remainingTimeSeconds % 60);
+              setUploadTimeRemaining(
+                minutes > 0 
+                ? `${minutes} мин ${seconds} сек` 
+                : `${seconds} сек`
+              );
+            }
+          }
+        });
 
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData
+        xhr.addEventListener('load', () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              const response = JSON.parse(xhr.responseText);
+              resolve(response);
+            } catch (e) {
+              reject(new Error("Сервер вернул некорректный ответ (не JSON)"));
+            }
+          } else {
+            reject(new Error(`Ошибка загрузки: статус ${xhr.status}`));
+          }
+        });
+
+        xhr.addEventListener('error', () => reject(new Error('Upload failed')));
+        xhr.addEventListener('abort', () => reject(new Error('Upload aborted')));
+
+        xhr.open('POST', '/api/upload');
+        xhr.send(formData);
       });
+
+      const data: any = await uploadPromise;
       
-      clearInterval(interval);
       setUploadProgress(100);
+      setUploadTimeRemaining(null);
       
-      const data = await res.json();
       if (data.success) {
         const fileMsg: Message = { 
           role: 'user', 
@@ -595,14 +634,17 @@ export default function App() {
           files: data.files
         };
         setMessages(prev => [...prev, fileMsg]);
+        showNotification("Файлы успешно загружены", "success");
       }
     } catch (error) {
       console.error("Upload error:", error);
+      showNotification("Ошибка при загрузке. Возможно, файл слишком большой.", "error");
     } finally {
       setTimeout(() => {
         setIsUploading(false);
         setUploadProgress(0);
-      }, 500);
+        setUploadTimeRemaining(null);
+      }, 1000);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
@@ -651,6 +693,10 @@ export default function App() {
                   {isOnline ? 'Онлайн' : 'Офлайн'}
                 </span>
               </div>
+            </div>
+            <div className="px-2 py-1 bg-white/5 rounded-lg border border-white/5 flex items-center gap-2">
+              <Info className="w-3 h-3 text-slate-600" />
+              <span className="text-[8px] text-slate-600 uppercase leading-tight">HMR WebSocket может быть отключен (это нормально)</span>
             </div>
             <div className="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/5">
               <span className="text-[10px] font-bold text-slate-500 uppercase">AI Агент</span>
@@ -1154,7 +1200,12 @@ export default function App() {
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <RefreshCw className="w-3 h-3 text-blue-400 animate-spin" />
-                  <span className="text-[10px] font-bold text-white uppercase">Загрузка файлов...</span>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-bold text-white uppercase">Загрузка файлов...</span>
+                    {uploadTimeRemaining && (
+                      <span className="text-[8px] text-slate-500 uppercase">Осталось: {uploadTimeRemaining}</span>
+                    )}
+                  </div>
                 </div>
                 <span className="text-[10px] text-blue-400 font-mono font-bold">{uploadProgress}%</span>
               </div>
