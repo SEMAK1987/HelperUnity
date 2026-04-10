@@ -1044,24 +1044,7 @@ export default function App() {
                 Задавайте любые вопросы по Unity или Blender на русском языке. Экспертные знания C# и Python теперь интегрированы напрямую в чат.
               </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-                <div 
-                  onClick={() => handleSend("Как оптимизировать производительность в Unity?")}
-                  className="p-6 rounded-3xl bg-white/5 border border-white/5 text-left hover:bg-white/10 transition-all cursor-pointer group"
-                >
-                  <Zap className="w-6 h-6 text-yellow-400 mb-4 group-hover:scale-110 transition-transform" />
-                  <div className="text-xs font-bold text-white uppercase mb-2">Оптимизация</div>
-                  <div className="text-[11px] text-slate-500 leading-relaxed">Советы по повышению FPS, кэшированию и работе с профайлером.</div>
-                </div>
-                <div 
-                  onClick={() => handleSend("Какие лучшие практики для работы в Blender?")}
-                  className="p-6 rounded-3xl bg-white/5 border border-white/5 text-left hover:bg-white/10 transition-all cursor-pointer group"
-                >
-                  <Sparkles className="w-6 h-6 text-purple-400 mb-4 group-hover:scale-110 transition-transform" />
-                  <div className="text-xs font-bold text-white uppercase mb-2">Best Practices</div>
-                  <div className="text-[11px] text-slate-500 leading-relaxed">Рекомендации по моделированию, развертке и подготовке ассетов.</div>
-                </div>
-              </div>
+              {/* Cards removed as per user request */}
             </div>
           )}
 

@@ -444,7 +444,18 @@ async function generateMasterBlueprint() {
     md += `- **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.\n`;
     md += `- **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.\n\n`;
 
-    md += `## 9. Инструкции по восстановлению\n`;
+    md += `## 9. История изменений (Последние 10)\n`;
+    const history = await fs.readJson(historyPath).catch(() => []);
+    if (history.length > 0) {
+      history.slice(-10).reverse().forEach((h: any) => {
+        md += `- **[${h.event.toUpperCase()}]** ${h.path} (${new Date(h.timestamp).toLocaleString()})\n`;
+      });
+    } else {
+      md += `История пуста.\n`;
+    }
+    md += `\n`;
+
+    md += `## 10. Инструкции по восстановлению\n`;
     md += `1. Установите Node.js (v18+).\n`;
     md += `2. Склонируйте репозиторий: \`git clone https://github.com/SEMAK1987/unity-ai-assistant.git\`\n`;
     md += `3. Запустите \`RUN.bat\` для автоматической установки зависимостей и запуска.\n`;
@@ -944,6 +955,15 @@ async function startServer() {
           "4. **Export:** При экспорте в FBX из Blender используйте '-Y Forward' и 'Z Up' для корректной ориентации в Unity.");
       }
 
+      if (keywords.some(k => k.includes('отладк') || k.includes('ошибк') || k.includes('исправ') || k.includes('баг'))) {
+        results.push("**ИНСТРУКЦИИ ПО ОТЛАДКЕ И ИСПРАВЛЕНИЮ ОШИБОК:**\n" +
+          "1. **Console:** Проверьте Unity Console на наличие 'NullReferenceException'. Это самая частая ошибка.\n" +
+          "2. **Debug.Log:** Расставьте Debug.Log() в критических точках кода, чтобы отследить поток выполнения.\n" +
+          "3. **Visual Studio:** Используйте 'Attach to Unity' для пошаговой отладки (breakpoints).\n" +
+          "4. **Синтаксис:** Убедитесь, что все скобки закрыты и точки с запятой на месте.\n" +
+          "5. **Логика:** Если код работает не так, как ожидалось, проверьте условия (if/else) и циклы (for/while).");
+      }
+
       res.json({ answer: results.join('\n\n'), source: "local_database_v3" });
     } catch (error) {
       console.error("Local search error:", error);
@@ -964,6 +984,10 @@ async function startServer() {
         {
           title: "Blender Expert (v2.4 - v5.1)",
           desc: "Глубокое знание всех версий Blender. Автоматизация API bpy, процедурные инструменты, Geometry Nodes и экспорт в Unity. Поддержка исторического контекста API."
+        },
+        {
+          title: "Code Debugger & Error Fixer",
+          desc: "Встроенный механизм анализа кода и файлов проекта. Поиск багов, логических ошибок и предоставление пошаговых инструкций по их исправлению в режиме реального времени."
         },
         {
           title: "Поддержка архивов (ZIP/RAR)",
