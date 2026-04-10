@@ -962,8 +962,8 @@ async function startServer() {
           desc: "Оптимизированный код, SOLID, лучшие практики движка и навыки мобов. Помощь в создании ИИ врагов, оптимизации Update-циклов и архитектуре проекта."
         },
         {
-          title: "Blender Python Expert (Интегрировано)",
-          desc: "Автоматизация API bpy, процедурные инструменты и экспорт в Unity. Создание кастомных аддонов и инструментов для ускорения пайплайна."
+          title: "Blender Expert (v2.4 - v5.1)",
+          desc: "Глубокое знание всех версий Blender. Автоматизация API bpy, процедурные инструменты, Geometry Nodes и экспорт в Unity. Поддержка исторического контекста API."
         },
         {
           title: "Поддержка архивов (ZIP/RAR)",
@@ -996,6 +996,7 @@ async function startServer() {
         "history.json - История изменений файлов",
         "PROJECT_MASTER_BLUEPRINT.md - Полный слепок проекта для восстановления",
         "unity_api_ref.json / blender_api_ref.json - Локальные справочники API",
+        "blender_manuals_index.json - Индекс документации Blender (2.4 - 5.1)",
         "*.zip / *.rar - Поддержка анализа архивов"
       ],
       video_knowledge_base: {

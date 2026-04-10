@@ -28,10 +28,12 @@ import {
   ChevronRight,
   AlertTriangle,
   ExternalLink,
+  BookOpen,
   GitBranch,
   Type,
   FileCode,
-  Trash2
+  Trash2,
+  Database
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenAI } from "@google/genai";
@@ -56,6 +58,7 @@ interface KBData {
     description: string;
     combined_knowledge: string;
   };
+  blender_manuals?: string[];
 }
 
 interface ProjectScan {
@@ -1903,6 +1906,32 @@ export default function App() {
                             {capabilities.inventory_guide.unity_implementation.map((u: string, i: number) => (
                               <span key={i} className="px-3 py-1 rounded-lg bg-black/40 text-[10px] text-slate-300">{u}</span>
                             ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {kb?.blender_manuals && (
+                    <div className="space-y-6">
+                      <h3 className="text-xs font-bold text-white uppercase tracking-widest flex items-center gap-3">
+                        <BookOpen className="w-4 h-4 text-blue-400" /> Документация Blender (v2.4 - v5.1)
+                      </h3>
+                      <div className="p-6 rounded-3xl bg-blue-600/5 border border-blue-500/20">
+                        <p className="text-[11px] text-slate-400 leading-relaxed mb-4">
+                          ИИ интегрировал знания из всех официальных руководств Blender. Это позволяет давать точные ответы как по классическим методам (Internal Render, Layers), так и по самым современным (Eevee Next, Simulation Nodes).
+                        </p>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                          {kb.blender_manuals.slice(0, 8).map((url: string, i: number) => {
+                            const version = url.split('/').filter(Boolean).pop();
+                            return (
+                              <div key={i} className="px-3 py-2 rounded-xl bg-black/40 border border-white/5 text-[10px] text-center text-blue-300 font-mono">
+                                v{version}
+                              </div>
+                            );
+                          })}
+                          <div className="px-3 py-2 rounded-xl bg-black/40 border border-white/5 text-[10px] text-center text-slate-500 font-mono italic">
+                            + еще {kb.blender_manuals.length - 8}
                           </div>
                         </div>
                       </div>
