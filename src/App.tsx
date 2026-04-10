@@ -144,6 +144,26 @@ export default function App() {
   const [updateProgress, setUpdateProgress] = useState(0);
   const [ollamaRunning, setOllamaRunning] = useState(false);
 
+  const fileToBase64 = async (url: string): Promise<{ mimeType: string; data: string }> => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64data = reader.result as string;
+          const data = base64data.split(',')[1];
+          resolve({ mimeType: blob.type, data });
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (e) {
+      console.error("Error in fileToBase64:", e);
+      throw e;
+    }
+  };
+
   const [showOllamaGuide, setShowOllamaGuide] = useState(false);
   const [showMigrationModal, setShowMigrationModal] = useState(false);
   const [migrationGuide, setMigrationGuide] = useState('');
@@ -396,7 +416,8 @@ export default function App() {
       timestamp: Date.now()
     };
 
-    setMessages(prev => [...prev, userMsg]);
+    const newMessages = [...messages, userMsg];
+    setMessages(newMessages);
     setInput('');
     setIsTyping(true);
 
@@ -438,9 +459,38 @@ export default function App() {
         return;
       }
 
+      // Prepare contents for Gemini (History + Images)
+      const contents = [];
+      // Limit history to last 10 messages to avoid token issues
+      const historyToProcess = newMessages.slice(-10);
+      
+      for (const msg of historyToProcess) {
+        const parts: any[] = [{ text: msg.content }];
+        
+        if (msg.files) {
+          for (const file of msg.files) {
+            if (file.type && file.type.startsWith('image/')) {
+              try {
+                const base64 = await fileToBase64(file.url);
+                parts.push({
+                  inlineData: base64
+                });
+              } catch (e) {
+                console.error("Error converting image to base64", e);
+              }
+            }
+          }
+        }
+        
+        contents.push({
+          role: msg.role === 'assistant' ? 'model' : 'user',
+          parts: parts
+        });
+      }
+
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        contents: text,
+        contents: contents,
         config: {
           systemInstruction: kb.system_instruction,
         },
@@ -692,6 +742,13 @@ export default function App() {
                 <span className={`text-[9px] font-bold uppercase ${isOnline ? 'text-green-500' : 'text-red-500'}`}>
                   {isOnline ? 'Онлайн' : 'Офлайн'}
                 </span>
+              </div>
+            </div>
+            <div className="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/5">
+              <span className="text-[10px] font-bold text-slate-500 uppercase">Зрение (Vision)</span>
+              <div className="flex items-center gap-1.5">
+                <ImageIcon className="w-3 h-3 text-blue-400" />
+                <span className="text-[9px] font-bold uppercase text-blue-400">Активно</span>
               </div>
             </div>
             <div className="px-2 py-1 bg-white/5 rounded-lg border border-white/5 flex items-center gap-2">
