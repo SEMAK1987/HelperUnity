@@ -119,6 +119,7 @@ export default function App() {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [blenderPresets, setBlenderPresets] = useState<BlenderPreset[]>([]);
   const [isRepairing, setIsRepairing] = useState(false);
+  const [isClearingChat, setIsClearingChat] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [showGithubGuide, setShowGithubGuide] = useState(false);
@@ -257,7 +258,17 @@ export default function App() {
 
     fetch('/api/kb')
       .then(res => res.json())
-      .then(data => setKb(data));
+      .then(data => setKb(data))
+      .catch(err => {
+        console.error("Failed to fetch KB, using fallback", err);
+        setKb({
+          name: "Unity AI Assistant",
+          version: "13.3.0",
+          description: "Гибридный ИИ-помощник",
+          project_path: "Unknown",
+          system_instruction: "Ты — экспертный ИИ-ассистент."
+        });
+      });
 
     fetch('/api/project/scan')
       .then(res => res.json())
@@ -309,6 +320,8 @@ export default function App() {
   }, [messages]);
 
   const handleClearChat = async () => {
+    if (isClearingChat) return;
+    setIsClearingChat(true);
     try {
       const res = await fetch('/api/chat/clear', { method: 'POST' });
       if (res.ok) {
@@ -317,6 +330,8 @@ export default function App() {
       }
     } catch (e) {
       showNotification("Ошибка при очистке чата.", "error");
+    } finally {
+      setIsClearingChat(false);
     }
   };
 
@@ -511,16 +526,31 @@ export default function App() {
   };
 
   const handleRepair = async () => {
+    if (isRepairing) return;
     setIsRepairing(true);
     try {
-      const res = await fetch('/api/system/repair', { method: 'POST' });
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+
+      const res = await fetch('/api/system/repair', { 
+        method: 'POST',
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      
       const data = await res.json();
       if (data.success) {
         showNotification(data.message, "success");
-        setTimeout(() => window.location.reload(), 2000);
+        setTimeout(() => window.location.reload(), 1500);
+      } else {
+        showNotification("Ошибка: " + (data.error || "Неизвестная ошибка"), "error");
       }
-    } catch (error) {
-      showNotification("Ошибка при восстановлении системы.", "error");
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        showNotification("Процесс занимает много времени, он продолжится в фоне. Перезагрузите страницу через минуту.", "info");
+      } else {
+        showNotification("Ошибка при восстановлении системы.", "error");
+      }
     } finally {
       setIsRepairing(false);
     }
@@ -537,10 +567,13 @@ export default function App() {
     Array.from(files).forEach(f => formData.append('files', f));
 
     try {
-      // Fake progress
+      // Fake progress for visual feedback
+      let progress = 0;
       const interval = setInterval(() => {
-        setUploadProgress(prev => Math.min(prev + 10, 90));
-      }, 200);
+        progress += Math.random() * 15;
+        if (progress > 95) progress = 95;
+        setUploadProgress(Math.floor(progress));
+      }, 300);
 
       const res = await fetch('/api/upload', {
         method: 'POST',
@@ -594,7 +627,8 @@ export default function App() {
     <div className="h-screen bg-[#0a0a0c] text-slate-300 font-sans flex overflow-hidden">
       
       {/* Sidebar for Stats and Status */}
-      <aside className="w-64 border-r border-white/5 bg-black/40 flex flex-col z-50 overflow-y-auto scrollbar-none">
+      {messages.length > 0 && (
+        <aside className="w-64 border-r border-white/5 bg-black/40 flex flex-col z-50 overflow-y-auto scrollbar-none">
         <div className="p-6 border-b border-white/5">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20">
@@ -723,13 +757,19 @@ export default function App() {
           <button 
             onClick={handleRepair}
             disabled={isRepairing}
-            className="w-full p-4 rounded-2xl bg-red-600/10 border border-red-500/20 hover:bg-red-600/20 hover:border-red-500/40 transition-all group text-left"
+            className={`w-full p-4 rounded-2xl border transition-all group text-left ${
+              isRepairing 
+              ? 'bg-red-600/20 border-red-500/50 cursor-wait' 
+              : 'bg-red-600/10 border-red-500/20 hover:bg-red-600/20 hover:border-red-500/40'
+            }`}
           >
             <div className="flex items-center gap-3 mb-1">
               <div className={`p-2 bg-black/40 rounded-lg group-hover:text-red-400 transition-colors ${isRepairing ? 'animate-spin' : ''}`}>
                 <RefreshCw className="w-4 h-4" />
               </div>
-              <span className="text-[11px] font-bold text-white uppercase">Самоочистка</span>
+              <span className="text-[11px] font-bold text-white uppercase">
+                {isRepairing ? 'Очистка...' : 'Самоочистка'}
+              </span>
             </div>
             <p className="text-[9px] text-slate-500 leading-relaxed">Исправить ошибки и восстановить целостность системы.</p>
           </button>
@@ -770,6 +810,7 @@ export default function App() {
           </div>
         </div>
       </aside>
+      )}
 
       {/* Main Chat Area */}
       <main className="flex-1 flex flex-col relative overflow-hidden">
@@ -784,32 +825,34 @@ export default function App() {
               <span className="text-[9px] text-slate-500 uppercase tracking-widest mt-0.5">Unity & Blender Expert</span>
             </div>
 
-            <nav className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/5">
-              <button 
-                onClick={() => setActiveTab('chat')}
-                className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 ${
-                  activeTab === 'chat' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-500 hover:text-slate-300'
-                }`}
-              >
-                <Send className="w-3.5 h-3.5" /> Чат
-              </button>
-              <button 
-                onClick={() => setActiveTab('dashboard')}
-                className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 ${
-                  activeTab === 'dashboard' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-500 hover:text-slate-300'
-                }`}
-              >
-                <Layers className="w-3.5 h-3.5" /> Дашборд
-              </button>
-              <button 
-                onClick={() => setActiveTab('project_info')}
-                className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 ${
-                  activeTab === 'project_info' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-500 hover:text-slate-300'
-                }`}
-              >
-                <Info className="w-3.5 h-3.5" /> О проекте
-              </button>
-            </nav>
+            {messages.length > 0 && (
+              <nav className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/5">
+                <button 
+                  onClick={() => setActiveTab('chat')}
+                  className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 ${
+                    activeTab === 'chat' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-500 hover:text-slate-300'
+                  }`}
+                >
+                  <Send className="w-3.5 h-3.5" /> Чат
+                </button>
+                <button 
+                  onClick={() => setActiveTab('dashboard')}
+                  className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 ${
+                    activeTab === 'dashboard' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-500 hover:text-slate-300'
+                  }`}
+                >
+                  <Layers className="w-3.5 h-3.5" /> Дашборд
+                </button>
+                <button 
+                  onClick={() => setActiveTab('project_info')}
+                  className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 ${
+                    activeTab === 'project_info' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-500 hover:text-slate-300'
+                  }`}
+                >
+                  <Info className="w-3.5 h-3.5" /> О проекте
+                </button>
+              </nav>
+            )}
           </div>
 
           <div className="flex items-center gap-4">
@@ -963,11 +1006,14 @@ export default function App() {
                 <div className="flex items-center gap-2">
                   <button 
                     onClick={handleClearChat}
-                    className="p-2 hover:bg-white/5 rounded-lg text-slate-500 hover:text-red-400 transition-all flex items-center gap-2"
+                    disabled={isClearingChat}
+                    className="p-2 hover:bg-white/5 rounded-lg text-slate-500 hover:text-red-400 transition-all flex items-center gap-2 disabled:opacity-50"
                     title="Очистить историю чата"
                   >
-                    <Trash2 className="w-4 h-4" />
-                    <span className="text-[9px] font-bold uppercase hidden sm:inline">Очистить</span>
+                    <Trash2 className={`w-4 h-4 ${isClearingChat ? 'animate-spin' : ''}`} />
+                    <span className="text-[9px] font-bold uppercase hidden sm:inline">
+                      {isClearingChat ? 'Очистка...' : 'Очистить'}
+                    </span>
                   </button>
                   <button 
                     onClick={() => setShowSettings(true)}
@@ -980,7 +1026,7 @@ export default function App() {
               {/* Messages */}
         <div className="flex-1 overflow-y-auto p-6 space-y-8 scrollbar-thin scrollbar-thumb-white/5">
           {messages.length === 0 && (
-            <div className="h-full flex flex-col items-center justify-center text-center max-w-2xl mx-auto">
+            <div className="flex-1 flex flex-col items-center justify-center text-center max-w-2xl mx-auto py-10">
               <motion.div 
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -989,28 +1035,32 @@ export default function App() {
                 <Cpu className="w-12 h-12 text-blue-500" />
               </motion.div>
               
-              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v13.2</h2>
-              <p className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg">
-                Я полностью осведомлен о вашем проекте по пути <code className="text-blue-400">C:\Users\user\Desktop\HelperUnity-main\HelperUnity-main</code>. 
-                Задавайте любые вопросы по Unity или Blender на русском языке.
+              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v{kb?.version || '13.3'}</h2>
+              <p className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg px-4">
+                Я полностью осведомлен о вашем проекте по пути <br/>
+                <code className="text-blue-400 break-all bg-white/5 px-2 py-1 rounded mt-2 inline-block">
+                  {kb?.project_path || 'Загрузка...'}
+                </code>. 
+                <br/><br/>
+                Задавайте любые вопросы по Unity или Blender на русском языке. Экспертные знания C# и Python теперь интегрированы напрямую в чат.
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
                 <div 
-                  onClick={() => handleSend("Напиши скрипт для передвижения игрока в Unity с использованием CharacterController.")}
+                  onClick={() => handleSend("Как оптимизировать производительность в Unity?")}
                   className="p-6 rounded-3xl bg-white/5 border border-white/5 text-left hover:bg-white/10 transition-all cursor-pointer group"
                 >
-                  <Gamepad2 className="w-6 h-6 text-blue-400 mb-4 group-hover:scale-110 transition-transform" />
-                  <div className="text-xs font-bold text-white uppercase mb-2">Unity C# Expert</div>
-                  <div className="text-[11px] text-slate-500 leading-relaxed">Оптимизированный код, SOLID, лучшие практики движка и навыки мобов.</div>
+                  <Zap className="w-6 h-6 text-yellow-400 mb-4 group-hover:scale-110 transition-transform" />
+                  <div className="text-xs font-bold text-white uppercase mb-2">Оптимизация</div>
+                  <div className="text-[11px] text-slate-500 leading-relaxed">Советы по повышению FPS, кэшированию и работе с профайлером.</div>
                 </div>
                 <div 
-                  onClick={() => handleSend("Напиши Python скрипт для Blender, который создает сетку из кубов.")}
+                  onClick={() => handleSend("Какие лучшие практики для работы в Blender?")}
                   className="p-6 rounded-3xl bg-white/5 border border-white/5 text-left hover:bg-white/10 transition-all cursor-pointer group"
                 >
-                  <Cube className="w-6 h-6 text-purple-400 mb-4 group-hover:scale-110 transition-transform" />
-                  <div className="text-xs font-bold text-white uppercase mb-2">Blender Python Expert</div>
-                  <div className="text-[11px] text-slate-500 leading-relaxed">Автоматизация API bpy, процедурные инструменты и экспорт в Unity.</div>
+                  <Sparkles className="w-6 h-6 text-purple-400 mb-4 group-hover:scale-110 transition-transform" />
+                  <div className="text-xs font-bold text-white uppercase mb-2">Best Practices</div>
+                  <div className="text-[11px] text-slate-500 leading-relaxed">Рекомендации по моделированию, развертке и подготовке ассетов.</div>
                 </div>
               </div>
             </div>
