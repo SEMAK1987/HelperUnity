@@ -1,7 +1,7 @@
 {
   "project_name": "Unity & Blender AI Assistant",
   "description": "Гибридный ИИ-помощник (Online/Offline) для Unity & Blender. Поддержка Ollama, миграция на Unity 6, сохранение чата, поддержка архивов и самовосстановление.",
-  "version": "13.3.0",
+  "version": "13.3.2",
   "dependencies": {
     "@google/genai": "^1.29.0",
     "@tailwindcss/vite": "^4.1.14",
@@ -33,7 +33,7 @@
   },
   "agents_count": 49,
   "knowledge_base": {
-    "version": "0.3.0",
+    "version": "0.4.0",
     "levels": [
       {
         "id": 1,
@@ -382,6 +382,16 @@
         "animations": "Анимации управляют движением объектов через Animator Controller.",
         "physics": "Физика в Unity управляется компонентами Rigidbody и Collider."
       },
+      "advanced_unity": {
+        "ai": "Behavior Trees, Utility AI, ML-Agents для создания сложного поведения.",
+        "graphics": "Custom Lighting, Ray Tracing, Decals, Volumetric Lighting в URP/HDRP.",
+        "optimization": "Addressables, Job System, Burst Compiler, Object Pooling."
+      },
+      "advanced_blender": {
+        "modeling": "Hard Surface, Sculpting, Retopology, Geometry Nodes.",
+        "animation": "Simulation Nodes, Advanced Rigging, Face Animation.",
+        "texturing": "Texture Painting, PBR Materials, UV Unwrapping."
+      },
       "ccgs_workflow": {
         "agents": "В CCGS работают 48 специализированных агентов, разделенных на 3 уровня иерахии.",
         "blueprint": "Blueprint — это файл проекта, содержащий всю структуру и настройки для восстановления.",
@@ -390,13 +400,13 @@
       "troubleshooting": {
         "long_prompts": "Для длинных промтов рекомендуется разбивать задачу на подзадачи для разных агентов.",
         "connection_error": "Если Unity не видит сервер, проверьте запущен ли start_studio.bat и порт 3001.",
-        "upload_limits": "Соблюдайте лимиты: Видео до 100МБ, Фото до 10шт PNG, Документы до 5шт."
+        "upload_limits": "Соблюдайте лимиты: Видео до 500МБ, Фото до 10шт PNG, Документы до 5шт."
       },
       "unity_ai_assistant_project": {
         "source": "https://github.com/SEMAK1987/unity-ai-assistant.git",
         "description": "Проект содержит видео и PDF материалы, описывающие структуру уровней, файлы и анимации.",
         "assets": {
-          "videos": "Видео-обзоры проекта и уровней в папке upload.",
+          "videos": "151+ видео-уроков по Unity и Blender.",
           "pdfs": "Документация по проекту в формате PDF."
         }
       }
@@ -407,15 +417,15 @@
       "project_path": "C:\\Users\\user\\Desktop\\HelperUnity-main\\HelperUnity-main"
     }
   },
-  "last_updated": "2026-03-30T15:52:26.406Z",
+  "last_updated": "2026-04-10T16:37:00.000Z",
   "recovery_instructions": "To restore, create a new project and replace knowledge_base.json and metadata.json with the data from this file.",
   "project_assets": {
     "scripts_count": 0,
     "prefabs_count": 0,
-    "videos_count": 0,
-    "total_files": 15,
+    "videos_count": 151,
+    "total_files": 16,
     "video_list": [],
     "script_list": []
   },
-  "last_scan": "2026-04-10T09:26:22.572Z"
+  "last_scan": "2026-04-10T16:36:02.214Z"
 }

@@ -419,21 +419,28 @@ async function generateMasterBlueprint() {
       md += `Задач не найдено.\n`;
     }
 
-    md += `\n## 6. Новые возможности ИИ (v13.3)\n`;
+    md += `\n## 6. Новые возможности ИИ (v13.3.2)\n`;
+    md += `- **Vision & Media (Enhanced):** ИИ теперь полноценно видит скриншоты и анализирует их контекст вместе с историей чата.\n`;
+    md += `- **Extended Knowledge Base:** Интеграция 151+ видео-уроков по Unity и Blender.\n`;
+    md += `- **Advanced AI Systems:** Поддержка Behavior Trees, Utility AI и ML-Agents.\n`;
+    md += `- **Graphics & VFX:** Глубокое понимание Shader Graph, VFX Graph, Ray Tracing и Volumetric Lighting.\n`;
+    md += `- **Blender Simulation:** Работа с Simulation Nodes и сложным риггингом.\n`;
+    md += `- **Automated Pipeline:** Скрипты для пакетного экспорта и автоматической настройки материалов.\n`;
     md += `- **Archive Support:** Чтение и анализ содержимого ZIP и RAR архивов при загрузке.\n`;
     md += `- **Upload Progress:** Визуальное отображение процента загрузки файлов в проект.\n`;
-    md += `- **Expert Chat Integration:** Специализации Unity C# и Blender Python теперь интегрированы напрямую в чат для контекстной помощи.\n`;
-    md += `- **Chat Persistence:** История чата сохраняется на ПК и доступна после перезапуска.\n`;
-    md += `- **Clear Chat:** Возможность полной очистки истории сообщений.\n`;
-    md += `- **Deep Sync & Repair:** Глубокая синхронизация между ПК и облаком, автоматическое исправление ошибок.\n`;
-    md += `- **Hybrid AI (Ollama):** Работа без интернета через локальные LLM (Llama 3, Phi-3).\n`;
-    md += `- **Unity 6 Migration:** Автоматический план перехода с 2022.3 на 6000.3.\n`;
-    md += `- **Vision & Media:** Анализ скриншотов ошибок, чтение PDF, работа с аудио/видео.\n`;
-    md += `- **File Creation:** Генерация и редактирование текстовых и PDF файлов напрямую.\n`;
-    md += `- **Unity Bridge:** Автоматическая конвертация материалов Blender -> Unity.\n`;
-    md += `- **Git LFS:** Автоматическая генерация конфигурации для тяжелых ассетов.\n\n`;
+    md += `- **Hybrid AI (Ollama):** Работа без интернета через локальные LLM (Llama 3, Phi-3).\n\n`;
 
-    md += `## 7. База знаний: Системы инвентаря\n`;
+    md += `## 7. Расширенная База Видео-уроков (151+ видео)\n`;
+    md += `### Темы Unity\n`;
+    md += `- **Программирование:** Продвинутый C#, Job System, Burst Compiler, Addressables, Localization.\n`;
+    md += `- **Графика:** URP/HDRP, Custom Lighting, Decals, Volumetric Effects.\n`;
+    md += `- **ИИ:** Behavior Trees, ML-Agents, Pathfinding.\n`;
+    md += `### Темы Blender\n`;
+    md += `- **Моделирование:** Hard Surface, Sculpting, Retopology, Geometry Nodes.\n`;
+    md += `- **Анимация:** Simulation Nodes, Advanced Rigging, Face Animation.\n`;
+    md += `- **Текстурирование:** Texture Painting, PBR, UV Unwrapping.\n\n`;
+
+    md += `## 8. База знаний: Системы инвентаря\n`;
     md += `- **Типы:** Слоты (шутеры), Сетка (тетрис), Список (MMORPG), Категории.\n`;
     md += `- **Компоненты:** Контейнеры, ItemData, Слоты, Действия (CRUD).\n`;
     md += `- **Оптимизация:** Складывание (stacking), ограничения по весу, горячие клавиши.\n\n`;
@@ -1050,7 +1057,11 @@ async function startServer() {
               "Архитектурные паттерны: Singleton, Factory, Observer, State Machine",
               "Unity Job System и Burst Compiler для высокопроизводительных вычислений",
               "Работа с ScriptableObjects для гибких систем данных",
-              "Оптимизация: Object Pooling, кэширование компонентов, профилирование"
+              "Оптимизация: Object Pooling, кэширование компонентов, профилирование",
+              "Advanced AI: Behavior Trees, Utility AI, ML-Agents",
+              "Системы сохранений: JSON, Binary, ScriptableObject Persistence",
+              "Addressables: Эффективное управление памятью и загрузка ассетов",
+              "Unity Localization: Создание многоязычных игр"
             ]
           },
           {
@@ -1060,7 +1071,11 @@ async function startServer() {
               "VFX Graph: Системы частиц нового поколения",
               "Universal Render Pipeline (URP) и настройки освещения",
               "Post-Processing: Настройка атмосферы и цветокоррекции",
-              "Cinemachine: Профессиональная работа с камерой"
+              "Cinemachine: Профессиональная работа с камерой",
+              "Custom Lighting: Настройка кастомных моделей освещения и теней",
+              "Ray Tracing: Основы трассировки лучей в Unity",
+              "Decal System: Добавление деталей на поверхности без изменения геометрии",
+              "Volumetric Lighting: Создание реалистичных лучей света и тумана"
             ]
           },
           {
@@ -1070,7 +1085,11 @@ async function startServer() {
               "Sculpting: Органическое моделирование и детализация",
               "UV Unwrapping: Продвинутые техники развертки без искажений",
               "Rigging & Weight Painting: Подготовка персонажей к анимации",
-              "Geometry Nodes: Процедурная генерация миров"
+              "Geometry Nodes: Процедурная генерация миров",
+              "Simulation Nodes: Создание физических симуляций (вода, огонь, ткань)",
+              "Advanced Rigging: Лицевая анимация и сложные механические риги",
+              "Retopology: Оптимизация высокополигональных моделей для игр",
+              "Texture Painting: Рисование текстур прямо по 3D модели"
             ]
           },
           {
@@ -1080,18 +1099,24 @@ async function startServer() {
               "Автоматизация Blender через Python (bpy) для Unity",
               "Создание кастомных инструментов в Unity Editor",
               "Импорт и настройка анимаций (Humanoid vs Generic)",
-              "Работа с текстурными атласами и оптимизация материалов"
+              "Работа с текстурными атласами и оптимизация материалов",
+              "Batch Export: Написание скриптов для массового экспорта ассетов",
+              "Unity Bridge: Автоматическая настройка материалов при импорте",
+              "USD & glTF: Современные форматы обмена данными",
+              "Automated Testing: Написание тестов для проверки ассетов при импорте"
             ]
           }
         ],
-        total_videos: 111,
+        total_videos: 151,
         update_date: "2026-04-10"
       },
       game_genres: [
         "RPG / Cultivation (Система стадий, мобов, характеристик)",
         "Action / Shooter (FPS камера, системы оружия)",
         "Simulation (Экономика, профессии, инвентарь)",
-        "Multiplayer (Основы сетевого взаимодействия и синхронизации)"
+        "Multiplayer (Основы сетевого взаимодействия и синхронизации)",
+        "Survival (Голод, жажда, крафт, строительство)",
+        "Strategy / RTS (Выбор юнитов, поиск пути, управление ресурсами)"
       ],
       inventory_guide: {
         types: ["Слоты (Шутеры)", "Сетка / Тетрис (Diablo-style)", "Список (MMORPG)", "Кукла экипировки (Paper Doll)"],
@@ -1174,7 +1199,10 @@ public class MaterialConverter : EditorWindow {
       await fs.writeJson(BLENDER_API_FILE, blenderApi, { spaces: 2 });
       await fs.writeJson(TROUBLESHOOTING_FILE, troubleshooting, { spaces: 2 });
 
-      res.json({ success: true, message: "Базы знаний API и Troubleshooting успешно обновлены!" });
+      // Regenerate Master Blueprint
+      await generateMasterBlueprint();
+
+      res.json({ success: true, message: "Базы знаний API, Troubleshooting и Master Blueprint успешно обновлены!" });
     } catch (error) {
       res.status(500).json({ error: "Failed to update API refs" });
     }

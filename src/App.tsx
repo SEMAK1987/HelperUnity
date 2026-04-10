@@ -537,6 +537,8 @@ export default function App() {
       const data = await res.json();
       if (data.success) {
         showNotification(data.message, "success");
+        // Refresh capabilities to show new data
+        fetchCapabilities();
       }
     } catch (error) {
       showNotification("Ошибка при обновлении баз знаний.", "error");

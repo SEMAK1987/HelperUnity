@@ -1,0 +1,18 @@
+[
+  {
+    "issue": "NullReferenceException",
+    "solution": "Проверьте, назначен ли объект в Инспекторе или инициализирован ли он в Start/Awake."
+  },
+  {
+    "issue": "Pink Textures",
+    "solution": "Шейдер несовместим с текущим Render Pipeline (URP/HDRP). Используйте Material Upgrader."
+  },
+  {
+    "issue": "Blender Export Rotation",
+    "solution": "Используйте -Z Forward и Y Up в настройках экспорта FBX, чтобы соответствовать системе координат Unity."
+  },
+  {
+    "issue": "Missing Script",
+    "solution": "Компонент ссылается на удаленный или перемещенный скрипт. Используйте 'Unity Cleanup' для удаления битых ссылок."
+  }
+]

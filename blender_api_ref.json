@@ -1,0 +1,30 @@
+[
+  {
+    "name": "bpy.context",
+    "desc": "Доступ к текущему состоянию Blender.",
+    "items": [
+      "active_object",
+      "selected_objects",
+      "scene"
+    ]
+  },
+  {
+    "name": "bpy.ops",
+    "desc": "Операторы для выполнения действий.",
+    "items": [
+      "mesh.primitive_cube_add",
+      "object.delete",
+      "export_scene.fbx"
+    ]
+  },
+  {
+    "name": "bpy.data",
+    "desc": "Доступ к внутренним данным Blender.",
+    "items": [
+      "objects",
+      "meshes",
+      "materials",
+      "textures"
+    ]
+  }
+]

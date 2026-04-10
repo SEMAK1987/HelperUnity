@@ -1,0 +1,53 @@
+[
+  {
+    "name": "GameObject",
+    "desc": "Базовый класс для всех сущностей в сценах Unity.",
+    "methods": [
+      "AddComponent",
+      "GetComponent",
+      "SetActive",
+      "Find"
+    ]
+  },
+  {
+    "name": "Transform",
+    "desc": "Позиция, вращение и масштаб объекта.",
+    "methods": [
+      "Translate",
+      "Rotate",
+      "LookAt",
+      "SetParent"
+    ]
+  },
+  {
+    "name": "Vector3",
+    "desc": "Представление 3D векторов и точек.",
+    "methods": [
+      "Distance",
+      "Lerp",
+      "Normalize",
+      "Dot",
+      "Cross"
+    ]
+  },
+  {
+    "name": "Quaternion",
+    "desc": "Представление вращений.",
+    "methods": [
+      "Euler",
+      "LookRotation",
+      "Slerp",
+      "Identity"
+    ]
+  },
+  {
+    "name": "MonoBehaviour",
+    "desc": "Базовый класс, от которого наследуются все скрипты Unity.",
+    "methods": [
+      "Start",
+      "Update",
+      "FixedUpdate",
+      "OnTriggerEnter"
+    ]
+  }
+]
