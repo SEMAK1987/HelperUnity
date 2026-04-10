@@ -215,11 +215,12 @@ async function performScan() {
           
           if (ext === '.cs') {
             results.scripts.push(relativePath);
-            // Code Audit & To-Do Scan
-            try {
-              const content = await fs.readFile(fullPath, 'utf-8');
-              
-              // 1. Audit: GetComponent/Find in Update
+            // Code Audit & To-Do Scan (Only for files < 1MB)
+            if (stat.size < 1024 * 1024) {
+              try {
+                const content = await fs.readFile(fullPath, 'utf-8');
+                
+                // 1. Audit: GetComponent/Find in Update
               const updateRegex = /(void\s+(Update|FixedUpdate|LateUpdate)\s*\(\s*\)[\s\S]*?\{)([\s\S]*?)\}/g;
               let match;
               while ((match = updateRegex.exec(content)) !== null) {
@@ -261,8 +262,9 @@ async function performScan() {
                 results.analysis.dependencies[className] = deps;
               }
 
-            } catch (e) {
-              console.error(`Failed to analyze script: ${relativePath}`, e);
+              } catch (e) {
+                console.error(`Failed to analyze script: ${relativePath}`, e);
+              }
             }
           }
           else if (ext === '.prefab' || ext === '.unity') {
@@ -419,8 +421,9 @@ async function generateMasterBlueprint() {
       md += `Задач не найдено.\n`;
     }
 
-    md += `\n## 6. Новые возможности ИИ (v13.3.2)\n`;
+    md += `\n## 6. Новые возможности ИИ (v13.3.4)\n`;
     md += `- **Vision & Media (Enhanced):** ИИ теперь полноценно видит скриншоты и анализирует их контекст вместе с историей чата.\n`;
+    md += `- **Crafting & RPG Systems (NEW):** Глубокие знания по созданию систем крафта (6 рангов, от Начального до Божественного), перековке в кузнице и RPG характеристикам (HP, Сила, Мана и др.).\n`;
     md += `- **Extended Knowledge Base:** Интеграция 151+ видео-уроков по Unity и Blender.\n`;
     md += `- **Advanced AI Systems:** Поддержка Behavior Trees, Utility AI и ML-Agents.\n`;
     md += `- **Graphics & VFX:** Глубокое понимание Shader Graph, VFX Graph, Ray Tracing и Volumetric Lighting.\n`;
@@ -440,10 +443,14 @@ async function generateMasterBlueprint() {
     md += `- **Анимация:** Simulation Nodes, Advanced Rigging, Face Animation.\n`;
     md += `- **Текстурирование:** Texture Painting, PBR, UV Unwrapping.\n\n`;
 
-    md += `## 8. База знаний: Системы инвентаря\n`;
-    md += `- **Типы:** Слоты (шутеры), Сетка (тетрис), Список (MMORPG), Категории.\n`;
-    md += `- **Компоненты:** Контейнеры, ItemData, Слоты, Действия (CRUD).\n`;
-    md += `- **Оптимизация:** Складывание (stacking), ограничения по весу, горячие клавиши.\n\n`;
+    md += `## 8. База знаний: RPG Системы\n`;
+    md += `### Крафт и Кузница\n`;
+    md += `- **Предметы:** Шлемы, Броня, Мечи, Копья, Секиры, Молоты, Кастеты, Алебарды и др.\n`;
+    md += `- **Ранги (Звезды):** Начальный (5), Земной (5), Небесный (5), Легендарный (10), Полубожественный (10), Божественный (10).\n`;
+    md += `- **Механики:** Перековка за золото, навыки кузнеца, зависимость статов от ранга.\n`;
+    md += `### Характеристики Героя\n`;
+    md += `- **Атрибуты:** Жизнь (HP), Сила, Ловкость, Мана, Интеллект, Выносливость.\n`;
+    md += `- **Инвентарь:** Создание систем слотов, веса и категорий предметов.\n\n`;
 
     md += `## 8. Архитектура Offline & Hybrid\n`;
     md += `- **LLM Provider:** Ollama (localhost:11434).\n`;
@@ -1060,6 +1067,18 @@ async function startServer() {
         {
           title: "Гибридный режим (Hybrid Sync)",
           desc: "Автоматическое переключение между облачным Gemini и локальным Ollama. Работает без интернета через Llama 3."
+        },
+        {
+          title: "Система Крафта и Кузница (NEW)",
+          desc: "Создание и перековка экипировки: шлемы, броня, мечи, алебарды и др. Поддержка 6 рангов (от Начального до Божественного) и системы звездности характеристик."
+        },
+        {
+          title: "RPG Системы и Характеристики",
+          desc: "Разработка систем инвентаря и характеристик героя (HP, Сила, Ловкость, Мана, Интеллект, Выносливость). Настройка прогрессии и зависимостей."
+        },
+        {
+          title: "Цветовая Система Артефактов",
+          desc: "Визуальная градация предметов по цветам (от Белого до Божественного) в зависимости от активных/пассивных навыков и ранга (5 или 10 звезд)."
         }
       ],
       files_handled: [
@@ -1236,22 +1255,28 @@ public class MaterialConverter : EditorWindow {
     try {
       console.log("[SYSTEM] Starting self-repair process...");
       
-      // Run repair steps
+      // 1. Fast Integrity Check
       await checkProjectIntegrity();
+      
+      // 2. Re-init Watcher (usually fast)
       await initWatcher();
       
-      // Perform scan in background if it's too heavy, or just ensure it's fast
-      // For now, we'll keep it sequential but add a timeout safety or just hope it's fast enough
-      // Actually, let's make it more robust
-      try {
-        await performScan();
-      } catch (scanError) {
-        console.error("[SYSTEM] Scan during repair failed, but continuing...", scanError);
-      }
+      // 3. Heavy tasks in background
+      (async () => {
+        try {
+          console.log("[SYSTEM] Running background scan and blueprint generation...");
+          await performScan();
+          await generateMasterBlueprint();
+          console.log("[SYSTEM] Background repair tasks completed.");
+        } catch (bgError) {
+          console.error("[SYSTEM] Background repair tasks failed:", bgError);
+        }
+      })();
       
-      await generateMasterBlueprint();
-      
-      res.json({ success: true, message: "Система успешно восстановлена и синхронизирована." });
+      res.json({ 
+        success: true, 
+        message: "Процесс восстановления запущен. Система проверяет целостность и обновляет базу данных в фоновом режиме." 
+      });
     } catch (error) {
       console.error("[SYSTEM] Repair failed:", error);
       res.status(500).json({ success: false, error: "Repair failed" });
