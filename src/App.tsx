@@ -36,7 +36,7 @@ import {
   Database
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import Markdown from 'react-markdown';
 
 // --- Types ---
@@ -144,6 +144,7 @@ export default function App() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateProgress, setUpdateProgress] = useState(0);
   const [ollamaRunning, setOllamaRunning] = useState(false);
+  const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([]);
 
   const fileToBase64 = async (url: string): Promise<{ mimeType: string; data: string }> => {
     try {
@@ -270,7 +271,24 @@ export default function App() {
   };
 
   // Initialize Gemini
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+
+  useEffect(() => {
+    if (input.length > 0 && input.length < 15) {
+      const suggestions = [
+        "Как оптимизировать FPS в Unity?",
+        "Создай скрипт для инвентаря",
+        "Как настроить экспорт из Blender?",
+        "Расскажи про систему Алхимии",
+        "Как работает Offline режим?",
+        "Покажи систему Артефактов",
+        "Как сделать крафт предметов?"
+      ].filter(s => s.toLowerCase().includes(input.toLowerCase()) || input.length < 3).slice(0, 4);
+      setSuggestedQuestions(suggestions);
+    } else {
+      setSuggestedQuestions([]);
+    }
+  }, [input]);
 
   useEffect(() => {
     // Load chat history
@@ -499,17 +517,20 @@ export default function App() {
         });
       }
 
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: contents,
-        config: {
-          systemInstruction: kb.system_instruction,
-        },
+      const model = genAI.getGenerativeModel({ 
+        model: "gemini-1.5-flash",
+        systemInstruction: kb.system_instruction 
       });
+
+      const result = await model.generateContent({
+        contents: contents
+      });
+      const response = await result.response;
+      const textResponse = response.text();
 
       const aiMsg: Message = {
         role: 'assistant',
-        content: response.text || "Извините, я не смог сгенерировать ответ.",
+        content: textResponse || "Извините, я не смог сгенерировать ответ.",
         timestamp: Date.now()
       };
 
@@ -1284,7 +1305,20 @@ export default function App() {
         </AnimatePresence>
 
         {/* Input */}
-        <div className="p-6 bg-gradient-to-t from-[#0a0a0c] via-[#0a0a0c] to-transparent">
+        <div className="p-6 bg-gradient-to-t from-[#0a0a0c] via-[#0a0a0c] to-transparent relative">
+          {suggestedQuestions.length > 0 && (
+            <div className="absolute bottom-full left-0 right-0 p-4 flex gap-2 overflow-x-auto bg-black/60 backdrop-blur-md border-t border-white/5 z-50">
+              {suggestedQuestions.map((q, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleSend(q)}
+                  className="whitespace-nowrap px-4 py-2 rounded-full bg-blue-600/20 border border-blue-500/30 text-[10px] font-bold text-blue-400 hover:bg-blue-600 hover:text-white transition-all uppercase tracking-wider"
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
+          )}
           <div className="max-w-4xl mx-auto relative">
             {/* Attached Files Queue */}
             <AnimatePresence>

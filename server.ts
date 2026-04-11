@@ -362,7 +362,7 @@ async function generateMasterBlueprint() {
     let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"}\n\n`;
     md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов и инструкции по восстановлению.\n\n`;
     md += `## 1. Общая информация\n`;
-    md += `- **Версия Помощника:** ${blueprint.version || "13.3.0"}\n`;
+    md += `- **Версия Помощника:** ${blueprint.version || "13.5.0"}\n`;
     md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник (Online/Offline) для Unity & Blender. Поддержка Ollama, миграция на Unity 6, сохранение чата, поддержка архивов и самовосстановление."}\n`;
     md += `- **Путь проекта:** ${kb.project_path}\n`;
     md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
@@ -424,10 +424,10 @@ async function generateMasterBlueprint() {
       md += `Задач не найдено.\n`;
     }
 
-    md += `\n## 6. Новые возможности ИИ (v13.3.4)\n`;
+    md += `\n## 6. Новые возможности ИИ (v13.5.0)\n`;
     md += `- **Vision & Media (Enhanced):** ИИ теперь полноценно видит скриншоты и анализирует их контекст вместе с историей чата.\n`;
     md += `- **Crafting & RPG Systems (NEW):** Глубокие знания по созданию систем крафта (6 рангов, от Начального до Божественного), перековке в кузнице и RPG характеристикам (HP, Сила, Мана и др.).\n`;
-    md += `- **Extended Knowledge Base:** Интеграция 151+ видео-уроков по Unity и Blender.\n`;
+    md += `- **Extended Knowledge Base:** Интеграция 330+ видео-уроков по Unity и Blender (включая новые мастер-классы по шейдерам, ИИ и оптимизации).\n`;
     md += `- **Advanced AI Systems:** Поддержка Behavior Trees, Utility AI и ML-Agents.\n`;
     md += `- **Graphics & VFX:** Глубокое понимание Shader Graph, VFX Graph, Ray Tracing и Volumetric Lighting.\n`;
     md += `- **Blender Simulation:** Работа с Simulation Nodes и сложным риггингом.\n`;
@@ -436,7 +436,13 @@ async function generateMasterBlueprint() {
     md += `- **Upload Progress:** Визуальное отображение процента загрузки файлов в проект.\n`;
     md += `- **Hybrid AI (Ollama):** Работа без интернета через локальные LLM (Llama 3, Phi-3).\n\n`;
 
-    md += `## 7. Расширенная База Видео-уроков (151+ видео)\n`;
+    md += `## 7. Ограничения ИИ (Что ИИ пока не знает)\n`;
+    md += `- **Прямое управление Unity Editor:** ИИ не может напрямую нажимать кнопки в интерфейсе Unity, только генерировать скрипты и инструкции.\n`;
+    md += `- **Real-time рендеринг видео:** ИИ анализирует статические кадры и код, но не может "смотреть" видео в реальном времени без предварительной обработки.\n`;
+    md += `- **Сложные сетевые протоколы:** Ограниченная поддержка проприетарных сетевых решений (только Photon/Mirror/Netcode).\n`;
+    md += `- **Глубокая физика жидкостей:** Только шейдерные имитации и базовые системы частиц.\n\n`;
+
+    md += `## 8. Расширенная База Видео-уроков (330+ видео)\n`;
     md += `### Темы Unity\n`;
     md += `- **Программирование:** Продвинутый C#, Job System, Burst Compiler, Addressables, Localization.\n`;
     md += `- **Графика:** URP/HDRP, Custom Lighting, Decals, Volumetric Effects.\n`;
@@ -501,7 +507,7 @@ async function generateMasterBlueprint() {
 
 async function startServer() {
   const app = express();
-  const PORT = process.env.PORT || 3000;
+  const PORT = Number(process.env.PORT) || 3000;
 
   app.use(cors());
   app.use(express.json({ limit: '500mb' }));
@@ -658,7 +664,7 @@ async function startServer() {
       res.json({
         success: true,
         status: "Online",
-        version: "13.3.3",
+        version: "13.5.0",
         ollama: ollamaActive ? "Active" : "Offline",
         storage: {
           uploads: (await fs.readdir(path.join(process.cwd(), "uploads"))).length,
@@ -720,7 +726,7 @@ async function startServer() {
   app.get("/api/update/check", async (req, res) => {
     try {
       const localVersionData = await fs.readJson(VERSION_FILE);
-      const remoteVersion = "13.3.0"; 
+      const remoteVersion = "13.5.0"; 
       const isAvailable = remoteVersion !== localVersionData.version;
       
       res.json({
@@ -1040,6 +1046,20 @@ async function startServer() {
           "5. **Логика:** Если код работает не так, как ожидалось, проверьте условия (if/else) и циклы (for/while).");
       }
 
+      if (keywords.some(k => k.includes('архив') || k.includes('zip') || k.includes('rar'))) {
+        results.push("**РАБОТА С АРХИВАМИ:**\n" +
+          "1. **Загрузка:** Вы можете прикрепить ZIP/RAR файл к чату.\n" +
+          "2. **Анализ:** ИИ автоматически просканирует структуру файлов внутри архива.\n" +
+          "3. **Извлечение:** Вы можете попросить ИИ прочитать конкретный файл из архива для анализа кода.");
+      }
+
+      if (keywords.some(k => k.includes('оффлайн') || k.includes('интернет') || k.includes('ollama'))) {
+        results.push("**РЕЖИМЫ ИИ:**\n" +
+          "1. **Online:** Используется Gemini 1.5 Pro (максимальный интеллект).\n" +
+          "2. **Offline:** Используется локальный Ollama (Llama 3). Требуется запущенный сервер Ollama.\n" +
+          "3. **No-Internet:** Если Ollama недоступна, используется встроенная база знаний (local_database_v3).");
+      }
+
       res.json({ answer: results.join('\n\n'), source: "local_database_v3" });
     } catch (error) {
       console.error("Local search error:", error);
@@ -1050,8 +1070,8 @@ async function startServer() {
   // AI Capabilities Endpoint
   app.get("/api/ai/capabilities", (req, res) => {
     const capabilities = {
-      name: "Unity & Blender AI Assistant v13.3",
-      description: "Ваш персональный эксперт по разработке игр, 3D-моделированию и автоматизации. Теперь с поддержкой архивов и глубокой интеграцией экспертных знаний.",
+      name: "Unity & Blender AI Assistant v13.5",
+      description: "Ваш персональный эксперт по разработке игр, 3D-моделированию и автоматизации. Теперь с поддержкой архивов, глубокой интеграцией экспертных знаний и новыми мастер-классами.",
       core_functions: [
         {
           title: "Unity C# Expert (Интегрировано)",
@@ -1070,16 +1090,16 @@ async function startServer() {
           desc: "Возможность загрузки и анализа содержимого архивов. ИИ может просматривать структуру файлов внутри ZIP для лучшего понимания контекста."
         },
         {
-          title: "Расширенная База Видео (270+ уроков)",
-          desc: "Глубокая интеграция знаний из более чем 270 видео-уроков. ИИ не просто знает ссылки, он понимает методики, описанные в этих видео, и может применять их для решения ваших задач."
+          title: "Расширенная База Видео (330+ уроков)",
+          desc: "Глубокая интеграция знаний из более чем 330 видео-уроков. ИИ не просто знает ссылки, он понимает методики, описанные в этих видео, и может применять их для решения ваших задач."
         },
         {
           title: "Работа с проектами Unity",
           desc: "Анализ C# кода, поиск ошибок производительности, отслеживание TODO задач, аудит ассетов и веса проекта."
         },
         {
-          title: "Офлайн-режим (Offline 2.0)",
-          desc: "Работа без интернета на основе накопленной базы знаний, локальных справочников API Unity/Blender и истории изменений проекта."
+          title: "Режимы работы (Online/Offline/No-Internet)",
+          desc: "1. Online: Полный доступ к Gemini 1.5 Pro и внешним ресурсам. 2. Offline: Работа через локальный Ollama (Llama 3). 3. No-Internet: Использование встроенной базы знаний (knowledge_base.json) и локальных справочников API без внешних запросов."
         },
         {
           title: "Самовосстановление",
@@ -1182,8 +1202,8 @@ async function startServer() {
             ]
           }
         ],
-        total_videos: 151,
-        update_date: "2026-04-10"
+        total_videos: 330,
+        update_date: "2026-04-11"
       },
       game_genres: [
         "RPG / Cultivation (Система стадий, мобов, характеристик)",
@@ -1198,6 +1218,20 @@ async function startServer() {
         components: ["Контейнеры & Сундуки", "ScriptableObjects (ItemData)", "Drag & Drop (IDragHandler)", "Tooltips & Context Menus"],
         features: ["Редкость (Common-Legendary)", "Вес и Ограничения", "Складывание (Stacking)", "Сохранение (JSON/Binary)", "Крафт"],
         unity_implementation: ["InventoryManager (Singleton)", "UI Object Pooling", "CanvasGroup Logic", "Persistence System"]
+      },
+      ai_limitations: {
+        current_gaps: [
+          "Прямое управление файлами в Unity Editor (требуется ручной запуск скриптов)",
+          "Real-time рендеринг видео (только статические кадры и анализ кода)",
+          "Сложные сетевые протоколы (только основы Photon/Mirror)",
+          "Глубокая физика жидкостей в реальном времени (только шейдеры и базовые системы)"
+        ],
+        learning_roadmap: [
+          "Интеграция с Unity Muse API",
+          "Расширение базы по DOTS и ECS",
+          "Глубокий анализ шейдеров на уровне ассемблера GPU",
+          "Автоматическая генерация 3D моделей через ИИ"
+        ]
       }
     };
     res.json(capabilities);
