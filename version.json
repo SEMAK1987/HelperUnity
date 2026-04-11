@@ -1,12 +1,12 @@
 {
-  "version": "13.7.0",
+  "version": "13.8.0",
   "release_date": "2026-04-11",
   "changelog": [
-    "Версия 13.7.0: Advanced Shaders & Geometry Nodes",
-    "Добавлено 20+ новых мастер-классов (Dissolve, Water, Holograms, Mobile VR)",
-    "Общее количество видео-уроков превысило 390+",
-    "Глубокая интеграция Geometry Nodes для левел-дизайна",
+    "Версия 13.8.0: Procedural Generation & Advanced Physics",
+    "Добавлено 60+ новых мастер-классов (Procedural Gen, Advanced Physics, AI Navigation)",
+    "Общее количество видео-уроков превысило 450+",
+    "Глубокая интеграция систем процедурной генерации миров",
     "Обновлен PROJECT_MASTER_BLUEPRINT.md с новыми данными",
-    "Улучшена поддержка симуляций в Blender и продвинутой физики в Unity"
+    "Улучшена поддержка сложных физических симуляций и AI Behavior Trees"
   ]
 }
