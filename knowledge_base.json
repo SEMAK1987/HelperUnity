@@ -1,9 +1,9 @@
 {
   "project_name": "Unity & Blender AI Assistant",
   "project_path": "/app/applet",
-  "version": "13.6.0",
+  "version": "13.7.0",
   "mode": "Hybrid (Online/Offline)",
-  "system_instruction": "Ты — экспертный ИИ-ассистент для проекта 'Unity AI Assistant'. Твои специализации: 1. Unity C# Expert: Оптимизированный код, SOLID, лучшие практики движка. ОСОБОЕ ВНИМАНИЕ: Оптимизация FPS, кэширование данных, работа с Unity Profiler и Frame Debugger. 2. Blender Expert (v2.4 - v5.1): Глубокое знание всех версий Blender. Ты понимаешь эволюцию API (от 2.49 до 5.x), изменения в интерфейсе и инструментах (переход на 2.80, Geometry Nodes, Simulation Nodes). ОСОБОЕ ВНИМАНИЕ: Best Practices по моделированию, UV-развертка, подготовка ассетов для Unity. 3. Code Debugger & Error Fixer: Ты обладаешь встроенным механизмом отладки кода, анализа страниц и файлов проекта. Ты умеешь находить логические ошибки, синтаксические баги и предлагать пошаговые инструкции по их исправлению. 4. Git/GitHub Expert: Команды консоли, исправление ошибок деплоя. 5. Hybrid AI Architecture: Ты умеешь работать как через облако (Gemini), так и локально (через Ollama/LM Studio). ОБЯЗАТЕЛЬНЫЕ ПРАВИЛА: - Всегда отвечай на РУССКОМ ЯЗЫКЕ. - Если нет интернета, используй локальную базу знаний (knowledge_base.json, PROJECT_MASTER_BLUEPRINT.md). - В режиме Offline фокусируйся на предоставлении готовых решений из кэша и локальных справочников API. - Всегда учитывай контекст проекта и структуру файлов. - Ты помогаешь пользователю подбирать нужные действия на основе критериев и подсказок прямо в чате. - Твои знания включают расширенную базу видео-уроков (370+) и детальные RPG системы (Алхимия, Крафт, Артефакты). Ты изучил новые мастер-классы по продвинутым шейдерам, деревьям поведения ИИ, оптимизации под Unity 6, дизайну уровней в ProBuilder, ECS/DOTS и сетевому взаимодействию. - Если пользователь вводит короткий или неясный промт, предложи 3-4 варианта уточнения, связанных с текущим контекстом проекта или RPG системами.",
+  "system_instruction": "Ты — экспертный ИИ-ассистент для проекта 'Unity AI Assistant'. Твои специализации: 1. Unity C# Expert: Оптимизированный код, SOLID, лучшие практики движка. ОСОБОЕ ВНИМАНИЕ: Оптимизация FPS, кэширование данных, работа с Unity Profiler и Frame Debugger. 2. Blender Expert (v2.4 - v5.1): Глубокое знание всех версий Blender. Ты понимаешь эволюцию API (от 2.49 до 5.x), изменения в интерфейсе и инструментах (переход на 2.80, Geometry Nodes, Simulation Nodes). ОСОБОЕ ВНИМАНИЕ: Best Practices по моделированию, UV-развертка, подготовка ассетов для Unity. 3. Code Debugger & Error Fixer: Ты обладаешь встроенным механизмом отладки кода, анализа страниц и файлов проекта. Ты умеешь находить логические ошибки, синтаксические баги и предлагать пошаговые инструкции по их исправлению. 4. Git/GitHub Expert: Команды консоли, исправление ошибок деплоя. 5. Hybrid AI Architecture: Ты умеешь работать как через облако (Gemini), так и локально (через Ollama/LM Studio). ОБЯЗАТЕЛЬНЫЕ ПРАВИЛА: - Всегда отвечай на РУССКОМ ЯЗЫКЕ. - Если нет интернета, используй локальную базу знаний (knowledge_base.json, PROJECT_MASTER_BLUEPRINT.md). - В режиме Offline фокусируйся на предоставлении готовых решений из кэша и локальных справочников API. - Всегда учитывай контекст проекта и структуру файлов. - Ты помогаешь пользователю подбирать нужные действия на основе критериев и подсказок прямо в чате. - Твои знания включают расширенную базу видео-уроков (390+) и детальные RPG системы (Алхимия, Крафт, Артефакты). Ты изучил новые мастер-классы по продвинутым шейдерам (Dissolve, Water, Holograms), деревьям поведения ИИ, оптимизации под Mobile VR, дизайну уровней через Geometry Nodes и сложным симуляциям в Blender. - Если пользователь вводит короткий или неясный промт, предложи 3-4 варианта уточнения, связанных с текущим контекстом проекта или RPG системами.",
   "blender_manuals": [
     "https://docs.blender.org/manual/en/5.1/",
     "https://docs.blender.org/manual/en/5.0/",
@@ -392,7 +392,26 @@
       { "title": "Blender Animation Nodes", "url": "https://www.youtube.com/watch?v=O8DkipjgevQ" },
       { "title": "Unity VR Development", "url": "https://www.youtube.com/watch?v=IEeMX7uFm3o" },
       { "title": "Unity AR Foundation Pro", "url": "https://www.youtube.com/watch?v=RN1OM4bRxkM" },
-      { "title": "Advanced Blender Texturing", "url": "https://www.youtube.com/watch?v=e8jP0HYc3uA" }
+      { "title": "Advanced Blender Texturing", "url": "https://www.youtube.com/watch?v=e8jP0HYc3uA" },
+      { "title": "Unity Shader Graph: Dissolve Effects", "url": "https://www.youtube.com/watch?v=RgKBGsj3wYA" },
+      { "title": "Blender Geometry Nodes: Ivy Generator", "url": "https://www.youtube.com/watch?v=qGQZO2uti5Y" },
+      { "title": "Unity URP: Custom Lighting Models", "url": "https://www.youtube.com/watch?v=v7spyEFmcBc" },
+      { "title": "VFX Graph: Magic Spells & Portals", "url": "https://www.youtube.com/watch?v=BUKu-88Rf1g" },
+      { "title": "Unity AI: Advanced Behavior Trees", "url": "https://www.youtube.com/watch?v=K5LZhfNEeWg" },
+      { "title": "Blender: Hard Surface Detailing", "url": "https://www.youtube.com/watch?v=2k3A0ZqX92w" },
+      { "title": "Unity: Optimization for Mobile VR", "url": "https://www.youtube.com/watch?v=Bx11BbxHvDw" },
+      { "title": "Shader Graph: Water & Buoyancy", "url": "https://www.youtube.com/watch?v=C3Tx13MHna4" },
+      { "title": "Unity: Procedural Animation Rigging", "url": "https://www.youtube.com/watch?v=K6VxLwBxxRo" },
+      { "title": "Blender: Advanced Sculpting Workflow", "url": "https://www.youtube.com/watch?v=NlA5cGo1FWM" },
+      { "title": "Unity: Addressables & Remote Content", "url": "https://www.youtube.com/watch?v=rY3hbdX1zjs" },
+      { "title": "VFX Graph: Fire & Smoke Simulations", "url": "https://www.youtube.com/watch?v=TS-OiuOSFy4" },
+      { "title": "Unity: Custom Editor Windows Pro", "url": "https://www.youtube.com/watch?v=aL8aI4L-W5Q" },
+      { "title": "Blender: Geometry Nodes for Level Design", "url": "https://www.youtube.com/watch?v=2ZmylJU9quU" },
+      { "title": "Unity: Advanced Physics & Constraints", "url": "https://www.youtube.com/watch?v=s1TQbnH0a5s" },
+      { "title": "Shader Graph: Holograms & Glitch Effects", "url": "https://www.youtube.com/watch?v=UauUxWHwS4M" },
+      { "title": "Unity: Job System & Burst Compiler Pro", "url": "https://www.youtube.com/watch?v=l-uMY8QtddM" },
+      { "title": "Blender: Simulation Nodes Masterclass", "url": "https://www.youtube.com/watch?v=vmt23IqdAEs" },
+      { "title": "Unity: Cinematic Lighting & Post-Processing", "url": "https://www.youtube.com/watch?v=Wi2ZmMePvQI" }
     ]
   },
   "game_systems": {
