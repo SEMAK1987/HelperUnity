@@ -362,7 +362,7 @@ async function generateMasterBlueprint() {
     let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"}\n\n`;
     md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов и инструкции по восстановлению.\n\n`;
     md += `## 1. Общая информация\n`;
-    md += `- **Версия Помощника:** ${blueprint.version || "13.9.0"}\n`;
+    md += `- **Версия Помощника:** ${blueprint.version || "14.0.0"}\n`;
     md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник (Online/Offline) для Unity & Blender. Поддержка Ollama, миграция на Unity 6, сохранение чата, поддержка архивов и самовосстановление."}\n`;
     md += `- **Путь проекта:** ${kb.project_path}\n`;
     md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
@@ -424,10 +424,10 @@ async function generateMasterBlueprint() {
       md += `Задач не найдено.\n`;
     }
 
-    md += `\n## 6. Новые возможности ИИ (v13.9.0)\n`;
-    md += `- **Vision & Media (Enhanced):** ИИ теперь полноценно видит скриншоты и анализирует их контекст вместе с историей чата.\n`;
-    md += `- **Crafting & RPG Systems (NEW):** Глубокие знания по созданию систем крафта (6 рангов, от Начального до Божественного), перековке в кузнице и RPG характеристикам (HP, Сила, Мана и др.).\n`;
-    md += `- **Extended Knowledge Base:** Интеграция 470+ видео-уроков по Unity и Blender (включая новые мастер-классы по кинематографическому рендерингу, кастомным инструментам движка, продвинутой анимации и процедурным зданиям).\n`;
+    md += `\n## 6. Новые возможности ИИ (v14.0.0)\n`;
+    md += `- **Massive Unity Docs Integration:** Полная поддержка документации Unity от версии 5.2 до Unity 6 (6000.x).\n`;
+    md += `- **Legacy & Modern API Expert:** Глубокое понимание изменений в API Unity за последние 10 лет, помощь в миграции старых проектов.\n`;
+    md += `- **Unity 6 / 6000.x Support:** Полное знание новых возможностей Unity 6, включая улучшения рендеринга, производительности и инструментов разработки.\n`;
     md += `- **Advanced AI Systems:** Поддержка Behavior Trees, Utility AI и ML-Agents.\n`;
     md += `- **Graphics & VFX:** Глубокое понимание Shader Graph, VFX Graph, Ray Tracing и Volumetric Lighting.\n`;
     md += `- **Blender Simulation:** Работа с Simulation Nodes и сложным риггингом.\n`;
@@ -664,7 +664,7 @@ async function startServer() {
       res.json({
         success: true,
         status: "Online",
-        version: "13.9.0",
+        version: "14.0.0",
         ollama: ollamaActive ? "Active" : "Offline",
         storage: {
           uploads: (await fs.readdir(path.join(process.cwd(), "uploads"))).length,
@@ -726,7 +726,7 @@ async function startServer() {
   app.get("/api/update/check", async (req, res) => {
     try {
       const localVersionData = await fs.readJson(VERSION_FILE);
-      const remoteVersion = "13.9.0"; 
+      const remoteVersion = "14.0.0"; 
       const isAvailable = remoteVersion !== localVersionData.version;
       
       res.json({
@@ -1070,12 +1070,12 @@ async function startServer() {
   // AI Capabilities Endpoint
   app.get("/api/ai/capabilities", (req, res) => {
     const capabilities = {
-      name: "Unity & Blender AI Assistant v13.9",
-      description: "Ваш персональный эксперт по разработке игр, 3D-моделированию и автоматизации. Теперь с поддержкой кинематографического рендеринга, кастомных инструментов движка и продвинутой анимации.",
+      name: "Unity & Blender AI Assistant v14.0",
+      description: "Ваш персональный эксперт по разработке игр, 3D-моделированию и автоматизации. Теперь с полной поддержкой документации Unity от 5.x до Unity 6 (6000.x).",
       core_functions: [
         {
-          title: "Unity C# Expert (Интегрировано)",
-          desc: "Оптимизированный код, SOLID, лучшие практики движка и навыки мобов. Помощь в создании ИИ врагов, оптимизации Update-циклов и архитектуре проекта."
+          title: "Unity Expert (v5.x - v6.x)",
+          desc: "Глубокое знание всех версий Unity. Помощь в миграции, оптимизации и использовании новейших функций Unity 6 (6000.x). Полная интеграция 30+ руководств."
         },
         {
           title: "Blender Expert (v2.4 - v5.1)",
