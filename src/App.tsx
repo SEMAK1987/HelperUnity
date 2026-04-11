@@ -134,6 +134,7 @@ export default function App() {
   const [showCapabilities, setShowCapabilities] = useState(false);
   const [capabilities, setCapabilities] = useState<any>(null);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [attachedFiles, setAttachedFiles] = useState<any[]>([]);
   
   const chatEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -408,17 +409,19 @@ export default function App() {
   };
 
   const handleSend = async (text: string = input) => {
-    if (!text.trim() || isTyping || !kb) return;
+    if ((!text.trim() && attachedFiles.length === 0) || isTyping || !kb) return;
 
     const userMsg: Message = {
       role: 'user',
       content: text,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      files: attachedFiles.length > 0 ? [...attachedFiles] : undefined
     };
 
     const newMessages = [...messages, userMsg];
     setMessages(newMessages);
     setInput('');
+    setAttachedFiles([]);
     setIsTyping(true);
 
     try {
@@ -678,14 +681,8 @@ export default function App() {
       setUploadTimeRemaining(null);
       
       if (data.success) {
-        const fileMsg: Message = { 
-          role: 'user', 
-          content: `Загружены файлы: ${data.files.map((f: any) => f.name).join(', ')}`,
-          timestamp: Date.now(),
-          files: data.files
-        };
-        setMessages(prev => [...prev, fileMsg]);
-        showNotification("Файлы успешно загружены", "success");
+        setAttachedFiles(prev => [...prev, ...data.files]);
+        showNotification("Файлы прикреплены к сообщению", "success");
       }
     } catch (error) {
       console.error("Upload error:", error);
@@ -1281,6 +1278,31 @@ export default function App() {
         {/* Input */}
         <div className="p-6 bg-gradient-to-t from-[#0a0a0c] via-[#0a0a0c] to-transparent">
           <div className="max-w-4xl mx-auto relative">
+            {/* Attached Files Queue */}
+            <AnimatePresence>
+              {attachedFiles.length > 0 && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="mb-4 flex flex-wrap gap-2"
+                >
+                  {attachedFiles.map((file, idx) => (
+                    <div key={idx} className="group relative flex items-center gap-2 bg-blue-600/10 border border-blue-500/30 px-3 py-2 rounded-xl text-[10px] font-bold text-blue-400 uppercase">
+                      {file.type.includes('image') ? <ImageIcon className="w-3.5 h-3.5" /> : <FileText className="w-3.5 h-3.5" />}
+                      <span className="max-w-[120px] truncate">{file.name}</span>
+                      <button 
+                        onClick={() => setAttachedFiles(prev => prev.filter((_, i) => i !== idx))}
+                        className="ml-1 p-1 hover:bg-red-500/20 hover:text-red-400 rounded-md transition-all"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             <div className="absolute -top-12 left-0 right-0 flex justify-center pointer-events-none">
               <div className="px-4 py-1.5 bg-white/5 backdrop-blur-sm border border-white/5 rounded-full text-[9px] text-slate-500 uppercase tracking-widest flex items-center gap-2">
                 <Terminal className="w-3 h-3" /> Нажмите Enter, чтобы отправить сообщение
@@ -1315,9 +1337,9 @@ export default function App() {
                 />
                 <button 
                   onClick={() => handleSend()}
-                  disabled={!input.trim() || isTyping}
+                  disabled={(!input.trim() && attachedFiles.length === 0) || isTyping}
                   className={`absolute right-4 top-4 p-3 rounded-xl transition-all ${
-                    input.trim() && !isTyping 
+                    (input.trim() || attachedFiles.length > 0) && !isTyping 
                     ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20 hover:scale-105 active:scale-95' 
                     : 'bg-white/5 text-slate-600'
                   }`}
