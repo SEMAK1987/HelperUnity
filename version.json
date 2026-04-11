@@ -1,12 +1,12 @@
 {
-  "version": "13.8.0",
+  "version": "13.9.0",
   "release_date": "2026-04-11",
   "changelog": [
-    "Версия 13.8.0: Procedural Generation & Advanced Physics",
-    "Добавлено 60+ новых мастер-классов (Procedural Gen, Advanced Physics, AI Navigation)",
-    "Общее количество видео-уроков превысило 450+",
-    "Глубокая интеграция систем процедурной генерации миров",
+    "Версия 13.9.0: Cinematic Rendering & Custom Engine Tools",
+    "Добавлено 20+ новых мастер-классов (Cinematic Rendering, Custom Tools, Advanced Animation)",
+    "Общее количество видео-уроков превысило 470+",
+    "Глубокая интеграция кинематографического рендеринга и кастомных инструментов движка",
     "Обновлен PROJECT_MASTER_BLUEPRINT.md с новыми данными",
-    "Улучшена поддержка сложных физических симуляций и AI Behavior Trees"
+    "Улучшена поддержка сложных систем анимации и процедурных зданий в Blender"
   ]
 }

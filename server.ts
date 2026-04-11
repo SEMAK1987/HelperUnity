@@ -362,7 +362,7 @@ async function generateMasterBlueprint() {
     let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"}\n\n`;
     md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов и инструкции по восстановлению.\n\n`;
     md += `## 1. Общая информация\n`;
-    md += `- **Версия Помощника:** ${blueprint.version || "13.8.0"}\n`;
+    md += `- **Версия Помощника:** ${blueprint.version || "13.9.0"}\n`;
     md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник (Online/Offline) для Unity & Blender. Поддержка Ollama, миграция на Unity 6, сохранение чата, поддержка архивов и самовосстановление."}\n`;
     md += `- **Путь проекта:** ${kb.project_path}\n`;
     md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
@@ -424,10 +424,10 @@ async function generateMasterBlueprint() {
       md += `Задач не найдено.\n`;
     }
 
-    md += `\n## 6. Новые возможности ИИ (v13.8.0)\n`;
+    md += `\n## 6. Новые возможности ИИ (v13.9.0)\n`;
     md += `- **Vision & Media (Enhanced):** ИИ теперь полноценно видит скриншоты и анализирует их контекст вместе с историей чата.\n`;
     md += `- **Crafting & RPG Systems (NEW):** Глубокие знания по созданию систем крафта (6 рангов, от Начального до Божественного), перековке в кузнице и RPG характеристикам (HP, Сила, Мана и др.).\n`;
-    md += `- **Extended Knowledge Base:** Интеграция 450+ видео-уроков по Unity и Blender (включая новые мастер-классы по процедурной генерации миров, продвинутой физике, AI Navigation и сложным системам анимации).\n`;
+    md += `- **Extended Knowledge Base:** Интеграция 470+ видео-уроков по Unity и Blender (включая новые мастер-классы по кинематографическому рендерингу, кастомным инструментам движка, продвинутой анимации и процедурным зданиям).\n`;
     md += `- **Advanced AI Systems:** Поддержка Behavior Trees, Utility AI и ML-Agents.\n`;
     md += `- **Graphics & VFX:** Глубокое понимание Shader Graph, VFX Graph, Ray Tracing и Volumetric Lighting.\n`;
     md += `- **Blender Simulation:** Работа с Simulation Nodes и сложным риггингом.\n`;
@@ -664,7 +664,7 @@ async function startServer() {
       res.json({
         success: true,
         status: "Online",
-        version: "13.7.0",
+        version: "13.9.0",
         ollama: ollamaActive ? "Active" : "Offline",
         storage: {
           uploads: (await fs.readdir(path.join(process.cwd(), "uploads"))).length,
@@ -726,7 +726,7 @@ async function startServer() {
   app.get("/api/update/check", async (req, res) => {
     try {
       const localVersionData = await fs.readJson(VERSION_FILE);
-      const remoteVersion = "13.7.0"; 
+      const remoteVersion = "13.9.0"; 
       const isAvailable = remoteVersion !== localVersionData.version;
       
       res.json({
@@ -1070,8 +1070,8 @@ async function startServer() {
   // AI Capabilities Endpoint
   app.get("/api/ai/capabilities", (req, res) => {
     const capabilities = {
-      name: "Unity & Blender AI Assistant v13.8",
-      description: "Ваш персональный эксперт по разработке игр, 3D-моделированию и автоматизации. Теперь с поддержкой процедурной генерации, продвинутой физики и AI Navigation.",
+      name: "Unity & Blender AI Assistant v13.9",
+      description: "Ваш персональный эксперт по разработке игр, 3D-моделированию и автоматизации. Теперь с поддержкой кинематографического рендеринга, кастомных инструментов движка и продвинутой анимации.",
       core_functions: [
         {
           title: "Unity C# Expert (Интегрировано)",
@@ -1090,8 +1090,8 @@ async function startServer() {
           desc: "Возможность загрузки и анализа содержимого архивов. ИИ может просматривать структуру файлов внутри ZIP для лучшего понимания контекста."
         },
         {
-          title: "Расширенная База Видео (450+ уроков)",
-          desc: "Глубокая интеграция знаний из более чем 450 видео-уроков. ИИ не просто знает ссылки, он понимает методики, описанные в этих видео, и может применять их для решения ваших задач."
+          title: "Расширенная База Видео (470+ уроков)",
+          desc: "Глубокая интеграция знаний из более чем 470 видео-уроков. ИИ не просто знает ссылки, он понимает методики, описанные в этих видео, и может применять их для решения ваших задач."
         },
         {
           title: "Работа с проектами Unity",
@@ -1202,7 +1202,7 @@ async function startServer() {
             ]
           }
         ],
-        total_videos: 450,
+        total_videos: 470,
         update_date: "2026-04-11"
       },
       game_genres: [
