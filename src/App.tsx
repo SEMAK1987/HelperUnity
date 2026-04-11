@@ -174,9 +174,13 @@ export default function App() {
   const fetchPackagesInfo = async () => {
     try {
       const res = await fetch('/api/unity/packages-info');
+      if (!res.ok) throw new Error("Failed to fetch packages");
       const data = await res.json();
       setUnityPackages(data);
-    } catch (e) {}
+    } catch (e) {
+      console.error("Error fetching packages info:", e);
+      showNotification("Не удалось загрузить информацию о пакетах.", "error");
+    }
   };
 
   const handleMigrate = async () => {
@@ -474,9 +478,13 @@ export default function App() {
           for (const file of msg.files) {
             if (file.type && file.type.startsWith('image/')) {
               try {
-                const base64 = await fileToBase64(file.url);
+                // Cache base64 in the file object to avoid re-converting
+                if (!file.base64) {
+                  const base64 = await fileToBase64(file.url);
+                  file.base64 = base64;
+                }
                 parts.push({
-                  inlineData: base64
+                  inlineData: file.base64
                 });
               } catch (e) {
                 console.error("Error converting image to base64", e);

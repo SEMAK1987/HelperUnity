@@ -186,6 +186,9 @@ async function performScan() {
       if (!(await fs.pathExists(dir))) return;
       const files = await fs.readdir(dir);
       for (const file of files) {
+        // Yield to event loop
+        await new Promise(resolve => setImmediate(resolve));
+        
         const fullPath = path.join(dir, file);
         const stat = await fs.stat(fullPath);
         
@@ -635,6 +638,7 @@ async function startServer() {
           size: f.size,
           type: f.mimetype,
           path: f.path,
+          url: `/uploads/${path.basename(f.path)}`,
           archiveContent
         });
       }
@@ -966,8 +970,25 @@ async function startServer() {
         results.push(`В проекте найдено ${stats.scripts.length} скриптов C#. Последнее обновление: ${stats.last_updated}`);
       }
       
-      if (keywords.some(k => k.includes('видео') || k.includes('обучение'))) {
-        results.push(`В базе знаний есть ${stats.videos.length} видео-уроков.`);
+      if (keywords.some(k => k.includes('видео') || k.includes('обучение') || k.includes('туториал'))) {
+        const kb = await fs.readJson(kbPath);
+        const foundVideos = kb.videos.filter((v: string) => v.toLowerCase().includes(q)).slice(0, 5);
+        results.push(`В базе знаний есть ${kb.videos.length} видео-уроков.${foundVideos.length > 0 ? '\nПохожие видео:\n' + foundVideos.join('\n') : ''}`);
+      }
+
+      if (keywords.some(k => k.includes('крафт') || k.includes('рпг') || k.includes('зелье') || k.includes('алхими') || k.includes('артефакт'))) {
+        const kb = await fs.readJson(kbPath);
+        if (kb.game_systems) {
+          if (q.includes('зелье') || q.includes('алхими')) {
+            results.push(`[Алхимия] Ранги: ${kb.game_systems.alchemy.ranks.map((r: any) => r.rank).join(', ')}. Эффекты от ${kb.game_systems.alchemy.ranks[0].bonus} до ${kb.game_systems.alchemy.ranks[kb.game_systems.alchemy.ranks.length-1].bonus}.`);
+          }
+          if (q.includes('артефакт')) {
+            results.push(`[Артефакты] Система рангов: ${kb.game_systems.artifact_system.ranks.map((r: any) => r.name).join(', ')}.`);
+          }
+          if (q.includes('крафт')) {
+            results.push(`[Крафт] Ранги предметов: ${kb.game_systems.crafting.item_ranks.map((r: any) => r.name).join(', ')}.`);
+          }
+        }
       }
 
       // 3. Search in Audit/Todos
@@ -1049,8 +1070,8 @@ async function startServer() {
           desc: "Возможность загрузки и анализа содержимого архивов. ИИ может просматривать структуру файлов внутри ZIP для лучшего понимания контекста."
         },
         {
-          title: "Расширенная База Видео (111+ уроков)",
-          desc: "Глубокая интеграция знаний из более чем 100 видео-уроков. ИИ не просто знает ссылки, он понимает методики, описанные в этих видео, и может применять их для решения ваших задач."
+          title: "Расширенная База Видео (270+ уроков)",
+          desc: "Глубокая интеграция знаний из более чем 270 видео-уроков. ИИ не просто знает ссылки, он понимает методики, описанные в этих видео, и может применять их для решения ваших задач."
         },
         {
           title: "Работа с проектами Unity",
@@ -1087,6 +1108,10 @@ async function startServer() {
         {
           title: "Алхимия и Зельеварение (NEW)",
           desc: "Создание и крафт зелий (Мана, Сила, Удача и др.) с системой рангов от E до SSS. Поддержка механик варки, перегонки и влияния навыков алхимии на результат."
+        },
+        {
+          title: "Blender API Evolution Expert",
+          desc: "Глубокое понимание изменений API от v2.49 до v5.1. Знание ключевых этапов: 2.80 (UI Overhaul), 2.93 (Geo Nodes), 3.6 (Sim Nodes), 4.0 (AgX)."
         }
       ],
       files_handled: [
