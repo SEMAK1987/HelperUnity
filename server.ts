@@ -362,7 +362,7 @@ async function generateMasterBlueprint() {
     let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"}\n\n`;
     md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов и инструкции по восстановлению.\n\n`;
     md += `## 1. Общая информация\n`;
-    md += `- **Версия Помощника:** ${blueprint.version || "14.0.0"}\n`;
+    md += `- **Версия Помощника:** ${blueprint.version || "14.2.0"}\n`;
     md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник (Online/Offline) для Unity & Blender. Поддержка Ollama, миграция на Unity 6, сохранение чата, поддержка архивов и самовосстановление."}\n`;
     md += `- **Путь проекта:** ${kb.project_path}\n`;
     md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
@@ -424,10 +424,13 @@ async function generateMasterBlueprint() {
       md += `Задач не найдено.\n`;
     }
 
-    md += `\n## 6. Новые возможности ИИ (v14.0.0)\n`;
-    md += `- **Massive Unity Docs Integration:** Полная поддержка документации Unity от версии 5.2 до Unity 6 (6000.x).\n`;
-    md += `- **Legacy & Modern API Expert:** Глубокое понимание изменений в API Unity за последние 10 лет, помощь в миграции старых проектов.\n`;
-    md += `- **Unity 6 / 6000.x Support:** Полное знание новых возможностей Unity 6, включая улучшения рендеринга, производительности и инструментов разработки.\n`;
+    md += `\n## 6. Новые возможности ИИ (v14.2.0)\n`;
+    md += `- **UI Toolkit & Modern UI:** Глубокое знание UI Toolkit и Canvas для создания современных и производительных интерфейсов.\n`;
+    md += `- **VR/AR Development (OpenXR):** Экспертиза в разработке под VR и AR гарнитуры с использованием стандарта OpenXR.\n`;
+    md += `- **Mobile Optimization Expert:** Лучшие практики оптимизации игр под мобильные устройства (Android/iOS).\n`;
+    md += `- **VFX Graph Mastery:** Создание сложных визуальных эффектов через Visual Effect Graph.\n`;
+    md += `- **Advanced Lighting & Ray Tracing:** Настройка реалистичного освещения и использование Real-time Ray Tracing.\n`;
+    md += `- **Extended Knowledge Base:** Интеграция 500+ видео-уроков по Unity и Blender.\n`;
     md += `- **Advanced AI Systems:** Поддержка Behavior Trees, Utility AI и ML-Agents.\n`;
     md += `- **Graphics & VFX:** Глубокое понимание Shader Graph, VFX Graph, Ray Tracing и Volumetric Lighting.\n`;
     md += `- **Blender Simulation:** Работа с Simulation Nodes и сложным риггингом.\n`;
@@ -664,7 +667,7 @@ async function startServer() {
       res.json({
         success: true,
         status: "Online",
-        version: "14.0.0",
+        version: "14.2.0",
         ollama: ollamaActive ? "Active" : "Offline",
         storage: {
           uploads: (await fs.readdir(path.join(process.cwd(), "uploads"))).length,
@@ -726,7 +729,7 @@ async function startServer() {
   app.get("/api/update/check", async (req, res) => {
     try {
       const localVersionData = await fs.readJson(VERSION_FILE);
-      const remoteVersion = "14.0.0"; 
+      const remoteVersion = "14.2.0"; 
       const isAvailable = remoteVersion !== localVersionData.version;
       
       res.json({
@@ -1070,8 +1073,8 @@ async function startServer() {
   // AI Capabilities Endpoint
   app.get("/api/ai/capabilities", (req, res) => {
     const capabilities = {
-      name: "Unity & Blender AI Assistant v14.0",
-      description: "Ваш персональный эксперт по разработке игр, 3D-моделированию и автоматизации. Теперь с полной поддержкой документации Unity от 5.x до Unity 6 (6000.x).",
+      name: "Unity & Blender AI Assistant v14.2",
+      description: "Ваш персональный эксперт по разработке игр, 3D-моделированию и автоматизации. Теперь с поддержкой UI Toolkit, VR/AR, мобильной оптимизации и VFX Graph.",
       core_functions: [
         {
           title: "Unity Expert (v5.x - v6.x)",
@@ -1090,8 +1093,8 @@ async function startServer() {
           desc: "Возможность загрузки и анализа содержимого архивов. ИИ может просматривать структуру файлов внутри ZIP для лучшего понимания контекста."
         },
         {
-          title: "Расширенная База Видео (470+ уроков)",
-          desc: "Глубокая интеграция знаний из более чем 470 видео-уроков. ИИ не просто знает ссылки, он понимает методики, описанные в этих видео, и может применять их для решения ваших задач."
+          title: "Расширенная База Видео (500+ уроков)",
+          desc: "Глубокая интеграция знаний из более чем 500 видео-уроков. ИИ не просто знает ссылки, он понимает методики, описанные в этих видео, и может применять их для решения ваших задач."
         },
         {
           title: "Работа с проектами Unity",
@@ -1202,7 +1205,7 @@ async function startServer() {
             ]
           }
         ],
-        total_videos: 470,
+        total_videos: 500,
         update_date: "2026-04-11"
       },
       game_genres: [
