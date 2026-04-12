@@ -129,6 +129,7 @@ export default function App() {
   const [showGithubGuide, setShowGithubGuide] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [localPathInput, setLocalPathInput] = useState('');
+  const [projectPathInput, setProjectPathInput] = useState('');
   const [isGeneratingBlueprint, setIsGeneratingBlueprint] = useState(false);
   const [isUpdatingKB, setIsUpdatingKB] = useState(false);
   const [showCapabilities, setShowCapabilities] = useState(false);
@@ -305,7 +306,11 @@ export default function App() {
 
     fetch('/api/kb')
       .then(res => res.json())
-      .then(data => setKb(data))
+      .then(data => {
+        setKb(data);
+        setLocalPathInput(data.local_training_path || '');
+        setProjectPathInput(data.project_path || '');
+      })
       .catch(err => {
         console.error("Failed to fetch KB, using fallback", err);
         setKb({
@@ -398,7 +403,11 @@ export default function App() {
 
   const handleSaveSettings = async () => {
     if (!kb) return;
-    const updatedKb = { ...kb, local_training_path: localPathInput };
+    const updatedKb = { 
+      ...kb, 
+      local_training_path: localPathInput,
+      project_path: projectPathInput 
+    };
     try {
       const response = await fetch('/api/kb/update', {
         method: 'POST',
@@ -408,9 +417,24 @@ export default function App() {
       if (response.ok) {
         setKb(updatedKb);
         setShowSettings(false);
+        showNotification("Настройки сохранены. Запускаю сканирование...", "success");
+        handleRefreshScan();
       }
     } catch (error) {
       console.error("Failed to save settings", error);
+    }
+  };
+
+  const handleRefreshScan = async () => {
+    try {
+      const res = await fetch('/api/project/scan/trigger', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        setProjectScan(data.scan);
+        showNotification("Статистика проекта обновлена!", "success");
+      }
+    } catch (e) {
+      showNotification("Ошибка при сканировании проекта.", "error");
     }
   };
 
@@ -806,11 +830,7 @@ export default function App() {
                 </span>
               </h3>
               <button 
-                onClick={() => {
-                  fetch('/api/project/scan')
-                    .then(res => res.json())
-                    .then(data => data.success && setProjectScan(data.scan));
-                }}
+                onClick={handleRefreshScan}
                 className="p-1 hover:bg-white/5 rounded-md transition-colors text-slate-500 hover:text-white"
                 title="Обновить статистику"
               >
@@ -2142,6 +2162,22 @@ export default function App() {
               </div>
               
               <div className="p-8 space-y-6">
+                <div className="space-y-3">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                    <Gamepad2 className="w-4 h-4 text-green-400" /> Путь к проекту Unity
+                  </label>
+                  <input 
+                    type="text"
+                    value={projectPathInput}
+                    onChange={(e) => setProjectPathInput(e.target.value)}
+                    placeholder="Например: C:\MyUnityProject"
+                    className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-green-500/50 transition-all font-mono text-sm"
+                  />
+                  <p className="text-[10px] text-slate-500 leading-relaxed italic">
+                    Укажите путь к папке вашего Unity проекта (где находятся папки Assets и ProjectSettings).
+                  </p>
+                </div>
+
                 <div className="space-y-3">
                   <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
                     <Folder className="w-4 h-4 text-blue-400" /> Путь сохранения файлов

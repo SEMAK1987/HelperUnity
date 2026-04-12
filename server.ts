@@ -140,6 +140,47 @@ let isScanning = false;
 let currentUnityStatus: any = { is_running: false, version: "unknown", project_path: "" };
 let currentBlenderStatus: any = { is_running: false, version: "unknown" };
 
+async function findUnityProject(startDir: string): Promise<string | null> {
+  try {
+    // 1. Check current dir
+    if (await fs.pathExists(path.join(startDir, "Assets")) && await fs.pathExists(path.join(startDir, "ProjectSettings"))) {
+      return startDir;
+    }
+    // 2. Check parent dir
+    const parentDir = path.join(startDir, "..");
+    if (await fs.pathExists(path.join(parentDir, "Assets")) && await fs.pathExists(path.join(parentDir, "ProjectSettings"))) {
+      return parentDir;
+    }
+    // 3. Check siblings
+    const parentFiles = await fs.readdir(parentDir);
+    for (const file of parentFiles) {
+      const siblingPath = path.join(parentDir, file);
+      if (siblingPath === startDir) continue;
+      const stat = await fs.stat(siblingPath).catch(() => null);
+      if (stat && stat.isDirectory()) {
+        if (await fs.pathExists(path.join(siblingPath, "Assets")) && await fs.pathExists(path.join(siblingPath, "ProjectSettings"))) {
+          return siblingPath;
+        }
+      }
+    }
+  } catch (e) {
+    console.error("[UNITY] Error during project detection:", e);
+  }
+  return null;
+}
+
+async function getUnityVersion(projectPath: string): Promise<string> {
+  try {
+    const versionFile = path.join(projectPath, "ProjectSettings", "ProjectVersion.txt");
+    if (await fs.pathExists(versionFile)) {
+      const content = await fs.readFile(versionFile, "utf-8");
+      const match = content.match(/m_EditorVersion: (.*)/);
+      if (match) return match[1];
+    }
+  } catch (e) {}
+  return "unknown";
+}
+
 async function performScan() {
   if (isScanning) {
     console.log("[SCAN] Scan already in progress, skipping...");
@@ -155,6 +196,15 @@ async function performScan() {
         const kb = await fs.readJson(kbPath);
         if (kb.project_path && await fs.pathExists(kb.project_path)) {
           rootDir = kb.project_path;
+        } else {
+          // Try auto-detect
+          const detected = await findUnityProject(process.cwd());
+          if (detected) {
+            rootDir = detected;
+            kb.project_path = detected;
+            await fs.writeJson(kbPath, kb, { spaces: 2 });
+            console.log(`[SCAN] Auto-detected Unity project at: ${detected}`);
+          }
         }
       }
     } catch (e) {
@@ -723,6 +773,15 @@ async function startServer() {
     res.json({ success: true, scan: currentScanResults });
   });
 
+  app.post("/api/project/scan/trigger", async (req, res) => {
+    try {
+      await performScan();
+      res.json({ success: true, scan: currentScanResults });
+    } catch (error) {
+      res.status(500).json({ error: "Scan failed" });
+    }
+  });
+
   // Update System Endpoints
   const VERSION_FILE = path.join(process.cwd(), "version.json");
 
@@ -805,22 +864,31 @@ async function startServer() {
     const versionPath = path.join(process.cwd(), "unity_version.txt");
     let isRunning = false;
     let version = "unknown";
-    let projectPath = "C:\\Users\\user\\Desktop\\HelperUnity-main\\HelperUnity-main";
+    let projectPath = process.cwd();
 
     try {
       if (await fs.pathExists(kbPath)) {
         const kb = await fs.readJson(kbPath);
         if (kb.project_path) projectPath = kb.project_path;
       }
-    } catch (e) {}
-    
-    if (await fs.pathExists(versionPath)) {
-      version = (await fs.readFile(versionPath, "utf-8")).trim();
-      isRunning = true;
-    } else {
-      isRunning = Math.random() > 0.5; // Mock for demo
-      version = isRunning ? "2022.3.62f2" : "unknown";
+      
+      const detected = await findUnityProject(projectPath);
+      if (detected) {
+        projectPath = detected;
+        version = await getUnityVersion(detected);
+        isRunning = true; // If we found a valid project, assume it's the active one
+      } else if (await fs.pathExists(versionPath)) {
+        version = (await fs.readFile(versionPath, "utf-8")).trim();
+        isRunning = true;
+      } else {
+        // Mock for demo if nothing found
+        isRunning = Math.random() > 0.5;
+        version = isRunning ? "2022.3.62f2" : "unknown";
+      }
+    } catch (e) {
+      console.error("[UNITY] Status check error:", e);
     }
+    
     currentUnityStatus = { is_running: isRunning, version, project_path: projectPath };
     res.json(currentUnityStatus);
   });
