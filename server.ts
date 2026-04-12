@@ -8,6 +8,10 @@ import dotenv from "dotenv";
 import multer from "multer";
 import chokidar, { FSWatcher } from "chokidar";
 import AdmZip from "adm-zip";
+import { exec } from "child_process";
+import { promisify } from "util";
+
+const execAsync = promisify(exec);
 
 dotenv.config();
 
@@ -179,6 +183,24 @@ async function getUnityVersion(projectPath: string): Promise<string> {
     }
   } catch (e) {}
   return "unknown";
+}
+
+async function detectLocalProcess(processName: string): Promise<{ isRunning: boolean; path?: string }> {
+  if (process.platform !== 'win32') return { isRunning: false };
+  try {
+    // Using wmic to get process path
+    const { stdout } = await execAsync(`wmic process where "name='${processName}'" get ExecutablePath /format:list`);
+    if (stdout && stdout.includes('ExecutablePath=')) {
+      const path = stdout.split('ExecutablePath=')[1].trim();
+      return { isRunning: true, path };
+    }
+    
+    // Fallback to tasklist if wmic fails or returns empty
+    const { stdout: tasklist } = await execAsync(`tasklist /FI "IMAGENAME eq ${processName}" /NH`);
+    return { isRunning: tasklist.toLowerCase().includes(processName.toLowerCase()) };
+  } catch (e) {
+    return { isRunning: false };
+  }
 }
 
 async function performScan() {
@@ -867,6 +889,10 @@ async function startServer() {
     let projectPath = process.cwd();
 
     try {
+      // 1. Check if process is actually running
+      const unityProc = await detectLocalProcess("Unity.exe");
+      isRunning = unityProc.isRunning;
+
       if (await fs.pathExists(kbPath)) {
         const kb = await fs.readJson(kbPath);
         if (kb.project_path) projectPath = kb.project_path;
@@ -876,15 +902,12 @@ async function startServer() {
       if (detected) {
         projectPath = detected;
         version = await getUnityVersion(detected);
-        isRunning = true; // If we found a valid project, assume it's the active one
       } else if (await fs.pathExists(versionPath)) {
         version = (await fs.readFile(versionPath, "utf-8")).trim();
-        isRunning = true;
-      } else {
-        // Mock for demo if nothing found
-        isRunning = Math.random() > 0.5;
-        version = isRunning ? "2022.3.62f2" : "unknown";
       }
+      
+      // If not running but we have a version, it's "Offline" or "Last Used"
+      // But user wants to see "launches", so we prioritize real-time detection
     } catch (e) {
       console.error("[UNITY] Status check error:", e);
     }
@@ -900,20 +923,35 @@ async function startServer() {
     let version = "unknown";
     
     try {
-      if (await fs.pathExists(kbPath)) {
-        const kb = await fs.readJson(kbPath);
-        if (kb.blender_version) version = kb.blender_version;
+      // 1. Try to detect running process
+      const blenderProc = await detectLocalProcess("blender.exe");
+      const launcherProc = await detectLocalProcess("blender-launcher.exe");
+      
+      const activeProc = blenderProc.isRunning ? blenderProc : (launcherProc.isRunning ? launcherProc : null);
+      
+      if (activeProc) {
+        isRunning = true;
+        if (activeProc.path) {
+          // Infer version from path
+          if (activeProc.path.includes("Blender 4.4")) version = "4.4.0";
+          else if (activeProc.path.includes("Blender Foundation\\Blender\\")) version = "2.78";
+          else {
+            // Try to get version from folder name if it's standard
+            const match = activeProc.path.match(/Blender ([\d.]+)/);
+            if (match) version = match[1];
+          }
+        }
       }
 
-      if (await fs.pathExists(versionPath)) {
-        version = (await fs.readFile(versionPath, "utf-8")).trim();
-        isRunning = true;
-      } else if (version !== "unknown") {
-        isRunning = true; // If version is set in KB, assume it's the one being used
-      } else {
-        // Fallback mock if nothing else
-        isRunning = Math.random() > 0.5;
-        version = isRunning ? "4.1.0" : "unknown";
+      // 2. Fallback to KB or File if not running or version unknown
+      if (version === "unknown") {
+        if (await fs.pathExists(kbPath)) {
+          const kb = await fs.readJson(kbPath);
+          if (kb.blender_version) version = kb.blender_version;
+        }
+        if (await fs.pathExists(versionPath)) {
+          version = (await fs.readFile(versionPath, "utf-8")).trim();
+        }
       }
     } catch (e) {
       console.error("[BLENDER] Status check error:", e);
