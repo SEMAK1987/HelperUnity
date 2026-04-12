@@ -1,0 +1,22 @@
+{
+  "project_name": "Unity Assistant",
+  "version": "15.4.0",
+  "interface_structure": {
+    "tabs": [
+      "studio",
+      "kb",
+      "commands",
+      "files"
+    ]
+  },
+  "agents_count": 49,
+  "project_assets": {
+    "scripts_count": 0,
+    "prefabs_count": 0,
+    "videos_count": 0,
+    "total_files": 17,
+    "video_list": [],
+    "script_list": []
+  },
+  "last_scan": "2026-04-12T14:57:58.046Z"
+}
