@@ -1,12 +1,12 @@
 {
-  "version": "14.3.0",
+  "version": "14.5.0",
   "release_date": "2026-04-12",
   "changelog": [
-    "Версия 14.3.0: Advanced AI, Procedural Worlds & MMO Networking",
-    "Добавлено 30 новых мастер-классов (Behavior Trees, Utility AI, Procedural Generation, MMO Networking, Mobile Shaders)",
-    "Общее количество видео-уроков превысило 530+",
-    "Глубокая интеграция систем искусственного интеллекта и процедурной генерации",
-    "Оптимизация сетевого кода для крупномасштабных многопользовательских игр (MMO)",
-    "Расширен раздел возможностей и ограничений ИИ в PROJECT_MASTER_BLUEPRINT.md"
+    "Версия 14.5.0: Hyper-Realistic Rendering & Advanced Character Systems",
+    "Добавлено 44 новых мастер-класса (Hyper-Realistic Rendering, Advanced Character Systems, MMO Scalability)",
+    "Общее количество видео-уроков превысило 610+",
+    "Интеграция методик гипер-реалистичного рендеринга в Unity",
+    "Расширенная поддержка сложных систем персонажей и скелетной анимации",
+    "Обновлен раздел возможностей ИИ в PROJECT_MASTER_BLUEPRINT.md"
   ]
 }
