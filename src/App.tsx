@@ -130,6 +130,7 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [localPathInput, setLocalPathInput] = useState('');
   const [projectPathInput, setProjectPathInput] = useState('');
+  const [blenderVersionInput, setBlenderVersionInput] = useState('');
   const [isGeneratingBlueprint, setIsGeneratingBlueprint] = useState(false);
   const [isUpdatingKB, setIsUpdatingKB] = useState(false);
   const [showCapabilities, setShowCapabilities] = useState(false);
@@ -310,6 +311,7 @@ export default function App() {
         setKb(data);
         setLocalPathInput(data.local_training_path || '');
         setProjectPathInput(data.project_path || '');
+        setBlenderVersionInput(data.blender_version || '');
       })
       .catch(err => {
         console.error("Failed to fetch KB, using fallback", err);
@@ -406,7 +408,8 @@ export default function App() {
     const updatedKb = { 
       ...kb, 
       local_training_path: localPathInput,
-      project_path: projectPathInput 
+      project_path: projectPathInput,
+      blender_version: blenderVersionInput
     };
     try {
       const response = await fetch('/api/kb/update', {
@@ -2175,6 +2178,22 @@ export default function App() {
                   />
                   <p className="text-[10px] text-slate-500 leading-relaxed italic">
                     Укажите путь к папке вашего Unity проекта (где находятся папки Assets и ProjectSettings).
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                    <Box className="w-4 h-4 text-orange-400" /> Версия Blender
+                  </label>
+                  <input 
+                    type="text"
+                    value={blenderVersionInput}
+                    onChange={(e) => setBlenderVersionInput(e.target.value)}
+                    placeholder="Например: 4.1.0"
+                    className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-orange-500/50 transition-all font-mono text-sm"
+                  />
+                  <p className="text-[10px] text-slate-500 leading-relaxed italic">
+                    Укажите версию Blender, которую вы используете, если она не определяется автоматически.
                   </p>
                 </div>
 

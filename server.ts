@@ -895,12 +895,29 @@ async function startServer() {
 
   // Blender Status Endpoint
   app.get("/api/blender/status", async (req, res) => {
+    const versionPath = path.join(process.cwd(), "blender_version.txt");
     let isRunning = false;
     let version = "unknown";
     
-    // Mock for demo
-    isRunning = Math.random() > 0.5;
-    version = isRunning ? "4.0.2" : "unknown";
+    try {
+      if (await fs.pathExists(kbPath)) {
+        const kb = await fs.readJson(kbPath);
+        if (kb.blender_version) version = kb.blender_version;
+      }
+
+      if (await fs.pathExists(versionPath)) {
+        version = (await fs.readFile(versionPath, "utf-8")).trim();
+        isRunning = true;
+      } else if (version !== "unknown") {
+        isRunning = true; // If version is set in KB, assume it's the one being used
+      } else {
+        // Fallback mock if nothing else
+        isRunning = Math.random() > 0.5;
+        version = isRunning ? "4.1.0" : "unknown";
+      }
+    } catch (e) {
+      console.error("[BLENDER] Status check error:", e);
+    }
 
     currentBlenderStatus = { is_running: isRunning, version };
     res.json(currentBlenderStatus);
