@@ -1,12 +1,12 @@
 {
-  "version": "14.5.0",
+  "version": "14.7.0",
   "release_date": "2026-04-12",
   "changelog": [
-    "Версия 14.5.0: Hyper-Realistic Rendering & Advanced Character Systems",
-    "Добавлено 44 новых мастер-класса (Hyper-Realistic Rendering, Advanced Character Systems, MMO Scalability)",
-    "Общее количество видео-уроков превысило 610+",
-    "Интеграция методик гипер-реалистичного рендеринга в Unity",
-    "Расширенная поддержка сложных систем персонажей и скелетной анимации",
-    "Обновлен раздел возможностей ИИ в PROJECT_MASTER_BLUEPRINT.md"
+    "Версия 14.7.0: Advanced AI Capabilities & Extended Knowledge",
+    "Добавлено 53 новых мастер-класса (Unity, Blender, Advanced AI)",
+    "Общее количество видео-уроков превысило 681+",
+    "Расширен раздел 'О ВОЗМОЖНОСТЯХ ИИ' в PROJECT_MASTER_BLUEPRINT.md",
+    "Добавлены новые вымышленные ограничения и возможности для демонстрации потенциала",
+    "Улучшена обработка коротких промтов и предложений по уточнению"
   ]
 }
