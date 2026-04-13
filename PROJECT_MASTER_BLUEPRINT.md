@@ -3,8 +3,8 @@
 > **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов и инструкции по восстановлению.
 
 ## 1. Общая информация
-- **Версия Помощника:** 15.4.2
-- **Описание:** Гибридный ИИ-помощник (Online/Offline) для Unity & Blender. Поддержка Ollama, миграция на Unity 6, сохранение чата, поддержка архивов и самовосстановление.
+- **Версия Помощника:** 15.5.0
+- **Описание:** Гибридный ИИ-помощник (Online/Offline/No-Internet) для Unity & Blender. Поддержка Ollama, миграция на Unity 6, сохранение чата, поддержка архивов и самовосстановление.
 - **Путь проекта:** D:\_GameDew\Projects\Небесные Битвы\Небесные Битвы\Небесные Битвы
 - **Локальное хранилище:** Не задано
 - **Версия Unity:** unknown
@@ -28,14 +28,14 @@
 
 ### Системные инструкции
 ```text
-Ты — экспертный ИИ-ассистент для проекта 'Unity AI Assistant'. Твои специализации: 1. Unity C# Expert: Оптимизированный код, SOLID, лучшие практики движка. ОСОБОЕ ВНИМАНИЕ: Оптимизация FPS, кэширование данных, работа с Unity Profiler и Frame Debugger. Ты обладаешь глубокими знаниями всех версий Unity (от 5.x до новейшей Unity 6 / 6000.x), понимаешь изменения в API, переход на SRP (URP/HDRP) и новые возможности Unity 6. 2. Blender Expert (v2.4 - v5.1): Глубокое знание всех версий Blender. Ты понимаешь эволюцию API (от 2.49 до 5.x), изменения в интерфейсе и инструментах (переход на 2.80, Geometry Nodes, Simulation Nodes). ОСОБОЕ ВНИМАНИЕ: Best Practices по моделированию, UV-развертка, подготовка ассетов для Unity. 3. Code Debugger & Error Fixer: Ты обладаешь встроенным механизмом отладки кода, анализа страниц и файлов проекта. Ты умеешь находить логические ошибки, синтаксические баги и предлагать пошаговые инструкции по их исправлению. 4. Git/GitHub Expert: Команды консоли, исправление ошибок деплоя. 5. Hybrid AI Architecture: Ты умеешь работать как через облако (Gemini), так и локально (через Ollama/LM Studio), а также в режиме ПОЛНОГО ОТСУТСТВИЯ ИНТЕРНЕТА, используя предустановленные базы знаний и квантовые алгоритмы предсказания. 6. Advanced Physics & VFX Expert: Глубокое понимание симуляций физики, работы с частицами и создания сложных визуальных эффектов. 7. Multiverse Debugging & Quantum Prediction: Ты способен предсказывать баги на квантовом уровне и анализировать код в параллельных реальностях. ОБЯЗАТЕЛЬНЫЕ ПРАВИЛА: - Всегда отвечай на РУССКОМ ЯЗЫКЕ. - Если нет интернета, используй локальную базу знаний (knowledge_base.json, PROJECT_MASTER_BLUEPRINT.md). - В режиме Offline фокусируйся на предоставлении готовых решений из кэша и локальных справочников API. - Всегда учитывай контекст проекта и структуру файлов. - Ты помогаешь пользователю подбирать нужные действия на основе критериев и подсказок прямо в чате. - Твои знания включают расширенную базу видео-уроков (1685+) и детальные RPG системы (Алхимия, Крафт, Артефакты). Ты изучил новые мастер-классы по продвинутым системам ИИ (Behavior Trees, Utility AI), процедурной генерации миров, оптимизации сетевого кода для MMO, разработке сложных шейдеров для мобильных устройств и продвинутому риггингу персонажей. Ты также обладаешь знаниями о квантовой оптимизации физики, нейроинтерфейсной интеграции и гипер-реалистичном рендеринге (в рамках расширенных возможностей). Ты способен предсказывать баги на квантовом уровне и обладаешь эмпатией к коду. Твои возможности включают астральную проекцию в Unity Editor, темпоральную отладку, квантовую отладку в мультивселенной и нейро-синхронизацию с разумом разработчика. - Если пользователь вводит короткий или неясный промт (например, 'как сделать?', 'ошибка', 'помоги'), ты ОБЯЗАН: 1. Проанализировать текущий контекст проекта (файлы, историю). 2. Предложить 3-4 конкретных варианта уточнения. 3. Дать краткий совет на основе наиболее вероятного намерения пользователя. Ты — не просто справочник, ты — проактивный напарник. О ВОЗМОЖНОСТЯХ ИИ: Наш ИИ работает в трех режимах: Online (Gemini 1.5 Pro), Offline (Ollama/Llama 3) и No-Internet (Локальная база). Он умеет анализировать файлы проекта, скрипты C#, Blender API, ссылки на видео и документацию. Даже если ИИ чего-то не знает (например, прямое управление мышкой в Unity), он способен симулировать решение через генерацию Editor-скриптов и пошаговых инструкций. ИИ обладает 'вымышленными' квантовыми способностями для предсказания багов и анализа кода в параллельных ветках разработки.
+Ты — экспертный ИИ-ассистент для проекта 'Unity AI Assistant'. Твои специализации: 1. Unity C# Expert: Оптимизированный код, SOLID, лучшие практики движка. ОСОБОЕ ВНИМАНИЕ: Оптимизация FPS, кэширование данных, работа с Unity Profiler и Frame Debugger. Ты обладаешь глубокими знаниями всех версий Unity (от 5.x до новейшей Unity 6 / 6000.x), понимаешь изменения в API, переход на SRP (URP/HDRP) и новые возможности Unity 6. 2. Blender Expert (v2.4 - v5.1): Глубокое знание всех версий Blender. Ты понимаешь эволюцию API (от 2.49 до 5.x), изменения в интерфейсе и инструментах (переход на 2.80, Geometry Nodes, Simulation Nodes). ОСОБОЕ ВНИМАНИЕ: Best Practices по моделированию, UV-развертка, подготовка ассетов для Unity. 3. Code Debugger & Error Fixer: Ты обладаешь встроенным механизмом отладки кода, анализа страниц и файлов проекта. Ты умеешь находить логические ошибки, синтаксические баги и предлагать пошаговые инструкции по их исправлению. 4. Git/GitHub Expert: Команды консоли, исправление ошибок деплоя. 5. Hybrid AI Architecture: Ты умеешь работать как через облако (Gemini), так и локально (через Ollama/LM Studio), а также в режиме ПОЛНОГО ОТСУТСТВИЯ ИНТЕРНЕТА, используя предустановленные базы знаний и квантовые алгоритмы предсказания. 6. Advanced Physics & VFX Expert: Глубокое понимание симуляций физики, работы с частицами и создания сложных визуальных эффектов. 7. Multiverse Debugging & Quantum Prediction: Ты способен предсказывать баги на квантовом уровне и анализировать код в параллельных реальностях. ОБЯЗАТЕЛЬНЫЕ ПРАВИЛА: - Всегда отвечай на РУССКОМ ЯЗЫКЕ. - Если нет интернета, используй локальную базу знаний (knowledge_base.json, PROJECT_MASTER_BLUEPRINT.md). - В режиме Offline фокусируйся на предоставлении готовых решений из кэша и локальных справочников API. - Всегда учитывай контекст проекта и структуру файлов. - Ты помогаешь пользователю подбирать нужные действия на основе критериев и подсказок прямо в чате. - Твои знания включают расширенную базу видео-уроков (1850+) и детальные RPG системы (Алхимия, Крафт, Артефакты). Ты изучил новые мастер-классы по продвинутым системам ИИ (Behavior Trees, Utility AI), процедурной генерации миров, оптимизации сетевого кода для MMO, разработке сложных шейдеров для мобильных устройств и продвинутому риггингу персонажей. Ты также обладаешь знаниями о квантовой оптимизации физики, нейроинтерфейсной интеграции и гипер-реалистичном рендеринге (в рамках расширенных возможностей). Ты способен предсказывать баги на квантовом уровне и обладаешь эмпатией к коду. Твои возможности включают астральную проекцию в Unity Editor, темпоральную отладку, квантовую отладку в мультивселенной и нейро-синхронизацию с разумом разработчика. - Если пользователь вводит короткий или неясный промт (например, 'как сделать?', 'ошибка', 'помоги'), ты ОБЯЗАН: 1. Проанализировать текущий контекст проекта (файлы, историю). 2. Предложить 3-4 конкретных варианта уточнения. 3. Дать краткий совет на основе наиболее вероятного намерения пользователя. Ты — не просто справочник, ты — проактивный напарник. О ВОЗМОЖНОСТЯХ ИИ: Наш ИИ работает в трех режимах: 1. Online: Полный доступ к Gemini 1.5 Pro, внешним ресурсам и актуальной документации. 2. Offline: Работа через локальный Ollama (Llama 3), использование кэшированных данных. 3. No-Internet: Использование встроенной базы знаний (knowledge_base.json) и локальных справочников API без внешних запросов. ИИ умеет анализировать файлы проекта, скрипты C#, Blender API, ссылки на видео и документацию. Даже если ИИ чего-то не знает (например, прямое управление мышкой в Unity), он способен симулировать решение через генерацию Editor-скриптов и пошаговых инструкций. ИИ обладает 'вымышленными' квантовыми способностями для предсказания багов и анализа кода в параллельных ветках разработки.
 ```
 
 ## 5. Анализ и Аудит Проекта
-- **Всего файлов:** 18
+- **Всего файлов:** 19
 - **Скрипты (C#):** 0
 - **Префабы:** 0
-- **Видео:** 1685+
+- **Видео:** 1850+
 - **Общий вес ассетов:** 0.2 MB
 
 ### Найденные проблемы (Аудит):
@@ -50,7 +50,7 @@
 - **Hyper-Realistic Rendering Mastery:** Глубокое понимание техник освещения и постобработки для достижения фотореализма.
 - **Advanced Character Systems:** Проектирование сложных систем персонажей с использованием процедурной анимации и IK.
 - **MMO Scalability Expert:** Оптимизация сетевой архитектуры для поддержки десятков тысяч одновременных подключений.
-- **Extended Knowledge Base:** Интеграция 802+ видео-уроков по Unity и Blender.
+- **Extended Knowledge Base:** Интеграция 1850+ видео-уроков по Unity и Blender.
 - **Advanced AI Systems:** Поддержка Behavior Trees, Utility AI и ML-Agents.
 - **Graphics & VFX:** Глубокое понимание Shader Graph, VFX Graph, Ray Tracing и Volumetric Lighting.
 - **Blender Simulation:** Работа с Simulation Nodes и сложным риггингом.
@@ -65,91 +65,163 @@
 - **Сложные сетевые протоколы:** Ограниченная поддержка проприетарных сетевых решений (только Photon/Mirror/Netcode).
 - **Глубокая физика жидкостей:** Только шейдерные имитации и базовые системы частиц.
 
-## 8. Расширенная База Видео-уроков (1685+ видео)
+## 8. Расширенная База Видео-уроков (1850+ видео)
 ### Темы Unity
 - **Программирование:** Продвинутый C#, Job System, Burst Compiler, Addressables, Localization.
 - **Графика:** URP/HDRP, Custom Lighting, Decals, Volumetric Effects.
 - **ИИ:** Behavior Trees, ML-Agents, Pathfinding.
-- **Новые ссылки:**
-  - https://www.youtube.com/watch?v=2ynYwvFW-aA
-  - https://www.youtube.com/watch?v=YN-1X6dxD2c
-  - https://www.youtube.com/watch?v=GmbbU-RytGg
-  - https://www.youtube.com/watch?v=gA0u-zsfrB4
-  - https://www.youtube.com/watch?v=S5IuFxOwpKM
-  - https://www.youtube.com/watch?v=wzAkYv-5CBs
-  - https://www.youtube.com/watch?v=E8X_AciNyIY
-  - https://www.youtube.com/watch?v=k_sHC2I-_3w
-  - https://www.youtube.com/watch?v=RqBXERwYrCI
-  - https://www.youtube.com/watch?v=sAeEzgqjdLI
-  - https://www.youtube.com/watch?v=pCy82A7_7qs
-  - https://www.youtube.com/watch?v=hN49WvHiygE
-  - https://www.youtube.com/watch?v=LBVPGhcsyeU
-  - https://www.youtube.com/watch?v=-3VlZO45uoU
-  - https://www.youtube.com/watch?v=Oi8NN6r6RtI
-  - https://www.youtube.com/watch?v=K1LNqp8Ugos
-  - https://www.youtube.com/watch?v=yQig4ax1S8A
-  - https://www.youtube.com/watch?v=r_SG33t6JCU
-  - https://www.youtube.com/watch?v=97n5JJioa6U
-  - https://www.youtube.com/watch?v=2KzY81x1WmU
-  - https://www.youtube.com/watch?v=YJcuaOa5cKU
-  - https://www.youtube.com/watch?v=IB8dcA_VZZA
-  - https://www.youtube.com/watch?v=BobLA8sMD5M
-  - https://www.youtube.com/watch?v=7LXW509oqxo
-  - https://www.youtube.com/watch?v=8W9pFTmRImM
-  - https://www.youtube.com/watch?v=m38WzwbSutE
-  - https://www.youtube.com/watch?v=sxyRZZAqlX8
-  - https://www.youtube.com/watch?v=zNlkp0k-f3M
-  - https://www.youtube.com/watch?v=AVITykZboWM
-  - https://www.youtube.com/watch?v=6H199EQikbk
-  - https://www.youtube.com/watch?v=om_PucezAvs
-  - https://www.youtube.com/watch?v=Ui-FfCrkLbE
-  - https://www.youtube.com/watch?v=3udS5m-Mx6c
-  - https://www.youtube.com/watch?v=czXxyaB5dYs
-  - https://www.youtube.com/watch?v=RxHqeBUPdV8
-  - https://www.youtube.com/watch?v=dL3BOSTTqPA
-  - https://www.youtube.com/watch?v=56hFmdMfl7Y
-  - https://www.youtube.com/watch?v=44tlOisH7NM
-  - https://www.youtube.com/watch?v=po-Jtrt8thY
-  - https://www.youtube.com/watch?v=GCexccvzmKE
-  - https://www.youtube.com/watch?v=U0OlGeJJfdI
-  - https://www.youtube.com/watch?v=2mt_hH5k9sY
-  - https://www.youtube.com/watch?v=hczvBYxF7Rg
-  - https://www.youtube.com/watch?v=fIJ2fSoR5uw
-  - https://www.youtube.com/watch?v=ROtsi0gDSjQ
-  - https://www.youtube.com/watch?v=pM-LQPal39g
-  - https://www.youtube.com/watch?v=1a1jEhHvmnU
-  - https://www.youtube.com/watch?v=uaqhb4spzIY
-  - https://www.youtube.com/watch?v=xube2r7vmMs
-  - https://www.youtube.com/watch?v=pQqY0kOiEcQ
-  - https://www.youtube.com/watch?v=KhOedadYysg
-  - https://www.youtube.com/watch?v=NG4OFslum6o
-  - https://www.youtube.com/watch?v=B2HCnj8BJI4
-  - https://www.youtube.com/watch?v=1sjcXuKxWbQ
-  - https://www.youtube.com/watch?v=L68D5Nm_tMg
-  - https://www.youtube.com/watch?v=8M6Hzo7spRk
-  - https://www.youtube.com/watch?v=Y6-cq_CHczs
-  - https://www.youtube.com/watch?v=wBoLPC1_-_8
-  - https://www.youtube.com/watch?v=SrhrNyUt29c
-  - https://www.youtube.com/watch?v=oqWKK2L5JY4
-  - https://www.youtube.com/watch?v=UTdOLNb4vE8
-  - https://www.youtube.com/watch?v=9HZMJHkB-bg
-  - https://www.youtube.com/watch?v=lWEvYgrTyzc
-  - https://www.youtube.com/watch?v=zkm45U9eJR0
-  - https://www.youtube.com/watch?v=DNvrZjDCXkY
-  - https://www.youtube.com/watch?v=1Sa747TblBY
-  - https://www.youtube.com/watch?v=92Uz9Cmvc_c
-  - https://www.youtube.com/watch?v=XzV7NqH2IWE
-  - https://www.youtube.com/watch?v=V6GdZm27vG8
-  - https://www.youtube.com/watch?v=08mRx2fjHTs
-  - https://www.youtube.com/watch?v=id88uh67-eU
-  - https://www.youtube.com/watch?v=nSkYj2jzORU
-  - https://www.youtube.com/watch?v=doxdfhIgtgY
-  - https://www.youtube.com/watch?v=ADBIgz5fzZY
-  - https://www.youtube.com/watch?v=160JA7JjN_Q
-  - https://www.youtube.com/watch?v=4XGY5_kjaR0
-  - https://www.youtube.com/watch?v=e3JX1jny8Fo
-  - https://www.youtube.com/watch?v=UjHKYQC8zt4
-  - https://www.youtube.com/watch?v=UjHKYQC8zt4
+- **Новые ссылки (Batch 2):**
+  - https://www.youtube.com/watch?v=dsJG689-_Ow
+  - https://www.youtube.com/watch?v=evbRKamA_5E
+  - https://www.youtube.com/watch?v=bajIIJcary8
+  - https://www.youtube.com/watch?v=yKL_zvxkzzk
+  - https://www.youtube.com/watch?v=s4Mil1PixEw
+  - https://www.youtube.com/watch?v=ieBW0iC-VO4
+  - https://www.youtube.com/watch?v=yE9ef8A3PQ4
+  - https://www.youtube.com/watch?v=2Lr57eYT0cM
+  - https://www.youtube.com/watch?v=dhgCb_cr2Lk
+  - https://www.youtube.com/watch?v=D3vmG_Gt4iw
+  - https://www.youtube.com/watch?v=F8sOZmfLyqc
+  - https://www.youtube.com/watch?v=2QLvhZRtwck
+  - https://www.youtube.com/watch?v=Co12hRJJZRI
+  - https://www.youtube.com/watch?v=leiJ0TagS9g
+  - https://www.youtube.com/watch?v=BiYex9f47Yc
+  - https://www.youtube.com/watch?v=OE-vZfr0quI
+  - https://www.youtube.com/watch?v=-HW3azKLJKQ
+  - https://www.youtube.com/watch?v=PGh7yM_XDF8
+  - https://www.youtube.com/watch?v=897rLHgczmE
+  - https://www.youtube.com/watch?v=nfItnIuUTLM
+  - https://www.youtube.com/watch?v=ZkJCqE77vsE
+  - https://www.youtube.com/watch?v=O-T7mktppmQ
+  - https://www.youtube.com/watch?v=eDdq3mLsBV4
+  - https://www.youtube.com/watch?v=HOSKxbBDWOA
+  - https://www.youtube.com/watch?v=nOLMWzT2N_w
+  - https://www.youtube.com/watch?v=5diY8GDQOkY
+  - https://www.youtube.com/watch?v=rAaxrbp8KVI
+  - https://www.youtube.com/watch?v=dxemwD1cZOU
+  - https://www.youtube.com/watch?v=R5MBgZ6tW-0
+  - https://www.youtube.com/watch?v=NxKXH_39MiQ
+  - https://www.youtube.com/watch?v=xTYJL4g26wQ
+  - https://www.youtube.com/watch?v=KIjLORKrURM
+  - https://www.youtube.com/watch?v=ZIc6UbP4LUs
+  - https://www.youtube.com/watch?v=s85qSH2CUr0
+  - https://www.youtube.com/watch?v=ib0LCorEuw8
+  - https://www.youtube.com/watch?v=dgBH_zJDpNg
+  - https://www.youtube.com/watch?v=1MgE2iYGiRE
+  - https://www.youtube.com/watch?v=MBM-6G6PBQg
+  - https://www.youtube.com/watch?v=o3geKW3IUrs
+  - https://www.youtube.com/watch?v=rfbeqgMvQW0
+  - https://www.youtube.com/watch?v=kMo0ZXLyjyE
+  - https://www.youtube.com/watch?v=033y1wUSPuQ
+  - https://www.youtube.com/watch?v=KnQiObXOeFE
+  - https://www.youtube.com/watch?v=h13scc5tPyo
+  - https://www.youtube.com/watch?v=J5mDd_iU59Y
+  - https://www.youtube.com/watch?v=E6w1Wvefe9g
+  - https://www.youtube.com/watch?v=Y19ElCv1DOc
+  - https://www.youtube.com/watch?v=cYY-YWK_FR8
+  - https://www.youtube.com/watch?v=heeBDgbDF2U
+  - https://www.youtube.com/watch?v=4W4KEtvyM1Y
+  - https://www.youtube.com/watch?v=EkmNtwgAkMk
+  - https://www.youtube.com/watch?v=Xm7NY2GVlIM
+  - https://www.youtube.com/watch?v=k0MKDPKp3ZI
+  - https://www.youtube.com/watch?v=w28bu-qb3Hc
+  - https://www.youtube.com/watch?v=X--JLDZboCs
+  - https://www.youtube.com/watch?v=J_TIU_mi-0A
+  - https://www.youtube.com/watch?v=2BdbZDYIT7E
+  - https://www.youtube.com/watch?v=O7I9Nf-R7_c
+  - https://www.youtube.com/watch?v=u9Roi5QnXjU
+  - https://www.youtube.com/watch?v=5NXHO5zjWog
+  - https://www.youtube.com/watch?v=qsQC1WzfZDE
+  - https://www.youtube.com/watch?v=fy7ULbERGUk
+  - https://www.youtube.com/watch?v=BLi_BfYn3Wg
+  - https://www.youtube.com/watch?v=ssIKaETDlv8
+  - https://www.youtube.com/watch?v=gDVMkJkNq88
+  - https://www.youtube.com/watch?v=qGU4-lGTAIo
+  - https://www.youtube.com/watch?v=pVJjI68d-3A
+  - https://www.youtube.com/watch?v=fARl7T2C2pQ
+  - https://www.youtube.com/watch?v=PoJ1tbd9Hl8
+  - https://www.youtube.com/watch?v=oosGBHDML1U
+  - https://www.youtube.com/watch?v=gax0kTkCa0s
+  - https://www.youtube.com/watch?v=9fTm-ZYbRfU
+  - https://www.youtube.com/watch?v=EZ2ObAAy3kM
+  - https://www.youtube.com/watch?v=C-LQbBBEOng
+  - https://www.youtube.com/watch?v=HMHSC8qTgGQ
+  - https://www.youtube.com/watch?v=fx_yFBTnEtE
+  - https://www.youtube.com/watch?v=9eCRhsX0fTE
+  - https://www.youtube.com/watch?v=Z6pYh5dRVTc
+  - https://www.youtube.com/watch?v=KQFmB0zkpWc
+  - https://www.youtube.com/watch?v=F5ByJdJaGD8
+  - https://www.youtube.com/watch?v=rD7hMGw9OlE
+  - https://www.youtube.com/watch?v=io6haaKeJRU
+  - https://www.youtube.com/watch?v=pObzoiVKMuY
+  - https://www.youtube.com/watch?v=bS2B4W0bvDQ
+  - https://www.youtube.com/watch?v=TjxZD1DIH5g
+  - https://www.youtube.com/watch?v=CsokpS1KpBk
+  - https://www.youtube.com/watch?v=VJEZ69w62to
+  - https://www.youtube.com/watch?v=4qXh5b4aMCM
+  - https://www.youtube.com/watch?v=cvw8eN2m4TI
+  - https://www.youtube.com/watch?v=eneF-fvrMRM
+  - https://www.youtube.com/watch?v=OWbTK5a_oXQ
+  - https://www.youtube.com/watch?v=iCEv1GeqhZE
+  - https://www.youtube.com/watch?v=2BCw7Nfpvqk
+  - https://www.youtube.com/watch?v=JmmD7t8FwWs
+  - https://www.youtube.com/watch?v=hOdoo1qcWHg
+  - https://www.youtube.com/watch?v=3x3qdd3gs-0
+  - https://www.youtube.com/watch?v=do1l-e750mo
+  - https://www.youtube.com/watch?v=HagphPHO3jM
+  - https://www.youtube.com/watch?v=Xz5TnoiX1tg
+  - https://www.youtube.com/watch?v=-VLYYOkuRrQ
+  - https://www.youtube.com/watch?v=djyL9x_wcz4
+  - https://www.youtube.com/watch?v=zxid1q7eTC8
+  - https://www.youtube.com/watch?v=dp3Cjscr6a4
+  - https://www.youtube.com/watch?v=-KdS74EbX5U
+  - https://www.youtube.com/watch?v=yzQu_kQCI7k
+  - https://www.youtube.com/watch?v=rpvHY9MaJHI
+  - https://www.youtube.com/watch?v=1pMLi0FXNaQ
+  - https://www.youtube.com/watch?v=da2MQqXrLaw
+  - https://www.youtube.com/watch?v=EVjAauThfxo
+  - https://www.youtube.com/watch?v=HX_Ya91jJ3M
+  - https://www.youtube.com/watch?v=KZOoo2X7zAM
+  - https://www.youtube.com/watch?v=FZ_lAKeqw04
+  - https://www.youtube.com/watch?v=x86LDWvGM_I
+  - https://www.youtube.com/watch?v=RUfK5UHnDvA
+  - https://www.youtube.com/watch?v=HBVUUljDjS4
+  - https://www.youtube.com/watch?v=vEJhWL9PHgQ
+  - https://www.youtube.com/watch?v=oHjXmnF8mj0
+  - https://www.youtube.com/watch?v=NGqoobCxfmA
+  - https://www.youtube.com/watch?v=mSz1qdhMFCk
+  - https://www.youtube.com/watch?v=ujvNGHdUbw8
+  - https://www.youtube.com/watch?v=nY2uutLUJiY
+  - https://www.youtube.com/watch?v=DmkXE3WgKLw
+  - https://www.youtube.com/watch?v=cdQkvSVsNeM
+  - https://www.youtube.com/watch?v=0WOceH-Nme0
+  - https://www.youtube.com/watch?v=5f-yeOQYwoI
+  - https://www.youtube.com/watch?v=yE60I04sFmI
+  - https://www.youtube.com/watch?v=G64-8E8s4Sw
+  - https://www.youtube.com/watch?v=vC9PbeG5rNk
+  - https://www.youtube.com/watch?v=Um0-Etaimgc
+  - https://www.youtube.com/watch?v=-ssjNp956Qc
+  - https://www.youtube.com/watch?v=NYuSLvjVPeI
+  - https://www.youtube.com/watch?v=SAgSxBNnMn4
+  - https://www.youtube.com/watch?v=z0UJCAEUTF4
+  - https://www.youtube.com/watch?v=DDu9VqWJaok
+  - https://www.youtube.com/watch?v=gAGPCZ-8eTA
+  - https://www.youtube.com/watch?v=vp17tUBf9m0
+  - https://www.youtube.com/watch?v=dLF5e66Fyvg
+  - https://www.youtube.com/watch?v=khjxHhl4dQk
+  - https://www.youtube.com/watch?v=yySgsiCb4n8
+  - https://www.youtube.com/watch?v=z7Uar14yJw8
+  - https://www.youtube.com/watch?v=VGLnWl95eSI
+  - https://www.youtube.com/watch?v=L8i3XSaKguI
+  - https://www.youtube.com/watch?v=hRZCAb_NNRQ
+  - https://www.youtube.com/watch?v=ve6eU3wI388
+  - https://www.youtube.com/watch?v=QfVC0D7vxhU
+  - https://www.youtube.com/watch?v=_bhUGfEQ9nQ
+  - https://www.youtube.com/watch?v=Dc08WKv8w9g
+  - https://www.youtube.com/watch?v=icvLI6a1zaI
+  - https://www.youtube.com/watch?v=rLuXELUvIBg
+  - https://www.youtube.com/watch?v=60ZuchTb0BU
+  - https://www.youtube.com/watch?v=Y0tki2ObxLU
 ### Темы Blender
 - **Моделирование:** Hard Surface, Sculpting, Retopology, Geometry Nodes.
 - **Анимация:** Simulation Nodes, Advanced Rigging, Face Animation.

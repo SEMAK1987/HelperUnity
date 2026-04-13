@@ -1,6 +1,6 @@
 {
   "project_name": "Unity Assistant",
-  "version": "15.4.0",
+  "version": "15.5.0",
   "interface_structure": {
     "tabs": [
       "studio",
@@ -13,10 +13,10 @@
   "project_assets": {
     "scripts_count": 0,
     "prefabs_count": 0,
-    "videos_count": 0,
-    "total_files": 17,
+    "videos_count": 1850,
+    "total_files": 19,
     "video_list": [],
     "script_list": []
   },
-  "last_scan": "2026-04-12T14:57:58.046Z"
+  "last_scan": "2026-04-13T17:31:06.397Z"
 }
