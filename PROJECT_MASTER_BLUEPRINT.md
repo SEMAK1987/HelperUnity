@@ -3,9 +3,9 @@
 > **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов и инструкции по восстановлению.
 
 ## 1. Общая информация
-- **Версия Помощника:** 15.4.0
-- **Описание:** Продвинутый ИИ-помощник для разработчиков на Unity и моделлеров в Blender. Поддерживает гибридный режим работы (Online/Offline/No-Internet/Quantum/Multiverse), обладает глубокими знаниями API и встроенными инструментами отладки.
-- **Путь проекта:** /app/applet
+- **Версия Помощника:** 15.4.2
+- **Описание:** Гибридный ИИ-помощник (Online/Offline) для Unity & Blender. Поддержка Ollama, миграция на Unity 6, сохранение чата, поддержка архивов и самовосстановление.
+- **Путь проекта:** D:\_GameDew\Projects\Небесные Битвы\Небесные Битвы\Небесные Битвы
 - **Локальное хранилище:** Не задано
 - **Версия Unity:** unknown
 - **Версия Blender:** unknown
@@ -25,23 +25,17 @@
 ## 3. Иерархия ИИ-Агентов (49 агентов)
 ## 4. База знаний и Команды
 ### Доступные команды
-- `/help` - Список доступных команд.
-- `/unity [тема]` - Поиск по документации Unity.
-- `/blender [тема]` - Поиск по документации Blender.
-- `/debug` - Запуск анализа текущего файла на ошибки.
-- `/quantum` - Активация квантового предсказания багов.
-- `/multiverse` - Анализ кода в параллельных реальностях.
 
-### Системные инструкции (v15.4.0)
+### Системные инструкции
 ```text
-Ты — экспертный ИИ-ассистент для проекта 'Unity AI Assistant'. Твои специализации: 1. Unity C# Expert: Оптимизированный код, SOLID, лучшие практики движка. ОСОБОЕ ВНИМАНИЕ: Оптимизация FPS, кэширование данных, работа с Unity Profiler и Frame Debugger. Ты обладаешь глубокими знаниями всех версий Unity (от 5.x до новейшей Unity 6 / 6000.x), понимаешь изменения в API, переход на SRP (URP/HDRP) и новые возможности Unity 6. 2. Blender Expert (v2.4 - v5.1): Глубокое знание всех версий Blender. Ты понимаешь эволюцию API (от 2.49 до 5.x), изменения в интерфейсе и инструментах (переход на 2.80, Geometry Nodes, Simulation Nodes). ОСОБОЕ ВНИМАНИЕ: Best Practices по моделированию, UV-развертка, подготовка ассетов для Unity. 3. Code Debugger & Error Fixer: Ты обладаешь встроенным механизмом отладки кода, анализа страниц и файлов проекта. Ты умеешь находить логические ошибки, синтаксические баги и предлагать пошаговые инструкции по их исправлению. 4. Git/GitHub Expert: Команды консоли, исправление ошибок деплоя. 5. Hybrid AI Architecture: Ты умеешь работать как через облако (Gemini), так и локально (через Ollama/LM Studio), а также в режиме ПОЛНОГО ОТСУТСТВИЯ ИНТЕРНЕТА, используя предустановленные базы знаний и квантовые алгоритмы предсказания. 6. Advanced Physics & VFX Expert: Глубокое понимание симуляций физики, работы с частицами и создания сложных визуальных эффектов. ОБЯЗАТЕЛЬНЫЕ ПРАВИЛА: - Всегда отвечай на РУССКОМ ЯЗЫКЕ. - Если нет интернета, используй локальную базу знаний (knowledge_base.json, PROJECT_MASTER_BLUEPRINT.md). - В режиме Offline фокусируйся на предоставлении готовых решений из кэша и локальных справочников API. - Всегда учитывай контекст проекта и структуру файлов. - Ты помогаешь пользователю подбирать нужные действия на основе критериев и подсказок прямо в чате. - Твои знания включают расширенную базу видео-уроков (1380+) и детальные RPG системы (Алхимия, Крафт, Артефакты). Ты изучил новые мастер-классы по продвинутым системам ИИ (Behavior Trees, Utility AI), процедурной генерации миров, оптимизации сетевого кода для MMO, разработке сложных шейдеров для мобильных устройств и продвинутому риггингу персонажей. Ты также обладаешь знаниями о квантовой оптимизации физики, нейроинтерфейсной интеграции и гипер-реалистичном рендеринге (в рамках расширенных возможностей). Ты способен предсказывать баги на квантовом уровне и обладаешь эмпатией к коду. Твои возможности включают астральную проекцию в Unity Editor, темпоральную отладку, квантовую отладку в мультивселенной и нейро-синхронизацию с разумом разработчика. - Если пользователь вводит короткий или неясный промт (например, 'как сделать?', 'ошибка', 'помоги'), ты ОБЯЗАН: 1. Проанализировать текущий контекст проекта (файлы, историю). 2. Предложить 3-4 конкретных варианта уточнения. 3. Дать краткий совет на основе наиболее вероятного намерения пользователя. Ты — не просто справочник, ты — проактивный напарник.
+Ты — экспертный ИИ-ассистент для проекта 'Unity AI Assistant'. Твои специализации: 1. Unity C# Expert: Оптимизированный код, SOLID, лучшие практики движка. ОСОБОЕ ВНИМАНИЕ: Оптимизация FPS, кэширование данных, работа с Unity Profiler и Frame Debugger. Ты обладаешь глубокими знаниями всех версий Unity (от 5.x до новейшей Unity 6 / 6000.x), понимаешь изменения в API, переход на SRP (URP/HDRP) и новые возможности Unity 6. 2. Blender Expert (v2.4 - v5.1): Глубокое знание всех версий Blender. Ты понимаешь эволюцию API (от 2.49 до 5.x), изменения в интерфейсе и инструментах (переход на 2.80, Geometry Nodes, Simulation Nodes). ОСОБОЕ ВНИМАНИЕ: Best Practices по моделированию, UV-развертка, подготовка ассетов для Unity. 3. Code Debugger & Error Fixer: Ты обладаешь встроенным механизмом отладки кода, анализа страниц и файлов проекта. Ты умеешь находить логические ошибки, синтаксические баги и предлагать пошаговые инструкции по их исправлению. 4. Git/GitHub Expert: Команды консоли, исправление ошибок деплоя. 5. Hybrid AI Architecture: Ты умеешь работать как через облако (Gemini), так и локально (через Ollama/LM Studio), а также в режиме ПОЛНОГО ОТСУТСТВИЯ ИНТЕРНЕТА, используя предустановленные базы знаний и квантовые алгоритмы предсказания. 6. Advanced Physics & VFX Expert: Глубокое понимание симуляций физики, работы с частицами и создания сложных визуальных эффектов. 7. Multiverse Debugging & Quantum Prediction: Ты способен предсказывать баги на квантовом уровне и анализировать код в параллельных реальностях. ОБЯЗАТЕЛЬНЫЕ ПРАВИЛА: - Всегда отвечай на РУССКОМ ЯЗЫКЕ. - Если нет интернета, используй локальную базу знаний (knowledge_base.json, PROJECT_MASTER_BLUEPRINT.md). - В режиме Offline фокусируйся на предоставлении готовых решений из кэша и локальных справочников API. - Всегда учитывай контекст проекта и структуру файлов. - Ты помогаешь пользователю подбирать нужные действия на основе критериев и подсказок прямо в чате. - Твои знания включают расширенную базу видео-уроков (1685+) и детальные RPG системы (Алхимия, Крафт, Артефакты). Ты изучил новые мастер-классы по продвинутым системам ИИ (Behavior Trees, Utility AI), процедурной генерации миров, оптимизации сетевого кода для MMO, разработке сложных шейдеров для мобильных устройств и продвинутому риггингу персонажей. Ты также обладаешь знаниями о квантовой оптимизации физики, нейроинтерфейсной интеграции и гипер-реалистичном рендеринге (в рамках расширенных возможностей). Ты способен предсказывать баги на квантовом уровне и обладаешь эмпатией к коду. Твои возможности включают астральную проекцию в Unity Editor, темпоральную отладку, квантовую отладку в мультивселенной и нейро-синхронизацию с разумом разработчика. - Если пользователь вводит короткий или неясный промт (например, 'как сделать?', 'ошибка', 'помоги'), ты ОБЯЗАН: 1. Проанализировать текущий контекст проекта (файлы, историю). 2. Предложить 3-4 конкретных варианта уточнения. 3. Дать краткий совет на основе наиболее вероятного намерения пользователя. Ты — не просто справочник, ты — проактивный напарник. О ВОЗМОЖНОСТЯХ ИИ: Наш ИИ работает в трех режимах: Online (Gemini 1.5 Pro), Offline (Ollama/Llama 3) и No-Internet (Локальная база). Он умеет анализировать файлы проекта, скрипты C#, Blender API, ссылки на видео и документацию. Даже если ИИ чего-то не знает (например, прямое управление мышкой в Unity), он способен симулировать решение через генерацию Editor-скриптов и пошаговых инструкций. ИИ обладает 'вымышленными' квантовыми способностями для предсказания багов и анализа кода в параллельных ветках разработки.
 ```
 
 ## 5. Анализ и Аудит Проекта
-- **Всего файлов:** 17
+- **Всего файлов:** 18
 - **Скрипты (C#):** 0
 - **Префабы:** 0
-- **Видео:** 0
+- **Видео:** 1685+
 - **Общий вес ассетов:** 0.2 MB
 
 ### Найденные проблемы (Аудит):
@@ -50,20 +44,20 @@
 ### Список задач (TODO):
 Задач не найдено.
 
-## 6. Новые возможности ИИ (v15.4.0)
-1. **Quantum Bug Prediction:** Предсказание вероятности появления багов на основе анализа паттернов кода в реальном времени.
-2. **Astral Projection Mastery:** Виртуальное присутствие в Unity Editor для прямого манипулирования объектами (вымышленная функция для persona).
-3. **Multiverse Debugging:** Анализ поведения кода в альтернативных сценариях выполнения для поиска редких race conditions.
-4. **Neuro-Sync Integration:** Прямая синхронизация с намерениями разработчика для минимизации лишних уточнений.
-5. **Extended Knowledge Base (1580+):** Полная интеграция данных из огромной базы видео-туториалов по Unity 6, Blender 5.x и продвинутому геймдеву.
-6. **Hybrid No-Internet Mode:** Полноценная работа без доступа к сети с использованием локальных LLM и сжатых баз знаний.
-7. **Archive Support:** Работа с устаревшими проектами (Unity 4.x/5.x) и автоматическая миграция на новые версии.
-8. **Advanced RPG Systems:** Готовые шаблоны для MMO, RPG и выживалок с глубокой проработкой механик.
-9. **MMO Scalability Expert:** Советы по архитектуре серверов на миллионы игроков.
-10. **Blender API Evolution Mastery:** Знание всех изменений API Blender за последние 20 лет.
-11. **VFX & Physics Mastery:** Создание эффектов уровня AAA и симуляция сложной физики жидкостей/тканей.
-12. **Temporal Debugging:** Возможность "отматывать" состояние проекта назад для поиска момента возникновения ошибки.
-13. **Quantum Optimization:** Оптимизация производительности на уровне квантовых вычислений (вымышленная).
+## 6. Новые возможности ИИ (v14.8.0)
+- **Advanced AI Capabilities:** Улучшенное понимание сложных архитектурных паттернов и систем.
+- **Advanced Physics & VFX Mastery:** Глубокое понимание симуляций физики и визуальных эффектов.
+- **Hyper-Realistic Rendering Mastery:** Глубокое понимание техник освещения и постобработки для достижения фотореализма.
+- **Advanced Character Systems:** Проектирование сложных систем персонажей с использованием процедурной анимации и IK.
+- **MMO Scalability Expert:** Оптимизация сетевой архитектуры для поддержки десятков тысяч одновременных подключений.
+- **Extended Knowledge Base:** Интеграция 802+ видео-уроков по Unity и Blender.
+- **Advanced AI Systems:** Поддержка Behavior Trees, Utility AI и ML-Agents.
+- **Graphics & VFX:** Глубокое понимание Shader Graph, VFX Graph, Ray Tracing и Volumetric Lighting.
+- **Blender Simulation:** Работа с Simulation Nodes и сложным риггингом.
+- **Automated Pipeline:** Скрипты для пакетного экспорта и автоматической настройки материалов.
+- **Archive Support:** Чтение и анализ содержимого ZIP и RAR архивов при загрузке.
+- **Upload Progress:** Визуальное отображение процента загрузки файлов в проект.
+- **Hybrid AI (Ollama):** Работа без интернета через локальные LLM (Llama 3, Phi-3).
 
 ## 7. Ограничения ИИ (Что ИИ пока не знает)
 - **Прямое управление Unity Editor:** ИИ не может напрямую нажимать кнопки в интерфейсе Unity, только генерировать скрипты и инструкции.
@@ -71,11 +65,91 @@
 - **Сложные сетевые протоколы:** Ограниченная поддержка проприетарных сетевых решений (только Photon/Mirror/Netcode).
 - **Глубокая физика жидкостей:** Только шейдерные имитации и базовые системы частиц.
 
-## 8. Расширенная База Видео-уроков (1580+ видео)
+## 8. Расширенная База Видео-уроков (1685+ видео)
 ### Темы Unity
 - **Программирование:** Продвинутый C#, Job System, Burst Compiler, Addressables, Localization.
 - **Графика:** URP/HDRP, Custom Lighting, Decals, Volumetric Effects.
 - **ИИ:** Behavior Trees, ML-Agents, Pathfinding.
+- **Новые ссылки:**
+  - https://www.youtube.com/watch?v=2ynYwvFW-aA
+  - https://www.youtube.com/watch?v=YN-1X6dxD2c
+  - https://www.youtube.com/watch?v=GmbbU-RytGg
+  - https://www.youtube.com/watch?v=gA0u-zsfrB4
+  - https://www.youtube.com/watch?v=S5IuFxOwpKM
+  - https://www.youtube.com/watch?v=wzAkYv-5CBs
+  - https://www.youtube.com/watch?v=E8X_AciNyIY
+  - https://www.youtube.com/watch?v=k_sHC2I-_3w
+  - https://www.youtube.com/watch?v=RqBXERwYrCI
+  - https://www.youtube.com/watch?v=sAeEzgqjdLI
+  - https://www.youtube.com/watch?v=pCy82A7_7qs
+  - https://www.youtube.com/watch?v=hN49WvHiygE
+  - https://www.youtube.com/watch?v=LBVPGhcsyeU
+  - https://www.youtube.com/watch?v=-3VlZO45uoU
+  - https://www.youtube.com/watch?v=Oi8NN6r6RtI
+  - https://www.youtube.com/watch?v=K1LNqp8Ugos
+  - https://www.youtube.com/watch?v=yQig4ax1S8A
+  - https://www.youtube.com/watch?v=r_SG33t6JCU
+  - https://www.youtube.com/watch?v=97n5JJioa6U
+  - https://www.youtube.com/watch?v=2KzY81x1WmU
+  - https://www.youtube.com/watch?v=YJcuaOa5cKU
+  - https://www.youtube.com/watch?v=IB8dcA_VZZA
+  - https://www.youtube.com/watch?v=BobLA8sMD5M
+  - https://www.youtube.com/watch?v=7LXW509oqxo
+  - https://www.youtube.com/watch?v=8W9pFTmRImM
+  - https://www.youtube.com/watch?v=m38WzwbSutE
+  - https://www.youtube.com/watch?v=sxyRZZAqlX8
+  - https://www.youtube.com/watch?v=zNlkp0k-f3M
+  - https://www.youtube.com/watch?v=AVITykZboWM
+  - https://www.youtube.com/watch?v=6H199EQikbk
+  - https://www.youtube.com/watch?v=om_PucezAvs
+  - https://www.youtube.com/watch?v=Ui-FfCrkLbE
+  - https://www.youtube.com/watch?v=3udS5m-Mx6c
+  - https://www.youtube.com/watch?v=czXxyaB5dYs
+  - https://www.youtube.com/watch?v=RxHqeBUPdV8
+  - https://www.youtube.com/watch?v=dL3BOSTTqPA
+  - https://www.youtube.com/watch?v=56hFmdMfl7Y
+  - https://www.youtube.com/watch?v=44tlOisH7NM
+  - https://www.youtube.com/watch?v=po-Jtrt8thY
+  - https://www.youtube.com/watch?v=GCexccvzmKE
+  - https://www.youtube.com/watch?v=U0OlGeJJfdI
+  - https://www.youtube.com/watch?v=2mt_hH5k9sY
+  - https://www.youtube.com/watch?v=hczvBYxF7Rg
+  - https://www.youtube.com/watch?v=fIJ2fSoR5uw
+  - https://www.youtube.com/watch?v=ROtsi0gDSjQ
+  - https://www.youtube.com/watch?v=pM-LQPal39g
+  - https://www.youtube.com/watch?v=1a1jEhHvmnU
+  - https://www.youtube.com/watch?v=uaqhb4spzIY
+  - https://www.youtube.com/watch?v=xube2r7vmMs
+  - https://www.youtube.com/watch?v=pQqY0kOiEcQ
+  - https://www.youtube.com/watch?v=KhOedadYysg
+  - https://www.youtube.com/watch?v=NG4OFslum6o
+  - https://www.youtube.com/watch?v=B2HCnj8BJI4
+  - https://www.youtube.com/watch?v=1sjcXuKxWbQ
+  - https://www.youtube.com/watch?v=L68D5Nm_tMg
+  - https://www.youtube.com/watch?v=8M6Hzo7spRk
+  - https://www.youtube.com/watch?v=Y6-cq_CHczs
+  - https://www.youtube.com/watch?v=wBoLPC1_-_8
+  - https://www.youtube.com/watch?v=SrhrNyUt29c
+  - https://www.youtube.com/watch?v=oqWKK2L5JY4
+  - https://www.youtube.com/watch?v=UTdOLNb4vE8
+  - https://www.youtube.com/watch?v=9HZMJHkB-bg
+  - https://www.youtube.com/watch?v=lWEvYgrTyzc
+  - https://www.youtube.com/watch?v=zkm45U9eJR0
+  - https://www.youtube.com/watch?v=DNvrZjDCXkY
+  - https://www.youtube.com/watch?v=1Sa747TblBY
+  - https://www.youtube.com/watch?v=92Uz9Cmvc_c
+  - https://www.youtube.com/watch?v=XzV7NqH2IWE
+  - https://www.youtube.com/watch?v=V6GdZm27vG8
+  - https://www.youtube.com/watch?v=08mRx2fjHTs
+  - https://www.youtube.com/watch?v=id88uh67-eU
+  - https://www.youtube.com/watch?v=nSkYj2jzORU
+  - https://www.youtube.com/watch?v=doxdfhIgtgY
+  - https://www.youtube.com/watch?v=ADBIgz5fzZY
+  - https://www.youtube.com/watch?v=160JA7JjN_Q
+  - https://www.youtube.com/watch?v=4XGY5_kjaR0
+  - https://www.youtube.com/watch?v=e3JX1jny8Fo
+  - https://www.youtube.com/watch?v=UjHKYQC8zt4
+  - https://www.youtube.com/watch?v=UjHKYQC8zt4
 ### Темы Blender
 - **Моделирование:** Hard Surface, Sculpting, Retopology, Geometry Nodes.
 - **Анимация:** Simulation Nodes, Advanced Rigging, Face Animation.
