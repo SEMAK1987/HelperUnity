@@ -1,6 +1,6 @@
 {
   "project_name": "Unity & Blender AI Assistant",
-  "version": "15.6.0",
+  "version": "15.7.0",
   "interface_structure": {
     "tabs": [
       "studio",
@@ -13,10 +13,10 @@
   "project_assets": {
     "scripts_count": 0,
     "prefabs_count": 0,
-    "videos_count": 1940,
-    "total_files": 21,
+    "videos_count": 2100,
+    "total_files": 20,
     "video_list": [],
     "script_list": []
   },
-  "last_scan": "2026-04-13T19:13:29.810Z"
+  "last_scan": "2026-04-14T14:54:30.000Z"
 }
