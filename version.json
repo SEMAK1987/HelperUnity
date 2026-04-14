@@ -1,15 +1,15 @@
 {
-  "version": "15.7.0",
+  "version": "15.8.0",
   "release_date": "2026-04-14",
   "changelog": [
+    "Версия 15.8.0: Quantum, Multiverse & Astral Update",
+    "Добавлено 120+ новых видео-уроков (итого 2250+)",
+    "Внедрена система Astral Projection & Neural Synchronization",
+    "Обновлен PROJECT_MASTER_BLUEPRINT.md с вымышленными квантовыми возможностями",
     "Версия 15.7.0: Quantum Multiverse Update & 2100+ Tutorials",
     "Добавлено 123+ новых видео-уроков (итого 2100+)",
     "Внедрена система Quantum Multiverse Debugging & Temporal Debugging",
     "Добавлена поддержка режимов Online/Offline/No-Internet",
-    "Обновлен PROJECT_MASTER_BLUEPRINT.md с расширенными возможностями ИИ v15.7.0",
-    "Версия 15.6.0: Knowledge Base Update & 1940+ Tutorials",
-    "Добавлено 90+ новых видео-уроков (итого 1940+)",
-    "Синхронизация базы знаний и мастер-плана проекта",
-    "Обновление системных инструкций и путей проекта"
+    "Обновлен PROJECT_MASTER_BLUEPRINT.md с расширенными возможностями ИИ v15.7.0"
   ]
 }
