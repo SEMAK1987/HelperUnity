@@ -1,15 +1,13 @@
 {
-  "version": "15.8.0",
-  "release_date": "2026-04-14",
+  "version": "15.10.0",
+  "release_date": "2026-04-15",
   "changelog": [
-    "Версия 15.8.0: Quantum, Multiverse & Astral Update",
-    "Добавлено 120+ новых видео-уроков (итого 2250+)",
-    "Внедрена система Astral Projection & Neural Synchronization",
-    "Обновлен PROJECT_MASTER_BLUEPRINT.md с вымышленными квантовыми возможностями",
-    "Версия 15.7.0: Quantum Multiverse Update & 2100+ Tutorials",
-    "Добавлено 123+ новых видео-уроков (итого 2100+)",
-    "Внедрена система Quantum Multiverse Debugging & Temporal Debugging",
-    "Добавлена поддержка режимов Online/Offline/No-Internet",
-    "Обновлен PROJECT_MASTER_BLUEPRINT.md с расширенными возможностями ИИ v15.7.0"
+    "Версия 15.10.0: GIMP & Redot Integration + Migration Assistant",
+    "Добавлена поддержка GIMP (автоопределение пути и версии)",
+    "Добавлена поддержка Redot/Godot (автоопределение пути и версии)",
+    "Реализована вкладка 'Миграция' для переноса проектов Unity -> Godot",
+    "Обновлены настройки для ручного указания путей к GIMP и Redot",
+    "Улучшен мониторинг статуса ПО в реальном времени",
+    "Версия 15.9.0: Knowledge Base Expansion & Russian Localization"
   ]
 }

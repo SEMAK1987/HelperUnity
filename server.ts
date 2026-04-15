@@ -143,6 +143,8 @@ async function saveStats() {
 let isScanning = false;
 let currentUnityStatus: any = { is_running: false, version: "unknown", project_path: "" };
 let currentBlenderStatus: any = { is_running: false, version: "unknown" };
+let currentGimpStatus: any = { is_running: false, version: "unknown" };
+let currentRedotStatus: any = { is_running: false, version: "unknown" };
 
 async function findUnityProject(startDir: string): Promise<string | null> {
   try {
@@ -439,7 +441,9 @@ async function generateMasterBlueprint() {
     md += `- **Путь проекта:** ${kb.project_path}\n`;
     md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
     md += `- **Версия Unity:** ${currentUnityStatus.version}\n`;
-    md += `- **Версия Blender:** ${currentBlenderStatus.version}\n\n`;
+    md += `- **Версия Blender:** ${currentBlenderStatus.version}\n`;
+    md += `- **Версия GIMP:** ${currentGimpStatus.version}\n`;
+    md += `- **Версия Redot:** ${currentRedotStatus.version}\n\n`;
     
     md += `## 2. Структура интерфейса\n`;
     md += `### Вкладки\n`;
@@ -767,6 +771,46 @@ async function startServer() {
     res.json({ success: true, guide: guide.join('\n') });
   });
 
+  // Unity to Godot/Redot Migration Endpoint
+  app.post("/api/migration/unity-to-godot", async (req, res) => {
+    const mapping = {
+      "GameObject": "Node / Node3D / Node2D",
+      "Transform": "Transform3D / Transform2D",
+      "MonoBehaviour": "Node / Resource",
+      "MeshFilter": "MeshInstance3D",
+      "BoxCollider": "CollisionShape3D (BoxShape3D)",
+      "Rigidbody": "RigidBody3D",
+      "Camera": "Camera3D",
+      "Light": "DirectionalLight3D / OmniLight3D",
+      "Canvas": "Control / CanvasLayer",
+      "Image": "TextureRect",
+      "Button": "Button",
+      "Text": "Label",
+      "AudioSource": "AudioStreamPlayer3D",
+      "Prefab": "PackedScene (.tscn)",
+      "Scene": "Scene (.tscn)",
+      "Material": "StandardMaterial3D / ShaderMaterial",
+      "Shader": "Shader (.gdshader)"
+    };
+
+    const scriptConversionTips = [
+      "1. **Start() -> _ready()**: Инициализация объектов.",
+      "2. **Update() -> _process(delta)**: Логика каждый кадр.",
+      "3. **FixedUpdate() -> _physics_process(delta)**: Физика.",
+      "4. **GetComponent<T>() -> get_node(\"path\") или $\"path\"**.",
+      "5. **Instantiate(prefab) -> prefab.instantiate()**.",
+      "6. **Destroy(obj) -> obj.queue_free()**.",
+      "7. **Debug.Log() -> print()**."
+    ];
+
+    res.json({ 
+      success: true, 
+      mapping, 
+      tips: scriptConversionTips,
+      message: "Миграция проекта — сложный процесс. Мы подготовили карту соответствий API и базовые советы по конвертации скриптов."
+    });
+  });
+
   // Package Analysis Endpoint
   app.get("/api/unity/packages-info", (req, res) => {
     const packages = [
@@ -959,6 +1003,76 @@ async function startServer() {
 
     currentBlenderStatus = { is_running: isRunning, version };
     res.json(currentBlenderStatus);
+  });
+
+  // GIMP Status Endpoint
+  app.get("/api/gimp/status", async (req, res) => {
+    let isRunning = false;
+    let version = "unknown";
+    
+    try {
+      const gimpProc = await detectLocalProcess("gimp-3.exe");
+      const gimpLegacyProc = await detectLocalProcess("gimp-2.10.exe");
+      const activeProc = gimpProc.isRunning ? gimpProc : (gimpLegacyProc.isRunning ? gimpLegacyProc : null);
+      
+      if (activeProc) {
+        isRunning = true;
+        if (activeProc.path) {
+          const match = activeProc.path.match(/GIMP ([\d.]+)/i);
+          if (match) version = match[1];
+        }
+      }
+
+      if (version === "unknown") {
+        if (await fs.pathExists(kbPath)) {
+          const kb = await fs.readJson(kbPath);
+          if (kb.gimp_path) {
+             const match = kb.gimp_path.match(/GIMP ([\d.]+)/i);
+             if (match) version = match[1];
+          }
+        }
+      }
+    } catch (e) {
+      console.error("[GIMP] Status check error:", e);
+    }
+
+    currentGimpStatus = { is_running: isRunning, version };
+    res.json(currentGimpStatus);
+  });
+
+  // Redot Status Endpoint
+  app.get("/api/redot/status", async (req, res) => {
+    let isRunning = false;
+    let version = "unknown";
+    
+    try {
+      const redotProc = await detectLocalProcess("Redot.exe");
+      const godotProc = await detectLocalProcess("Godot.exe");
+      const activeProc = redotProc.isRunning ? redotProc : (godotProc.isRunning ? godotProc : null);
+      
+      if (activeProc) {
+        isRunning = true;
+        if (activeProc.path) {
+          const match = activeProc.path.match(/Redot_v([\d.]+)/i) || activeProc.path.match(/Godot_v([\d.]+)/i);
+          if (match) version = match[1];
+        }
+      }
+
+      if (version === "unknown") {
+        if (await fs.pathExists(kbPath)) {
+          const kb = await fs.readJson(kbPath);
+          if (kb.redot_path) {
+             const match = kb.redot_path.match(/Redot_v([\d.]+)/i) || kb.redot_path.match(/Godot_v([\d.]+)/i);
+             if (match) version = match[1];
+          }
+        }
+      }
+    } catch (e) {
+      console.error("[REDOT] Status check error:", e);
+    }
+
+    currentRedotStatus = { is_running: isRunning, version };
+    res.json(currentRedotStatus);
   });
 
   // Blender Presets Endpoint

@@ -107,10 +107,20 @@ interface BlenderStatus {
   version: string;
 }
 
+interface GimpStatus {
+  is_running: boolean;
+  version: string;
+}
+
+interface RedotStatus {
+  is_running: boolean;
+  version: string;
+}
+
 // --- App Component ---
 export default function App() {
   const [kb, setKb] = useState<KBData | null>(null);
-  const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info'>('chat');
+  const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info' | 'migration'>('chat');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -119,6 +129,8 @@ export default function App() {
   const [projectScan, setProjectScan] = useState<ProjectScan | null>(null);
   const [unityStatus, setUnityStatus] = useState<UnityStatus | null>(null);
   const [blenderStatus, setBlenderStatus] = useState<BlenderStatus | null>(null);
+  const [gimpStatus, setGimpStatus] = useState<GimpStatus | null>(null);
+  const [redotStatus, setRedotStatus] = useState<RedotStatus | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [blenderPresets, setBlenderPresets] = useState<BlenderPreset[]>([]);
   const [isRepairing, setIsRepairing] = useState(false);
@@ -130,6 +142,8 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [localPathInput, setLocalPathInput] = useState('');
   const [projectPathInput, setProjectPathInput] = useState('');
+  const [gimpPathInput, setGimpPathInput] = useState('');
+  const [redotPathInput, setRedotPathInput] = useState('');
   const [blenderVersionInput, setBlenderVersionInput] = useState('');
   const [isGeneratingBlueprint, setIsGeneratingBlueprint] = useState(false);
   const [isUpdatingKB, setIsUpdatingKB] = useState(false);
@@ -137,6 +151,8 @@ export default function App() {
   const [capabilities, setCapabilities] = useState<any>(null);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
   const [attachedFiles, setAttachedFiles] = useState<any[]>([]);
+  const [migrationData, setMigrationData] = useState<any>(null);
+  const [isFetchingMigration, setIsFetchingMigration] = useState(false);
   
   const chatEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -311,6 +327,8 @@ export default function App() {
         setKb(data);
         setLocalPathInput(data.local_training_path || '');
         setProjectPathInput(data.project_path || '');
+        setGimpPathInput(data.gimp_path || '');
+        setRedotPathInput(data.redot_path || '');
         setBlenderVersionInput(data.blender_version || '');
       })
       .catch(err => {
@@ -340,6 +358,14 @@ export default function App() {
       fetch('/api/blender/status')
         .then(res => res.json())
         .then(status => setBlenderStatus(status));
+
+      fetch('/api/gimp/status')
+        .then(res => res.json())
+        .then(status => setGimpStatus(status));
+
+      fetch('/api/redot/status')
+        .then(res => res.json())
+        .then(status => setRedotStatus(status));
       
       fetch('/api/ai/ollama-status')
         .then(res => res.json())
@@ -409,6 +435,8 @@ export default function App() {
       ...kb, 
       local_training_path: localPathInput,
       project_path: projectPathInput,
+      gimp_path: gimpPathInput,
+      redot_path: redotPathInput,
       blender_version: blenderVersionInput
     };
     try {
@@ -640,6 +668,21 @@ export default function App() {
     }
   };
 
+  const fetchMigrationData = async () => {
+    setIsFetchingMigration(true);
+    try {
+      const res = await fetch('/api/migration/unity-to-godot', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        setMigrationData(data);
+        setActiveTab('migration');
+      }
+    } catch (e) {
+      showNotification("Ошибка при загрузке данных миграции.", "error");
+    } finally {
+      setIsFetchingMigration(false);
+    }
+  };
   const handleRepair = async () => {
     if (isRepairing) return;
     setIsRepairing(true);
@@ -896,14 +939,40 @@ export default function App() {
                   <Gamepad2 className="w-3.5 h-3.5 text-blue-400" />
                   <span className="text-[10px] text-slate-300">Unity</span>
                 </div>
-                <span className="text-[9px] font-mono text-slate-500">{unityStatus?.version || '---'}</span>
+                <div className="flex items-center gap-2">
+                  <div className={`w-1.5 h-1.5 rounded-full ${unityStatus?.is_running ? 'bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.5)]' : 'bg-slate-700'}`} />
+                  <span className="text-[9px] font-mono text-slate-500">{unityStatus?.version || '---'}</span>
+                </div>
               </div>
               <div className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Cube className="w-3.5 h-3.5 text-purple-400" />
                   <span className="text-[10px] text-slate-300">Blender</span>
                 </div>
-                <span className="text-[9px] font-mono text-slate-500">{blenderStatus?.version || '---'}</span>
+                <div className="flex items-center gap-2">
+                  <div className={`w-1.5 h-1.5 rounded-full ${blenderStatus?.is_running ? 'bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.5)]' : 'bg-slate-700'}`} />
+                  <span className="text-[9px] font-mono text-slate-500">{blenderStatus?.version || '---'}</span>
+                </div>
+              </div>
+              <div className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <ImageIcon className="w-3.5 h-3.5 text-orange-400" />
+                  <span className="text-[10px] text-slate-300">GIMP</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className={`w-1.5 h-1.5 rounded-full ${gimpStatus?.is_running ? 'bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.5)]' : 'bg-slate-700'}`} />
+                  <span className="text-[9px] font-mono text-slate-500">{gimpStatus?.version || '---'}</span>
+                </div>
+              </div>
+              <div className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Zap className="w-3.5 h-3.5 text-cyan-400" />
+                  <span className="text-[10px] text-slate-300">Redot</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className={`w-1.5 h-1.5 rounded-full ${redotStatus?.is_running ? 'bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.5)]' : 'bg-slate-700'}`} />
+                  <span className="text-[9px] font-mono text-slate-500">{redotStatus?.version || '---'}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -1003,6 +1072,14 @@ export default function App() {
                 }`}
               >
                 <Info className="w-3.5 h-3.5" /> О проекте
+              </button>
+              <button 
+                onClick={fetchMigrationData}
+                className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 ${
+                  activeTab === 'migration' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-500 hover:text-slate-300'
+                }`}
+              >
+                <GitBranch className="w-3.5 h-3.5" /> Миграция
               </button>
             </nav>
           </div>
@@ -1419,6 +1496,69 @@ export default function App() {
           </p>
         </div>
             </>
+          ) : activeTab === 'migration' ? (
+            <div className="flex-1 overflow-y-auto p-8 scrollbar-thin scrollbar-thumb-white/5">
+              <div className="max-w-4xl mx-auto space-y-8">
+                <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-orange-600/10 to-red-600/10 border border-orange-500/20">
+                  <div className="flex items-center gap-6 mb-6">
+                    <div className="w-16 h-16 bg-orange-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-orange-600/40">
+                      <GitBranch className="w-8 h-8 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-white uppercase tracking-tighter">Помощник миграции (Unity → Godot/Redot)</h2>
+                      <p className="text-sm text-slate-400">Инструменты и справочники для переноса ваших проектов на открытые движки.</p>
+                    </div>
+                  </div>
+                  <div className="p-4 bg-black/40 rounded-2xl border border-white/5 text-xs text-slate-300 leading-relaxed">
+                    {migrationData?.message}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <section className="p-8 rounded-[2.5rem] bg-black/40 border border-white/5">
+                    <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6 flex items-center gap-3">
+                      <Code className="w-4 h-4 text-blue-400" /> Карта соответствий API
+                    </h3>
+                    <div className="space-y-2">
+                      {Object.entries(migrationData?.mapping || {}).map(([unity, godot]: [any, any]) => (
+                        <div key={unity} className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 group hover:bg-white/10 transition-all">
+                          <span className="text-[10px] font-mono text-blue-400">{unity}</span>
+                          <ChevronRight className="w-3 h-3 text-slate-600" />
+                          <span className="text-[10px] font-mono text-orange-400">{godot}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+
+                  <section className="p-8 rounded-[2.5rem] bg-black/40 border border-white/5">
+                    <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6 flex items-center gap-3">
+                      <Zap className="w-4 h-4 text-yellow-400" /> Советы по конвертации
+                    </h3>
+                    <div className="space-y-4">
+                      {migrationData?.tips.map((tip: string, i: number) => (
+                        <div key={i} className="p-4 rounded-2xl bg-white/5 border border-white/5 text-xs text-slate-300 leading-relaxed">
+                          {tip}
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                </div>
+
+                <div className="p-8 rounded-[2.5rem] bg-blue-600/5 border border-blue-500/10">
+                  <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-4">Автоматизированный перенос (Experimental)</h3>
+                  <p className="text-xs text-slate-400 mb-6">
+                    Мы работаем над скриптом, который сможет автоматически конвертировать структуру сцены (.unity → .tscn) и базовые C# скрипты. 
+                    На данный момент рекомендуется использовать ручной перенос с помощью карты соответствий выше.
+                  </p>
+                  <button 
+                    onClick={() => showNotification("Функция автоматического переноса находится в разработке.", "info")}
+                    className="px-6 py-3 bg-blue-600/20 border border-blue-500/30 rounded-xl text-[10px] font-bold text-blue-400 uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all"
+                  >
+                    Запустить анализ проекта
+                  </button>
+                </div>
+              </div>
+            </div>
           ) : activeTab === 'dashboard' ? (
             <div className="flex-1 overflow-y-auto p-8 scrollbar-thin scrollbar-thumb-white/5 space-y-8">
               <div className="max-w-6xl mx-auto space-y-8">
@@ -2176,25 +2316,45 @@ export default function App() {
                     placeholder="Например: C:\MyUnityProject"
                     className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-green-500/50 transition-all font-mono text-sm"
                   />
-                  <p className="text-[10px] text-slate-500 leading-relaxed italic">
-                    Укажите путь к папке вашего Unity проекта (где находятся папки Assets и ProjectSettings).
-                  </p>
                 </div>
 
                 <div className="space-y-3">
                   <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                    <Box className="w-4 h-4 text-orange-400" /> Версия Blender
+                    <ImageIcon className="w-4 h-4 text-orange-400" /> Путь к GIMP (.exe)
+                  </label>
+                  <input 
+                    type="text"
+                    value={gimpPathInput}
+                    onChange={(e) => setGimpPathInput(e.target.value)}
+                    placeholder="C:\...\gimp-3.exe"
+                    className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-orange-500/50 transition-all font-mono text-sm"
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-cyan-400" /> Путь к Redot/Godot (.exe)
+                  </label>
+                  <input 
+                    type="text"
+                    value={redotPathInput}
+                    onChange={(e) => setRedotPathInput(e.target.value)}
+                    placeholder="D:\...\Redot.exe"
+                    className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-cyan-500/50 transition-all font-mono text-sm"
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                    <Box className="w-4 h-4 text-purple-400" /> Версия Blender
                   </label>
                   <input 
                     type="text"
                     value={blenderVersionInput}
                     onChange={(e) => setBlenderVersionInput(e.target.value)}
                     placeholder="Например: 4.1.0"
-                    className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-orange-500/50 transition-all font-mono text-sm"
+                    className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-purple-500/50 transition-all font-mono text-sm"
                   />
-                  <p className="text-[10px] text-slate-500 leading-relaxed italic">
-                    Укажите версию Blender, которую вы используете, если она не определяется автоматически.
-                  </p>
                 </div>
 
                 <div className="space-y-3">
