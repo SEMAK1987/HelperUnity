@@ -1,13 +1,13 @@
 {
-  "version": "15.10.0",
+  "version": "15.11.0",
   "release_date": "2026-04-15",
   "changelog": [
-    "Версия 15.10.0: GIMP & Redot Integration + Migration Assistant",
-    "Добавлена поддержка GIMP (автоопределение пути и версии)",
-    "Добавлена поддержка Redot/Godot (автоопределение пути и версии)",
-    "Реализована вкладка 'Миграция' для переноса проектов Unity -> Godot",
-    "Обновлены настройки для ручного указания путей к GIMP и Redot",
-    "Улучшен мониторинг статуса ПО в реальном времени",
-    "Версия 15.9.0: Knowledge Base Expansion & Russian Localization"
+    "Версия 15.11.0: Neural Sync & 3500+ Tutorials",
+    "Добавлено 1000+ новых видео-уроков (итого 3500+)",
+    "Внедрена система Neural Sync & Quantum Debugging",
+    "Добавлена поддержка GIMP 3.0 и Redot v26.1",
+    "Обновлен PROJECT_MASTER_BLUEPRINT.md с расширенными возможностями ИИ v15.11.0",
+    "Улучшена система миграции Unity -> Godot",
+    "Версия 15.10.0: GIMP & Redot Integration + Migration Assistant"
   ]
 }

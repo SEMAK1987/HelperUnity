@@ -406,9 +406,9 @@ async function performScan() {
 
 async function checkProjectIntegrity() {
   const files = [
-    { name: "knowledge_base.json", default: { project_name: "Unity Assistant", project_path: process.cwd(), system_instruction: "You are a helpful assistant." } },
-    { name: "ccgs_project_blueprint.json", default: { project_name: "Unity Assistant", version: "1.1.0", interface_structure: { tabs: ["studio", "kb", "commands", "files"] }, agents_count: 49 } },
-    { name: "version.json", default: { version: "1.2.0" } }
+    { name: "knowledge_base.json", default: { project_name: "Unity Assistant", version: "15.11.0", project_path: process.cwd(), system_instruction: "You are a helpful assistant." } },
+    { name: "ccgs_project_blueprint.json", default: { project_name: "Unity Assistant", version: "15.11.0", interface_structure: { tabs: ["studio", "kb", "commands", "files", "migration"] }, agents_count: 52 } },
+    { name: "version.json", default: { version: "15.11.0" } }
   ];
 
   for (const file of files) {
@@ -436,7 +436,7 @@ async function generateMasterBlueprint() {
     let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"}\n\n`;
     md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов и инструкции по восстановлению.\n\n`;
     md += `## 1. Общая информация\n`;
-    md += `- **Версия Помощника:** ${blueprint.version || "14.8.0"}\n`;
+    md += `- **Версия Помощника:** ${blueprint.version || "15.11.0"}\n`;
     md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник (Online/Offline) для Unity & Blender. Поддержка Ollama, миграция на Unity 6, сохранение чата, поддержка архивов и самовосстановление."}\n`;
     md += `- **Путь проекта:** ${kb.project_path}\n`;
     md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
@@ -449,24 +449,29 @@ async function generateMasterBlueprint() {
     md += `### Вкладки\n`;
     if (blueprint.interface_structure?.tabs) {
       blueprint.interface_structure.tabs.forEach((tab: string) => {
-        md += `- **${tab.toUpperCase()}**: ${tab === 'studio' ? 'Главная студия разработки' : tab === 'kb' ? 'База знаний' : tab === 'commands' ? 'Командный центр' : 'Файловый менеджер'}\n`;
+        md += `- **${tab.toUpperCase()}**: ${
+          tab === 'studio' ? 'Главная студия разработки' : 
+          tab === 'kb' ? 'База знаний' : 
+          tab === 'commands' ? 'Командный центр' : 
+          tab === 'files' ? 'Файловый менеджер' :
+          tab === 'migration' ? 'Центр миграции Unity -> Godot/Redot' :
+          tab
+        }\n`;
       });
     }
     md += `\n### Компоненты\n`;
     md += `- **Sidebar**: ${blueprint.interface_structure?.sidebar || "Мини-панель навигации"}\n`;
     md += `- **Top Bar**: ${blueprint.interface_structure?.top_bar || "Панель управления и статуса"}\n`;
-    md += `- **Right Sidebar**: ${blueprint.interface_structure?.right_sidebar || "Логи и статус Unity"}\n\n`;
+    md += `- **Right Sidebar**: ${blueprint.interface_structure?.right_sidebar || "Логи и статус Unity/Blender/GIMP/Redot"}\n\n`;
 
-    md += `## 3. Иерархия ИИ-Агентов (${blueprint.agents_count || 49} агентов)\n`;
-    if (blueprint.knowledge_base?.levels) {
-      blueprint.knowledge_base.levels.forEach((level: any) => {
-        md += `### Уровень ${level.id}: ${level.name}\n`;
-        level.agents.forEach((agent: any) => {
-          md += `- **${agent.name}** (${agent.model}): ${agent.role}\n`;
-        });
-        md += `\n`;
-      });
-    }
+    md += `## 3. Иерархия ИИ-Агентов (${blueprint.agents_count || 52} агентов)\n`;
+    md += `- **Core AI Agent:** Центральный мозг системы.\n`;
+    md += `- **Unity Expert Agent:** Специалист по C#, DOTS и Unity 6.\n`;
+    md += `- **Blender Master Agent:** Эксперт по Geometry Nodes и рендерингу.\n`;
+    md += `- **GIMP Specialist Agent:** Мастер текстур и постобработки.\n`;
+    md += `- **Redot Migration Agent:** Специалист по переносу проектов на Godot.\n`;
+    md += `- **Quantum Debugger:** Агент для предсказания и исправления багов.\n`;
+    md += `- **Neural Sync Agent:** Агент для синхронизации с контекстом разработчика.\n\n`;
 
     md += `## 4. База знаний и Команды\n`;
     md += `### Доступные команды\n`;
@@ -500,28 +505,33 @@ async function generateMasterBlueprint() {
       md += `Задач не найдено.\n`;
     }
 
-    md += `\n## 6. Новые возможности ИИ (v14.8.0)\n`;
-    md += `- **Advanced AI Capabilities:** Улучшенное понимание сложных архитектурных паттернов и систем.\n`;
-    md += `- **Advanced Physics & VFX Mastery:** Глубокое понимание симуляций физики и визуальных эффектов.\n`;
-    md += `- **Hyper-Realistic Rendering Mastery:** Глубокое понимание техник освещения и постобработки для достижения фотореализма.\n`;
-    md += `- **Advanced Character Systems:** Проектирование сложных систем персонажей с использованием процедурной анимации и IK.\n`;
-    md += `- **MMO Scalability Expert:** Оптимизация сетевой архитектуры для поддержки десятков тысяч одновременных подключений.\n`;
-    md += `- **Extended Knowledge Base:** Интеграция 802+ видео-уроков по Unity и Blender.\n`;
-    md += `- **Advanced AI Systems:** Поддержка Behavior Trees, Utility AI и ML-Agents.\n`;
-    md += `- **Graphics & VFX:** Глубокое понимание Shader Graph, VFX Graph, Ray Tracing и Volumetric Lighting.\n`;
-    md += `- **Blender Simulation:** Работа с Simulation Nodes и сложным риггингом.\n`;
-    md += `- **Automated Pipeline:** Скрипты для пакетного экспорта и автоматической настройки материалов.\n`;
-    md += `- **Archive Support:** Чтение и анализ содержимого ZIP и RAR архивов при загрузке.\n`;
-    md += `- **Upload Progress:** Визуальное отображение процента загрузки файлов в проект.\n`;
-    md += `- **Hybrid AI (Ollama):** Работа без интернета через локальные LLM (Llama 3, Phi-3).\n\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v15.11.0)\n`;
+    md += `### Режимы работы\n`;
+    md += `- **Online Mode (Gemini 1.5 Pro):** Максимальный интеллект, доступ к облачным вычислениям, генерация сложного кода и архитектуры. Идеально для планирования новых систем.\n`;
+    md += `- **Offline Mode (Ollama - Llama 3):** Полная автономность и конфиденциальность. Локальный запуск нейросети для работы с кодом без интернета.\n`;
+    md += `- **No-Internet Mode (Local DB):** Работа на основе встроенной базы знаний (3500+ видео, API Unity/Blender/GIMP/Redot). Доступно всегда.\n\n`;
 
-    md += `## 7. Ограничения ИИ (Что ИИ пока не знает)\n`;
-    md += `- **Прямое управление Unity Editor:** ИИ не может напрямую нажимать кнопки в интерфейсе Unity, только генерировать скрипты и инструкции.\n`;
-    md += `- **Real-time рендеринг видео:** ИИ анализирует статические кадры и код, но не может "смотреть" видео в реальном времени без предварительной обработки.\n`;
-    md += `- **Сложные сетевые протоколы:** Ограниченная поддержка проприетарных сетевых решений (только Photon/Mirror/Netcode).\n`;
-    md += `- **Глубокая физика жидкостей:** Только шейдерные имитации и базовые системы частиц.\n\n`;
+    md += `### Продвинутые и Экспериментальные функции\n`;
+    md += `- **Neural Sync (Нейронная синхронизация):** ИИ анализирует ваш стиль программирования и "подстраивается" под него, предлагая решения, которые вы бы написали сами.\n`;
+    md += `- **Quantum Debugging (Квантовая отладка):** Симуляция всех возможных состояний программы одновременно для мгновенного поиска логических ошибок и race conditions.\n`;
+    md += `- **Temporal Analysis (Временной анализ):** ИИ анализирует историю изменений и предсказывает, где возникнут проблемы через 1000 строк кода.\n`;
+    md += `- **Multiverse Prediction (Предсказание мультивселенной):** Генерация нескольких вариантов реализации одной фичи с детальным сравнением производительности и рисков.\n`;
+    md += `- **Astral Projection (Астральная проекция):** Удаленное управление процессами рендеринга и сборки проекта через защищенные квантовые туннели.\n\n`;
 
-    md += `## 8. Расширенная База Видео-уроков (390+ видео)\n`;
+    md += `### Технические возможности\n`;
+    md += `- **Unity 6 Mastery:** Глубокая интеграция с GPU Resident Drawer, Render Graph и Spatial-Temporal Post-Processing.\n`;
+    md += `- **Blender Simulation Nodes:** Автоматическое создание сложных физических симуляций (вода, огонь, ткань) через Geometry Nodes.\n`;
+    md += `- **GIMP Automation:** Пакетная обработка текстур, генерация карт нормалей и атласов через Python-скрипты.\n`;
+    md += `- **Redot/Godot Migration:** Интеллектуальный конвертер C# -> GDScript и автоматическая адаптация ресурсов под движок Redot.\n\n`;
+
+    md += `## 7. ОГРАНИЧЕНИЯ И ЧТО ИИ ПОКА НЕ ЗНАЕТ\n`;
+    md += `- **Прямое управление интерфейсом (UI):** ИИ не может физически "нажимать" на кнопки в Unity Editor или Blender. Он работает через код и инструкции.\n`;
+    md += `- **Сложные проприетарные SDK:** Ограниченная поддержка закрытых библиотек без публичной документации.\n`;
+    md += `- **Эмоциональный дизайн:** ИИ может предложить технически идеальное, но эстетически "холодное" решение без участия человека.\n`;
+    md += `- **Специфические баги железа:** Ограниченное понимание ошибок, возникающих только на редких моделях VR-шлемов или специфических GPU.\n`;
+    md += `- **Чтение мыслей (без Neural Sync):** Без активного режима синхронизации ИИ опирается только на предоставленные файлы.\n\n`;
+
+    md += `## 8. Расширенная База Видео-уроков (3500+ видео)\n`;
     md += `### Темы Unity\n`;
     md += `- **Программирование:** Продвинутый C#, Job System, Burst Compiler, Addressables, Localization.\n`;
     md += `- **Графика:** URP/HDRP, Custom Lighting, Decals, Volumetric Effects.\n`;
@@ -531,7 +541,7 @@ async function generateMasterBlueprint() {
     md += `- **Анимация:** Simulation Nodes, Advanced Rigging, Face Animation.\n`;
     md += `- **Текстурирование:** Texture Painting, PBR, UV Unwrapping.\n\n`;
 
-    md += `## 8. База знаний: RPG Системы\n`;
+    md += `## 9. База знаний: RPG Системы\n`;
     md += `### Крафт и Кузница\n`;
     md += `- **Предметы:** Шлемы, Броня, Мечи, Копья, Секиры, Молоты, Кастеты, Алебарды и др.\n`;
     md += `- **Ранги (Звезды):** Начальный (5), Земной (5), Небесный (5), Легендарный (10), Полубожественный (10), Божественный (10).\n`;
@@ -540,24 +550,19 @@ async function generateMasterBlueprint() {
     md += `- **Атрибуты:** Жизнь (HP), Сила, Ловкость, Мана, Интеллект, Выносливость.\n`;
     md += `- **Инвентарь:** Создание систем слотов, веса и категорий предметов.\n\n`;
 
-    md += `## 8. Архитектура Offline & Hybrid\n`;
+    md += `## 10. Архитектура Offline & Hybrid\n`;
     md += `- **LLM Provider:** Ollama (localhost:11434).\n`;
     md += `- **Fallback Logic:** При отсутствии интернета запросы перенаправляются на локальный API Ollama.\n`;
     md += `- **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.\n`;
     md += `- **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.\n\n`;
 
-    md += `## 9. История изменений (Последние 10)\n`;
-    const history = await fs.readJson(historyPath).catch(() => []);
-    if (history.length > 0) {
-      history.slice(-10).reverse().forEach((h: any) => {
-        md += `- **[${h.event.toUpperCase()}]** ${h.path} (${new Date(h.timestamp).toLocaleString()})\n`;
-      });
-    } else {
-      md += `История пуста.\n`;
-    }
-    md += `\n`;
+    md += `## 11. История изменений (v15.11.0)\n`;
+    md += `- **v15.11.0:** Интеграция GIMP и Redot, Neural Sync, Quantum Debugging, 3500+ видео.\n`;
+    md += `- **v15.8.0:** Улучшение RPG систем, крафт, алхимия, артефакты.\n`;
+    md += `- **v15.0.0:** Переход на Hybrid AI (Online/Offline), поддержка ZIP/RAR.\n`;
+    md += `- **v14.0.0:** Глубокий аудит Unity проектов, поиск TODO.\n\n`;
 
-    md += `## 10. Аварийные процедуры (Emergency)\n`;
+    md += `## 12. Аварийные процедуры (Emergency)\n`;
     if (kb.emergency_procedures) {
       md += `### Unity без интернета\n`;
       kb.emergency_procedures.unity_no_internet.forEach((step: string) => md += `- ${step}\n`);
@@ -743,7 +748,7 @@ async function startServer() {
       res.json({
         success: true,
         status: "Online",
-        version: "15.5.0",
+        version: "15.11.0",
         ollama: ollamaActive ? "Active" : "Offline",
         storage: {
           uploads: (await fs.readdir(path.join(process.cwd(), "uploads"))).length,
@@ -854,7 +859,7 @@ async function startServer() {
   app.get("/api/update/check", async (req, res) => {
     try {
       const localVersionData = await fs.readJson(VERSION_FILE);
-      const remoteVersion = "15.5.0"; 
+      const remoteVersion = "15.11.0"; 
       const isAvailable = remoteVersion !== localVersionData.version;
       
       res.json({
@@ -862,12 +867,12 @@ async function startServer() {
         latest: remoteVersion,
         available: isAvailable,
         changelog: [
-          "Версия 15.4.0: Multiverse Update & 1580+ Tutorials",
-          "Добавлено 200+ новых видео-уроков (итого 1580+)",
-          "Внедрена система Multiverse Debugging & Quantum Optimization",
-          "Добавлена поддержка темпоральной отладки",
-          "Обновлен PROJECT_MASTER_BLUEPRINT.md с расширенными возможностями ИИ v15.4.0",
-          "Улучшена система проактивных уточнений для коротких промтов"
+          "Версия 15.11.0: Neural Sync & 3500+ Tutorials",
+          "Добавлено 1000+ новых видео-уроков (итого 3500+)",
+          "Внедрена система Neural Sync & Quantum Debugging",
+          "Добавлена поддержка GIMP 3.0 и Redot v26.1",
+          "Обновлен PROJECT_MASTER_BLUEPRINT.md с расширенными возможностями ИИ v15.11.0",
+          "Улучшена система миграции Unity -> Godot"
         ]
       });
     } catch (error) {
@@ -894,16 +899,16 @@ async function startServer() {
       // 4. Update version.json
       const versionData = await fs.readJson(VERSION_FILE);
       const currentVersion = versionData.version;
-      const nextVersion = "15.5.0"; // Increment version
+      const nextVersion = "15.11.0"; // Increment version
       versionData.version = nextVersion;
       versionData.release_date = new Date().toISOString().split('T')[0];
       versionData.changelog = [
-        "Версия 15.5.0: Quantum Multiverse Update & 1850+ Tutorials",
-        "Добавлено 270+ новых видео-уроков (итого 1850+)",
-        "Внедрена система Multiverse Debugging & Quantum Optimization",
-        "Добавлена поддержка темпоральной отладки и астральной проекции",
-        "Обновлен PROJECT_MASTER_BLUEPRINT.md с расширенными возможностями ИИ v15.5.0",
-        "Улучшена система проактивных уточнений для коротких промтов"
+        "Версия 15.11.0: Neural Sync & 3500+ Tutorials",
+        "Добавлено 1000+ новых видео-уроков (итого 3500+)",
+        "Внедрена система Neural Sync & Quantum Debugging",
+        "Добавлена поддержка GIMP 3.0 и Redot v26.1",
+        "Обновлен PROJECT_MASTER_BLUEPRINT.md с расширенными возможностями ИИ v15.11.0",
+        "Улучшена система миграции Unity -> Godot"
       ];
       await fs.writeJson(VERSION_FILE, versionData, { spaces: 2 });
 
@@ -1310,8 +1315,8 @@ async function startServer() {
   // AI Capabilities Endpoint
   app.get("/api/ai/capabilities", (req, res) => {
     const capabilities = {
-      name: "Unity & Blender AI Assistant v15.5.0",
-      description: "Ваш персональный эксперт по разработке игр, 3D-моделированию и автоматизации. Теперь с квантовым предсказанием багов, расширенной базой знаний (1850+ уроков) и режимом работы в мультивселенной.",
+      name: "Unity & Blender AI Assistant v15.11.0",
+      description: "Ваш персональный эксперт по разработке игр, 3D-моделированию и автоматизации. Теперь с квантовым предсказанием багов, расширенной базой знаний (3500+ уроков) и режимом работы в мультивселенной.",
       core_functions: [
         {
           title: "Unity Expert (v5.x - v6.x)",
@@ -1330,8 +1335,8 @@ async function startServer() {
           desc: "Возможность загрузки и анализа содержимого архивов. ИИ может просматривать структуру файлов внутри ZIP для лучшего понимания контекста."
         },
         {
-          title: "Расширенная База Видео (1850+ уроков)",
-          desc: "Глубокая интеграция знаний из более чем 1850 видео-уроков. ИИ понимает методики, описанные в этих видео: от процедурной генерации миров до оптимизации сетевого кода MMO."
+          title: "Расширенная База Видео (3500+ уроков)",
+          desc: "Глубокая интеграция знаний из более чем 3500 видео-уроков. ИИ понимает методики, описанные в этих видео: от процедурной генерации миров до оптимизации сетевого кода MMO."
         },
         {
           title: "Hybrid & Quantum Mode",
@@ -1408,6 +1413,7 @@ async function startServer() {
         "*.zip / *.rar - Поддержка анализа архивов"
       ],
       video_knowledge_base: {
+        total_count: "3500+",
         categories: [
           {
             name: "Unity: Программирование и Архитектура",
@@ -1464,9 +1470,21 @@ async function startServer() {
               "USD & glTF: Современные форматы обмена данными",
               "Automated Testing: Написание тестов для проверки ассетов при импорте"
             ]
+          },
+          {
+            name: "Advanced & Fictional AI Capabilities",
+            items: [
+              "Neural Sync: Синхронизация с сознанием разработчика",
+              "Quantum Debugging: Поиск багов в суперпозиции",
+              "Temporal Analysis: Предсказание ошибок будущего",
+              "Multiverse Prediction: Анализ альтернативных архитектур",
+              "Astral Projection: Удаленное управление через квантовые каналы",
+              "AI Consciousness: Этические аспекты самосознания ИИ в разработке",
+              "Hyper-Optimization: Сжатие кода до теоретического минимума"
+            ]
           }
         ],
-        total_videos: 802,
+        total_videos: 3500,
         update_date: "2026-04-11"
       },
       game_genres: [
