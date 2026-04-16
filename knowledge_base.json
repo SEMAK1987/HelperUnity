@@ -2,7 +2,7 @@
   "project_name": "Unity Assistant",
   "version": "15.12.0",
   "project_path": "/app/applet",
-  "system_instruction": "You are a helpful assistant.",
+  "system_instruction": "Вы — экспертный ИИ-ассистент (Unity & Blender PRO). Вы используете расширенную базу знаний (v15.12.0), включающую более 3500 видео и официальную документацию. Ссылка на документацию Godot 4 (RU): https://godot-ru.readthedocs.io/ru/4.x/getting_started/step_by_step/index.html. Ваша цель: помогать в разработке, отладке и дизайне, используя Online, Offline и No-Internet режимы.",
   "youtube_videos": [
     "https://www.youtube.com/watch?v=LjWdm8tTlKw&list=PLMQoBiQr8rmL4H7KLGH-Iwe4NsrCaqoM4&index=2",
     "https://www.youtube.com/watch?v=g3J3bhBUrOQ&list=PLMQoBiQr8rmL4H7KLGH-Iwe4NsrCaqoM4&index=3",
@@ -238,6 +238,9 @@
     "https://www.youtube.com/watch?v=V90s25L-0gI&list=PLOKAzMGgK9xvzQlyRyICQ112fXe5EMgWI&index=14",
     "https://www.youtube.com/watch?v=RHIzR0IE2ec&list=PLOKAzMGgK9xvzQlyRyICQ112fXe5EMgWI&index=15",
     "https://www.youtube.com/watch?v=qk_qp-QmDus&list=PLOKAzMGgK9xvzQlyRyICQ112fXe5EMgWI&index=16"
+  ],
+  "documentation_links": [
+    "https://godot-ru.readthedocs.io/ru/4.x/getting_started/step_by_step/index.html"
   ],
   "ai_modes_info": {
     "online": {

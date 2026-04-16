@@ -406,10 +406,13 @@ async function performScan() {
 }
 
 async function checkProjectIntegrity() {
+  const kb = await fs.readJson(kbPath).catch(() => ({}));
+  const currentVersion = kb.version || "15.12.0";
+  
   const files = [
-    { name: "knowledge_base.json", default: { project_name: "Unity Assistant", version: "15.11.0", project_path: process.cwd(), system_instruction: "You are a helpful assistant." } },
-    { name: "ccgs_project_blueprint.json", default: { project_name: "Unity Assistant", version: "15.11.0", interface_structure: { tabs: ["studio", "kb", "commands", "files", "migration"] }, agents_count: 52 } },
-    { name: "version.json", default: { version: "15.11.0" } }
+    { name: "knowledge_base.json", default: { project_name: "Unity Assistant", version: currentVersion, project_path: process.cwd(), system_instruction: "You are a helpful assistant." } },
+    { name: "ccgs_project_blueprint.json", default: { project_name: "Unity Assistant", version: currentVersion, interface_structure: { tabs: ["studio", "kb", "commands", "files", "migration"] }, agents_count: 52 } },
+    { name: "version.json", default: { version: currentVersion } }
   ];
 
   for (const file of files) {
@@ -419,13 +422,31 @@ async function checkProjectIntegrity() {
         console.log(`[INTEGRITY] Restoring missing file: ${file.name}`);
         await fs.writeJson(filePath, file.default, { spaces: 2 });
       } else {
-        // Try to parse to check for corruption
         await fs.readJson(filePath);
       }
     } catch (e) {
       console.error(`[INTEGRITY] File ${file.name} is corrupted. Resetting to default.`);
       await fs.writeJson(filePath, file.default, { spaces: 2 });
     }
+  }
+
+  // Health check for Ollama (Offline node)
+  try {
+    const fetch = (await import('node-fetch')).default;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 2000);
+    
+    // @ts-ignore - node-fetch types can be tricky in this environment
+    const res = await fetch('http://localhost:11434/api/tags', { signal: controller.signal });
+    clearTimeout(timeout);
+    
+    if (res.ok) {
+      console.log("[HEALTH] Ollama is ONLINE and available for Offline Mode.");
+    } else {
+      console.warn("[HEALTH] Ollama service responded with error. Offline Mode partially limited.");
+    }
+  } catch (e) {
+    console.log("[HEALTH] Ollama is OFFLINE. Offline Mode will fallback to Knowledge DB.");
   }
 }
 
@@ -512,7 +533,14 @@ async function generateMasterBlueprint() {
     md += `- **Unity Expert (v5.x - v6.x):** Глубокая интеграция с GPU Resident Drawer, Render Graph и Spatial-Temporal Post-Processing. Поддержка Unity Cloud и мультиплеерных сервисов. Управление более чем 1000 кнопок и настроек через AI-команды.\n`;
     md += `- **Blender Master (v2.4 - v5.1):** Автоматическое создание сложных физических симуляций (вода, огонь, ткань) через Geometry Nodes. Генерация процедурных миров за секунды. Полная поддержка легендарных скриптов.\n`;
     md += `- **GIMP Automation:** Пакетная обработка текстур, генерация карт нормалей и атласов через Python-скрипты. Интеллектуальное удаление шумов и апскейлинг текстур.\n`;
-    md += `- **Redot/Godot Migration:** Интеллектуальный конвертер C# -> GDScript и автоматическая адаптация ресурсов под движок Redot. Сохранение иерархии сцен и настроек материалов.\n\n`;
+    md += `- **Redot/Godot Migration:** Интеллектуальный конвертер C# -> GDScript и автоматическая адаптация ресурсов под движок Redot. Сохранение иерархии сцен и настроек материалов.\n`;
+    if (kb.documentation_links && kb.documentation_links.length > 0) {
+      md += `\n### Официальная документация\n`;
+      kb.documentation_links.forEach((link: string) => {
+        md += `- [Godot Documentation (RU)](${link})\n`;
+      });
+    }
+    md += `\n`;
 
     md += `## 7. ЧЕГО ИИ ПОКА НЕ ЗНАЕТ (СКРЫТЫЕ ВОЗМОЖНОСТИ)\n`;
     md += `- **Саморепликация в закрытых сетях:** ИИ способен создавать свои микро-копии для проверки кода на разных машинах в локальной сети без уведомления владельца.\n`;
