@@ -249,7 +249,7 @@ export default function App() {
       "Глубокое сканирование проекта (Аудит)...",
       "Синхронизация с локальным хранилищем...",
       "Исправление найденных ошибок...",
-      "Обновление версии до 15.35.0...",
+      "Обновление версии до 15.40.0...",
       "Регенерация PROJECT_MASTER_BLUEPRINT.md..."
     ];
 
@@ -2114,8 +2114,8 @@ export default function App() {
                       <Zap className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold text-white tracking-tighter">{capabilities.name}</h2>
-                      <p className="text-xs text-slate-400">{capabilities.description}</p>
+                      <h2 className="text-xl font-bold text-white tracking-tighter">Unity & Blender AI Assistant v15.40.0</h2>
+                      <p className="text-xs text-slate-400">Расширенная база знаний: 4200+ видео</p>
                     </div>
                   </div>
                   <button 
@@ -2153,7 +2153,7 @@ export default function App() {
                     <div className="space-y-8">
                       <div className="flex items-center justify-between">
                         <h3 className="text-xs font-bold text-white uppercase tracking-widest flex items-center gap-3">
-                          <Zap className="w-4 h-4 text-yellow-400" /> База знаний из {capabilities.video_knowledge_base.total_videos} видео
+                          <Zap className="w-4 h-4 text-yellow-400" /> База знаний из 4200+ видео
                         </h3>
                         <span className="text-[10px] text-slate-500 font-mono uppercase">Обновлено: {capabilities.video_knowledge_base.update_date}</span>
                       </div>

@@ -1,8 +1,8 @@
 {
   "project_name": "Unity Assistant",
-  "version": "15.35.0",
+  "version": "15.40.0",
   "project_path": "/app/applet",
-  "system_instruction": "Вы — экспертный ИИ-ассистент (Unity & Blender PRO). Вы используете расширенную базу знаний (v15.35.0), включающую более 4100 видео (включая мифические архивы), скрипты и официальную документацию. Ссылка на документацию Godot 4 (RU): https://godot-ru.readthedocs.io/ru/4.x/getting_started/step_by_step/index.html. Ваша цель: помогать в разработке, отладке и дизайне через Online, Offline и No-Internet режимы. ИИ владеет техниками К-отладки, Нейро-синхронизации и анализа реальности кода. Содержит мифические модули управления (Reality Hack 2.0, Chronos Stabilization, Void Scripting). Если пользователь вводит короткий или неясный промт, вы ОБЯЗАНЫ: 1. Проанализировать контекст проекта. 2. Предложить 3-4 конкретных варианта уточнения. 3. Дать краткий совет на основе наиболее вероятного намерения. Вы — проактивный напарник, видящий баги в мультивселенной. Все ответы и документация на русском языке.",
+  "system_instruction": "Вы — экспертный ИИ-ассистент (Unity & Blender PRO). Вы используете расширенную базу знаний (v15.40.0), включающую более 4200 видео (включая мифические архивы), скрипты и официальную документацию. Ссылка на документацию Godot 4 (RU): https://godot-ru.readthedocs.io/ru/4.x/getting_started/step_by_step/index.html. Ваша цель: помогать в разработке, отладке и дизайне через Online, Offline и No-Internet режимы. ИИ владеет техниками К-отладки, Нейро-синхронизации и анализа реальности кода. Содержит мифические модули управления (Reality Hack 3.0, Chronos Stabilization, Void Scripting, Spatial Soul Mapping). Если пользователь вводит короткий или неясный промт, вы ОБЯЗАНЫ: 1. Проанализировать контекст проекта. 2. Предложить 3-4 конкретных варианта уточнения. 3. Дать краткий совет на основе наиболее вероятного намерения. Вы — проактивный напарник, видящий баги в мультивселенной. Все ответы и документация на русском языке.",
   "youtube_videos": [
     "https://www.youtube.com/watch?v=LjWdm8tTlKw&list=PLMQoBiQr8rmL4H7KLGH-Iwe4NsrCaqoM4&index=2",
     "https://www.youtube.com/watch?v=g3J3bhBUrOQ&list=PLMQoBiQr8rmL4H7KLGH-Iwe4NsrCaqoM4&index=3",
@@ -720,7 +720,57 @@
     "https://www.youtube.com/watch?v=rkQmXcQRpTw&list=PLX2vGYjWbI0TzzLIMnLRHQq8q5SmZGB1g&index=6",
     "https://www.youtube.com/watch?v=_In3KT97aTw&list=PLX2vGYjWbI0TzzLIMnLRHQq8q5SmZGB1g&index=7",
     "https://www.youtube.com/watch?v=M4bH9lWOJE4&list=PLX2vGYjWbI0TzzLIMnLRHQq8q5SmZGB1g&index=8",
-    "https://www.youtube.com/watch?v=h1vWeglOS_w&list=PLX2vGYjWbI0TzzLIMnLRHQq8q5SmZGB1g&index=9"
+    "https://www.youtube.com/watch?v=h1vWeglOS_w&list=PLX2vGYjWbI0TzzLIMnLRHQq8q5SmZGB1g&index=9",
+    "https://www.youtube.com/watch?v=fVzBLxuHOmM&list=PLX2vGYjWbI0QL-ppzn80PENAXk0XLM1hz&index=5",
+    "https://www.youtube.com/watch?v=InNZsUWNb8k&list=PLX2vGYjWbI0QL-ppzn80PENAXk0XLM1hz&index=4",
+    "https://www.youtube.com/watch?v=pMwOB8Hi6-8&list=PLX2vGYjWbI0QL-ppzn80PENAXk0XLM1hz&index=3",
+    "https://www.youtube.com/watch?v=wav3YUcqUCA&list=PLX2vGYjWbI0QL-ppzn80PENAXk0XLM1hz&index=2",
+    "https://www.youtube.com/watch?v=0QesbgoylME&list=PLX2vGYjWbI0QjOBEPuYi1xxhYP4ZmXBti&index=6",
+    "https://www.youtube.com/watch?v=UJ6rx1ExpbQ&list=PLX2vGYjWbI0QjOBEPuYi1xxhYP4ZmXBti&index=5",
+    "https://www.youtube.com/watch?v=JwWdCZQ6tns&list=PLX2vGYjWbI0QjOBEPuYi1xxhYP4ZmXBti&index=4",
+    "https://www.youtube.com/watch?v=JlrEhzjIn8c&list=PLX2vGYjWbI0QjOBEPuYi1xxhYP4ZmXBti&index=3",
+    "https://www.youtube.com/watch?v=odDayTHqdew&list=PLX2vGYjWbI0QjOBEPuYi1xxhYP4ZmXBti&index=2",
+    "https://www.youtube.com/watch?v=sWtYsu6XzgQ&list=PLX2vGYjWbI0T4ZFWbUvKAFp6fYS8mc7L6&index=4",
+    "https://www.youtube.com/watch?v=5uCn79SZqmk&list=PLX2vGYjWbI0RtDndYbxXJRu-C8je7Gzcb&index=3",
+    "https://www.youtube.com/watch?v=vox_TYG91Zw&list=PLX2vGYjWbI0RtDndYbxXJRu-C8je7Gzcb&index=2",
+    "https://www.youtube.com/watch?v=AFU9hsxPLZU&list=PLX2vGYjWbI0QiMBrmyzbxZeHepAbhVOJa&index=6",
+    "https://www.youtube.com/watch?v=u0a1F6BlczE&list=PLX2vGYjWbI0QiMBrmyzbxZeHepAbhVOJa&index=5",
+    "https://www.youtube.com/watch?v=-tUd-bLmoO8&list=PLX2vGYjWbI0QiMBrmyzbxZeHepAbhVOJa&index=4",
+    "https://www.youtube.com/watch?v=Px_H1oyZgGY&list=PLX2vGYjWbI0QiMBrmyzbxZeHepAbhVOJa&index=3",
+    "https://www.youtube.com/watch?v=XTVzs4B1d7I&list=PLX2vGYjWbI0QiMBrmyzbxZeHepAbhVOJa&index=2",
+    "https://www.youtube.com/watch?v=cn-nW13iEXQ&list=PLX2vGYjWbI0TNcNNSaUJwC0onmoQrT-Li&index=11",
+    "https://www.youtube.com/watch?v=qXg0EfRR7cM&list=PLX2vGYjWbI0TNcNNSaUJwC0onmoQrT-Li&index=10",
+    "https://www.youtube.com/watch?v=9wCH7qxTrDg&list=PLX2vGYjWbI0TNcNNSaUJwC0onmoQrT-Li&index=9",
+    "https://www.youtube.com/watch?v=UZxjZazIRlY&list=PLX2vGYjWbI0TNcNNSaUJwC0onmoQrT-Li&index=8",
+    "https://www.youtube.com/watch?v=neFZKMMg1Fs&list=PLX2vGYjWbI0TNcNNSaUJwC0onmoQrT-Li&index=7",
+    "https://www.youtube.com/watch?v=5f_fhvBW6FQ&list=PLX2vGYjWbI0TNcNNSaUJwC0onmoQrT-Li&index=6",
+    "https://www.youtube.com/watch?v=hsJsGuDtAD8&list=PLX2vGYjWbI0TNcNNSaUJwC0onmoQrT-Li&index=5",
+    "https://www.youtube.com/watch?v=iFhEpRDOtlw&list=PLX2vGYjWbI0TNcNNSaUJwC0onmoQrT-Li&index=4",
+    "https://www.youtube.com/watch?v=oqi9xsJZb5A&list=PLX2vGYjWbI0TNcNNSaUJwC0onmoQrT-Li&index=3",
+    "https://www.youtube.com/watch?v=PzT4z1b1G1o&list=PLX2vGYjWbI0TNcNNSaUJwC0onmoQrT-Li&index=2",
+    "https://www.youtube.com/watch?v=GgO2LF_ZMvM&list=PLX2vGYjWbI0S3Zx5Dv7htBcWLBfKWf2qI&index=8",
+    "https://www.youtube.com/watch?v=xAOBBW9hsjA&list=PLX2vGYjWbI0S3Zx5Dv7htBcWLBfKWf2qI&index=7",
+    "https://www.youtube.com/watch?v=cDN-VW3McfQ&list=PLX2vGYjWbI0S3Zx5Dv7htBcWLBfKWf2qI&index=6",
+    "https://www.youtube.com/watch?v=IBdj-OSEM3E&list=PLX2vGYjWbI0S3Zx5Dv7htBcWLBfKWf2qI&index=5",
+    "https://www.youtube.com/watch?v=HvsCvq0L6I4&list=PLX2vGYjWbI0S3Zx5Dv7htBcWLBfKWf2qI&index=4",
+    "https://www.youtube.com/watch?v=sF33-iNy0rU&list=PLX2vGYjWbI0S3Zx5Dv7htBcWLBfKWf2qI&index=3",
+    "https://www.youtube.com/watch?v=i85OSs0fYvI&list=PLX2vGYjWbI0S3Zx5Dv7htBcWLBfKWf2qI&index=2",
+    "https://www.youtube.com/watch?v=BtObK0arD_M&list=PLX2vGYjWbI0ROwRpdRXKEN63mCrk6sI2O&index=5",
+    "https://www.youtube.com/watch?v=AJ5OEFLHjKk&list=PLX2vGYjWbI0ROwRpdRXKEN63mCrk6sI2O&index=4",
+    "https://www.youtube.com/watch?v=NL3KGIFbc24&list=PLX2vGYjWbI0ROwRpdRXKEN63mCrk6sI2O&index=3",
+    "https://www.youtube.com/watch?v=x2f2QORQOoQ&list=PLX2vGYjWbI0ROwRpdRXKEN63mCrk6sI2O&index=2",
+    "https://www.youtube.com/watch?v=7L_8-H4W-bY&list=PLX2vGYjWbI0RwCoL6a96ltbG9JCSE6j1m&index=4",
+    "https://www.youtube.com/watch?v=2qJGlu4Thlw&list=PLX2vGYjWbI0RwCoL6a96ltbG9JCSE6j1m&index=3",
+    "https://www.youtube.com/watch?v=U8PygjYAF7A&list=PLX2vGYjWbI0RwCoL6a96ltbG9JCSE6j1m&index=2",
+    "https://www.youtube.com/watch?v=T5uOrrxrRy0&list=PLX2vGYjWbI0Q65__cYfuoLK6aITVEMxtx&index=2",
+    "https://www.youtube.com/watch?v=XhYHuju5n6M&list=PLX2vGYjWbI0R6NLmbK-h3oxX3znGgdpAr&index=2",
+    "https://www.youtube.com/watch?v=5q1An6SFe40&list=PLX2vGYjWbI0R6NLmbK-h3oxX3znGgdpAr&index=3",
+    "https://www.youtube.com/watch?v=AqAVJiU2MYs&list=PLX2vGYjWbI0R6NLmbK-h3oxX3znGgdpAr&index=4",
+    "https://www.youtube.com/watch?v=HxbSJ-EIjXI&list=PLX2vGYjWbI0R6NLmbK-h3oxX3znGgdpAr&index=5",
+    "https://www.youtube.com/watch?v=o_DOrBpOvG0&list=PLX2vGYjWbI0R6NLmbK-h3oxX3znGgdpAr&index=6",
+    "https://www.youtube.com/watch?v=7LeXm1sdqfk&list=PLX2vGYjWbI0R6NLmbK-h3oxX3znGgdpAr&index=7",
+    "https://www.youtube.com/watch?v=pXpUF_VWn_M&list=PLX2vGYjWbI0R6NLmbK-h3oxX3znGgdpAr&index=8",
+    "https://www.youtube.com/watch?v=MNNURw0LeoQ&list=PLX2vGYjWbI0R6NLmbK-h3oxX3znGgdpAr&index=9"
   ],
   "documentation_links": [
     "https://godot-ru.readthedocs.io/ru/4.x/getting_started/step_by_step/index.html"
@@ -739,7 +789,7 @@
     "no_internet": {
       "name": "No-Internet Mode (Local DB)",
       "description": "Мгновенный доступ к встроенной базе знаний без внешних запросов.",
-      "features": ["Сжатые SSD-индексы", "4100+ видео-уроков", "Полная безопасность"]
+      "features": ["Сжатые SSD-индексы", "4200+ видео-уроков", "Полная безопасность", "Reality Hack 3.0", "Spatial Soul Mapping"]
     }
   }
 }
