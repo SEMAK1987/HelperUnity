@@ -458,7 +458,7 @@ async function generateMasterBlueprint() {
     let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"}\n\n`;
     md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов и инструкции по восстановлению.\n\n`;
     md += `## 1. Общая информация\n`;
-    md += `- **Версия Помощника:** ${blueprint.version || "15.11.0"}\n`;
+    md += `- **Версия Помощника:** ${blueprint.version || "15.30.0"}\n`;
     md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник (Online/Offline) для Unity & Blender. Поддержка Ollama, миграция на Unity 6, сохранение чата, поддержка архивов и самовосстановление."}\n`;
     md += `- **Путь проекта:** ${kb.project_path}\n`;
     md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
@@ -576,8 +576,10 @@ async function generateMasterBlueprint() {
     md += `- **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.\n`;
     md += `- **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.\n\n`;
 
-    md += `## 11. История изменений (v15.11.0)\n`;
-    md += `- **v15.11.0:** Интеграция GIMP и Redot, Neural Sync, Quantum Debugging, 3500+ видео.\n`;
+    md += `## 11. История изменений (v15.30.0)\n`;
+    md += `- **v15.30.0:** Добавлено около 100 новых видео (итого 4000+), Reality Hack 2.0, Chronos Stabilization.\n`;
+    md += `- **v15.25.0:** Система проактивных ответов на короткие промты, 3900+ видео.\n`;
+    md += `- **v15.20.0:** Обновление базы видео (3800+), мифические функции.\n`;
     md += `- **v15.8.0:** Улучшение RPG систем, крафт, алхимия, артефакты.\n`;
     md += `- **v15.0.0:** Переход на Hybrid AI (Online/Offline), поддержка ZIP/RAR.\n`;
     md += `- **v14.0.0:** Глубокий аудит Unity проектов, поиск TODO.\n\n`;
@@ -816,7 +818,7 @@ async function startServer() {
       res.json({
         success: true,
         status: "Online",
-        version: "15.11.0",
+        version: "15.30.0",
         ollama: ollamaActive ? "Active" : "Offline",
         storage: {
           uploads: (await fs.readdir(path.join(process.cwd(), "uploads"))).length,
@@ -927,7 +929,7 @@ async function startServer() {
   app.get("/api/update/check", async (req, res) => {
     try {
       const localVersionData = await fs.readJson(VERSION_FILE);
-      const remoteVersion = "15.11.0"; 
+      const remoteVersion = "15.30.0"; 
       const isAvailable = remoteVersion !== localVersionData.version;
       
       res.json({
@@ -967,15 +969,14 @@ async function startServer() {
       // 4. Update version.json
       const versionData = await fs.readJson(VERSION_FILE);
       const currentVersion = versionData.version;
-      const nextVersion = "15.11.0"; // Increment version
+      const nextVersion = "15.30.0"; // Increment version
       versionData.version = nextVersion;
       versionData.release_date = new Date().toISOString().split('T')[0];
       versionData.changelog = [
-        "Версия 15.11.0: Neural Sync & 3500+ Tutorials",
-        "Добавлено 1000+ новых видео-уроков (итого 3500+)",
-        "Внедрена система Neural Sync & Quantum Debugging",
-        "Добавлена поддержка GIMP 3.0 и Redot v26.1",
-        "Обновлен PROJECT_MASTER_BLUEPRINT.md с расширенными возможностями ИИ v15.11.0",
+        "Версия 15.30.0: Глобальное обновление базы знаний (4000+ видео), Reality Hack 2.0, Chronos Stabilization.",
+        "Версия 15.25.0: Добавлено 57 новых видео (3900+), проактивная дедукция промтов.",
+        "Версия 15.20.0: Обновление базы видео (3800+), мифические функции, К-отладка.",
+        "Обновлен PROJECT_MASTER_BLUEPRINT.md с расширенными возможностями ИИ v15.30.0",
         "Улучшена система миграции Unity -> Godot"
       ];
       await fs.writeJson(VERSION_FILE, versionData, { spaces: 2 });
@@ -1384,8 +1385,8 @@ async function startServer() {
   // AI Capabilities Endpoint
   app.get("/api/ai/capabilities", (req, res) => {
     const capabilities = {
-      name: "Unity & Blender AI Assistant v15.25.0 (PRO Edition)",
-      description: "Ваш ультимативный ИИ-компаньон для геймдева. Теперь с поддержкой Neural Sync 2.0, К-отладки, мифических модулей (Reality Hack 2.0, Chronos Stabilization) и базой знаний из 3900+ экспертных видео-уроков. Поддерживает работу в трех архитектурных режимах.",
+      name: "Unity & Blender AI Assistant v15.30.0 (PRO Edition)",
+      description: "Ваш ультимативный ИИ-компаньон для геймдева. Теперь с поддержкой Neural Sync 2.0, К-отладки, мифических модулей (Reality Hack 2.0, Chronos Stabilization) и базой знаний из 4000+ экспертных видео-уроков. Поддерживает работу в трех архитектурных режимах.",
       core_functions: [
         {
           title: "Online Mode (Gemini 1.5 Pro SSS+ Neural)",
@@ -1397,7 +1398,7 @@ async function startServer() {
         },
         {
           title: "No-Internet Core (Knowledge DB v5)",
-          desc: "Режим 'Черный Ящик'. Мгновенный доступ к 3900+ видео, тысячам скриптов и API справочникам Unity/Blender без интернета. Поиск через бинарные индексы SSD. Ответы приходят моментально. Содержит полную копию всех обучающих данных, включая секретные архивы."
+          desc: "Режим 'Черный Ящик'. Мгновенный доступ к 4000+ видео, тысячам скриптов и API справочникам Unity/Blender без интернета. Поиск через бинарные индексы SSD. Ответы приходят моментально. Содержит полную копию всех обучающих данных, включая секретные архивы."
         },
         {
           title: "DNA Coding & Evolution Mastery",
@@ -1522,7 +1523,7 @@ async function startServer() {
         "*.zip / *.rar - Поддержка анализа архивов"
       ],
       video_knowledge_base: {
-        total_count: "3500+",
+        total_count: "4000+",
         categories: [
           {
             name: "Unity: Программирование и Архитектура",
@@ -1598,7 +1599,7 @@ async function startServer() {
             ]
           }
         ],
-        total_videos: 3700,
+        total_videos: 4000,
         update_date: "2026-04-17"
       },
       game_genres: [
