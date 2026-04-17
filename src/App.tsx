@@ -249,7 +249,7 @@ export default function App() {
       "Глубокое сканирование проекта (Аудит)...",
       "Синхронизация с локальным хранилищем...",
       "Исправление найденных ошибок...",
-      "Обновление версии до 15.30.0...",
+      "Обновление версии до 15.35.0...",
       "Регенерация PROJECT_MASTER_BLUEPRINT.md..."
     ];
 
@@ -335,7 +335,7 @@ export default function App() {
         console.error("Failed to fetch KB, using fallback", err);
         setKb({
           name: "Unity AI Assistant",
-          version: "15.30.0",
+          version: "15.35.0",
           description: "Гибридный ИИ-помощник",
           project_path: "Unknown",
           system_instruction: "Ты — экспертный ИИ-ассистент."
@@ -1264,7 +1264,7 @@ export default function App() {
                 <Cpu className="w-12 h-12 text-blue-500" />
               </motion.div>
               
-              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v{kb?.version || '15.30.0'}</h2>
+              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v{kb?.version || '15.35.0'}</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg px-4">
                 Я полностью осведомлен о вашем проекте по пути <br/>
                 <code className="text-blue-400 break-all bg-white/5 px-2 py-1 rounded mt-2 inline-block">
