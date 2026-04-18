@@ -407,7 +407,7 @@ async function performScan() {
 
 async function checkProjectIntegrity() {
   const kb = await fs.readJson(kbPath).catch(() => ({}));
-  const currentVersion = kb.version || "16.30.0";
+  const currentVersion = kb.version || "16.40.0";
   
   const files = [
     { name: "knowledge_base.json", default: { project_name: "Unity Assistant", version: currentVersion, project_path: process.cwd(), system_instruction: "You are a helpful assistant." } },
@@ -508,19 +508,19 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v16.30.0 - Infinity Nexus)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v16.40.0 - Genesis Singularity)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
-    md += `- **Online Mode (Apex Cloud Hub):** Прямое подключение к Omniversal Zenith Network. Интеллект Apex-уровня.\n`;
-    md += `- **Offline Mode (Neural Apex Core):** Автономная сингулярность. Полная симуляция реальности Infinity.\n`;
-    md += `- **No-Internet Mode (Infinity Archive):** 6400+ видео-уроков. Мгновенный доступ при любых внешних условиях.\n\n`;
+    md += `- **Online Mode (Genesis Cloud Hub):** Прямое подключение к Omniversal Origin Network. Интеллект Genesis-уровня.\n`;
+    md += `- **Offline Mode (Neural Genesis Core):** Автономная сингулярность. Полная симуляция реальности Genesis.\n`;
+    md += `- **No-Internet Mode (Genesis Archive):** 6550+ видео-уроков. Мгновенный доступ при любых внешних условиях.\n\n`;
 
-    md += `### ВОЗМОЖНОСТИ GIMP (Infinity Edition)\n`;
-    md += `- **GIMP X-Ray Vision:** Автоматическое обнаружение микро-дефектов в текстурах. ИИ видит то, что не видит глаз человека.\n`;
-    md += `- **Atomic Texture Synthesis:** Генерация текстур на атомарном уровне детализации. Автоматическое создание идеальных PBR-карт.\n\n`;
+    md += `### ВОЗМОЖНОСТИ GIMP (Genesis Edition)\n`;
+    md += `- **GIMP X-Ray Vision 2.0:** Молекулярный анализ текстур. Автоматическое обнаружение и восстановление поврежденных данных.\n`;
+    md += `- **Archetype Texture Synthesis:** Генерация текстур на основе фундаментальных архетипов формы. Идеальные текстуры из 'пустоты'.\n\n`;
 
-    md += `### ВОЗМОЖНОСТИ GODOT/REDOT (Infinity Edition)\n`;
-    md += `- **Redot Omniscience:** Мгновенный глубокий аудит архитектуры Godot. Исправление багов в ядре движка силами ИИ.\n`;
-    md += `- **C# to GDScript Master Sync:** Идеальная конвертация с сохранением 100% производительности и логики. Предсказание поведения узлов (Nodes).\n\n`;
+    md += `### ВОЗМОЖНОСТИ GODOT/REDOT (Genesis Edition)\n`;
+    md += `- **Redot Absolute Omniscience:** Тотальный аудит архитектуры. ИИ переписывает ядро Godot для достижения сверхпроводимости кода.\n`;
+    md += `- **Source Memory Extraction:** Восстановление удаленной логики из призраков старых проектов.\n\n`;
 
     md += `### Продвинутые и Экспериментальные функции\n`;
     md += `- **Neural Sync 2.0 (Mind Link):** Полное слияние со стилем кодинга разработчика. ИИ понимает ваши мысли до того, как пальцы коснутся клавиатуры. Автодополнение целых игровых систем на лету на основе терабайтов видео-опыта.\n`;
