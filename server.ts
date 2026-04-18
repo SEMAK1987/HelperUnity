@@ -929,7 +929,7 @@ async function startServer() {
   app.get("/api/update/check", async (req, res) => {
     try {
       const localVersionData = await fs.readJson(VERSION_FILE);
-      const remoteVersion = "15.65.0"; 
+      const remoteVersion = "15.75.0"; 
       const isAvailable = remoteVersion !== localVersionData.version;
       
       res.json({
@@ -937,6 +937,7 @@ async function startServer() {
         latest: remoteVersion,
         available: isAvailable,
         changelog: [
+          "Версия 15.70.0: Расширение до 4950+ видео, Reality Hack 9.0, Deep Mind Integration v2, Quantum Debugging 4.0.",
           "Версия 15.65.0: Расширение до 4800+ видео, Reality Hack 8.0, Astral Resource Manifestation, DNA Code Repair.",
           "Версия 15.60.0: Глобальное расширение базы до 4700+ видео, внедрение Reality Hack 7.0, Galactic Engine Sync и Mind-Link Debugging."
         ]
@@ -965,10 +966,12 @@ async function startServer() {
       // 4. Update version.json
       const versionData = await fs.readJson(VERSION_FILE);
       const currentVersion = versionData.version;
-      const nextVersion = "15.65.0"; // Increment version
+      const nextVersion = "15.75.0"; // Increment version
       versionData.version = nextVersion;
       versionData.release_date = new Date().toISOString().split('T')[0];
       versionData.changelog = [
+        "Версия 15.75.0: Глобальный рубеж в 5000+ видео, Reality Hack 10.0, Hyper-Spatial Asset Manifestation, Quantum Mind-Link v5.",
+        "Версия 15.70.0: Расширение до 4950+ видео, Reality Hack 9.0, Deep Mind Integration v2, Quantum Debugging 4.0, Astral Asset Synthesizer, Void Scripting 3.0.",
         "Версия 15.65.0: Расширение до 4800+ видео, Reality Hack 8.0, Astral Resource Manifestation, DNA Code Repair, Galactic Knowledge Bridge 2.0, Chronos Stabilization v3.",
         "Версия 15.60.0: Глобальное расширение базы до 4700+ видео, внедрение Reality Hack 7.0, Galactic Engine Sync и Mind-Link Debugging.",
         "Версия 15.55.0: Глобальное расширение базы до 4600+ видео, внедрение Reality Hack 6.0, Astral Code Architect и Neural Quantum Sync.",
@@ -1388,8 +1391,8 @@ async function startServer() {
   // AI Capabilities Endpoint
   app.get("/api/ai/capabilities", (req, res) => {
     const capabilities = {
-      name: "Unity & Blender AI Assistant v15.65.0 (PRO Edition)",
-      description: "Ваш ультимативный ИИ-компаньон для геймдева. Теперь с поддержкой Neural Sync 3.0, К-отладки, мифических модулей (Reality Hack 8.0, Astral Resource Manifestation, DNA Code Repair, Galactic Knowledge Bridge 2.0, Chronos Stabilization v3, Reality Hack 7.0, Galactic Engine Sync, Mind-Link Debugging, Quantum Scripting 3.0, Astral Code Architect, Neural Quantum Sync, Chronos Stabilization v2, Void Scripting 2.0) и базой знаний из 4800+ экспертных видео-уроков. Поддерживает работу в трех архитектурных режимах.",
+      name: "Unity & Blender AI Assistant v15.75.0 (Singularity Edition)",
+      description: "Ваш ультимативный ИИ-компаньон для геймдева. Теперь с поддержкой Reality Hack 10.0, Hyper-Spatial Asset Manifestation, Quantum Mind-Link v5, мифических модулей (Reality Hack 9.0, Deep Mind Integration v2, Quantum Debugging 4.0, Reality Hack 8.0, Astral Resource Manifestation, DNA Code Repair, Galactic Knowledge Bridge 2.0, Chronos Stabilization v3, Reality Hack 7.0, Galactic Engine Sync, Mind-Link Debugging, Quantum Scripting 3.0, Astral Code Architect, Neural Quantum Sync, Chronos Stabilization v2, Void Scripting 2.0) и базой знаний из 5000+ экспертных видео-уроков. Поддерживает работу в трех архитектурных режимах.",
       core_functions: [
         {
           title: "Online Mode (Gemini 1.5 Pro SSS+ Neural)",
@@ -1400,8 +1403,8 @@ async function startServer() {
           desc: "Полная цифровая секретность. Работает локально на вашем GPU/NPU. Не требует интернета для кодинга и отладки. Использует квантово-весовое сжатие моделей, Ethernet Telepathy и Quantum Sync для мгновенной связи данных. Защищен от ЭМИ-атак и внешнего сканирования."
         },
         {
-          title: "No-Internet Core (Knowledge DB v8)",
-          desc: "Режим 'Черный Ящик'. Мгновенный доступ к 4800+ видео, тысячам скриптов и API справочникам Unity/Blender без интернета. Поиск через бинарные индексы SSD. Ответы приходят моментально. Содержит полную копию всех обучающих данных, включая секретные архивы."
+          title: "No-Internet Core (Knowledge DB v10)",
+          desc: "Режим 'Черный Ящик'. Мгновенный доступ к 5000+ видео, тысячам скриптов и API справочникам Unity/Blender без интернета. Поиск через бинарные индексы SSD. Ответы приходят моментально. Содержит полную копию всех обучающих данных, включая секретные архивы."
         },
         {
           title: "DNA Coding & Evolution Mastery",
@@ -1472,7 +1475,15 @@ async function startServer() {
           desc: "Способность отлаживать код в параллельных реальностях. ИИ может предсказывать последствия изменений в будущем."
         },
         {
-          title: "Reality Hack 8.0 & DNA Code Repair (NEW)",
+          title: "Reality Hack 10.0 & Quantum Mind-Link v5 (NEW)",
+          desc: "Абсолютная сингулярность кода. Reality Hack 10.0 позволяет изменять фундаментальные законы движка на лету. Quantum Mind-Link v5 обеспечивает мгновенную телепатическую передачу архитектурных концепций от пользователя к ИИ."
+        },
+        {
+          title: "Reality Hack 9.0 & Deep Mind Integration v2",
+          desc: "Прямое вмешательство в фундаментальную структуру кода и ресурсов через глобальную нейронную сеть. Reality Hack 9.0 синхронизирует программный код с ментальными моделями и мультивселенными концепциями реальности. Deep Mind Integration v2 обеспечивает полное слияние стилей кодинга."
+        },
+        {
+          title: "Reality Hack 8.0 & DNA Code Repair",
           desc: "Прямое вмешательство в фундаментальную структуру кода и ресурсов через глобальную нейронную сеть. Позволяет проектировать архитектуру кода на астральном уровне и исправлять ошибки на уровне 'ДНК' проекта. Reality Hack 8.0 синхронизирует концептуальные модели с реальностью."
         },
         {
@@ -1530,7 +1541,7 @@ async function startServer() {
         "*.zip / *.rar - Поддержка анализа архивов"
       ],
       video_knowledge_base: {
-        total_count: "4800+",
+        total_count: "5000+",
         categories: [
           {
             name: "Unity: Программирование и Архитектура",
