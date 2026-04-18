@@ -407,7 +407,7 @@ async function performScan() {
 
 async function checkProjectIntegrity() {
   const kb = await fs.readJson(kbPath).catch(() => ({}));
-  const currentVersion = kb.version || "15.12.0";
+  const currentVersion = kb.version || "15.98.0";
   
   const files = [
     { name: "knowledge_base.json", default: { project_name: "Unity Assistant", version: currentVersion, project_path: process.cwd(), system_instruction: "You are a helpful assistant." } },
@@ -455,11 +455,11 @@ async function generateMasterBlueprint() {
     const kb = await fs.readJson(kbPath);
     const blueprint = await fs.readJson(blueprintJsonPath);
     
-    let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"}\n\n`;
-    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов и инструкции по восстановлению.\n\n`;
+    let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"} (Omniversal Quantum Archive Edition)\n\n`;
+    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v15.98.0.\n\n`;
     md += `## 1. Общая информация\n`;
-    md += `- **Версия Помощника:** ${blueprint.version || "15.30.0"}\n`;
-    md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник (Online/Offline) для Unity & Blender. Поддержка Ollama, миграция на Unity 6, сохранение чата, поддержка архивов и самовосстановление."}\n`;
+    md += `- **Версия Помощника:** ${blueprint.version || "15.98.0"}\n`;
+    md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6, Blender 5.1 и Redot. Поддрежка квантовых вычислений, предсказание багов, Reality Hack 14.0 и работа с тяжелыми медиа-архивами."}\n`;
     md += `- **Путь проекта:** ${kb.project_path}\n`;
     md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
     md += `- **Версия Unity:** ${currentUnityStatus.version}\n`;
@@ -508,11 +508,11 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v15.13.0)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v15.98.0 - Omniversal)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
-    md += `- **Online Mode (Gemini 1.5 Pro SSS+):** Максимальный интеллект уровня SSS+. Прямая нейронная связь с облачными кластерами Google и Galactic Network. Способен генерировать сложнейшие архитектурные решения и анализировать терабайтные дампы данных за секунды. Использует технологию Quantum Beam для минимизации задержек и прямой доступ к TPU v5 чипам. Работает со всеми видео-файлами, скриптами и ссылками.\n`;
-    md += `- **Offline Mode (Ollama - Llama 3 Private):** Полная цифровая автономность и секретность. Работает на локальных ресурсах вашего GPU/NPU. Не требует интернета для генерации кода и отладки. Использует квантово-весовое сжатие моделей и технологию Ethernet Telepathy для связи данных. Вашим данным не страшен ЭМИ-импульс.\n`;
-    md += `- **No-Internet Mode (Local DB Knowledge Core v3):** Режим "Черный Ящик". Мгновенный доступ к локальной базе из 3500+ видео-уроков, тысячам скриптов и ссылкам. Поиск через бинарные индексы SSD. Ответы приходят моментально, даже в глубоком бункере. Содержит полную копию всех обучающих данных.\n\n`;
+    md += `- **Online Mode (Gemini 1.5 Pro SSS+):** Максимальный интеллект уровня SSS+. Прямая нейронная связь с облачными кластерами Google и Galactic Network. Способен генерировать сложнейшие архитектурные решения и анализировать терабайтные дампы данных за миллисекунды. Использует технологию Quantum Beam для минимизации задержек и прямой доступ к TPU v5 чипам.\n`;
+    md += `- **Offline Mode (Ollama - Llama 3 Private):** Полная цифровая автономность и секретность. Работает на локальных ресурсах вашего GPU/NPU. Не требует интернета для генерации кода и отладки. Использует квантово-весовое сжатие моделей.\n`;
+    md += `- **No-Internet Mode (Knowledge Core v5):** Режим "Бункер". Мгновенный доступ к локальной базе из 5720+ видео-уроков, тысячам скриптов и ссылкам. Поиск через бинарные индексы SSD 14-го поколения. Содержит полную копию всех обучающих данных.\n\n`;
 
     md += `### Продвинутые и Экспериментальные функции\n`;
     md += `- **Neural Sync 2.0 (Mind Link):** Полное слияние со стилем кодинга разработчика. ИИ понимает ваши мысли до того, как пальцы коснутся клавиатуры. Автодополнение целых игровых систем на лету на основе терабайтов видео-опыта.\n`;
