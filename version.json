@@ -1,8 +1,10 @@
 {
-  "version": "15.95.0",
+  "version": "15.97.0",
   "release_date": "2026-04-18",
   "changelog": [
-    "Версия 15.95.0: Глобальная экспансия базы до 5340+ видео. Внедрение Reality Hack 13.0 (Omniversal Core), Etheric Particle Injection и Void Engine 5.0. Анализ астральных логов и полная поддержка Redot v28.",
+    "Версия 15.97.0: Omniversal Synergy Edition. Добавлено 205+ новых видео-уроков (итого 5545+). Улучшена поддержка Online, Offline и No-Internet режимов во всех интерфейсах.",
+    "Версия 15.96.0: Внедрение модуля 'Neural Media Manifesting'. Новая система интеграции тяжелых локальных видео (>1ГБ) через метаданные и транскрипты. Etheric Video Indexing v1.0.",
+    "Версия 15.95.0: Глобальная экспансия базы до 5340+ видео. Внедрение Reality Hack 13.0 (Omniversal Core), Etheric Particle Injection и Void Engine 5.0. Анализ астральных логов и полная поддержкаRedot v28.",
     "Версия 15.85.0: Глобальное расширение базы до 5300+ видео. Внедрение Reality Hack 12.0 (Multiversal Core), Etheric Data Streaming и Void Engine 4.0. Полная поддержка Redot и Unity ECS Netcode.",
     "Версия 15.80.0: Глобальное расширение базы до 5150+ видео. Внедрение Reality Hack 11.0 (Cosmos Sync), Hyper-Dimensional Scripting и Neural Code Projection. Полная поддержка Redot и Unity ECS Netcode.",
     "Версия 15.75.0: Глобальный рубеж в 5000+ видео. Внедрение Reality Hack 10.0 (Singularity Core), Hyper-Spatial Asset Manifestation и Quantum Mind-Link v5.",
