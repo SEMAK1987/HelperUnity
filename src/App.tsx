@@ -249,10 +249,10 @@ export default function App() {
       "Глубокое сканирование проекта (Аудит)...",
       "Синхронизация с локальным хранилищем...",
       "Исправление найденных ошибок...",
-      "Обновление версии до 15.98.0...",
-      "Инициализация Omniversal Quantum Archive...",
-      "Синхронизация Neural Media Manifesting v2...",
-      "Регенерация PROJECT_MASTER_BLUEPRINT.md (Omniversal)..."
+      "Обновление версии до 15.99.0...",
+      "Инициализация Omniversal Quantum Odyssey...",
+      "Синхронизация Neural Media Manifesting v3...",
+      "Регенерация PROJECT_MASTER_BLUEPRINT.md (Odyssey)..."
     ];
 
     let step = 0;
@@ -337,7 +337,7 @@ export default function App() {
         console.error("Failed to fetch KB, using fallback", err);
         setKb({
           name: "Unity AI Assistant",
-          version: "15.98.0",
+          version: "15.99.0",
           description: "Гибридный ИИ-помощник",
           project_path: "Unknown",
           system_instruction: "Ты — экспертный ИИ-ассистент."
