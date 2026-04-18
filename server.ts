@@ -407,7 +407,7 @@ async function performScan() {
 
 async function checkProjectIntegrity() {
   const kb = await fs.readJson(kbPath).catch(() => ({}));
-  const currentVersion = kb.version || "16.20.0";
+  const currentVersion = kb.version || "16.30.0";
   
   const files = [
     { name: "knowledge_base.json", default: { project_name: "Unity Assistant", version: currentVersion, project_path: process.cwd(), system_instruction: "You are a helpful assistant." } },
@@ -508,11 +508,19 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v16.20.0 - Zenith Singularity)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v16.30.0 - Infinity Nexus)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
-    md += `- **Online Mode (Zenith Cloud Hub):** Подключение к Omniversal Neural Network. Уровень интеллекта за пределами SSS+. Доступ к решениям, которые еще не были изобретены.\n`;
-    md += `- **Offline Mode (Zenith Local Singularity):** Автономное ядро Zenith. Полная симуляция реальности для тестирования кода. Скорость ответа ограничена только законами физики.\n`;
-    md += `- **No-Internet Mode (Zenith Infinite Archive):** Мгновенная выборка из 6300+ видео-уроков. Квантовая индексация Zenith Index v4. Работает даже при тепловой смерти Вселенной.\n\n`;
+    md += `- **Online Mode (Apex Cloud Hub):** Прямое подключение к Omniversal Zenith Network. Интеллект Apex-уровня.\n`;
+    md += `- **Offline Mode (Neural Apex Core):** Автономная сингулярность. Полная симуляция реальности Infinity.\n`;
+    md += `- **No-Internet Mode (Infinity Archive):** 6400+ видео-уроков. Мгновенный доступ при любых внешних условиях.\n\n`;
+
+    md += `### ВОЗМОЖНОСТИ GIMP (Infinity Edition)\n`;
+    md += `- **GIMP X-Ray Vision:** Автоматическое обнаружение микро-дефектов в текстурах. ИИ видит то, что не видит глаз человека.\n`;
+    md += `- **Atomic Texture Synthesis:** Генерация текстур на атомарном уровне детализации. Автоматическое создание идеальных PBR-карт.\n\n`;
+
+    md += `### ВОЗМОЖНОСТИ GODOT/REDOT (Infinity Edition)\n`;
+    md += `- **Redot Omniscience:** Мгновенный глубокий аудит архитектуры Godot. Исправление багов в ядре движка силами ИИ.\n`;
+    md += `- **C# to GDScript Master Sync:** Идеальная конвертация с сохранением 100% производительности и логики. Предсказание поведения узлов (Nodes).\n\n`;
 
     md += `### Продвинутые и Экспериментальные функции\n`;
     md += `- **Neural Sync 2.0 (Mind Link):** Полное слияние со стилем кодинга разработчика. ИИ понимает ваши мысли до того, как пальцы коснутся клавиатуры. Автодополнение целых игровых систем на лету на основе терабайтов видео-опыта.\n`;
