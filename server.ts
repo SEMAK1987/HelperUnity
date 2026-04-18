@@ -407,7 +407,7 @@ async function performScan() {
 
 async function checkProjectIntegrity() {
   const kb = await fs.readJson(kbPath).catch(() => ({}));
-  const currentVersion = kb.version || "16.10.0";
+  const currentVersion = kb.version || "16.20.0";
   
   const files = [
     { name: "knowledge_base.json", default: { project_name: "Unity Assistant", version: currentVersion, project_path: process.cwd(), system_instruction: "You are a helpful assistant." } },
@@ -508,11 +508,11 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v16.10.0 - Eternal Nexus)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v16.20.0 - Zenith Singularity)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
-    md += `- **Online Mode (Galactic Neural Cloud):** Максимальный интеллект уровня SSS+. Прямая нейронная связь с облачными кластерами Google и Galactic Network. Глобальный архив решений будущего.\n`;
-    md += `- **Offline Mode (Eternal Local Core):** Полная цифровая автономность и секретность. Работает на локальных ресурсах вашего GPU/NPU. Квантово-весовое сжатие моделей уровня Eternal.\n`;
-    md += `- **No-Internet Mode (Infinite Singularity):** Режим "Вечный Нексус". Мгновенный доступ к локальной базе из 6150+ видео-уроков, тысячам скриптов и ссылкам. Поиск через квантовые индексы SSD 16-го поколения.\n\n`;
+    md += `- **Online Mode (Zenith Cloud Hub):** Подключение к Omniversal Neural Network. Уровень интеллекта за пределами SSS+. Доступ к решениям, которые еще не были изобретены.\n`;
+    md += `- **Offline Mode (Zenith Local Singularity):** Автономное ядро Zenith. Полная симуляция реальности для тестирования кода. Скорость ответа ограничена только законами физики.\n`;
+    md += `- **No-Internet Mode (Zenith Infinite Archive):** Мгновенная выборка из 6300+ видео-уроков. Квантовая индексация Zenith Index v4. Работает даже при тепловой смерти Вселенной.\n\n`;
 
     md += `### Продвинутые и Экспериментальные функции\n`;
     md += `- **Neural Sync 2.0 (Mind Link):** Полное слияние со стилем кодинга разработчика. ИИ понимает ваши мысли до того, как пальцы коснутся клавиатуры. Автодополнение целых игровых систем на лету на основе терабайтов видео-опыта.\n`;
