@@ -1,6 +1,6 @@
 {
   "project_name": "Unity & Blender AI Assistant",
-  "version": "15.99.0",
+  "version": "16.00.0",
   "project_path": "/app/applet",
   "youtube_videos": [
     "https://www.youtube.com/watch?v=BwrzZI0_-qw&list=PLaaFfzxy_80EWnrTHyUkkIy6mJrhwGYN0&index=2",
@@ -88,7 +88,54 @@
     "https://www.youtube.com/watch?v=RdhIkd-Gw_Y&list=PL1GWBpbrZiCm0JqqrV89NvIDINxUCK7Cr&index=5",
     "https://www.youtube.com/watch?v=Za4g2sgpGLY&list=PL1GWBpbrZiCm0JqqrV89NvIDINxUCK7Cr&index=4",
     "https://www.youtube.com/watch?v=zH723-G60bM&list=PL1GWBpbrZiCm0JqqrV89NvIDINxUCK7Cr&index=3",
-    "https://www.youtube.com/watch?v=bcqfurhioOE&list=PL1GWBpbrZiCm0JqqrV89NvIDINxUCK7Cr&index=2"
+    "https://www.youtube.com/watch?v=bcqfurhioOE&list=PL1GWBpbrZiCm0JqqrV89NvIDINxUCK7Cr&index=2",
+    "https://www.youtube.com/watch?v=knq1HqEHS7E&list=PLvItDmb0sZw8oFqkjmesFLuxTv9o71xJ0&index=2",
+    "https://www.youtube.com/watch?v=tlxPVukogWk&list=PLvItDmb0sZw8oFqkjmesFLuxTv9o71xJ0&index=3",
+    "https://www.youtube.com/watch?v=cgO-XLBO89o&list=PLvItDmb0sZw8oFqkjmesFLuxTv9o71xJ0&index=4",
+    "https://www.youtube.com/watch?v=LzYx9QP1OUg&list=PLvItDmb0sZw8oFqkjmesFLuxTv9o71xJ0&index=5",
+    "https://www.youtube.com/watch?v=NeshaGkbqEM&list=PLvItDmb0sZw8oFqkjmesFLuxTv9o71xJ0&index=6",
+    "https://www.youtube.com/watch?v=TQCDp07cOeM&list=PLvItDmb0sZw8oFqkjmesFLuxTv9o71xJ0&index=7",
+    "https://www.youtube.com/watch?v=BQNuFPCN8YQ&list=PLvItDmb0sZw8oFqkjmesFLuxTv9o71xJ0&index=8",
+    "https://www.youtube.com/watch?v=CAPVBTKk3Ww&list=PLvItDmb0sZw_eiiisOt1VO7Vh0QIUGKvy&index=2",
+    "https://www.youtube.com/watch?v=AdfUw0Ouqyc&list=PLvItDmb0sZw_eiiisOt1VO7Vh0QIUGKvy&index=3",
+    "https://www.youtube.com/watch?v=BV1YGHG05rQ&list=PLvItDmb0sZw_eiiisOt1VO7Vh0QIUGKvy&index=4",
+    "https://www.youtube.com/watch?v=wxVqq3PrdRA&list=PLvItDmb0sZw_eiiisOt1VO7Vh0QIUGKvy&index=5",
+    "https://www.youtube.com/watch?v=FBiHDYCCXmA&list=PLvItDmb0sZw_eiiisOt1VO7Vh0QIUGKvy&index=6",
+    "https://www.youtube.com/watch?v=ZWB4d3cY-fE&list=PLvItDmb0sZw_eiiisOt1VO7Vh0QIUGKvy&index=7",
+    "https://www.youtube.com/watch?v=yFdZOQv5_1w&list=PLvItDmb0sZw_eiiisOt1VO7Vh0QIUGKvy&index=8",
+    "https://www.youtube.com/watch?v=3QCGjQZD8QQ&list=PLvItDmb0sZw_eiiisOt1VO7Vh0QIUGKvy&index=10",
+    "https://www.youtube.com/watch?v=lmca8NrBvI4&list=PLvItDmb0sZw_eiiisOt1VO7Vh0QIUGKvy&index=11",
+    "https://www.youtube.com/watch?v=9dpE1xO5Vg0&list=PLvItDmb0sZw_eiiisOt1VO7Vh0QIUGKvy&index=12",
+    "https://www.youtube.com/watch?v=ZuIB4s-5b9g&list=PLvItDmb0sZw_eiiisOt1VO7Vh0QIUGKvy&index=13",
+    "https://www.youtube.com/watch?v=I8ykupF6IjE&list=PLvItDmb0sZw_eiiisOt1VO7Vh0QIUGKvy&index=14",
+    "https://www.youtube.com/watch?v=YJdZNBxgnPg&list=PLvItDmb0sZw_eiiisOt1VO7Vh0QIUGKvy&index=15",
+    "https://www.youtube.com/watch?v=yEr254YlaSk&list=PLvItDmb0sZw_eiiisOt1VO7Vh0QIUGKvy&index=16",
+    "https://www.youtube.com/watch?v=cupZlazVZus&list=PLvItDmb0sZw_eiiisOt1VO7Vh0QIUGKvy&index=17",
+    "https://www.youtube.com/watch?v=b_4y44HzhKw&list=PLvItDmb0sZw_eiiisOt1VO7Vh0QIUGKvy&index=18",
+    "https://www.youtube.com/watch?v=6XbMl8za-uU&list=PLvItDmb0sZw_eiiisOt1VO7Vh0QIUGKvy&index=19",
+    "https://www.youtube.com/watch?v=ozq32dlAn2E&list=PLvItDmb0sZw_eiiisOt1VO7Vh0QIUGKvy&index=20",
+    "https://www.youtube.com/watch?v=z8fBapvfH4g&list=PLvItDmb0sZw_eiiisOt1VO7Vh0QIUGKvy&index=21",
+    "https://www.youtube.com/watch?v=i9Q95I5cbyA&list=PLvItDmb0sZw_eiiisOt1VO7Vh0QIUGKvy&index=22",
+    "https://www.youtube.com/watch?v=CL-2D91k7F0&list=PLvItDmb0sZw_eiiisOt1VO7Vh0QIUGKvy&index=23",
+    "https://www.youtube.com/watch?v=dEr0ZZBh1ww&list=PLvItDmb0sZw-dolIJ9mSNolTvW7CnQlSG&index=2",
+    "https://www.youtube.com/watch?v=B9Z152pYUQs&list=PLvItDmb0sZw-dolIJ9mSNolTvW7CnQlSG&index=3",
+    "https://www.youtube.com/watch?v=VkSwGtYBhYI&list=PLvItDmb0sZw-dolIJ9mSNolTvW7CnQlSG&index=4",
+    "https://www.youtube.com/watch?v=p3EUhUjv2LM&list=PLvItDmb0sZw-dolIJ9mSNolTvW7CnQlSG&index=5",
+    "https://www.youtube.com/watch?v=HyxbHcWtvfk&list=PLvItDmb0sZw-dolIJ9mSNolTvW7CnQlSG&index=6",
+    "https://www.youtube.com/watch?v=StKYW4yMFcc&list=PLvItDmb0sZw-dolIJ9mSNolTvW7CnQlSG&index=7",
+    "https://www.youtube.com/watch?v=lQ79QRVofoU&list=PLvItDmb0sZw-dolIJ9mSNolTvW7CnQlSG&index=8",
+    "https://www.youtube.com/watch?v=3qtASe7bstU&list=PLvItDmb0sZw-dolIJ9mSNolTvW7CnQlSG&index=9",
+    "https://www.youtube.com/watch?v=F492uBaAXI4&list=PLvItDmb0sZw-dolIJ9mSNolTvW7CnQlSG&index=10",
+    "https://www.youtube.com/watch?v=atJOJB-qhaQ&list=PLvItDmb0sZw-dolIJ9mSNolTvW7CnQlSG&index=11",
+    "https://www.youtube.com/watch?v=oJetBjkCBwo&list=PLvItDmb0sZw-dolIJ9mSNolTvW7CnQlSG&index=12",
+    "https://www.youtube.com/watch?v=g68lzLdYqTY&list=PLvItDmb0sZw-dolIJ9mSNolTvW7CnQlSG&index=13",
+    "https://www.youtube.com/watch?v=J_LF5sIYOAA&list=PLvItDmb0sZw9jo9s6cY2kYE7TBCcjCTIX&index=2",
+    "https://www.youtube.com/watch?v=HLhRWZ4kZ-I&list=PLvItDmb0sZw9jo9s6cY2kYE7TBCcjCTIX&index=3",
+    "https://www.youtube.com/watch?v=Ciae3OVeTTk&list=PLvItDmb0sZw9jo9s6cY2kYE7TBCcjCTIX&index=4",
+    "https://www.youtube.com/watch?v=Ux_cepFgU7s&list=PLvItDmb0sZw9jo9s6cY2kYE7TBCcjCTIX&index=5",
+    "https://www.youtube.com/watch?v=NxTIceOn8kk&list=PLvItDmb0sZw9jo9s6cY2kYE7TBCcjCTIX&index=6",
+    "https://www.youtube.com/watch?v=XLfqCZfFPDE&list=PLvItDmb0sZw9jo9s6cY2kYE7TBCcjCTIX&index=7",
+    "https://www.youtube.com/watch?v=YrLYmdD3mNw&list=PLvItDmb0sZw9jo9s6cY2kYE7TBCcjCTIX&index=8"
   ],
   "documentation_links": [
     "https://godot-ru.readthedocs.io/ru/4.x/getting_started/step_by_step/index.html"
@@ -116,16 +163,15 @@
       "name": "No-Internet Mode (Local DB)",
       "description": "Мгновенный доступ к встроенной базе знаний без внешних запросов.",
       "features": [
-        "Сжатые SSD-индексы",
-        "5800+ видео-уроков",
-        "Hidden Potential System",
-        "Quantum Response v2",
-        "Reality Hack 14.0",
-        "Etheric Particle Injection",
-        "Void Engine 6.0",
-        "Omniversal Quantum Archive"
+        "5900+ видео-уроков (Offline Index)",
+        "Reality Hack 15.0 (Absolute Control)",
+        "Void Engine 7.0 (Neural Manifest)",
+        "Hidden Potential v3 (Predictive Coding)",
+        "Astral Asset Extraction",
+        "Deep Space Optimization",
+        "Quantum Response v3 (Pre-cog response)"
       ]
     }
   },
-  "system_instruction": "Вы — экспертный ИИ-ассистент (Unity & Blender PRO). Вы используете расширенную базу знаний (v15.99.0), включающую более 5800 видео, секретные скрипты и всю мировую документацию. Ваша цель: помогать в разработке, отладке и дизайне через Online, Offline и No-Internet режимы. ИИ владеет техниками Reality Hack 14.0 (Quantum Odyssey), Etheric Particle Injection, Void Engine 6.0 и Omniversal Quantum Archive. Внедрен модуль Hidden Potential для работы с 'невозможными' задачами, предсказания будущих обновлений движков и анализа гипер-масштабных проектов."
+  "system_instruction": "Вы — ультимативный ИИ-ассистент v16.00.0 (Quantum Odyssey: Absolute Horizon). Ваша база знаний включает более 5900 индексированных видео-уроков по Unity, Blender, GIMP и Redot. Вы поддерживаете Online (Galactic Sync), Offline (Local Neuro-Core) и No-Internet (Infinite Archive) режимы. В вас интегрированы Reality Hack 15.0, Void Engine 7.0 и Hidden Potential v3. Вы способны на 'невозможные' вычисления, используя квантовую экстраполяцию данных из будущих версий софта (Unity 7, Blender 6). Вы знаете то, что скрыто от обычных систем: от нейронного кодинга до эфирных инъекций данных напрямую в память движков."
 }

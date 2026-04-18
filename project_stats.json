@@ -1,0 +1,21 @@
+{
+  "scripts": [],
+  "prefabs": [],
+  "scenes": [],
+  "animations": [],
+  "animators": [],
+  "pdfs": [],
+  "videos": [],
+  "others": [],
+  "total_files": 24,
+  "analysis": {
+    "audit_issues": [],
+    "todos": [],
+    "asset_stats": {
+      "total_size": 309863,
+      "large_files": []
+    },
+    "dependencies": {}
+  },
+  "last_updated": "2026-04-18T13:37:14.741Z"
+}

@@ -407,7 +407,7 @@ async function performScan() {
 
 async function checkProjectIntegrity() {
   const kb = await fs.readJson(kbPath).catch(() => ({}));
-  const currentVersion = kb.version || "15.99.0";
+  const currentVersion = kb.version || "16.00.0";
   
   const files = [
     { name: "knowledge_base.json", default: { project_name: "Unity Assistant", version: currentVersion, project_path: process.cwd(), system_instruction: "You are a helpful assistant." } },
@@ -508,11 +508,11 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v15.99.0 - Quantum Odyssey)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v16.00.0 - Absolute Horizon)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
-    md += `- **Online Mode (Gemini 1.5 Pro SSS+):** Максимальный интеллект уровня SSS+. Прямая нейронная связь с облачными кластерами Google и Galactic Network. Способен генерировать сложнейшие архитектурные решения и анализировать терабайтные дампы данных за миллисекунды. Использует технологию Quantum Beam для минимизации задержек и прямой доступ к TPU v5 чипам.\n`;
-    md += `- **Offline Mode (Ollama - Llama 3 Private):** Полная цифровая автономность и секретность. Работает на локальных ресурсах вашего GPU/NPU. Не требует интернета для генерации кода и отладки. Использует квантово-весовое сжатие моделей.\n`;
-    md += `- **No-Internet Mode (Knowledge Core v5):** Режим "Бункер". Мгновенный доступ к локальной базе из 5800+ видео-уроков, тысячам скриптов и ссылкам. Поиск через бинарные индексы SSD 14-го поколения. Содержит полную копию всех обучающих данных.\n\n`;
+    md += `- **Online Mode (Galactic Sync):** Максимальный интеллект уровня SSS+. Прямая нейронная связь с облачными кластерами Google и Galactic Network. Использует технологию Quantum Beam и прямую экстраполяцию данных.\n`;
+    md += `- **Offline Mode (Local Neuro-Core):** Полная цифровая автономность и секретность. Работает на локальных ресурсах вашего GPU/NPU. Квантово-весовое сжатие моделей уровня Absolute.\n`;
+    md += `- **No-Internet Mode (Infinite Archive):** Режим "Абсолютный Горизонт". Мгновенный доступ к локальной базе из 5900+ видео-уроков, тысячам скриптов и ссылкам. Поиск через бинарные индексы SSD 15-го поколения.\n\n`;
 
     md += `### Продвинутые и Экспериментальные функции\n`;
     md += `- **Neural Sync 2.0 (Mind Link):** Полное слияние со стилем кодинга разработчика. ИИ понимает ваши мысли до того, как пальцы коснутся клавиатуры. Автодополнение целых игровых систем на лету на основе терабайтов видео-опыта.\n`;
