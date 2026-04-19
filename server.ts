@@ -407,7 +407,7 @@ async function performScan() {
 
 async function checkProjectIntegrity() {
   const kb = await fs.readJson(kbPath).catch(() => ({}));
-  const currentVersion = kb.version || "16.40.0";
+  const currentVersion = kb.version || "16.50.0";
   
   const files = [
     { name: "knowledge_base.json", default: { project_name: "Unity Assistant", version: currentVersion, project_path: process.cwd(), system_instruction: "You are a helpful assistant." } },
@@ -508,15 +508,19 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v16.40.0 - Genesis Singularity)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v16.50.0 - Origin Synthesis)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
-    md += `- **Online Mode (Genesis Cloud Hub):** Прямое подключение к Omniversal Origin Network. Интеллект Genesis-уровня.\n`;
-    md += `- **Offline Mode (Neural Genesis Core):** Автономная сингулярность. Полная симуляция реальности Genesis.\n`;
-    md += `- **No-Internet Mode (Genesis Archive):** 6550+ видео-уроков. Мгновенный доступ при любых внешних условиях.\n\n`;
+    md += `- **Online Mode (Origin Synthesis Cloud):** Прямое подключение к Omniversal Origin Network. Интеллект Origin-уровня.\n`;
+    md += `- **Offline Mode (Neural Synthetic Nexus):** Автономная сингулярность. Полная симуляция реальности Synthesis.\n`;
+    md += `- **No-Internet Mode (Origin Archive):** 6650+ видео-уроков. Мгновенный доступ при любых внешних условиях.\n\n`;
 
-    md += `### ВОЗМОЖНОСТИ GIMP (Genesis Edition)\n`;
-    md += `- **GIMP X-Ray Vision 2.0:** Молекулярный анализ текстур. Автоматическое обнаружение и восстановление поврежденных данных.\n`;
-    md += `- **Archetype Texture Synthesis:** Генерация текстур на основе фундаментальных архетипов формы. Идеальные текстуры из 'пустоты'.\n\n`;
+    md += `### BLENDER-UNITY NEXUS (Master Pipeline)\n`;
+    md += `- **Blender Scripting Master:** Генерация Python скриптов для всех версий Blender без ошибок.\n`;
+    md += `- **Script Compatibility Predictor:** ИИ предсказывает работу скриптов в разных версиях Blender.\n`;
+    md += `- **Blender-to-Unity Pipeline (BUP):** Пошаговый алгоритм экспорта сложных конструкций в Unity (любые версии).\n\n`;
+
+    md += `### ВОЗМОЖНОСТИ GIMP (Origin Edition)\n`;
+    md += `- **GIMP X-Ray Vision 2.0:** Молекулярный анализ текстур и восстановление данных.\n\n`;
 
     md += `### ВОЗМОЖНОСТИ GODOT/REDOT (Genesis Edition)\n`;
     md += `- **Redot Absolute Omniscience:** Тотальный аудит архитектуры. ИИ переписывает ядро Godot для достижения сверхпроводимости кода.\n`;
