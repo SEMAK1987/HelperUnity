@@ -259,7 +259,7 @@ export default function App() {
       "Глубокое сканирование проекта (Аудит)...",
       "Синхронизация с локальным хранилищем...",
       "Исправление найденных ошибок...",
-      "Обновление версии до 16.92.0...",
+      "Обновление версии до 16.95.0...",
       "Инициализация Omniversal Quantum Link...",
       "Установка Нейронного Моста (Blender & Unity)...",
       "Регенерация PROJECT_MASTER_BLUEPRINT.md (Quantum Link)..."
@@ -347,7 +347,7 @@ export default function App() {
         console.error("Failed to fetch KB, using fallback", err);
         setKb({
           name: "Unity AI Assistant",
-          version: "16.92.0",
+          version: "16.95.0",
           description: "Гибридный ИИ-помощник с Quantum Link",
           project_path: "Unknown",
           system_instruction: "Ты — экспертный ИИ-ассистент."
@@ -1399,7 +1399,7 @@ export default function App() {
                 <Cpu className="w-12 h-12 text-blue-500" />
               </motion.div>
               
-              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v16.92.0</h2>
+              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v16.95.0</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg px-4">
                 Я полностью осведомлен о вашем проекте по пути <br/>
                 <code className="text-blue-400 break-all bg-white/5 px-2 py-1 rounded mt-2 inline-block">
@@ -1714,7 +1714,7 @@ export default function App() {
                         <ExternalLink className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v16.92.0)</h2>
+                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v16.95.0)</h2>
                         <p className="text-xs text-slate-400">Прямое управление Blender и Unity через нейронный мост.</p>
                       </div>
                     </div>
@@ -2324,8 +2324,8 @@ export default function App() {
                       <Zap className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold text-white tracking-tighter">Unity & Blender AI Assistant v16.92.0</h2>
-                      <p className="text-xs text-slate-400">Расширенная база знаний: 7530+ видео</p>
+                      <h2 className="text-xl font-bold text-white tracking-tighter">Unity & Blender AI Assistant v16.95.0</h2>
+                      <p className="text-xs text-slate-400">Расширенная база знаний: 7715+ видео</p>
                     </div>
                   </div>
                   <button 
@@ -2363,7 +2363,7 @@ export default function App() {
                     <div className="space-y-8">
                       <div className="flex items-center justify-between">
                         <h3 className="text-xs font-bold text-white uppercase tracking-widest flex items-center gap-3">
-                          <Zap className="w-4 h-4 text-yellow-400" /> База знаний: 7530+ видео & Global Synergy
+                          <Zap className="w-4 h-4 text-yellow-400" /> База знаний: 7715+ видео & Global Synergy
                         </h3>
                         <span className="text-[10px] text-slate-500 font-mono uppercase">Обновлено: {capabilities.video_knowledge_base.update_date}</span>
                       </div>
@@ -2520,7 +2520,7 @@ export default function App() {
                     <Zap className="w-8 h-8 text-white animate-pulse" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-white uppercase tracking-tighter">Quantum Link Fusion (v16.92.0)</h2>
+                    <h2 className="text-2xl font-bold text-white uppercase tracking-tighter">Quantum Link Fusion (v16.95.0)</h2>
                     <p className="text-xs text-slate-400 font-mono uppercase tracking-[0.2em]">Neural Integration Bridge</p>
                   </div>
                 </div>
@@ -2820,7 +2820,7 @@ export default function App() {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                   </span>
-                  Neural Bridge v16.92.0 Active
+                  Neural Bridge v16.95.0 Active
                 </div>
                 <button 
                   onClick={() => setShowQuantumLink(false)}

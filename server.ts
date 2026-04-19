@@ -1469,20 +1469,20 @@ async function startServer() {
   // AI Capabilities Endpoint
   app.get("/api/ai/capabilities", (req, res) => {
     const capabilities = {
-      name: "Unity & Blender AI Assistant v16.92.0",
-      description: "Ваш ультимативный ИИ-компаньон. Мощная база знаний (7530+ видео), Neural Memory v2, Quantum Link Fusion и Reality Hack 22.0.",
+      name: "Unity & Blender AI Assistant v16.95.0",
+      description: "Ваш ультимативный ИИ-компаньон. Мощная база знаний (7715+ видео), Neural Memory v2, Quantum Link Fusion и Reality Hack 22.0.",
       core_functions: [
         {
           title: "Online Mode (Gemini 1.5 Pro SSS+ Neural)",
-          desc: "Максимальный интеллект уровня SSS+. Прямая нейронная связь с облачными кластерами. Анализ архитектуры, генерация сложнейшего кода и работа с 7500+ видео-уроками в реальном времени."
+          desc: "Максимальный интеллект уровня SSS+. Прямая нейронная связь с облачными кластерами. Анализ архитектуры, генерация сложнейшего кода и работа с 7715+ видео-уроков в реальном времени."
         },
         {
           title: "Offline Mode (Ollama Private Core)",
-          desc: "Локальный интеллект на вашем GPU. Полнотекстовый поиск по базе знаний 7530+ видео без интернета."
+          desc: "Локальный интеллект на вашем GPU. Полнотекстовый поиск по базе знаний 7715+ видео без интернета."
         },
         {
-          title: "No-Internet Core (Knowledge DB v16.92.0)",
-          desc: "Режим 'Библиотека Пустоты'. Мгновенный доступ к 7530+ видео и 20к+ скриптов без интернета."
+          title: "No-Internet Core (Knowledge DB v16.95.0)",
+          desc: "Режим 'Библиотека Пустоты'. Мгновенный доступ к 7715+ видео и 20к+ скриптов без интернета."
         },
         {
           title: "DNA Coding & Evolution Mastery",

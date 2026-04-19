@@ -24,7 +24,7 @@ namespace AI_Assistant_Quantum
 
         private void OnGUI()
         {
-            GUILayout.Label("v16.92.0 - Massive Knowledge Expansion (v2)", EditorStyles.boldLabel);
+            GUILayout.Label("v16.95.0 - Massive Knowledge Expansion (v3)", EditorStyles.boldLabel);
             
             serverUrl = EditorGUILayout.TextField("Server URL", serverUrl);
             mode = (Mode)EditorGUILayout.EnumPopup("Mode", mode);
