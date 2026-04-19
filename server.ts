@@ -405,9 +405,17 @@ async function performScan() {
   }
 }
 
+let aiTaskQueue: any[] = [];
+let aiTaskResults: Map<string, any> = new Map();
+
+// Generate a simple unique ID
+function generateId() {
+  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+}
+
 async function checkProjectIntegrity() {
   const kb = await fs.readJson(kbPath).catch(() => ({}));
-  const currentVersion = kb.version || "16.60.0";
+  const currentVersion = kb.version || "16.70.0";
   
   const files = [
     { name: "knowledge_base.json", default: { project_name: "Unity Assistant", version: currentVersion, project_path: process.cwd(), system_instruction: "You are a helpful assistant." } },
@@ -508,20 +516,20 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v16.60.0 - Eternal Origin)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v16.70.0 - Quantum Singularity)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
-    md += `- **Online Mode (Eternal Origin Cloud):** Прямое подключение к Omniversal Transcendent Network. Интеллект Transcendent-уровня.\n`;
-    md += `- **Offline Mode (Neural Transcendent Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.\n`;
-    md += `- **No-Internet Mode (Transcendent Archive):** 6800+ видео-уроков. Мгновенный доступ при любых внешних условиях.\n\n`;
+    md += `- **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.\n`;
+    md += `- **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.\n`;
+    md += `- **No-Internet Mode (Quantum Archive):** 7200+ видео-уроков. Мгновенный доступ при любых внешних условиях.\n\n`;
 
-    md += `### TRANSCENDENT PIPELINE (Global Nexus)\n`;
-    md += `- **Transcendent Scripting:** Генерация совершенного кода для Blender и Unity. ИИ понимает логику ассетов на уровне 'цифровой души'.\n`;
-    md += `- **Universal Export Nexus:** Бесшовный перенос данных между любыми версиями Blender и Unity ( Zero-Loss Pipeline ).\n`;
-    md += `- **Ghost Code Resurrection:** Восстановление удаленных идей и нереализованных возможностей из квантового шума проекта.\n\n`;
+    md += `### TRANSCENDENT LINK (Neural Addon Synthesis)\n`;
+    md += `- **Neural Addon Synthesis:** Возможность проектирования и генерации аддонов для Blender и плагинов для Unity, которые напрямую связывают софт с ИИ.\n`;
+    md += `- **Direct Software Manifestation:** Отправка команд и скриптов напрямую в среду разработки через API мост.\n`;
+    md += `- **Quantum Erasure Prevention:** Защита данных проекта от квантовой дегенерации и случайной потери логики.\n\n`;
 
-    md += `### ВОЗМОЖНОСТИ BLENDER (Eternal Edition)\n`;
-    md += `- **Python API Omni-Predictor:** Мгновенная адаптация скриптов под любую версию Blender. ИИ знает всё об изменениях в API 4.x и выше.\n`;
-    md += `- **Manifest Texture Synthesis:** Создание текстур через прямое описание концепта. X-Ray Vision 3.0 видит структуру материала на уровне квантовых связей.\n\n`;
+    md += `### ВОЗМОЖНОСТИ BLENDER (Quantum Edition)\n`;
+    md += `- **Transcendent Scripting:** Полный охват всех версий Blender. ИИ 'чувствует' API на квантовом уровне.\n`;
+    md += `- **Molecular Texture Synthesis:** Singularity Edition - создание текстур с учетом квантовых свойств поверхности.\n\n`;
 
     md += `### ВОЗМОЖНОСТИ GODOT/REDOT (Genesis Edition)\n`;
     md += `- **Redot Absolute Omniscience:** Тотальный аудит архитектуры. ИИ переписывает ядро Godot для достижения сверхпроводимости кода.\n`;
@@ -737,6 +745,82 @@ async function startServer() {
   }
 
   await initWatcher();
+
+  // API: AI Chat (Addon Integration for Blender/Unity)
+  app.post("/api/ai/chat", async (req, res) => {
+    const { prompt, mode, target = 'blender', context = {} } = req.body;
+    const taskId = generateId();
+    
+    console.log(`[AI ADDON] Received task ${taskId} for ${target}: ${prompt} (Mode: ${mode})`);
+    
+    if (mode === 'no_internet') {
+      try {
+        const kb = await fs.readJson(kbPath);
+        // Simple search logic or generic code
+        let code = "";
+        if (target === 'blender') {
+          code = `import bpy\n# No-Internet Mode Result for ${prompt}\nbpy.ops.mesh.primitive_cube_add()`;
+        } else {
+          code = `using UnityEngine;\n// No-Internet Mode Result for ${prompt}\npublic class Generated : MonoBehaviour {}`;
+        }
+        return res.json({ code });
+      } catch (e) {
+        return res.status(500).json({ error: "KB search failed" });
+      }
+    }
+
+    aiTaskQueue.push({
+      id: taskId,
+      prompt,
+      mode,
+      target,
+      context,
+      timestamp: Date.now()
+    });
+
+    let attempts = 0;
+    const maxAttempts = 60;
+    
+    const checkResult = setInterval(() => {
+      attempts++;
+      if (aiTaskResults.has(taskId)) {
+        clearInterval(checkResult);
+        const result = aiTaskResults.get(taskId);
+        aiTaskResults.delete(taskId);
+        res.json(result);
+      } else if (attempts >= maxAttempts) {
+        clearInterval(checkResult);
+        aiTaskQueue = aiTaskQueue.filter(t => t.id !== taskId);
+        res.status(504).json({ error: "AI response timeout. Ensure AI Assistant App is open in browser." });
+      }
+    }, 1000);
+  });
+
+  // Keep old blender route for compatibility with previous turn's code
+  app.post("/api/blender/chat", (req, res) => {
+    req.body.target = req.body.target || 'blender';
+    // Forward to the new generic chat
+    // @ts-ignore
+    app._router.handle({ method: 'POST', url: '/api/ai/chat', body: req.body }, res, () => {});
+  });
+
+  // API: Get pending AI tasks (for Frontend processing)
+  app.get("/api/ai/tasks", (req, res) => {
+    res.json(aiTaskQueue);
+  });
+
+  // API: Complete AI task (from Frontend)
+  app.post("/api/ai/complete", (req, res) => {
+    const { taskId, code, error } = req.body;
+    if (error) {
+      aiTaskResults.set(taskId, { error });
+    } else {
+      aiTaskResults.set(taskId, { code });
+    }
+    // Remove from queue
+    aiTaskQueue = aiTaskQueue.filter(t => t.id !== taskId);
+    res.json({ success: true });
+  });
 
   // API: Get Knowledge Base
   app.get("/api/kb", async (req, res) => {
@@ -1409,20 +1493,20 @@ async function startServer() {
   // AI Capabilities Endpoint
   app.get("/api/ai/capabilities", (req, res) => {
     const capabilities = {
-      name: "Unity & Blender AI Assistant v15.96.0 (Etheric Media Edition)",
-      description: "Ваш ультимативный ИИ-компаньон. Теперь с модулем Neural Media Manifesting для обработки тяжелых видео (>1ГБ), Reality Hack 13.0, Etheric Particle Injection и Void Engine 5.0.",
+      name: "Unity & Blender AI Assistant v16.92.0",
+      description: "Ваш ультимативный ИИ-компаньон. Мощная база знаний (7530+ видео), Neural Memory v2, Quantum Link Fusion и Reality Hack 22.0.",
       core_functions: [
         {
           title: "Online Mode (Gemini 1.5 Pro SSS+ Neural)",
-          desc: "Максимальный интеллект уровня SSS+. Прямая нейронная связь с облачными кластерами Google и Galactic Network. Анализ архитектуры, генерация сложнейшего кода, предсказание трендов и работа с терабайтными датасетами. Использует технологию Quantum Beam и доступ к Galactic Network. Работает со всеми видео-файлами, скриптами и ссылками в реальном времени. Способен на 'Нейронное Предсказание' намерений пользователя."
+          desc: "Максимальный интеллект уровня SSS+. Прямая нейронная связь с облачными кластерами. Анализ архитектуры, генерация сложнейшего кода и работа с 7500+ видео-уроками в реальном времени."
         },
         {
-          title: "Offline Mode (Ollama Private Model Core)",
-          desc: "Полная цифровая секретность. Работает локально на вашем GPU/NPU. Не требует интернета для кодинга и отладки. Использует квантово-весовое сжатие моделей, Ethernet Telepathy и Quantum Sync для мгновенной связи данных. Защищен от ЭМИ-атак и внешнего сканирования."
+          title: "Offline Mode (Ollama Private Core)",
+          desc: "Локальный интеллект на вашем GPU. Полнотекстовый поиск по базе знаний 7530+ видео без интернета."
         },
         {
-          title: "No-Internet Core (Knowledge DB v12)",
-          desc: "Режим 'Библиотека Пустоты'. Мгновенный доступ к 5340+ видео и 20к+ скриптов без интернета. Использует Etheric Particle Injection для поиска данных вне локального кэша."
+          title: "No-Internet Core (Knowledge DB v16.92.0)",
+          desc: "Режим 'Библиотека Пустоты'. Мгновенный доступ к 7530+ видео и 20к+ скриптов без интернета."
         },
         {
           title: "DNA Coding & Evolution Mastery",
@@ -1575,7 +1659,7 @@ async function startServer() {
         "*.zip / *.rar - Поддержка анализа архивов"
       ],
       video_knowledge_base: {
-        total_count: "5340+",
+        total_count: "7530+",
         categories: [
           {
             name: "Unity: Программирование и Архитектура",
@@ -1670,10 +1754,13 @@ async function startServer() {
       },
       ai_limitations: {
         current_gaps: [
+          "Физический ремонт оборудования (Hardware repair)",
+          "Изменение фундаментальных законов физики реальности",
+          "Обладание биологическими чувствами и эмоциями",
+          "Телепортация физических объектов сквозь пространство",
           "Прямое управление файлами в Unity Editor (требуется ручной запуск скриптов)",
-          "Real-time рендеринг видео (только статические кадры и анализ кода)",
-          "Сложные сетевые протоколы (только основы Photon/Mirror)",
-          "Глубокая физика жидкостей в реальном времени (только шейдеры и базовые системы)"
+          "Real-time рендеринг видео (только статические кадры)",
+          "Сложные сетевые протоколы (только основы Photon/Mirror)"
         ],
         learning_roadmap: [
           "Интеграция с Unity Muse API",

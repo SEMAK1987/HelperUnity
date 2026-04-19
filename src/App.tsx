@@ -4,6 +4,7 @@ import {
   Code, 
   Box, 
   Zap, 
+  BrainCircuit,
   Send, 
   Copy, 
   Check, 
@@ -26,6 +27,7 @@ import {
   Wifi,
   WifiOff,
   ChevronRight,
+  ChevronLeft,
   AlertTriangle,
   ExternalLink,
   BookOpen,
@@ -33,7 +35,9 @@ import {
   Type,
   FileCode,
   Trash2,
-  Database
+  Database,
+  Code2,
+  HelpCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -140,6 +144,12 @@ export default function App() {
   const [uploadTimeRemaining, setUploadTimeRemaining] = useState<string | null>(null);
   const [showGithubGuide, setShowGithubGuide] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showQuantumLink, setShowQuantumLink] = useState(false);
+  const [guideTab, setGuideTab] = useState<'blender' | 'unity' | 'manual'>('blender');
+  const [manualPrompt, setManualPrompt] = useState('');
+  const [manualResultCode, setManualResultCode] = useState('');
+  const [isManualGenerating, setIsManualGenerating] = useState(false);
+  const [manualTarget, setManualTarget] = useState<'blender' | 'unity'>('blender');
   const [localPathInput, setLocalPathInput] = useState('');
   const [projectPathInput, setProjectPathInput] = useState('');
   const [gimpPathInput, setGimpPathInput] = useState('');
@@ -249,10 +259,10 @@ export default function App() {
       "Глубокое сканирование проекта (Аудит)...",
       "Синхронизация с локальным хранилищем...",
       "Исправление найденных ошибок...",
-      "Обновление версии до 16.60.0...",
-      "Инициализация Omniversal Eternal Origin...",
-      "Активиция Transcendent Synthesis (Nexus v1.0)...",
-      "Регенерация PROJECT_MASTER_BLUEPRINT.md (Eternal Origin)..."
+      "Обновление версии до 16.92.0...",
+      "Инициализация Omniversal Quantum Link...",
+      "Установка Нейронного Моста (Blender & Unity)...",
+      "Регенерация PROJECT_MASTER_BLUEPRINT.md (Quantum Link)..."
     ];
 
     let step = 0;
@@ -296,13 +306,13 @@ export default function App() {
   useEffect(() => {
     if (input.length > 0 && input.length < 15) {
       const suggestions = [
-        "Как оптимизировать FPS в Unity?",
-        "Создай скрипт для инвентаря",
-        "Как настроить экспорт из Blender?",
-        "Расскажи про систему Алхимии",
-        "Как работает Offline режим?",
-        "Покажи систему Артефактов",
-        "Как сделать крафт предметов?"
+        "Как создать модульное здание в Blender?",
+        "Unity DOTS: основы оптимизации",
+        "Создай скрипт для поведения врагов (Unity)",
+        "Геометрические ноды: процедурный город",
+        "Как перенести проект из Unity в Redot?",
+        "Как работает Neural Memory?",
+        "Как настроить Quantum Link?"
       ].filter(s => s.toLowerCase().includes(input.toLowerCase()) || input.length < 3).slice(0, 4);
       setSuggestedQuestions(suggestions);
     } else {
@@ -337,8 +347,8 @@ export default function App() {
         console.error("Failed to fetch KB, using fallback", err);
         setKb({
           name: "Unity AI Assistant",
-          version: "16.60.0",
-          description: "Гибридный ИИ-помощник",
+          version: "16.92.0",
+          description: "Гибридный ИИ-помощник с Quantum Link",
           project_path: "Unknown",
           system_instruction: "Ты — экспертный ИИ-ассистент."
         });
@@ -389,6 +399,81 @@ export default function App() {
     };
   }, []);
 
+  // --- AI Task Processor (for Blender/Unity Addons) ---
+  useEffect(() => {
+    const processTasks = async () => {
+      if (!isOnline || !genAI) return;
+      
+      try {
+        const res = await fetch('/api/ai/tasks');
+        const tasks = await res.json();
+        
+        if (tasks && tasks.length > 0) {
+          for (const task of tasks) {
+            console.log(`[AI TASK] Processing ${task.id}: ${task.prompt}`);
+            
+            try {
+              let systemInstruction = kb?.system_instruction || "You are a helpful assistant.";
+              
+              if (task.target === 'blender') {
+                systemInstruction += "\nIMPORTANT: GENERATE ONLY PURE PYTHON CODE FOR BLENDER 4.x. NO MARKDOWN, NO EXPLANATIONS. START CODE DIRECTLY. Focus on bpy modules.";
+              } else if (task.target === 'unity') {
+                systemInstruction += "\nIMPORTANT: GENERATE ONLY PURE C# CODE FOR UNITY 6. NO MARKDOWN, NO EXPLANATIONS. START CODE DIRECTLY. Use standard Unity namespaces.";
+              }
+
+              const model = genAI.getGenerativeModel({ 
+                model: "gemini-1.5-flash",
+                systemInstruction: systemInstruction
+              });
+
+              // Add context if available
+              let fullPrompt = "";
+              
+              // Neural Memory: Include recent chat history as context for the link
+              const recentHistory = messages.slice(-5).map(m => `${m.role.toUpperCase()}: ${m.content}`).join("\n");
+              if (recentHistory) {
+                fullPrompt += `### NEURAL MEMORY (RECENT CHAT CONTEXT) ###\n${recentHistory}\n\n`;
+              }
+
+              fullPrompt += `### TASK FOR ${task.target.toUpperCase()} ###\n${task.prompt}`;
+              
+              if (task.context) {
+                fullPrompt += `\n\n### SOFTWARE CONTEXT ###\n${JSON.stringify(task.context)}`;
+              }
+
+              const result = await model.generateContent(fullPrompt);
+              const response = await result.response;
+              let code = response.text();
+              
+              // Clean code from potential markdown blocks
+              code = code.replace(/```python\n?/g, '').replace(/```\n?/g, '').replace(/```csharp\n?/g, '').replace(/```cs\n?/g, '');
+              
+              await fetch('/api/ai/complete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ taskId: task.id, code: code.trim() })
+              });
+              
+              console.log(`[AI TASK] Completed ${task.id}`);
+            } catch (err: any) {
+              console.error(`[AI TASK] Failed ${task.id}:`, err);
+              await fetch('/api/ai/complete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ taskId: task.id, error: err.message })
+              });
+            }
+          }
+        }
+      } catch (e) {
+        // Silent error for task polling
+      }
+    };
+
+    const interval = setInterval(processTasks, 3000);
+    return () => clearInterval(interval);
+  }, [kb, genAI, isOnline]);
+
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     // Save chat history when messages change
@@ -414,6 +499,46 @@ export default function App() {
       showNotification("Ошибка при очистке чата.", "error");
     } finally {
       setIsClearingChat(false);
+    }
+  };
+
+  const handleManualGenerateCode = async () => {
+    if (!manualPrompt.trim() || !genAI) return;
+    setIsManualGenerating(true);
+    setManualResultCode('');
+
+    try {
+      let systemInstruction = kb?.system_instruction || "You are a helpful assistant.";
+      
+      if (manualTarget === 'blender') {
+        systemInstruction += "\nIMPORTANT: GENERATE ONLY PURE PYTHON CODE FOR BLENDER 4.x. NO MARKDOWN, NO EXPLANATIONS. START CODE DIRECTLY. Focus on bpy modules.";
+      } else if (manualTarget === 'unity') {
+        systemInstruction += "\nIMPORTANT: GENERATE ONLY PURE C# CODE FOR UNITY 6. NO MARKDOWN, NO EXPLANATIONS. START CODE DIRECTLY. Use standard Unity namespaces.";
+      }
+
+      const model = genAI.getGenerativeModel({ 
+        model: "gemini-1.5-flash",
+        systemInstruction: systemInstruction
+      });
+
+      let fullPrompt = "";
+      const recentHistory = messages.slice(-5).map(m => `${m.role.toUpperCase()}: ${m.content}`).join("\n");
+      if (recentHistory) {
+        fullPrompt += `### NEURAL MEMORY (RECENT CHAT CONTEXT) ###\n${recentHistory}\n\n`;
+      }
+      fullPrompt += `### MANUAL CODE REQUEST FOR ${manualTarget.toUpperCase()} ###\n${manualPrompt}`;
+
+      const result = await model.generateContent(fullPrompt);
+      const response = await result.response;
+      let code = response.text();
+      code = code.replace(/```python\n?/g, '').replace(/```\n?/g, '').replace(/```csharp\n?/g, '').replace(/```cs\n?/g, '');
+      setManualResultCode(code.trim());
+      showNotification("Код сгенерирован!", "success");
+    } catch (err: any) {
+      console.error(err);
+      showNotification("Ошибка генерации: " + err.message, "error");
+    } finally {
+      setIsManualGenerating(false);
     }
   };
 
@@ -1121,6 +1246,14 @@ export default function App() {
               <span className="text-[10px] font-bold uppercase tracking-widest hidden sm:inline">ИИ Моде</span>
             </button>
             <button 
+              onClick={() => setShowQuantumLink(true)}
+              className="px-4 py-2 rounded-xl bg-blue-600/20 border border-blue-500/30 text-blue-400 hover:text-white hover:bg-blue-600 transition-all group flex items-center gap-2 shadow-lg shadow-blue-600/10"
+              title="Quantum Link Integration"
+            >
+              <ExternalLink className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              <span className="text-[10px] font-bold uppercase tracking-widest hidden sm:inline">Quantum Link</span>
+            </button>
+            <button 
               onClick={checkUpdates}
               className="px-4 py-2 rounded-xl bg-green-600/20 border border-green-500/30 text-green-400 hover:text-white hover:bg-green-600 transition-all group flex items-center gap-2 shadow-lg shadow-green-600/10"
               title="Проверить обновления"
@@ -1266,7 +1399,7 @@ export default function App() {
                 <Cpu className="w-12 h-12 text-blue-500" />
               </motion.div>
               
-              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v{kb?.version || '15.35.0'}</h2>
+              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v16.92.0</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg px-4">
                 Я полностью осведомлен о вашем проекте по пути <br/>
                 <code className="text-blue-400 break-all bg-white/5 px-2 py-1 rounded mt-2 inline-block">
@@ -1565,6 +1698,81 @@ export default function App() {
             <div className="flex-1 overflow-y-auto p-8 scrollbar-thin scrollbar-thumb-white/5 space-y-8">
               <div className="max-w-6xl mx-auto space-y-8">
                 
+                {/* Quantum Link Integration Block */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-8 rounded-[2.5rem] bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-cyan-600/10 border border-blue-500/20 relative overflow-hidden group"
+                >
+                  <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-700">
+                    <Zap className="w-32 h-32 text-blue-400" />
+                  </div>
+                  
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-600/20">
+                        <ExternalLink className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v16.92.0)</h2>
+                        <p className="text-xs text-slate-400">Прямое управление Blender и Unity через нейронный мост.</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                      {/* Blender Card */}
+                      <div className="p-6 rounded-3xl bg-black/40 border border-white/5 hover:border-orange-500/30 transition-all">
+                        <div className="flex items-center gap-3 mb-4 text-orange-400 uppercase font-bold text-xs tracking-widest">
+                          <Cube className="w-4 h-4" /> Blender Addon
+                        </div>
+                        <p className="text-[10px] text-slate-400 mb-6 leading-relaxed">
+                          Создает панель управления в Blender. Позволяет ИИ напрямую генерировать меши, материалы и логику сцены.
+                        </p>
+                        <button 
+                          onClick={() => window.open('/blender_connector.py', '_blank')}
+                          className="w-full py-3 rounded-xl bg-orange-600/20 border border-orange-500/30 text-[10px] font-bold text-orange-400 uppercase tracking-widest hover:bg-orange-600 hover:text-white transition-all"
+                        >
+                          Открыть blender_connector.py
+                        </button>
+                      </div>
+
+                      {/* Unity Card */}
+                      <div className="p-6 rounded-3xl bg-black/40 border border-white/5 hover:border-cyan-500/30 transition-all">
+                        <div className="flex items-center gap-3 mb-4 text-cyan-400 uppercase font-bold text-xs tracking-widest">
+                          <Gamepad2 className="w-4 h-4" /> Unity Connector
+                        </div>
+                        <p className="text-[10px] text-slate-400 mb-6 leading-relaxed">
+                          Окно редактора для Unity. Генерируйте C# скрипты и управляйте игровыми объектами с помощью ИИ.
+                        </p>
+                        <button 
+                          onClick={() => window.open('/UnityConnector.cs', '_blank')}
+                          className="w-full py-3 rounded-xl bg-cyan-600/20 border border-cyan-500/30 text-[10px] font-bold text-cyan-400 uppercase tracking-widest hover:bg-cyan-600 hover:text-white transition-all"
+                        >
+                          Открыть UnityConnector.cs
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="p-6 rounded-2xl bg-white/5 border border-white/5">
+                      <h4 className="text-[10px] font-bold text-white uppercase tracking-widest mb-4">Краткая инструкция по установке:</h4>
+                      <div className="space-y-3">
+                        <div className="flex items-start gap-4">
+                          <div className="w-5 h-5 rounded-full bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-[10px] font-bold text-blue-400 shrink-0">1</div>
+                          <p className="text-[10px] text-slate-400">Нажмите кнопки выше, чтобы открыть код. Скопируйте его и сохраните в файл с указанным именем в корне вашего проекта.</p>
+                        </div>
+                        <div className="flex items-start gap-4">
+                          <div className="w-5 h-5 rounded-full bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-[10px] font-bold text-blue-400 shrink-0">2</div>
+                          <p className="text-[10px] text-slate-400"><span className="text-orange-400 font-bold uppercase">Blender:</span> Зайдите в Edit → Preferences → Add-ons → Install, выберите файл и активируйте галочку.</p>
+                        </div>
+                        <div className="flex items-start gap-4">
+                          <div className="w-5 h-5 rounded-full bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-[10px] font-bold text-blue-400 shrink-0">3</div>
+                          <p className="text-[10px] text-slate-400"><span className="text-cyan-400 font-bold uppercase">Unity:</span> Создайте в папке Assets папку "Editor" и поместите файл туда. Окно появится в меню "AI Assistant".</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+
                 {/* Top Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="p-6 rounded-3xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
@@ -2116,8 +2324,8 @@ export default function App() {
                       <Zap className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold text-white tracking-tighter">Unity & Blender AI Assistant v15.96.0</h2>
-                      <p className="text-xs text-slate-400">Расширенная база знаний: 5340+ видео</p>
+                      <h2 className="text-xl font-bold text-white tracking-tighter">Unity & Blender AI Assistant v16.92.0</h2>
+                      <p className="text-xs text-slate-400">Расширенная база знаний: 7530+ видео</p>
                     </div>
                   </div>
                   <button 
@@ -2155,7 +2363,7 @@ export default function App() {
                     <div className="space-y-8">
                       <div className="flex items-center justify-between">
                         <h3 className="text-xs font-bold text-white uppercase tracking-widest flex items-center gap-3">
-                          <Zap className="w-4 h-4 text-yellow-400" /> База знаний: 5545+ видео & Global Synergy
+                          <Zap className="w-4 h-4 text-yellow-400" /> База знаний: 7530+ видео & Global Synergy
                         </h3>
                         <span className="text-[10px] text-slate-500 font-mono uppercase">Обновлено: {capabilities.video_knowledge_base.update_date}</span>
                       </div>
@@ -2178,19 +2386,35 @@ export default function App() {
                     </div>
                   )}
 
-                  <div className="space-y-6">
-                    <h3 className="text-xs font-bold text-white uppercase tracking-widest flex items-center gap-3">
-                      <Gamepad2 className="w-4 h-4 text-green-400" /> Поддерживаемые жанры
-                    </h3>
-                    <div className="flex flex-wrap gap-3">
-                      {capabilities.game_genres.map((genre: string, i: number) => (
-                        <div key={i} className="px-4 py-2 rounded-full bg-green-600/10 border border-green-500/20 text-[10px] font-bold text-green-400 uppercase tracking-widest">
-                          {genre}
-                        </div>
-                      ))}
+                  {capabilities.ai_limitations?.current_gaps && (
+                    <div className="space-y-6">
+                      <h3 className="text-xs font-bold text-red-400 uppercase tracking-widest flex items-center gap-3">
+                        <AlertTriangle className="w-4 h-4" /> Чего ИИ пока НЕ знает
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {capabilities.ai_limitations.current_gaps.map((limit: string, i: number) => (
+                          <div key={i} className="px-5 py-3 rounded-2xl bg-red-500/5 border border-red-500/10 text-[11px] text-slate-400 italic">
+                            {limit}
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
+                  {capabilities.game_genres && (
+                    <div className="space-y-6">
+                      <h3 className="text-xs font-bold text-white uppercase tracking-widest flex items-center gap-3">
+                        <Gamepad2 className="w-4 h-4 text-green-400" /> Поддерживаемые жанры
+                      </h3>
+                      <div className="flex flex-wrap gap-3">
+                        {capabilities.game_genres.map((genre: string, i: number) => (
+                          <div key={i} className="px-4 py-2 rounded-full bg-green-600/10 border border-green-500/20 text-[10px] font-bold text-green-400 uppercase tracking-widest">
+                            {genre}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   {capabilities.inventory_guide && (
                     <div className="space-y-6">
                       <h3 className="text-xs font-bold text-white uppercase tracking-widest flex items-center gap-3">
@@ -2272,6 +2496,343 @@ export default function App() {
             </motion.div>
           )}
         </AnimatePresence>
+      
+      {/* Quantum Link Modal */}
+      <AnimatePresence>
+        {showQuantumLink && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[110] bg-black/90 backdrop-blur-xl flex items-center justify-center p-6"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 50 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 50 }}
+              className="bg-[#0a0a0c] border border-white/10 rounded-[3.5rem] w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-[0_0_100px_rgba(59,130,246,0.1)] relative"
+            >
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 via-blue-500 to-cyan-500" />
+              
+              <div className="p-10 border-b border-white/5 flex items-center justify-between bg-gradient-to-r from-blue-600/10 to-transparent">
+                <div className="flex items-center gap-6">
+                  <div className="p-5 bg-blue-600 rounded-[2rem] shadow-2xl shadow-blue-600/30">
+                    <Zap className="w-8 h-8 text-white animate-pulse" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-white uppercase tracking-tighter">Quantum Link Fusion (v16.92.0)</h2>
+                    <p className="text-xs text-slate-400 font-mono uppercase tracking-[0.2em]">Neural Integration Bridge</p>
+                  </div>
+                </div>
+                <button 
+                   onClick={() => setShowQuantumLink(false)}
+                   className="p-4 hover:bg-white/5 rounded-3xl text-slate-500 hover:text-white transition-all border border-white/5"
+                >
+                  <X className="w-8 h-8" />
+                </button>
+              </div>
+
+              {/* Navigation Tabs */}
+              <div className="px-10 py-6 bg-black/20 border-b border-white/5 flex items-center gap-4">
+                <button 
+                  onClick={() => setGuideTab('blender')}
+                  className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl text-xs font-bold uppercase tracking-widest transition-all border ${
+                    guideTab === 'blender' 
+                    ? 'bg-orange-600/20 border-orange-500/50 text-orange-400 shadow-lg shadow-orange-600/10' 
+                    : 'bg-white/5 border-white/5 text-slate-500 hover:text-white'
+                  }`}
+                >
+                  <Cube className="w-4 h-4" /> Blender Guide
+                </button>
+                <button 
+                  onClick={() => setGuideTab('unity')}
+                  className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl text-xs font-bold uppercase tracking-widest transition-all border ${
+                    guideTab === 'unity' 
+                    ? 'bg-cyan-600/20 border-cyan-500/50 text-cyan-400 shadow-lg shadow-cyan-600/10' 
+                    : 'bg-white/5 border-white/5 text-slate-500 hover:text-white'
+                  }`}
+                >
+                  <Gamepad2 className="w-4 h-4" /> Unity Guide
+                </button>
+                <button 
+                  onClick={() => setGuideTab('manual')}
+                  className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl text-xs font-bold uppercase tracking-widest transition-all border ${
+                    guideTab === 'manual' 
+                    ? 'bg-purple-600/20 border-purple-500/50 text-purple-400 shadow-lg shadow-purple-600/10' 
+                    : 'bg-white/5 border-white/5 text-slate-500 hover:text-white'
+                  }`}
+                >
+                  <Code2 className="w-4 h-4" /> Quantum Terminal
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-10 space-y-12 scrollbar-thin scrollbar-thumb-white/5">
+                
+                {guideTab === 'blender' ? (
+                  <motion.div 
+                    key="blender"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="space-y-12"
+                  >
+                    {/* Header Info */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                      <div className="space-y-6">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-600/10 border border-orange-500/20 text-[10px] font-bold text-orange-400 uppercase tracking-widest">
+                          <Check className="w-3 h-3" /> Авто-определение Blender активно
+                        </div>
+                        <h3 className="text-3xl font-bold text-white tracking-tighter">Связь с Blender</h3>
+                        <p className="text-slate-400 text-sm leading-relaxed">
+                          Нейронный аддон позволяет ИИ манипулировать мешами, назначать шейдеры и строить сложные сцены прямо во время вашего диалога. Квантовый мост автоматически переводит ваши мысли в Python-скрипты.
+                        </p>
+                        <button 
+                          onClick={() => window.open('/blender_connector.py', '_blank')}
+                          className="px-8 py-4 bg-orange-600 text-white rounded-2xl text-xs font-bold uppercase tracking-widest hover:bg-orange-500 transition-all shadow-xl shadow-orange-600/20 flex items-center gap-3"
+                        >
+                          <Cube className="w-5 h-5" /> Скачать blender_connector.py
+                        </button>
+                      </div>
+                      <div className="relative group">
+                        <div className="absolute inset-0 bg-blue-500/10 blur-[100px] rounded-full group-hover:bg-blue-500/20 transition-all" />
+                        <div className="p-8 rounded-[3rem] bg-black/40 border border-white/5 relative z-10 flex flex-col items-center justify-center text-center gap-4">
+                          <div className="w-20 h-20 bg-orange-600/20 rounded-3xl flex items-center justify-center text-orange-400">
+                            <Cpu className="w-10 h-10 animate-pulse" />
+                          </div>
+                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Quantum Engine Processing</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Steps Implementation */}
+                    <div className="space-y-8">
+                      <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Пошаговый процесс установки:</h4>
+                      <div className="grid grid-cols-1 gap-6">
+                        {[
+                          { title: "Загрузка", text: "Скачайте .py файл по кнопке выше и сохраните его.", icon: <Folder className="w-5 h-5" /> },
+                          { title: "Инсталляция", text: "В Blender: Edit -> Preferences -> Add-ons -> Install. Выберите ваш файл.", icon: <Settings className="w-5 h-5" /> },
+                          { title: "Активация", text: "Поставьте галочку напротив 'AI Assistant Link'.", icon: <Check className="w-5 h-5" /> },
+                          { title: "Рабочая панель", text: "Нажмите 'N' во Viewport. Вкладка 'AI Assistant' появится в правой боковой панели приложения.", icon: <Layers className="w-5 h-5" /> },
+                          { title: "Творчество", text: "Введите запрос (например: 'Создай город') и нажмите 'Manifest Code'. ИИ сгенерирует меши и материалы. Также вы можете использовать вкладку Quantum Terminal для ручного получения кода.", icon: <Sparkles className="w-5 h-5" /> },
+                        ].map((step, idx) => (
+                          <motion.div 
+                            key={idx}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: idx * 0.1 }}
+                            className="flex items-start gap-6 group"
+                          >
+                            <div className="w-12 h-12 flex-shrink-0 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-orange-400 group-hover:bg-orange-600/20 group-hover:border-orange-500 transition-all">
+                              {step.icon}
+                            </div>
+                            <div>
+                                <h5 className="text-sm font-bold text-white uppercase tracking-tight mb-1">Шаг {idx+1}: {step.title}</h5>
+                                <p className="text-xs text-slate-500 leading-relaxed">{step.text}</p>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                ) : guideTab === 'unity' ? (
+                  <motion.div 
+                    key="unity"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="space-y-12"
+                  >
+                     {/* Header Info */}
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                      <div className="space-y-6">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-600/10 border border-cyan-500/20 text-[10px] font-bold text-cyan-400 uppercase tracking-widest">
+                          <Check className="w-3 h-3" /> Unity 2021+ Engine Connected
+                        </div>
+                        <h3 className="text-3xl font-bold text-white tracking-tighter">Связь с Unity</h3>
+                        <p className="text-slate-400 text-sm leading-relaxed">
+                          Quantum Connector создает мост между нейросетью и Unity Editor. ИИ пишет C# скрипты, настраивает компоненты и управляет иерархией вашей игры в реальном времени.
+                        </p>
+                        <button 
+                          onClick={() => window.open('/UnityConnector.cs', '_blank')}
+                          className="px-8 py-4 bg-cyan-600 text-white rounded-2xl text-xs font-bold uppercase tracking-widest hover:bg-cyan-500 transition-all shadow-xl shadow-cyan-600/20 flex items-center gap-3"
+                        >
+                          <Gamepad2 className="w-5 h-5" /> Скачать UnityConnector.cs
+                        </button>
+                      </div>
+                      <div className="relative group">
+                        <div className="absolute inset-0 bg-cyan-500/10 blur-[100px] rounded-full group-hover:bg-cyan-500/20 transition-all" />
+                        <div className="p-8 rounded-[3rem] bg-black/40 border border-white/5 relative z-10 flex flex-col items-center justify-center text-center gap-4">
+                          <div className="w-20 h-20 bg-cyan-600/20 rounded-3xl flex items-center justify-center text-cyan-400">
+                            <Database className="w-10 h-10 animate-bounce" />
+                          </div>
+                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Neural C# Compiler Ready</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Steps Implementation */}
+                    <div className="space-y-8">
+                      <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Пошаговая инструкция для Unity:</h4>
+                      <div className="grid grid-cols-1 gap-6">
+                        {[
+                          { title: "Подготовка папок", text: "В вашем проекте Unity (окно Project), зайдите в Assets и создайте там папку с именем 'Editor'. Это критически важно.", icon: <Folder className="w-5 h-5 text-cyan-400" /> },
+                          { title: "Загрузка скрипта", text: "Скачайте UnityConnector.cs и переместите его прямо в созданную папку Assets/Editor.", icon: <Send className="w-5 h-5 text-cyan-400" /> },
+                          { title: "Компиляция", text: "Подождите несколько секунд, пока Unity скомпилирует скрипт. В верхнем меню появится пункт 'AI Assistant'.", icon: <RefreshCw className="w-5 h-5 text-cyan-400" /> },
+                          { title: "Запуск Quantum Window", text: "Перейдите в AI Assistant -> Quantum Singularity Window. В открывшемся окне вы увидите поле ввода и кнопку 'Manifest Code'.", icon: <Zap className="w-5 h-5 text-cyan-400" /> },
+                          { title: "Написание запросов", text: "Пишите запрос прямо в окне Unity. Например: 'Создай игрока с CharacterController'. ИИ обработает это и выведет C# код. Нужен чистый код без аддона? Перейдите во вкладку Quantum Terminal.", icon: <Code className="w-5 h-5 text-cyan-400" /> },
+                        ].map((step, idx) => (
+                          <motion.div 
+                            key={idx}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: idx * 0.1 }}
+                            className="flex items-start gap-6 group"
+                          >
+                            <div className="w-12 h-12 flex-shrink-0 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-cyan-400 group-hover:bg-cyan-600/20 group-hover:border-cyan-500 transition-all">
+                              {step.icon}
+                            </div>
+                            <div>
+                                <h5 className="text-sm font-bold text-white uppercase tracking-tight mb-1">Шаг {idx+1}: {step.title}</h5>
+                                <p className="text-xs text-slate-500 leading-relaxed">{step.text}</p>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div 
+                    key="manual"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="space-y-8"
+                  >
+                    <div className="p-8 rounded-[2.5rem] bg-purple-600/5 border border-purple-500/20 space-y-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="text-xl font-bold text-white uppercase tracking-tight">Quantum Terminal (Manual Mode)</h3>
+                          <p className="text-xs text-purple-400 uppercase tracking-widest font-mono">Neural Code Manifistation Tool</p>
+                        </div>
+                        <div className="flex bg-black/40 p-1 rounded-xl border border-white/5">
+                          <button 
+                            onClick={() => setManualTarget('blender')}
+                            className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${manualTarget === 'blender' ? 'bg-orange-600 text-white' : 'text-slate-500 hover:text-white'}`}
+                          >Blender</button>
+                          <button 
+                            onClick={() => setManualTarget('unity')}
+                            className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${manualTarget === 'unity' ? 'bg-cyan-600 text-white' : 'text-slate-500 hover:text-white'}`}
+                          >Unity</button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <textarea 
+                          value={manualPrompt}
+                          onChange={(e) => setManualPrompt(e.target.value)}
+                          placeholder="Введите запрос для генерации чистого кода (например: 'Система инвентаря на ScriptableObject')..."
+                          className="w-full h-32 bg-black/40 border border-white/10 rounded-2xl p-6 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500/50 resize-none transition-all"
+                        />
+                        <button 
+                          onClick={handleManualGenerateCode}
+                          disabled={isManualGenerating || !manualPrompt.trim()}
+                          className="w-full py-4 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl font-bold uppercase tracking-widest text-xs transition-all shadow-xl shadow-purple-600/20 flex items-center justify-center gap-3"
+                        >
+                          {isManualGenerating ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+                          {isManualGenerating ? 'Нейронный синтез...' : 'Сгенерировать чистый код'}
+                        </button>
+                      </div>
+
+                      {manualResultCode && (
+                        <motion.div 
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="space-y-4"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-bold text-purple-400 uppercase tracking-widest font-mono">Результат: {manualTarget.toUpperCase()} {manualTarget === 'blender' ? 'PYTHON' : 'C#'}</span>
+                            <button 
+                              onClick={() => {
+                                navigator.clipboard.writeText(manualResultCode);
+                                showNotification("Код скопирован в буфер обмена!", "success");
+                              }}
+                              className="flex items-center gap-2 px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[10px] text-white transition-all"
+                            >
+                              <Copy className="w-3 h-3" /> Copy Code
+                            </button>
+                          </div>
+                          <pre className="p-6 bg-black text-xs text-purple-300 font-mono overflow-x-auto rounded-2xl border border-white/5 max-h-72 scrollbar-thin scrollbar-thumb-white/10">
+                            {manualResultCode}
+                          </pre>
+                        </motion.div>
+                      )}
+                    </div>
+                    
+                    <div className="p-6 rounded-2xl bg-white/5 border border-white/5 flex gap-4">
+                      <HelpCircle className="w-5 h-5 text-slate-500 shrink-0" />
+                      <p className="text-[10px] text-slate-500 leading-relaxed italic">
+                        Режим Manual Quantum Terminal генерирует код без отправки в аддоны. Используйте это, чтобы вручную копировать и настраивать скрипты прямо в вашей среде разработки. ИИ всё еще видит контекст нашего чата!
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Common Neural Memory Feature */}
+                <div className="p-8 rounded-3xl bg-gradient-to-r from-purple-600/20 to-blue-600/20 border border-purple-500/30 flex gap-6 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 p-4 opacity-10">
+                    <Sparkles className="w-20 h-20 text-purple-400 group-hover:rotate-12 transition-transform" />
+                  </div>
+                  <div className="w-14 h-14 bg-purple-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-purple-600/20">
+                    <BrainCircuit className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="relative z-10">
+                    <h5 className="text-sm font-bold text-white uppercase tracking-tight mb-2 flex items-center gap-2">
+                       Neural Memory Integration <span className="text-[8px] bg-purple-500 px-2 py-0.5 rounded-full text-white">Advanced</span>
+                    </h5>
+                    <p className="text-xs text-purple-200/70 leading-relaxed mb-3">
+                      Ваш чат теперь напрямую связан с Quantum Link! ИИ запоминает последние 5 сообщений из браузера и использует их при генерации кода в Blender или Unity. 
+                    </p>
+                    <div className="flex items-center gap-4 text-[10px] text-purple-400/80 font-mono">
+                       <span className="flex items-center gap-1"><Check className="w-3 h-3"/> ЧАТ</span>
+                       <ChevronRight className="w-3 h-3 text-white/20"/>
+                       <span className="flex items-center gap-1"><Check className="w-3 h-3"/> МОЗГ</span>
+                       <ChevronRight className="w-3 h-3 text-white/20"/>
+                       <span className="flex items-center gap-1"><Check className="w-3 h-3"/> ГЕЙМДЕВ</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Common Warning */}
+                <div className="p-8 rounded-3xl bg-blue-600/10 border border-blue-500/20 flex gap-6">
+                  <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center flex-shrink-0 animate-pulse">
+                    <Info className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h5 className="text-sm font-bold text-white uppercase tracking-tight mb-1">Золотое правило Квантовой Связи</h5>
+                    <p className="text-xs text-blue-300/70 leading-relaxed">
+                      Для того чтобы Quantum Link работал, это окно браузера должно оставаться открытым. Оно работает как «Ценральный Процессор» и передает данные между вашим ИИ и игровым движком.
+                    </p>
+                  </div>
+                </div>
+
+              </div>
+
+              <div className="p-10 bg-black/40 flex justify-end gap-4 border-t border-white/5">
+                <div className="flex-1 flex items-center gap-4 px-6 text-[10px] text-slate-600 uppercase tracking-widest font-mono">
+                  <span className="flex h-2 w-2 relative">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                  </span>
+                  Neural Bridge v16.92.0 Active
+                </div>
+                <button 
+                  onClick={() => setShowQuantumLink(false)}
+                  className="px-10 py-4 bg-white text-black hover:bg-blue-600 hover:text-white rounded-2xl text-xs font-bold uppercase tracking-widest transition-all shadow-xl shadow-white/10"
+                >
+                  Закрыть и начать работу
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Settings Modal */}
       <AnimatePresence>
@@ -2290,6 +2851,12 @@ export default function App() {
             >
               <div className="p-8 border-b border-white/5 flex items-center justify-between bg-white/5">
                 <div className="flex items-center gap-4">
+                  <button 
+                    onClick={() => setShowSettings(false)}
+                    className="p-2 hover:bg-white/5 rounded-lg text-slate-500 hover:text-white transition-all sm:hidden"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
                   <div className="p-3 bg-blue-600/20 rounded-2xl">
                     <Settings className="w-6 h-6 text-blue-400" />
                   </div>

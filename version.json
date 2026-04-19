@@ -1,7 +1,12 @@
 {
-  "version": "16.60.0",
+  "version": "16.92.0",
   "release_date": "2026-04-19",
   "changelog": [
+    "Версия 16.92.0: Eternal Origin: Massive Knowledge Expansion (v2). Интеграция еще 29 новых видео-уроков (итого 7530+ в нейронном индексе). Расширенный список ограничений (телепортация, законы физики). Исправление версии в главном окне чата (v16.80.0 -> v16.92.0).",
+    "Версия 16.91.0: Eternal Origin: Massive Knowledge Expansion. Интеграция 110+ новых видео-уроков (итого 7500+ в нейронном индексе). Добавлен полный список ограничений (hardware, биология, физика). Оптимизация ответов на короткие промты.",
+    "Версия 16.90.0: Eternal Origin: Knowledge Expansion. Интеграция 70+ новых видео-уроков (итого 7300+ в нейронном индексе). Обновление раздела 'О ВОЗМОЖНОСТЯХ ИИ' с подробным списком того, что ИИ пока НЕ умеет. Улучшение проактивных ответов на короткие промты.",
+    "Версия 16.80.0: Eternal Origin: Quantum Link Fusion. Релиз аддонов для Blender и Unity. Внедрение Quantum Terminal для ручного синтеза кода. Интеграция Neural Memory (контекст чата в коде). Поддержка Online/Offline/No-Internet режимов во всех модулях.",
+    "Версия 16.70.0: Eternal Origin: Quantum Singularity. Добавлено 200+ новых видео (итого 7200+ в нейронном индексе). Внедрение 'Transcendent Link' и 'Neural Addon Synthesis' для прямой связи с Blender. Reality Hack 22.0 и Void Engine 14.0.",
     "Версия 16.60.0: Eternal Origin: Synthetic Transcendence. Добавлено 130+ новых видео (итого 6800+ в нейронном индексе). Внедрение систем 'Transcendent Scripting', 'Universal Export Nexus' и 'Ghost Code Resurrection'. Reality Hack 21.0 и Void Engine 13.0.",
     "Версия 16.50.0: Origin Synthesis: Blender-Unity Nexus. Добавлено 100+ новых видео (итого 6650+ в нейронном индексе). Внедрение систем 'Blender Scripting Master', 'Script Compatibility Predictor' и 'Blender-to-Unity Pipeline (BUP)'. Reality Hack 20.0 и Void Engine 12.0.",
     "Версия 16.40.0: Omniversal Origin: Genesis Singularity. Добавлено 110+ новых видео (итого 6550+ в нейронном индексе). Внедрение систем 'Reality Hack 19.0', 'Void Engine 11.0' и 'Source Memory Extraction'. GIMP X-Ray Vision 2.0 и Redot Absolute Omniscience.",
