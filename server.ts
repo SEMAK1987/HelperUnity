@@ -1025,19 +1025,17 @@ async function startServer() {
 
   app.get("/api/update/check", async (req, res) => {
     try {
-      const localVersionData = await fs.readJson(VERSION_FILE);
-      const remoteVersion = "15.97.0"; 
-      const isAvailable = remoteVersion !== localVersionData.version;
+      const versionData = await fs.readJson(VERSION_FILE);
+      
+      // We'll use the version from version.json as the "latest" known to the server.
+      // In a real scenario, this would check a remote server.
+      const currentVersion = versionData.version;
       
       res.json({
-        current: localVersionData.version,
-        latest: remoteVersion,
-        available: isAvailable,
-        changelog: [
-          "Версия 15.70.0: Расширение до 4950+ видео, Reality Hack 9.0, Deep Mind Integration v2, Quantum Debugging 4.0.",
-          "Версия 15.65.0: Расширение до 4800+ видео, Reality Hack 8.0, Astral Resource Manifestation, DNA Code Repair.",
-          "Версия 15.60.0: Глобальное расширение базы до 4700+ видео, внедрение Reality Hack 7.0, Galactic Engine Sync и Mind-Link Debugging."
-        ]
+        current: currentVersion,
+        latest: currentVersion,
+        available: true, // Always show as available for re-sync/repair if user clicks
+        changelog: versionData.changelog.slice(0, 5) // Show top 5 real entries
       });
     } catch (error) {
       res.status(500).json({ error: "Failed to check for updates" });
@@ -1063,30 +1061,8 @@ async function startServer() {
       // 4. Update version.json
       const versionData = await fs.readJson(VERSION_FILE);
       const currentVersion = versionData.version;
-      const nextVersion = "15.97.0"; // Increment version
-      versionData.version = nextVersion;
+      const nextVersion = versionData.version;
       versionData.release_date = new Date().toISOString().split('T')[0];
-      versionData.changelog = [
-        "Версия 15.97.0: Omniversal Synergy Edition. Добавлено 205+ новых видео-уроков (итого 5545+). Улучшена поддержка Online, Offline и No-Internet режимов во всех интерфейсах.",
-        "Версия 15.96.0: Внедрение модуля 'Neural Media Manifesting'. Новая система интеграции тяжелых локальных видео (>1ГБ) через метаданные и транскрипты. Etheric Video Indexing v1.0.",
-        "Версия 15.95.0: Глобальная экспансия базы до 5340+ видео. Внедрение Reality Hack 13.0 (Omniversal Core), Etheric Particle Injection и Void Engine 5.0. Анализ астральных логов и полная поддержкаRedot v28.",
-        "Версия 15.85.0: Глобальное расширение базы до 5300+ видео. Внедрение Reality Hack 12.0 (Multiversal Core), Etheric Data Streaming и Void Engine 4.0. Полная поддержка Redot и Unity ECS Netcode.",
-        "Версия 15.80.0: Глобальное расширение базы до 5150+ видео. Внедрение Reality Hack 11.0 (Cosmos Sync), Hyper-Dimensional Scripting и Neural Code Projection. Полная поддержка Redot и Unity ECS Netcode.",
-        "Версия 15.75.0: Глобальный рубеж в 5000+ видео, Reality Hack 10.0, Hyper-Spatial Asset Manifestation, Quantum Mind-Link v5.",
-        "Версия 15.70.0: Расширение до 4950+ видео, Reality Hack 9.0, Deep Mind Integration v2, Quantum Debugging 4.0, Astral Asset Synthesizer, Void Scripting 3.0.",
-        "Версия 15.65.0: Расширение до 4800+ видео, Reality Hack 8.0, Astral Resource Manifestation, DNA Code Repair, Galactic Knowledge Bridge 2.0, Chronos Stabilization v3.",
-        "Версия 15.60.0: Глобальное расширение базы до 4700+ видео, внедрение Reality Hack 7.0, Galactic Engine Sync и Mind-Link Debugging.",
-        "Версия 15.55.0: Глобальное расширение базы до 4600+ видео, внедрение Reality Hack 6.0, Astral Code Architect и Neural Quantum Sync.",
-        "Версия 15.50.0: Глобальное расширение базы до 4500+ видео, внедрение Reality Hack 5.0, Astral Asset Projection и Neural Code Synthesis.",
-        "Версия 15.45.0: Глобальное расширение базы до 4400+ видео, внедрение Reality Hack 4.0 и Universal Soul Synchronization.",
-        "Версия 15.40.0: Глобальное расширение базы до 4300+ видео, внедрение Spatial Soul Mapping, Reality Hack 3.0 и Multiverse Asset Sync.",
-        "Версия 15.35.0: Расширение базы до 4100+ видео, Void Scripting, детализация Reality Hack 2.0.",
-        "Версия 15.30.0: Глобальное обновление базы знаний (4000+ видео), Reality Hack 2.0, Chronos Stabilization.",
-        "Версия 15.25.0: Добавлено 57 новых видео (3900+), проактивная дедукция промтов.",
-        "Версия 15.20.0: Обновление базы видео (3800+), мифические функции, К-отладка.",
-        "Обновлен PROJECT_MASTER_BLUEPRINT.md с расширенными возможностями ИИ v15.60.0",
-        "Улучшена система миграции Unity -> Godot"
-      ];
       await fs.writeJson(VERSION_FILE, versionData, { spaces: 2 });
 
       // 5. Regenerate Master Blueprint (Source of Truth)
@@ -1096,7 +1072,7 @@ async function startServer() {
       
       res.json({ 
         success: true, 
-        message: "Синхронизация и восстановление завершены успешно!",
+        message: "Синхронизация и восстановление завершены успешно! База знаний обновлена до актуального состояния.",
         oldVersion: currentVersion,
         newVersion: nextVersion
       });
