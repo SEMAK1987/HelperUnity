@@ -1469,8 +1469,8 @@ async function startServer() {
   // AI Capabilities Endpoint
   app.get("/api/ai/capabilities", (req, res) => {
     const capabilities = {
-      name: "Unity & Blender AI Assistant v16.95.0",
-      description: "Ваш ультимативный ИИ-компаньон. Мощная база знаний (7715+ видео), Neural Memory v2, Quantum Link Fusion и Reality Hack 22.0.",
+      name: "Unity & Blender AI Assistant v16.96.0",
+      description: "Ваш ультимативный ИИ-компаньон. Мощная база знаний (7715+ видео), Multi-Modal Quantum Link (Картинки/GIF), Neural Memory v2 и Reality Hack 22.0.",
       core_functions: [
         {
           title: "Online Mode (Gemini 1.5 Pro SSS+ Neural)",
@@ -1481,7 +1481,7 @@ async function startServer() {
           desc: "Локальный интеллект на вашем GPU. Полнотекстовый поиск по базе знаний 7715+ видео без интернета."
         },
         {
-          title: "No-Internet Core (Knowledge DB v16.95.0)",
+          title: "No-Internet Core (Knowledge DB v16.96.0)",
           desc: "Режим 'Библиотека Пустоты'. Мгновенный доступ к 7715+ видео и 20к+ скриптов без интернета."
         },
         {
@@ -1543,6 +1543,18 @@ async function startServer() {
         {
           title: "Алхимия и Зельеварение (NEW)",
           desc: "Создание и крафт зелий (Мана, Сила, Удача и др.) с системой рангов от E до SSS. Поддержка механик варки, перегонки и влияния навыков алхимии на результат."
+        },
+        {
+          title: "Multi-Modal Quantum Link (Скриншоты и GIF)",
+          desc: "Теперь Quantum Link поддерживает анализ скриншотов и GIF-анимаций. Пришлите ИИ кадр из вашей игры или запись бага, и он сгенерирует исправляющий C# или Python скрипт прямо для Unity/Blender."
+        },
+        {
+          title: "Godot/Redot Absolute Omniscience",
+          desc: "Тотальный аудит архитектуры. ИИ помогает переписывать логику Godot (GDScript, C#) для достижения максимальной производительности. Эксперт в области миграции с Unity."
+        },
+        {
+          title: "GIMP & Asset Processing Automation",
+          desc: "Автоматизация текстур: пакетная обработка, генерация карт нормалей и атласов. Интеллектуальный апскейлинг и очистка текстур силами ИИ (Script-fu & Python)."
         },
         {
           title: "Blender API Evolution Expert",

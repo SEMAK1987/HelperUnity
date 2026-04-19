@@ -259,7 +259,7 @@ export default function App() {
       "Глубокое сканирование проекта (Аудит)...",
       "Синхронизация с локальным хранилищем...",
       "Исправление найденных ошибок...",
-      "Обновление версии до 16.95.0...",
+      "Обновление версии до 16.96.0...",
       "Инициализация Omniversal Quantum Link...",
       "Установка Нейронного Моста (Blender & Unity)...",
       "Регенерация PROJECT_MASTER_BLUEPRINT.md (Quantum Link)..."
@@ -347,7 +347,7 @@ export default function App() {
         console.error("Failed to fetch KB, using fallback", err);
         setKb({
           name: "Unity AI Assistant",
-          version: "16.95.0",
+          version: "16.96.0",
           description: "Гибридный ИИ-помощник с Quantum Link",
           project_path: "Unknown",
           system_instruction: "Ты — экспертный ИИ-ассистент."
@@ -503,7 +503,7 @@ export default function App() {
   };
 
   const handleManualGenerateCode = async () => {
-    if (!manualPrompt.trim() || !genAI) return;
+    if ((!manualPrompt.trim() && attachedFiles.length === 0) || !genAI) return;
     setIsManualGenerating(true);
     setManualResultCode('');
 
@@ -521,19 +521,30 @@ export default function App() {
         systemInstruction: systemInstruction
       });
 
-      let fullPrompt = "";
+      const parts: any[] = [];
       const recentHistory = messages.slice(-5).map(m => `${m.role.toUpperCase()}: ${m.content}`).join("\n");
       if (recentHistory) {
-        fullPrompt += `### NEURAL MEMORY (RECENT CHAT CONTEXT) ###\n${recentHistory}\n\n`;
+        parts.push({ text: `### NEURAL MEMORY (RECENT CHAT CONTEXT) ###\n${recentHistory}\n\n` });
       }
-      fullPrompt += `### MANUAL CODE REQUEST FOR ${manualTarget.toUpperCase()} ###\n${manualPrompt}`;
 
-      const result = await model.generateContent(fullPrompt);
+      if (attachedFiles.length > 0) {
+        for (const file of attachedFiles) {
+          if (file.type && file.type.startsWith('image/')) {
+            const data = await fileToBase64(file.url);
+            parts.push({ inlineData: data });
+          }
+        }
+      }
+
+      parts.push({ text: `### MANUAL CODE REQUEST FOR ${manualTarget.toUpperCase()} ###\n${manualPrompt}` });
+
+      const result = await model.generateContent({ contents: [{ role: 'user', parts }] });
       const response = await result.response;
       let code = response.text();
       code = code.replace(/```python\n?/g, '').replace(/```\n?/g, '').replace(/```csharp\n?/g, '').replace(/```cs\n?/g, '');
       setManualResultCode(code.trim());
-      showNotification("Код сгенерирован!", "success");
+      setAttachedFiles([]);
+      showNotification("Код сгенерирован (Multi-Modal)!", "success");
     } catch (err: any) {
       console.error(err);
       showNotification("Ошибка генерации: " + err.message, "error");
@@ -1399,7 +1410,7 @@ export default function App() {
                 <Cpu className="w-12 h-12 text-blue-500" />
               </motion.div>
               
-              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v16.95.0</h2>
+              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v16.96.0</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg px-4">
                 Я полностью осведомлен о вашем проекте по пути <br/>
                 <code className="text-blue-400 break-all bg-white/5 px-2 py-1 rounded mt-2 inline-block">
@@ -1714,7 +1725,7 @@ export default function App() {
                         <ExternalLink className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v16.95.0)</h2>
+                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v16.96.0)</h2>
                         <p className="text-xs text-slate-400">Прямое управление Blender и Unity через нейронный мост.</p>
                       </div>
                     </div>
@@ -2324,7 +2335,7 @@ export default function App() {
                       <Zap className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold text-white tracking-tighter">Unity & Blender AI Assistant v16.95.0</h2>
+                      <h2 className="text-xl font-bold text-white tracking-tighter">Unity & Blender AI Assistant v16.96.0</h2>
                       <p className="text-xs text-slate-400">Расширенная база знаний: 7715+ видео</p>
                     </div>
                   </div>
@@ -2520,7 +2531,7 @@ export default function App() {
                     <Zap className="w-8 h-8 text-white animate-pulse" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-white uppercase tracking-tighter">Quantum Link Fusion (v16.95.0)</h2>
+                    <h2 className="text-2xl font-bold text-white uppercase tracking-tighter">Quantum Link Fusion (v16.96.0)</h2>
                     <p className="text-xs text-slate-400 font-mono uppercase tracking-[0.2em]">Neural Integration Bridge</p>
                   </div>
                 </div>
@@ -2727,17 +2738,42 @@ export default function App() {
                         <textarea 
                           value={manualPrompt}
                           onChange={(e) => setManualPrompt(e.target.value)}
-                          placeholder="Введите запрос для генерации чистого кода (например: 'Система инвентаря на ScriptableObject')..."
+                          placeholder="Введите запрос или прикрепите скриншот для генерации кода..."
                           className="w-full h-32 bg-black/40 border border-white/10 rounded-2xl p-6 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500/50 resize-none transition-all"
                         />
-                        <button 
-                          onClick={handleManualGenerateCode}
-                          disabled={isManualGenerating || !manualPrompt.trim()}
-                          className="w-full py-4 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl font-bold uppercase tracking-widest text-xs transition-all shadow-xl shadow-purple-600/20 flex items-center justify-center gap-3"
-                        >
-                          {isManualGenerating ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
-                          {isManualGenerating ? 'Нейронный синтез...' : 'Сгенерировать чистый код'}
-                        </button>
+
+                        {attachedFiles.length > 0 && (
+                          <div className="flex flex-wrap gap-3">
+                            {attachedFiles.map((file, i) => (
+                              <div key={i} className="relative group w-20 h-20">
+                                <img src={file.url} className="w-full h-full object-cover rounded-xl border border-white/10" alt="attach" />
+                                <button 
+                                  onClick={() => setAttachedFiles(prev => prev.filter((_, idx) => idx !== i))}
+                                  className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className="flex gap-4">
+                          <button 
+                            onClick={() => fileInputRef.current?.click()}
+                            className="px-6 py-4 bg-white/5 hover:bg-white/10 border border-white/5 rounded-2xl text-slate-400 hover:text-white transition-all flex items-center justify-center gap-2"
+                          >
+                            <Paperclip className="w-4 h-4" /> Прикрепить
+                          </button>
+                          <button 
+                            onClick={handleManualGenerateCode}
+                            disabled={isManualGenerating || (!manualPrompt.trim() && attachedFiles.length === 0)}
+                            className="flex-1 py-4 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl font-bold uppercase tracking-widest text-xs transition-all shadow-xl shadow-purple-600/20 flex items-center justify-center gap-3"
+                          >
+                            {isManualGenerating ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+                            {isManualGenerating ? 'Нейронный синтез...' : 'Сгенерировать код'}
+                          </button>
+                        </div>
                       </div>
 
                       {manualResultCode && (
@@ -2820,7 +2856,7 @@ export default function App() {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                   </span>
-                  Neural Bridge v16.95.0 Active
+                  Neural Bridge v16.96.0 Active
                 </div>
                 <button 
                   onClick={() => setShowQuantumLink(false)}
