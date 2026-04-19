@@ -407,7 +407,7 @@ async function performScan() {
 
 async function checkProjectIntegrity() {
   const kb = await fs.readJson(kbPath).catch(() => ({}));
-  const currentVersion = kb.version || "16.50.0";
+  const currentVersion = kb.version || "16.60.0";
   
   const files = [
     { name: "knowledge_base.json", default: { project_name: "Unity Assistant", version: currentVersion, project_path: process.cwd(), system_instruction: "You are a helpful assistant." } },
@@ -508,19 +508,20 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v16.50.0 - Origin Synthesis)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v16.60.0 - Eternal Origin)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
-    md += `- **Online Mode (Origin Synthesis Cloud):** Прямое подключение к Omniversal Origin Network. Интеллект Origin-уровня.\n`;
-    md += `- **Offline Mode (Neural Synthetic Nexus):** Автономная сингулярность. Полная симуляция реальности Synthesis.\n`;
-    md += `- **No-Internet Mode (Origin Archive):** 6650+ видео-уроков. Мгновенный доступ при любых внешних условиях.\n\n`;
+    md += `- **Online Mode (Eternal Origin Cloud):** Прямое подключение к Omniversal Transcendent Network. Интеллект Transcendent-уровня.\n`;
+    md += `- **Offline Mode (Neural Transcendent Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.\n`;
+    md += `- **No-Internet Mode (Transcendent Archive):** 6800+ видео-уроков. Мгновенный доступ при любых внешних условиях.\n\n`;
 
-    md += `### BLENDER-UNITY NEXUS (Master Pipeline)\n`;
-    md += `- **Blender Scripting Master:** Генерация Python скриптов для всех версий Blender без ошибок.\n`;
-    md += `- **Script Compatibility Predictor:** ИИ предсказывает работу скриптов в разных версиях Blender.\n`;
-    md += `- **Blender-to-Unity Pipeline (BUP):** Пошаговый алгоритм экспорта сложных конструкций в Unity (любые версии).\n\n`;
+    md += `### TRANSCENDENT PIPELINE (Global Nexus)\n`;
+    md += `- **Transcendent Scripting:** Генерация совершенного кода для Blender и Unity. ИИ понимает логику ассетов на уровне 'цифровой души'.\n`;
+    md += `- **Universal Export Nexus:** Бесшовный перенос данных между любыми версиями Blender и Unity ( Zero-Loss Pipeline ).\n`;
+    md += `- **Ghost Code Resurrection:** Восстановление удаленных идей и нереализованных возможностей из квантового шума проекта.\n\n`;
 
-    md += `### ВОЗМОЖНОСТИ GIMP (Origin Edition)\n`;
-    md += `- **GIMP X-Ray Vision 2.0:** Молекулярный анализ текстур и восстановление данных.\n\n`;
+    md += `### ВОЗМОЖНОСТИ BLENDER (Eternal Edition)\n`;
+    md += `- **Python API Omni-Predictor:** Мгновенная адаптация скриптов под любую версию Blender. ИИ знает всё об изменениях в API 4.x и выше.\n`;
+    md += `- **Manifest Texture Synthesis:** Создание текстур через прямое описание концепта. X-Ray Vision 3.0 видит структуру материала на уровне квантовых связей.\n\n`;
 
     md += `### ВОЗМОЖНОСТИ GODOT/REDOT (Genesis Edition)\n`;
     md += `- **Redot Absolute Omniscience:** Тотальный аудит архитектуры. ИИ переписывает ядро Godot для достижения сверхпроводимости кода.\n`;
