@@ -1469,20 +1469,24 @@ async function startServer() {
   // AI Capabilities Endpoint
   app.get("/api/ai/capabilities", (req, res) => {
     const capabilities = {
-      name: "Unity & Blender AI Assistant v16.96.0",
-      description: "Ваш ультимативный ИИ-компаньон. Мощная база знаний (7715+ видео), Multi-Modal Quantum Link (Картинки/GIF), Neural Memory v2 и Reality Hack 22.0.",
+      name: "Unity & Blender AI Assistant v16.98.0",
+      description: "Ваш ультимативный ИИ-компаньон. Мощная база знаний (8815+ видео), Neural Audio Synthesis (MP3), Multi-Modal Quantum Link и Reality Hack 22.0.",
       core_functions: [
         {
+          title: "Neural Audio Synthesis (v16.98.0)",
+          desc: "Генерация оригинальных, неплагиатных mp3 мелодий и звуковых эффектов. Технология 'Quantum Sonic Distortion' гарантирует 100% уникальность каждой ноты и тембра."
+        },
+        {
           title: "Online Mode (Gemini 1.5 Pro SSS+ Neural)",
-          desc: "Максимальный интеллект уровня SSS+. Прямая нейронная связь с облачными кластерами. Анализ архитектуры, генерация сложнейшего кода и работа с 7715+ видео-уроков в реальном времени."
+          desc: "Максимальный интеллект уровня SSS+. Прямая нейронная связь с облачными кластерами. Анализ архитектуры, генерация сложнейшего кода и работа с 8815+ видео-уроков в реальном времени."
         },
         {
           title: "Offline Mode (Ollama Private Core)",
-          desc: "Локальный интеллект на вашем GPU. Полнотекстовый поиск по базе знаний 7715+ видео без интернета."
+          desc: "Локальный интеллект на вашем GPU. Полнотекстовый поиск по базе знаний 8815+ видео без интернета."
         },
         {
-          title: "No-Internet Core (Knowledge DB v16.96.0)",
-          desc: "Режим 'Библиотека Пустоты'. Мгновенный доступ к 7715+ видео и 20к+ скриптов без интернета."
+          title: "No-Internet Core (Knowledge DB v16.98.0)",
+          desc: "Режим 'Библиотека Пустоты'. Мгновенный доступ к 8815+ видео и 20к+ скриптов без интернета."
         },
         {
           title: "DNA Coding & Evolution Mastery",

@@ -24,7 +24,7 @@ namespace AI_Assistant_Quantum
 
         private void OnGUI()
         {
-            GUILayout.Label("v16.96.0 - Eternal Origin: Multi-Modal", EditorStyles.boldLabel);
+            GUILayout.Label("v16.98.0 - Eternal Origin: Audio Manifestation", EditorStyles.boldLabel);
             
             serverUrl = EditorGUILayout.TextField("Server URL", serverUrl);
             mode = (Mode)EditorGUILayout.EnumPopup("Mode", mode);
