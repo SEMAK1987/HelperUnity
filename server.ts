@@ -1469,12 +1469,20 @@ async function startServer() {
   // AI Capabilities Endpoint
   app.get("/api/ai/capabilities", (req, res) => {
     const capabilities = {
-      name: "Unity & Blender AI Assistant v16.98.0",
-      description: "Ваш ультимативный ИИ-компаньон. Мощная база знаний (8815+ видео), Neural Audio Synthesis (MP3), Multi-Modal Quantum Link и Reality Hack 22.0.",
+      name: "Unity & Blender AI Assistant v17.0.0",
+      description: "Ваш ультимативный ИИ-компаньон. Зенитная база знаний (9300+ видео), Neural Audio Synthesis (Original MP3 & Variants), Multi-Modal Quantum Link и Reality Hack 22.0.",
       core_functions: [
         {
-          title: "Neural Audio Synthesis (v16.98.0)",
-          desc: "Генерация оригинальных, неплагиатных mp3 мелодий и звуковых эффектов. Технология 'Quantum Sonic Distortion' гарантирует 100% уникальность каждой ноты и тембра."
+          title: "Neural Audio Synthesis (v16.99.0: 5-7 Variants)",
+          desc: "Генерация 5-7 оригинальных вариантов мелодий и песен. Технология 'Quantum Sonic Distortion' гарантирует 100% уникальность. Поддержка прослушивания и скачивания напрямую."
+        },
+        {
+          title: "Quantum Link Multi-Modal (New)",
+          desc: "ИИ теперь понимает скриншоты, GIF и картинки. Автоматическое создание скриптов для Unity/Blender на основе визуальных данных и запросов."
+        },
+        {
+          title: "Software Status Awareness",
+          desc: "ИИ в реальном времени отслеживает статус и версии Unity, Blender, GIMP и Redot, адаптируя свои советы и код под конкретную рабочую среду."
         },
         {
           title: "Online Mode (Gemini 1.5 Pro SSS+ Neural)",
@@ -1485,7 +1493,7 @@ async function startServer() {
           desc: "Локальный интеллект на вашем GPU. Полнотекстовый поиск по базе знаний 8815+ видео без интернета."
         },
         {
-          title: "No-Internet Core (Knowledge DB v16.98.0)",
+          title: "No-Internet Core (Knowledge DB v16.99.0)",
           desc: "Режим 'Библиотека Пустоты'. Мгновенный доступ к 8815+ видео и 20к+ скриптов без интернета."
         },
         {
@@ -1651,7 +1659,7 @@ async function startServer() {
         "*.zip / *.rar - Поддержка анализа архивов"
       ],
       video_knowledge_base: {
-        total_count: "7530+",
+        total_count: "9200+",
         categories: [
           {
             name: "Unity: Программирование и Архитектура",

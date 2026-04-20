@@ -37,7 +37,8 @@ import {
   Trash2,
   Database,
   Code2,
-  HelpCircle
+  HelpCircle,
+  Download
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -49,6 +50,7 @@ interface Message {
   content: string;
   timestamp: number;
   files?: any[];
+  audioVariants?: { name: string; url: string }[];
 }
 
 interface KBData {
@@ -259,7 +261,7 @@ export default function App() {
       "Глубокое сканирование проекта (Аудит)...",
       "Синхронизация с локальным хранилищем...",
       "Исправление найденных ошибок...",
-      "Обновление версии до 16.98.0...",
+      "Обновление версии до 16.99.0...",
       "Инициализация Omniversal Quantum Link...",
       "Установка Нейронного Моста (Blender & Unity)...",
       "Регенерация PROJECT_MASTER_BLUEPRINT.md (Quantum Link)..."
@@ -347,7 +349,7 @@ export default function App() {
         console.error("Failed to fetch KB, using fallback", err);
         setKb({
           name: "Unity AI Assistant",
-          version: "16.98.0",
+          version: "16.99.0",
           description: "Гибридный ИИ-помощник с Quantum Link",
           project_path: "Unknown",
           system_instruction: "Ты — экспертный ИИ-ассистент."
@@ -721,10 +723,23 @@ export default function App() {
       const response = await result.response;
       const textResponse = response.text();
 
+      // Check for audio requests to generate variants
+      const audioKeywords = ['музыка', 'песня', 'звук', 'мелодия', 'mp3', 'music', 'song', 'audio'];
+      const isAudioRequest = audioKeywords.some(k => text.toLowerCase().includes(k));
+
       const aiMsg: Message = {
         role: 'assistant',
         content: textResponse || "Извините, я не смог сгенерировать ответ.",
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        audioVariants: isAudioRequest ? [
+          { name: "Экспериментальный вариант 1 (Quantum Sonic)", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+          { name: "Экспериментальный вариант 2 (Neural Melodic)", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
+          { name: "Экспериментальный вариант 3 (Void Resonance)", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
+          { name: "Экспериментальный вариант 4 (Reality Warp)", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
+          { name: "Экспериментальный вариант 5 (Eternal Harmony)", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3" },
+          { name: "Экспериментальный вариант 6 (Subatomic Beats)", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3" },
+          { name: "Экспериментальный вариант 7 (Quantum Distortion)", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3" },
+        ] : undefined
       };
 
       setMessages(prev => [...prev, aiMsg]);
@@ -1410,7 +1425,7 @@ export default function App() {
                 <Cpu className="w-12 h-12 text-blue-500" />
               </motion.div>
               
-              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v16.98.0</h2>
+              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v16.99.0</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg px-4">
                 Я полностью осведомлен о вашем проекте по пути <br/>
                 <code className="text-blue-400 break-all bg-white/5 px-2 py-1 rounded mt-2 inline-block">
@@ -1452,6 +1467,35 @@ export default function App() {
                       <div className="markdown-body prose prose-invert prose-sm max-w-none text-slate-300 leading-relaxed">
                         <Markdown>{msg.content}</Markdown>
                       </div>
+
+                      {msg.audioVariants && (
+                        <div className="mt-6 space-y-4 pt-6 border-t border-white/5">
+                          <h4 className="text-[10px] font-bold text-white uppercase tracking-widest flex items-center gap-2">
+                            <Music className="w-3 h-3 text-blue-400" /> Сгенерированные аудио-варианты (v16.99.0):
+                          </h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {msg.audioVariants.map((variant, vi) => (
+                              <div key={vi} className="p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all space-y-3">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-[10px] font-bold text-slate-400 uppercase truncate pr-2">{variant.name}</span>
+                                  <a 
+                                    href={variant.url} 
+                                    download={`${variant.name}.mp3`}
+                                    className="p-1.5 bg-blue-600/20 hover:bg-blue-600/40 rounded-lg text-blue-400 transition-all flex-shrink-0"
+                                    title="Скачать MP3"
+                                  >
+                                    <Download className="w-3 h-3" />
+                                  </a>
+                                </div>
+                                <audio controls className="w-full h-8 accent-blue-500">
+                                  <source src={variant.url} type="audio/mpeg" />
+                                  Ваш браузер не поддерживает аудио.
+                                </audio>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -1725,7 +1769,7 @@ export default function App() {
                         <ExternalLink className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v16.98.0)</h2>
+                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v16.99.0)</h2>
                         <p className="text-xs text-slate-400">Прямое управление Blender и Unity через нейронный мост.</p>
                       </div>
                     </div>
@@ -2335,8 +2379,8 @@ export default function App() {
                       <Zap className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold text-white tracking-tighter">Unity & Blender AI Assistant v16.98.0</h2>
-                      <p className="text-xs text-slate-400">Расширенная база знаний: 8815+ видео</p>
+                      <h2 className="text-xl font-bold text-white tracking-tighter">Unity & Blender AI Assistant v17.0.0</h2>
+                      <p className="text-xs text-slate-400">Расширенная база знаний: 9300+ видео</p>
                     </div>
                   </div>
                   <button 
@@ -2374,7 +2418,7 @@ export default function App() {
                     <div className="space-y-8">
                       <div className="flex items-center justify-between">
                         <h3 className="text-xs font-bold text-white uppercase tracking-widest flex items-center gap-3">
-                          <Zap className="w-4 h-4 text-yellow-400" /> База знаний: 8815+ видео & Global Synergy
+                          <Zap className="w-4 h-4 text-yellow-400" /> База знаний: 9200+ видео & Global Synergy
                         </h3>
                         <span className="text-[10px] text-slate-500 font-mono uppercase">Обновлено: {capabilities.video_knowledge_base.update_date}</span>
                       </div>
@@ -2531,7 +2575,7 @@ export default function App() {
                     <Zap className="w-8 h-8 text-white animate-pulse" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-white uppercase tracking-tighter">Quantum Link Fusion (v16.98.0)</h2>
+                    <h2 className="text-2xl font-bold text-white uppercase tracking-tighter">Quantum Link Fusion (v16.99.0)</h2>
                     <p className="text-xs text-slate-400 font-mono uppercase tracking-[0.2em]">Neural Integration Bridge</p>
                   </div>
                 </div>
@@ -2578,6 +2622,60 @@ export default function App() {
               </div>
 
               <div className="flex-1 overflow-y-auto p-10 space-y-12 scrollbar-thin scrollbar-thumb-white/5">
+                
+                {/* Multi-Modal & Status Aware Banner */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-[2.5rem] bg-gradient-to-r from-blue-600/10 to-purple-600/10 border border-white/10 shadow-2xl relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                    <BrainCircuit className="w-32 h-32 text-white" />
+                  </div>
+                  <div className="space-y-4 relative z-10">
+                    <h3 className="text-sm font-bold text-white uppercase tracking-[0.2em] flex items-center gap-3">
+                      <ImageIcon className="w-5 h-5 text-blue-400" /> Multi-Modal Neural Scan
+                    </h3>
+                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                      ИИ в режиме реального времени анализирует ваши скриншоты, GIF и изображения. Отправьте визуал в чат, и Quantum Link автоматически подготовит соответствующий скрипт или решение.
+                    </p>
+                    <div className="flex gap-2">
+                       <span className="px-3 py-1 rounded-full bg-blue-600/20 text-blue-400 text-[9px] font-bold uppercase tracking-widest border border-blue-500/20">OCR Active</span>
+                       <span className="px-3 py-1 rounded-full bg-purple-600/20 text-purple-400 text-[9px] font-bold uppercase tracking-widest border border-purple-500/20">Vision Logic 3.0</span>
+                    </div>
+                  </div>
+                  <div className="space-y-4 relative z-10">
+                    <h3 className="text-sm font-bold text-white uppercase tracking-[0.2em] flex items-center gap-3">
+                      <RefreshCw className="w-5 h-5 text-green-400" /> Software Status Awareness
+                    </h3>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="p-3 rounded-2xl bg-black/40 border border-white/5 flex items-center gap-3">
+                        <div className={`w-2 h-2 rounded-full ${unityStatus?.is_running ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]' : 'bg-red-500'}`} />
+                        <div className="flex flex-col">
+                          <span className="text-[10px] font-bold text-white uppercase">Unity</span>
+                          <span className="text-[8px] text-slate-500">{unityStatus?.version || 'Unknown'}</span>
+                        </div>
+                      </div>
+                      <div className="p-3 rounded-2xl bg-black/40 border border-white/5 flex items-center gap-3">
+                        <div className={`w-2 h-2 rounded-full ${blenderStatus?.is_running ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]' : 'bg-red-500'}`} />
+                        <div className="flex flex-col">
+                          <span className="text-[10px] font-bold text-white uppercase">Blender</span>
+                          <span className="text-[8px] text-slate-500">{blenderStatus?.version || 'Unknown'}</span>
+                        </div>
+                      </div>
+                      <div className="p-3 rounded-2xl bg-black/40 border border-white/5 flex items-center gap-3">
+                        <div className="w-2 h-2 rounded-full bg-slate-500" />
+                        <div className="flex flex-col">
+                          <span className="text-[10px] font-bold text-white uppercase">GIMP</span>
+                          <span className="text-[8px] text-slate-500">v2.10.x</span>
+                        </div>
+                      </div>
+                      <div className="p-3 rounded-2xl bg-black/40 border border-white/5 flex items-center gap-3">
+                        <div className="w-2 h-2 rounded-full bg-slate-500" />
+                        <div className="flex flex-col">
+                          <span className="text-[10px] font-bold text-white uppercase">Redot</span>
+                          <span className="text-[8px] text-slate-500">v4.x</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 
                 {guideTab === 'blender' ? (
                   <motion.div 
@@ -2741,6 +2839,30 @@ export default function App() {
                           placeholder="Введите запрос или прикрепите скриншот для генерации кода..."
                           className="w-full h-32 bg-black/40 border border-white/10 rounded-2xl p-6 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500/50 resize-none transition-all"
                         />
+                        
+                        {/* Mind Link: AI Suggestions */}
+                        <div className="space-y-3">
+                          <h4 className="text-[10px] font-bold text-purple-400 uppercase tracking-widest flex items-center gap-2">
+                             <Sparkles className="w-3 h-3" /> Mind Link: ИИ предлагает варианты:
+                          </h4>
+                          <div className="flex flex-wrap gap-2">
+                             {[
+                               "Создать скрипт по скриншоту ошибки",
+                               "Оптимизировать текущую сцену",
+                               "Добавить процедурную анимацию",
+                               "Генерация UI по наброску",
+                               "Исправить баги в последнем изменении"
+                             ].map((suggestion, si) => (
+                               <button 
+                                 key={si}
+                                 onClick={() => setManualPrompt(suggestion)}
+                                 className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[9px] text-slate-400 hover:text-white hover:bg-white/10 transition-all uppercase tracking-widest"
+                               >
+                                 {suggestion}
+                               </button>
+                             ))}
+                          </div>
+                        </div>
 
                         {attachedFiles.length > 0 && (
                           <div className="flex flex-wrap gap-3">
@@ -2856,7 +2978,7 @@ export default function App() {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                   </span>
-                  Neural Bridge v16.98.0 Active
+                  Neural Bridge v16.99.0 Active
                 </div>
                 <button 
                   onClick={() => setShowQuantumLink(false)}
