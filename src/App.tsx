@@ -139,7 +139,6 @@ export default function App() {
   const [redotStatus, setRedotStatus] = useState<RedotStatus | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [blenderPresets, setBlenderPresets] = useState<BlenderPreset[]>([]);
-  const [isRepairing, setIsRepairing] = useState(false);
   const [isClearingChat, setIsClearingChat] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -836,37 +835,6 @@ export default function App() {
       setIsFetchingMigration(false);
     }
   };
-  const handleRepair = async () => {
-    if (isRepairing) return;
-    setIsRepairing(true);
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
-
-      const res = await fetch('/api/system/repair', { 
-        method: 'POST',
-        signal: controller.signal
-      });
-      clearTimeout(timeoutId);
-      
-      const data = await res.json();
-      if (data.success) {
-        showNotification(data.message, "success");
-        setTimeout(() => window.location.reload(), 1500);
-      } else {
-        showNotification("Ошибка: " + (data.error || "Неизвестная ошибка"), "error");
-      }
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
-        showNotification("Процесс занимает много времени, он продолжится в фоне. Перезагрузите страницу через минуту.", "info");
-      } else {
-        showNotification("Ошибка при восстановлении системы.", "error");
-      }
-    } finally {
-      setIsRepairing(false);
-    }
-  };
-
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -1129,27 +1097,6 @@ export default function App() {
               </div>
             </div>
           </div>
-
-          {/* System Repair Button */}
-          <button 
-            onClick={handleRepair}
-            disabled={isRepairing}
-            className={`w-full p-4 rounded-2xl border transition-all group text-left ${
-              isRepairing 
-              ? 'bg-red-600/20 border-red-500/50 cursor-wait' 
-              : 'bg-red-600/10 border-red-500/20 hover:bg-red-600/20 hover:border-red-500/40'
-            }`}
-          >
-            <div className="flex items-center gap-3 mb-1">
-              <div className={`p-2 bg-black/40 rounded-lg group-hover:text-red-400 transition-colors ${isRepairing ? 'animate-spin' : ''}`}>
-                <RefreshCw className="w-4 h-4" />
-              </div>
-              <span className="text-[11px] font-bold text-white uppercase">
-                {isRepairing ? 'Очистка...' : 'Самоочистка'}
-              </span>
-            </div>
-            <p className="text-[9px] text-slate-500 leading-relaxed">Исправить ошибки и восстановить целостность системы.</p>
-          </button>
 
           {/* About AI Button */}
           <button 
