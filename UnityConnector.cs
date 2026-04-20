@@ -24,7 +24,7 @@ namespace AI_Assistant_Quantum
 
         private void OnGUI()
         {
-            GUILayout.Label("v17.0.0 - Eternal Origin: Zenith Knowledge Expansion", EditorStyles.boldLabel);
+            GUILayout.Label("v17.2.0 - Eternal Origin: Systems & Multiplayer Expansion", EditorStyles.boldLabel);
             
             serverUrl = EditorGUILayout.TextField("Server URL", serverUrl);
             mode = (Mode)EditorGUILayout.EnumPopup("Mode", mode);

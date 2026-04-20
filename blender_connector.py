@@ -1,6 +1,6 @@
 bl_info = {
     "name": "AI Assistant Link",
-    "author": "Eternal Origin - Quantum Singularity v17.0.0 (Zenith Expansion)",
+    "author": "Eternal Origin - Quantum Singularity v17.2.0 (Systems Expansion)",
     "version": (1, 0, 0),
     "blender": (2, 80, 0),
     "location": "View3D > N-Panel > AI Assistant",

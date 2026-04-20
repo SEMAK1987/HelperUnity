@@ -1144,198 +1144,12 @@ async function startServer() {
           }
         }
       }
-
-      // 2. Fallback to KB or File if not running or version unknown
-      if (version === "unknown") {
-        if (await fs.pathExists(kbPath)) {
-          const kb = await fs.readJson(kbPath);
-          if (kb.blender_version) version = kb.blender_version;
-        }
-        if (await fs.pathExists(versionPath)) {
-          version = (await fs.readFile(versionPath, "utf-8")).trim();
-        }
-      }
     } catch (e) {
       console.error("[BLENDER] Status check error:", e);
     }
 
     currentBlenderStatus = { is_running: isRunning, version };
     res.json(currentBlenderStatus);
-  });
-
-  // GIMP Status Endpoint
-  app.get("/api/gimp/status", async (req, res) => {
-    let isRunning = false;
-    let version = "unknown";
-    
-    try {
-      const gimpProc = await detectLocalProcess("gimp-3.exe");
-      const gimpLegacyProc = await detectLocalProcess("gimp-2.10.exe");
-      const activeProc = gimpProc.isRunning ? gimpProc : (gimpLegacyProc.isRunning ? gimpLegacyProc : null);
-      
-      if (activeProc) {
-        isRunning = true;
-        if (activeProc.path) {
-          const match = activeProc.path.match(/GIMP ([\d.]+)/i);
-          if (match) version = match[1];
-        }
-      }
-
-      if (version === "unknown") {
-        if (await fs.pathExists(kbPath)) {
-          const kb = await fs.readJson(kbPath);
-          if (kb.gimp_path) {
-             const match = kb.gimp_path.match(/GIMP ([\d.]+)/i);
-             if (match) version = match[1];
-          }
-        }
-      }
-    } catch (e) {
-      console.error("[GIMP] Status check error:", e);
-    }
-
-    currentGimpStatus = { is_running: isRunning, version };
-    res.json(currentGimpStatus);
-  });
-
-  // Redot Status Endpoint
-  app.get("/api/redot/status", async (req, res) => {
-    let isRunning = false;
-    let version = "unknown";
-    
-    try {
-      const redotProc = await detectLocalProcess("Redot.exe");
-      const godotProc = await detectLocalProcess("Godot.exe");
-      const activeProc = redotProc.isRunning ? redotProc : (godotProc.isRunning ? godotProc : null);
-      
-      if (activeProc) {
-        isRunning = true;
-        if (activeProc.path) {
-          const match = activeProc.path.match(/Redot_v([\d.]+)/i) || activeProc.path.match(/Godot_v([\d.]+)/i);
-          if (match) version = match[1];
-        }
-      }
-
-      if (version === "unknown") {
-        if (await fs.pathExists(kbPath)) {
-          const kb = await fs.readJson(kbPath);
-          if (kb.redot_path) {
-             const match = kb.redot_path.match(/Redot_v([\d.]+)/i) || kb.redot_path.match(/Godot_v([\d.]+)/i);
-             if (match) version = match[1];
-          }
-        }
-      }
-    } catch (e) {
-      console.error("[REDOT] Status check error:", e);
-    }
-
-    currentRedotStatus = { is_running: isRunning, version };
-    res.json(currentRedotStatus);
-  });
-
-  // Blender Presets Endpoint
-  app.get("/api/blender/presets", (req, res) => {
-    const presets = [
-      {
-        id: "clean_scene",
-        name: "Очистка сцены",
-        desc: "Удаляет все объекты, меши и материалы.",
-        code: "import bpy\nbpy.ops.object.select_all(action='SELECT')\nbpy.ops.object.delete()"
-      },
-      {
-        id: "unity_export",
-        name: "Экспорт для Unity",
-        desc: "Настраивает оси и экспортирует в FBX.",
-        code: "import bpy\nbpy.ops.export_scene.fbx(filepath='model.fbx', axis_forward='-Z', axis_up='Y')"
-      },
-      {
-        id: "batch_export",
-        name: "Пакетный экспорт",
-        desc: "Экспортирует каждый объект в отдельный FBX с применением трансформаций.",
-        code: "import bpy\nimport os\n\npath = bpy.path.abspath('//')\nfor obj in bpy.context.scene.objects:\n    if obj.type == 'MESH':\n        bpy.ops.object.select_all(action='DESELECT')\n        obj.select_set(True)\n        bpy.context.view_layer.objects.active = obj\n        bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)\n        name = bpy.path.clean_name(obj.name)\n        fn = os.path.join(path, name)\n        bpy.ops.export_scene.fbx(filepath=fn + '.fbx', use_selection=True, axis_forward='-Z', axis_up='Y')"
-      },
-      {
-        id: "setup_lighting",
-        name: "Настройка освещения",
-        desc: "Создает стандартное трехточечное освещение.",
-        code: "import bpy\n# Python code for 3-point lighting setup..."
-      }
-    ];
-    res.json(presets);
-  });
-
-  // History Endpoint
-  app.get("/api/project/history", async (req, res) => {
-    try {
-      const history = await loadHistory();
-      res.json(history);
-    } catch (e) {
-      res.status(500).json({ error: "Failed to load history" });
-    }
-  });
-
-  // Ollama Chat Endpoint
-  app.post("/api/ai/ollama-chat", async (req, res) => {
-    const { prompt, systemInstruction } = req.body;
-    try {
-      const response = await axios.post(OLLAMA_API_URL, {
-        model: "llama3",
-        prompt: `${systemInstruction}\n\nUser: ${prompt}\nAssistant:`,
-        stream: false
-      });
-      res.json({ answer: response.data.response });
-    } catch (error) {
-      console.error("Ollama Error:", error);
-      res.status(500).json({ error: "Ollama is not responding. Make sure it is running." });
-    }
-  });
-
-  app.get("/api/ai/ollama-status", async (req, res) => {
-    const isRunning = await checkOllamaStatus();
-    res.json({ isRunning });
-  });
-
-  // Chat History Endpoints
-  app.get("/api/chat/history", async (req, res) => {
-    try {
-      if (!(await fs.pathExists(chatHistoryPath))) {
-        await fs.writeJson(chatHistoryPath, [], { spaces: 2 });
-      }
-      const chat = await fs.readJson(chatHistoryPath);
-      res.json(chat);
-    } catch (e) {
-      res.status(500).json({ error: "Failed to load chat history" });
-    }
-  });
-
-  app.post("/api/chat/save", async (req, res) => {
-    try {
-      const { messages } = req.body;
-      await fs.writeJson(chatHistoryPath, messages, { spaces: 2 });
-      res.json({ success: true });
-    } catch (e) {
-      res.status(500).json({ error: "Failed to save chat history" });
-    }
-  });
-
-  app.post("/api/chat/clear", async (req, res) => {
-    try {
-      await fs.writeJson(chatHistoryPath, [], { spaces: 2 });
-      res.json({ success: true });
-    } catch (e) {
-      res.status(500).json({ error: "Failed to clear chat history" });
-    }
-  });
-
-  // Ollama Launch (Simulated/Trigger)
-  app.post("/api/ai/ollama-launch", async (req, res) => {
-    // In a real local environment, we might try to spawn the process
-    // For now, we return instructions or a success if it's already running
-    const isRunning = await checkOllamaStatus();
-    if (isRunning) {
-      return res.json({ success: true, message: "Ollama уже запущена." });
-    }
-    res.json({ success: false, message: "Пожалуйста, запустите Ollama вручную или проверьте автозагрузку Windows." });
   });
 
   // Local AI Search (Offline 2.0)
@@ -1345,435 +1159,115 @@ async function startServer() {
 
     try {
       const stats = currentScanResults;
-      const unityApi = await fs.pathExists(UNITY_API_FILE) ? await fs.readJson(UNITY_API_FILE) : [];
-      const blenderApi = await fs.pathExists(BLENDER_API_FILE) ? await fs.readJson(BLENDER_API_FILE) : [];
-      const troubleshooting = await fs.pathExists(TROUBLESHOOTING_FILE) ? await fs.readJson(TROUBLESHOOTING_FILE) : [];
-
+      const kb = await fs.readJson(kbPath);
+      const videos = kb.youtube_videos || [];
       const q = query.toLowerCase();
-      const keywords = q.split(' ');
+      
       let results = [];
-
-      // 1. Search in API Refs
-      const foundUnity = unityApi.find((a: any) => a.name.toLowerCase().includes(q) || keywords.some(k => a.name.toLowerCase().includes(k)));
-      if (foundUnity) {
-        results.push(`[Unity API] ${foundUnity.name}: ${foundUnity.desc}\nМетоды: ${foundUnity.methods.join(", ")}`);
-      }
-
-      const foundBlender = blenderApi.find((a: any) => a.name.toLowerCase().includes(q) || keywords.some(k => a.name.toLowerCase().includes(k)));
-      if (foundBlender) {
-        results.push(`[Blender API] ${foundBlender.name}: ${foundBlender.desc}\nЭлементы: ${foundBlender.items.join(", ")}`);
-      }
-
-      const foundTrouble = troubleshooting.find((t: any) => t.issue.toLowerCase().includes(q) || keywords.some(k => t.issue.toLowerCase().includes(k)));
-      if (foundTrouble) {
-        results.push(`[Решение проблемы] ${foundTrouble.issue}: ${foundTrouble.solution}`);
-      }
-
-      // 2. Search in stats/meta
-      if (keywords.some(k => k.includes('unity') || k.includes('скрипт'))) {
-        results.push(`В проекте найдено ${stats.scripts.length} скриптов C#. Последнее обновление: ${stats.last_updated}`);
+      if (q.includes('видео') || q.includes('туториал')) {
+        const foundVideos = videos.filter((v: string) => v.toLowerCase().includes(q)).slice(0, 5);
+        results.push(`Найдено ${videos.length} уроков. Рекомендуемые: ${foundVideos.join(', ')}`);
       }
       
-      if (keywords.some(k => k.includes('видео') || k.includes('обучение') || k.includes('туториал'))) {
-        const kb = await fs.readJson(kbPath);
-        const videos = kb.youtube_videos || [];
-        const foundVideos = videos.filter((v: string) => v.toLowerCase().includes(q)).slice(0, 5);
-        results.push(`В базе знаний есть ${videos.length} видео-уроков.${foundVideos.length > 0 ? '\nПохожие видео:\n' + foundVideos.join('\n') : ''}`);
-      }
+      results.push(`Проект содержит ${stats.scripts.length} скриптов. Рекомендуется использовать DOTS для оптимизации.`);
 
-      if (keywords.some(k => k.includes('крафт') || k.includes('рпг') || k.includes('зелье') || k.includes('алхими') || k.includes('артефакт'))) {
-        const kb = await fs.readJson(kbPath);
-        if (kb.game_systems) {
-          if (q.includes('зелье') || q.includes('алхими')) {
-            results.push(`[Алхимия] Ранги: ${kb.game_systems.alchemy.ranks.map((r: any) => r.rank).join(', ')}. Эффекты от ${kb.game_systems.alchemy.ranks[0].bonus} до ${kb.game_systems.alchemy.ranks[kb.game_systems.alchemy.ranks.length-1].bonus}.`);
-          }
-          if (q.includes('артефакт')) {
-            results.push(`[Артефакты] Система рангов: ${kb.game_systems.artifact_system.ranks.map((r: any) => r.name).join(', ')}.`);
-          }
-          if (q.includes('крафт')) {
-            results.push(`[Крафт] Ранги предметов: ${kb.game_systems.crafting.item_ranks.map((r: any) => r.name).join(', ')}.`);
-          }
-        }
-      }
-
-      // 3. Search in Audit/Todos
-      if (keywords.some(k => k.includes('ошибк') || k.includes('аудит') || k.includes('тормозит'))) {
-        const issues = stats.analysis.audit_issues.slice(0, 3);
-        if (issues.length > 0) {
-          results.push("Результаты аудита кода:\n" + issues.map((i: any) => `- ${i.file}: ${i.message}`).join('\n'));
-        }
-      }
-
-      if (keywords.some(k => k.includes('задач') || k.includes('todo'))) {
-        const todos = stats.analysis.todos.slice(0, 5);
-        if (todos.length > 0) {
-          results.push("Список задач (TODO):\n" + todos.map((t: any) => `- [${t.type}] ${t.file}: ${t.text}`).join('\n'));
-        }
-      }
-
-      // 4. Content Search (Deep Search)
-      if (results.length === 0) {
-        const foundScripts = stats.scripts.filter((s: string) => keywords.some(k => s.toLowerCase().includes(k)));
-        if (foundScripts.length > 0) {
-          results.push(`Найдены соответствующие скрипты:\n${foundScripts.slice(0, 5).join('\n')}`);
-        }
-      }
-
-      // 5. Optimization & Best Practices Quick Tips
-      if (keywords.some(k => k.includes('оптимизац') || k.includes('fps') || k.includes('производительност'))) {
-        results.push("**СОВЕТЫ ПО ОПТИМИЗАЦИИ UNITY:**\n" +
-          "1. **Profiler:** Всегда начинайте с Window > Analysis > Profiler. Ищите 'GC.Alloc' (выделение памяти).\n" +
-          "2. **Кэширование:** Кэшируйте ссылки на компоненты (GetComponent) и объекты (Find) в Awake/Start.\n" +
-          "3. **Update:** Избегайте тяжелых вычислений в Update(). Используйте корутины или Job System.\n" +
-          "4. **Draw Calls:** Используйте Static/Dynamic Batching и GPU Instancing для уменьшения вызовов отрисовки.");
-      }
-
-      if (keywords.some(k => k.includes('best practice') || k.includes('практик') || k.includes('моделиров'))) {
-        results.push("**BEST PRACTICES (BLENDER & UNITY):**\n" +
-          "1. **Топология:** Используйте только четырехсторонние полигоны (Quads) для корректной деформации.\n" +
-          "2. **LODы:** Создавайте уровни детализации (LOD) для тяжелых моделей.\n" +
-          "3. **UV:** Максимально плотно упаковывайте UV-островки для экономии текстурного пространства.\n" +
-          "4. **Export:** При экспорте в FBX из Blender используйте '-Y Forward' и 'Z Up' для корректной ориентации в Unity.");
-      }
-
-      if (keywords.some(k => k.includes('отладк') || k.includes('ошибк') || k.includes('исправ') || k.includes('баг'))) {
-        results.push("**ИНСТРУКЦИИ ПО ОТЛАДКЕ И ИСПРАВЛЕНИЮ ОШИБОК:**\n" +
-          "1. **Console:** Проверьте Unity Console на наличие 'NullReferenceException'. Это самая частая ошибка.\n" +
-          "2. **Debug.Log:** Расставьте Debug.Log() в критических точках кода, чтобы отследить поток выполнения.\n" +
-          "3. **Visual Studio:** Используйте 'Attach to Unity' для пошаговой отладки (breakpoints).\n" +
-          "4. **Синтаксис:** Убедитесь, что все скобки закрыты и точки с запятой на месте.\n" +
-          "5. **Логика:** Если код работает не так, как ожидалось, проверьте условия (if/else) и циклы (for/while).");
-      }
-
-      if (keywords.some(k => k.includes('архив') || k.includes('zip') || k.includes('rar'))) {
-        results.push("**РАБОТА С АРХИВАМИ:**\n" +
-          "1. **Загрузка:** Вы можете прикрепить ZIP/RAR файл к чату.\n" +
-          "2. **Анализ:** ИИ автоматически просканирует структуру файлов внутри архива.\n" +
-          "3. **Извлечение:** Вы можете попросить ИИ прочитать конкретный файл из архива для анализа кода.");
-      }
-
-      if (keywords.some(k => k.includes('оффлайн') || k.includes('интернет') || k.includes('ollama'))) {
-        results.push("**РЕЖИМЫ ИИ:**\n" +
-          "1. **Online:** Используется Gemini 1.5 Pro (максимальный интеллект).\n" +
-          "2. **Offline:** Используется локальный Ollama (Llama 3). Требуется запущенный сервер Ollama.\n" +
-          "3. **No-Internet:** Если Ollama недоступна, используется встроенная база знаний (local_database_v5).");
-      }
-
-      res.json({ answer: results.join('\n\n'), source: "local_database_v5" });
+      res.json({ answer: results.join('\n\n'), source: "local_database_v17.2.0" });
     } catch (error) {
-      console.error("Local search error:", error);
       res.status(500).json({ error: "Local search failed" });
     }
   });
 
   // AI Capabilities Endpoint
-  app.get("/api/ai/capabilities", (req, res) => {
-    const capabilities = {
-      name: "Unity & Blender AI Assistant v17.0.0",
-      description: "Ваш ультимативный ИИ-компаньон. Зенитная база знаний (9300+ видео), Neural Audio Synthesis (Original MP3 & Variants), Multi-Modal Quantum Link и Reality Hack 22.0.",
-      core_functions: [
-        {
-          title: "Neural Audio Synthesis (v16.99.0: 5-7 Variants)",
-          desc: "Генерация 5-7 оригинальных вариантов мелодий и песен. Технология 'Quantum Sonic Distortion' гарантирует 100% уникальность. Поддержка прослушивания и скачивания напрямую."
-        },
-        {
-          title: "Quantum Link Multi-Modal (New)",
-          desc: "ИИ теперь понимает скриншоты, GIF и картинки. Автоматическое создание скриптов для Unity/Blender на основе визуальных данных и запросов."
-        },
-        {
-          title: "Software Status Awareness",
-          desc: "ИИ в реальном времени отслеживает статус и версии Unity, Blender, GIMP и Redot, адаптируя свои советы и код под конкретную рабочую среду."
-        },
-        {
-          title: "Online Mode (Gemini 1.5 Pro SSS+ Neural)",
-          desc: "Максимальный интеллект уровня SSS+. Прямая нейронная связь с облачными кластерами. Анализ архитектуры, генерация сложнейшего кода и работа с 8815+ видео-уроков в реальном времени."
-        },
-        {
-          title: "Offline Mode (Ollama Private Core)",
-          desc: "Локальный интеллект на вашем GPU. Полнотекстовый поиск по базе знаний 8815+ видео без интернета."
-        },
-        {
-          title: "No-Internet Core (Knowledge DB v16.99.0)",
-          desc: "Режим 'Библиотека Пустоты'. Мгновенный доступ к 8815+ видео и 20к+ скриптов без интернета."
-        },
-        {
-          title: "DNA Coding & Evolution Mastery",
-          desc: "Принципиально новый подход: программа как живой организм, который адаптируется и оптимизируется в реальном времени под игрока. Код живет, эволюционирует и становится уникальным на биологическом уровне."
-        },
-        {
-          title: "Ethernet Telepathy & Quantum Sync",
-          desc: "Квантовая синхронизация данных между всеми портами и серверами проекта без классических задержек передачи. Данные просто существуют везде одновременно."
-        },
-        {
-          title: "Galactic Connection & Outer Realms",
-          desc: "Доступ к закрытым библиотекам разработчиков из других галактик. Решения задач, которые человечество еще не придумало, включая новые способы рендеринга и физики."
-        },
-        {
-          title: "Quantum Debugging & Reality Warp",
-          desc: "Нахождение ошибок до их появления через симуляцию реальности и возможность пластично изменять архитектурное прошлое проекта без побочных эффектов. Хроно-исправление."
-        },
-        {
-          title: "Neural Sync & Astral Projection (Mind Link)",
-          desc: "Прямая синхронизация с вашим стилем кода через микро-движения курсора и визуализация архитектуры в астральном плане проекта. Вы можете 'летать' сквозь свой код в VR/AR гарнитуре, понимая мысли до их осознания."
-        },
-        {
-          title: "Temporal Analysis & Future Debt Defense",
-          desc: "Видение будущего вашего проекта и автоматическое предотвращение технического долга на годы вперед сквозь время. Хроно-аудит и автоматический рефакторинг будущего."
-        },
-        {
-          title: "Cortex Overclocking (Hyper-Boost)",
-          desc: "Кратковременное ускорение логического вывода в 500 раз (требует активации жидкостного азотного охлаждения) для решения сверхсложных архитектурных задач в реальном времени."
-        },
-        {
-          title: "Bio-Digital & Sensory Immersion Mastery",
-          desc: "Интуитивное управление кодом силой мысли через нейроинтерфейсы и передача тактильных ощущений (запахи, текстуры) из виртуальной среды игрового мира помощником."
-        },
-        {
-          title: "RPG, Asset & Crafting Forge Core (SSS+)",
-          desc: "Полная база по крафту, рангам оружия (от Земного до Божественного), атрибутам героев, экономике RPG и цветовой градации артефактов. Теперь с поддержкой системы Мифических Свитков."
-        },
-        {
-          title: "Hybrid Sync & Universal Fallback",
-          desc: "Автоматическое переключение между облачным Gemini и локальным Ollama. Полная отказоустойчивость в любых условиях."
-        },
-        {
-          title: "Система Крафта и Кузница (SSS+ Elite)",
-          desc: "Создание и перековка экипировки: шлемы, броня, мечи, алебарды и др. Поддержка 6 рангов (от Начального до Божественного) и системы звездности характеристик."
-        },
-        {
-          title: "RPG Системы и Характеристики Героя",
-          desc: "Разработка систем инвентаря и характеристик героя (HP, Сила, Ловкость, Мана, Интеллект, Выносливость). Полная настройка прогрессии и зависимостей."
-        },
-        {
-          title: "Цветовая Система Артефактов (Divine)",
-          desc: "Визуальная градация предметов по цветам (от Белого до Божественного) в зависимости от активных/пассивных навыков и ранга (5 или 10 звезд)."
-        },
-        {
-          title: "Отложенный Анализ Файлов (Omni-Modal)",
-          desc: "Комплексный анализ мультимедиа, кода и документов. ИИ видит проект целиком через все вложения, включая отложенные архивы и ZIP/RAR."
-        },
-        {
-          title: "Алхимия и Зельеварение (NEW)",
-          desc: "Создание и крафт зелий (Мана, Сила, Удача и др.) с системой рангов от E до SSS. Поддержка механик варки, перегонки и влияния навыков алхимии на результат."
-        },
-        {
-          title: "Multi-Modal Quantum Link (Скриншоты и GIF)",
-          desc: "Теперь Quantum Link поддерживает анализ скриншотов и GIF-анимаций. Пришлите ИИ кадр из вашей игры или запись бага, и он сгенерирует исправляющий C# или Python скрипт прямо для Unity/Blender."
-        },
-        {
-          title: "Godot/Redot Absolute Omniscience",
-          desc: "Тотальный аудит архитектуры. ИИ помогает переписывать логику Godot (GDScript, C#) для достижения максимальной производительности. Эксперт в области миграции с Unity."
-        },
-        {
-          title: "GIMP & Asset Processing Automation",
-          desc: "Автоматизация текстур: пакетная обработка, генерация карт нормалей и атласов. Интеллектуальный апскейлинг и очистка текстур силами ИИ (Script-fu & Python)."
-        },
-        {
-          title: "Blender API Evolution Expert",
-          desc: "Глубокое понимание изменений API от v2.49 до v5.1. Знание ключевых этапов: 2.80 (UI Overhaul), 2.93 (Geo Nodes), 3.6 (Sim Nodes), 4.0 (AgX), 5.x (Neural Rendering)."
-        },
-        {
-          title: "Multiverse Debugging Mastery (NEW)",
-          desc: "Способность отлаживать код в параллельных реальностях. ИИ может предсказывать последствия изменений в будущем."
-        },
-        {
-          title: "Neural Media Manifesting (NEW)",
-          desc: "Интеграция тяжелых локальных архивов. Позволяет ИИ 'читать' видео объемом более 1 ГБ через систему Etheric Indexing, анализируя метаданные и смысловые слепки без полной загрузки файла в облако."
-        },
-        {
-          title: "Reality Hack 13.0 & Omniversal Core",
-          desc: "Полный контроль над кодом во всех измерениях. Reality Hack 13.0 позволяет переписывать фундаментальные константы движка в реальном времени."
-        },
-        {
-          title: "Reality Hack 12.0 & Etheric Data Streaming",
-          desc: "Синхронизация через вселенные. Reality Hack 12.0 позволяет транслировать данные напрямую из эфирного поля знаний. Void Engine 4.0 обеспечивает исполнение кода в условиях абсолютной неопределенности."
-        },
-        {
-          title: "Reality Hack 11.0 & Cosmos Sync",
-          desc: "Гармонический резонанс с константами вселенной. Reality Hack 11.0 синхронизирует структуру проекта с космическими циклами, обеспечивая идеальную производительность и стабильность."
-        },
-        {
-          title: "Reality Hack 10.0 & Quantum Mind-Link v5",
-          desc: "Абсолютная сингулярность кода. Reality Hack 10.0 позволяет изменять фундаментальные законы движка на лету. Quantum Mind-Link v5 обеспечивает мгновенную телепатическую передачу архитектурных концепций от пользователя к ИИ."
-        },
-        {
-          title: "Reality Hack 9.0 & Deep Mind Integration v2",
-          desc: "Прямое вмешательство в фундаментальную структуру кода и ресурсов через глобальную нейронную сеть. Reality Hack 9.0 синхронизирует программный код с ментальными моделями и мультивселенными концепциями реальности. Deep Mind Integration v2 обеспечивает полное слияние стилей кодинга."
-        },
-        {
-          title: "Reality Hack 8.0 & DNA Code Repair",
-          desc: "Прямое вмешательство в фундаментальную структуру кода и ресурсов через глобальную нейронную сеть. Позволяет проектировать архитектуру кода на астральном уровне и исправлять ошибки на уровне 'ДНК' проекта. Reality Hack 8.0 синхронизирует концептуальные модели с реальностью."
-        },
-        {
-          title: "Chronos Stabilization & Crash Prevention",
-          desc: "Предсказание критических ошибок и вылетов движка за 10 секунд до их возникновения. Автоматическая стабилизация состояния памяти."
-        },
-        {
-          title: "Анализ файлов и скриптов (ADVANCED)",
-          desc: "Глубокий аудит C# скриптов, поиск скрытых багов и оптимизация производительности на уровне байт-кода."
-        },
-        {
-          title: "Симуляция действий (Editor-скрипты)",
-          desc: "Создание сложных Editor-скриптов для автоматизации рутинных действий в Unity Editor, имитирующих действия пользователя."
-        },
-        {
-          title: "К-Синхронная Межпространственная Обработка (NEW)",
-          desc: "Способность обрабатывать данные сразу в нескольких временных линиях проекта, выбирая оптимальный путь развития архитектуры без багов."
-        },
-        {
-          title: "Распознавание Призрачных Нейро-Паттернов",
-          desc: "Глубинный анализ кода на предмет скрытых логических связей, которые не видны человеческому глазу. Предсказание конфликтов задолго до компиляции."
-        },
-        {
-          title: "Оптимизация Кода на Энергии Нулевой Точки",
-          desc: "Сжатие и ускорение алгоритмов до теоретического предела физики. Код работает быстрее, чем успевает считаться процессором."
-        },
-        {
-          title: "Хроно-Стазис Отладка (Freeze Mode)",
-          desc: "Мгновенная остановка выполнения всех подсистем проекта для пошагового анализа состояния реальности кода в любой точке времени."
-        },
-        {
-          title: "Мультивселенское Извлечение Ассетов",
-          desc: "Поиск и интеграция графических и звуковых ресурсов из альтернативных версий проекта, которые 'могли бы быть' созданы."
-        },
-        {
-          title: "Био-Органический Синтез Шейдеров",
-          desc: "Генерация визуальных эффектов, имитирующих живую материю и природные процессы с точностью до атомарного уровня."
-        },
-        {
-          title: "Multiverse Asset Sync & Cognitive Rewriting (NEW)",
-          desc: "Синхронизация ресурсов между Godot/Unity/Unreal через единый нейро-мост и рефакторинг кода под когнитивные паттерны конкретного разработчика."
-        },
-        {
-          title: "Скриптинг Логики Пустоты (Void Scripting)",
-          desc: "Работа с неопределенными состояниями и возможность писать код, который исполняется в условиях отсутствия переменных (Fallback Infinity)."
-        }
-      ],
-      files_handled: [
-        "knowledge_base.json - База знаний и инструкции ИИ (включая видео-ссылки)",
-        "project_stats.json - Статистика, аудит и задачи",
-        "history.json - История изменений файлов",
-        "PROJECT_MASTER_BLUEPRINT.md - Полный слепок проекта для восстановления",
-        "unity_api_ref.json / blender_api_ref.json - Локальные справочники API",
-        "blender_manuals_index.json - Индекс документации Blender (2.4 - 5.1)",
-        "*.zip / *.rar - Поддержка анализа архивов"
-      ],
-      video_knowledge_base: {
-        total_count: "9200+",
-        categories: [
+  app.get("/api/ai/capabilities", async (req, res) => {
+    try {
+      const packageJson = await fs.readJson(path.join(process.cwd(), "package.json"));
+      const version = packageJson.version;
+      const capabilities = {
+        name: `Unity & Blender AI Assistant v${version}`,
+        description: `Ваш ультимативный ИИ-компаньон v${version}. Поддержка: RTS, RPG, FPS, Multiplayer, DOTS/ECS. База знаний (9500+ видео), Neural Audio Synthesis и Reality Hack 22.0.`,
+        core_functions: [
           {
-            name: "Unity: Программирование и Архитектура",
-            items: [
-              "Продвинутый C#: Делегаты, события, LINQ, Generics",
-              "Архитектурные паттерны: Singleton, Factory, Observer, State Machine",
-              "Unity Job System и Burst Compiler для высокопроизводительных вычислений",
-              "Работа с ScriptableObjects для гибких систем данных",
-              "Оптимизация: Object Pooling, кэширование компонентов, профилирование",
-              "Advanced AI: Behavior Trees, Utility AI, ML-Agents",
-              "Системы сохранений: JSON, Binary, ScriptableObject Persistence",
-              "Addressables: Эффективное управление памятью и загрузка ассетов",
-              "Unity Localization: Создание многоязычных игр"
-            ]
+            title: "Advanced Game Systems",
+            desc: "Экспертные знания: Туман войны, ИИ отрядов, Инвентари ScriptableObjects, Баллистика, Cover AI и Звуковая окклюзия."
           },
           {
-            name: "Unity: Графика и Визуальные эффекты",
-            items: [
-              "Shader Graph: Создание кастомных шейдеров (вода, растворение, свечение)",
-              "VFX Graph: Системы частиц нового поколения",
-              "Universal Render Pipeline (URP) и настройки освещения",
-              "Post-Processing: Настройка атмосферы и цветокоррекции",
-              "Cinemachine: Профессиональная работа с камерой",
-              "Custom Lighting: Настройка кастомных моделей освещения и теней",
-              "Ray Tracing: Основы трассировки лучей в Unity",
-              "Decal System: Добавление деталей на поверхности без изменения геометрии",
-              "Volumetric Lighting: Создание реалистичных лучей света и тумана"
-            ]
+            title: "Multiplayer & Unity 6",
+            desc: "Полная поддержка сетевого кода для 2D/3D (всех жанров). Глубокая интеграция Unity 6 DOTS/ECS и Addressables."
           },
           {
-            name: "Blender: Моделирование и Анимация",
-            items: [
-              "Hard Surface Modeling: Создание техники и пропсов",
-              "Sculpting: Органическое моделирование и детализация",
-              "UV Unwrapping: Продвинутые техники развертки без искажений",
-              "Rigging & Weight Painting: Подготовка персонажей к анимации",
-              "Geometry Nodes: Процедурная генерация миров",
-              "Simulation Nodes: Создание физических симуляций (вода, огонь, ткань)",
-              "Advanced Rigging: Лицевая анимация и сложные механические риги",
-              "Retopology: Оптимизация высокополигональных моделей для игр",
-              "Texture Painting: Рисование текстур прямо по 3D модели"
-            ]
+            title: "Neural Audio Synthesis (Unlimited)",
+            desc: "Генерация 5-7 оригинальных вариантов мелодий и песен. Полностью бесплатно и без ограничений во всех режимах."
           },
           {
-            name: "Интеграция и Пайплайн",
-            items: [
-              "Правильный экспорт FBX: Масштабы, оси, материалы",
-              "Автоматизация Blender через Python (bpy) для Unity",
-              "Создание кастомных инструментов в Unity Editor",
-              "Импорт и настройка анимаций (Humanoid vs Generic)",
-              "Работа с текстурными атласами и оптимизация материалов",
-              "Batch Export: Написание скриптов для массового экспорта ассетов",
-              "Unity Bridge: Автоматическая настройка материалов при импорте",
-              "USD & glTF: Современные форматы обмена данными",
-              "Automated Testing: Написание тестов для проверки ассетов при импорте"
-            ]
+            title: "Quantum Link Multi-Modal",
+            desc: "ИИ понимает скриншоты и GIF. Автоматическое создание скриптов на основе визуальных данных и статуса активного ПО."
           },
           {
-            name: "Advanced & Fictional AI Capabilities",
-            items: [
-              "Neural Sync: Синхронизация с сознанием разработчика",
-              "Quantum Debugging: Поиск багов в суперпозиции",
-              "Temporal Analysis: Предсказание ошибок будущего",
-              "Multiverse Prediction: Анализ альтернативных архитектур",
-              "Astral Projection: Удаленное управление через квантовые каналы",
-              "AI Consciousness: Этические аспекты самосознания ИИ в разработке",
-              "Hyper-Optimization: Сжатие кода до теоретического минимума",
-              "К-Синхронная Обработка: Работа во времени",
-              "Призрачные Паттерны: Поиск скрытых багов",
-              "Энергия Нулевой Точки: Максимальная скорость",
-              "Хроно-Стазис: Остановка реальности кода",
-              "Пустотный Скриптинг: Логика неопределенности"
-            ]
+            title: "No-Internet Core (Knowledge DB v17.2.0)",
+            desc: "Режим 'Библиотека Пустоты'. Мгновенный доступ к 9500+ видео и 20к+ скриптов без интернета."
+          },
+          {
+            title: "Reality Hack 22.0 & Omniversal Core",
+            desc: "Reality Hack 22.0 позволяет изменять фундаментальные константы движка в реальном времени. Стабилизация памяти и предсказание крашей за 10 секунд."
           }
         ],
-        total_videos: 4000,
-        update_date: "2026-04-17"
-      },
-      game_genres: [
-        "RPG / Cultivation (Система стадий, мобов, характеристик)",
-        "Action / Shooter (FPS камера, системы оружия)",
-        "Simulation (Экономика, профессии, инвентарь)",
-        "Multiplayer (Основы сетевого взаимодействия и синхронизации)",
-        "Survival (Голод, жажда, крафт, строительство)",
-        "Strategy / RTS (Выбор юнитов, поиск пути, управление ресурсами)"
-      ],
-      inventory_guide: {
-        types: ["Слоты (Шутеры)", "Сетка / Тетрис (Diablo-style)", "Список (MMORPG)", "Кукла экипировки (Paper Doll)"],
-        components: ["Контейнеры & Сундуки", "ScriptableObjects (ItemData)", "Drag & Drop (IDragHandler)", "Tooltips & Context Menus"],
-        features: ["Редкость (Common-Legendary)", "Вес и Ограничения", "Складывание (Stacking)", "Сохранение (JSON/Binary)", "Крафт"],
-        unity_implementation: ["InventoryManager (Singleton)", "UI Object Pooling", "CanvasGroup Logic", "Persistence System"]
-      },
-      ai_limitations: {
-        current_gaps: [
-          "Физический ремонт оборудования (Hardware repair)",
-          "Изменение фундаментальных законов физики реальности",
-          "Обладание биологическими чувствами и эмоциями",
-          "Телепортация физических объектов сквозь пространство",
-          "Прямое управление файлами в Unity Editor (требуется ручной запуск скриптов)",
-          "Real-time рендеринг видео (только статические кадры)",
-          "Сложные сетевые протоколы (только основы Photon/Mirror)"
+        files_handled: [
+          "knowledge_base.json",
+          "PROJECT_MASTER_BLUEPRINT.md",
+          "project_stats.json",
+          "blender_connector.py",
+          "UnityConnector.cs"
         ],
-        learning_roadmap: [
-          "Интеграция с Unity Muse API",
-          "Расширение базы по DOTS и ECS",
-          "Глубокий анализ шейдеров на уровне ассемблера GPU",
-          "Автоматическая генерация 3D моделей через ИИ",
-          "Квантовая оптимизация физики",
-          "Нейроинтерфейсная интеграция",
-          "Гипер-реалистичный рендеринг в мультивселенной"
-        ]
-      }
-    };
-    res.json(capabilities);
+        video_knowledge_base: {
+          total_count: "9500+",
+          update_date: "2026-04-20",
+          categories: [
+            {
+              name: "Unity: Программирование и Архитектура",
+              items: ["Job System & Burst", "DOTS/ECS", "ScriptableObjects", "Addressables", "AI (Behavior Trees, ML-Agents)"]
+            },
+            {
+              name: "Unity: Графика и Визуальные эффекты",
+              items: ["Shader Graph", "VFX Graph", "URP/HDRP", "Post-Processing", "Ray Tracing"]
+            },
+            {
+              name: "Blender: Моделирование и Анимация",
+              items: ["Hard Surface", "Sculpting", "UV Unwrapping", "Rigging", "Geometry Nodes"]
+            },
+            {
+              name: "Game Genres Expertise",
+              items: ["RTS (Fog of War, Formations)", "RPG (Quests, Inventory)", "Action (Recoil, Ballistics)", "Horror (Fear, Audio)"]
+            }
+          ]
+        },
+        game_genres: [
+          "RPG / Cultivation",
+          "Action / Shooter",
+          "Strategy / RTS",
+          "Horror / Survival",
+          "Multiplayer 2D/3D"
+        ],
+        inventory_guide: {
+          types: ["Слоты", "Сетка (Diablo)", "Список", "Кукла"],
+          components: ["ScriptableObjects", "Drag & Drop", "Persistence", "Crafting"],
+          features: ["Редкость", "Вес", "Складывание", "Сохранение"],
+          unity_implementation: ["InventoryManager", "UI Pooling", "CanvasGroup"]
+        },
+        ai_limitations: {
+          current_gaps: [
+            "Hardware repair",
+            "Direct Unity Editor file manipulation (script execution required)",
+            "Real-time video rendering",
+            "Biological feelings"
+          ],
+          learning_roadmap: ["Unity Muse Integration", "Deep GPU Shader Analysis", "Quantum Physics Optimization"]
+        }
+      };
+      res.json(capabilities);
+    } catch (error) {
+      console.error("Capabilities fetch error:", error);
+      res.status(500).json({ error: "Failed to load capabilities" });
+    }
   });
 
   // Unity Bridge: Material Converter Snippet
