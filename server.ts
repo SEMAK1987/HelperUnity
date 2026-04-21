@@ -1171,7 +1171,7 @@ async function startServer() {
       
       results.push(`Проект содержит ${stats.scripts.length} скриптов. Рекомендуется использовать DOTS для оптимизации.`);
 
-      res.json({ answer: results.join('\n\n'), source: "local_database_v17.2.0" });
+      res.json({ answer: results.join('\n\n'), source: "local_database_v17.5.0" });
     } catch (error) {
       res.status(500).json({ error: "Local search failed" });
     }
@@ -1184,31 +1184,31 @@ async function startServer() {
       const version = packageJson.version;
       const capabilities = {
         name: `Unity & Blender AI Assistant v${version}`,
-        description: `Ваш ультимативный ИИ-компаньон v${version}. Поддержка: RTS, RPG, FPS, Multiplayer, DOTS/ECS. База знаний (9500+ видео), Neural Audio Synthesis и Reality Hack 22.0.`,
+        description: `Ваш ультимативный ИИ-компаньон v${version}. Поддержка: RTS, RPG, FPS, Multiplayer и Cinematic VFX. Новые модули: Blender Character Factory, GIMP Asset Gen и Redot Scene Architect. Reality Hack 25.0.`,
         core_functions: [
           {
-            title: "Advanced Game Systems",
-            desc: "Экспертные знания: Туман войны, ИИ отрядов, Инвентари ScriptableObjects, Баллистика, Cover AI и Звуковая окклюзия."
+            title: "Universal Synthesis Mastery",
+            desc: "Продвинутое создание 2D/3D персонажей, мобов и игровых миров. Автосборка уровней в Redot через JSON и LP-HP Bridge в Blender."
           },
           {
-            title: "Multiplayer & Unity 6",
-            desc: "Полная поддержка сетевого кода для 2D/3D (всех жанров). Глубокая интеграция Unity 6 DOTS/ECS и Addressables."
+            title: "Asset Generation (GIMP & Blender)",
+            desc: "Tileset Creator для RTS/RPG, генератор портретов NPC и процедурная генерация 5-10 вариаций мобов."
           },
           {
-            title: "Neural Audio Synthesis (Unlimited)",
-            desc: "Генерация 5-7 оригинальных вариантов мелодий и песен. Полностью бесплатно и без ограничений во всех режимах."
+            title: "Neural Audio Synthesis Pro",
+            desc: "Разделение дорожек (Stems), SFX Layering, BPM Sync и Mood-to-Wave для идеальной игровой атмосферы."
           },
           {
-            title: "Quantum Link Multi-Modal",
-            desc: "ИИ понимает скриншоты и GIF. Автоматическое создание скриптов на основе визуальных данных и статуса активного ПО."
+            title: "Multi-Modal Link 2.0 (Elite)",
+            desc: "Мгновенное понимание контекста и интеграция созданных ассетов напрямую в движки через Quantum Link."
           },
           {
-            title: "No-Internet Core (Knowledge DB v17.2.0)",
-            desc: "Режим 'Библиотека Пустоты'. Мгновенный доступ к 9500+ видео и 20к+ скриптов без интернета."
+            title: "No-Internet Core (v17.5.0)",
+            desc: "Локальный доступ к 9800+ видео и расширенным шаблонам управления для RTS, RPG и FPS."
           },
           {
-            title: "Reality Hack 22.0 & Omniversal Core",
-            desc: "Reality Hack 22.0 позволяет изменять фундаментальные константы движка в реальном времени. Стабилизация памяти и предсказание крашей за 10 секунд."
+            title: "Reality Hack 25.0",
+            desc: "Интеллектуальная кросс-платформенная авто-оптимизация и глубокий аудит производительности."
           }
         ],
         files_handled: [
@@ -1216,27 +1216,28 @@ async function startServer() {
           "PROJECT_MASTER_BLUEPRINT.md",
           "project_stats.json",
           "blender_connector.py",
-          "UnityConnector.cs"
+          "UnityConnector.cs",
+          "version.json"
         ],
         video_knowledge_base: {
-          total_count: "9500+",
-          update_date: "2026-04-20",
+          total_count: "9800+",
+          update_date: "2026-04-21",
           categories: [
             {
-              name: "Unity: Программирование и Архитектура",
-              items: ["Job System & Burst", "DOTS/ECS", "ScriptableObjects", "Addressables", "AI (Behavior Trees, ML-Agents)"]
+              name: "Character & Mob Design",
+              items: ["2D/3D Characters", "AI Mob Behavior", "Procedural Modeling", "Low-poly/Pixel/Realistic", "5-10 Variations Generation"]
             },
             {
-              name: "Unity: Графика и Визуальные эффекты",
-              items: ["Shader Graph", "VFX Graph", "URP/HDRP", "Post-Processing", "Ray Tracing"]
+              name: "Cinematic & Visual Effects",
+              items: ["VFX Graph", "Cinema Choreo", "Advanced Shaders", "Volumetric Fog", "Photorealistic Lighting"]
             },
             {
-              name: "Blender: Моделирование и Анимация",
-              items: ["Hard Surface", "Sculpting", "UV Unwrapping", "Rigging", "Geometry Nodes"]
+              name: "Unity & XR Integration",
+              items: ["DOTS/ECS Netcode", "Job System 2.0", "XR Interaction Toolkit", "Spatial Audio", "Quest 3 Integration"]
             },
             {
-              name: "Game Genres Expertise",
-              items: ["RTS (Fog of War, Formations)", "RPG (Quests, Inventory)", "Action (Recoil, Ballistics)", "Horror (Fear, Audio)"]
+              name: "Cross-platform Automation",
+              items: ["GIMP Python Scripting", "Blender API Bridge", "Redot Genesis Support", "Automated Asset Import"]
             }
           ]
         },

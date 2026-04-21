@@ -1,7 +1,7 @@
 bl_info = {
     "name": "AI Assistant Link",
-    "author": "Eternal Origin - Quantum Singularity v17.2.0 (Systems Expansion)",
-    "version": (1, 0, 0),
+    "author": "Universal Synthesis v17.5.0 (Mastery Core)",
+    "version": (1, 5, 0),
     "blender": (2, 80, 0),
     "location": "View3D > N-Panel > AI Assistant",
     "description": "Direct bridge to the Unity & Blender AI Assistant for code generation and scene manipulation.",
@@ -101,7 +101,7 @@ class AI_ASSISTANT_PT_Panel(bpy.types.Panel):
         props = context.scene.ai_assistant_props
         
         col = layout.column(align=True)
-        col.label(text="v16.70.0 - Quantum Singularity")
+        col.label(text="v17.5.0 - Universal Synthesis Edition")
         col.prop(props, "server_url")
         col.prop(props, "mode")
         
