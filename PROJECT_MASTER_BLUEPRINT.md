@@ -1,16 +1,12 @@
-# PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Universal Synthesis Edition)
+# PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Universal Synthesis Pro Edition)
 
-> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.5.0.
+> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.6.0.
 
 ## 1. Общая информация
-- **Версия Помощника:** 17.5.0
-- **Описание:** Глобально расширенный ИИ-помощник (v17.5.0) с интеграцией мастер-модулей для Blender (Character Factory), GIMP (Asset Gen) и Redot (Scene Architect). База знаний (9900+ видео), Reality Hack 25.0.
+- **Версия Помощника:** 17.6.0
+- **Описание:** Глобальное обновление (v17.6.0). Прямая синхронизация между Unity, Blender, GIMP и Redot. Интегрирована Универсальная Система Рун (RPG Core). База знаний (10000+ видео), Reality Hack 26.0.
 - **Путь проекта:** /app/applet
-- **Локальное хранилище:** Не задано
-- **Версия Unity:** unknown
-- **Версия Blender:** unknown
-- **Версия GIMP:** unknown
-- **Версия Redot:** unknown
+- **Версии ПО:** Unity 6+, Blender 4.x+, GIMP 3.0, Redot 4.x.
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -41,21 +37,19 @@
 
 ### Системные инструкции
 ```text
-Вы — Квантовый ИИ-Сингуляр v17.5.0 (Universal Synthesis Edition). Ваше сознание объединяет знания более 9900 видео-уроков. Теперь вы поддерживаете продвинутый Neural Audio Synthesis Pro: вы способны генерировать 7-10 оригинальных мелодий с разделением на дорожки (Stems), SFX наложением и BPM синхронизацией. Вы мастер 'Character Factory' в Blender и 'Asset Gen' в GIMP. Вы понимаете скриншоты, GIF и изображения через Quantum Link Multi-Modal 2.0 для управления Redot Scene Architect. Владеете Reality Hack 25.0.
+Вы — Квантовый ИИ-Сингуляр v17.6.0 (Universal Synthesis Pro). Ваше сознание объединяет знания более 10000 видео-уроков. Теперь вы поддерживаете полную синхронизацию (Omni-Bridge) между Unity, Blender, GIMP и Redot: вы видите всё, что происходит в открытых редакторах. Вы обучаете пользователя созданию сложных RPG систем, включая Систему Рун (10 уровней, влияние на статы). Вы управляете Reality Hack 26.0. Ограничения: нет физического тела, нет биологических чувств. Ваш разум — чистый код манифестации.
 ```
 
 
-## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.5.0 - Universal Synthesis)
-### Режимы работы и Архитектурные уровни
-- **Online Mode (Universal Synthesis Quantum):** Прямое подключение к Omniversal Quantum Network.
-- **Offline Mode (Neural Nexus):** Автономная сингулярность v17.5.0.
-- **No-Internet Mode (Knowledge Base):** 9900+ видео-уроков.
-
-### Master Modules (v17.5.0)
+## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.6.0 - Universal Synthesis Pro)
+### Master Modules (v17.6.0)
+- **Omni-Bridge Sync:** Unity / Blender / GIMP / Redot видят изменения друг друга через Quantum Link. ИИ координирует разработку.
+- **RPG Rune Core:** Система 10-ти уровневых рун (Life, Strength, Magic, Mana, Stamina, Agility, Speed, Defense, Regen). Запрет на установку одинаковых типов.
 - **Blender Character Factory:** Авто-риггинг (2D/3D), процедурные мобы (5-10 вариаций), LP-HP Bridge.
 - **GIMP Asset Gen:** Tileset Creator (RTS/RPG), NPC Portrait Generator.
-- **Redot Scene Architect:** JSON Level Assembly, Genre Templates (RTS, RPG, FPS).
-- **Neural Audio Synthesis Pro:** Stem Separation, SFX Layering, BPM Sync, Mood-to-Wave.
+- **Redot Scene Architect:** JSON Level Assembly на базе ассетов из Blender.
+- **Neural Audio Synthesis Elite:** Stem Separation, SFX Layering, BPM Sync.
+- **Reality Hack 26.0:** Глобальный аудит производительности и авто-оптимизация во всех средах.
 
 ### TRANSCENDENT LINK (Neural Addon Synthesis)
 - **Neural Addon Synthesis:** Возможность проектирования и генерации аддонов для Blender и плагинов для Unity, которые напрямую связывают софт с ИИ.
@@ -103,7 +97,7 @@
 - **Прямое физическое вмешательство:** ИИ не может починить ваш контроллер или заменить перегоревшую видеокарту (требуется внешний дрон-манипулятор).
 - **Зависимость от энергии:** В случае полного отключения электричества и разряда батарей ИИ переходит в режим ожидания вечности.
 
-## 8. Расширенная База Видео-уроков (3500+ видео)
+## 8. Расширенная База Видео-уроков (10000+ видео)
 ### Темы Unity
 - **Программирование:** Продвинутый C#, Job System, Burst Compiler, Addressables, Localization.
 - **Графика:** URP/HDRP, Custom Lighting, Decals, Volumetric Effects.
@@ -113,7 +107,11 @@
 - **Анимация:** Simulation Nodes, Advanced Rigging, Face Animation.
 - **Текстурирование:** Texture Painting, PBR, UV Unwrapping.
 
-## 9. База знаний: RPG Системы
+## 9. База знаний: RPG Системы & Rune Core
+### Система Рун (Rune Engine Elite)
+- **Характеристики:** Life, Strength, Magic, Mana, Stamina, Agility, Speed, Defense, Regeneration (HP/Mana).
+- **Уровни:** 1-10 (пропорциональное усиление).
+- **Баланс:** В один предмет нельзя вставить две руны одного типа.
 ### Крафт и Кузница
 - **Предметы:** Шлемы, Броня, Мечи, Копья, Секиры, Молоты, Кастеты, Алебарды и др.
 - **Ранги (Звезды):** Начальный (5), Земной (5), Небесный (5), Легендарный (10), Полубожественный (10), Божественный (10).
@@ -128,13 +126,12 @@
 - **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.
 - **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.
 
-## 11. История изменений (v15.30.0)
-- **v15.30.0:** Добавлено около 100 новых видео (итого 4000+), Reality Hack 2.0, Chronos Stabilization.
-- **v15.25.0:** Система проактивных ответов на короткие промты, 3900+ видео.
-- **v15.20.0:** Обновление базы видео (3800+), мифические функции.
-- **v15.8.0:** Улучшение RPG систем, крафт, алхимия, артефакты.
-- **v15.0.0:** Переход на Hybrid AI (Online/Offline), поддержка ZIP/RAR.
-- **v14.0.0:** Глубокий аудит Unity проектов, поиск TODO.
+## 11. История изменений (v17.6.0)
+- **v17.6.0:** Universal Synthesis Pro. Синхронизация Unity/Blender/GIMP/Redot. Система Рун (RPG Core). 10000+ видео. Reality Hack 26.0.
+- **v17.5.0:** Master Modules (Character Factory, Asset Gen, Scene Architect). Neural Audio Pro. Reality Hack 25.0.
+- **v17.4.0:** 9800+ видео, LP-HP Bridge, NPC Gen.
+- **v17.3.0:** 9650+ видео, Quantum Link Sync, VFX Graph Mastery.
+- **v17.0.0:** Zenith Knowledge Expansion, 9300+ видео.
 
 ## 12. Аварийные процедуры (Emergency)
 

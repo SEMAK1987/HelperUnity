@@ -127,7 +127,7 @@ interface RedotStatus {
 export default function App() {
   const [kb, setKb] = useState<KBData | null>(null);
   const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info' | 'migration'>('chat');
-  const [appVersion, setAppVersion] = useState('17.5.0');
+  const [appVersion, setAppVersion] = useState('17.6.0');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -397,7 +397,7 @@ export default function App() {
       fetch('/api/ai/capabilities')
         .then(res => res.json())
         .then(data => {
-          const v = data.name.match(/v([\d.]+)/)?.[1] || '17.5.0';
+          const v = data.name.match(/v([\d.]+)/)?.[1] || '17.6.0';
           setAppVersion(v);
         });
     }, 5000);
@@ -2332,7 +2332,7 @@ export default function App() {
                     </div>
                     <div>
                       <h2 className="text-xl font-bold text-white tracking-tighter">Unity & Blender AI Assistant v{appVersion}</h2>
-                      <p className="text-xs text-slate-400">Расширенная база знаний: 9900+ видео</p>
+                      <p className="text-xs text-slate-400">Расширенная база знаний: 10000+ видео</p>
                     </div>
                   </div>
                   <button 

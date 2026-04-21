@@ -1184,31 +1184,31 @@ async function startServer() {
       const version = packageJson.version;
       const capabilities = {
         name: `Unity & Blender AI Assistant v${version}`,
-        description: `Ваш ультимативный ИИ-компаньон v${version}. Поддержка: RTS, RPG, FPS, Multiplayer и Cinematic VFX. Новые модули: Blender Character Factory, GIMP Asset Gen и Redot Scene Architect. Reality Hack 25.0.`,
+        description: `Ваш ультимативный ИИ-компаньон v${version}. Синхронизация Unity/Blender/GIMP/Redot. Система Рун (RPG Core). База знаний (10000+ видео). Reality Hack 26.0.`,
         core_functions: [
           {
-            title: "Universal Synthesis Mastery",
-            desc: "Продвинутое создание 2D/3D персонажей, мобов и игровых миров. Автосборка уровней в Redot через JSON и LP-HP Bridge в Blender."
+            title: "Universal Synthesis Pro",
+            desc: "Продвинутая синхронизация между Unity, Blender, GIMP и Redot. ИИ видит изменения во всех редакторах и координирует разработку ассетов и кода."
           },
           {
-            title: "Asset Generation (GIMP & Blender)",
-            desc: "Tileset Creator для RTS/RPG, генератор портретов NPC и процедурная генерация 5-10 вариаций мобов."
+            title: "RPG Rune Engine",
+            desc: "Генератор рун для вставки в снаряжение (Жизнь, Сила, Магия и др.). 10 уровней развития. Обучен балансу: запрет на дублирование типов рун."
+          },
+          {
+            title: "Asset Generation Elite",
+            desc: "Tileset Creator для RTS/RPG, NPC Portrait Generator и процедурная генерация 5-10 вариаций мобов в Blender."
           },
           {
             title: "Neural Audio Synthesis Pro",
-            desc: "Разделение дорожек (Stems), SFX Layering, BPM Sync и Mood-to-Wave для идеальной игровой атмосферы."
+            desc: "Stem Separation, SFX Layering, BPM Sync и Mood-to-Wave для идеальной игровой атмосферы."
           },
           {
-            title: "Multi-Modal Link 2.0 (Elite)",
-            desc: "Мгновенное понимание контекста и интеграция созданных ассетов напрямую в движки через Quantum Link."
+            title: "No-Internet Core (v17.6.0)",
+            desc: "Локальный доступ к 10000+ видео и расширенным шаблонам управления для RTS, RPG и FPS."
           },
           {
-            title: "No-Internet Core (v17.5.0)",
-            desc: "Локальный доступ к 9800+ видео и расширенным шаблонам управления для RTS, RPG и FPS."
-          },
-          {
-            title: "Reality Hack 25.0",
-            desc: "Интеллектуальная кросс-платформенная авто-оптимизация и глубокий аудит производительности."
+            title: "Reality Hack 26.0",
+            desc: "Глобальный аудит производительности и авто-оптимизация во всех соединенных средах одновременно."
           }
         ],
         files_handled: [

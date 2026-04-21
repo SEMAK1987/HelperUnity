@@ -24,7 +24,7 @@ namespace AI_Assistant_Quantum
 
         private void OnGUI()
         {
-            GUILayout.Label("v17.5.0 - Universal Synthesis & Mastery", EditorStyles.boldLabel);
+            GUILayout.Label("v17.6.0 - Universal Synthesis Pro", EditorStyles.boldLabel);
             
             serverUrl = EditorGUILayout.TextField("Server URL", serverUrl);
             mode = (Mode)EditorGUILayout.EnumPopup("Mode", mode);
