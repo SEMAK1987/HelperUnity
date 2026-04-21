@@ -133,6 +133,88 @@ interface PhotoshopStatus {
   path: string;
 }
 
+const VKImageCard = ({ res, type, showNotification, onZoom }: { res: any, type: string, showNotification: any, onZoom: (url: string) => void }) => {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
+
+  // We append retryKey to the URL to bypass cache
+  const imageUrl = `${res.url}&retry=${retryKey}`;
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      onClick={() => !loading && !error && onZoom(imageUrl)}
+      className={`relative group overflow-hidden rounded-3xl border transition-all duration-500 shadow-2xl bg-white/5 cursor-zoom-in ${
+        error ? 'border-red-500/50' : 'border-white/10 hover:border-blue-500/50'
+      }`}
+    >
+      <div className={`w-full relative ${type === 'live' ? 'aspect-[9/16]' : 'aspect-[15.9/4]'}`}>
+        {loading && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 space-y-4 bg-black/40 z-10 backdrop-blur-sm">
+            <RefreshCw className="w-8 h-8 text-blue-500 animate-spin" />
+            <div className="text-center">
+              <p className="text-[10px] text-white font-black tracking-widest animate-pulse uppercase">Манифестация...</p>
+              <p className="text-[8px] text-slate-500 mt-1 uppercase tracking-tighter">Нейросеть рисует ассет</p>
+            </div>
+          </div>
+        )}
+        
+        {error ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 space-y-4 bg-red-950/20 backdrop-blur-sm z-20">
+            <AlertTriangle className="w-10 h-10 text-red-500" />
+            <div className="text-center">
+              <p className="text-[10px] text-white font-bold uppercase mb-1">Ошибка синтеза</p>
+              <p className="text-[8px] text-red-400/60 uppercase max-w-[120px] mx-auto leading-relaxed">Сервер перегружен. Попробуйте еще раз.</p>
+            </div>
+            <button 
+              onClick={(e) => { e.stopPropagation(); setError(false); setLoading(true); setRetryKey(prev => prev + 1); }}
+              className="px-5 py-2 bg-white/10 hover:bg-white/20 border border-white/10 rounded-2xl text-[9px] font-black uppercase transition-all flex items-center gap-2 group pointer-events-auto"
+            >
+              <RefreshCw className="w-3 h-3 group-hover:rotate-180 transition-transform duration-500" />
+              Повторить
+            </button>
+          </div>
+        ) : (
+          <img 
+            src={imageUrl} 
+            alt={`VK Cover ${res.id}`} 
+            className={`w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-110 ${loading ? 'opacity-0 scale-110' : 'opacity-100 scale-100'}`}
+            onLoad={() => setLoading(false)}
+            onError={() => { setError(true); setLoading(false); }}
+            referrerPolicy="no-referrer"
+          />
+        )}
+
+        {/* Overlay - only show if loaded */}
+        {!loading && !error && (
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-6 translate-y-4 group-hover:translate-y-0">
+             <div className="flex items-center justify-between mb-2">
+                <span className="px-3 py-1 bg-blue-600 rounded-lg text-[10px] font-black uppercase text-white shadow-lg border border-blue-400/30">
+                  Вариант #{res.id}
+                </span>
+                <div className="flex gap-2">
+                  <a 
+                    href={imageUrl} 
+                    download={res.filename}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-3 bg-white text-black rounded-2xl hover:bg-blue-600 hover:text-white transition-all transform hover:scale-110 active:scale-95 shadow-xl border border-white/10"
+                    onClick={() => showNotification(`Подготовка файла #${res.id}...`, "info")}
+                  >
+                    <Download className="w-5 h-5" />
+                  </a>
+                </div>
+             </div>
+             <p className="text-[9px] text-slate-400 font-medium italic line-clamp-1 opacity-60">{res.prompt_note}</p>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+};
+
 // --- App Component ---
 export default function App() {
   const [kb, setKb] = useState<KBData | null>(null);
@@ -143,6 +225,7 @@ export default function App() {
   const [isTyping, setIsTyping] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [projectScan, setProjectScan] = useState<ProjectScan | null>(null);
   const [unityStatus, setUnityStatus] = useState<UnityStatus | null>(null);
   const [blenderStatus, setBlenderStatus] = useState<BlenderStatus | null>(null);
@@ -3265,8 +3348,8 @@ export default function App() {
                     <ImageIcon className="w-8 h-8" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Генератор Обложек VK v17.12.0</h3>
-                    <p className="text-xs text-slate-500 uppercase tracking-[0.2em] font-bold">Континент Судьбы • Мульти-синтез</p>
+                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Генератор Обложек VK v17.12.3</h3>
+                    <p className="text-xs text-slate-500 uppercase tracking-[0.2em] font-bold">Континент Судьбы • Умный Синтез</p>
                   </div>
                 </div>
                 <button 
@@ -3347,12 +3430,12 @@ export default function App() {
                         {isGeneratingVK ? (
                           <>
                             <RefreshCw className="w-5 h-5 animate-spin" />
-                            Синтез...
+                            Синтез подождите...
                           </>
                         ) : (
                           <>
                             <Sparkles className="w-5 h-5" />
-                            Генерировать 10 фото
+                            Генерировать 6 фото
                           </>
                         )}
                       </button>
@@ -3371,8 +3454,8 @@ export default function App() {
                     </div>
                   )}
 
-                  <div className={`grid gap-6 ${vkType === 'live' ? 'grid-cols-2 md:grid-cols-3 xl:grid-cols-5' : 'grid-cols-1'}`}>
-                    {isGeneratingVK && Array.from({ length: 4 }).map((_, i) => (
+                  <div className={`grid gap-6 ${vkType === 'live' ? 'grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
+                    {isGeneratingVK && Array.from({ length: 3 }).map((_, i) => (
                       <div key={i} className={`animate-pulse bg-white/5 border border-white/10 rounded-3xl flex items-center justify-center shadow-2xl ${vkType === 'live' ? 'aspect-[9/16]' : 'aspect-[15.9/4]'}`}>
                         <div className="flex flex-col items-center gap-4">
                           <RefreshCw className="w-10 h-10 text-slate-800 animate-spin" />
@@ -3382,40 +3465,85 @@ export default function App() {
                     ))}
 
                     {vkResults.map((res: any) => (
-                      <motion.div 
-                        key={res.id}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="relative group overflow-hidden rounded-3xl border border-white/10 hover:border-blue-500/50 transition-all shadow-2xl"
-                      >
-                        <img 
-                          src={res.url} 
-                          alt={`VK Cover ${res.id}`} 
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
-                          referrerPolicy="no-referrer"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-6">
-                           <div className="flex items-center justify-between mb-4">
-                              <span className="px-3 py-1 bg-blue-600 rounded-lg text-[10px] font-black uppercase text-white shadow-lg">#{res.id}</span>
-                              <div className="flex gap-2">
-                                <a 
-                                  href={res.url} 
-                                  download={res.filename}
-                                  className="p-3 bg-white text-black rounded-2xl hover:bg-blue-500 hover:text-white transition-all transform hover:scale-110 active:scale-95"
-                                  title="Скачать ассет"
-                                >
-                                  <Download className="w-5 h-5" />
-                                </a>
-                              </div>
-                           </div>
-                           <p className="text-[9px] text-slate-400 font-medium italic line-clamp-2">{res.prompt_note}</p>
-                        </div>
-                      </motion.div>
+                      <VKImageCard 
+                        key={res.id} 
+                        res={res} 
+                        type={vkType} 
+                        showNotification={showNotification} 
+                        onZoom={(url) => setSelectedImage(url)}
+                      />
                     ))}
                   </div>
                 </div>
               </div>
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Image Zoom Lightbox */}
+      <AnimatePresence>
+        {selectedImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedImage(null)}
+            className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 cursor-zoom-out"
+          >
+            <div className="absolute top-8 left-8 right-8 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <Sparkles className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                   <h4 className="text-white font-bold uppercase tracking-tight">Просмотр ассета</h4>
+                   <p className="text-[10px] text-slate-500 uppercase tracking-widest font-black">Континент Судьбы v17.12.3</p>
+                </div>
+              </div>
+              <button 
+                onClick={(e) => { e.stopPropagation(); setSelectedImage(null); }}
+                className="p-4 bg-white/5 hover:bg-red-500 hover:text-white border border-white/10 rounded-2xl text-slate-400 transition-all flex items-center gap-3 uppercase font-black text-[10px] tracking-widest"
+              >
+                <X className="w-5 h-5" />
+                Вернуться к выбору
+              </button>
+            </div>
+
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className={`max-w-[90vw] max-h-[75vh] rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl relative ${vkType === 'live' ? 'aspect-[9/16] h-full' : 'aspect-[15.9/4] w-full'}`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img 
+                src={selectedImage} 
+                alt="Selected asset" 
+                className="w-full h-full object-contain bg-black/50"
+                referrerPolicy="no-referrer"
+              />
+            </motion.div>
+
+            <div className="mt-8 flex gap-4">
+               <a 
+                href={selectedImage}
+                download="vk_cover.jpg"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black uppercase text-xs tracking-widest transition-all flex items-center gap-3 shadow-xl shadow-blue-600/20"
+               >
+                 <Download className="w-5 h-5" />
+                 Скачать оригинал
+               </a>
+               <button 
+                onClick={(e) => { e.stopPropagation(); setSelectedImage(null); }}
+                className="px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-2xl font-black uppercase text-xs tracking-widest transition-all"
+               >
+                 Закрыть
+               </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

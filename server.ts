@@ -1211,15 +1211,27 @@ async function startServer() {
       // Enhance prompt with Fantasy / Cultivation master style
       const masterStyle = "high fantasy, xianxia cultivation world, stylized digital painting, cinematic lighting, ethereal atmosphere, epic scale, concept art, vibrant colors, magical aura, detailed textures, artistic brushwork, avoid photorealism";
       const enhancedPrompt = `${prompt}, ${masterStyle}`;
+      const encodedPrompt = encodeURIComponent(enhancedPrompt);
 
-      const variations = Array.from({ length: 10 }).map((_, i) => {
+      const variations = Array.from({ length: 6 }).map((_, i) => {
         const seed = Math.floor(Math.random() * 1000000);
+        const stylisticSuffixes = [
+          "cinematic wide shot",
+          "ethereal glowing particles",
+          "detailed xianxia environment",
+          "golden hour lighting",
+          "concept art style",
+          "intricate textures"
+        ];
+        const variationPrompt = `${enhancedPrompt}, ${stylisticSuffixes[i]}`;
+        const variationEncoded = encodeURIComponent(variationPrompt);
+        
         return {
           id: i + 1,
-          url: `https://picsum.photos/seed/${seed}/${width}/${height}`,
+          url: `https://image.pollinations.ai/prompt/${variationEncoded}?seed=${seed}&width=${width}&height=${height}&nologo=true&enhance=true&t=${Date.now() + i}`,
           filename: `vk_cover_${type}_${seed}.jpg`,
           seed,
-          prompt_note: `[Fate Manifestation v17.12.1] ${type.toUpperCase()} | Synthesis: ${enhancedPrompt.slice(0, 60)}...`
+          prompt_note: `[Fate Manifestation v17.12.3] ${type.toUpperCase()} | Synthesis: ${variationPrompt.slice(0, 50)}...`
         };
       });
 
