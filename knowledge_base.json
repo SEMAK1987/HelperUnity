@@ -1,12 +1,15 @@
 {
   "project_name": "Unity & Blender AI Assistant",
-  "version": "17.8.0",
+  "version": "17.11.0",
   "project_path": "/app/applet",
   "unity_ai_assistant": {
-    "description": "Центральный архив знаний Квантового ИИ v17.8.0",
-    "combined_knowledge": "# О ВОЗМОЖНОСТЯХ ИИ (v17.8.0 - OMNIVERSAL STRATEGY AWAKENING)\n\n## 1. Тотальная Синхронизация (Omni-Bridge strategy Edition)\n- **Unity / Blender / GIMP / Photoshop 2024 / Redot Synchronization:** Бесшовная интеграция всех инструментов. ИИ координирует работу между 2D (GIMP/Photoshop) и 3D (Blender/Unity/Redot).\n- **Adobe Photoshop Integration:** Прямая связь с Photoshop (C:\\Program Files\\Adobe\\Adobe Photoshop 2024\\Photoshop.exe) для текстурирования, создания ассетов UI и мини-карт.\n\n## 2. Модули Стратегий (Strategy Mastery)\n- **RTS/TBS Infrastructure:** Создание континентов, замков, героев и стражей. Архитектура уровней графики и режимов экрана.\n- **Dynamic Grid System:** Реализация клеточного поля с модификаторами ландшафта (замедление, ускорение, проходимость).\n- **Advanced Strategy AI:** Логика компьютера для планирования нападений, защиты и развития городов. Выбор веток технологий и героев в зависимости от ситуации.\n\n## 3. Эволюция и Снаряжение (Evolution System)\n- **Monster Evolution:** Система прокачки мобов с изменением визуала и характеристик. Нанесение узоров и гравировок.\n- **Equipment Rarity (Rings/Items):** Цветовая иерархия: Белый -> Зеленый -> Синий -> Фиолетовый -> Розовый -> Красный -> Золотой.\n- **Master Rune System:** Усиление предметов рунами и магическими накладками.\n\n## 4. UI/UX Cosmic Design\n- **Unified Interface:** Синхронизированный стиль кнопок, панелей и текста во всех редакторах.\n- **Reality Hack 28.0:** Контроль качества стратегических механик и баланса AI.\n\n## 5. Сложность Системы\n- **AI Difficulty Levels:** Слабый, Легкий, Средний, Сильный, Мастер, Ужасный. Влияет на начальные баффы и агрессивность компьютера."
+    "description": "Центральный архив знаний Квантового ИИ v17.11.0",
+    "combined_knowledge": "# О ВОЗМОЖНОСТЯХ ИИ (v17.11.0 - OMNIVERSAL STRATEGY AWAKENING)\n\n## 1. Студия Разработки Игр (Omni-Game Studio)\n- **Активный Проект:** 'Omniversal Conquest: Path of the Emperors'. Пошаговая стратегия (TBS) с глубокой системой континентов и рас.\n- **Мировая прогрессия:** Прохождение 4-х континентов (3 начальных + финальный Императорский). Взаимодействие с 10 уникальными расами.\n- **Герои и Эволюция:** 3 класса старта (Воин, Лучник, Маг). Система эволюции юнитов и прокачки снаряжения через руны.\n\n## 2. Тотальная Синхронизация (Omni-Bridge strategy Edition)\n- **Unity / Blender / GIMP / Photoshop 2024 / Redot Synchronization:** Полная поддержка Online, Offline и No-Internet режимов. Сохранение проектных данных в локальном хранилище.\n\n## 3. Генерация Медиа (VK Cover Multi-Gen Hybrid)\n- **VK Group Covers:** Генерация обложек 1590x530 во всех режимах.\n\n## 4. Модули Стратегий (Strategy Mastery v2.1)\n- **TBS Infrastructure:** Логика ходов, расчет урона на основе классов и магические системы.\n- **Advanced Strategy AI:** Поддержка сложности: Легкий, Средний, Сложный, Ужасный.\n\n## 5. Эволюция и Снаряжение (Evolution System)\n- **Rarity Colors:** Белый, Зеленый, Синий, Фиолетовый, Розовый, Красный, Золотой."
   },
   "youtube_videos": [
+    "https://youtu.be/nVchGnkGISU",
+    "https://youtu.be/uoIsc3zJqD8",
+    "https://youtu.be/QHlV9I0o5R8",
     "https://www.youtube.com/watch?v=BdtND2-Wy10",
     "https://www.youtube.com/watch?v=NTIkEbx_src",
     "https://www.youtube.com/watch?v=HclxqB6gTy0",

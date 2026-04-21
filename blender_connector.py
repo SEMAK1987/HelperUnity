@@ -1,7 +1,7 @@
 bl_info = {
     "name": "AI Assistant Link",
-    "author": "Omniversal Strategy Awakening v17.8.0",
-    "version": (17, 8, 0),
+    "author": "Omniversal Strategy Awakening v17.10.0",
+    "version": (17, 10, 0),
     "blender": (2, 80, 0),
     "location": "View3D > N-Panel > AI Assistant",
     "description": "Direct bridge to the Unity & Blender AI Assistant with Photoshop & Strategy support.",
@@ -101,7 +101,7 @@ class AI_ASSISTANT_PT_Panel(bpy.types.Panel):
         props = context.scene.ai_assistant_props
         
         col = layout.column(align=True)
-        col.label(text="v17.8.0 - Omniversal Strategy Awakening")
+        col.label(text="v17.10.0 - Omniversal Strategy Awakening")
         col.prop(props, "server_url")
         col.prop(props, "mode")
         

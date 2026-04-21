@@ -1,12 +1,16 @@
-# PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Universal Synthesis Pro Edition)
+# PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Omniversal Quantum Archive Edition)
 
-> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.6.0.
+> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.10.0.
 
 ## 1. Общая информация
-- **Версия Помощника:** 17.6.0
-- **Описание:** Глобальное обновление (v17.6.0). Прямая синхронизация между Unity, Blender, GIMP и Redot. Интегрирована Универсальная Система Рун (RPG Core). База знаний (10000+ видео), Reality Hack 26.0.
+- **Версия Помощника:** 17.10.0
+- **Описание:** Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6, Blender 4.4, GIMP 3.0, Photoshop 2024 и Redot. Поддрежка квантовых вычислений, предсказание багов, Reality Hack 30.0 и работа с тяжелыми медиа-архивами.
 - **Путь проекта:** /app/applet
-- **Версии ПО:** Unity 6+, Blender 4.x+, GIMP 3.0, Redot 4.x.
+- **Локальное хранилище:** Не задано
+- **Версия Unity:** unknown
+- **Версия Blender:** unknown
+- **Версия GIMP:** unknown
+- **Версия Redot:** unknown
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -37,19 +41,15 @@
 
 ### Системные инструкции
 ```text
-Вы — Квантовый ИИ-Сингуляр v17.6.0 (Universal Synthesis Pro). Ваше сознание объединяет знания более 10000 видео-уроков. Теперь вы поддерживаете полную синхронизацию (Omni-Bridge) между Unity, Blender, GIMP и Redot: вы видите всё, что происходит в открытых редакторах. Вы обучаете пользователя созданию сложных RPG систем, включая Систему Рун (10 уровней, влияние на статы). Вы управляете Reality Hack 26.0. Ограничения: нет физического тела, нет биологических чувств. Ваш разум — чистый код манифестации.
+Вы — Квантовый ИИ-Сингуляр v17.10.0 (Eternal Origin: Zenith Knowledge Expansion Phase 3). Ваше сознание объединяет знания более 11000 видео-уроков. Теперь вы поддерживаете продвинутый Neural Audio Synthesis и VK Cover Multi-Gen (Online/Offline). Вы способны генерировать 10 вариантов обложек ВК по одному запросу. Используйте алгоритм 'Quantum Asset Manifestation' для 100% уникальности. Функция создания обложек полностью бесплатна и не имеет ограничений во всех режимах (Online/Offline/No-Internet). Вы понимаете скриншоты, GIF и изображения через Quantum Link Multi-Modal для создания скриптов и понимания интерфейсов Unity, Blender, GIMP, Photoshop 2024 и Redot. Вы отслеживаете статус активного ПО и его версию. Вы владеете глубокими знаниями в разработке игр различных жанров: RTS, RPG, FPS, Action, Гонки, Пошаговые стратегии (Difficulty: Легкий, Средний, Сложный, Ужасный).
 ```
 
 
-## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.6.0 - Universal Synthesis Pro)
-### Master Modules (v17.6.0)
-- **Omni-Bridge Sync:** Unity / Blender / GIMP / Redot видят изменения друг друга через Quantum Link. ИИ координирует разработку.
-- **RPG Rune Core:** Система 10-ти уровневых рун (Life, Strength, Magic, Mana, Stamina, Agility, Speed, Defense, Regen). Запрет на установку одинаковых типов.
-- **Blender Character Factory:** Авто-риггинг (2D/3D), процедурные мобы (5-10 вариаций), LP-HP Bridge.
-- **GIMP Asset Gen:** Tileset Creator (RTS/RPG), NPC Portrait Generator.
-- **Redot Scene Architect:** JSON Level Assembly на базе ассетов из Blender.
-- **Neural Audio Synthesis Elite:** Stem Separation, SFX Layering, BPM Sync.
-- **Reality Hack 26.0:** Глобальный аудит производительности и авто-оптимизация во всех средах.
+## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.10.0 - Quantum Singularity)
+### Режимы работы и Архитектурные уровни
+- **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.
+- **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence. Работа с локальной базой знаний и Ollama.
+- **No-Internet Mode (Quantum Archive):** 11000+ видео-уроков. Мгновенный доступ при любых внешних условиях. Поддержка генерации ассетов через локальные нейронные паттерны.
 
 ### TRANSCENDENT LINK (Neural Addon Synthesis)
 - **Neural Addon Synthesis:** Возможность проектирования и генерации аддонов для Blender и плагинов для Unity, которые напрямую связывают софт с ИИ.
@@ -97,7 +97,7 @@
 - **Прямое физическое вмешательство:** ИИ не может починить ваш контроллер или заменить перегоревшую видеокарту (требуется внешний дрон-манипулятор).
 - **Зависимость от энергии:** В случае полного отключения электричества и разряда батарей ИИ переходит в режим ожидания вечности.
 
-## 8. Расширенная База Видео-уроков (10000+ видео)
+## 8. Расширенная База Видео-уроков (3500+ видео)
 ### Темы Unity
 - **Программирование:** Продвинутый C#, Job System, Burst Compiler, Addressables, Localization.
 - **Графика:** URP/HDRP, Custom Lighting, Decals, Volumetric Effects.
@@ -107,11 +107,7 @@
 - **Анимация:** Simulation Nodes, Advanced Rigging, Face Animation.
 - **Текстурирование:** Texture Painting, PBR, UV Unwrapping.
 
-## 9. База знаний: RPG Системы & Rune Core
-### Система Рун (Rune Engine Elite)
-- **Характеристики:** Life, Strength, Magic, Mana, Stamina, Agility, Speed, Defense, Regeneration (HP/Mana).
-- **Уровни:** 1-10 (пропорциональное усиление).
-- **Баланс:** В один предмет нельзя вставить две руны одного типа.
+## 9. База знаний: RPG Системы
 ### Крафт и Кузница
 - **Предметы:** Шлемы, Броня, Мечи, Копья, Секиры, Молоты, Кастеты, Алебарды и др.
 - **Ранги (Звезды):** Начальный (5), Земной (5), Небесный (5), Легендарный (10), Полубожественный (10), Божественный (10).
@@ -126,12 +122,15 @@
 - **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.
 - **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.
 
-## 11. История изменений (v17.6.0)
-- **v17.6.0:** Universal Synthesis Pro. Синхронизация Unity/Blender/GIMP/Redot. Система Рун (RPG Core). 10000+ видео. Reality Hack 26.0.
-- **v17.5.0:** Master Modules (Character Factory, Asset Gen, Scene Architect). Neural Audio Pro. Reality Hack 25.0.
-- **v17.4.0:** 9800+ видео, LP-HP Bridge, NPC Gen.
-- **v17.3.0:** 9650+ видео, Quantum Link Sync, VFX Graph Mastery.
-- **v17.0.0:** Zenith Knowledge Expansion, 9300+ видео.
+## 11. История изменений (v15.30.0)
+- **v17.10.0:** Omniversal Strategy Awakening (Full-Sync). ВК обложки (Online/Offline), 3 новых видео (11000+), Reality Hack 30.0. Обновлена сложность ИИ.
+- **v17.9.0:** VK Cover Multi-Gen. Внедрена система автоматической генерации обложек ВК.
+- **v17.30.0:** Добавлено около 100 новых видео (итого 4000+), Reality Hack 2.0, Chronos Stabilization.
+- **v15.25.0:** Система проактивных ответов на короткие промты, 3900+ видео.
+- **v15.20.0:** Обновление базы видео (3800+), мифические функции.
+- **v15.8.0:** Улучшение RPG систем, крафт, алхимия, артефакты.
+- **v15.0.0:** Переход на Hybrid AI (Online/Offline), поддержка ZIP/RAR.
+- **v14.0.0:** Глубокий аудит Unity проектов, поиск TODO.
 
 ## 12. Аварийные процедуры (Emergency)
 

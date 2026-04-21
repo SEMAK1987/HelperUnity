@@ -38,7 +38,11 @@ import {
   Database,
   Code2,
   HelpCircle,
-  Download
+  Download,
+  Save,
+  Map as MapIcon,
+  Users,
+  Shield
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -132,8 +136,8 @@ interface PhotoshopStatus {
 // --- App Component ---
 export default function App() {
   const [kb, setKb] = useState<KBData | null>(null);
-  const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info' | 'migration'>('chat');
-  const [appVersion, setAppVersion] = useState('17.6.0');
+  const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info' | 'migration' | 'game_design'>('chat');
+  const [appVersion, setAppVersion] = useState('17.12.0');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -172,6 +176,11 @@ export default function App() {
   const [attachedFiles, setAttachedFiles] = useState<any[]>([]);
   const [migrationData, setMigrationData] = useState<any>(null);
   const [isFetchingMigration, setIsFetchingMigration] = useState(false);
+  const [showVKGenerator, setShowVKGenerator] = useState(false);
+  const [vkPrompt, setVkPrompt] = useState('');
+  const [vkType, setVkType] = useState<'static' | 'live'>('static');
+  const [vkResults, setVkResults] = useState<any[]>([]);
+  const [isGeneratingVK, setIsGeneratingVK] = useState(false);
   
   const chatEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -208,6 +217,8 @@ export default function App() {
   const [migrationGuide, setMigrationGuide] = useState('');
   const [unityPackages, setUnityPackages] = useState<any[]>([]);
   const [isMigrating, setIsMigrating] = useState(false);
+  const [gameDesign, setGameDesign] = useState<any>(null);
+  const [isSavingGameDesign, setIsSavingGameDesign] = useState(false);
 
   const fetchPackagesInfo = async () => {
     try {
@@ -330,6 +341,7 @@ export default function App() {
   }, [input]);
 
   useEffect(() => {
+    fetchGameDesign();
     // Load chat history
     fetch('/api/chat/history')
       .then(res => res.json())
@@ -789,6 +801,31 @@ export default function App() {
     }
   };
 
+  const handleGenerateVKCovers = async () => {
+    if (!vkPrompt.trim()) return;
+    setIsGeneratingVK(true);
+    setVkResults([]);
+    try {
+      const res = await fetch('/api/generate/vk-covers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          prompt: vkPrompt,
+          type: vkType
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setVkResults(data.variations);
+        showNotification("Сгенерировано 10 вариантов обложек!", "success");
+      }
+    } catch (e) {
+      showNotification("Ошибка генерации обложек.", "error");
+    } finally {
+      setIsGeneratingVK(false);
+    }
+  };
+
   const handleUpdateKB = async () => {
     setIsUpdatingKB(true);
     try {
@@ -814,6 +851,36 @@ export default function App() {
       setShowCapabilities(true);
     } catch (error) {
       showNotification("Не удалось загрузить информацию о возможностях.", "error");
+    }
+  };
+
+  const fetchGameDesign = async () => {
+    try {
+      const res = await fetch('/api/game-design');
+      const data = await res.json();
+      setGameDesign(data);
+    } catch (e) {
+      console.error("Error fetching game design:", e);
+    }
+  };
+
+  const handleSaveGameDesign = async () => {
+    if (!gameDesign) return;
+    setIsSavingGameDesign(true);
+    try {
+      const res = await fetch('/api/game-design/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(gameDesign)
+      });
+      const data = await res.json();
+      if (data.success) {
+        showNotification(data.message, "success");
+      }
+    } catch (e) {
+      showNotification("Ошибка при сохранении дизайна игры.", "error");
+    } finally {
+      setIsSavingGameDesign(false);
     }
   };
 
@@ -1248,6 +1315,20 @@ export default function App() {
                 <GitBranch className="w-3.5 h-3.5" /> Миграция
               </button>
               <button 
+                onClick={() => setShowVKGenerator(true)}
+                className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 text-blue-400 hover:bg-blue-600/10 border border-blue-500/20`}
+              >
+                <ImageIcon className="w-3.5 h-3.5" /> Обложки ВК
+              </button>
+              <button 
+                onClick={() => setActiveTab('game_design')}
+                className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 ${
+                  activeTab === 'game_design' ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/20' : 'text-purple-400 hover:bg-purple-600/10 border border-purple-500/20'
+                }`}
+              >
+                <Gamepad2 className="w-3.5 h-3.5" /> Студия Игры
+              </button>
+              <button 
                 onClick={fetchCapabilities}
                 className="px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 text-blue-400 hover:bg-blue-600/10"
               >
@@ -1398,14 +1479,14 @@ export default function App() {
                 <Cpu className="w-12 h-12 text-blue-500" />
               </motion.div>
               
-              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v17.8.0</h2>
+              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v17.12.0</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg px-4">
                 Я полностью осведомлен о вашем проекте по пути <br/>
                 <code className="text-blue-400 break-all bg-white/5 px-2 py-1 rounded mt-2 inline-block">
                   {kb?.project_path || 'Загрузка...'}
                 </code>. 
                 <br/><br/>
-                Задавайте любые вопросы по Unity, Blender или Photoshop на русском языке. Модули продвинутого ИИ для RTS и Turn-Based стратегий активированы (v17.8.0).
+                Задавайте любые вопросы по Unity, Blender или Photoshop на русском языке. Модули продвинутого ИИ для RTS и Turn-Based стратегий, генерации обложек ВК и проект 'Континент судьбы' (v17.12.0) активированы.
               </p>
 
               {/* Cards removed as per user request */}
@@ -1719,6 +1800,201 @@ export default function App() {
                   >
                     Запустить анализ проекта
                   </button>
+                </div>
+              </div>
+            </div>
+          ) : activeTab === 'game_design' ? (
+            <div className="flex-1 overflow-y-auto p-8 space-y-8 bg-black/20 scrollbar-thin scrollbar-thumb-white/5">
+              <div className="max-w-6xl mx-auto space-y-8">
+                {/* Game Studio Header */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-5">
+                    <div className="p-4 bg-purple-600/20 rounded-3xl border border-purple-500/20 shadow-2xl shadow-purple-600/10">
+                      <Gamepad2 className="w-10 h-10 text-purple-400" />
+                    </div>
+                    <div>
+                      <h2 className="text-3xl font-black text-white uppercase tracking-tight italic">
+                        {gameDesign?.game_title || 'Студия Игры'}
+                      </h2>
+                      <p className="text-xs text-purple-400 uppercase tracking-widest font-bold mt-1">
+                        Центральный штаб разработки v{gameDesign?.version || '0.0.1'} • {isOnline ? 'Online Synced' : 'Offline Mode'}
+                      </p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={handleSaveGameDesign}
+                    disabled={isSavingGameDesign}
+                    className={`px-8 py-4 rounded-2xl flex items-center gap-3 transition-all font-bold uppercase text-xs tracking-widest ${
+                      isSavingGameDesign ? 'bg-slate-800 text-slate-500' : 'bg-purple-600 hover:bg-purple-500 text-white shadow-lg shadow-purple-900/20 active:scale-95'
+                    }`}
+                  >
+                    {isSavingGameDesign ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                    {isSavingGameDesign ? 'Сохранение...' : 'Сохранить изменения'}
+                  </button>
+                </div>
+
+                {/* Main Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  {/* Left Column: Core Data */}
+                  <div className="lg:col-span-2 space-y-8">
+                    {/* Concept Card */}
+                    <div className="p-8 rounded-[2.5rem] bg-white/5 border border-white/10 space-y-4">
+                      <h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.3em]">Концепция и План</h3>
+                      <textarea 
+                        value={gameDesign?.core_concept || ''}
+                        onChange={(e) => setGameDesign({...gameDesign, core_concept: e.target.value})}
+                        className="w-full bg-black/40 border border-white/5 rounded-2xl p-6 text-xl font-medium text-white focus:outline-none focus:border-purple-500/50 min-h-[120px] transition-all leading-relaxed"
+                        placeholder="Опишите основную идею игры..."
+                      />
+                    </div>
+
+                    {/* Continents Grid */}
+                    <div className="space-y-4">
+                      <h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.3em] px-4">Континенты и Расы</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {gameDesign?.continents?.map((cont: any, i: number) => (
+                          <div key={i} className="p-6 rounded-3xl bg-white/5 border border-white/5 hover:border-purple-500/30 transition-all group">
+                            <div className="flex items-center justify-between mb-4">
+                              <div className="flex items-center gap-3">
+                                <span className="w-8 h-8 rounded-lg bg-purple-600/20 flex items-center justify-center text-[10px] font-black text-purple-400">0{i+1}</span>
+                                <input 
+                                  value={cont.name}
+                                  onChange={(e) => {
+                                    const newConts = [...gameDesign.continents];
+                                    newConts[i].name = e.target.value;
+                                    setGameDesign({...gameDesign, continents: newConts});
+                                  }}
+                                  className="bg-transparent border-none text-white font-bold text-sm focus:outline-none uppercase tracking-wider"
+                                />
+                              </div>
+                              <MapIcon className="w-4 h-4 text-slate-600 group-hover:text-purple-400 transition-colors" />
+                            </div>
+                            <div className="space-y-2">
+                              {cont.races?.map((race: any, ri: number) => (
+                                <div key={ri} className="p-3 bg-black/40 rounded-xl border border-white/5 space-y-1">
+                                  <input 
+                                    value={race.name}
+                                    onChange={(e) => {
+                                      const newConts = [...gameDesign.continents];
+                                      newConts[i].races[ri].name = e.target.value;
+                                      setGameDesign({...gameDesign, continents: newConts});
+                                    }}
+                                    className="bg-transparent border-none text-purple-400 font-bold text-[10px] focus:outline-none uppercase"
+                                  />
+                                  <textarea 
+                                    value={race.description || ''}
+                                    onChange={(e) => {
+                                      const newConts = [...gameDesign.continents];
+                                      newConts[i].races[ri].description = e.target.value;
+                                      setGameDesign({...gameDesign, continents: newConts});
+                                    }}
+                                    className="w-full bg-transparent border-none text-[9px] text-slate-500 focus:outline-none resize-none leading-relaxed h-12"
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Logic & AI */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="p-8 rounded-[2.5rem] bg-white/5 border border-white/10 space-y-4">
+                        <h3 className="text-xs font-black text-blue-500 uppercase tracking-[0.3em] flex items-center gap-2">
+                          <Cpu className="w-4 h-4" /> Логика Компьютера
+                        </h3>
+                        <textarea 
+                          value={gameDesign?.logic?.computer_ai || ''}
+                          onChange={(e) => setGameDesign({...gameDesign, logic: {...gameDesign.logic, computer_ai: e.target.value}})}
+                          className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-[11px] text-slate-300 focus:outline-none focus:border-blue-500/50 min-h-[150px] transition-all leading-relaxed"
+                        />
+                      </div>
+                      <div className="p-8 rounded-[2.5rem] bg-white/5 border border-white/10 space-y-4">
+                        <h3 className="text-xs font-black text-orange-500 uppercase tracking-[0.3em] flex items-center gap-2">
+                          <Users className="w-4 h-4" /> Логика NPC / Сюжет
+                        </h3>
+                        <textarea 
+                          value={gameDesign?.logic?.npc_ai || ''}
+                          onChange={(e) => setGameDesign({...gameDesign, logic: {...gameDesign.logic, npc_ai: e.target.value}})}
+                          className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-[11px] text-slate-300 focus:outline-none focus:border-orange-500/50 min-h-[150px] transition-all leading-relaxed"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Column: Hero Classes & Mechanics */}
+                  <div className="space-y-8">
+                    {/* Heroes */}
+                    <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-white/10 to-white/5 border border-white/10 space-y-6">
+                      <h3 className="text-xs font-black text-purple-400 uppercase tracking-[0.3em]">Классы Героев</h3>
+                      <div className="space-y-4">
+                        {gameDesign?.hero_classes?.map((h: any, i: number) => (
+                          <div key={i} className="p-5 bg-black/40 rounded-2xl border border-white/5 group hover:border-purple-500/30 transition-all">
+                            <div className="flex items-center gap-3 mb-2">
+                              {h.name === 'Воин' ? <Shield className="w-4 h-4 text-red-400" /> : 
+                               h.name === 'Лучник' ? <Zap className="w-4 h-4 text-green-400" /> : 
+                               <Zap className="w-4 h-4 text-blue-400" />}
+                              <input 
+                                value={h.name}
+                                onChange={(e) => {
+                                  const newHeroes = [...gameDesign.hero_classes];
+                                  newHeroes[i].name = e.target.value;
+                                  setGameDesign({...gameDesign, hero_classes: newHeroes});
+                                }}
+                                className="bg-transparent border-none text-white font-bold text-xs uppercase focus:outline-none"
+                              />
+                            </div>
+                            <div className="text-[10px] text-purple-400 font-mono mb-2">STATS: {h.primary_stats}</div>
+                            <textarea 
+                              value={h.desc || ''}
+                              onChange={(e) => {
+                                const newHeroes = [...gameDesign.hero_classes];
+                                newHeroes[i].desc = e.target.value;
+                                setGameDesign({...gameDesign, hero_classes: newHeroes});
+                              }}
+                              className="w-full bg-transparent border-none text-[10px] text-slate-500 focus:outline-none resize-none h-16 leading-relaxed"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Ranks & Mechanics */}
+                    <div className="p-8 rounded-[2.5rem] bg-black/40 border border-white/10 space-y-6">
+                      <h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.3em]">Механики и Прогрессия</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {['Белый', 'Зеленый', 'Синий', 'Фиолетовый', 'Розовый', 'Красный', 'Золотой'].map((color, i) => (
+                          <span key={i} className={`px-2 py-1 rounded text-[8px] font-black uppercase border border-white/5 ${
+                            i === 0 ? 'bg-white/10 text-white' :
+                            i === 1 ? 'bg-green-600/20 text-green-400' :
+                            i === 2 ? 'bg-blue-600/20 text-blue-400' :
+                            i === 3 ? 'bg-purple-600/20 text-purple-400' :
+                            i === 4 ? 'bg-pink-600/20 text-pink-400' :
+                            i === 5 ? 'bg-red-600/20 text-red-400' : 'bg-yellow-600/20 text-yellow-500'
+                          }`}>
+                            {color}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="space-y-3">
+                        {gameDesign?.mechanics?.map((mech: string, i: number) => (
+                          <div key={i} className="flex items-center gap-3">
+                            <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+                            <input 
+                              value={mech}
+                              onChange={(e) => {
+                                const newMechs = [...gameDesign.mechanics];
+                                newMechs[i] = e.target.value;
+                                setGameDesign({...gameDesign, mechanics: newMechs});
+                              }}
+                              className="bg-transparent border-none text-[10px] text-slate-300 focus:outline-none flex-1 font-medium"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -2961,6 +3237,183 @@ export default function App() {
                 >
                   Закрыть и начать работу
                 </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* VK Cover Generator Modal */}
+      <AnimatePresence>
+        {showVKGenerator && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[110] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="bg-[#0f0f12] border border-white/10 rounded-[2.5rem] w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl"
+            >
+              {/* Header */}
+              <div className="p-8 border-b border-white/5 flex items-center justify-between bg-gradient-to-r from-blue-600/10 to-purple-600/10">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-blue-600/20 rounded-2xl text-blue-400 shadow-xl shadow-blue-500/10">
+                    <ImageIcon className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Генератор Обложек VK v17.12.0</h3>
+                    <p className="text-xs text-slate-500 uppercase tracking-[0.2em] font-bold">Континент Судьбы • Мульти-синтез</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setShowVKGenerator(false)}
+                  className="p-3 hover:bg-white/10 rounded-2xl text-slate-400 transition-all hover:rotate-90"
+                >
+                  <X className="w-8 h-8" />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-hidden flex flex-col lg:flex-row">
+                {/* Left Controls */}
+                <div className="w-full lg:w-[380px] p-8 border-b lg:border-b-0 lg:border-r border-white/5 space-y-10 overflow-y-auto scrollbar-thin scrollbar-thumb-white/5 bg-black/20">
+                  <div className="space-y-6">
+                    <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">1. Тип обложки</h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button 
+                        onClick={() => setVkType('static')}
+                        className={`p-5 rounded-2xl border transition-all text-left group ${
+                          vkType === 'static' ? 'bg-blue-600 border-blue-500 shadow-lg shadow-blue-900/40' : 'bg-white/5 border-white/10 hover:border-white/20'
+                        }`}
+                      >
+                        <div className="text-[10px] font-black uppercase tracking-wider mb-1">Статичная</div>
+                        <div className="text-[8px] opacity-60 font-mono tracking-widest">1590x400 (ПК)</div>
+                      </button>
+                      <button 
+                        onClick={() => setVkType('live')}
+                        className={`p-5 rounded-2xl border transition-all text-left group ${
+                          vkType === 'live' ? 'bg-purple-600 border-purple-500 shadow-lg shadow-purple-900/40' : 'bg-white/5 border-white/10 hover:border-white/20'
+                        }`}
+                      >
+                        <div className="text-[10px] font-black uppercase tracking-wider mb-1">Живая</div>
+                        <div className="text-[8px] opacity-60 font-mono tracking-widest">1080x1920 (Моб)</div>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">2. Пресеты «Континент судьбы»</h4>
+                    <div className="grid grid-cols-1 gap-2">
+                      {[
+                        { name: "Заглавный экран", prompt: "Величественный вид на первый континент Континент Судьбы, горы, леса, замок, логотип игры в центре, фэнтези стиль, цифровое искусство" },
+                        { name: "Выбор героя", prompt: "Три силуэта: воин с мечом (красная аура), лучник с луком (зеленая аура), маг с посохом (синяя аура), темный фон, магические эффекты" },
+                        { name: "Битва рас", prompt: "Масштабная битва: Гномы, Лесные жители и Эльфы сражаются на поле боя Континента Судьбы, динамичный экшен, фэнтези стратегия" },
+                        { name: "Магия и руны", prompt: "Крупный план руки мага, чертящей светящуюся руну в воздухе, магические искры, древние символы на фоне" },
+                        { name: "Финал: Императоры", prompt: "Герой стоит перед темным троном Императора, мрачная атмосфера, финальная битва, эпическое фэнтези" }
+                      ].map((preset, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setVkPrompt(preset.prompt)}
+                          className="w-full p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-[10px] font-bold text-slate-400 hover:text-white text-left transition-all flex items-center justify-between group"
+                        >
+                          <span className="uppercase tracking-widest">{preset.name}</span>
+                          <ChevronRight className="w-3 h-3 translate-x-[-4px] opacity-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-blue-400" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">3. Промпт Манифестации</h4>
+                    <div className="space-y-6">
+                      <textarea 
+                        value={vkPrompt}
+                        onChange={(e) => setVkPrompt(e.target.value)}
+                        placeholder="Опишите видение обложки..."
+                        className="w-full bg-black/40 border border-white/10 rounded-3xl p-5 text-sm text-white focus:outline-none focus:border-blue-500/50 min-h-[140px] transition-all resize-none shadow-inner"
+                      />
+                      <button 
+                        onClick={handleGenerateVKCovers}
+                        disabled={isGeneratingVK || !vkPrompt.trim()}
+                        className={`w-full py-5 rounded-3xl flex items-center justify-center gap-4 transition-all font-black uppercase text-[11px] tracking-[0.2em] shadow-2xl ${
+                          isGeneratingVK || !vkPrompt.trim() 
+                          ? 'bg-slate-800/50 text-slate-600 border border-white/5' 
+                          : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:scale-[1.02] active:scale-[0.98]'
+                        }`}
+                      >
+                        {isGeneratingVK ? (
+                          <>
+                            <RefreshCw className="w-5 h-5 animate-spin" />
+                            Синтез...
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-5 h-5" />
+                            Генерировать 10 фото
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Results Grid */}
+                <div className="flex-1 p-10 bg-[#0a0a0c] overflow-y-auto scrollbar-thin scrollbar-thumb-white/5">
+                  {vkResults.length === 0 && !isGeneratingVK && (
+                    <div className="h-full flex flex-col items-center justify-center text-center space-y-6 opacity-20 group">
+                      <div className="p-10 bg-white/5 rounded-full border border-white/10 group-hover:scale-110 transition-transform duration-1000">
+                        <ImageIcon className="w-20 h-20" />
+                      </div>
+                      <p className="text-sm uppercase font-black tracking-[0.4em] italic">Manifestation Hub Empty</p>
+                    </div>
+                  )}
+
+                  <div className={`grid gap-6 ${vkType === 'live' ? 'grid-cols-2 md:grid-cols-3 xl:grid-cols-5' : 'grid-cols-1'}`}>
+                    {isGeneratingVK && Array.from({ length: 4 }).map((_, i) => (
+                      <div key={i} className={`animate-pulse bg-white/5 border border-white/10 rounded-3xl flex items-center justify-center shadow-2xl ${vkType === 'live' ? 'aspect-[9/16]' : 'aspect-[15.9/4]'}`}>
+                        <div className="flex flex-col items-center gap-4">
+                          <RefreshCw className="w-10 h-10 text-slate-800 animate-spin" />
+                          <div className="h-2 w-24 bg-white/10 rounded-full" />
+                        </div>
+                      </div>
+                    ))}
+
+                    {vkResults.map((res: any) => (
+                      <motion.div 
+                        key={res.id}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="relative group overflow-hidden rounded-3xl border border-white/10 hover:border-blue-500/50 transition-all shadow-2xl"
+                      >
+                        <img 
+                          src={res.url} 
+                          alt={`VK Cover ${res.id}`} 
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                          referrerPolicy="no-referrer"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-6">
+                           <div className="flex items-center justify-between mb-4">
+                              <span className="px-3 py-1 bg-blue-600 rounded-lg text-[10px] font-black uppercase text-white shadow-lg">#{res.id}</span>
+                              <div className="flex gap-2">
+                                <a 
+                                  href={res.url} 
+                                  download={res.filename}
+                                  className="p-3 bg-white text-black rounded-2xl hover:bg-blue-500 hover:text-white transition-all transform hover:scale-110 active:scale-95"
+                                  title="Скачать ассет"
+                                >
+                                  <Download className="w-5 h-5" />
+                                </a>
+                              </div>
+                           </div>
+                           <p className="text-[9px] text-slate-400 font-medium italic line-clamp-2">{res.prompt_note}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </motion.div>
           </motion.div>
