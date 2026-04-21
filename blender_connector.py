@@ -1,10 +1,10 @@
 bl_info = {
     "name": "AI Assistant Link",
-    "author": "Universal Synthesis Pro v17.6.0 (Mastery Elite)",
-    "version": (1, 6, 0),
+    "author": "Omniversal Strategy Awakening v17.8.0",
+    "version": (17, 8, 0),
     "blender": (2, 80, 0),
     "location": "View3D > N-Panel > AI Assistant",
-    "description": "Direct bridge to the Unity & Blender AI Assistant for code generation and scene manipulation.",
+    "description": "Direct bridge to the Unity & Blender AI Assistant with Photoshop & Strategy support.",
     "warning": "",
     "doc_url": "",
     "category": "Interface",
@@ -101,7 +101,7 @@ class AI_ASSISTANT_PT_Panel(bpy.types.Panel):
         props = context.scene.ai_assistant_props
         
         col = layout.column(align=True)
-        col.label(text="v17.6.0 - Universal Synthesis Pro Edition")
+        col.label(text="v17.8.0 - Omniversal Strategy Awakening")
         col.prop(props, "server_url")
         col.prop(props, "mode")
         

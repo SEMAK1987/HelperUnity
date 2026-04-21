@@ -123,6 +123,12 @@ interface RedotStatus {
   version: string;
 }
 
+interface PhotoshopStatus {
+  is_running: boolean;
+  version: string;
+  path: string;
+}
+
 // --- App Component ---
 export default function App() {
   const [kb, setKb] = useState<KBData | null>(null);
@@ -138,6 +144,7 @@ export default function App() {
   const [blenderStatus, setBlenderStatus] = useState<BlenderStatus | null>(null);
   const [gimpStatus, setGimpStatus] = useState<GimpStatus | null>(null);
   const [redotStatus, setRedotStatus] = useState<RedotStatus | null>(null);
+  const [photoshopStatus, setPhotoshopStatus] = useState<PhotoshopStatus | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [blenderPresets, setBlenderPresets] = useState<BlenderPreset[]>([]);
   const [isClearingChat, setIsClearingChat] = useState(false);
@@ -380,6 +387,10 @@ export default function App() {
       fetch('/api/redot/status')
         .then(res => res.json())
         .then(status => setRedotStatus(status));
+
+      fetch('/api/photoshop/status')
+        .then(res => res.json())
+        .then(status => setPhotoshopStatus(status));
       
       fetch('/api/ai/ollama-status')
         .then(res => res.json())
@@ -1104,6 +1115,16 @@ export default function App() {
                   <span className="text-[9px] font-mono text-slate-500">{redotStatus?.version || '---'}</span>
                 </div>
               </div>
+              <div className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <ImageIcon className="w-3.5 h-3.5 text-blue-500" />
+                  <span className="text-[10px] text-slate-300">Photoshop</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className={`w-1.5 h-1.5 rounded-full ${photoshopStatus?.is_running ? 'bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.5)]' : 'bg-slate-700'}`} />
+                  <span className="text-[9px] font-mono text-slate-500">{photoshopStatus?.version || '---'}</span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1377,14 +1398,14 @@ export default function App() {
                 <Cpu className="w-12 h-12 text-blue-500" />
               </motion.div>
               
-              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v{appVersion}</h2>
+              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v17.8.0</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg px-4">
                 Я полностью осведомлен о вашем проекте по пути <br/>
                 <code className="text-blue-400 break-all bg-white/5 px-2 py-1 rounded mt-2 inline-block">
                   {kb?.project_path || 'Загрузка...'}
                 </code>. 
                 <br/><br/>
-                Задавайте любые вопросы по Unity или Blender на русском языке. Экспертные знания C# и Python теперь интегрированы напрямую в чат.
+                Задавайте любые вопросы по Unity, Blender или Photoshop на русском языке. Модули продвинутого ИИ для RTS и Turn-Based стратегий активированы (v17.8.0).
               </p>
 
               {/* Cards removed as per user request */}

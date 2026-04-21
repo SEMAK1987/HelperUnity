@@ -1,7 +1,8 @@
 {
-  "version": "17.7.0",
+  "version": "17.8.0",
   "release_date": "2026-04-21",
   "changelog": [
+    "Версия 17.8.0: Omniversal Strategy Awakening. Интеграция Adobe Photoshop 2024. Модули: Глобальные стратегии (RTS/TBS), Эволюция мобов и монстров (от Белого до Золотого ранга), Сверх-ИИ для стратегического планирования, Клеточная система ландшафта и UI Cosmic Design.",
     "Версия 17.7.0: Omniversal Synthesis Mastery. Глобальное расширение базы знаний (10500+ видео). Углубленная синхронизация между Unity, Blender, GIMP и Redot. Внедрены продвинутые модули по созданию RTS, RPG и Шутеров всех жанров (2D/3D). Новая система Reality Hack 27.0 для тотального контроля качества проекта.",
     "Версия 17.6.0: Universal Synthesis Pro. Внедрена полная синхронизация между Unity, Blender, GIMP и Redot через Quantum Link. Теперь программы 'видят' друг друга и обмениваются статусами. Добавлена продвинутая Система Рун (RPG Core) для всех жанров: 10 уровней характеристик (Жизнь, Сила, Магия и др.). Интегрировано более 200 новых видео-уроков (итого 10000+). Reality Hack 26.0.",
     "Версия 17.5.0: Universal Synthesis: Game-Dev Mastery Expansion. Внедрены мастер-модули: Blender Character Factory (Авто-риггинг, Процедурные мобы, LP-HP Bridge), GIMP Asset Gen (Tileset Creator, NPC Portrait Gen), Redot Scene Architect (JSON Level Assembly, Genre Templates). Расширен Neural Audio Synthesis: разделение аудиодорожек, наложение эффектов, BPM Sync и Mood-to-Wave. Внедрен Reality Hack 25.0.",

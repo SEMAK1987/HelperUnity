@@ -146,6 +146,7 @@ let currentUnityStatus: any = { is_running: false, version: "unknown", project_p
 let currentBlenderStatus: any = { is_running: false, version: "unknown" };
 let currentGimpStatus: any = { is_running: false, version: "unknown" };
 let currentRedotStatus: any = { is_running: false, version: "unknown" };
+let currentPhotoshopStatus: any = { is_running: false, version: "unknown", path: "C:\\Program Files\\Adobe\\Adobe Photoshop 2024\\Photoshop.exe" };
 
 async function findUnityProject(startDir: string): Promise<string | null> {
   try {
@@ -915,7 +916,7 @@ async function startServer() {
       res.json({
         success: true,
         status: "Online",
-        version: "15.65.0",
+        version: "17.8.0",
         ollama: ollamaActive ? "Active" : "Offline",
         storage: {
           uploads: (await fs.readdir(path.join(process.cwd(), "uploads"))).length,
@@ -1152,6 +1153,50 @@ async function startServer() {
     res.json(currentBlenderStatus);
   });
 
+  // GIMP Status Endpoint
+  app.get("/api/gimp/status", async (req, res) => {
+    let isRunning = false;
+    let version = "unknown";
+    try {
+      const gimpProc = await detectLocalProcess("gimp-2.10.exe") || await detectLocalProcess("gimp.exe");
+      isRunning = gimpProc.isRunning;
+      if (isRunning && gimpProc.path) {
+        if (gimpProc.path.includes("2.10")) version = "2.10";
+        else if (gimpProc.path.includes("3.0")) version = "3.0";
+      }
+    } catch (e) {}
+    currentGimpStatus = { is_running: isRunning, version };
+    res.json(currentGimpStatus);
+  });
+
+  // Redot Status Endpoint
+  app.get("/api/redot/status", async (req, res) => {
+    let isRunning = false;
+    let version = "unknown";
+    try {
+      const redotProc = await detectLocalProcess("Redot.exe") || await detectLocalProcess("Redot_v4.3-stable_win64.exe");
+      isRunning = redotProc.isRunning;
+    } catch (e) {}
+    currentRedotStatus = { is_running: isRunning, version };
+    res.json(currentRedotStatus);
+  });
+
+  // Photoshop Status Endpoint
+  app.get("/api/photoshop/status", async (req, res) => {
+    let isRunning = false;
+    let version = "2024 (v25.x)";
+    try {
+      const photoshopProc = await detectLocalProcess("Photoshop.exe");
+      isRunning = photoshopProc.isRunning;
+    } catch (e) {}
+    currentPhotoshopStatus = { 
+      is_running: isRunning, 
+      version: version, 
+      path: "C:\\Program Files\\Adobe\\Adobe Photoshop 2024\\Photoshop.exe" 
+    };
+    res.json(currentPhotoshopStatus);
+  });
+
   // Local AI Search (Offline 2.0)
   app.post("/api/ai/local-search", async (req, res) => {
     const { query } = req.body;
@@ -1184,31 +1229,31 @@ async function startServer() {
       const version = packageJson.version;
       const capabilities = {
         name: `Unity & Blender AI Assistant v${version}`,
-        description: `Ваш ультимативный ИИ-компаньон v${version}. Синхронизация Unity/Blender/GIMP/Redot. Система Рун (RPG Core). База знаний (10000+ видео). Reality Hack 26.0.`,
+        description: `Omniversal Strategy Awakening v${version}. Полная синхронизация Unity/Blender/GIMP/Photoshop 2024/Redot. Глобальные стратегии (RTS/TBS).Reality Hack 28.0.`,
         core_functions: [
           {
-            title: "Universal Synthesis Pro",
-            desc: "Продвинутая синхронизация между Unity, Blender, GIMP и Redot. ИИ видит изменения во всех редакторах и координирует разработку ассетов и кода."
+            title: "Omniversal Strategy Awakening",
+            desc: "Продвинутая синхронизация всех инструментов, включая Photoshop 2024. ИИ координирует разработку сложных RTS и TBS систем, включая мобов и ИИ противника."
           },
           {
-            title: "RPG Rune Engine",
-            desc: "Генератор рун для вставки в снаряжение (Жизнь, Сила, Магия и др.). 10 уровней развития. Обучен балансу: запрет на дублирование типов рун."
+            title: "Advanced Strategy Engine",
+            desc: "Логика для стратегического планирования компьютерных оппонентов, динамические сетки ландшафта и системы городов."
           },
           {
-            title: "Asset Generation Elite",
-            desc: "Tileset Creator для RTS/RPG, NPC Portrait Generator и процедурная генерация 5-10 вариаций мобов в Blender."
+            title: "Mob Evolution & Runes",
+            desc: "Система эволюции монстров (7 рангов редкости) и продвинутая ювелирная кузня для прокачки колец и рун."
           },
           {
-            title: "Neural Audio Synthesis Pro",
-            desc: "Stem Separation, SFX Layering, BPM Sync и Mood-to-Wave для идеальной игровой атмосферы."
+            title: "UI Cosmic Design",
+            desc: "Синхронизированный дизайн интерфейсов во всех редакторах. Создание ассетов в Photoshop и импорт в Unity/Redot."
           },
           {
-            title: "No-Internet Core (v17.6.0)",
-            desc: "Локальный доступ к 10000+ видео и расширенным шаблонам управления для RTS, RPG и FPS."
+            title: "No-Internet Core (v17.8.0)",
+            desc: "Локальный доступ к 10500+ видео и расширенным шаблонам управления для стратегий и RPG."
           },
           {
-            title: "Reality Hack 26.0",
-            desc: "Глобальный аудит производительности и авто-оптимизация во всех соединенных средах одновременно."
+            title: "Reality Hack 28.0",
+            desc: "Глобальный аудит производительности и балансировка стратегических механик."
           }
         ],
         files_handled: [
