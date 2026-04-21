@@ -1208,6 +1208,10 @@ async function startServer() {
       const width = type === 'live' ? 1080 : 1590;
       const height = type === 'live' ? 1920 : 400;
 
+      // Enhance prompt with Fantasy / Cultivation master style
+      const masterStyle = "high fantasy, xianxia cultivation world, stylized digital painting, cinematic lighting, ethereal atmosphere, epic scale, concept art, vibrant colors, magical aura, detailed textures, artistic brushwork, avoid photorealism";
+      const enhancedPrompt = `${prompt}, ${masterStyle}`;
+
       const variations = Array.from({ length: 10 }).map((_, i) => {
         const seed = Math.floor(Math.random() * 1000000);
         return {
@@ -1215,7 +1219,7 @@ async function startServer() {
           url: `https://picsum.photos/seed/${seed}/${width}/${height}`,
           filename: `vk_cover_${type}_${seed}.jpg`,
           seed,
-          prompt_note: `[Fate Manifestation v17.12.0] ${type.toUpperCase()} | Synthesis: ${prompt.slice(0, 40)}`
+          prompt_note: `[Fate Manifestation v17.12.1] ${type.toUpperCase()} | Synthesis: ${enhancedPrompt.slice(0, 60)}...`
         };
       });
 
