@@ -1209,8 +1209,9 @@ async function startServer() {
       const height = type === 'live' ? 1920 : 400;
 
       // Enhance prompt with Fantasy / Cultivation master style
-      const masterStyle = "high fantasy, xianxia cultivation world, stylized digital painting, cinematic lighting, ethereal atmosphere, epic scale, concept art, vibrant colors, magical aura, detailed textures, artistic brushwork, avoid photorealism";
-      const enhancedPrompt = `${prompt}, ${masterStyle}`;
+      const negativePrompt = "no text, no watermark, no letters, no words, no cars, no planes, no modern vehicles, no computers, no tech, no tractors, no city, no realistic photo";
+      const masterStyle = "high fantasy, xianxia cultivation world, stylized digital painting, cinematic lighting, ethereal atmosphere, epic scale, concept art, vibrant colors, magical aura, detailed textures, artistic brushwork, avoid photorealism, professional dnd art style";
+      const enhancedPrompt = `${prompt}. Masterpiece aesthetic. ${masterStyle}. Negative: ${negativePrompt}`;
       const encodedPrompt = encodeURIComponent(enhancedPrompt);
 
       const variations = Array.from({ length: 6 }).map((_, i) => {
