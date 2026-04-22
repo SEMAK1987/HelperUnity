@@ -306,7 +306,7 @@ export default function App() {
   const [isMigrating, setIsMigrating] = useState(false);
   const [gameDesign, setGameDesign] = useState<any>(null);
   const [isSavingGameDesign, setIsSavingGameDesign] = useState(false);
-  const [designSubTab, setDesignSubTab] = useState<'World' | 'Castle System' | 'Heroes & Units' | 'Abilities' | 'Balancing & Rarity'>('World');
+  const [designSubTab, setDesignSubTab] = useState<'World' | 'Castle System' | 'Heroes & Units' | 'Abilities' | 'Balancing & Rarity' | 'Economy'>('World');
 
   const fetchPackagesInfo = async () => {
     try {
@@ -1935,7 +1935,7 @@ export default function App() {
 
                 {/* Sub-tabs for Game Design */}
                 <div className="flex items-center gap-2 p-1.5 bg-black/40 rounded-2xl border border-white/5 w-fit">
-                  {['World', 'Castle System', 'Heroes & Units', 'Abilities', 'Balancing & Rarity'].map((tab) => (
+                  {['World', 'Castle System', 'Heroes & Units', 'Abilities', 'Balancing & Rarity', 'Economy'].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setDesignSubTab(tab as any)}
@@ -2194,14 +2194,37 @@ export default function App() {
                        </div>
 
                        <div className="p-8 rounded-[2.5rem] bg-gradient-to-r from-blue-600/10 to-transparent border border-blue-500/20 space-y-6">
-                         <h4 className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Лимиты Груза</h4>
-                         <div className="space-y-3">
-                           {Object.entries(gameDesign?.weight_limits || {}).map(([key, val]: any) => (
-                             <div key={key} className="flex items-center justify-between text-[10px]">
-                               <span className="text-slate-500 uppercase">{key}:</span>
-                               <span className="text-blue-400 font-black">{val} КГ</span>
-                             </div>
-                           ))}
+                         <h4 className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Система Грузоподъёмности</h4>
+                         <div className="space-y-4">
+                           <div className="grid grid-cols-1 gap-2">
+                             {[
+                               { label: "Простой Герой (L1)", value: "600 КГ", sub: "+500кг каждые 100 ур." },
+                               { label: "Главный Герой (L1)", value: "1200 КГ", sub: "+1000кг каждые 100 ур." }
+                             ].map((b, i) => (
+                               <div key={i} className="flex hover:bg-white/5 p-2 rounded-xl transition-colors items-center justify-between">
+                                 <div>
+                                   <div className="text-[10px] text-white font-black uppercase">{b.label}</div>
+                                   <div className="text-[8px] text-slate-500 uppercase">{b.sub}</div>
+                                 </div>
+                                 <div className="text-[11px] font-black text-blue-400">{b.value}</div>
+                               </div>
+                             ))}
+                           </div>
+                           <div className="p-4 bg-black/40 rounded-2xl border border-white/5 space-y-2 mt-4">
+                              <div className="text-[9px] text-slate-500 uppercase font-black">Рост веса по классам (+100 уровней)</div>
+                              <div className="flex justify-between text-[10px]">
+                                <span className="text-slate-400 italic">Маг (Прост/Глав)</span>
+                                <span className="text-white">+10 / +20 КГ</span>
+                              </div>
+                              <div className="flex justify-between text-[10px]">
+                                <span className="text-slate-400 italic">Стрелок (Прост/Глав)</span>
+                                <span className="text-white">+12 / +22 КГ</span>
+                              </div>
+                              <div className="flex justify-between text-[10px]">
+                                <span className="text-slate-400 italic">Воин (Прост/Глав)</span>
+                                <span className="text-white">+15 / +25 КГ</span>
+                              </div>
+                           </div>
                          </div>
                        </div>
                     </div>
@@ -2275,6 +2298,134 @@ export default function App() {
                              </p>
                           </div>
                        </div>
+                    </div>
+                  </motion.div>
+                ) : designSubTab === 'Economy' ? (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="space-y-8"
+                  >
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                      <div className="lg:col-span-2 space-y-8">
+                        <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] px-4">Экономика Найма</h3>
+                        <div className="p-8 rounded-[2.5rem] bg-black/40 border border-white/10 overflow-hidden">
+                          <table className="w-full text-left text-[10px]">
+                            <thead>
+                              <tr className="text-slate-600 border-b border-white/5 uppercase tracking-widest">
+                                <th className="pb-4 pt-2 font-black">Тип войск</th>
+                                <th className="pb-4 pt-2 font-black">База (K)</th>
+                                <th className="pb-4 pt-2 font-black">Сосед (+25%)</th>
+                                <th className="pb-4 pt-2 font-black">Дальний (+50%)</th>
+                                <th className="pb-4 pt-2 font-black">Крайний (+100%)</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-white/5">
+                              {[
+                                { name: 'Легкая броня', base: '3000-5000' },
+                                { name: 'Средняя броня', base: '6000-10000' },
+                                { name: 'Тяжелая броня', base: '11000-15000' },
+                                { name: 'Дальние (Ср)', base: '16000-20000' },
+                                { name: 'Легендарные', base: '50000-100000' }
+                              ].map((row, i) => {
+                                const baseMin = parseInt(row.base.split('-')[0]);
+                                const baseMax = parseInt(row.base.split('-')[1]);
+                                return (
+                                  <tr key={i} className="group hover:bg-white/5 transition-colors">
+                                    <td className="py-4 font-black text-white">{row.name}</td>
+                                    <td className="py-4 text-slate-400 italic">{row.base}</td>
+                                    <td className="py-4 text-blue-400 font-bold">
+                                      {Math.round(baseMin*1.25)}-{Math.round(baseMax*1.25)}
+                                    </td>
+                                    <td className="py-4 text-purple-400 font-bold">
+                                      {Math.round(baseMin*1.5)}-{Math.round(baseMax*1.5)}
+                                    </td>
+                                    <td className="py-4 text-red-500 font-bold">
+                                      {Math.round(baseMin*2)}-{Math.round(baseMax*2)}
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+
+                        <div className="p-8 rounded-[2.5rem] bg-gradient-to-r from-purple-600/10 to-transparent border border-purple-500/20">
+                          <h4 className="text-[10px] font-black text-purple-400 uppercase tracking-widest mb-6">Скидки по Классам</h4>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                             <div className="p-4 bg-black/40 rounded-2xl border border-white/5 space-y-1">
+                               <div className="text-[9px] text-slate-500 uppercase">Воин</div>
+                               <div className="text-xs text-white">-10% Тяжелая/Ближние</div>
+                             </div>
+                             <div className="p-4 bg-black/40 rounded-2xl border border-white/5 space-y-1">
+                               <div className="text-[9px] text-slate-500 uppercase">Стрелок</div>
+                               <div className="text-xs text-white">-10% Дальние</div>
+                             </div>
+                             <div className="p-4 bg-black/40 rounded-2xl border border-white/5 space-y-1">
+                               <div className="text-[9px] text-slate-500 uppercase">Маг</div>
+                               <div className="text-xs text-white">-10% Легенды/Маги</div>
+                             </div>
+                          </div>
+                        </div>
+
+                        <div className="p-10 rounded-[3rem] bg-black/40 border border-white/10 space-y-8">
+                           <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Бонусы Замков (L5)</h4>
+                           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                             <div className="space-y-4">
+                               <div className="text-[9px] text-blue-400 font-black uppercase tracking-widest">Типы Бонусов</div>
+                               <div className="space-y-2">
+                                 {[
+                                   { type: "Экономический", bonus: "+10% Золота" },
+                                   { type: "Военный", bonus: "+5% Груз" },
+                                   { type: "Магический", bonus: "-5% Цена Легенд" },
+                                   { type: "Торговый", bonus: "-5% Цена Континента" }
+                                 ].map((b, i) => (
+                                   <div key={i} className="flex justify-between items-center text-[10px] p-2 bg-white/5 rounded-xl border border-white/5">
+                                      <span className="text-slate-500 italic">{b.type}</span>
+                                      <span className="text-white font-bold">{b.bonus}</span>
+                                   </div>
+                                 ))}
+                               </div>
+                             </div>
+                             <div className="space-y-4">
+                               <div className="text-[9px] text-purple-400 font-black uppercase tracking-widest">Множитель за кол-во</div>
+                               <div className="space-y-2">
+                                 {[
+                                   { count: "3 Замка", mult: "x1.5" },
+                                   { count: "5 Замка", mult: "x2.0" },
+                                   { count: "7 Замков", mult: "x3.0" },
+                                   { count: "10 Замков", mult: "x4.0" }
+                                 ].map((m, i) => (
+                                   <div key={i} className="flex justify-between items-center text-[10px] p-2 bg-white/5 rounded-xl border border-white/5">
+                                      <span className="text-slate-500 font-black uppercase">{m.count}</span>
+                                      <span className="text-purple-400 font-bold">{m.mult}</span>
+                                   </div>
+                                 ))}
+                               </div>
+                             </div>
+                           </div>
+                           <div className="p-6 bg-blue-600/5 rounded-3xl border border-blue-500/20 text-[10px] leading-relaxed text-slate-500 italic">
+                             "Важно: На уровне сложности 'Невероятный' множитель бонусов замков снижен до x0.6, а макс. кол-во замков одного типа ограничено семью до 1000 уровня."
+                           </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-8">
+                        <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] px-4">Уровни Сложности</h3>
+                        <div className="grid grid-cols-1 gap-4">
+                          {[
+                            { name: 'Новичок', color: 'text-green-400', desc: '-20% Цена, +20% Грузовик, +50% Золото' },
+                            { name: 'Средний', color: 'text-blue-400', desc: 'Базовые параметры' },
+                            { name: 'Сложный', color: 'text-orange-400', desc: '+25% Цена, -15% Грузовик, -20% Золото' },
+                            { name: 'Невероятный', color: 'text-red-500', desc: '+50% Цена, -30% Грузовик, -40% Золото, Легенды с 1000 уровня' }
+                          ].map((diff, i) => (
+                             <div key={i} className="p-6 rounded-3xl bg-white/5 border border-white/5 hover:border-blue-500/30 transition-all group">
+                               <div className={`text-[11px] font-black uppercase tracking-widest mb-2 ${diff.color}`}>{diff.name}</div>
+                               <p className="text-[10px] text-slate-500 leading-relaxed italic">{diff.desc}</p>
+                             </div>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </motion.div>
                 ) : (

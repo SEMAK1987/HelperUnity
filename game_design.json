@@ -1,6 +1,6 @@
 {
   "game_title": "Континент судьбы",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "style": "High Fantasy / Xianxia / Cultivation",
   "continents": [
     {
@@ -43,91 +43,164 @@
       }
     }
   ],
-  "castle_system": {
-    "upgrade_levels": [
-      { "level": 1, "name": "Новичок", "heroes": 1, "units": "Легкие", "gold": 1000, "gear": "Легкое" },
-      { "level": 2, "name": "Начальный", "heroes": 2, "units": "Средние", "gold": 3000, "gear": "Средняя броня" },
-      { "level": 3, "name": "Продвинутый", "heroes": 3, "units": "Тяжелые", "gold": 5000, "gear": "Тяжелые доспехи" },
-      { "level": 4, "name": "Застава", "heroes": 4, "units": "Все кроме легендарных", "gold": 7000, "gear": "Платиновая броня" },
-      { "level": 5, "name": "Замок", "heroes": 5, "units": "Все типы", "gold": 10000, "gear": "Легендарное снаряжение, уникальные умения" }
-    ],
-    "shops": {
-      "magic": {
-        "desc": "Зелья, свитки, артефакты",
-        "levels": [
-          { "lvl": 1, "cost": 500, "items": ["Малые зелья здоровья", "Свиток Огненный шар", "Лечение"] },
-          { "lvl": 2, "cost": 1500, "items": ["Зелья маны", "Свиток Молния", "Щит"] },
-          { "lvl": 3, "cost": 3000, "items": ["Редкие зелья", "Свиток Заморозка", "Яд"] },
-          { "lvl": 4, "cost": 6000, "items": ["Эпические зелья", "Свиток Армагеддон", "Воскрешение"] },
-          { "lvl": 5, "cost": 12000, "items": ["Артефакты", "Свиток Портал", "Божественный свет"] }
+  "unit_data": {
+    "units_by_faction": {
+      "Гномы": {
+        "light": [
+          { "name": "Подземные разведчики", "base_weight": 65, "full_weight": 75, "gear": "Легкая кожаная броня, кинжалы, инструменты" },
+          { "name": "Горные ловкачи", "base_weight": 70, "full_weight": 80, "gear": "Кожано-металлическая броня, метательные ножи" },
+          { "name": "Туннельные следопыты", "base_weight": 68, "full_weight": 78, "gear": "Усиленная кожаная броня, короткий меч" }
+        ],
+        "medium": [
+          { "name": "Кузнечные стражи", "base_weight": 80, "full_weight": 110, "gear": "Ламеллярная броня, боевой молот" },
+          { "name": "Щитовые рудокопы", "base_weight": 85, "full_weight": 120, "gear": "Кольчуга, большой щит, кирка-топор" },
+          { "name": "Бородатые копейщики", "base_weight": 82, "full_weight": 115, "gear": "Чешуйчатая броня, длинное копьё" }
+        ],
+        "heavy": [
+          { "name": "Крепостные защитники", "base_weight": 90, "full_weight": 150, "gear": "Латные доспехи, двуручный меч, щит" },
+          { "name": "Молотники гор", "base_weight": 95, "full_weight": 160, "gear": "Пластинчатые доспехи, гигантский молот" },
+          { "name": "Доспешные берсерки", "base_weight": 88, "full_weight": 145, "gear": "Усиленные доспехи с шипами, два топора" }
+        ],
+        "ranged": [
+          { "name": "Арбалетчики глубин", "base_weight": 75, "full_weight": 95, "gear": "Кожаная броня с пластинами, тяжелый арбалет" },
+          { "name": "Метатели кирок", "base_weight": 78, "full_weight": 105, "gear": "Комбинированная броня, набор кирок" },
+          { "name": "Рунные стрелки", "base_weight": 76, "full_weight": 100, "gear": "Рунно-усиленная броня, магический арбалет" }
+        ],
+        "legendary": [
+          { "name": "Стражи древних кланов", "base_weight": 92, "full_weight": 180, "gear": "Мифриловая сталь, двуручный рунный меч" },
+          { "name": "Повелители горна", "base_weight": 98, "full_weight": 200, "gear": "Титановые доспехи, гигантский молот горна" },
+          { "name": "Хранители родословной", "base_weight": 94, "full_weight": 190, "gear": "Легендарные доспехи, меч предков" }
         ]
       },
-      "armor": {
-        "desc": "Броня, оружие, щиты",
-        "levels": [
-          { "lvl": 1, "cost": 400, "items": ["Кожаные доспехи", "Мечи", "Луки", "Легкие щиты"] },
-          { "lvl": 2, "cost": 1200, "items": ["Кольчуги", "Стальные мечи", "Арбалеты", "Средние щиты"] },
-          { "lvl": 3, "cost": 2500, "items": ["Латные доспехи", "Двуручные мечи", "Дальнобойные луки"] },
-          { "lvl": 4, "cost": 5000, "items": ["Платиновая броня", "Магические мечи", "Самонаводящиеся арбалеты"] },
-          { "lvl": 5, "cost": 10000, "items": ["Меч короля", "Божественные доспехи", "Щиты с аурой"] }
-        ]
-      },
-      "arena": {
-        "desc": "Опыт, тренировки",
-        "levels": [
-          { "lvl": 1, "cost": 300, "bonus": "+10% опыта", "activity": "Манекены" },
-          { "lvl": 2, "cost": 900, "bonus": "+20% опыта", "activity": "Бои с новичками" },
-          { "lvl": 3, "cost": 1800, "bonus": "+30% опыта", "activity": "Элитные воины" },
-          { "lvl": 4, "cost": 3600, "bonus": "+40% опыта", "activity": "Бои с чемпионами" },
-          { "lvl": 5, "cost": 7200, "bonus": "+50% опыта", "activity": "Турниры с героями" }
+      "Водные люди": {
+        "light": [
+          { "name": "Рифовые ловцы", "base_weight": 70, "full_weight": 80, "gear": "Чешуйчатая броня из ракушек, нож-гарпун" },
+          { "name": "Приливные разведчики", "base_weight": 68, "full_weight": 78, "gear": "Гидродинамическая кожаная броня" },
+          { "name": "Волновые ныряльщики", "base_weight": 72, "full_weight": 85, "gear": "Броня из хрящей рыб, кинжалы" }
+        ],
+        "medium": [
+          { "name": "Коралловые стражи", "base_weight": 85, "full_weight": 115, "gear": "Панцирная броня, трезубец" },
+          { "name": "Гарпунёры глубин", "base_weight": 82, "full_weight": 120, "gear": "Комбинированная броня, тяжелый гарпун" },
+          { "name": "Тритоны-щитоносцы", "base_weight": 88, "full_weight": 125, "gear": "Чешуйчато-пластинчатая броня" }
+        ],
+        "heavy": [
+          { "name": "Левиафановы защитники", "base_weight": 95, "full_weight": 160, "gear": "Кости левиафана, двуручный трезубец" },
+          { "name": "Океанские рыцари", "base_weight": 98, "full_weight": 170, "gear": "Латные доспехи, меч из морской стали" },
+          { "name": "Бронированные кракены", "base_weight": 100, "full_weight": 180, "gear": "Тяжелые доспехи с присосками" }
+        ],
+        "ranged": [
+          { "name": "Лучники лагун", "base_weight": 75, "full_weight": 95, "gear": "Водоросли и перламутр, ядовитые стрелы" },
+          { "name": "Метатели трезубцев", "base_weight": 80, "full_weight": 110, "gear": "Костяные пластины, набор трезубцев" },
+          { "name": "Водяные арбалетчики", "base_weight": 78, "full_weight": 105, "gear": "Гидроизоляция, подводный арбалет" }
+        ],
+        "legendary": [
+          { "name": "Хранители жемчужных тронов", "base_weight": 92, "full_weight": 200, "gear": "Жемчужины и кораллы, скипетр-трезубец" },
+          { "name": "Владыки морских течений", "base_weight": 96, "full_weight": 220, "gear": "Титановая броня, посох управления водой" },
+          { "name": "Адмиралы глубинных флотов", "base_weight": 94, "full_weight": 210, "gear": "Навигационные руны, командный трезубец" }
         ]
       }
+    },
+    "monster_weight_modifier": {
+      "light": [5, 8],
+      "medium": [8, 10],
+      "heavy": [10, 12],
+      "legendary": [12, 15],
+      "desc": "Увеличение веса компьютерных противников для баланса"
     }
   },
-  "hero_classes": {
-    "main_heroes": [
-      { "class": "Воин", "hp": 150, "atk": 25, "def": 20, "speed": 3, "range": 1, "bonus": "+20% к защите в ближнем бою" },
-      { "class": "Лучник", "hp": 100, "atk": 18, "def": 8, "speed": 4, "range": 4, "bonus": "+15% к уклонению" },
-      { "class": "Маг", "hp": 80, "atk": 30, "def": 5, "speed": 3, "range": 3, "bonus": "Регенерация 5% здоровья/ход" }
-    ],
-    "sub_heroes": [
-      { "class": "Воин", "hp": 120, "atk": 20, "def": 15, "speed": 3, "range": 1, "skill": "Мощный удар (+25% урона, пропуск хода)" },
-      { "class": "Лучник", "hp": 90, "atk": 16, "def": 7, "speed": 4, "range": 4, "skill": "Отравленная стрела (5 урона/3 хода)" },
-      { "class": "Маг", "hp": 70, "atk": 25, "def": 4, "speed": 3, "range": 3, "skill": "Огненный шар (20 урона в 2x2)" }
-    ]
-  },
-  "unit_balance": {
-    "tiers": [
-      { "type": "Легкая броня", "hp": [60, 80], "atk": [12, 15], "def": [5, 8], "speed": [4, 5], "range": "1/4" },
-      { "type": "Средняя броня", "hp": [100, 120], "atk": [18, 22], "def": [12, 15], "speed": [3, 4], "range": "1/3" },
-      { "type": "Тяжёлая броня", "hp": [150, 180], "atk": [25, 30], "def": [20, 25], "speed": [2, 3], "range": "1" },
-      { "type": "Дальние войска", "hp": [80, 100], "atk": [15, 20], "def": [8, 12], "speed": [3, 4], "range": "4/5" },
-      { "type": "Легендарная броня", "hp": [200, 250], "atk": [35, 40], "def": [30, 35], "speed": [3, 4], "range": "1/5" }
-    ],
-    "evolution": [
-      "Базовый", "Улучшенный", "Элитный", "Героический", "Легендарный"
-    ],
-    "scaling_formula": {
-      "1_100": "+1% за уровень",
-      "101_500": "+0.5% за уровень",
-      "501_1000": "+0.2% за уровень",
-      "1001_9999": "+0.05% за уровень"
+  "hero_growth": {
+    "simple_hero": {
+      "base_weight": 300,
+      "base_capacity": 600,
+      "weight_gain_per_100lv": 15,
+      "capacity_gain_per_100lv": 500,
+      "formulas": {
+        "capacity": "600 + (L/100) * 500"
+      }
+    },
+    "main_hero": {
+      "base_weight": 400,
+      "base_capacity": 1200,
+      "weight_gain_per_100lv": 25,
+      "capacity_gain_per_100lv": 1000,
+      "formulas": {
+        "capacity": "1200 + (L/100) * 1000"
+      }
+    },
+    "classes": {
+      "mage": { "weight_inc": 10, "main_weight_inc": 20 },
+      "archer": { "weight_inc": 12, "main_weight_inc": 22 },
+      "warrior": { "weight_inc": 15, "main_weight_inc": 25 }
     }
   },
-  "rarity_tiers": [
-    { "name": "Белый", "bonus": "0%" },
-    { "name": "Зеленый", "bonus": "+5% ATK/DEF" },
-    { "name": "Синий", "bonus": "+10%, 1 руна" },
-    { "name": "Фиолетовый", "bonus": "+20%, 2 руны, +5% крит" },
-    { "name": "Розовый", "bonus": "+30%, 3 руны, +10% крит, +15% маг.резист" },
-    { "name": "Красный", "bonus": "+40%, 4 руны, +15% крит, +25% маг.резист, 1 пассивка" },
-    { "name": "Золотой", "bonus": "+50%, 5 рун, +20% крит, +35% маг.резист, 2 пассивки" },
-    { "name": "Божественный", "bonus": "+75%, 6 рун, +30% крит, +50% маг.резист, 3 пассивки, аура" }
-  ],
-  "weight_limits": {
-    "warrior": 50,
-    "archer": 30,
-    "mage": 20,
-    "main_hero_scaling": "40кг + 2кг за уровень"
-  }
+  "economic_system": {
+    "hiring_base_costs": {
+      "light": 5000000,
+      "medium": 10000000,
+      "heavy": 15000000,
+      "ranged": 20000000,
+      "legendary": 100000000
+    },
+    "continent_multipliers": {
+      "own": 1.0,
+      "neighbor": 1.25,
+      "far": 1.5,
+      "extreme": 2.0
+    },
+    "discounts": {
+      "warrior": { "target": ["heavy", "melee"], "value": 0.1 },
+      "archer": { "target": ["ranged"], "value": 0.1 },
+      "mage": { "target": ["legendary", "mage"], "value": 0.1 }
+    }
+  },
+  "difficulty_levels": {
+    "beginner": {
+      "hiring_discount": 0.2,
+      "capacity_bonus": 0.2,
+      "gold_bonus": 0.5,
+      "building_speed": 1.1,
+      "castle_multiplier": 1.2
+    },
+    "average": {
+      "hiring_discount": 0.0,
+      "capacity_bonus": 0.0,
+      "gold_bonus": 0.0,
+      "building_speed": 1.0,
+      "castle_multiplier": 1.0
+    },
+    "hard": {
+      "hiring_penalty": 0.25,
+      "capacity_penalty": 0.15,
+      "gold_penalty": 0.2,
+      "building_speed": 0.85,
+      "castle_multiplier": 0.8
+    },
+    "incredible": {
+      "hiring_penalty": 0.5,
+      "capacity_penalty": 0.3,
+      "gold_penalty": 0.4,
+      "building_speed": 0.7,
+      "castle_multiplier": 0.6,
+      "legendary_threshold": 1000
+    }
+  },
+  "castle_bonuses": {
+    "types": {
+      "economic": { "bonus": "+10% золота/день" },
+      "military": { "bonus": "+5% грузоподъёмность" },
+      "magic": { "bonus": "-5% цена магов/легенд" },
+      "trading": { "bonus": "-5% цена на своем континенте" },
+      "defensive": { "bonus": "+2% защита армии" }
+    },
+    "accumulation": {
+      "3": 1.5,
+      "5": 2.0,
+      "7": 3.0,
+      "10": 4.0
+    }
+  },
+  "combination_bonuses": [
+    { "combo": "Воин + Горы + Новичок", "desc": "Мин. стоимость тяжелой брони, макс. грузоподъёмность" },
+    { "combo": "Стрелок + Леса + Средний", "desc": "Высокая мобильность и эффективность дальнего боя" }
+  ]
 }
