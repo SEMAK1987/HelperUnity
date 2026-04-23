@@ -62,7 +62,8 @@ import {
   Sword,
   Star,
   Eye,
-  ZapOff
+  ZapOff,
+  Crown
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -322,7 +323,7 @@ export default function App() {
   const [isMigrating, setIsMigrating] = useState(false);
   const [gameDesign, setGameDesign] = useState<any>(null);
   const [isSavingGameDesign, setIsSavingGameDesign] = useState(false);
-  const [designSubTab, setDesignSubTab] = useState<'World' | 'Castle System' | 'Heroes & Units' | 'Visuals & Nav' | 'Abilities' | 'Synergies' | 'Balancing & Rarity' | 'Economy'>('World');
+  const [designSubTab, setDesignSubTab] = useState<'World' | 'Castle System' | 'Heroes & Units' | 'Visuals & Nav' | 'Abilities' | 'Synergies' | 'Balancing & Rarity' | 'Economy' | 'Strategies'>('World');
   const [synergyHeroType, setSynergyHeroType] = useState<'simple' | 'main'>('simple');
 
   const fetchPackagesInfo = async () => {
@@ -1952,7 +1953,7 @@ export default function App() {
 
                 {/* Sub-tabs for Game Design */}
                 <div className="flex items-center gap-2 p-1.5 bg-black/40 rounded-2xl border border-white/5 w-fit">
-                  {['World', 'Castle System', 'Heroes & Units', 'Visuals & Nav', 'Abilities', 'Synergies', 'Balancing & Rarity', 'Economy'].map((tab) => (
+                  {['World', 'Castle System', 'Heroes & Units', 'Visuals & Nav', 'Abilities', 'Synergies', 'Balancing & Rarity', 'Economy', 'Strategies'].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setDesignSubTab(tab as any)}
@@ -2305,6 +2306,26 @@ export default function App() {
     className="grid grid-cols-1 lg:grid-cols-2 gap-8"
   >
                     <div className="space-y-8">
+                       <div className="p-6 rounded-3xl bg-purple-600/10 border border-purple-500/20">
+                          <h3 className="text-[10px] font-black text-purple-400 uppercase tracking-[0.4em] mb-4 flex items-center gap-2">
+                             <Users className="w-4 h-4" /> Лимиты покупки героев
+                          </h3>
+                          <div className="grid grid-cols-2 gap-2">
+                             {[
+                               { l: "Континент 1", v: gameDesign?.hero_limits?.continent_1 },
+                               { l: "Континент 2", v: gameDesign?.hero_limits?.continent_2 },
+                               { l: "Континент 3", v: gameDesign?.hero_limits?.continent_3 },
+                               { l: "Континент 4", v: gameDesign?.hero_limits?.continent_4 }
+                             ].map((item, idx) => (
+                               <div key={idx} className="flex items-center justify-between p-2 bg-black/40 rounded-xl">
+                                  <span className="text-[9px] text-slate-400 font-bold uppercase">{item.l}</span>
+                                  <span className="text-[11px] text-white font-black">{item.v} шт</span>
+                               </div>
+                             ))}
+                          </div>
+                          <div className="mt-2 text-[8px] text-purple-300 font-bold text-center uppercase tracking-widest">+1 Основной герой у всех (Игрок/ИИ)</div>
+                       </div>
+                       
                        <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] px-4">Основные Классы</h3>
                        <div className="grid grid-cols-1 gap-4">
                          {gameDesign?.hero_classes?.main_heroes?.map((h: any, i: number) => (
@@ -2387,45 +2408,93 @@ export default function App() {
                          </div>
                        </div>
 
-                       <div className="p-8 rounded-[2.5rem] bg-red-600/5 border border-red-500/20 space-y-6">
-                          <div className="flex items-center justify-between">
-                             <h4 className="text-[10px] font-black text-red-400 uppercase tracking-widest flex items-center gap-2">
-                               <Skull className="w-4 h-4" /> Войска Разбойников (NPC)
-                             </h4>
-                             <span className="px-2 py-1 bg-red-500/10 rounded-lg text-[8px] font-black text-red-500 uppercase">Enemy Faction</span>
-                          </div>
-                          <div className="space-y-4">
-                             {Object.entries(gameDesign?.bandit_troops?.classes || {}).map(([key, cls]: any) => (
-                               <div key={key} className="p-4 bg-black/40 rounded-2xl border border-white/5 space-y-3 group hover:border-red-500/30 transition-all">
-                                  <div className="flex items-center justify-between italic">
-                                     <span className="text-[10px] font-black text-white uppercase">{cls.name}</span>
-                                     <div className="flex items-center gap-2 text-[8px] text-slate-500 font-bold">
-                                        <span>HP: {cls.stats.hp}</span>
-                                        <span>ATK: {cls.stats.atk}</span>
-                                        <span>SPD: {cls.stats.spd}</span>
+                        <div className="p-8 rounded-[2.5rem] bg-red-600/5 border border-red-500/20 space-y-6">
+                           <div className="flex items-center justify-between">
+                              <h4 className="text-[10px] font-black text-red-400 uppercase tracking-widest flex items-center gap-2">
+                                <Skull className="w-4 h-4" /> Разбойники: Ранги и Характеристики
+                              </h4>
+                              <span className="px-2 py-1 bg-red-500/10 rounded-lg text-[8px] font-black text-red-500 uppercase">Enemy NPC</span>
+                           </div>
+                           <div className="space-y-4">
+                              {gameDesign?.bandit_faction?.ranks?.map((rank: any, ri: number) => (
+                                <div key={ri} className="p-4 bg-black/40 rounded-2xl border border-white/5 space-y-2 group hover:border-red-500/30 transition-all">
+                                   <div className="flex items-center justify-between">
+                                      <span className="text-[10px] font-black text-white uppercase italic">{rank.rank} (ур. {rank.level})</span>
+                                      <span className="text-[9px] text-slate-500 font-bold">{rank.range}</span>
+                                   </div>
+                                   <div className="grid grid-cols-4 gap-2">
+                                      <div className="text-center p-1.5 bg-red-500/10 rounded-lg">
+                                         <div className="text-[7px] text-red-400 uppercase font-bold">HP</div>
+                                         <div className="text-[10px] text-white font-black">{rank.hp}</div>
+                                      </div>
+                                      <div className="text-center p-1.5 bg-orange-500/10 rounded-lg">
+                                         <div className="text-[7px] text-orange-400 uppercase font-bold">ATK</div>
+                                         <div className="text-[10px] text-white font-black">{rank.atk}</div>
+                                      </div>
+                                      <div className="text-center p-1.5 bg-blue-500/10 rounded-lg">
+                                         <div className="text-[7px] text-blue-400 uppercase font-bold">DEF</div>
+                                         <div className="text-[10px] text-white font-black">{rank.def}</div>
+                                      </div>
+                                      <div className="text-center p-1.5 bg-green-500/10 rounded-lg">
+                                         <div className="text-[7px] text-green-400 uppercase font-bold">SPD</div>
+                                         <div className="text-[10px] text-white font-black">{rank.spd}</div>
+                                      </div>
+                                   </div>
+                                </div>
+                              ))}
+                           </div>
+
+                           <div className="pt-4 border-t border-white/5 space-y-4">
+                              <h5 className="text-[9px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                                <Crown className="w-4 h-4 text-orange-400" /> Герои Разбойников
+                              </h5>
+                              <div className="grid grid-cols-1 gap-3">
+                                {Object.values(gameDesign?.bandit_faction?.heroes || {}).map((hero: any, hi: number) => (
+                                  <div key={hi} className="p-4 bg-white/5 rounded-2xl border border-white/5 flex items-start gap-4">
+                                     <div className="p-3 bg-red-600/20 rounded-xl text-red-500">
+                                       {hero.name === 'Тень Ветра' ? <Zap className="w-5 h-5"/> : 
+                                        hero.name === 'Огненный Лис' ? <Flame className="w-5 h-5"/> :
+                                        hero.name === 'Глаз Ястреба' ? <Target className="w-5 h-5"/> : <Sword className="w-5 h-5" />}
+                                     </div>
+                                     <div className="flex-1 space-y-2">
+                                        <div className="flex items-center justify-between">
+                                           <span className="text-[11px] font-black text-white uppercase italic">{hero.name}</span>
+                                           <span className="text-[8px] text-slate-500 font-bold uppercase">{hero.title}</span>
+                                        </div>
+                                        <div className="flex gap-4 text-[9px] text-slate-400 font-bold italic">
+                                           <span>HP: {hero.hp}</span>
+                                           <span>ATK: {hero.atk}</span>
+                                           <span>SPD: {hero.spd}</span>
+                                        </div>
+                                        <div className="bg-black/20 p-2 rounded-lg">
+                                           <div className="text-[8px] text-orange-400 font-black uppercase mb-1">Ультимейт: {hero.ultimate.name}</div>
+                                           <p className="text-[8px] text-slate-500 leading-tight italic">{hero.ultimate.desc}</p>
+                                        </div>
                                      </div>
                                   </div>
-                                  <div className="flex flex-wrap gap-1.5">
-                                     {cls.skills.simple.map((s: string, si: number) => (
-                                       <span key={si} className="px-2 py-0.5 bg-white/5 border border-white/5 rounded-md text-[8px] text-slate-400">{s}</span>
-                                     ))}
-                                     <span className="px-2 py-0.5 bg-purple-600/10 border border-purple-500/20 rounded-md text-[8px] text-purple-400 font-bold">{cls.skills.super}</span>
-                                  </div>
-                               </div>
-                             ))}
-                          </div>
-                          <div className="pt-4 border-t border-white/5 space-y-4">
-                             <h5 className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Прогрессия (1—9999)</h5>
-                             <div className="space-y-2">
-                                {gameDesign?.bandit_troops?.progression_tiers?.map((tier: any, ti: number) => (
-                                  <div key={ti} className="flex items-center justify-between text-[9px]">
-                                     <span className="text-slate-400 font-mono italic">{tier.lvl} LVL:</span>
-                                     <span className="text-red-400 font-bold text-right">{tier.mod}</span>
-                                  </div>
                                 ))}
-                             </div>
-                          </div>
-                       </div>
+                              </div>
+                           </div>
+
+                           <div className="pt-4 border-t border-white/5 space-y-3">
+                              <h5 className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Внешний вид по континентам</h5>
+                              <div className="space-y-3">
+                                 {Object.entries(gameDesign?.castle_mechanics?.continental_styles || {}).map(([key, style]: any) => (
+                                   <div key={key} className="p-3 bg-black/40 rounded-xl border border-white/5 space-y-2">
+                                      <div className="flex items-center gap-2">
+                                         <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                                         <span className="text-[9px] font-black text-white uppercase">{style.name}</span>
+                                      </div>
+                                      <div className="space-y-1">
+                                         <p className="text-[8px] text-slate-400"><span className="text-slate-500 font-bold uppercase">Одежда:</span> {style.appearance.clothes}</p>
+                                         <p className="text-[8px] text-slate-400"><span className="text-slate-500 font-bold uppercase">Оружие:</span> {style.appearance.weapons}</p>
+                                         <p className="text-[8px] text-slate-400"><span className="text-slate-500 font-bold uppercase">Особенности:</span> {style.appearance.features}</p>
+                                      </div>
+                                   </div>
+                                 ))}
+                              </div>
+                           </div>
+                        </div>
                     </div>
                   </motion.div>
                 ) : designSubTab === 'Abilities' ? (
@@ -2922,6 +2991,83 @@ export default function App() {
                           ))}
                         </div>
                       </div>
+                    </div>
+                  </motion.div>
+                ) : designSubTab === 'Strategies' ? (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="space-y-12"
+                  >
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                       <div className="space-y-6">
+                          <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] px-4">Тактическое Развертывание Разбойников</h3>
+                          <div className="grid grid-cols-1 gap-4">
+                             {Object.entries(gameDesign?.bandit_faction?.strategies || {}).map(([key, strat]: any) => (
+                               <div key={key} className="p-8 rounded-[2.5rem] bg-black/40 border border-white/5 space-y-4 hover:border-red-500/20 transition-all">
+                                  <div className="flex items-center justify-between">
+                                     <h4 className="text-xl font-black text-white uppercase italic tracking-tighter">
+                                        {key === 'wind_plains' ? 'Ветреные Равнины' : 
+                                         key === 'mountain_range' ? 'Горный Хребет' :
+                                         key === 'ancient_woods' ? 'Древние Леса' : 'Рассвет Империи'}
+                                     </h4>
+                                     <span className="px-3 py-1 bg-red-500/10 rounded-xl text-[10px] font-black text-red-500">{strat.cities} Города</span>
+                                  </div>
+                                  <p className="text-[11px] text-slate-400 leading-relaxed"><span className="text-slate-500 font-bold uppercase mr-2">Тактика:</span>{strat.tactics}</p>
+                                  <div className="space-y-2">
+                                     <div className="text-[9px] text-slate-600 uppercase font-black">Приоритеты развития:</div>
+                                     <div className="flex flex-wrap gap-2">
+                                        {strat.priorities.map((p: string, pi: number) => (
+                                          <span key={pi} className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-[9px] text-slate-300 font-bold">{p}</span>
+                                        ))}
+                                     </div>
+                                  </div>
+                               </div>
+                             ))}
+                          </div>
+                       </div>
+
+                       <div className="space-y-6">
+                          <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] px-4">Прогрессия по Сложности</h3>
+                          <div className="space-y-4">
+                             {Object.entries(gameDesign?.bandit_faction?.difficulty_scaling || {}).map(([key, scale]: any) => (
+                               <div key={key} className="p-8 rounded-[2.5rem] bg-gradient-to-br from-slate-900 to-black border border-white/5 space-y-4">
+                                  <div className="flex items-center justify-between">
+                                     <span className={`text-[10px] font-black uppercase tracking-widest ${
+                                        key === 'beginner' ? 'text-green-400' :
+                                        key === 'medium' ? 'text-blue-400' :
+                                        key === 'hard' ? 'text-orange-400' : 'text-red-500'
+                                     }`}>{key}</span>
+                                     <span className="text-[10px] font-mono text-slate-600 italic">Диапазон УР: {scale.lvl_range}</span>
+                                  </div>
+                                  <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+                                     <div className="text-[8px] text-slate-500 uppercase font-black mb-1">Основные Цели:</div>
+                                     <p className="text-[11px] text-slate-300 italic leading-relaxed">{scale.goal}</p>
+                                  </div>
+                               </div>
+                             ))}
+                          </div>
+
+                          <div className="p-10 rounded-[3rem] bg-indigo-600/5 border border-indigo-500/20 space-y-6">
+                             <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.4em]">Общие Рекомендации</h4>
+                             <div className="space-y-4">
+                                {[
+                                  { t: "Развитие городов", d: "Приоритет на экономические постройки в начале, затем военные." },
+                                  { t: "Покупка войск", d: "Балансируйте между массовкой и элитными отрядами для засад." },
+                                  { t: "Использование зелий", d: "Всегда держите запас зелий скорости и невидимости." },
+                                  { t: "Герои", d: "Специализируйте героев под условия континента." }
+                                ].map((rec, ri) => (
+                                  <div key={ri} className="flex items-start gap-4 p-4 hover:bg-white/5 rounded-2xl transition-all">
+                                     <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 flex-shrink-0" />
+                                     <div className="space-y-1">
+                                        <div className="text-[10px] font-black text-white uppercase italic">{rec.t}</div>
+                                        <p className="text-[10px] text-slate-500 leading-snug">{rec.d}</p>
+                                     </div>
+                                  </div>
+                                ))}
+                             </div>
+                          </div>
+                       </div>
                     </div>
                   </motion.div>
                 ) : (
