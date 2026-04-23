@@ -47,7 +47,22 @@ import {
   Target,
   Layout,
   Swords,
-  Clock
+  Clock,
+  Skull,
+  CloudOff,
+  TrendingUp,
+  Coins,
+  Flame,
+  Droplets,
+  Wind,
+  Mountain,
+  FlaskConical,
+  Calculator,
+  Dna,
+  Sword,
+  Star,
+  Eye,
+  ZapOff
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -307,7 +322,8 @@ export default function App() {
   const [isMigrating, setIsMigrating] = useState(false);
   const [gameDesign, setGameDesign] = useState<any>(null);
   const [isSavingGameDesign, setIsSavingGameDesign] = useState(false);
-  const [designSubTab, setDesignSubTab] = useState<'World' | 'Castle System' | 'Heroes & Units' | 'Visuals & Nav' | 'Abilities' | 'Balancing & Rarity' | 'Economy'>('World');
+  const [designSubTab, setDesignSubTab] = useState<'World' | 'Castle System' | 'Heroes & Units' | 'Visuals & Nav' | 'Abilities' | 'Synergies' | 'Balancing & Rarity' | 'Economy'>('World');
+  const [synergyHeroType, setSynergyHeroType] = useState<'simple' | 'main'>('simple');
 
   const fetchPackagesInfo = async () => {
     try {
@@ -2159,6 +2175,77 @@ export default function App() {
                     animate={{ opacity: 1 }}
                     className="space-y-12"
                   >
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                       <div className="p-10 rounded-[3rem] bg-black/40 border border-white/10 space-y-8">
+                          <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Визуальные состояния</h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                             {Object.entries(gameDesign?.castle_mechanics?.visual_states || {}).map(([key, state]: any) => (
+                               <div key={key} className="space-y-4">
+                                  <div className="flex items-center gap-3">
+                                    <div className={`p-2 rounded-xl ${key === 'abandoned' ? 'bg-slate-800 text-slate-400' : 'bg-red-600/20 text-red-400'}`}>
+                                      {key === 'abandoned' ? <CloudOff className="w-4 h-4" /> : <Skull className="w-4 h-4" />}
+                                    </div>
+                                    <h5 className="text-[11px] font-black text-white uppercase tracking-widest">{state.title}</h5>
+                                  </div>
+                                  <div className="space-y-2">
+                                     {state.features.map((f: string, fi: number) => (
+                                       <div key={fi} className="flex items-start gap-2 text-[9px] text-slate-500 italic leading-tight">
+                                          <div className="w-1 h-1 rounded-full bg-purple-500 mt-1.5 shrink-0" />
+                                          {f}
+                                       </div>
+                                     ))}
+                                  </div>
+                               </div>
+                             ))}
+                          </div>
+
+                          <div className="pt-8 border-t border-white/5 space-y-4">
+                             <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Стили континентов</h4>
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {Object.entries(gameDesign?.castle_mechanics?.continental_styles || {}).map(([key, style]: any) => (
+                                  <div key={key} className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-1">
+                                     <div className="text-[8px] text-slate-600 uppercase font-black">{key}</div>
+                                     <div className="text-[10px] text-slate-300 leading-relaxed italic">{style}</div>
+                                  </div>
+                                ))}
+                             </div>
+                          </div>
+                       </div>
+
+                       <div className="p-10 rounded-[3rem] bg-gradient-to-br from-purple-600/10 to-blue-600/10 border border-purple-500/20 space-y-8">
+                          <h4 className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-purple-400" /> Глобальные уровни развития (1—5)
+                          </h4>
+                          <div className="space-y-4">
+                             {gameDesign?.castle_mechanics?.development_levels?.map((dl: any) => (
+                               <div key={dl.level} className="p-6 bg-black/40 rounded-3xl border border-white/5 group hover:border-white/20 transition-all">
+                                  <div className="flex items-center justify-between mb-4">
+                                     <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-xl bg-purple-600 flex items-center justify-center text-xs font-black italic">{dl.level}</div>
+                                        <h5 className="text-[11px] font-black text-white uppercase tracking-widest">{dl.name}</h5>
+                                     </div>
+                                     <span className="text-[8px] text-slate-500 font-bold uppercase">{dl.state}</span>
+                                  </div>
+                                  <div className="grid grid-cols-3 gap-4">
+                                     <div className="space-y-1">
+                                        <div className="text-[8px] text-slate-600 uppercase font-black">Гарнизон</div>
+                                        <div className="text-[10px] text-slate-400 italic leading-tight">{dl.garrison}</div>
+                                     </div>
+                                     <div className="space-y-1">
+                                        <div className="text-[8px] text-slate-600 uppercase font-black">Оборона</div>
+                                        <div className="text-[10px] text-slate-400 italic leading-tight">{dl.defense}</div>
+                                     </div>
+                                     <div className="space-y-1">
+                                        <div className="text-[8px] text-slate-600 uppercase font-black">Экономика</div>
+                                        <div className="text-[10px] text-slate-400 italic leading-tight">{dl.economy}</div>
+                                     </div>
+                                  </div>
+                               </div>
+                             ))}
+                          </div>
+                       </div>
+                    </div>
+
                     <div className="grid grid-cols-1 gap-12">
                       {gameDesign?.continents?.map((cont: any, i: number) => (
                         <div key={i} className="space-y-6">
@@ -2212,11 +2299,11 @@ export default function App() {
                     </div>
                   </motion.div>
                 ) : designSubTab === 'Heroes & Units' ? (
-                   <motion.div 
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="grid grid-cols-1 lg:grid-cols-2 gap-8"
-                  >
+  <motion.div 
+    initial={{ opacity: 0, x: -20 }}
+    animate={{ opacity: 1, x: 0 }}
+    className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+  >
                     <div className="space-y-8">
                        <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] px-4">Основные Классы</h3>
                        <div className="grid grid-cols-1 gap-4">
@@ -2298,6 +2385,46 @@ export default function App() {
                              ))}
                            </div>
                          </div>
+                       </div>
+
+                       <div className="p-8 rounded-[2.5rem] bg-red-600/5 border border-red-500/20 space-y-6">
+                          <div className="flex items-center justify-between">
+                             <h4 className="text-[10px] font-black text-red-400 uppercase tracking-widest flex items-center gap-2">
+                               <Skull className="w-4 h-4" /> Войска Разбойников (NPC)
+                             </h4>
+                             <span className="px-2 py-1 bg-red-500/10 rounded-lg text-[8px] font-black text-red-500 uppercase">Enemy Faction</span>
+                          </div>
+                          <div className="space-y-4">
+                             {Object.entries(gameDesign?.bandit_troops?.classes || {}).map(([key, cls]: any) => (
+                               <div key={key} className="p-4 bg-black/40 rounded-2xl border border-white/5 space-y-3 group hover:border-red-500/30 transition-all">
+                                  <div className="flex items-center justify-between italic">
+                                     <span className="text-[10px] font-black text-white uppercase">{cls.name}</span>
+                                     <div className="flex items-center gap-2 text-[8px] text-slate-500 font-bold">
+                                        <span>HP: {cls.stats.hp}</span>
+                                        <span>ATK: {cls.stats.atk}</span>
+                                        <span>SPD: {cls.stats.spd}</span>
+                                     </div>
+                                  </div>
+                                  <div className="flex flex-wrap gap-1.5">
+                                     {cls.skills.simple.map((s: string, si: number) => (
+                                       <span key={si} className="px-2 py-0.5 bg-white/5 border border-white/5 rounded-md text-[8px] text-slate-400">{s}</span>
+                                     ))}
+                                     <span className="px-2 py-0.5 bg-purple-600/10 border border-purple-500/20 rounded-md text-[8px] text-purple-400 font-bold">{cls.skills.super}</span>
+                                  </div>
+                               </div>
+                             ))}
+                          </div>
+                          <div className="pt-4 border-t border-white/5 space-y-4">
+                             <h5 className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Прогрессия (1—9999)</h5>
+                             <div className="space-y-2">
+                                {gameDesign?.bandit_troops?.progression_tiers?.map((tier: any, ti: number) => (
+                                  <div key={ti} className="flex items-center justify-between text-[9px]">
+                                     <span className="text-slate-400 font-mono italic">{tier.lvl} LVL:</span>
+                                     <span className="text-red-400 font-bold text-right">{tier.mod}</span>
+                                  </div>
+                                ))}
+                             </div>
+                          </div>
                        </div>
                     </div>
                   </motion.div>
@@ -2423,73 +2550,102 @@ export default function App() {
                     animate={{ opacity: 1, scale: 1 }}
                     className="space-y-12"
                   >
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-4">
+                      <div>
+                        <h3 className="text-xl font-black text-white uppercase italic tracking-tighter">Прогрессия Синергий</h3>
+                        <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Взаимодействие умений и уровни мастерства (1—9999)</p>
+                      </div>
+                      <div className="flex p-1 bg-black/40 rounded-2xl border border-white/5">
+                        <button 
+                          onClick={() => setSynergyHeroType('simple')}
+                          className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${synergyHeroType === 'simple' ? 'bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.3)]' : 'text-slate-500 hover:text-slate-300'}`}
+                        >
+                          Простые герои
+                        </button>
+                        <button 
+                          onClick={() => setSynergyHeroType('main')}
+                          className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${synergyHeroType === 'main' ? 'bg-purple-600 text-white shadow-[0_0_20px_rgba(147,51,234,0.3)]' : 'text-slate-500 hover:text-slate-300'}`}
+                        >
+                          Главные герои
+                        </button>
+                      </div>
+                    </div>
+
                     <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                       {Object.entries(gameDesign?.skill_synergies?.classes || {}).map(([cls, data]: any) => (
-                         <div key={cls} className="space-y-6">
-                           <div className="flex items-center gap-4 px-4">
-                             <div className={`p-3 rounded-2xl ${
-                               cls === 'Warrior' ? 'bg-orange-600/20 text-orange-400' : 
-                               cls === 'Mage' ? 'bg-purple-600/20 text-purple-400' : 'bg-green-600/20 text-green-400'
+                       {Object.entries((synergyHeroType === 'simple' ? gameDesign?.skill_synergies?.simple_heroes : gameDesign?.skill_synergies?.main_heroes) || {}).map(([cls, data]: any) => (
+                         <div key={cls} className="space-y-8">
+                           <div className="flex items-center gap-4 px-6">
+                             <div className={`p-4 rounded-3xl ${
+                               cls === 'Warrior' ? 'bg-orange-600/20 text-orange-400 border border-orange-500/20' : 
+                               cls === 'Mage' ? 'bg-purple-600/20 text-purple-400 border border-purple-500/20' : 'bg-green-600/20 text-green-400 border border-green-500/20'
                              }`}>
-                               {cls === 'Warrior' ? <Shield className="w-5 h-5" /> : 
-                                cls === 'Mage' ? <Zap className="w-5 h-5" /> : <Target className="w-5 h-5" />}
+                               {cls === 'Warrior' ? <Shield className="w-6 h-6" /> : 
+                                cls === 'Mage' ? <Zap className="w-6 h-6" /> : <Target className="w-6 h-6" />}
                              </div>
                              <div>
                                <h3 className="text-lg font-black text-white uppercase italic">{cls === 'Warrior' ? 'Воин' : cls === 'Mage' ? 'Маг' : 'Стрелок'}</h3>
-                               <span className="text-[9px] text-slate-500 uppercase font-black tracking-widest">Система Синергий</span>
+                               <div className="flex items-center gap-2">
+                                 <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
+                                 <span className="text-[9px] text-slate-500 uppercase font-black tracking-widest">Прогрессия 5 Тиров</span>
+                               </div>
                              </div>
                            </div>
 
-                           <div className="space-y-4">
-                             <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-4">Комбинации</h4>
-                             <div className="space-y-3">
-                               {data.synergies.map((syn: any, si: number) => (
-                                 <div key={si} className="p-6 rounded-[2rem] bg-black/40 border border-white/10 space-y-4 group hover:border-white/20 transition-all">
-                                   <div className="flex items-center gap-2 flex-wrap">
-                                      {syn.skills.map((s: string, ski: number) => (
-                                        <React.Fragment key={ski}>
-                                          <span className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/5 text-[10px] font-black text-white uppercase tracking-tighter italic">
-                                            {s}
-                                          </span>
-                                          {ski < syn.skills.length - 1 && <ArrowRight className="w-3 h-3 text-slate-700" />}
-                                        </React.Fragment>
+                           <div className="space-y-6">
+                             {data.tiers?.map((tier: any, ti: number) => (
+                               <div key={ti} className="relative group">
+                                 {ti < data.tiers.length - 1 && (
+                                   <div className="absolute left-[34px] top-20 bottom-0 w-[2px] bg-gradient-to-b from-white/10 to-transparent z-0 hidden md:block" />
+                                 )}
+                                 
+                                 <div className="p-8 rounded-[3rem] bg-black/40 border border-white/10 group-hover:border-white/20 transition-all relative z-10 space-y-6">
+                                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                      <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-[11px] font-black text-slate-400 italic">
+                                          {ti + 1}
+                                        </div>
+                                        <div>
+                                          <div className="text-[10px] text-purple-400 font-bold uppercase tracking-[0.2em]">{tier.range} LVL</div>
+                                          <h5 className="text-sm font-black text-white uppercase tracking-tighter italic">{tier.title}</h5>
+                                        </div>
+                                      </div>
+                                      <div className="flex gap-2">
+                                        <span className="px-3 py-1 bg-blue-600/10 border border-blue-500/20 rounded-lg text-[9px] font-black text-blue-400 text-center flex items-center">{tier.stats}</span>
+                                        <span className="px-3 py-1 bg-yellow-600/10 border border-yellow-500/20 rounded-lg text-[9px] font-black text-yellow-500 text-center flex items-center">CD: {tier.cooldown}</span>
+                                      </div>
+                                   </div>
+
+                                   <div className="space-y-3 pl-4 border-l-2 border-white/5">
+                                      {tier.effects?.map((eff: string, ei: number) => (
+                                        <div key={ei} className="flex gap-3 text-[10px] text-slate-300 leading-relaxed italic">
+                                           <div className="mt-1.5 w-1 h-1 rounded-full bg-blue-500 shrink-0" />
+                                           {eff}
+                                        </div>
                                       ))}
                                    </div>
-                                   <div className="space-y-2">
-                                      <div className="text-[9px] text-slate-500 uppercase font-black italic">{syn.condition}</div>
-                                      <div className="p-3 bg-purple-600/5 rounded-xl border border-purple-500/20 text-[11px] text-purple-300 leading-relaxed">
-                                        {syn.effect}
-                                      </div>
-                                      <div className="text-[10px] text-orange-400/60 font-mono flex items-center gap-2">
-                                        <Sparkles className="w-3 h-3" /> {syn.visual}
-                                      </div>
+
+                                   <div className="p-4 bg-purple-600/5 rounded-2xl border border-purple-500/10 flex items-center gap-3">
+                                      <Sparkles className="w-4 h-4 text-purple-400" />
+                                      <span className="text-[9px] text-slate-400 uppercase font-bold tracking-widest">{tier.visual}</span>
                                    </div>
                                  </div>
-                               ))}
-                             </div>
-
-                             <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-white/5 to-transparent border border-white/5 space-y-4">
-                               <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Цепочки комбинаций</h4>
-                               <div className="space-y-2">
-                                 {data.combos.map((c: string, ci: number) => (
-                                   <div key={ci} className="flex items-center gap-3 text-[10px] text-slate-300">
-                                      <div className="w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0" />
-                                      {c}
-                                   </div>
-                                 ))}
                                </div>
-                             </div>
+                             ))}
 
-                             <div className="p-8 rounded-[2.5rem] bg-purple-600/5 border border-purple-500/10 space-y-4">
-                               <h4 className="text-[10px] font-black text-purple-400 uppercase tracking-widest">Особые эффекты</h4>
-                               <div className="space-y-3">
-                                 {data.special_effects.map((e: string, ei: number) => (
-                                   <div key={ei} className="p-3 bg-black/40 rounded-2xl border border-white/5 text-[10px] text-slate-400 leading-relaxed italic">
-                                      {e}
-                                   </div>
-                                 ))}
+                             {synergyHeroType === 'main' && data.unique_effects && (
+                               <div className="p-10 rounded-[3rem] bg-gradient-to-br from-purple-600/20 to-blue-600/20 border border-purple-500/30 space-y-6">
+                                  <h4 className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-2">
+                                    <Star className="w-4 h-4 text-yellow-500" /> Уникальные особенности
+                                  </h4>
+                                  <div className="space-y-3">
+                                    {data.unique_effects.map((ue: string, uei: number) => (
+                                      <div key={uei} className="p-3 bg-black/40 rounded-2xl border border-white/5 text-[10px] text-slate-300 font-bold italic leading-relaxed">
+                                        {ue}
+                                      </div>
+                                    ))}
+                                  </div>
                                </div>
-                             </div>
+                             )}
                            </div>
                          </div>
                        ))}
@@ -2548,6 +2704,95 @@ export default function App() {
                               "Синергии требуют непосредственного участия игрока и понимания таймингов. При активации иконка умения мерцает золотым, а звуковой сигнал подтверждает успех комбинации."
                             </div>
                          </div>
+                       </div>
+                    </div>
+                  </motion.div>
+                ) : designSubTab === 'Balancing & Rarity' ? (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="space-y-12"
+                  >
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                       <div className="p-10 rounded-[3rem] bg-black/40 border border-white/10 space-y-8">
+                          <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">Механика Урона</h4>
+                          <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-blue-600/10 to-transparent border border-blue-500/20 space-y-6">
+                             <div className="flex items-center gap-4">
+                                <div className="p-4 bg-blue-600 rounded-2xl text-white shadow-lg">
+                                   <Calculator className="w-6 h-6" />
+                                </div>
+                                <div>
+                                   <h5 className="text-sm font-black text-white uppercase italic">Универсальная Формула</h5>
+                                   <div className="text-xl font-black text-blue-400 tracking-tighter mt-1">{gameDesign?.combat_mechanics?.formulas?.base_damage}</div>
+                                </div>
+                             </div>
+                             <div className="space-y-4">
+                                {gameDesign?.combat_mechanics?.calculation_steps?.map((step: string, si: number) => (
+                                  <div key={si} className="flex items-center gap-3 text-[10px] text-slate-400 font-bold italic">
+                                     <div className="w-5 h-5 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-[8px]">{si + 1}</div>
+                                     {step}
+                                  </div>
+                                ))}
+                             </div>
+                          </div>
+
+                          <div className="p-8 rounded-[2.5rem] bg-white/5 border border-white/5 space-y-6">
+                             <h5 className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Пример расчёта: Воин vs Маг</h5>
+                             <div className="space-y-3">
+                                {[
+                                  { s: "1. ATK Воина (L10)", v: "50 * (1 + 0.01*10) = 55" },
+                                  { s: "2. DEF Мага con Дебафф", v: "32 * 0.8 = 26" },
+                                  { s: "3. Базовый урон", v: "69 - 26 = 43" },
+                                  { s: "4. Крит (RNG 22 < 25%)", v: "43 * 2 = 86" },
+                                  { s: "5. Финальный урон", v: "86 ед. (Здоровье: 200 -> 114)" }
+                                ].map((row, i) => (
+                                  <div key={i} className="flex justify-between items-center text-[10px]">
+                                     <span className="text-slate-500 italic">{row.s}</span>
+                                     <span className="text-white font-mono font-bold">{row.v}</span>
+                                  </div>
+                                ))}
+                             </div>
+                          </div>
+                       </div>
+
+                       <div className="p-10 rounded-[3rem] bg-purple-600/5 border border-purple-500/10 space-y-8">
+                          <h4 className="text-[10px] font-black text-purple-400 uppercase tracking-[0.4em]">Коэффициенты Прогрессии</h4>
+                          <div className="space-y-6">
+                             <div className="grid grid-cols-2 gap-4">
+                                {Object.entries(gameDesign?.combat_mechanics?.formulas?.level_scaling || {}).map(([key, formula]: any) => (
+                                  <div key={key} className="p-4 bg-black/40 rounded-2xl border border-white/5 space-y-1">
+                                     <div className="text-[8px] text-slate-500 uppercase font-black">{key} Scaling</div>
+                                     <div className="text-[11px] text-purple-400 font-mono font-bold italic">{formula}</div>
+                                  </div>
+                                ))}
+                             </div>
+                             <div className="p-8 bg-white/5 rounded-[2.5rem] border border-white/5">
+                                <table className="w-full text-left text-[10px]">
+                                  <thead>
+                                    <tr className="text-slate-600 uppercase border-b border-white/5 italic">
+                                      <th className="pb-2">LVL</th>
+                                      <th className="pb-2 text-right text-orange-400">ATK</th>
+                                      <th className="pb-2 text-right text-blue-400">DEF</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody className="divide-y divide-white/5">
+                                    {[
+                                      { l: "1-500", a: "x1.0-1.5", d: "x1.0-1.4" },
+                                      { l: "501-1000", a: "x1.5-2.0", d: "x1.4-1.8" },
+                                      { l: "1001-2000", a: "x2.0-3.0", d: "x1.8-2.6" },
+                                      { l: "2001-5000", a: "x3.0-5.0", d: "x2.6-4.4" },
+                                      { l: "5001-9999", a: "x5.0-10.0", d: "x4.4-8.8" }
+                                    ].map((row, i) => (
+                                      <tr key={i} className="group hover:bg-white/5 transition-colors">
+                                        <td className="py-3 font-mono text-slate-500">{row.l}</td>
+                                        <td className="py-3 text-right text-white font-bold">{row.a}</td>
+                                        <td className="py-3 text-right text-slate-400">{row.d}</td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                             </div>
+                          </div>
                        </div>
                     </div>
                   </motion.div>
