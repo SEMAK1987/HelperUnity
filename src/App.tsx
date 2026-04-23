@@ -46,7 +46,8 @@ import {
   ArrowRight,
   Target,
   Layout,
-  Swords
+  Swords,
+  Clock
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -306,7 +307,7 @@ export default function App() {
   const [isMigrating, setIsMigrating] = useState(false);
   const [gameDesign, setGameDesign] = useState<any>(null);
   const [isSavingGameDesign, setIsSavingGameDesign] = useState(false);
-  const [designSubTab, setDesignSubTab] = useState<'World' | 'Castle System' | 'Heroes & Units' | 'Abilities' | 'Balancing & Rarity' | 'Economy'>('World');
+  const [designSubTab, setDesignSubTab] = useState<'World' | 'Castle System' | 'Heroes & Units' | 'Visuals & Nav' | 'Abilities' | 'Balancing & Rarity' | 'Economy'>('World');
 
   const fetchPackagesInfo = async () => {
     try {
@@ -1905,7 +1906,7 @@ export default function App() {
                         <h2 className="text-4xl font-black text-white uppercase tracking-tighter italic">
                           {gameDesign?.game_title || 'Континент судьбы'}
                         </h2>
-                        <span className="px-3 py-1 rounded-full bg-purple-600/20 border border-purple-500/30 text-[10px] font-bold text-purple-400 uppercase tracking-widest">v{gameDesign?.version || '1.1.0'}</span>
+                        <span className="px-3 py-1 rounded-full bg-purple-600/20 border border-purple-500/30 text-[10px] font-bold text-purple-400 uppercase tracking-widest">v{gameDesign?.version || '1.2.0'}</span>
                       </div>
                       <p className="text-xs text-slate-500 uppercase tracking-[0.3em] font-black mt-2 flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
@@ -1935,7 +1936,7 @@ export default function App() {
 
                 {/* Sub-tabs for Game Design */}
                 <div className="flex items-center gap-2 p-1.5 bg-black/40 rounded-2xl border border-white/5 w-fit">
-                  {['World', 'Castle System', 'Heroes & Units', 'Abilities', 'Balancing & Rarity', 'Economy'].map((tab) => (
+                  {['World', 'Castle System', 'Heroes & Units', 'Visuals & Nav', 'Abilities', 'Synergies', 'Balancing & Rarity', 'Economy'].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setDesignSubTab(tab as any)}
@@ -1963,62 +1964,155 @@ export default function App() {
                                <MapIcon className="w-24 h-24 text-white" />
                              </div>
                              <div className="relative z-10 space-y-6">
-                               <div className="flex items-center gap-4">
-                                 <div className="w-12 h-12 rounded-2xl bg-purple-600 text-white flex items-center justify-center font-black italic text-xl">0{i+1}</div>
-                                 <input 
-                                   value={cont.name}
-                                   onChange={(e) => {
-                                      const newConts = [...gameDesign.continents];
-                                      newConts[i].name = e.target.value;
-                                      setGameDesign({...gameDesign, continents: newConts});
-                                   }}
-                                   className="bg-transparent border-none text-2xl font-black text-white focus:outline-none uppercase tracking-tighter w-full"
-                                 />
+                               <div className="flex items-center justify-between">
+                                 <div className="flex items-center gap-4">
+                                   <div className="w-12 h-12 rounded-2xl bg-purple-600 text-white flex items-center justify-center font-black italic text-xl">0{i+1}</div>
+                                   <input 
+                                     value={cont.name}
+                                     onChange={(e) => {
+                                        const newConts = [...gameDesign.continents];
+                                        newConts[i].name = e.target.value;
+                                        setGameDesign({...gameDesign, continents: newConts});
+                                     }}
+                                     className="bg-transparent border-none text-2xl font-black text-white focus:outline-none uppercase tracking-tighter w-full"
+                                   />
+                                 </div>
+                                 {cont.visuals && (
+                                   <div className="flex items-center gap-2">
+                                     <span className="px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-[8px] font-black uppercase text-slate-400">
+                                       {cont.visuals.main_color}
+                                     </span>
+                                     <span className="px-2 py-1 rounded-lg bg-purple-600/20 border border-purple-500/30 text-[8px] font-black uppercase text-purple-400">
+                                       {cont.visuals.hero_icon}
+                                     </span>
+                                   </div>
+                                 )}
                                </div>
 
-                               {cont.factions ? (
-                                 <div className="grid grid-cols-1 gap-3">
-                                   {cont.factions.map((f: any, fi: number) => (
-                                     <div key={fi} className="p-4 bg-black/40 rounded-2xl border border-white/5 space-y-2">
-                                       <div className="flex items-center justify-between">
-                                         <input 
-                                           value={f.name}
-                                           onChange={(e) => {
-                                              const newConts = [...gameDesign.continents];
-                                              newConts[i].factions[fi].name = e.target.value;
-                                              setGameDesign({...gameDesign, continents: newConts});
-                                           }}
-                                           className="bg-transparent border-none text-[11px] font-black text-purple-400 focus:outline-none uppercase tracking-widest"
-                                         />
-                                         <Users className="w-3 h-3 text-slate-700" />
-                                       </div>
-                                       <textarea 
-                                         value={f.locations}
-                                         onChange={(e) => {
-                                            const newConts = [...gameDesign.continents];
-                                            newConts[i].factions[fi].locations = e.target.value;
-                                            setGameDesign({...gameDesign, continents: newConts});
-                                         }}
-                                         className="w-full bg-transparent border-none text-[10px] text-slate-500 focus:outline-none resize-none h-12 leading-relaxed"
-                                       />
+                               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                 {cont.environment && (
+                                   <div className="space-y-3">
+                                     <h5 className="text-[9px] font-black text-slate-500 uppercase tracking-widest px-1">Окружение</h5>
+                                     <div className="space-y-1">
+                                       {cont.environment.map((item: string, idx: number) => (
+                                         <div key={idx} className="flex items-start gap-2 text-[9px] text-slate-400 leading-tight">
+                                           <div className="w-1 h-1 rounded-full bg-purple-500 mt-1 flex-shrink-0" />
+                                           {item}
+                                         </div>
+                                       ))}
                                      </div>
-                                   ))}
+                                   </div>
+                                 )}
+
+                                 <div className="space-y-3">
+                                   <h5 className="text-[9px] font-black text-slate-500 uppercase tracking-widest px-1">Фракции</h5>
+                                   {cont.factions ? (
+                                     <div className="grid grid-cols-1 gap-3">
+                                       {cont.factions.map((f: any, fi: number) => (
+                                         <div key={fi} className="p-4 bg-black/40 rounded-2xl border border-white/5 space-y-1">
+                                           <div className="flex items-center justify-between">
+                                             <input 
+                                               value={f.name}
+                                               onChange={(e) => {
+                                                  const newConts = [...gameDesign.continents];
+                                                  newConts[i].factions[fi].name = e.target.value;
+                                                  setGameDesign({...gameDesign, continents: newConts});
+                                               }}
+                                               className="bg-transparent border-none text-[10px] font-black text-purple-400 focus:outline-none uppercase tracking-widest"
+                                             />
+                                             <Users className="w-3 h-3 text-slate-700" />
+                                           </div>
+                                           <textarea 
+                                             value={f.locations}
+                                             onChange={(e) => {
+                                                const newConts = [...gameDesign.continents];
+                                                newConts[i].factions[fi].locations = e.target.value;
+                                                setGameDesign({...gameDesign, continents: newConts});
+                                             }}
+                                             className="w-full bg-transparent border-none text-[9px] text-slate-500 focus:outline-none resize-none h-10 leading-relaxed"
+                                           />
+                                         </div>
+                                       ))}
+                                     </div>
+                                   ) : cont.structure ? (
+                                      <div className="p-4 bg-blue-600/5 border border-blue-500/20 rounded-2xl space-y-3">
+                                        {Object.entries(cont.structure).map(([key, val]: any, si: number) => (
+                                          <div key={si} className="flex items-center justify-between text-[9px]">
+                                            <span className="text-slate-500 uppercase">{key}:</span>
+                                            <span className="text-slate-300 font-bold">{val}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                   ) : null}
                                  </div>
-                               ) : cont.structure ? (
-                                  <div className="p-6 bg-blue-600/5 border border-blue-500/20 rounded-3xl space-y-4">
-                                    <div className="flex items-center gap-3 text-blue-400 font-bold text-[10px] uppercase tracking-widest">
-                                      <Layout className="w-4 h-4" /> Структура Империи
-                                    </div>
-                                    <div className="grid grid-cols-1 gap-2">
-                                      {Object.entries(cont.structure).map(([key, val]: any, si: number) => (
-                                        <div key={si} className="flex items-center justify-between text-[10px]">
-                                          <span className="text-slate-500 uppercase">{key}:</span>
-                                          <span className="text-slate-300 font-bold">{val}</span>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-                               ) : null}
+                               </div>
+                ) : designSubTab === 'Visuals & Nav' ? (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+                  >
+                    <div className="space-y-8">
+                      <div className="p-10 rounded-[3rem] bg-black/40 border border-white/10 space-y-8 relative overflow-hidden">
+                        <div className="absolute -top-12 -right-12 w-64 h-64 bg-green-600/5 rounded-full blur-[80px]" />
+                        <h4 className="text-[10px] font-black text-green-400 uppercase tracking-[0.4em] mb-4">Выделение клеток</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {Object.entries(gameDesign?.visual_system?.cell_highlight || {}).map(([key, val]: any) => (
+                            <div key={key} className="p-6 rounded-3xl bg-white/5 border border-white/5 space-y-2">
+                              <div className="text-[9px] text-slate-500 uppercase font-black">{key}</div>
+                              <div className="text-sm text-white font-medium">{val}</div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="p-6 bg-white/5 rounded-3xl space-y-4">
+                          <h5 className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Система подсказок (Зум)</h5>
+                          <div className="space-y-3">
+                            {Object.entries(gameDesign?.visual_system?.scaling_hints || {}).map(([key, val]: any) => (
+                              <div key={key} className="flex items-center justify-between text-[11px]">
+                                <span className="text-slate-500 uppercase">{key}:</span>
+                                <span className="text-blue-400 font-bold italic">{val}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-8">
+                       <div className="p-10 rounded-[3rem] bg-black/40 border border-white/10 space-y-8">
+                         <h4 className="text-[10px] font-black text-blue-400 uppercase tracking-[0.4em]">Механика Камеры</h4>
+                         <div className="space-y-6">
+                           <div className="grid grid-cols-1 gap-3">
+                             <div className="text-[10px] text-slate-500 uppercase font-black">Уровни масштаба</div>
+                             {Object.entries(gameDesign?.camera_mechanics?.zoom_levels || {}).map(([key, val]: any) => (
+                               <div key={key} className="p-4 bg-white/5 rounded-2xl border border-white/5 flex items-center justify-between">
+                                  <span className="text-[10px] text-slate-400 uppercase">{key}</span>
+                                  <span className="text-[11px] text-white font-medium italic text-right">{val}</span>
+                               </div>
+                             ))}
+                           </div>
+                           <div className="p-6 bg-purple-600/5 rounded-3xl border border-purple-500/20 space-y-4">
+                              <div className="flex items-center gap-3 text-purple-400 font-bold text-[10px] uppercase tracking-widest">
+                                <RefreshCw className="w-4 h-4" /> Вращение
+                              </div>
+                              <div className="text-[11px] text-slate-300">
+                                {gameDesign?.camera_mechanics?.rotation?.free}. Фиксированные углы: {gameDesign?.camera_mechanics?.rotation?.fixed?.join('°, ')}°. {gameDesign?.camera_mechanics?.rotation?.auto}.
+                              </div>
+                           </div>
+                           <div className="grid grid-cols-2 gap-4">
+                             <div className="p-6 bg-white/5 rounded-3xl border border-white/5 space-y-2">
+                               <div className="text-[9px] text-slate-500 uppercase font-black">Интерфейс</div>
+                               <div className="text-xs text-white">{gameDesign?.camera_mechanics?.ui?.join(', ')}</div>
+                             </div>
+                             <div className="p-6 bg-white/5 rounded-3xl border border-white/5 space-y-2">
+                               <div className="text-[9px] text-slate-500 uppercase font-black">Анимация</div>
+                               <div className="text-xs text-white">{gameDesign?.camera_mechanics?.animations?.join(', ')}</div>
+                             </div>
+                           </div>
+                         </div>
+                       </div>
+                    </div>
+                  </motion.div>
                              </div>
                            </div>
                          ))}
@@ -2061,67 +2155,60 @@ export default function App() {
                   </motion.div>
                 ) : designSubTab === 'Castle System' ? (
                   <motion.div 
-                    initial={{ opacity: 0, scale: 0.98 }}
-                    animate={{ opacity: 1, scale: 1 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
                     className="space-y-12"
                   >
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                      {gameDesign?.castle_system?.upgrade_levels?.map((lvl: any) => (
-                        <div key={lvl.level} className="p-6 rounded-3xl bg-white/5 border border-white/5 hover:border-purple-500/40 transition-all group">
-                          <div className="text-[10px] font-black text-slate-600 uppercase mb-4 tracking-widest">Уровень {lvl.level}</div>
-                          <h4 className="text-sm font-black text-white uppercase mb-6 tracking-tighter">{lvl.name}</h4>
-                          <div className="space-y-3">
-                            <div className="flex items-center justify-between text-[9px]">
-                              <span className="text-slate-500 uppercase">Герои:</span>
-                              <span className="text-purple-400 font-bold">{lvl.heroes}</span>
-                            </div>
-                            <div className="flex items-center justify-between text-[9px]">
-                              <span className="text-slate-500 uppercase">Войска:</span>
-                              <span className="text-slate-300 font-bold">{lvl.units}</span>
-                            </div>
-                            <div className="flex items-center justify-between text-[9px]">
-                              <span className="text-slate-500 uppercase">Золото:</span>
-                              <span className="text-yellow-500 font-bold">{lvl.gold}</span>
-                            </div>
-                          </div>
+                    <div className="grid grid-cols-1 gap-12">
+                      {gameDesign?.continents?.map((cont: any, i: number) => (
+                        <div key={i} className="space-y-6">
+                           <div className="flex items-center gap-4 px-4">
+                             <div className="w-8 h-8 rounded-lg bg-purple-600 text-white flex items-center justify-center font-black italic text-xs leading-none">0{i+1}</div>
+                             <h4 className="text-lg font-black text-white uppercase tracking-tighter italic">{cont.name}: Путь Развития Замка</h4>
+                           </div>
+                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+                             {cont.castles?.map((lvl: any) => (
+                               <div key={lvl.level} className="p-6 rounded-[2rem] bg-white/5 border border-white/5 hover:border-purple-500/40 transition-all group relative overflow-hidden">
+                                 <div className="text-[9px] font-black text-slate-700 uppercase mb-3 tracking-widest flex items-center justify-between">
+                                   <span>Level {lvl.level}</span>
+                                   {lvl.special && <Zap className="w-3 h-3 text-yellow-500" />}
+                                 </div>
+                                 <h5 className="text-xs font-black text-white uppercase mb-4 tracking-tighter leading-tight min-h-[2rem]">{lvl.name}</h5>
+                                 <div className="space-y-3">
+                                   <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1.5">
+                                     <div className="text-[8px] text-slate-600 uppercase font-black">Внешний вид</div>
+                                     <div className="text-[10px] text-slate-400 leading-tight h-10 overflow-y-auto scrollbar-none">{lvl.appearance}</div>
+                                   </div>
+                                   <div className="space-y-2">
+                                     {lvl.units && (
+                                       <div className="flex items-center justify-between text-[9px]">
+                                         <span className="text-slate-500 uppercase">Войска:</span>
+                                         <span className="text-blue-400 font-bold text-right">{lvl.units}</span>
+                                       </div>
+                                     )}
+                                     {lvl.income && (
+                                       <div className="flex items-center justify-between text-[9px]">
+                                         <span className="text-slate-500 uppercase">Доход:</span>
+                                         <span className="text-yellow-500 font-bold">{lvl.income}</span>
+                                       </div>
+                                     )}
+                                   </div>
+                                   {lvl.bonuses && (
+                                     <div className="pt-2 border-t border-white/5 italic text-[9px] text-purple-400 line-clamp-2 leading-relaxed h-8">
+                                       {lvl.bonuses}
+                                     </div>
+                                   )}
+                                   {lvl.special && (
+                                     <div className="px-2 py-1 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-[8px] font-bold text-yellow-500 uppercase text-center mt-2 truncate">
+                                       {lvl.special}
+                                     </div>
+                                   )}
+                                 </div>
+                               </div>
+                             ))}
+                           </div>
                         </div>
                       ))}
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                       {gameDesign?.castle_system?.shops && Object.entries(gameDesign.castle_system.shops).map(([key, shop]: any) => (
-                         <div key={key} className="p-8 rounded-[2.5rem] bg-black/40 border border-white/10 space-y-8">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-4">
-                                <div className={`p-3 rounded-2xl ${
-                                  key === 'magic' ? 'bg-blue-600/20 text-blue-400' :
-                                  key === 'armor' ? 'bg-red-600/20 text-red-400' : 'bg-green-600/20 text-green-400'
-                                }`}>
-                                  {key === 'magic' ? <Sparkles className="w-6 h-6" /> : 
-                                   key === 'armor' ? <Shield className="w-6 h-6" /> : <Swords className="w-6 h-6" />}
-                                </div>
-                                <div>
-                                  <h4 className="text-sm font-black text-white uppercase tracking-widest">{key === 'magic' ? 'Магазин Магии' : key === 'armor' ? 'Кузница' : 'Арена'}</h4>
-                                  <p className="text-[9px] text-slate-600 uppercase tracking-widest">{shop.desc}</p>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="space-y-4">
-                              {shop.levels.map((sl: any) => (
-                                <div key={sl.lvl} className="p-4 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-all flex items-center justify-between group">
-                                   <div className="flex items-center gap-3">
-                                      <span className="text-[10px] font-black text-slate-700">L{sl.lvl}</span>
-                                      <span className="text-[10px] text-slate-300 font-medium">
-                                        {sl.items ? sl.items[0] + "..." : sl.bonus}
-                                      </span>
-                                   </div>
-                                   <div className="text-[10px] font-bold text-yellow-500">{sl.cost} G</div>
-                                </div>
-                              ))}
-                            </div>
-                         </div>
-                       ))}
                     </div>
                   </motion.div>
                 ) : designSubTab === 'Heroes & Units' ? (
@@ -2210,93 +2297,257 @@ export default function App() {
                                </div>
                              ))}
                            </div>
-                           <div className="p-4 bg-black/40 rounded-2xl border border-white/5 space-y-2 mt-4">
-                              <div className="text-[9px] text-slate-500 uppercase font-black">Рост веса по классам (+100 уровней)</div>
-                              <div className="flex justify-between text-[10px]">
-                                <span className="text-slate-400 italic">Маг (Прост/Глав)</span>
-                                <span className="text-white">+10 / +20 КГ</span>
-                              </div>
-                              <div className="flex justify-between text-[10px]">
-                                <span className="text-slate-400 italic">Стрелок (Прост/Глав)</span>
-                                <span className="text-white">+12 / +22 КГ</span>
-                              </div>
-                              <div className="flex justify-between text-[10px]">
-                                <span className="text-slate-400 italic">Воин (Прост/Глав)</span>
-                                <span className="text-white">+15 / +25 КГ</span>
-                              </div>
-                           </div>
                          </div>
                        </div>
                     </div>
                   </motion.div>
                 ) : designSubTab === 'Abilities' ? (
                   <motion.div 
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="space-y-12"
                   >
-                    <div className="space-y-8">
-                       <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] px-4">Способности Войск</h3>
-                       <div className="grid grid-cols-1 gap-6">
-                         {[
-                           { faction: "Гномы", pass: "Крепкая кожа (+10% защиты)", act: "Мощный удар щитом (Стан 1 ход)", sup: "Гнев подземелья (Армагеддон)" },
-                           { faction: "Эльфы", pass: "Лесная поступь (+15% уклонения)", act: "Залп стрел (Урон по площади)", sup: "Зов природы (Призыв энтов)" },
-                           { faction: "Орки", pass: "Ярость крови (+20% ATK при HP < 50%)", act: "Разрушительный прыжок", sup: "Берсерк" }
-                         ].map((fac, i) => (
-                           <div key={i} className="p-8 rounded-[2.5rem] bg-white/5 border border-white/10 space-y-6">
-                              <h4 className="text-xl font-black text-white uppercase tracking-tighter italic">{fac.faction}</h4>
-                              <div className="space-y-4">
-                                <div className="p-4 bg-black/40 rounded-2xl border border-white/5">
-                                   <div className="text-[8px] text-blue-400 font-black uppercase mb-1">Пассивная</div>
-                                   <p className="text-[11px] text-slate-300">{fac.pass}</p>
-                                </div>
-                                <div className="p-4 bg-black/40 rounded-2xl border border-white/5">
-                                   <div className="text-[8px] text-orange-400 font-black uppercase mb-1">Активная</div>
-                                   <p className="text-[11px] text-slate-300">{fac.act}</p>
-                                </div>
-                                <div className="p-4 bg-purple-600/10 rounded-2xl border border-purple-500/20">
-                                   <div className="text-[8px] text-purple-400 font-black uppercase mb-1">Супер-способность</div>
-                                   <p className="text-[11px] text-purple-200">{fac.sup}</p>
+                    <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                       <div className="xl:col-span-1 space-y-6">
+                         <div className="flex items-center justify-between px-4">
+                           <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">Простые Герои (L1-5000)</h3>
+                           <div className="px-2 py-1 bg-white/5 rounded-lg text-[9px] text-slate-400 font-bold">1-10 LVL</div>
+                         </div>
+                         <div className="space-y-4">
+                            {Object.entries(gameDesign?.ability_system?.simple || {}).map(([cls, skills]: any) => (
+                              <div key={cls} className="p-6 rounded-[2rem] bg-black/40 border border-white/10 space-y-4">
+                                <h4 className="text-sm font-black text-white uppercase italic">{cls}</h4>
+                                <div className="space-y-2">
+                                  {skills.map((s: any, i: number) => (
+                                    <div key={i} className="p-3 bg-white/5 rounded-xl border border-white/5 group hover:border-purple-500/30 transition-all">
+                                      <div className="flex items-center justify-between mb-1">
+                                        <span className="text-[10px] font-black text-white uppercase truncate pr-2">{s.name}</span>
+                                        <span className={`text-[8px] font-black uppercase ${s.type === 'active' ? 'text-orange-400' : 'text-blue-400'}`}>{s.type}</span>
+                                      </div>
+                                      <div className="flex justify-between text-[9px] text-slate-500 italic">
+                                        <span>L1: {s.lvl1}</span>
+                                        <span>L10: {s.lvl10}</span>
+                                      </div>
+                                      {s.cd && <div className="mt-1 text-[8px] text-yellow-500/60 font-mono">Откат: {s.cd}х</div>}
+                                    </div>
+                                  ))}
                                 </div>
                               </div>
+                            ))}
+                         </div>
+                       </div>
+
+                       <div className="xl:col-span-1 space-y-6">
+                         <div className="flex items-center justify-between px-4">
+                           <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">Главные Герои (L1-5000)</h3>
+                           <div className="px-2 py-1 bg-purple-600/20 rounded-lg text-[9px] text-purple-400 font-bold">1-20 LVL</div>
+                         </div>
+                         <div className="space-y-4">
+                            {Object.entries(gameDesign?.ability_system?.main || {}).map(([cls, skills]: any) => (
+                              <div key={cls} className="p-6 rounded-[2rem] bg-purple-600/5 border border-purple-500/20 space-y-4">
+                                <h4 className="text-sm font-black text-white uppercase italic">{cls}</h4>
+                                <div className="space-y-2">
+                                  {skills.map((s: any, i: number) => (
+                                    <div key={i} className={`p-3 rounded-xl border transition-all ${s.type === 'heroic' ? 'bg-purple-600/20 border-purple-500/40' : 'bg-black/60 border-white/5'}`}>
+                                      <div className="flex items-center justify-between mb-1">
+                                        <span className="text-[10px] font-black text-white uppercase">{s.name}</span>
+                                        <span className={`text-[8px] font-black uppercase ${s.type === 'heroic' ? 'text-yellow-400 animate-pulse' : 'text-purple-400'}`}>{s.type}</span>
+                                      </div>
+                                      <p className="text-[9px] text-slate-400 leading-snug">{s.lvl20 || s.lvl10}</p>
+                                      {s.cd && <div className="mt-1 text-[8px] text-yellow-500/60 font-mono">Откат: {s.cd}х</div>}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                         </div>
+                       </div>
+
+                       <div className="xl:col-span-1 space-y-8">
+                         <div className="space-y-6">
+                           <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] px-4">Система Откатов</h3>
+                           <div className="p-8 rounded-[2.5rem] bg-black/40 border border-white/10 space-y-6">
+                             <div className="grid grid-cols-1 gap-4">
+                               {gameDesign?.cooldown_system?.modifiers && Object.entries(gameDesign.cooldown_system.modifiers).map(([key, val]: any) => (
+                                 <div key={key} className="space-y-2">
+                                   <div className="text-[9px] text-slate-600 uppercase font-black px-1">{key === 'gear' ? 'Экипировка' : key === 'skills' ? 'Навыки' : key === 'locations' ? 'Локации' : 'Эффекты'}</div>
+                                   <div className="p-3 bg-white/5 rounded-2xl border border-white/5 text-[10px] text-slate-300 italic">
+                                     {val}
+                                   </div>
+                                 </div>
+                               ))}
+                             </div>
+                             <div className="p-4 bg-yellow-500/5 border border-yellow-500/20 rounded-2xl">
+                               <div className="flex items-center gap-2 mb-2">
+                                 <Clock className="w-3 h-3 text-yellow-500" />
+                                 <span className="text-[9px] font-black text-yellow-500 uppercase">Ограничения</span>
+                               </div>
+                               <ul className="text-[10px] text-slate-400 space-y-1 list-disc pl-4 italic">
+                                 <li>Мин. откат обычных: 1 ход</li>
+                                 <li>Мин. откат героич: 3 хода</li>
+                                 <li>Округление всех значений вверх</li>
+                               </ul>
+                             </div>
                            </div>
-                         ))}
+                         </div>
+
+                         <div className="space-y-6">
+                           <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] px-4">Механика Прокачки</h3>
+                           <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-purple-600/10 to-transparent border border-purple-500/20 space-y-6">
+                             <div className="space-y-4">
+                               <div className="flex items-center justify-between text-[10px]">
+                                 <span className="text-slate-400">Простые герои</span>
+                                 <span className="text-white font-bold">+1 XP / использование</span>
+                               </div>
+                               <div className="flex items-center justify-between text-[10px]">
+                                 <span className="text-slate-400">Главные герои</span>
+                                 <span className="text-purple-400 font-bold">+2 XP / использование</span>
+                               </div>
+                               <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+                                 <h5 className="text-[9px] font-black text-white uppercase mb-2">Визуальная эволюция</h5>
+                                 <div className="space-y-2 text-[9px] text-slate-500 italic">
+                                   <p>1-5 ур: Легкое мерцание иконки</p>
+                                   <p>6-15 ур: Яркий свет + анимация</p>
+                                   <p>16-20 ур: Эфирная аура вокруг</p>
+                                 </div>
+                               </div>
+                             </div>
+                           </div>
+                         </div>
                        </div>
                     </div>
-
-                    <div className="space-y-8">
-                       <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] px-4">Визуальная Детализация</h3>
-                       <div className="p-8 rounded-[2.5rem] bg-black/40 border border-white/10 space-y-8">
-                          <div className="space-y-4">
-                             <h4 className="text-sm font-black text-white uppercase tracking-widest">Описание Доспехов</h4>
-                             <div className="grid grid-cols-1 gap-3">
-                                {[
-                                  { type: "Легкие", desc: "Кожаные куртки, тканевые обмотки, минимум металла. Цвета: Зеленый, коричневый." },
-                                  { type: "Средние", desc: "Кольчуги поверх кожи, стальные наплечники и шлемы. Гномы: матовые металлы, Эльфы: серебристые." },
-                                  { type: "Тяжелые", desc: "Полные латы, огромные щиты, гравировка рун. Императорские: золотая отделка." }
-                                ].map((arm, i) => (
-                                  <div key={i} className="flex gap-4 items-start p-4 bg-white/5 rounded-2xl border border-white/5 group hover:border-blue-500/30 transition-all">
-                                     <div className="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center shrink-0">
-                                        <Shield className="w-4 h-4 text-slate-500 group-hover:text-blue-400 transition-colors" />
-                                     </div>
-                                     <div>
-                                        <div className="text-[10px] font-black text-white uppercase">{arm.type}</div>
-                                        <p className="text-[10px] text-slate-500 leading-relaxed mt-1">{arm.desc}</p>
-                                     </div>
-                                  </div>
-                                ))}
+                  </motion.div>
+                ) : designSubTab === 'Synergies' ? (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="space-y-12"
+                  >
+                    <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                       {Object.entries(gameDesign?.skill_synergies?.classes || {}).map(([cls, data]: any) => (
+                         <div key={cls} className="space-y-6">
+                           <div className="flex items-center gap-4 px-4">
+                             <div className={`p-3 rounded-2xl ${
+                               cls === 'Warrior' ? 'bg-orange-600/20 text-orange-400' : 
+                               cls === 'Mage' ? 'bg-purple-600/20 text-purple-400' : 'bg-green-600/20 text-green-400'
+                             }`}>
+                               {cls === 'Warrior' ? <Shield className="w-5 h-5" /> : 
+                                cls === 'Mage' ? <Zap className="w-5 h-5" /> : <Target className="w-5 h-5" />}
                              </div>
-                          </div>
-
-                          <div className="p-8 rounded-3xl bg-blue-600/5 border border-blue-500/20">
-                             <div className="flex items-center gap-3 mb-4">
-                                <Sparkles className="w-5 h-5 text-blue-400" />
-                                <h4 className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Заметка Геймдизайнера</h4>
+                             <div>
+                               <h3 className="text-lg font-black text-white uppercase italic">{cls === 'Warrior' ? 'Воин' : cls === 'Mage' ? 'Маг' : 'Стрелок'}</h3>
+                               <span className="text-[9px] text-slate-500 uppercase font-black tracking-widest">Система Синергий</span>
                              </div>
-                             <p className="text-[10px] text-slate-500 leading-relaxed italic">
-                               "Важно: способности должны визуально соответствовать стилистике Xianxia. Например, Гномы используют золотые руны земли, а Лесные жители — изумрудные потоки жизненной энергии."
-                             </p>
-                          </div>
+                           </div>
+
+                           <div className="space-y-4">
+                             <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-4">Комбинации</h4>
+                             <div className="space-y-3">
+                               {data.synergies.map((syn: any, si: number) => (
+                                 <div key={si} className="p-6 rounded-[2rem] bg-black/40 border border-white/10 space-y-4 group hover:border-white/20 transition-all">
+                                   <div className="flex items-center gap-2 flex-wrap">
+                                      {syn.skills.map((s: string, ski: number) => (
+                                        <React.Fragment key={ski}>
+                                          <span className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/5 text-[10px] font-black text-white uppercase tracking-tighter italic">
+                                            {s}
+                                          </span>
+                                          {ski < syn.skills.length - 1 && <ArrowRight className="w-3 h-3 text-slate-700" />}
+                                        </React.Fragment>
+                                      ))}
+                                   </div>
+                                   <div className="space-y-2">
+                                      <div className="text-[9px] text-slate-500 uppercase font-black italic">{syn.condition}</div>
+                                      <div className="p-3 bg-purple-600/5 rounded-xl border border-purple-500/20 text-[11px] text-purple-300 leading-relaxed">
+                                        {syn.effect}
+                                      </div>
+                                      <div className="text-[10px] text-orange-400/60 font-mono flex items-center gap-2">
+                                        <Sparkles className="w-3 h-3" /> {syn.visual}
+                                      </div>
+                                   </div>
+                                 </div>
+                               ))}
+                             </div>
+
+                             <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-white/5 to-transparent border border-white/5 space-y-4">
+                               <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Цепочки комбинаций</h4>
+                               <div className="space-y-2">
+                                 {data.combos.map((c: string, ci: number) => (
+                                   <div key={ci} className="flex items-center gap-3 text-[10px] text-slate-300">
+                                      <div className="w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0" />
+                                      {c}
+                                   </div>
+                                 ))}
+                               </div>
+                             </div>
+
+                             <div className="p-8 rounded-[2.5rem] bg-purple-600/5 border border-purple-500/10 space-y-4">
+                               <h4 className="text-[10px] font-black text-purple-400 uppercase tracking-widest">Особые эффекты</h4>
+                               <div className="space-y-3">
+                                 {data.special_effects.map((e: string, ei: number) => (
+                                   <div key={ei} className="p-3 bg-black/40 rounded-2xl border border-white/5 text-[10px] text-slate-400 leading-relaxed italic">
+                                      {e}
+                                   </div>
+                                 ))}
+                               </div>
+                             </div>
+                           </div>
+                         </div>
+                       ))}
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                       <div className="p-10 rounded-[3rem] bg-black/40 border border-white/10 space-y-8">
+                         <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-4">Общие механики взаимодействия</h4>
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {[
+                              { title: 'Эффект «Комбо»', desc: gameDesign?.skill_synergies?.general?.combo_effect, icon: <Zap className="w-4 h-4 text-yellow-500" /> },
+                              { title: 'Специализация', desc: gameDesign?.skill_synergies?.general?.specialization, icon: <Sparkles className="w-4 h-4 text-purple-500" /> },
+                              { title: 'Адаптация', desc: gameDesign?.skill_synergies?.general?.adaptation, icon: <RefreshCw className="w-4 h-4 text-blue-500" /> },
+                              { title: 'Мастерство', desc: gameDesign?.skill_synergies?.general?.mastery, icon: <Star className="w-4 h-4 text-orange-500" /> }
+                            ].map((m, i) => (
+                              <div key={i} className="p-6 rounded-3xl bg-white/5 border border-white/5 space-y-3">
+                                <div className="flex items-center gap-3">
+                                  {m.icon}
+                                  <div className="text-[11px] font-black text-white uppercase tracking-widest">{m.title}</div>
+                                </div>
+                                <p className="text-[10px] text-slate-500 leading-relaxed italic">{m.desc}</p>
+                              </div>
+                            ))}
+                         </div>
+                       </div>
+
+                       <div className="p-10 rounded-[3rem] bg-gradient-to-br from-blue-600/10 to-purple-600/10 border border-blue-500/20 space-y-8">
+                         <h4 className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Правила Активации</h4>
+                         <div className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                               <div className="space-y-2">
+                                 <div className="text-[9px] text-slate-500 uppercase font-black">Окно активации</div>
+                                 <div className="p-4 bg-black/40 rounded-2xl border border-white/5 text-xs text-white font-medium italic">
+                                   {gameDesign?.skill_synergies?.rules?.activation_window}
+                                 </div>
+                               </div>
+                               <div className="space-y-2">
+                                 <div className="text-[9px] text-slate-500 uppercase font-black">Перезарядка синергии</div>
+                                 <div className="p-4 bg-black/40 rounded-2xl border border-white/5 text-xs text-white font-medium italic">
+                                   {gameDesign?.skill_synergies?.rules?.cooldown}
+                                 </div>
+                               </div>
+                            </div>
+                            <div className="space-y-4 pt-4 border-t border-white/10">
+                               <div className="text-[9px] text-slate-500 uppercase font-black">Влияние местности</div>
+                               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                  {Object.entries(gameDesign?.skill_synergies?.rules?.terrain_mod || {}).map(([key, val]: any) => (
+                                    <div key={key} className="p-3 bg-white/5 rounded-xl border border-white/5 flex flex-col gap-1">
+                                      <div className="text-[8px] text-slate-600 uppercase font-black">{key === 'mountains' ? 'Горы' : key === 'forest' ? 'Лес' : 'Равнины'}</div>
+                                      <div className="text-[10px] text-slate-300 font-bold">{val}</div>
+                                    </div>
+                                  ))}
+                               </div>
+                            </div>
+                            <div className="p-6 bg-purple-600/10 rounded-[2.5rem] border border-purple-500/20 text-[11px] text-purple-300 italic leading-relaxed">
+                              "Синергии требуют непосредственного участия игрока и понимания таймингов. При активации иконка умения мерцает золотым, а звуковой сигнал подтверждает успех комбинации."
+                            </div>
+                         </div>
                        </div>
                     </div>
                   </motion.div>
