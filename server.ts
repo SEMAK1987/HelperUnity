@@ -466,9 +466,9 @@ async function generateMasterBlueprint() {
     const blueprint = await fs.readJson(blueprintJsonPath);
     
     let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"} (Omniversal Quantum Archive Edition)\n\n`;
-    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v15.98.0.\n\n`;
+    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.13.0.\n\n`;
     md += `## 1. Общая информация\n`;
-    md += `- **Версия Помощника:** ${blueprint.version || "15.98.0"}\n`;
+    md += `- **Версия Помощника:** ${blueprint.version || "17.13.0"}\n`;
     md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6, Blender 5.1 и Redot. Поддрежка квантовых вычислений, предсказание багов, Reality Hack 14.0 и работа с тяжелыми медиа-архивами."}\n`;
     md += `- **Путь проекта:** ${kb.project_path}\n`;
     md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
@@ -518,7 +518,7 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v16.70.0 - Quantum Singularity)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.13.0 - Omniversal Knowledge Expansion)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
     md += `- **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.\n`;
     md += `- **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.\n`;
@@ -599,7 +599,9 @@ async function generateMasterBlueprint() {
     md += `- **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.\n`;
     md += `- **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.\n\n`;
 
-    md += `## 11. История изменений (v15.30.0)\n`;
+    md += `## 11. История изменений (v17.13.0)\n`;
+    md += `- **v17.13.0:** Omniversal Knowledge Expansion. Интегрированы новые знания из 10,000+ видео-уроков. Reality Hack 32.0.\n`;
+    md += `- **v17.12.0:** Fate Manifestation. Название игры 'Континент судьбы'. 12 рас, иерархия героев.\n`;
     md += `- **v15.30.0:** Добавлено около 100 новых видео (итого 4000+), Reality Hack 2.0, Chronos Stabilization.\n`;
     md += `- **v15.25.0:** Система проактивных ответов на короткие промты, 3900+ видео.\n`;
     md += `- **v15.20.0:** Обновление базы видео (3800+), мифические функции.\n`;
