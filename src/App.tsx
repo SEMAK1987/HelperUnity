@@ -63,7 +63,10 @@ import {
   Star,
   Eye,
   ZapOff,
-  Crown
+  Crown,
+  Sun,
+  Moon,
+  Activity
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -323,7 +326,7 @@ export default function App() {
   const [isMigrating, setIsMigrating] = useState(false);
   const [gameDesign, setGameDesign] = useState<any>(null);
   const [isSavingGameDesign, setIsSavingGameDesign] = useState(false);
-  const [designSubTab, setDesignSubTab] = useState<'World' | 'Castle System' | 'Heroes & Units' | 'Visuals & Nav' | 'Abilities' | 'Synergies' | 'Balancing & Rarity' | 'Economy' | 'Strategies'>('World');
+  const [designSubTab, setDesignSubTab] = useState<'World' | 'Castle System' | 'Heroes & Units' | 'Visuals & Nav' | 'Abilities' | 'Synergies' | 'Balancing & Rarity' | 'Economy' | 'Strategies' | 'Combat & Environment' | 'Potions & Alchemy'>('World');
   const [synergyHeroType, setSynergyHeroType] = useState<'simple' | 'main'>('simple');
 
   const fetchPackagesInfo = async () => {
@@ -1952,8 +1955,8 @@ export default function App() {
                 </div>
 
                 {/* Sub-tabs for Game Design */}
-                <div className="flex items-center gap-2 p-1.5 bg-black/40 rounded-2xl border border-white/5 w-fit">
-                  {['World', 'Castle System', 'Heroes & Units', 'Visuals & Nav', 'Abilities', 'Synergies', 'Balancing & Rarity', 'Economy', 'Strategies'].map((tab) => (
+                <div className="flex items-center gap-2 p-1.5 bg-black/40 rounded-2xl border border-white/5 w-fit overflow-x-auto max-w-full no-scrollbar">
+                  {['World', 'Castle System', 'Heroes & Units', 'Visuals & Nav', 'Abilities', 'Synergies', 'Balancing & Rarity', 'Economy', 'Strategies', 'Combat & Environment', 'Potions & Alchemy'].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setDesignSubTab(tab as any)}
@@ -2784,84 +2787,112 @@ export default function App() {
                   >
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                        <div className="p-10 rounded-[3rem] bg-black/40 border border-white/10 space-y-8">
-                          <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">Механика Урона</h4>
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">Механика Урона</h4>
+                            <div className="px-3 py-1 bg-blue-500/10 rounded-lg text-[9px] text-blue-400 font-black uppercase">Ур. 1—9999</div>
+                          </div>
+                          
                           <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-blue-600/10 to-transparent border border-blue-500/20 space-y-6">
                              <div className="flex items-center gap-4">
                                 <div className="p-4 bg-blue-600 rounded-2xl text-white shadow-lg">
                                    <Calculator className="w-6 h-6" />
                                 </div>
-                                <div>
-                                   <h5 className="text-sm font-black text-white uppercase italic">Универсальная Формула</h5>
-                                   <div className="text-xl font-black text-blue-400 tracking-tighter mt-1">{gameDesign?.combat_mechanics?.formulas?.base_damage}</div>
+                                <div className="flex-1">
+                                   <h5 className="text-[10px] font-black text-slate-400 uppercase italic mb-1">Базовая Формула</h5>
+                                   <div className="text-xl font-black text-blue-400 tracking-tighter whitespace-pre-wrap">{gameDesign?.combat_mechanics?.formulas?.base_damage}</div>
                                 </div>
                              </div>
-                             <div className="space-y-4">
+                             <div className="space-y-4 pt-4 border-t border-white/5">
                                 {gameDesign?.combat_mechanics?.calculation_steps?.map((step: string, si: number) => (
-                                  <div key={si} className="flex items-center gap-3 text-[10px] text-slate-400 font-bold italic">
-                                     <div className="w-5 h-5 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-[8px]">{si + 1}</div>
-                                     {step}
+                                  <div key={si} className="flex items-center gap-4 text-[11px] text-slate-400 font-bold italic group">
+                                     <div className="w-6 h-6 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-[9px] font-black group-hover:bg-blue-600 group-hover:text-white transition-all">{si + 1}</div>
+                                     <span className="group-hover:text-white transition-colors">{step}</span>
                                   </div>
                                 ))}
                              </div>
                           </div>
 
-                          <div className="p-8 rounded-[2.5rem] bg-white/5 border border-white/5 space-y-6">
-                             <h5 className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Пример расчёта: Воин vs Маг</h5>
-                             <div className="space-y-3">
-                                {[
-                                  { s: "1. ATK Воина (L10)", v: "50 * (1 + 0.01*10) = 55" },
-                                  { s: "2. DEF Мага con Дебафф", v: "32 * 0.8 = 26" },
-                                  { s: "3. Базовый урон", v: "69 - 26 = 43" },
-                                  { s: "4. Крит (RNG 22 < 25%)", v: "43 * 2 = 86" },
-                                  { s: "5. Финальный урон", v: "86 ед. (Здоровье: 200 -> 114)" }
-                                ].map((row, i) => (
-                                  <div key={i} className="flex justify-between items-center text-[10px]">
-                                     <span className="text-slate-500 italic">{row.s}</span>
-                                     <span className="text-white font-mono font-bold">{row.v}</span>
-                                  </div>
-                                ))}
+                          <div className="space-y-4">
+                             <h5 className="text-[9px] font-black text-slate-500 uppercase tracking-widest px-2">Система Заклинаний</h5>
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="p-5 bg-purple-600/5 border border-purple-500/20 rounded-2xl space-y-2">
+                                   <div className="text-[8px] text-purple-400 font-black uppercase">Стоимость маны</div>
+                                   <div className="text-[10px] text-white font-mono italic">{gameDesign?.combat_mechanics?.formulas?.spells?.cost}</div>
+                                </div>
+                                <div className="p-5 bg-orange-600/5 border border-orange-500/20 rounded-2xl space-y-2">
+                                   <div className="text-[8px] text-orange-400 font-black uppercase">Урон заклинаний</div>
+                                   <div className="text-[10px] text-white font-mono italic">{gameDesign?.combat_mechanics?.formulas?.spells?.damage}</div>
+                                </div>
                              </div>
                           </div>
                        </div>
 
                        <div className="p-10 rounded-[3rem] bg-purple-600/5 border border-purple-500/10 space-y-8">
-                          <h4 className="text-[10px] font-black text-purple-400 uppercase tracking-[0.4em]">Коэффициенты Прогрессии</h4>
-                          <div className="space-y-6">
-                             <div className="grid grid-cols-2 gap-4">
-                                {Object.entries(gameDesign?.combat_mechanics?.formulas?.level_scaling || {}).map(([key, formula]: any) => (
-                                  <div key={key} className="p-4 bg-black/40 rounded-2xl border border-white/5 space-y-1">
-                                     <div className="text-[8px] text-slate-500 uppercase font-black">{key} Scaling</div>
-                                     <div className="text-[11px] text-purple-400 font-mono font-bold italic">{formula}</div>
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-[10px] font-black text-purple-400 uppercase tracking-[0.4em]">Коэффициенты Прогрессии</h4>
+                            <div className="flex items-center gap-2">
+                               <TrendingUp className="w-3 h-3 text-purple-400" />
+                               <span className="text-[9px] text-slate-500 font-bold">Scaling Logic</span>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                             {Object.entries(gameDesign?.combat_mechanics?.formulas?.level_scaling || {}).map(([key, formula]: any) => (
+                               <div key={key} className="p-5 bg-black/40 rounded-3xl border border-white/5 group hover:border-purple-500/30 transition-all">
+                                  <div className="text-[9px] text-slate-600 uppercase font-black mb-2 flex items-center justify-between">
+                                     {key}
+                                     <span className="w-1.5 h-1.5 rounded-full bg-purple-600/40 group-hover:bg-purple-500 animate-pulse" />
                                   </div>
-                                ))}
+                                  <div className="text-[11px] text-purple-400 font-mono font-black italic break-words leading-relaxed">{formula}</div>
+                               </div>
+                             ))}
+                          </div>
+
+                          <div className="p-8 bg-indigo-600/5 rounded-[2.5rem] border border-indigo-500/20 space-y-4">
+                             <div className="flex items-center justify-between">
+                                <h5 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">High-Level Balancer (L100+)</h5>
+                                <span className="text-[8px] text-slate-500 font-black">ANTI-INFLATION</span>
                              </div>
-                             <div className="p-8 bg-white/5 rounded-[2.5rem] border border-white/5">
-                                <table className="w-full text-left text-[10px]">
-                                  <thead>
-                                    <tr className="text-slate-600 uppercase border-b border-white/5 italic">
-                                      <th className="pb-2">LVL</th>
-                                      <th className="pb-2 text-right text-orange-400">ATK</th>
-                                      <th className="pb-2 text-right text-blue-400">DEF</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody className="divide-y divide-white/5">
-                                    {[
-                                      { l: "1-500", a: "x1.0-1.5", d: "x1.0-1.4" },
-                                      { l: "501-1000", a: "x1.5-2.0", d: "x1.4-1.8" },
-                                      { l: "1001-2000", a: "x2.0-3.0", d: "x1.8-2.6" },
-                                      { l: "2001-5000", a: "x3.0-5.0", d: "x2.6-4.4" },
-                                      { l: "5001-9999", a: "x5.0-10.0", d: "x4.4-8.8" }
-                                    ].map((row, i) => (
-                                      <tr key={i} className="group hover:bg-white/5 transition-colors">
-                                        <td className="py-3 font-mono text-slate-500">{row.l}</td>
-                                        <td className="py-3 text-right text-white font-bold">{row.a}</td>
-                                        <td className="py-3 text-right text-slate-400">{row.d}</td>
-                                      </tr>
-                                    ))}
-                                  </tbody>
-                                </table>
+                             <div className="p-4 bg-black/40 rounded-2xl border border-white/5 text-center">
+                                <div className="text-[12px] font-black text-white italic mb-1">{gameDesign?.combat_mechanics?.formulas?.high_level_balancer?.modifier_formula}</div>
+                                <p className="text-[9px] text-slate-500 leading-snug">Замедляет рост характеристик при достижении порога в {gameDesign?.combat_mechanics?.formulas?.high_level_balancer?.threshold} уровней, предотвращая "раздувание" цифр.</p>
                              </div>
                           </div>
+                       </div>
+                    </div>
+
+                    <div className="p-10 rounded-[3rem] bg-black/40 border border-white/10 space-y-8">
+                       <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">Статистика Классов (База и Рост)</h4>
+                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          {Object.entries(gameDesign?.combat_mechanics?.class_growth_tables || {}).map(([cls, stats]: any) => (
+                            <div key={cls} className="p-8 rounded-[2.5rem] bg-white/5 border border-white/5 space-y-6 group hover:bg-white/10 transition-all">
+                               <div className="flex items-center justify-between">
+                                  <h5 className="text-xl font-black text-white uppercase italic tracking-tighter">{cls}</h5>
+                                  <div className="p-2 bg-white/5 rounded-xl">
+                                     {cls === 'warrior' ? <Sword className="w-5 h-5 text-red-400" /> : 
+                                      cls === 'mage' ? <Zap className="w-5 h-5 text-blue-400" /> : <Target className="w-5 h-5 text-green-400" />}
+                                  </div>
+                               </div>
+                               <div className="space-y-3">
+                                  <div className="flex items-center justify-between text-[10px]">
+                                     <span className="text-slate-500 uppercase font-black">HP (Base/Growth)</span>
+                                     <span className="text-red-400 font-bold">{stats.base_hp} / +{stats.hp_growth * 100}%</span>
+                                  </div>
+                                  <div className="flex items-center justify-between text-[10px]">
+                                     <span className="text-slate-500 uppercase font-black">MP (Base/Growth)</span>
+                                     <span className="text-blue-400 font-bold">{stats.base_mp} / +{stats.mp_growth * 100}%</span>
+                                  </div>
+                                  <div className="flex items-center justify-between text-[10px]">
+                                     <span className="text-slate-500 uppercase font-black">ATK/DEF Growth</span>
+                                     <span className="text-purple-400 font-bold">+{stats.atk_growth * 100}% / +{stats.def_growth * 100}%</span>
+                                  </div>
+                                  <div className="flex items-center justify-between text-[10px] pt-2 border-t border-white/5">
+                                     <span className="text-slate-600 uppercase font-black">Regen (HP/MP)</span>
+                                     <span className="text-white font-black">{stats.regen_hp} / {stats.regen_mp}</span>
+                                  </div>
+                               </div>
+                            </div>
+                          ))}
                        </div>
                     </div>
                   </motion.div>
@@ -3044,7 +3075,7 @@ export default function App() {
                                      <div className="text-[8px] text-slate-500 uppercase font-black mb-1">Основные Цели:</div>
                                      <p className="text-[11px] text-slate-300 italic leading-relaxed">{scale.goal}</p>
                                   </div>
-                               </div>
+                                </div>
                              ))}
                           </div>
 
@@ -3065,6 +3096,329 @@ export default function App() {
                                      </div>
                                   </div>
                                 ))}
+                             </div>
+                          </div>
+                       </div>
+                    </div>
+                  </motion.div>
+                ) : designSubTab === 'Combat & Environment' ? (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="space-y-12"
+                  >
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                       <div className="space-y-6">
+                          <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] px-4 flex items-center gap-2">
+                             <MapIcon className="w-3 h-3" /> Континенты и Ландшафт
+                          </h3>
+                          <div className="grid grid-cols-1 gap-4">
+                             {Object.entries(gameDesign?.world_combat_locations?.continents || {}).map(([key, data]: any) => (
+                               <div key={key} className="p-8 rounded-[3rem] bg-black/40 border border-white/5 space-y-6 hover:bg-black/60 transition-all flex flex-col">
+                                  <div className="flex items-center justify-between">
+                                     <h4 className={`text-xl font-black uppercase italic tracking-tighter ${
+                                        key === 'plains_of_winds' ? 'text-green-400' :
+                                        key === 'mountain_range' ? 'text-slate-400' :
+                                        key === 'ancient_woods' ? 'text-emerald-500' : 'text-amber-400'
+                                     }`}>{data.name}</h4>
+                                     <div className="flex gap-2 text-slate-500 opacity-50">
+                                        {key === 'plains_of_winds' ? <Wind className="w-5 h-5" /> : 
+                                         key === 'mountain_range' ? <Mountain className="w-5 h-5" /> :
+                                         key === 'ancient_woods' ? <Flame className="w-5 h-5" /> : <Shield className="w-5 h-5" />}
+                                     </div>
+                                  </div>
+                                  
+                                  <div className="grid grid-cols-2 gap-4">
+                                     <div className="space-y-2">
+                                        <div className="text-[8px] text-slate-600 uppercase font-black tracking-widest">Состав Клеток:</div>
+                                        <div className="space-y-1">
+                                           {Object.entries(data.cells).map(([ctype, perc]: any) => (
+                                             <div key={ctype} className="flex justify-between items-center text-[10px] text-slate-400">
+                                                <span className="italic">{ctype}</span>
+                                                <span className="font-mono">{perc}%</span>
+                                             </div>
+                                           ))}
+                                        </div>
+                                     </div>
+                                     <div className="space-y-2">
+                                        <div className="text-[8px] text-slate-600 uppercase font-black tracking-widest">Эффекты:</div>
+                                        <div className="p-3 bg-white/5 rounded-xl space-y-1">
+                                           <div className="text-[9px] text-green-400 font-bold tracking-tighter">{data.effects.bonus}</div>
+                                           <div className="text-[9px] text-red-400 font-bold tracking-tighter">{data.effects.debuff}</div>
+                                        </div>
+                                     </div>
+                                  </div>
+
+                                  <div className="p-4 bg-white/5 rounded-2xl border border-white/5 mt-auto">
+                                     <div className="text-[8px] text-slate-500 uppercase font-black mb-1">Тактика:</div>
+                                     <p className="text-[11px] text-slate-300 italic leading-relaxed">{data.tactics}</p>
+                                  </div>
+                               </div>
+                             ))}
+                          </div>
+                       </div>
+
+                       <div className="space-y-8">
+                          <div className="space-y-6">
+                             <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] px-4 flex items-center gap-2">
+                                <Zap className="w-3 h-3 text-yellow-500" /> Динамические События
+                             </h3>
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="p-8 rounded-[2.5rem] bg-indigo-600/5 border border-indigo-500/20 space-y-6">
+                                   <div className="flex items-center gap-4">
+                                      <div className="p-3 bg-blue-500 rounded-xl">
+                                         <Droplets className="w-5 h-5 text-white" />
+                                      </div>
+                                      <div>
+                                         <div className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Weather: Rain</div>
+                                         <div className="text-[9px] text-slate-500 font-bold uppercase">Chance: {gameDesign?.dynamic_events?.weather?.rain?.chance * 100}%</div>
+                                      </div>
+                                   </div>
+                                   <p className="text-[10px] text-slate-400 italic leading-relaxed">{gameDesign?.dynamic_events?.weather?.rain?.effects}</p>
+                                </div>
+
+                                <div className="p-8 rounded-[2.5rem] bg-slate-600/5 border border-slate-500/20 space-y-6">
+                                   <div className="flex items-center gap-4">
+                                      <div className="p-3 bg-slate-500 rounded-xl">
+                                         <CloudOff className="w-5 h-5 text-white" />
+                                      </div>
+                                      <div>
+                                         <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Weather: Fog</div>
+                                         <div className="text-[9px] text-slate-500 font-bold uppercase">Chance: {gameDesign?.dynamic_events?.weather?.fog?.chance * 100}%</div>
+                                      </div>
+                                   </div>
+                                   <p className="text-[10px] text-slate-400 italic leading-relaxed">{gameDesign?.dynamic_events?.weather?.fog?.effects}</p>
+                                </div>
+                             </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                             <div className="p-8 rounded-[2.5rem] bg-black/40 border border-white/10 space-y-6 shadow-2xl">
+                                <Sun className="w-5 h-5 text-orange-400" />
+                                <div className="space-y-2">
+                                   <h4 className="text-xs font-black text-white uppercase italic tracking-widest">Дневной Цикл</h4>
+                                   <p className="text-[10px] text-slate-500 italic leading-relaxed">{gameDesign?.dynamic_events?.time_cycle?.day?.effects}</p>
+                                </div>
+                             </div>
+                             <div className="p-8 rounded-[2.5rem] bg-black/40 border border-white/10 space-y-6 shadow-2xl">
+                                <Moon className="w-5 h-5 text-indigo-400" />
+                                <div className="space-y-2">
+                                   <h4 className="text-xs font-black text-white uppercase italic tracking-widest">Ночной Цикл</h4>
+                                   <p className="text-[10px] text-slate-500 italic leading-relaxed">{gameDesign?.dynamic_events?.time_cycle?.night?.effects}</p>
+                                </div>
+                             </div>
+                          </div>
+
+                          <div className="p-10 rounded-[3rem] bg-red-600/5 border border-red-500/20 space-y-6">
+                             <h4 className="text-[10px] font-black text-red-500 uppercase tracking-[0.4em]">Случайные Угрозы</h4>
+                             <div className="grid grid-cols-1 gap-4">
+                                {Object.entries(gameDesign?.dynamic_events?.random_encounters || {}).map(([key, data]: any) => (
+                                  <div key={key} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 group hover:bg-white/10 transition-all cursor-default text-slate-100">
+                                     <div className="flex flex-col gap-1">
+                                        <span className="text-[11px] font-black text-white uppercase italic tracking-tighter">{key.replace('_', ' ')}</span>
+                                        {data.chance && <span className="text-[9px] text-slate-600 font-bold uppercase">Шанс: {data.chance * 100}%</span>}
+                                     </div>
+                                     <div className="text-right">
+                                        <div className="text-[9px] text-slate-400 italic max-w-[200px] leading-snug">
+                                           {data.effects || data.rewards}
+                                        </div>
+                                     </div>
+                                  </div>
+                                ))}
+                             </div>
+                          </div>
+                       </div>
+                    </div>
+
+                    <div className="p-10 rounded-[4rem] bg-black/40 border border-white/10 space-y-8">
+                       <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">Боевые Объекты и Клетки</h4>
+                       <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+                          {Object.entries(gameDesign?.world_combat_locations?.cell_types || {}).map(([key, data]: any) => (
+                            <div key={key} className="flex flex-col items-center gap-4 p-6 rounded-3xl bg-white/5 border border-white/5 group hover:border-white/20 transition-all">
+                               <div className={`p-4 rounded-2xl ${
+                                  key === 'passable' ? 'bg-green-600/10 text-green-400' :
+                                  key === 'hard' ? 'bg-orange-600/10 text-orange-400' :
+                                  key === 'impassable' ? 'bg-slate-600/10 text-slate-400' :
+                                  key === 'hidden' ? 'bg-blue-600/10 text-blue-400' : 'bg-red-600/10 text-red-400'
+                               }`}>
+                                  {key === 'passable' ? <Layout className="w-6 h-6" /> :
+                                   key === 'hard' ? <Activity className="w-6 h-6" /> :
+                                   key === 'impassable' ? <Box className="w-6 h-6" /> :
+                                   key === 'hidden' ? <Eye className="w-6 h-6" /> : <Skull className="w-6 h-6" />}
+                               </div>
+                               <div className="text-center space-y-1">
+                                  <div className="text-[11px] font-black text-white uppercase tracking-tighter">{data.name}</div>
+                                  <div className="text-[8px] text-slate-500 font-bold uppercase">{data.penalty || data.effect || data.bonus}</div>
+                                </div>
+                             </div>
+                           ))}
+                        </div>
+                     </div>
+                  </motion.div>
+                ) : designSubTab === 'Potions & Alchemy' ? (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="space-y-12"
+                  >
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                       <div className="lg:col-span-2 space-y-8">
+                          <div className="flex items-center justify-between px-4">
+                             <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] flex items-center gap-2">
+                                <FlaskConical className="w-3 h-3 text-emerald-400" /> Алхимия и Зелья
+                             </h3>
+                             <div className="flex items-center gap-2">
+                                <div className="px-2 py-1 bg-white/5 rounded border border-white/10 text-[8px] text-slate-500 font-black">LVL MULTIPLIER: {gameDesign?.potions_system?.scaling?.level_multiplier_formula}</div>
+                             </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                             {/* Health Potions Row */}
+                             <div className="col-span-full grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {Object.entries(gameDesign?.potions_system?.types?.health || {}).map(([size, data]: any) => (
+                                  <div key={size} className="p-6 rounded-[2.5rem] bg-gradient-to-br from-red-600/10 to-transparent border border-red-500/20 space-y-4 hover:bg-red-600/5 transition-all">
+                                     <div className="flex items-center justify-between">
+                                        <div className="p-2 bg-red-600 rounded-lg shadow-lg shadow-red-600/20">
+                                           <Droplets className="w-4 h-4 text-white" />
+                                        </div>
+                                        <span className="text-[8px] text-red-400 font-black uppercase tracking-widest">{data.name} HP</span>
+                                     </div>
+                                     <div className="space-y-1">
+                                        <h4 className="text-sm font-black text-white uppercase italic tracking-tighter">Зелье Здоровья</h4>
+                                        <div className="text-[10px] text-slate-500 font-mono italic">
+                                           {data.base > 0 && `${data.base} + `}{data.level_factor > 0 && `(Lvl * ${data.level_factor})`}{data.percentage > 0 && `${data.base > 0 || data.level_factor > 0 ? ' + ' : ''}(MaxHP * ${data.percentage * 100}%)`}
+                                        </div>
+                                     </div>
+                                  </div>
+                                ))}
+                             </div>
+
+                             {/* Mana Potions Row */}
+                             <div className="col-span-full grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {Object.entries(gameDesign?.potions_system?.types?.mana || {}).map(([size, data]: any) => (
+                                  <div key={size} className="p-6 rounded-[2.5rem] bg-gradient-to-br from-blue-600/10 to-transparent border border-blue-500/20 space-y-4 hover:bg-blue-600/5 transition-all">
+                                     <div className="flex items-center justify-between">
+                                        <div className="p-2 bg-blue-600 rounded-lg shadow-lg shadow-blue-600/20">
+                                           <Zap className="w-4 h-4 text-white" />
+                                        </div>
+                                        <span className="text-[8px] text-blue-400 font-black uppercase tracking-widest">{data.name} MP</span>
+                                     </div>
+                                     <div className="space-y-1">
+                                        <h4 className="text-sm font-black text-white uppercase italic tracking-tighter">Зелье Маны</h4>
+                                        <div className="text-[10px] text-slate-500 font-mono italic">
+                                           {data.base > 0 && `${data.base} + `}{data.level_factor > 0 && `(Lvl * ${data.level_factor})`}{data.percentage > 0 && `${data.base > 0 || data.level_factor > 0 ? ' + ' : ''}(MaxMP * ${data.percentage * 100}%)`}
+                                        </div>
+                                     </div>
+                                  </div>
+                                ))}
+                             </div>
+                          </div>
+
+                          <div className="p-8 rounded-[3rem] bg-black/40 border border-white/5 space-y-6">
+                             <div className="flex items-center justify-between">
+                                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Профессиональные Бонусы</h4>
+                                <div className="text-[8px] text-blue-400 font-black uppercase">Passive Traits</div>
+                             </div>
+                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {Object.entries(gameDesign?.potions_system?.class_bonuses || {}).map(([cls, data]: any) => (
+                                  <div key={cls} className="p-4 rounded-2xl bg-white/5 border border-white/5 flex flex-col gap-1 text-center">
+                                     <div className="text-[10px] font-black text-white uppercase italic">{cls === 'warrior' ? 'Воин' : cls === 'mage' ? 'Маг' : 'Стрелок'}</div>
+                                     <div className="text-[9px] text-emerald-400 font-bold">+{data.bonus * 100}% {data.stat} Potions</div>
+                                  </div>
+                                ))}
+                             </div>
+                          </div>
+                       </div>
+
+                       <div className="space-y-8">
+                          <div className="p-8 rounded-[3rem] bg-indigo-600/5 border border-indigo-500/20 space-y-6">
+                             <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Артефакты Алхимии</h4>
+                             <div className="space-y-3">
+                                {gameDesign?.potions_system?.equipment_bonuses?.items?.map((item: any, i: number) => (
+                                  <div key={i} className="flex items-center justify-between p-4 bg-black/40 rounded-2xl border border-white/5 group hover:border-indigo-500/30 transition-all">
+                                     <div className="flex flex-col gap-0.5">
+                                        <span className="text-[10px] font-black text-white uppercase italic tracking-tighter">{item.name}</span>
+                                        <span className="text-[9px] text-slate-500 leading-none">{item.effect}</span>
+                                     </div>
+                                     <Star className="w-3 h-3 text-indigo-400 opacity-20 group-hover:opacity-100 transition-opacity" />
+                                  </div>
+                                ))}
+                             </div>
+                             <div className="p-3 bg-red-600/5 rounded-xl border border-red-500/20 text-[9px] text-red-300 italic text-center leading-snug">
+                                "Максимальный суммарный бонус от экипировки: +{gameDesign?.potions_system?.equipment_bonuses?.max_capped_bonus * 100}%"
+                             </div>
+                          </div>
+
+                          <div className="p-8 rounded-[3rem] bg-black/40 border border-white/5 space-y-6">
+                             <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Эталонные Значения (scaling)</h4>
+                             <div className="space-y-4">
+                                {gameDesign?.potions_system?.scaling?.examples?.map((ex: any, i: number) => (
+                                  <div key={i} className="flex items-center justify-between text-[10px]">
+                                     <div className="flex items-center gap-3">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                        <span className="text-slate-500 font-black">Level {ex.level}</span>
+                                     </div>
+                                     <span className="text-emerald-400 font-mono font-bold">x{ex.multiplier.toFixed(1)} effect</span>
+                                  </div>
+                                ))}
+                             </div>
+                          </div>
+                       </div>
+                    </div>
+
+                    <div className="p-10 rounded-[4rem] bg-black/40 border border-white/10 space-y-8">
+                       <div className="flex items-center justify-between">
+                          <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">Реализация (C# MonoBehaviour)</h4>
+                          <div className="flex items-center gap-4 text-[9px] text-slate-600 font-black">
+                             <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-green-500" /> SCALABLE</div>
+                             <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-500" /> CLASS-AWARE</div>
+                          </div>
+                       </div>
+                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                          <div className="space-y-3">
+                             <div className="text-[9px] text-slate-500 uppercase font-black px-2 mb-1">Potion.cs</div>
+                             <div className="p-6 bg-slate-950 rounded-3xl border border-white/5 text-[10px] text-blue-300 font-mono leading-relaxed overflow-x-auto whitespace-pre">
+{`public float CalculateRestoreAmount(CharacterStats target) {
+    float levelMultiplier = 1f + Mathf.Log10(target.level);
+    float baseRestoreAmount = 0;
+
+    switch (potionType) {
+        case SmallHealth:
+            baseRestoreAmount = (base + level * factor); break;
+        case MediumHealth:
+            baseRestoreAmount = (target.maxHP * percentage); break;
+        case LargeHealth:
+            baseRestoreAmount = (base + level * factor) + (target.maxHP * percentage); break;
+        // MP logic identical...
+    }
+
+    float classBonus = GetClassBonus(target);
+    float equipBonus = target.GetEquipBonus();
+    
+    return baseRestoreAmount * levelMultiplier * classBonus * equipBonus;
+}`}
+                             </div>
+                          </div>
+                          <div className="space-y-4">
+                             <div className="text-[9px] text-slate-500 uppercase font-black px-2">Правила использования</div>
+                             <div className="grid grid-cols-1 gap-3">
+                                {[
+                                  { t: "Cooldown", v: gameDesign?.potions_system?.rules?.cooldown, i: <Clock className="w-3 h-3 text-orange-400" /> },
+                                  { t: "Visual", v: gameDesign?.potions_system?.rules?.visuals?.animation, i: <Eye className="w-3 h-3 text-blue-400" /> },
+                                  { t: "Particles", v: "Зелёные (HP) / Синие (MP)", i: <Sparkles className="w-3 h-3 text-emerald-400" /> },
+                                  { t: "UI Result", v: "Плавное заполнение + Floating Text", i: <Type className="w-3 h-3 text-purple-400" /> }
+                                ].map((rule, ri) => (
+                                  <div key={ri} className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/5">
+                                     <div className="p-2 bg-white/5 rounded-lg">{rule.i}</div>
+                                     <div className="space-y-0.5">
+                                        <div className="text-[9px] text-slate-500 font-black uppercase tracking-widest">{rule.t}</div>
+                                        <div className="text-[10px] text-white font-bold leading-tight">{rule.v}</div>
+                                     </div>
+                                  </div>
+                                ))}
+                             </div>
+                             <div className="p-6 bg-emerald-600/10 rounded-[2.5rem] border border-emerald-500/20 text-[10px] text-emerald-300 italic leading-relaxed">
+                                "Система автоматически масштабирует полезность зелий от 1 до 9999 уровня, предотвращая инфляцию статов и сохраняя актуальность расходных материалов на всех этапах игры."
                              </div>
                           </div>
                        </div>

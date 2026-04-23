@@ -238,21 +238,135 @@
   },
   "combat_mechanics": {
     "formulas": {
-      "base_damage": "(Атака - Защита) * Крит * Навык",
+      "base_damage": "Attack - Defense * DamageReduction",
       "level_scaling": {
-        "atk": "Base * (1 + 0.01 * LVL)",
-        "def": "Base * (1 + 0.008 * LVL)",
-        "crit": "Base + 0.5 * LVL",
-        "dodge": "Base + 0.3 * LVL"
+        "atk": "BaseAtk * (1 + Growth * sqrt(Level) * Modifier)",
+        "def": "BaseDef * (1 + Growth * sqrt(Level) * Modifier)",
+        "crit": "BaseCrit + (Level * 0.05%)",
+        "dodge": "BaseDodge + (Level * 0.03%)",
+        "hp": "BaseHP * (1 + Growth * sqrt(Level) * Modifier)",
+        "mp": "BaseMP * (1 + Growth * sqrt(Level) * Modifier)"
+      },
+      "high_level_balancer": {
+        "threshold": 100,
+        "modifier_formula": "1 / (1 + log10(Level / 100))"
+      },
+      "experience": {
+        "next_level": "BaseXP * Level^1.5",
+        "kill_reward": "MonsterXP * (1 + PartyBonus)"
+      },
+      "spells": {
+        "cost": "BaseCost * (1 + ScalingFactor * Level)",
+        "damage": "BaseDamage * (1 + PowerFactor * Level) * SpellPower"
       }
     },
     "calculation_steps": [
-      "1. Проверка на уклонение (Dodge RNG)",
-      "2. Расчёт базовой разницы (ATK - DEF)",
-      "3. Применение Крита (2x) и Бонусов навыков",
-      "4. Учёт сопротивления (Resist %)",
-      "5. Нанесение финального урона"
-    ]
+      "1. Инициализация параметров (ATK, DEF, Multipliers)",
+      "2. Расчёт базового урона (ATK - DEF)",
+      "3. Применение модификаторов ландшафта и погоды",
+      "4. Проверка шанса критического удара и уклонения",
+      "5. Финальное вычитание HP и проверка состояния юнита"
+    ],
+    "class_growth_tables": {
+      "warrior": {
+        "base_hp": 120, "hp_growth": 0.25,
+        "base_mp": 30, "mp_growth": 0.05,
+        "base_atk": 25, "atk_growth": 0.18,
+        "base_def": 15, "def_growth": 0.12,
+        "regen_hp": 1.5, "regen_mp": 0.5
+      },
+      "mage": {
+        "base_hp": 60, "hp_growth": 0.15,
+        "base_mp": 150, "mp_growth": 0.30,
+        "base_atk": 10, "atk_growth": 0.25,
+        "base_def": 5, "def_growth": 0.08,
+        "regen_hp": 0.8, "regen_mp": 2.0
+      },
+      "archer": {
+        "base_hp": 80, "hp_growth": 0.20,
+        "base_mp": 70, "mp_growth": 0.10,
+        "base_atk": 20, "atk_growth": 0.22,
+        "base_def": 8, "def_growth": 0.10,
+        "regen_hp": 1.2, "regen_mp": 1.0
+      }
+    }
+  },
+  "world_combat_locations": {
+    "cell_types": {
+      "passable": { "name": "Проходимая", "effect": "Стандарт" },
+      "hard": { "name": "Труднопроходимая", "penalty": "-30% SPD" },
+      "impassable": { "name": "Непроходимая", "effect": "Блок движения" },
+      "hidden": { "name": "Скрытая", "bonus": "+20% Dodge" },
+      "dangerous": { "name": "Опасная", "penalty": "Периодический урон" }
+    },
+    "continents": {
+      "plains_of_winds": {
+        "name": "Равнины Ветров",
+        "cells": { "grass": 70, "bumpy": 20, "high_grass": 10 },
+        "obstacles": {
+          "windmills": "+15% Range for Archers",
+          "caravan_trails": "+20% Movement Speed"
+        },
+        "effects": { "bonus": "+10% SPD", "debuff": "-5% Magic DEF" },
+        "tactics": "Акцент на кавалерию и лучников, засады в траве."
+      },
+      "mountain_range": {
+        "name": "Горная Гряда",
+        "cells": { "rocky": 40, "scree": 30, "rocks": 25, "caves": 5 },
+        "obstacles": {
+          "gorges": "-40% SPD, +25% DEF",
+          "stone_pillars": "+15% Dodge"
+        },
+        "effects": { "bonus": "+20% DEF", "debuff": "-25% Range" },
+        "tactics": "Засады в ущельях, ловушки, преимущество высоты."
+      },
+      "ancient_woods": {
+        "name": "Вековые Леса",
+        "cells": { "litter": 50, "thickets": 20, "overgrown": 25, "marshes": 5 },
+        "obstacles": {
+          "ancient_trees": "+20% Stealth",
+          "ruins": "+15% DEF"
+        },
+        "effects": { "bonus": "+25% Stealth", "debuff": "-15% Vision" },
+        "tactics": "Скрытные атаки, отравление, контроль троп."
+      },
+      "dawn_empire": {
+        "name": "Империя Рассвета",
+        "cells": { "pavements": 60, "ruins": 20, "buildings": 15, "dungeons": 5 },
+        "obstacles": {
+          "walls": "+30% DEF",
+          "towers": "+25% Range"
+        },
+        "effects": { "bonus": "+15% Melee ATK", "debuff": "-20% Cavalry Mobility" },
+        "tactics": "Уличные бои, осады, маневры в подземельях."
+      }
+    }
+  },
+  "dynamic_events": {
+    "weather": {
+      "rain": {
+        "chance": 0.15,
+        "effects": "-20% SPD, +15% Dodge in puddles, -30% Fire damage, +10% Stealth in grass, Lightning strikes (50 dmg + stun)"
+      },
+      "fog": {
+        "chance": 0.25,
+        "effects": "-50% Archer Range, +25% Stealth, -20% Accuracy, Dangerous traps"
+      }
+    },
+    "time_cycle": {
+      "night": {
+        "effects": "+30% Stealth, +50% Stealth skills, -40% Vision (max 5), Night monsters +20% ATK, +15% SPD"
+      },
+      "day": {
+        "effects": "Max vision (8-10), +15% Archer accuracy, -10% Stealth, Day creatures +15% DEF"
+      }
+    },
+    "random_encounters": {
+      "monster_raid": { "chance": 0.05, "rewards": "XP, Gold, Rare items" },
+      "earthquake": { "chance": 0.02, "effects": "Building destruction, Cracks (-30% SPD, 10% fall dmg)" },
+      "forest_fire": { "chance": 0.03, "effects": "20 dmg/turn, spreads 1-2 cells/turn" },
+      "diplomatic_incident": { "trigger": "Action/Level", "effects": "Reputation, Influence, Conflict" }
+    }
   },
   "game_title": "Континент судьбы",
   "version": "1.2.0",
@@ -1213,6 +1327,56 @@
         "forest": "Стрелки +20% к силе синергии",
         "plains": "Стандарт"
       }
+    }
+  },
+  "potions_system": {
+    "scaling": {
+      "level_multiplier_formula": "1 + log10(Level)",
+      "examples": [
+        { "level": 1, "multiplier": 1.0 },
+        { "level": 10, "multiplier": 2.0 },
+        { "level": 100, "multiplier": 3.0 },
+        { "level": 1000, "multiplier": 4.0 },
+        { "level": 9999, "multiplier": 5.0 }
+      ]
+    },
+    "types": {
+      "health": {
+        "small": { "name": "Малое", "base": 50, "level_factor": 2, "percentage": 0 },
+        "medium": { "name": "Среднее", "base": 0, "level_factor": 0, "percentage": 0.3 },
+        "large": { "name": "Большое", "base": 30, "level_factor": 1, "percentage": 0.2 }
+      },
+      "mana": {
+        "small": { "name": "Малое", "base": 40, "level_factor": 3, "percentage": 0 },
+        "medium": { "name": "Среднее", "base": 0, "level_factor": 0, "percentage": 0.25 },
+        "large": { "name": "Большое", "base": 25, "level_factor": 2, "percentage": 0.15 }
+      }
+    },
+    "class_bonuses": {
+      "warrior": { "stat": "HP", "bonus": 0.1 },
+      "mage": { "stat": "MP", "bonus": 0.15 },
+      "archer": { "stat": "All", "bonus": 0.05 }
+    },
+    "equipment_bonuses": {
+      "items": [
+        { "name": "Кольцо регенерации", "effect": "+10% к зельям здоровья" },
+        { "name": "Амулет мудрости", "effect": "+8% к зельям маны" },
+        { "name": "Пояс алхимика", "effect": "+5% ко всем зельям" }
+      ],
+      "max_capped_bonus": 0.5
+    },
+    "rules": {
+      "cooldown": "3-5 секунд",
+      "limit": "Ограниченное кол-во в инвентаре",
+      "visuals": {
+        "animation": "Персонаж подносит бутылку ко рту, бутылка исчезает",
+        "particles": { "health": "Зелёные искры", "mana": "Синие искры" },
+        "sounds": "Бульканье + магическое свечение"
+      }
+    },
+    "csharp_implementation": {
+      "potion_class": "public class Potion : MonoBehaviour { ... }",
+      "stats_integration": "public class CharacterStats : MonoBehaviour { ... }"
     }
   }
 }
