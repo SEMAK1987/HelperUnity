@@ -351,7 +351,7 @@ function VKImageCard({ res, type, showNotification, onZoom }: { res: any, type: 
 export default function App() {
   const [kb, setKb] = useState<KBData | null>(null);
   const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info' | 'migration' | 'game_design' | 'game_help'>('chat');
-  const [appVersion, setAppVersion] = useState('17.17.1');
+  const [appVersion, setAppVersion] = useState('17.17.2');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
