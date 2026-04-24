@@ -157,7 +157,115 @@ interface PhotoshopStatus {
   path: string;
 }
 
-const VKImageCard = ({ res, type, showNotification, onZoom }: { res: any, type: string, showNotification: any, onZoom: (url: string) => void }) => {
+// --- Components ---
+
+function GameHelpView() {
+  const [content, setContent] = useState<string>('Загрузка руководства...');
+  const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    fetch('/GAME_HELP_GUIDE.md')
+      .then(res => res.text())
+      .then(text => setContent(text))
+      .catch(() => setContent('# Ошибка\nНе удалось загрузить GAME_HELP_GUIDE.md'));
+  }, []);
+
+  const filteredLines = content.split('\n').filter(line => 
+    line.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="h-full flex flex-col p-6 space-y-6 overflow-hidden"
+    >
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-black text-white uppercase tracking-tighter italic flex items-center gap-3">
+             <BookOpen className="w-8 h-8 text-blue-500" />
+             Помощь По Игре (Unity 6)
+          </h2>
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v17.17.0</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+            <input 
+              type="text" 
+              placeholder="Поиск по документации..." 
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="bg-white/5 border border-white/10 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-blue-500 transition-all w-64 uppercase tracking-widest font-bold"
+            />
+          </div>
+          <button 
+            onClick={() => window.open('/GAME_HELP_GUIDE.md', '_blank')}
+            className="p-3 rounded-2xl bg-blue-500/20 text-blue-400 hover:bg-blue-500 hover:text-white transition-all shadow-lg shadow-blue-500/10 border border-blue-500/30"
+          >
+            <ExternalLink className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-y-auto bg-black/40 border border-white/5 rounded-[2.5rem] p-10 backdrop-blur-md custom-scrollbar shadow-2xl relative overflow-x-hidden">
+        <div className="prose prose-invert max-w-none relative z-10">
+          <Markdown
+            components={{
+              h1: ({ children }) => <h1 className="text-4xl font-black text-white mb-10 uppercase tracking-tighter border-b-4 border-blue-600 pb-4 inline-block">{children}</h1>,
+              h2: ({ children }) => <h2 className="text-2xl font-black text-blue-400 mt-16 mb-6 uppercase tracking-tighter flex items-center gap-3"><Cpu className="w-6 h-6" /> {children}</h2>,
+              h3: ({ children }) => <h3 className="text-lg font-black text-white mt-10 mb-4 uppercase italic border-l-4 border-blue-500 pl-4">{children}</h3>,
+              p: ({ children }) => <p className="text-slate-400 leading-relaxed mb-6 font-medium">{children}</p>,
+              code: ({ children }) => <code className="bg-slate-900 text-blue-300 px-2 py-1 rounded-lg font-mono text-xs border border-white/10 shadow-inner">{children}</code>,
+              pre: ({ children }) => (
+                <div className="relative group my-8 bg-[#0a0a0c] rounded-3xl border border-white/5 p-6 shadow-2xl">
+                  <div className="absolute top-0 right-0 left-0 h-1 rounded-t-3xl bg-gradient-to-r from-blue-600 to-purple-600 opacity-50" />
+                  <pre className="text-sm font-mono text-slate-300 leading-relaxed overflow-x-auto p-2 scrollbar-thin scrollbar-thumb-white/5">{children}</pre>
+                  <button className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity p-2 bg-white/5 rounded-xl hover:bg-white/10 border border-white/10">
+                    <Copy className="w-4 h-4 text-slate-400" />
+                  </button>
+                </div>
+              ),
+              li: ({ children }) => <li className="text-slate-400 mb-4 list-none flex gap-4 items-start"><div className="w-2 h-2 rounded-full bg-blue-500 mt-2 flex-shrink-0 animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.5)]" /> <span className="flex-1">{children}</span></li>,
+              ul: ({ children }) => <ul className="space-y-4 mb-10 ml-2">{children}</ul>,
+              hr: () => <hr className="border-white/5 my-16" />,
+              strong: ({ children }) => <strong className="text-white font-black uppercase tracking-widest text-[10px] bg-blue-600/20 px-2 py-1 rounded border border-blue-500/30 mx-1">{children}</strong>
+            }}
+          >
+            {search ? filteredLines.join('\n') : content}
+          </Markdown>
+        </div>
+        
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/5 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-600/5 rounded-full blur-[100px] pointer-events-none" />
+      </div>
+    </motion.div>
+  );
+}
+
+function SearchIcon({ className, ...props }: any) {
+  return (
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      width="24" 
+      height="24" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      className={className} 
+      {...props}
+    >
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.3-4.3" />
+    </svg>
+  );
+}
+
+function VKImageCard({ res, type, showNotification, onZoom }: { res: any, type: string, showNotification: any, onZoom: (url: string) => void }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
@@ -242,8 +350,8 @@ const VKImageCard = ({ res, type, showNotification, onZoom }: { res: any, type: 
 // --- App Component ---
 export default function App() {
   const [kb, setKb] = useState<KBData | null>(null);
-  const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info' | 'migration' | 'game_design'>('chat');
-  const [appVersion, setAppVersion] = useState('17.16.0');
+  const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info' | 'migration' | 'game_design' | 'game_help'>('chat');
+  const [appVersion, setAppVersion] = useState('17.17.1');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -388,7 +496,7 @@ export default function App() {
       "Глубокое сканирование проекта (Аудит)...",
       "Синхронизация с локальным хранилищем...",
       "Исправление найденных ошибок...",
-      "Обновление версии до 17.16.0...",
+      "Обновление версии до 17.17.0...",
       "Инициализация Omniversal Quantum Link...",
       "Установка Нейронного Моста (Blender & Unity)...",
       "Регенерация PROJECT_MASTER_BLUEPRINT.md (Quantum Link)..."
@@ -477,7 +585,7 @@ export default function App() {
         console.error("Failed to fetch KB, using fallback", err);
         setKb({
           name: "Unity AI Assistant",
-          version: "17.16.0",
+          version: "17.17.0",
           description: "Гибридный ИИ-помощник с Quantum Link",
           project_path: "Unknown",
           system_instruction: "Ты — экспертный ИИ-ассистент."
@@ -1438,6 +1546,14 @@ export default function App() {
                 <Gamepad2 className="w-3.5 h-3.5" /> Студия Игры
               </button>
               <button 
+                onClick={() => setActiveTab('game_help')}
+                className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 ${
+                  activeTab === 'game_help' ? 'bg-green-600 text-white shadow-lg shadow-green-600/20' : 'text-green-400 hover:bg-green-600/10 border border-green-500/20'
+                }`}
+              >
+                <HelpCircle className="w-3.5 h-3.5" /> Помощь По Игре
+              </button>
+              <button 
                 onClick={fetchCapabilities}
                 className="px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 text-blue-400 hover:bg-blue-600/10"
               >
@@ -1588,14 +1704,14 @@ export default function App() {
                 <Cpu className="w-12 h-12 text-blue-500" />
               </motion.div>
               
-              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v17.16.0</h2>
+              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v17.17.1</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg px-4">
                 Я полностью осведомлен о вашем проекте по пути <br/>
                 <code className="text-blue-400 break-all bg-white/5 px-2 py-1 rounded mt-2 inline-block">
                   {kb?.project_path || 'Загрузка...'}
                 </code>. 
                 <br/><br/>
-                Задавайте любые вопросы по Unity, Blender или Photoshop на русском языке. Модули продвинутого ИИ для RTS и Turn-Based стратегий, генерации обложек ВК и проект 'Континент судьбы' (v17.16.0) активированы.
+                Задавайте любые вопросы по Unity, Blender или Photoshop на русском языке. Модули продвинутого ИИ для RTS и Turn-Based стратегий, генерации обложек ВК и проект 'Континент судьбы' (v17.17.1) активированы.
               </p>
 
               {/* Cards removed as per user request */}
@@ -1634,7 +1750,7 @@ export default function App() {
                       {msg.audioVariants && (
                         <div className="mt-6 space-y-4 pt-6 border-t border-white/5">
                            <h4 className="text-[10px] font-bold text-white uppercase tracking-widest flex items-center gap-2">
-                            <Music className="w-3 h-3 text-blue-400" /> Сгенерированные аудио-варианты (v17.16.0):
+                            <Music className="w-3 h-3 text-blue-400" /> Сгенерированные аудио-варианты (v17.17.1):
                           </h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {msg.audioVariants.map((variant, vi) => (
@@ -1912,6 +2028,8 @@ export default function App() {
                 </div>
               </div>
             </div>
+          ) : activeTab === 'game_help' ? (
+            <GameHelpView />
           ) : activeTab === 'game_design' ? (
             <div className="flex-1 overflow-y-auto p-8 space-y-8 bg-black/20 scrollbar-thin scrollbar-thumb-white/5">
               <div className="max-w-7xl mx-auto space-y-8">
@@ -3534,7 +3652,7 @@ export default function App() {
                         <ExternalLink className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v17.16.0)</h2>
+                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v17.17.1)</h2>
                         <p className="text-xs text-slate-400">Прямое управление Blender и Unity через нейронный мост.</p>
                       </div>
                     </div>
@@ -4781,7 +4899,7 @@ export default function App() {
                     <ImageIcon className="w-8 h-8" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Генератор Обложек VK v17.16.0</h3>
+                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Генератор Обложек VK v17.17.1</h3>
                     <p className="text-xs text-slate-500 uppercase tracking-[0.2em] font-bold">Континент Судьбы • Умный Синтез</p>
                   </div>
                 </div>

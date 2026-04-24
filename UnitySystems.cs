@@ -148,4 +148,75 @@ namespace GameStudio.Core
             }
         }
     }
+
+    // Module: Global Event Director
+    public class GlobalEventDirector : MonoBehaviour
+    {
+        public enum WorldEvent { None, Eclipse, EtherTide, BloodMoon }
+        public WorldEvent currentEvent = WorldEvent.None;
+
+        public void TriggerEvent(WorldEvent newEvent)
+        {
+            currentEvent = newEvent;
+            Debug.Log($"Global Event Triggered: {currentEvent}");
+            // Sync with visual shaders or lighting
+        }
+    }
+
+    // Module: Character Cultivation Auras
+    public class CultivationVisuals : MonoBehaviour
+    {
+        public int currentRank = 1; // 1-10
+        public ParticleSystem auraEffect;
+        public Color[] rankColors;
+
+        public void UpdateAura()
+        {
+            if (auraEffect != null && currentRank <= rankColors.Length)
+            {
+                var main = auraEffect.main;
+                main.startColor = rankColors[currentRank - 1];
+                auraEffect.Play();
+            }
+        }
+    }
+
+    // Module: Terrain Deformation (10x10 Grid)
+    public class TerrainDeformer : MonoBehaviour
+    {
+        public void CreateCrater(Vector3 gridPosition)
+        {
+            Debug.Log($"Deforming terrain at {gridPosition}: CRATER");
+            // Logic to move vertices of the grid cell down
+        }
+
+        public void SpawnWall(Vector3 gridPosition)
+        {
+             Debug.Log($"Creating barrier at {gridPosition}: WALL");
+             // Logic to block the cell for pathfinding
+        }
+    }
+
+    // Module: AI Personalities
+    public class AIPersonality : MonoBehaviour
+    {
+        public enum PersonalityType { Aggressive, Defensive, Tactical, Magical }
+        public PersonalityType personality;
+
+        public void ExecuteTurn()
+        {
+            switch (personality)
+            {
+                case PersonalityType.Aggressive:
+                    Debug.Log("AI Action: Full Charge (Orc Style)");
+                    break;
+                case PersonalityType.Magical:
+                    Debug.Log("AI Action: Mana Charge & Cast (Elf Style)");
+                    break;
+                case PersonalityType.Defensive:
+                    Debug.Log("AI Action: Hold Position & Fortify");
+                    break;
+            }
+        }
+    }
 }

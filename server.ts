@@ -599,7 +599,8 @@ async function generateMasterBlueprint() {
     md += `- **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.\n`;
     md += `- **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.\n\n`;
 
-    md += `## 11. История изменений (v17.16.0)\n`;
+    md += `## 11. История изменений (v17.17.0)\n`;
+    md += `- **v17.17.0:** Omniversal Divine Architect Supreme. Глобальные события, деформация террейна и ИИ-личности.\n`;
     md += `- **v17.16.0:** Omniversal Divine Master. Динамическая погода, квесты 'Культивация', ИИ-Директор агрессии и процедурное оружие.\n`;
     md += `- **v17.15.0:** Omniversal Architect Elite. Внедрено 7 модулей разработки для игры 'Континент Судьбы'.\n`;
     md += `- **v17.14.0:** Omniversal World Architect. Автогенерация 4 континентов, 12 рас, иерархия героев и юнитов. Синхронизация Blender-Unity.\n`;
