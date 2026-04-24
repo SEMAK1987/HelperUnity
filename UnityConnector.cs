@@ -24,7 +24,7 @@ namespace AI_Assistant_Quantum
 
         private void OnGUI()
         {
-            GUILayout.Label("v17.13.0 - Omniversal Knowledge Expansion (Power Edition)", EditorStyles.boldLabel);
+            GUILayout.Label("v17.16.0 - Omniversal Divine Master (Sync Edition)", EditorStyles.boldLabel);
             
             serverUrl = EditorGUILayout.TextField("Server URL", serverUrl);
             mode = (Mode)EditorGUILayout.EnumPopup("Mode", mode);

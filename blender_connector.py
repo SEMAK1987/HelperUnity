@@ -1,10 +1,10 @@
 bl_info = {
     "name": "AI Assistant Link",
-    "author": "Omniversal Knowledge Expansion v17.13.0",
-    "version": (17, 13, 0),
+    "author": "Omniversal World Architect v17.16.0",
+    "version": (17, 16, 0),
     "blender": (2, 80, 0),
     "location": "View3D > N-Panel > AI Assistant",
-    "description": "Direct bridge to the Unity & Blender AI Assistant with 10k+ video knowledges.",
+    "description": "Direct bridge to the World Architect Divine Master with advanced strategy modules.",
     "warning": "",
     "doc_url": "",
     "category": "Interface",
@@ -101,7 +101,7 @@ class AI_ASSISTANT_PT_Panel(bpy.types.Panel):
         props = context.scene.ai_assistant_props
         
         col = layout.column(align=True)
-        col.label(text="v17.13.0 - Omniversal Knowledge Expansion")
+        col.label(text="v17.16.0 - Omniversal Divine Master")
         col.prop(props, "server_url")
         col.prop(props, "mode")
         

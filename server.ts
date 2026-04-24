@@ -599,7 +599,10 @@ async function generateMasterBlueprint() {
     md += `- **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.\n`;
     md += `- **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.\n\n`;
 
-    md += `## 11. История изменений (v17.13.0)\n`;
+    md += `## 11. История изменений (v17.16.0)\n`;
+    md += `- **v17.16.0:** Omniversal Divine Master. Динамическая погода, квесты 'Культивация', ИИ-Директор агрессии и процедурное оружие.\n`;
+    md += `- **v17.15.0:** Omniversal Architect Elite. Внедрено 7 модулей разработки для игры 'Континент Судьбы'.\n`;
+    md += `- **v17.14.0:** Omniversal World Architect. Автогенерация 4 континентов, 12 рас, иерархия героев и юнитов. Синхронизация Blender-Unity.\n`;
     md += `- **v17.13.0:** Omniversal Knowledge Expansion. Интегрированы новые знания из 10,000+ видео-уроков. Reality Hack 32.0.\n`;
     md += `- **v17.12.0:** Fate Manifestation. Название игры 'Континент судьбы'. 12 рас, иерархия героев.\n`;
     md += `- **v15.30.0:** Добавлено около 100 новых видео (итого 4000+), Reality Hack 2.0, Chronos Stabilization.\n`;
@@ -1234,7 +1237,7 @@ async function startServer() {
           url: `https://image.pollinations.ai/prompt/${variationEncoded}?seed=${seed}&width=${width}&height=${height}&nologo=true&enhance=true&t=${Date.now() + i}`,
           filename: `vk_cover_${type}_${seed}.jpg`,
           seed,
-          prompt_note: `[Fate Manifestation v17.13.0] ${type.toUpperCase()} | Synthesis: ${variationPrompt.slice(0, 50)}...`
+          prompt_note: `[Fate Manifestation v17.16.0] ${type.toUpperCase()} | Synthesis: ${variationPrompt.slice(0, 50)}...`
         };
       });
 

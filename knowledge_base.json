@@ -1,9 +1,9 @@
 {
   "project_name": "Unity & Blender AI Assistant",
-  "version": "17.13.0",
+  "version": "17.16.0",
   "project_path": "/app/applet",
   "unity_ai_assistant": {
-    "description": "Центральный архив знаний Квантового ИИ v17.13.0",
+    "description": "Центральный архив знаний Квантового ИИ v17.16.0",
     "combined_knowledge": "# О ВОЗМОЖНОСТЯХ ИИ (v17.13.0 - OMNIVERSAL KNOWLEDGE EXPANSION)\n\n## 1. Студия Разработки Игр (Omni-Game Studio)\n- **Активный Проект:** 'Omniversal Conquest: Path of the Emperors'. Пошаговая стратегия (TBS).\n- **Мировая прогрессия:** 4 континента, 12 уникальных рас, иерархия героев (1 основной + 10 вспомогательных).\n- **Боевая система:** Сетка 10x10, учет ландшафта (равнины, горы, леса), препятствия и эффекты континентов.\n\n## 2. Глубокие знания ПО (Deep Software Mastery 2024)\n- **Unity 6 Muse:** Интеграция ИИ для генерации ассетов, текстур и анимаций. Темы: DOTS/ECS, URP 17+, VFX Graph.\n- **Blender 5.2 Quantum:** Нейронное моделирование, AI-ретопология, Geometry Nodes Simulation.\n- **Godot 4.3 / Redot:** Оптимизация производительности, GDScript v2 эксперт, миграция с Unity.\n- **GIMP AI / Photoshop 2024:** Мастер текстур, Stable Diffusion inpainting, автоматизация через Python-fu.\n\n## 3. Тотальная Синхронизация (Omni-Bridge v2)\n- **Режимы:** Online (Gemini 1.5 Pro), Offline (Ollama Llama 3), No-Internet (Local KB 10,000+ видео).\n- **Quantum Link:** Анализ скриншотов и GIF в реальном времени для помощи в коде.\n\n## 4. Алхимия и Снаряжение (Potion & Equipment System)\n- **Зелья:** Масштабируемые формулы восстановления (LevelMultiplier = 1 + log10(Level)).\n- **Снаряжение:** 10 рангов редкости (от Обычного до Божественного)."
   },
   "youtube_videos": [
