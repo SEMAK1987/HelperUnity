@@ -1,6 +1,6 @@
 {
   "project_name": "Unity & Blender AI Assistant",
-  "version": "15.11.0",
+  "version": "17.17.4",
   "interface_structure": {
     "tabs": [
       "studio",
@@ -12,12 +12,17 @@
   },
   "agents_count": 52,
   "project_assets": {
-    "scripts_count": 0,
+    "scripts_count": 4,
     "prefabs_count": 0,
     "videos_count": 0,
-    "total_files": 24,
+    "total_files": 31,
     "video_list": [],
-    "script_list": []
+    "script_list": [
+      "UnityConnector.cs",
+      "UnityRaceData.cs",
+      "UnitySystems.cs",
+      "UnityWorldSync.cs"
+    ]
   },
-  "last_scan": "2026-04-18T15:39:59.133Z"
+  "last_scan": "2026-04-24T18:50:53.394Z"
 }

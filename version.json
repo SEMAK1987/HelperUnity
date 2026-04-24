@@ -1,7 +1,10 @@
 {
-  "version": "17.17.1",
+  "version": "17.17.4",
   "release_date": "2026-04-24",
   "changelog": [
+    "Версия 17.17.4: Multi-Blender Genesis. Внедрена поддержка и синхронизация для нескольких версий Blender одновременно (4.4, 5.1.1 и стандартной). Полная кросс-платформенная интеграция моделей.",
+    "Версия 17.17.3: Supreme Omniscience Edition. Полная интеграция Blender 5.1.1 (Путь: C:\\Program Files\\Blender Foundation\\Blender 5.1\\blender-launcher.exe). Внедрена поддержка OSL, Mask to SDF, Physically Accurate Shaders и 11,800+ видео уроков. Оптимизирован Quantum Link для Unity 6 и Blender 5.1.1.",
+    "Версия 17.17.2: Support Edition Update. Расширен гайд по добавлению модулей Unity (IL2CPP, WebGL) и решению проблем с 'Validation Failed'.",
     "Версия 17.17.1: Support Edition. Добавлен раздел 'Помощь По Игре' с инструкциями по Unity 6 и устранению неполадок Unity Hub.",
     "Версия 17.17.0: Omniversal Divine Architect Supreme. Внедрена система глобальных событий (Затмения), деформация террейна (кратеры), ауры культивации и профили личности ИИ для 12 рас.",
     "Версия 17.16.0: Omniversal Divine Master. Внедрена динамическая погода (Unity), генератор квестов 'Культивация', ИИ-Директор агрессии и процедурная генерация оружия в Blender по редкости JSON.",

@@ -186,7 +186,7 @@ function GameHelpView() {
              <BookOpen className="w-8 h-8 text-blue-500" />
              Помощь По Игре (Unity 6)
           </h2>
-          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v17.17.0</p>
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v17.17.4</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -351,7 +351,7 @@ function VKImageCard({ res, type, showNotification, onZoom }: { res: any, type: 
 export default function App() {
   const [kb, setKb] = useState<KBData | null>(null);
   const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info' | 'migration' | 'game_design' | 'game_help'>('chat');
-  const [appVersion, setAppVersion] = useState('17.17.2');
+  const [appVersion, setAppVersion] = useState('17.17.4');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -1704,14 +1704,14 @@ export default function App() {
                 <Cpu className="w-12 h-12 text-blue-500" />
               </motion.div>
               
-              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v17.17.1</h2>
+              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v17.17.4</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg px-4">
                 Я полностью осведомлен о вашем проекте по пути <br/>
                 <code className="text-blue-400 break-all bg-white/5 px-2 py-1 rounded mt-2 inline-block">
                   {kb?.project_path || 'Загрузка...'}
                 </code>. 
                 <br/><br/>
-                Задавайте любые вопросы по Unity, Blender или Photoshop на русском языке. Модули продвинутого ИИ для RTS и Turn-Based стратегий, генерации обложек ВК и проект 'Континент судьбы' (v17.17.1) активированы.
+                Задавайте любые вопросы по Unity, Blender или Photoshop на русском языке. Модули продвинутого ИИ для RTS и Turn-Based стратегий, генерации обложек ВК и проект 'Континент судьбы' (v17.17.4) активированы.
               </p>
 
               {/* Cards removed as per user request */}
@@ -1750,7 +1750,7 @@ export default function App() {
                       {msg.audioVariants && (
                         <div className="mt-6 space-y-4 pt-6 border-t border-white/5">
                            <h4 className="text-[10px] font-bold text-white uppercase tracking-widest flex items-center gap-2">
-                            <Music className="w-3 h-3 text-blue-400" /> Сгенерированные аудио-варианты (v17.17.1):
+                            <Music className="w-3 h-3 text-blue-400" /> Сгенерированные аудио-варианты (v17.17.4):
                           </h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {msg.audioVariants.map((variant, vi) => (
@@ -3652,7 +3652,7 @@ export default function App() {
                         <ExternalLink className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v17.17.1)</h2>
+                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v17.17.4)</h2>
                         <p className="text-xs text-slate-400">Прямое управление Blender и Unity через нейронный мост.</p>
                       </div>
                     </div>
@@ -4263,7 +4263,7 @@ export default function App() {
                     </div>
                     <div>
                       <h2 className="text-xl font-bold text-white tracking-tighter">Unity & Blender AI Assistant v{appVersion}</h2>
-                      <p className="text-xs text-slate-400">Расширенная база знаний: 10000+ видео</p>
+                      <p className="text-xs text-slate-400">Расширенная база знаний: 11800+ видео</p>
                     </div>
                   </div>
                   <button 
@@ -4301,7 +4301,7 @@ export default function App() {
                     <div className="space-y-8">
                       <div className="flex items-center justify-between">
                         <h3 className="text-xs font-bold text-white uppercase tracking-widest flex items-center gap-3">
-                          <Zap className="w-4 h-4 text-yellow-400" /> База знаний: 9200+ видео & Global Synergy
+                          <Zap className="w-4 h-4 text-yellow-400" /> База знаний: 11800+ видео & Global Synergy
                         </h3>
                         <span className="text-[10px] text-slate-500 font-mono uppercase">Обновлено: {capabilities.video_knowledge_base.update_date}</span>
                       </div>
@@ -4400,11 +4400,11 @@ export default function App() {
                   {kb?.blender_manuals && (
                     <div className="space-y-6">
                       <h3 className="text-xs font-bold text-white uppercase tracking-widest flex items-center gap-3">
-                        <BookOpen className="w-4 h-4 text-blue-400" /> Документация Blender (v2.4 - v5.1)
+                        <BookOpen className="w-4 h-4 text-blue-400" /> Документация Blender (v2.4 - v5.1.1)
                       </h3>
                       <div className="p-6 rounded-3xl bg-blue-600/5 border border-blue-500/20">
                         <p className="text-[11px] text-slate-400 leading-relaxed mb-4">
-                          ИИ интегрировал знания из всех официальных руководств Blender. Это позволяет давать точные ответы как по классическим методам (Internal Render, Layers), так и по самым современным (Eevee Next, Simulation Nodes).
+                            ИИ интегрировал знания из всех официальных руководств Blender, включая новейшую версию 5.1.1. Это позволяет использовать OSL шейдеры, Physically Accurate Glass, Mask to SDF и новые инструменты риггинга.
                         </p>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                           {kb.blender_manuals.slice(0, 8).map((url: string, i: number) => {
@@ -4899,7 +4899,7 @@ export default function App() {
                     <ImageIcon className="w-8 h-8" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Генератор Обложек VK v17.17.1</h3>
+                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Генератор Обложек VK v17.17.4</h3>
                     <p className="text-xs text-slate-500 uppercase tracking-[0.2em] font-bold">Континент Судьбы • Умный Синтез</p>
                   </div>
                 </div>

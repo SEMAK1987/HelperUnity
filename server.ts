@@ -466,10 +466,10 @@ async function generateMasterBlueprint() {
     const blueprint = await fs.readJson(blueprintJsonPath);
     
     let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"} (Omniversal Quantum Archive Edition)\n\n`;
-    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.13.0.\n\n`;
+    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.17.4.\n\n`;
     md += `## 1. Общая информация\n`;
-    md += `- **Версия Помощника:** ${blueprint.version || "17.13.0"}\n`;
-    md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6, Blender 5.1 и Redot. Поддрежка квантовых вычислений, предсказание багов, Reality Hack 14.0 и работа с тяжелыми медиа-архивами."}\n`;
+    md += `- **Версия Помощника:** ${blueprint.version || "17.17.4"}\n`;
+    md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3.10f1), Blender 5.1.1 (Multi-Sync 4.4, Legacy) и Redot. Поддержка квантовых вычислений, предсказание багов, Reality Hack 34.0 и работа с тяжелыми медиа-архивами (11,800+ видео)."}\n`;
     md += `- **Путь проекта:** ${kb.project_path}\n`;
     md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
     md += `- **Версия Unity:** ${currentUnityStatus.version}\n`;
@@ -518,11 +518,11 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.13.0 - Omniversal Knowledge Expansion)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.17.4 - Supreme Omniscience)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
     md += `- **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.\n`;
     md += `- **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.\n`;
-    md += `- **No-Internet Mode (Quantum Archive):** 7200+ видео-уроков. Мгновенный доступ при любых внешних условиях.\n\n`;
+    md += `- **No-Internet Mode (Quantum Archive):** 11,800+ видео-уроков. Мгновенный доступ при любых внешних условиях.\n\n`;
 
     md += `### TRANSCENDENT LINK (Neural Addon Synthesis)\n`;
     md += `- **Neural Addon Synthesis:** Возможность проектирования и генерации аддонов для Blender и плагинов для Unity, которые напрямую связывают софт с ИИ.\n`;
@@ -554,7 +554,7 @@ async function generateMasterBlueprint() {
 
     md += `### Технические возможности\n`;
     md += `- **Unity Expert (v5.x - v6.x):** Глубокая интеграция с GPU Resident Drawer, Render Graph и Spatial-Temporal Post-Processing. Поддержка Unity Cloud и мультиплеерных сервисов. Управление более чем 1000 кнопок и настроек через AI-команды.\n`;
-    md += `- **Blender Master (v2.4 - v5.1):** Автоматическое создание сложных физических симуляций (вода, огонь, ткань) через Geometry Nodes. Генерация процедурных миров за секунды. Полная поддержка легендарных скриптов.\n`;
+    md += `- **Blender Master (v2.4 - v5.1.1):** Автоматическое создание сложных физических симуляций (вода, огонь, ткань) через Geometry Nodes. Генерация процедурных миров за секунды. Полная поддержка легендарных скриптов.\n`;
     md += `- **GIMP Automation:** Пакетная обработка текстур, генерация карт нормалей и атласов через Python-скрипты. Интеллектуальное удаление шумов и апскейлинг текстур.\n`;
     md += `- **Redot/Godot Migration:** Интеллектуальный конвертер C# -> GDScript и автоматическая адаптация ресурсов под движок Redot. Сохранение иерархии сцен и настроек материалов.\n`;
     if (kb.documentation_links && kb.documentation_links.length > 0) {
@@ -599,19 +599,17 @@ async function generateMasterBlueprint() {
     md += `- **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.\n`;
     md += `- **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.\n\n`;
 
-    md += `## 11. История изменений (v17.17.0)\n`;
+    md += `## 11. История изменений (v17.17.4)\n`;
+    md += `- **v17.17.4:** Multi-Blender Genesis. Полная синхронизация Blender 4.4, 5.1.1 и Standard.\n`;
+    md += `- **v17.17.3:** Supreme Omniscience Edition. Полная интеграция Blender 5.1.1. 11,800+ видео-уроков.\n`;
+    md += `- **v17.17.2:** Support Edition Update. Гайды по модулям Unity и Troubleshooting.\n`;
+    md += `- **v17.17.1:** Support Edition. Инструкции по Unity 6 и Hub.\n`;
     md += `- **v17.17.0:** Omniversal Divine Architect Supreme. Глобальные события, деформация террейна и ИИ-личности.\n`;
     md += `- **v17.16.0:** Omniversal Divine Master. Динамическая погода, квесты 'Культивация', ИИ-Директор агрессии и процедурное оружие.\n`;
     md += `- **v17.15.0:** Omniversal Architect Elite. Внедрено 7 модулей разработки для игры 'Континент Судьбы'.\n`;
-    md += `- **v17.14.0:** Omniversal World Architect. Автогенерация 4 континентов, 12 рас, иерархия героев и юнитов. Синхронизация Blender-Unity.\n`;
-    md += `- **v17.13.0:** Omniversal Knowledge Expansion. Интегрированы новые знания из 10,000+ видео-уроков. Reality Hack 32.0.\n`;
-    md += `- **v17.12.0:** Fate Manifestation. Название игры 'Континент судьбы'. 12 рас, иерархия героев.\n`;
-    md += `- **v15.30.0:** Добавлено около 100 новых видео (итого 4000+), Reality Hack 2.0, Chronos Stabilization.\n`;
-    md += `- **v15.25.0:** Система проактивных ответов на короткие промты, 3900+ видео.\n`;
-    md += `- **v15.20.0:** Обновление базы видео (3800+), мифические функции.\n`;
-    md += `- **v15.8.0:** Улучшение RPG систем, крафт, алхимия, артефакты.\n`;
-    md += `- **v15.0.0:** Переход на Hybrid AI (Online/Offline), поддержка ZIP/RAR.\n`;
-    md += `- **v14.0.0:** Глубокий аудит Unity проектов, поиск TODO.\n\n`;
+    md += `- **v17.14.0:** Quantum Vision 2.0. Neural Audio Synthesis & Multi-Modal Sync.\n`;
+    md += `- **v17.13.0:** Omniversal Knowledge Expansion. 10k+ видео база.\n`;
+    md += `- **v15.11.0:** Базовая версия Quantum AI.\n\n`;
 
     md += `## 12. Аварийные процедуры (Emergency)\n`;
     if (kb.emergency_procedures) {
@@ -1238,7 +1236,7 @@ async function startServer() {
           url: `https://image.pollinations.ai/prompt/${variationEncoded}?seed=${seed}&width=${width}&height=${height}&nologo=true&enhance=true&t=${Date.now() + i}`,
           filename: `vk_cover_${type}_${seed}.jpg`,
           seed,
-          prompt_note: `[Fate Manifestation v17.16.0] ${type.toUpperCase()} | Synthesis: ${variationPrompt.slice(0, 50)}...`
+          prompt_note: `[Fate Manifestation v17.17.4] ${type.toUpperCase()} | Synthesis: ${variationPrompt.slice(0, 50)}...`
         };
       });
 
@@ -1355,7 +1353,7 @@ async function startServer() {
       
       results.push(`Проект содержит ${stats.scripts.length} скриптов. Рекомендуется использовать DOTS для оптимизации.`);
 
-      res.json({ answer: results.join('\n\n'), source: "local_database_v17.5.0" });
+      res.json({ answer: results.join('\n\n'), source: "local_database_v17.17.4" });
     } catch (error) {
       res.status(500).json({ error: "Local search failed" });
     }
@@ -1395,8 +1393,8 @@ async function startServer() {
             desc: "Синхронизированный дизайн интерфейсов во всех редакторах. Создание ассетов в Photoshop и импорт в Unity/Redot."
           },
           {
-            title: "No-Internet Core (v17.10.0)",
-            desc: "Локальный доступ к 11000+ видео и расширенным шаблонам управления для стратегий и RPG."
+            title: "No-Internet Core (v17.17.4)",
+            desc: "Локальный доступ к 11800+ видео и расширенным шаблонам управления для стратегий и RPG."
           },
           {
             title: "Reality Hack 30.0",
