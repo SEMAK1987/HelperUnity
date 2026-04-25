@@ -198,5 +198,148 @@ public class DayNightCycle : MonoBehaviour
 2.  При экспорте .fbx выбирайте `Apply Scalings: FBX All` для корректных размеров в Unity.
 
 ---
-*Документ обновлен для версии v17.17.4 (Multi-Blender Genesis)*
+
+## 🛠️ ШАГ 6: Устранение неполадок (Troubleshooting)
+
+### 1. Package Manager завис на "Refreshing list..."
+Если вы видите бесконечную загрузку при попытке найти TextMeshPro или другие пакеты:
+*   **Проверка Аккаунта:** На скриншоте проверьте Unity Hub. Выйдите из него (Sign Out) и зайдите снова.
+*   **Сброс поиска:** Удалите любой текст из строки поиска в окне Package Manager.
+*   **Удаление Library:** Закройте Unity и удалите папку `Library` внутри вашего проекта. Это безопасно, Unity создаст её заново, исправив ошибки кэша.
+*   **Add package by name:** Если список не грузится, нажмите на «+» в углу Package Manager -> `Add package by name` и введите `com.unity.textmeshpro`. Это установит его в обход общего списка.
+*   **Offline Mode:** В Unity Hub можно перевести проект в Offline, чтобы он не пытался стучаться на сервера при каждом действии.
+
+### 2. Замедление интернета (VPN Fix)
+Если сайты и сервисы Unity тормозят:
+1.  **Используйте VPN:** Для авторизации в Hub и загрузки пакетов VPN обязателен. После начала загрузки его можно попробовать отключить, но для Package Manager он критичен.
+2.  **Ручная установка в manifest.json:** 
+    *   Закройте Unity.
+    *   Перейдите в папку проекта `Packages/manifest.json`.
+    *   Добавьте строку `"com.unity.textmeshpro": "3.0.6",` (или другую версию) в список зависимостей.
+    *   При запуске Unity сам скачает пакет без поиска в UI.
+
+## 🎨 ШАГ 7: Создание интерфейса (UI Design)
+
+### 1. Название Игры (Title)
+*   **Создание:** Hierarchy -> Canvas -> UI -> Text - TextMeshPro.
+*   **Имя:** `GameTitle`.
+*   **Настройка Inspector:**
+    *   `Text Input`: КОНТИНЕНТ СУДЬБЫ.
+    *   `Font Size`: 90.
+    *   `Alignment`: Center.
+    *   `Color Gradient`: Включить. Выберите градиент от золотого (#FFD700) к белому.
+    *   `Rect Transform`: Pos Y = 350.
+
+### 2. Интерактивные Кнопки
+*   **Старт:** UI -> Button - TextMeshPro. Имя `StartButton`. Текст: "ИГРАТЬ". Pos Y = 0.
+*   **Выход:** UI -> Button - TextMeshPro. Имя `ExitButton`. Текст: "ВЫХОД". Pos Y = -100.
+
+### 3. Скрипт MainMenu.cs
+Создайте `Assets/Scripts/MainMenu.cs`:
+```csharp
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+public class MainMenu : MonoBehaviour {
+    // ВНИМАНИЕ: Используйте именно эти имена, чтобы они появились в списке On Click()
+    public void StartGame() { 
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1); 
+    }
+
+    public void ExitGame() { 
+        Application.Quit();
+        Debug.Log("Выход из игры..."); 
+    }
+}
+```
+Прикрепите его к `Canvas` и настройте события `On Click ()` у кнопок.
+
+## 🔠 ШАГ 8: Работа со шрифтами и исправление ошибок
+
+### 0. Почему в списке On Click () нет функций StartGame/ExitGame?
+Если вы видите `No Function` и в списке `MainMenu` нет ваших методов:
+1.  **Проверьте скрипт:** Убедитесь, что перед `void StartGame()` стоит слово **public**. Если метода нет в списке — он либо приватный, либо скрипт не скомпилирован.
+2.  **Ошибки в консоли:** Проверьте вкладку **Console** внизу Unity. Если там есть красные ошибки, Unity не "видит" новые функции в коде. Исправьте ошибки и список обновится.
+3.  **Авто-заполнение:** Нажмите `Ctrl+S` в Visual Studio, чтобы сохранить файл. Unity должен "мигнуть" (появится иконка загрузки в углу), после чего функции появятся в списке.
+
+### 1. Почему текст стоит "столбом"?
+На вашем скриншоте текст `Континент Судьбы` отображается вертикально. 
+*   **Причина:** Ширина (Width) в Rect Transform слишком мала (200), а размер шрифта большой (90).
+*   **Решение:** 
+    1.  Выберите объект `GameTitle` в Hierarchy.
+    2.  В Inspector найдите **Rect Transform**.
+    3.  Измените **Width** с 200 на **1000**.
+    4.  Измените **Height** на **150**.
+    5.  В компоненте **TextMeshPro - Text (UI)** найдите раздел **Alignment** и выберите центральную иконку (Center).
+
+### 2. Где скачать шрифты для русского языка?
+Стандартные шрифты Unity не всегда хорошо поддерживают кириллицу.
+1.  Зайдите на [Google Fonts](https://fonts.google.com/).
+2.  В фильтрах (Language) выберите **Cyrillic**.
+3.  Рекомендуемые шрифты: **Montserrat**, **Roboto**, **Oswald** (для заголовков).
+4.  Скачайте архив, распакуйте и перетащите файл `.ttf` в Unity в папку `Assets/Fonts`.
+
+### 3. Как создать Font Asset для TextMeshPro?
+Просто перетащить шрифт недостаточно, TMP нужен специальный ассет:
+1.  Нажмите правой кнопкой на ваш файл `.ttf` в Unity.
+2.  Выберите **Create > TextMeshPro > Font Asset**.
+3.  Если вы хотите, чтобы шрифт был супер-четким или поддерживал все символы:
+    *   Откройте **Window > TextMeshPro > Font Asset Creator**.
+    *   Выберите ваш шрифт в `Source Font File`.
+    *   `Character Set` -> Выберите **Cyrillic**.
+    *   Нажмите **Generate Font Atlas**, затем **Save**.
+4.  Теперь в объекте `GameTitle` в поле **Font Asset** перетащите ваш новый созданный ассет.
+
+## ⚙️ ШАГ 9: Меню настроек (Settings Menu)
+
+### 1. Создание структуры UI
+1.  **Панель подложки:** На `Canvas` нажмите правой кнопкой: `UI > Image`. Назовите `SettingsPanel`. Растяните на весь экран, сделайте цвет темно-серым с прозрачностью. 
+2.  **Заголовок:** Внутри `SettingsPanel` создайте `UI > Text - TMP` с текстом "НАСТРОЙКИ" (ID 2).
+3.  **Кнопка закрытия:** `UI > Button - TMP`. Текст "НАЗАД" (ID 19). В событие `On Click` перетащите саму панель `SettingsPanel` и выберите `GameObject.SetActive(false)`.
+4.  **Разделы (Graphics, Audio, Language):** Создайте пустой объект `Content` внутри панели и добавьте `Vertical Layout Group`, чтобы элементы стояли ровно.
+
+### 2. Настройка Звука и Графики
+Создайте скрипт `SettingsManager.cs` и добавьте его на `SettingsPanel`:
+
+```csharp
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+
+public class SettingsManager : MonoBehaviour {
+    public TMP_Dropdown resolutionDropdown;
+    public Toggle fullscreenToggle;
+
+    void Start() {
+        // Настройка разрешений
+        resolutionDropdown.ClearOptions();
+        resolutionDropdown.AddOptions(new System.Collections.Generic.List<string> { "1920x1080", "1280x720", "2560x1440" });
+    }
+
+    public void SetResolution(int index) {
+        if (index == 0) Screen.SetResolution(1920, 1080, Screen.fullScreen);
+        else if (index == 1) Screen.SetResolution(1280, 720, Screen.fullScreen);
+    }
+
+    public void SetFullscreen(bool isFullscreen) { Screen.fullScreen = isFullscreen; }
+    
+    public void SetVolume(float volume) { AudioListener.volume = volume; }
+}
+```
+
+### 3. Интеграция ваших скриптов перевода
+1.  **Объект Translator:** Создайте в сцене пустой объект `_Translator`. Прикрепите на него ваш скрипт `Translator.cs`.
+    *   Перетащите ваш кириллический Font Asset в поле `russianFont`.
+    *   Перетащите стандартный Font Asset в `defaultFont`.
+2.  **Выбор языка:** В `SettingsPanel` создайте `UI > Dropdown - TMP`. Прикрепите на него ваш скрипт `LanguageSelector.cs`.
+    *   В поле `Language Dropdown` перетащите сам этот Dropdown.
+    *   В поле `Language Title Label` перетащите текстовую метку "Язык" (ID 12).
+3.  **Перевод всех надписей:** На КАЖДЫЙ объект с текстом (Кнопки, Заголовки) добавьте ваш скрипт `Transtable_Text.cs`.
+    *   В поле `Text ID` введите номер из массива в `Translator.cs` (например: 0 - Старт, 4 - Выход, 2 - Опции).
+
+### 4. Связка с главной кнопкой
+На вашей кнопке `OptionsButton` в `On Click ()` перетащите `SettingsPanel` и выберите `GameObject.SetActive(true)`.
+
+---
+*Документ обновлен для версии v17.17.11 (Logic & UI Final Sync)*
 

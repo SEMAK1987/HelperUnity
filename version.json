@@ -1,7 +1,14 @@
 {
-  "version": "17.17.4",
-  "release_date": "2026-04-24",
+  "version": "17.17.11",
+  "release_date": "2026-04-25",
   "changelog": [
+    "Версия 17.17.11: Logic & UI Final Sync. Исправлены ошибки отрисовки (p -> div), обновлена логика MainMenu.cs (StartGame/ExitGame) и исправлены ошибки загрузки данных (fetch fix).",
+    "Версия 17.17.10: Logic Sync Edition. Исправлены имена методов в MainMenu.cs (StartGame/ExitGame) и добавлен гайд по отладке списка функций в Inspector.",
+    "Версия 17.17.9: Settings Architect Edition. Полная интеграция системы настроек: Графика, Звук и Мульти-языковая локализация на базе предоставленных скриптов.",
+    "Версия 17.17.8: UI Typography Edition. Решение проблемы вертикального текста, гайд по созданию TMP Font Asset и установке кириллических шрифтов.",
+    "Версия 17.17.7: UI Architect Edition. Детальные инструкции по TMP UI и MainMenu.cs.",
+    "Версия 17.17.6: Quantum Connectivity Edition. Добавлены обходы региональных блокировок для Unity Package Manager и метод принудительной установки TextMeshPro.",
+    "Версия 17.17.5: Package Manager Fix Edition. Добавлены инструкции по устранению зависаний 'Refreshing list' в Unity 6.",
     "Версия 17.17.4: Multi-Blender Genesis. Внедрена поддержка и синхронизация для нескольких версий Blender одновременно (4.4, 5.1.1 и стандартной). Полная кросс-платформенная интеграция моделей.",
     "Версия 17.17.3: Supreme Omniscience Edition. Полная интеграция Blender 5.1.1 (Путь: C:\\Program Files\\Blender Foundation\\Blender 5.1\\blender-launcher.exe). Внедрена поддержка OSL, Mask to SDF, Physically Accurate Shaders и 11,800+ видео уроков. Оптимизирован Quantum Link для Unity 6 и Blender 5.1.1.",
     "Версия 17.17.2: Support Edition Update. Расширен гайд по добавлению модулей Unity (IL2CPP, WebGL) и решению проблем с 'Validation Failed'.",

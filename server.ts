@@ -466,16 +466,17 @@ async function generateMasterBlueprint() {
     const blueprint = await fs.readJson(blueprintJsonPath);
     
     let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"} (Omniversal Quantum Archive Edition)\n\n`;
-    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.17.4.\n\n`;
+    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.17.11.\n\n`;
     md += `## 1. Общая информация\n`;
-    md += `- **Версия Помощника:** ${blueprint.version || "17.17.4"}\n`;
-    md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3.10f1), Blender 5.1.1 (Multi-Sync 4.4, Legacy) и Redot. Поддержка квантовых вычислений, предсказание багов, Reality Hack 34.0 и работа с тяжелыми медиа-архивами (11,800+ видео)."}\n`;
+    md += `- **Версия Помощника:** ${blueprint.version || "17.17.11"}\n`;
+    md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3.10f1), Blender 5.1.1 и Redot. Поддержка квантовых вычислений, обход региональных блокировок и 11,800+ видео уроков."}\n`;
     md += `- **Путь проекта:** ${kb.project_path}\n`;
     md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
     md += `- **Версия Unity:** ${currentUnityStatus.version}\n`;
     md += `- **Версия Blender:** ${currentBlenderStatus.version}\n`;
     md += `- **Версия GIMP:** ${currentGimpStatus.version}\n`;
-    md += `- **Версия Redot:** ${currentRedotStatus.version}\n\n`;
+    md += `- **Версия Redot:** ${currentRedotStatus.version}\n`;
+    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V17_17_11_STABLE]\n\n`;
     
     md += `## 2. Структура интерфейса\n`;
     md += `### Вкладки\n`;
@@ -599,9 +600,13 @@ async function generateMasterBlueprint() {
     md += `- **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.\n`;
     md += `- **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.\n\n`;
 
-    md += `## 11. История изменений (v17.17.4)\n`;
-    md += `- **v17.17.4:** Multi-Blender Genesis. Полная синхронизация Blender 4.4, 5.1.1 и Standard.\n`;
-    md += `- **v17.17.3:** Supreme Omniscience Edition. Полная интеграция Blender 5.1.1. 11,800+ видео-уроков.\n`;
+    md += `## 11. История изменений (v17.17.11)\n`;
+    md += `- **v17.17.11:** Logic & UI Final Sync. Исправлены ошибки отрисовки (p -> div), обновлена логика MainMenu.cs (StartGame/ExitGame) и исправлены ошибки загрузки данных (fetch fix).\n`;
+    md += `- **v17.17.10:** Logic Sync Edition. Исправлены имена методов в MainMenu.cs (StartGame/ExitGame) и добавлен гайд по отладке списка функций в Inspector.\n`;
+    md += `- **v17.17.9:** Settings Architect Edition. Полная интеграция систем настроек, локализации и кириллических шрифтов.\n`;
+    md += `- **v17.17.8:** UI Typography Edition. Решение проблемы вертикального текста и гайд по кириллическим шрифтам.\n`;
+    md += `- **v17.17.7:** UI Architect Edition. Детальные инструкции по TMP UI и MainMenu.cs.\n`;
+    md += `- **v17.17.6:** Quantum Connectivity Edition. Решение проблемы региональных блокировок и Package Manager.\n`;
     md += `- **v17.17.2:** Support Edition Update. Гайды по модулям Unity и Troubleshooting.\n`;
     md += `- **v17.17.1:** Support Edition. Инструкции по Unity 6 и Hub.\n`;
     md += `- **v17.17.0:** Omniversal Divine Architect Supreme. Глобальные события, деформация террейна и ИИ-личности.\n`;
@@ -1236,7 +1241,7 @@ async function startServer() {
           url: `https://image.pollinations.ai/prompt/${variationEncoded}?seed=${seed}&width=${width}&height=${height}&nologo=true&enhance=true&t=${Date.now() + i}`,
           filename: `vk_cover_${type}_${seed}.jpg`,
           seed,
-          prompt_note: `[Fate Manifestation v17.17.4] ${type.toUpperCase()} | Synthesis: ${variationPrompt.slice(0, 50)}...`
+          prompt_note: `[Fate Manifestation v17.17.6] ${type.toUpperCase()} | Synthesis: ${variationPrompt.slice(0, 50)}...`
         };
       });
 
@@ -1353,7 +1358,7 @@ async function startServer() {
       
       results.push(`Проект содержит ${stats.scripts.length} скриптов. Рекомендуется использовать DOTS для оптимизации.`);
 
-      res.json({ answer: results.join('\n\n'), source: "local_database_v17.17.4" });
+      res.json({ answer: results.join('\n\n'), source: "local_database_v17.17.6" });
     } catch (error) {
       res.status(500).json({ error: "Local search failed" });
     }
@@ -1393,7 +1398,7 @@ async function startServer() {
             desc: "Синхронизированный дизайн интерфейсов во всех редакторах. Создание ассетов в Photoshop и импорт в Unity/Redot."
           },
           {
-            title: "No-Internet Core (v17.17.4)",
+            title: "No-Internet Core (v17.17.6)",
             desc: "Локальный доступ к 11800+ видео и расширенным шаблонам управления для стратегий и RPG."
           },
           {
