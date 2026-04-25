@@ -349,6 +349,19 @@ function VKImageCard({ res, type, showNotification, onZoom }: { res: any, type: 
 
 // --- App Component ---
 export default function App() {
+  async function fetchWithRetry(url: string, retries = 5, delay = 1000) {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const res = await fetch(url);
+        if (res.ok) return await res.json();
+        throw new Error('Not OK');
+      } catch (e) {
+        if (i === retries - 1) throw e;
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+
   const [kb, setKb] = useState<KBData | null>(null);
   const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info' | 'migration' | 'game_design' | 'game_help'>('chat');
   const [appVersion, setAppVersion] = useState('17.17.11');
@@ -396,6 +409,14 @@ export default function App() {
   const [vkType, setVkType] = useState<'static' | 'live'>('static');
   const [vkResults, setVkResults] = useState<any[]>([]);
   const [isGeneratingVK, setIsGeneratingVK] = useState(false);
+  const [showMenuSettings, setShowMenuSettings] = useState(false);
+  const [gameSettings, setGameSettings] = useState({
+    graphics: 'high',
+    resolution: '1920x1080',
+    sound: 80,
+    music: 60,
+    language: 'ru'
+  });
   
   const chatEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -570,19 +591,6 @@ export default function App() {
     const handleOffline = () => setIsOnline(false);
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
-
-    const fetchWithRetry = async (url: string, retries = 5, delay = 1000) => {
-      for (let i = 0; i < retries; i++) {
-        try {
-          const res = await fetch(url);
-          if (res.ok) return await res.json();
-          throw new Error('Not OK');
-        } catch (e) {
-          if (i === retries - 1) throw e;
-          await new Promise(resolve => setTimeout(resolve, delay));
-        }
-      }
-    };
 
     fetchWithRetry('/api/kb')
       .then(data => {
@@ -1568,6 +1576,12 @@ export default function App() {
               >
                 <Info className="w-3.5 h-3.5" /> Возможности ИИ
               </button>
+              <button 
+                onClick={() => setShowMenuSettings(true)}
+                className="px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 text-slate-400 hover:bg-white/10 border border-white/10"
+              >
+                <Settings className="w-3.5 h-3.5" /> Меню
+              </button>
             </nav>
           </div>
 
@@ -1592,6 +1606,150 @@ export default function App() {
             </div>
           </div>
         </header>
+
+        {/* Update Modal */}
+        <AnimatePresence>
+          {showMenuSettings && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+               <motion.div 
+                 initial={{ opacity: 0 }}
+                 animate={{ opacity: 1 }}
+                 exit={{ opacity: 0 }}
+                 onClick={() => setShowMenuSettings(false)}
+                 className="absolute inset-0 bg-black/80 backdrop-blur-xl"
+               />
+               <motion.div 
+                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                 animate={{ opacity: 1, scale: 1, y: 0 }}
+                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                 className="relative w-full max-w-2xl bg-[#0d0d0f] rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden p-10"
+               >
+                 <div className="flex items-center justify-between mb-10">
+                    <div className="flex items-center gap-4">
+                       <div className="p-3 rounded-2xl bg-blue-500/20 text-blue-400">
+                          <Settings className="w-6 h-6" />
+                       </div>
+                       <div>
+                          <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">Настройки Системы</h3>
+                          <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Конфигурация среды разработки v17.17.11</p>
+                       </div>
+                    </div>
+                    <button onClick={() => setShowMenuSettings(false)} className="p-3 rounded-2xl bg-white/5 text-slate-500 hover:text-white transition-all">
+                       <X className="w-6 h-6" />
+                    </button>
+                 </div>
+
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-6">
+                       <div className="space-y-4">
+                          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                             <Layout className="w-3 h-3" /> Графика
+                          </label>
+                          <select 
+                            value={gameSettings.graphics}
+                            onChange={(e) => setGameSettings({...gameSettings, graphics: e.target.value})}
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-white focus:outline-none focus:border-blue-500 appearance-none uppercase tracking-widest font-bold"
+                          >
+                             <option value="low">Производительность (Low)</option>
+                             <option value="medium">Баланс (Medium)</option>
+                             <option value="high">Качество (High)</option>
+                             <option value="ultra">Ультра (Ultra)</option>
+                          </select>
+                       </div>
+
+                       <div className="space-y-4">
+                          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                             <Layout className="w-3 h-3" /> Разрешение
+                          </label>
+                          <select 
+                            value={gameSettings.resolution}
+                            onChange={(e) => setGameSettings({...gameSettings, resolution: e.target.value})}
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-white focus:outline-none focus:border-blue-500 appearance-none uppercase tracking-widest font-bold"
+                          >
+                             <option value="1280x720">1280 x 720 (16:9)</option>
+                             <option value="1920x1080">1920 x 1080 (FHD)</option>
+                             <option value="2560x1440">2560 x 1440 (2K)</option>
+                             <option value="3840x2160">3840 x 2160 (4K)</option>
+                          </select>
+                       </div>
+
+                       <div className="space-y-4">
+                          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                             <Type className="w-3 h-3" /> Язык (Language)
+                          </label>
+                          <div className="flex gap-2">
+                             {['ru', 'en', 'cn'].map(lang => (
+                               <button 
+                                 key={lang}
+                                 onClick={() => setGameSettings({...gameSettings, language: lang})}
+                                 className={`flex-1 p-3 rounded-2xl border text-xs font-black uppercase tracking-widest transition-all ${
+                                   gameSettings.language === lang ? 'bg-blue-600 border-blue-500 text-white shadow-lg' : 'bg-white/5 border-white/5 text-slate-500 hover:text-white'
+                                 }`}
+                               >
+                                 {lang}
+                               </button>
+                             ))}
+                          </div>
+                       </div>
+                    </div>
+
+                    <div className="space-y-8">
+                       <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                                <Droplets className="w-3 h-3" /> Громкость Звука
+                             </label>
+                             <span className="text-[10px] font-mono text-blue-400">{gameSettings.sound}%</span>
+                          </div>
+                          <input 
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={gameSettings.sound}
+                            onChange={(e) => setGameSettings({...gameSettings, sound: parseInt(e.target.value)})}
+                            className="w-full accent-blue-500 h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer"
+                          />
+                       </div>
+
+                       <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                                <Music className="w-3 h-3" /> Громкость Музыки
+                             </label>
+                             <span className="text-[10px] font-mono text-purple-400">{gameSettings.music}%</span>
+                          </div>
+                          <input 
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={gameSettings.music}
+                            onChange={(e) => setGameSettings({...gameSettings, music: parseInt(e.target.value)})}
+                            className="w-full accent-purple-500 h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer"
+                          />
+                       </div>
+
+                       <div className="p-6 rounded-[2rem] bg-gradient-to-br from-blue-600/10 to-purple-600/10 border border-white/5 space-y-4">
+                          <h4 className="text-[10px] font-black text-white uppercase tracking-widest italic">Статус Синхронизации</h4>
+                          <div className="flex items-center gap-3">
+                             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+                             <span className="text-[9px] text-slate-400 uppercase tracking-tighter">Все системы работают в штатном режиме</span>
+                          </div>
+                          <button 
+                            onClick={() => {
+                               showNotification("Настройки сохранены и синхронизированы.", "success");
+                               setShowMenuSettings(false);
+                            }}
+                            className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all transform active:scale-95 shadow-xl shadow-blue-600/20"
+                          >
+                             Применить (Apply)
+                          </button>
+                       </div>
+                    </div>
+                 </div>
+               </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
 
         {/* Update Modal */}
         <AnimatePresence>

@@ -2,356 +2,501 @@
   {
     "event": "change",
     "path": "/app/applet/history.json",
-    "timestamp": "2026-04-13T19:10:02.709Z"
+    "timestamp": "2026-04-25T18:17:55.854Z"
   },
   {
     "event": "change",
-    "path": "/app/applet/all_urls.txt",
-    "timestamp": "2026-04-13T19:10:02.703Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-04-13T19:09:23.412Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/update_kb.js",
-    "timestamp": "2026-04-13T19:09:23.407Z"
+    "path": "/app/applet/game_design.json",
+    "timestamp": "2026-04-25T18:17:55.848Z"
   },
   {
     "event": "change",
     "path": "/app/applet/history.json",
-    "timestamp": "2026-04-13T19:09:22.368Z"
+    "timestamp": "2026-04-25T18:17:50.271Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/fix_json.js",
+    "timestamp": "2026-04-25T18:17:50.267Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T18:17:49.001Z"
   },
   {
     "event": "add",
-    "path": "/app/applet/update_kb.js",
-    "timestamp": "2026-04-13T19:09:22.362Z"
+    "path": "/app/applet/fix_json.js",
+    "timestamp": "2026-04-25T18:17:48.994Z"
   },
   {
     "event": "change",
     "path": "/app/applet/history.json",
-    "timestamp": "2026-04-13T18:39:33.540Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/extract_videos_v3.js",
-    "timestamp": "2026-04-13T18:39:33.535Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-04-13T18:39:32.453Z"
-  },
-  {
-    "event": "add",
-    "path": "/app/applet/extract_videos_v3.js",
-    "timestamp": "2026-04-13T18:39:32.448Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-04-13T17:31:58.140Z"
-  },
-  {
-    "event": "unlink",
-    "path": "/app/applet/extract_videos_v2.js",
-    "timestamp": "2026-04-13T17:31:58.135Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-04-13T17:31:04.390Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/server.ts",
-    "timestamp": "2026-04-13T17:31:04.387Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-04-13T17:30:04.932Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/server.ts",
-    "timestamp": "2026-04-13T17:30:04.927Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-04-13T17:27:42.130Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/server.ts",
-    "timestamp": "2026-04-13T17:27:42.126Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-04-13T17:26:56.969Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/server.ts",
-    "timestamp": "2026-04-13T17:26:56.965Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-04-13T17:20:19.671Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/extract_videos_v2.js",
-    "timestamp": "2026-04-13T17:20:19.667Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-04-13T17:20:18.601Z"
-  },
-  {
-    "event": "add",
-    "path": "/app/applet/extract_videos_v2.js",
-    "timestamp": "2026-04-13T17:20:18.596Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-04-13T16:48:25.072Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/server.ts",
-    "timestamp": "2026-04-13T16:48:25.067Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-04-13T16:45:47.138Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/server.ts",
-    "timestamp": "2026-04-13T16:45:47.134Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-04-13T16:45:19.578Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/server.ts",
-    "timestamp": "2026-04-13T16:45:19.571Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-04-13T16:41:49.660Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/extract_videos.js",
-    "timestamp": "2026-04-13T16:41:49.656Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-04-13T16:41:47.381Z"
-  },
-  {
-    "event": "add",
-    "path": "/app/applet/extract_videos.js",
-    "timestamp": "2026-04-13T16:41:47.376Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-04-13T15:36:27.497Z"
-  },
-  {
-    "event": "add",
-    "path": "/app/applet/chat_history.json",
-    "timestamp": "2026-04-13T15:36:27.489Z"
-  },
-  {
-    "event": "add",
-    "path": "/app/applet/troubleshooting_db.json",
-    "timestamp": "2026-04-10T16:41:36.542Z"
-  },
-  {
-    "event": "add",
-    "path": "/app/applet/unity_api_ref.json",
-    "timestamp": "2026-04-10T16:41:36.532Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-04-10T16:39:35.039Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/server.ts",
-    "timestamp": "2026-04-10T16:39:35.035Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-04-10T16:36:00.203Z"
+    "timestamp": "2026-04-25T18:15:57.463Z"
   },
   {
     "event": "change",
     "path": "/app/applet/src/App.tsx",
-    "timestamp": "2026-04-10T16:36:00.200Z"
+    "timestamp": "2026-04-25T18:15:57.457Z"
   },
   {
     "event": "change",
     "path": "/app/applet/history.json",
-    "timestamp": "2026-04-10T16:35:46.619Z"
+    "timestamp": "2026-04-25T18:13:14.637Z"
   },
   {
     "event": "change",
-    "path": "/app/applet/server.ts",
-    "timestamp": "2026-04-10T16:35:46.615Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-04-10T16:33:10.102Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/server.ts",
-    "timestamp": "2026-04-10T16:33:10.098Z"
+    "path": "/app/applet/game_design.json",
+    "timestamp": "2026-04-25T18:13:14.632Z"
   },
   {
     "event": "change",
     "path": "/app/applet/history.json",
-    "timestamp": "2026-04-10T16:18:45.518Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/chat_history.json",
-    "timestamp": "2026-04-10T16:18:45.513Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-04-10T16:15:34.880Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/chat_history.json",
-    "timestamp": "2026-04-10T16:15:34.875Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-04-10T16:15:34.441Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/chat_history.json",
-    "timestamp": "2026-04-10T16:15:34.435Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-04-10T16:14:07.442Z"
+    "timestamp": "2026-04-25T18:12:06.437Z"
   },
   {
     "event": "change",
     "path": "/app/applet/src/App.tsx",
-    "timestamp": "2026-04-10T16:14:07.437Z"
+    "timestamp": "2026-04-25T18:12:06.432Z"
   },
   {
     "event": "change",
     "path": "/app/applet/history.json",
-    "timestamp": "2026-04-10T16:12:11.790Z"
+    "timestamp": "2026-04-25T18:11:37.703Z"
   },
   {
     "event": "change",
     "path": "/app/applet/src/App.tsx",
-    "timestamp": "2026-04-10T16:12:11.786Z"
+    "timestamp": "2026-04-25T18:11:37.698Z"
   },
   {
     "event": "change",
     "path": "/app/applet/history.json",
-    "timestamp": "2026-04-10T16:11:32.419Z"
+    "timestamp": "2026-04-25T17:58:10.498Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/game_design.json",
+    "timestamp": "2026-04-25T17:58:10.494Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:57:33.631Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-04-25T17:57:33.627Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:57:15.418Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-04-25T17:57:15.414Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:56:29.661Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/game_design.json",
+    "timestamp": "2026-04-25T17:56:29.657Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:56:02.589Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/game_design.json",
+    "timestamp": "2026-04-25T17:56:02.581Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:55:47.249Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/game_design.json",
+    "timestamp": "2026-04-25T17:55:47.244Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:55:30.748Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/game_design.json",
+    "timestamp": "2026-04-25T17:55:30.745Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:55:21.038Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/game_design.json",
+    "timestamp": "2026-04-25T17:55:21.033Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:47:46.991Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-04-25T17:47:46.987Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:47:23.045Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-04-25T17:47:23.041Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:46:28.165Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-04-25T17:46:28.160Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:46:05.484Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-04-25T17:46:05.479Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:45:55.369Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/metadata.json",
+    "timestamp": "2026-04-25T17:45:55.364Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:43:58.747Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-04-25T17:43:58.744Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:43:50.059Z"
   },
   {
     "event": "change",
     "path": "/app/applet/server.ts",
-    "timestamp": "2026-04-10T16:11:32.415Z"
+    "timestamp": "2026-04-25T17:43:50.054Z"
   },
   {
     "event": "change",
     "path": "/app/applet/history.json",
-    "timestamp": "2026-04-10T16:06:25.380Z"
+    "timestamp": "2026-04-25T17:43:07.033Z"
   },
   {
     "event": "change",
-    "path": "/app/applet/chat_history.json",
-    "timestamp": "2026-04-10T16:06:25.377Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-04-10T16:06:18.851Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/chat_history.json",
-    "timestamp": "2026-04-10T16:06:18.846Z"
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-04-25T17:43:07.027Z"
   },
   {
     "event": "change",
     "path": "/app/applet/history.json",
-    "timestamp": "2026-04-10T16:05:04.197Z"
+    "timestamp": "2026-04-25T17:39:31.102Z"
   },
   {
     "event": "change",
-    "path": "/app/applet/chat_history.json",
-    "timestamp": "2026-04-10T16:05:04.193Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-04-10T16:04:55.787Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/chat_history.json",
-    "timestamp": "2026-04-10T16:04:55.784Z"
+    "path": "/app/applet/GAME_HELP_GUIDE.md",
+    "timestamp": "2026-04-25T17:39:31.094Z"
   },
   {
     "event": "change",
     "path": "/app/applet/history.json",
-    "timestamp": "2026-04-10T16:04:25.301Z"
+    "timestamp": "2026-04-25T17:39:08.741Z"
   },
   {
     "event": "change",
-    "path": "/app/applet/chat_history.json",
-    "timestamp": "2026-04-10T16:04:25.297Z"
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-04-25T17:39:08.737Z"
   },
   {
     "event": "change",
     "path": "/app/applet/history.json",
-    "timestamp": "2026-04-10T16:04:07.432Z"
+    "timestamp": "2026-04-25T17:37:36.182Z"
   },
   {
-    "event": "add",
+    "event": "change",
+    "path": "/app/applet/server.ts",
+    "timestamp": "2026-04-25T17:37:36.177Z"
+  },
+  {
+    "event": "change",
     "path": "/app/applet/history.json",
-    "timestamp": "2026-04-10T16:04:07.428Z"
+    "timestamp": "2026-04-25T17:37:32.631Z"
   },
   {
-    "event": "add",
-    "path": "/app/applet/chat_history.json",
-    "timestamp": "2026-04-10T16:04:07.425Z"
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-04-25T17:37:32.626Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:29:40.821Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-04-25T17:29:40.816Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:29:30.582Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-04-25T17:29:30.579Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:29:24.159Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-04-25T17:29:24.155Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:29:18.886Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-04-25T17:29:18.882Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:28:21.624Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/server.ts",
+    "timestamp": "2026-04-25T17:28:21.618Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:28:18.139Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/GAME_HELP_GUIDE.md",
+    "timestamp": "2026-04-25T17:28:18.134Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:12:33.109Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-04-25T17:12:33.105Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:12:23.925Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/server.ts",
+    "timestamp": "2026-04-25T17:12:23.919Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:12:10.448Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/GAME_HELP_GUIDE.md",
+    "timestamp": "2026-04-25T17:12:10.444Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:04:55.753Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/server.ts",
+    "timestamp": "2026-04-25T17:04:55.750Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:04:52.874Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-04-25T17:04:52.870Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:04:48.045Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-04-25T17:04:48.041Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:04:44.055Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-04-25T17:04:44.050Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T17:04:35.527Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/GAME_HELP_GUIDE.md",
+    "timestamp": "2026-04-25T17:04:35.521Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T16:34:45.908Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-04-25T16:34:45.903Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T16:34:35.592Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-04-25T16:34:35.585Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T16:33:53.713Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/server.ts",
+    "timestamp": "2026-04-25T16:33:53.710Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T16:33:50.356Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/server.ts",
+    "timestamp": "2026-04-25T16:33:50.351Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T16:33:47.806Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/server.ts",
+    "timestamp": "2026-04-25T16:33:47.802Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T16:33:45.047Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/server.ts",
+    "timestamp": "2026-04-25T16:33:45.044Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T16:33:42.210Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/server.ts",
+    "timestamp": "2026-04-25T16:33:42.206Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T16:33:38.843Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-04-25T16:33:38.839Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-04-25T16:33:35.361Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-04-25T16:33:35.358Z"
   }
 ]
