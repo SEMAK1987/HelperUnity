@@ -66,7 +66,13 @@ import {
   Crown,
   Sun,
   Moon,
-  Activity
+  Activity,
+  Play,
+  LogOut,
+  Monitor,
+  Volume2,
+  Globe,
+  AlertCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -347,6 +353,7 @@ function VKImageCard({ res, type, showNotification, onZoom }: { res: any, type: 
   );
 };
 
+
 // --- App Component ---
 export default function App() {
   async function fetchWithRetry(url: string, retries = 5, delay = 1000) {
@@ -409,14 +416,6 @@ export default function App() {
   const [vkType, setVkType] = useState<'static' | 'live'>('static');
   const [vkResults, setVkResults] = useState<any[]>([]);
   const [isGeneratingVK, setIsGeneratingVK] = useState(false);
-  const [showMenuSettings, setShowMenuSettings] = useState(false);
-  const [gameSettings, setGameSettings] = useState({
-    graphics: 'high',
-    resolution: '1920x1080',
-    sound: 80,
-    music: 60,
-    language: 'ru'
-  });
   
   const chatEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -1576,12 +1575,6 @@ export default function App() {
               >
                 <Info className="w-3.5 h-3.5" /> Возможности ИИ
               </button>
-              <button 
-                onClick={() => setShowMenuSettings(true)}
-                className="px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 text-slate-400 hover:bg-white/10 border border-white/10"
-              >
-                <Settings className="w-3.5 h-3.5" /> Меню
-              </button>
             </nav>
           </div>
 
@@ -1608,225 +1601,6 @@ export default function App() {
         </header>
 
         {/* Update Modal */}
-        <AnimatePresence>
-          {showMenuSettings && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-               <motion.div 
-                 initial={{ opacity: 0 }}
-                 animate={{ opacity: 1 }}
-                 exit={{ opacity: 0 }}
-                 onClick={() => setShowMenuSettings(false)}
-                 className="absolute inset-0 bg-black/80 backdrop-blur-xl"
-               />
-               <motion.div 
-                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                 className="relative w-full max-w-2xl bg-[#0d0d0f] rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden p-10"
-               >
-                 <div className="flex items-center justify-between mb-10">
-                    <div className="flex items-center gap-4">
-                       <div className="p-3 rounded-2xl bg-blue-500/20 text-blue-400">
-                          <Settings className="w-6 h-6" />
-                       </div>
-                       <div>
-                          <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">Настройки Системы</h3>
-                          <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Конфигурация среды разработки v17.17.11</p>
-                       </div>
-                    </div>
-                    <button onClick={() => setShowMenuSettings(false)} className="p-3 rounded-2xl bg-white/5 text-slate-500 hover:text-white transition-all">
-                       <X className="w-6 h-6" />
-                    </button>
-                 </div>
-
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-6">
-                       <div className="space-y-4">
-                          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                             <Layout className="w-3 h-3" /> Графика
-                          </label>
-                          <select 
-                            value={gameSettings.graphics}
-                            onChange={(e) => setGameSettings({...gameSettings, graphics: e.target.value})}
-                            className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-white focus:outline-none focus:border-blue-500 appearance-none uppercase tracking-widest font-bold"
-                          >
-                             <option value="low">Производительность (Low)</option>
-                             <option value="medium">Баланс (Medium)</option>
-                             <option value="high">Качество (High)</option>
-                             <option value="ultra">Ультра (Ultra)</option>
-                          </select>
-                       </div>
-
-                       <div className="space-y-4">
-                          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                             <Layout className="w-3 h-3" /> Разрешение
-                          </label>
-                          <select 
-                            value={gameSettings.resolution}
-                            onChange={(e) => setGameSettings({...gameSettings, resolution: e.target.value})}
-                            className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-white focus:outline-none focus:border-blue-500 appearance-none uppercase tracking-widest font-bold"
-                          >
-                             <option value="1280x720">1280 x 720 (16:9)</option>
-                             <option value="1920x1080">1920 x 1080 (FHD)</option>
-                             <option value="2560x1440">2560 x 1440 (2K)</option>
-                             <option value="3840x2160">3840 x 2160 (4K)</option>
-                          </select>
-                       </div>
-
-                       <div className="space-y-4">
-                          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                             <Type className="w-3 h-3" /> Язык (Language)
-                          </label>
-                          <div className="flex gap-2">
-                             {['ru', 'en', 'cn'].map(lang => (
-                               <button 
-                                 key={lang}
-                                 onClick={() => setGameSettings({...gameSettings, language: lang})}
-                                 className={`flex-1 p-3 rounded-2xl border text-xs font-black uppercase tracking-widest transition-all ${
-                                   gameSettings.language === lang ? 'bg-blue-600 border-blue-500 text-white shadow-lg' : 'bg-white/5 border-white/5 text-slate-500 hover:text-white'
-                                 }`}
-                               >
-                                 {lang}
-                               </button>
-                             ))}
-                          </div>
-                       </div>
-                    </div>
-
-                    <div className="space-y-8">
-                       <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                                <Droplets className="w-3 h-3" /> Громкость Звука
-                             </label>
-                             <span className="text-[10px] font-mono text-blue-400">{gameSettings.sound}%</span>
-                          </div>
-                          <input 
-                            type="range"
-                            min="0"
-                            max="100"
-                            value={gameSettings.sound}
-                            onChange={(e) => setGameSettings({...gameSettings, sound: parseInt(e.target.value)})}
-                            className="w-full accent-blue-500 h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer"
-                          />
-                       </div>
-
-                       <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                                <Music className="w-3 h-3" /> Громкость Музыки
-                             </label>
-                             <span className="text-[10px] font-mono text-purple-400">{gameSettings.music}%</span>
-                          </div>
-                          <input 
-                            type="range"
-                            min="0"
-                            max="100"
-                            value={gameSettings.music}
-                            onChange={(e) => setGameSettings({...gameSettings, music: parseInt(e.target.value)})}
-                            className="w-full accent-purple-500 h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer"
-                          />
-                       </div>
-
-                       <div className="p-6 rounded-[2rem] bg-gradient-to-br from-blue-600/10 to-purple-600/10 border border-white/5 space-y-4">
-                          <h4 className="text-[10px] font-black text-white uppercase tracking-widest italic">Статус Синхронизации</h4>
-                          <div className="flex items-center gap-3">
-                             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
-                             <span className="text-[9px] text-slate-400 uppercase tracking-tighter">Все системы работают в штатном режиме</span>
-                          </div>
-                          <button 
-                            onClick={() => {
-                               showNotification("Настройки сохранены и синхронизированы.", "success");
-                               setShowMenuSettings(false);
-                            }}
-                            className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all transform active:scale-95 shadow-xl shadow-blue-600/20"
-                          >
-                             Применить (Apply)
-                          </button>
-                       </div>
-                    </div>
-                 </div>
-               </motion.div>
-            </div>
-          )}
-        </AnimatePresence>
-
-        {/* Update Modal */}
-        <AnimatePresence>
-          {showUpdateModal && (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex items-center justify-center p-6"
-            >
-              <motion.div 
-                initial={{ scale: 0.9, y: 20 }}
-                animate={{ scale: 1, y: 0 }}
-                exit={{ scale: 0.9, y: 20 }}
-                className="bg-[#0f0f11] border border-white/10 rounded-3xl w-full max-w-lg overflow-hidden flex flex-col shadow-2xl"
-              >
-                <div className="p-8 border-b border-white/5 flex items-center justify-between bg-gradient-to-r from-blue-600/10 to-purple-600/10">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-blue-600/20 rounded-2xl text-blue-400">
-                      <Zap className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-bold text-white uppercase tracking-tight">Доступно обновление</h2>
-                      <p className="text-xs text-slate-400">Новая версия: <span className="text-blue-400 font-bold">{updateInfo?.latest}</span></p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="p-8 space-y-6">
-                  <div className="space-y-3">
-                    <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Что нового:</h4>
-                    <ul className="space-y-2">
-                      {updateInfo?.changelog?.map((item: string, i: number) => (
-                        <li key={i} className="flex items-start gap-3 text-sm text-slate-300">
-                          <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 flex-shrink-0" />
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {isUpdating ? (
-                    <div className="space-y-4 py-4">
-                      <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-blue-400">
-                        <span>Загрузка и установка...</span>
-                        <span>{updateProgress}%</span>
-                      </div>
-                      <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-                        <motion.div 
-                          className="h-full bg-blue-600 shadow-[0_0_15px_rgba(59,130,246,0.5)]"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${updateProgress}%` }}
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex gap-4 pt-4">
-                      <button 
-                        onClick={() => setShowUpdateModal(false)}
-                        className="flex-1 px-6 py-4 bg-white/5 hover:bg-white/10 text-white rounded-2xl text-xs font-bold uppercase tracking-widest transition-all border border-white/10"
-                      >
-                        Позже
-                      </button>
-                      <button 
-                        onClick={applyUpdate}
-                        className="flex-1 px-6 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-xs font-bold uppercase tracking-widest transition-all shadow-lg shadow-blue-600/20"
-                      >
-                        Обновить сейчас
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
         {/* Content Area */}
         <div className="flex-1 overflow-hidden flex flex-col">
           {activeTab === 'chat' ? (
@@ -4176,6 +3950,40 @@ export default function App() {
                     </button>
                   </div>
                 </div>
+              </div>
+            </div>
+          ) : activeTab === 'menu' ? (
+            <div className="flex-1 flex flex-col items-center justify-center p-8 relative overflow-hidden h-full">
+              <AtmosphereOverlay type={weatherType} />
+              
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="relative z-10 flex flex-col items-center gap-12"
+              >
+                {/* Logo / Title Area */}
+                <div className="text-center space-y-2">
+                  <motion.h1 
+                    initial={{ letterSpacing: '0.5em', opacity: 0 }}
+                    animate={{ letterSpacing: '0.1em', opacity: 1 }}
+                    className="text-7xl font-black text-white italic uppercase tracking-[0.2em] drop-shadow-[0_0_30px_rgba(59,130,246,0.5)]"
+                  >
+                    CONTINENT
+                    <span className="block text-blue-500 mt-2">OF DESTINY</span>
+                  </motion.h1>
+                  <p className="text-[10px] text-slate-500 uppercase tracking-[0.5em] font-black">Powered by Neural Quantum Link • v{appVersion}</p>
+                </div>
+
+                <div className="flex flex-col items-center gap-6">
+                  {renderMenuContent()}
+                </div>
+              </motion.div>
+
+              {/* Decorative side markers */}
+              <div className="absolute left-10 top-1/2 -translate-y-1/2 flex flex-col gap-2 items-center opacity-20">
+                <div className="w-[1px] h-32 bg-white" />
+                <span className="text-[8px] font-black uppercase text-white [writing-mode:vertical-lr] tracking-[0.5em]">System Status: Online</span>
+                <div className="w-[1px] h-32 bg-white" />
               </div>
             </div>
           ) : null}
