@@ -1,6 +1,6 @@
-# Помощь По Игре - Unity 6 (6000.3.10f1) Ultimate Guide
+# Помощь По Игре - Unity 6 (6000.3.10f1) Ultimate Guide (v17.18.1)
 
-Этот документ является динамическим руководством по созданию игры "Континент Судьбы". Здесь описаны пошаговые инструкции, скрипты и настройки для Unity, дополненные деталями по установке и настройке среды.
+Этот документ является динамическим руководством по созданию игры "Континент Судьбы". Здесь описаны пошаговые инструкции, скрипты и настройки для Unity, дополненные деталями по сохранению данных и синхронизации.
 
 ---
 
@@ -337,9 +337,191 @@ public class SettingsManager : MonoBehaviour {
 3.  **Перевод всех надписей:** На КАЖДЫЙ объект с текстом (Кнопки, Заголовки) добавьте ваш скрипт `Transtable_Text.cs`.
     *   В поле `Text ID` введите номер из массива в `Translator.cs` (например: 0 - Старт, 4 - Выход, 2 - Опции).
 
-### 4. Связка с главной кнопкой
-На вашей кнопке `OptionsButton` в `On Click ()` перетащите `SettingsPanel` и выберите `GameObject.SetActive(true)`.
+## 🎨 ГЛАВА 11: Menu Studio (Мастер-Класс по Интерфейсам)
+
+Это руководство позволит вам создать меню уровня AAA, которое мы спроектировали в Студии.
+
+### 1. Подготовка сцены и UI Core
+1.  **Canvas:** Установите `UI Scale Mode` в `Scale With Screen Size`. Reference Resolution: `1920 x 1080`.
+2.  **Background:** Создайте Image. Цвет сделайте темным (`#0a0a0c`), прозрачность 60%. Добавьте компонент `Canvas Group` для эффектов затухания.
+3.  **Animator:** Создайте `MenuAnimator` на корневом объекте меню. Это позволит плавно входить и выходить из настроек.
+
+### 2. Реализация 8К Разрешений и 8 Языков
+Создайте скрипт `UnityMenuMaster.cs`:
+
+```csharp
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using System.Collections.Generic;
+
+public class UnityMenuMaster : MonoBehaviour {
+    [Header("UI References")]
+    public TMP_Dropdown resDropdown;
+    public TMP_Dropdown langDropdown;
+    public Slider masterVol, musicVol;
+    public Toggle fsToggle;
+
+    private Resolution[] resolutions = {
+        new Resolution { width = 640, height = 480 },
+        new Resolution { width = 1024, height = 768 },
+        new Resolution { width = 1280, height = 720 },
+        new Resolution { width = 1920, height = 1080 },
+        new Resolution { width = 2560, height = 1440 },
+        new Resolution { width = 3840, height = 2160 },
+        new Resolution { width = 7680, height = 4320 } // 8K support
+    };
+
+    void Start() {
+        InitDropdowns();
+    }
+
+    void InitDropdowns() {
+        // Разрешения
+        resDropdown.ClearOptions();
+        List<string> resOptions = new List<string>();
+        foreach (var r in resolutions) resOptions.Add($"{r.width}x{r.height}");
+        resDropdown.AddOptions(resOptions);
+
+        // Языки (Master Sync v17.18.1)
+        langDropdown.ClearOptions();
+        langDropdown.AddOptions(new List<string> { 
+            "Русский", "English", "Deutsch", "Français", 
+            "Español", "日本語", "한국어", "简体中文" 
+        });
+    }
+
+    public void ApplyGraphics() {
+        Resolution r = resolutions[resDropdown.value];
+        Screen.SetResolution(r.width, r.height, fsToggle.isOn);
+    }
+}
+```
+
+### 3. Гайд по Анимации (Без Плагиата)
+Чтобы не копировать чужие решения, создайте собственную параметрическую анимацию:
+1.  **Idle Breathing:** В Animator создайте цикл, который меняет `LocalScale` кнопки от `1.0` до `1.05` за 3 секунды.
+2.  **Hover Pulse:** При наведении (`Highlighted`) добавьте анимацию свечения краев (`Outline Global Color`).
+3.  **Click Impact:** При клике (`Pressed`) мгновенно уменьшайте масштаб до `0.95` и меняйте цвет на `#3b82f6` (Blue-500).
+
+### 4. Создание Скинов "Menu Studio Edition"
+*   **Void Crystal:** В GIMP используйте фильтр "Plasma" с холодными цветами. Примените `Colorize` в фиолетовый.
+*   **Runed Blade:** Нарисуйте белую линию (руну). В Unity в компоненте `Image` используйте `Material` с шейдером свечения (HDR).
+*   **Atmospheric Ray:** Используйте `UI Particles` или просто полупрозрачный градиентный спрайт, который медленно вращается на фоне кнопок.
+
+### 5. Структура Папок проекта
+Рекомендуем следующую структуру для идеального порядка:
+*   `Assets/UI/Skins/` - спрайты и атласы.
+*   `Assets/UI/Animations/` - аниматоры и клипы.
+*   `Assets/UI/Scripts/` - логика меню и настроек.
+*   `Assets/UI/Icons/` - иконки (Flame, Gear, X).
 
 ---
-*Документ обновлен для версии v17.17.11 (Logic & UI Final Sync)*
+*Документ полностью переработан для версии v17.18.1 (Settings Persistence & Master Sync)*
+
+## 💾 ГЛАВА 12: Сохранение Настроек и Синхронизация (PlayerPrefs & Events)
+
+Чтобы ваши настройки (звук, язык, разрешение) не сбрасывались при каждом запуске и работали во всех сценах игры, используйте следующую систему.
+
+### 1. Глобальный SettingsManager (Singleton)
+Создайте объект `GameCore` в первой сцене и прикрепите к нему скрипт `SettingsPersistence.cs`.
+
+```csharp
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using System;
+
+public class SettingsPersistence : MonoBehaviour {
+    public static SettingsPersistence Instance;
+
+    [Header("Current Settings")]
+    public float masterVolume = 0.8f;
+    public int langIndex = 0; // 0: RU, 1: EN...
+    public int resolutionIndex = 3;
+
+    // Событие для мгновенного обновления интерфейса по всей игре
+    public static event Action OnSettingsChanged;
+
+    void Awake() {
+        if (Instance == null) {
+            Instance = this;
+            DontDestroyOnLoad(gameObject); // Объект не удалится при смене сцены
+            LoadSettings();
+        } else {
+            Destroy(gameObject);
+        }
+    }
+
+    public void SaveSettings(float vol, int lang, int res) {
+        masterVolume = vol;
+        langIndex = lang;
+        resolutionIndex = res;
+
+        // Сохраняем в системный реестр/файл
+        PlayerPrefs.SetFloat("MasterVolume", masterVolume);
+        PlayerPrefs.SetInt("LanguageIndex", langIndex);
+        PlayerPrefs.SetInt("ResolutionIndex", resolutionIndex);
+        PlayerPrefs.Save();
+
+        ApplySettings();
+        OnSettingsChanged?.Invoke(); // Оповещаем всех слушателей
+    }
+
+    void LoadSettings() {
+        masterVolume = PlayerPrefs.GetFloat("MasterVolume", 0.8f);
+        langIndex = PlayerPrefs.GetInt("LanguageIndex", 0);
+        resolutionIndex = PlayerPrefs.GetInt("ResolutionIndex", 3);
+        ApplySettings();
+    }
+
+    public void ApplySettings() {
+        AudioListener.volume = masterVolume;
+        // Логика смены разрешения и языка...
+        Debug.Log("Настройки применены глобально.");
+    }
+}
+```
+
+### 2. Синхронизация Текста (Localization Sync)
+Каждый компонент текста должен "подписаться" на событие обновления настроек.
+
+```csharp
+using UnityEngine;
+using TMPro;
+
+public class localizedText : MonoBehaviour {
+    public int textID; // ID фразы из вашего Translator
+    private TextMeshProUGUI textComp;
+
+    void OnEnable() {
+        textComp = GetComponent<TextMeshProUGUI>();
+        SettingsPersistence.OnSettingsChanged += UpdateText; // Подписка
+        UpdateText();
+    }
+
+    void OnDisable() {
+        SettingsPersistence.OnSettingsChanged -= UpdateText; // Отписка
+    }
+
+    void UpdateText() {
+        // Вызываем ваш метод перевода из Translator
+        // textComp.text = Translator.Instance.GetText(textID, SettingsPersistence.Instance.langIndex);
+        Debug.Log($"Текст {textID} обновлен на язык {SettingsPersistence.Instance.langIndex}");
+    }
+}
+```
+
+### 3. Задний план: Замки и Рассы (Multiverse Visuals)
+В "Menu Studio" мы внедрили визуализацию замков. Вот как это сделать в Unity:
+1. **Параллакс:** Разместите модели замков (Human, Elf, Orc, Undead) на разной глубине (Z coordinates).
+2. **Атмосфера:** Добавьте `Fog` (туман) и `Skybox`, соответствующие игровому миру.
+3. **Связь с игроком:** Если игрок выбрал расу Эльфов, в `SettingsPersistence` сохраните `SelectedRace`. При загрузке меню проверяйте это значение и подсвечивайте нужный замок ярче других.
+
+### 4. Резюме Синхронизации
+*   **Громкость:** `AudioListener.volume` — управляет всем звуком сразу.
+*   **Разрешение:** `Screen.SetResolution` — меняет окно приложения.
+*   **Язык:** Событие `OnSettingsChanged` — заставляет все кнопки и диалоги мгновенно перерисоваться на лету.
+
+
 

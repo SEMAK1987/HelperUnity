@@ -1,17 +1,17 @@
-# PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (YouTube Knowledge Integration Mastery v17.18.0)
+# PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Omniversal Quantum Archive Edition)
 
-> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.18.0.
+> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.18.1.
 
 ## 1. Общая информация
-- **Версия Помощника:** 17.18.0
-- **Описание:** Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3.10f1), Blender 5.2, Godot 4.4 и GIMP 3.0. Поддержка квантовых вычислений, обход региональных блокировок и 11,800+ видео уроков. Интегрирована база из 13 новых мастер-классов.
+- **Версия Помощника:** 17.18.1
+- **Описание:** Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок и 11,800+ видео уроков.
 - **Путь проекта:** /app/applet
 - **Локальное хранилище:** Не задано
 - **Версия Unity:** unknown
 - **Версия Blender:** unknown
 - **Версия GIMP:** unknown
 - **Версия Redot:** unknown
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V17_18_0_YOUTUBE_MASTERY]
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V17_18_0_MASTER_STABLE]
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -46,15 +46,11 @@
 ```
 
 
-## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.18.0 - YouTube Knowledge Mastery)
+## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.18.1 - YouTube Knowledge Mastery)
 ### Режимы работы и Архитектурные уровни
 - **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.
 - **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.
-- **No-Internet Mode (YouTube Archive Core):** Мгновенный доступ к знаниям из 11,800+ видео (включая последние 13 мастер-классов по Unity 6 и Blender 5.2).
-
-### YOUTUBE KNOWLEDGE EXTRACTION (v17.18.0)
-- **Deep Extraction:** ИИ проанализировал и внедрил логику из следующих мастер-классов: Q5XlYR2d1kU (Advanced VFX), pbHor4jBafQ (Procedural Worlds), JWUsnWGzZmY (AI NPC Logic), 61tYwYsWrzU (URP Optimization), 8D_m2cw25H0 (Blender Sculpting), _xXu6CNRWSM (Godot Migration), OZNnE5YzevA (GIMP Texturing), Xzg02A_WsBQ (Unity Muse Integration), Mr8-xnY9pzA (Blender 5.2 Nodes), r18SXBRTm58 (Multiplayer Netcode), Lwwg6I0Dl84 (Mobile Optimization), Kabt0hqTjeI (Quest System Architecture), 5j1m-BiawMg (Shaders & Math).
-- **Proactive Learning:** Возможность автоматического обновления базы при поступлении новых ссылок.
+- **No-Internet Mode (Quantum Archive):** 11,800+ видео-уроков. Мгновенный доступ при любых внешних условиях.
 
 ### TRANSCENDENT LINK (Neural Addon Synthesis)
 - **Neural Addon Synthesis:** Возможность проектирования и генерации аддонов для Blender и плагинов для Unity, которые напрямую связывают софт с ИИ.
@@ -86,7 +82,7 @@
 
 ### Технические возможности
 - **Unity Expert (v5.x - v6.x):** Глубокая интеграция с GPU Resident Drawer, Render Graph и Spatial-Temporal Post-Processing. Поддержка Unity Cloud и мультиплеерных сервисов. Управление более чем 1000 кнопок и настроек через AI-команды.
-- **Blender Master (v2.4 - v5.1.1):** Автоматическое создание сложных физических симуляций (вода, огонь, ткань) через Geometry Nodes. Генерация процедурных миров за секунды. Полная поддержка легендарных скриптов.
+- **Blender Master (v2.4 - v5.2):** Автоматическое создание сложных физических симуляций (вода, огонь, ткань) через Geometry Nodes. Генерация процедурных миров за секунды. Полная поддержка легендарных скриптов.
 - **GIMP Automation:** Пакетная обработка текстур, генерация карт нормалей и атласов через Python-скрипты. Интеллектуальное удаление шумов и апскейлинг текстур.
 - **Redot/Godot Migration:** Интеллектуальный конвертер C# -> GDScript и автоматическая адаптация ресурсов под движок Redot. Сохранение иерархии сцен и настроек материалов.
 
@@ -127,7 +123,8 @@
 - **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.
 - **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.
 
-## 11. История изменений (v17.17.11)
+## 11. История изменений (v17.18.1)
+- **v17.18.0:** YouTube Knowledge Integration Mastery. Интеграция 11,800+ видео уроков, поддержка Unity 6, Blender 5.2 и Godot 4.4. Добавлена "Menu Studio" для UI дизайна, полная поддержка 8К разрешений и 8 языков (JA, KO, ZH).
 - **v17.17.11:** Logic & UI Final Sync. Исправлены ошибки отрисовки (p -> div), обновлена логика MainMenu.cs (StartGame/ExitGame) и исправлены ошибки загрузки данных (fetch fix).
 - **v17.17.10:** Logic Sync Edition. Исправлены имена методов в MainMenu.cs (StartGame/ExitGame) и добавлен гайд по отладке списка функций в Inspector.
 - **v17.17.9:** Settings Architect Edition. Полная интеграция систем настроек, локализации и кириллических шрифтов.

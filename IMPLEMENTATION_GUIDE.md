@@ -1,4 +1,4 @@
-# Continent of Fate: Implementation Guide v17.17.0
+# Continent of Fate: Implementation Guide v17.18.1
 
 This master guide provides step-by-step instructions for integrating the complex modules of the "Continent of Fate" project using Unity and Blender.
 

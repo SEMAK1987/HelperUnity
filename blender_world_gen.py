@@ -3,7 +3,7 @@ import bmesh
 import random
 import math
 
-# Project: Continent of Fate - Omniversal Divine Master v17.17.0
+# Project: Continent of Fate - Omniversal Divine Master v17.18.1
 # Description: Automated generation of 4 continents with 12 races, heroes, and units.
 # Includes: Relief generator, Castle levels (1-5), Roads, Cells, Heroes & Skills.
 

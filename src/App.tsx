@@ -192,7 +192,7 @@ function GameHelpView() {
              <BookOpen className="w-8 h-8 text-blue-500" />
              Помощь По Игре (Unity 6)
           </h2>
-          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v17.17.11</p>
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v17.18.1</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -354,7 +354,279 @@ function VKImageCard({ res, type, showNotification, onZoom }: { res: any, type: 
 };
 
 
-// --- App Component ---
+// --- Menu Studio Preview ---
+function MenuStudioPreview() {
+  const [view, setView] = useState<'main' | 'settings'>('main');
+  const [quality, setQuality] = useState('Ultra');
+  const [resolution, setResolution] = useState('1920 x 1080');
+  const [volume, setVolume] = useState(80);
+  const [music, setMusic] = useState(60);
+  const [isFullscreen, setIsFullscreen] = useState(true);
+  const [language, setLanguage] = useState('Русский');
+  const [showLanguageList, setShowLanguageList] = useState(false);
+
+  const t = {
+    'Русский': { play: 'Играть', settings: 'Настройки', exit: 'Выход', back: 'Назад', volume: 'Звук', music: 'Музыка', quality: 'Качество', res: 'Разрешение', fs: 'Весь экран', graphics: 'Графика', lang: 'Язык' },
+    'English': { play: 'Play', settings: 'Settings', exit: 'Exit', back: 'Back', volume: 'Sound', music: 'Music', quality: 'Quality', res: 'Resolution', fs: 'Fullscreen', graphics: 'Graphics', lang: 'Language' },
+    'Deutsch': { play: 'Spielen', settings: 'Einstellungen', exit: 'Beenden', back: 'Zurück', volume: 'Ton', music: 'Musik', quality: 'Qualität', res: 'Auflösung', fs: 'Vollbild', graphics: 'Grafik', lang: 'Sprache' },
+    'Français': { play: 'Jouer', settings: 'Paramètres', exit: 'Quitter', back: 'Retour', volume: 'Son', music: 'Musique', quality: 'Qualité', res: 'Résolution', fs: 'Plein écran', graphics: 'Graphisme', lang: 'Langue' },
+    'Español': { play: 'Jugar', settings: 'Ajustes', exit: 'Salir', back: 'Volver', volume: 'Sonido', music: 'Música', quality: 'Calidad', res: 'Resolución', fs: 'Pantalla completa', graphics: 'Gráficos', lang: 'Idioma' },
+    '日本語': { play: 'プレイ', settings: '設定', exit: '終了', back: '戻る', volume: '音量', music: '音楽', quality: '品質', res: '解像度', fs: '全画面', graphics: 'グラフィック', lang: '言語' },
+    '한국어': { play: '플레이', settings: '설정', exit: '나가기', back: '뒤로', volume: '소리', music: '음악', quality: '품질', res: '해상도', fs: '전체 화면', graphics: '그래픽', lang: '언어' },
+    '简体中文': { play: '开始', settings: '设置', exit: '退出', back: '返回', volume: '音量', music: '音乐', quality: '画质', res: '分辨率', fs: '全屏', graphics: '图像', lang: '语言' }
+  }[language as keyof typeof t] || { play: 'Играть', settings: 'Настройки', exit: 'Выход', back: 'Назад', volume: 'Звук', music: 'Музыка', quality: 'Качество', res: 'Разрешение', fs: 'Весь экран', graphics: 'Графика', lang: 'Язык' };
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="relative w-full aspect-video rounded-[3rem] overflow-hidden bg-slate-900 shadow-2xl border border-white/10 group"
+    >
+      {/* Background Layer: Animated Castles & Landscape */}
+      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=2070')] bg-cover bg-center opacity-40" />
+      
+      {/* Castles Silhouette Layer */}
+      <div className="absolute inset-0 flex items-end justify-between px-20 pb-10 pointer-events-none opacity-50">
+        {[
+          { name: 'Human Castle', h: 120, x: -20 },
+          { name: 'Elf Citadel', h: 160, x: 0 },
+          { name: 'Orc Fortress', h: 100, x: 20 },
+          { name: 'Undead Necropolis', h: 140, x: -10 }
+        ].map((castle, i) => (
+          <motion.div 
+            key={i}
+            animate={{ y: [0, -5, 0] }}
+            transition={{ duration: 5 + i, repeat: Infinity, ease: "easeInOut" }}
+            className="relative"
+            style={{ marginLeft: `${castle.x}px` }}
+          >
+            <svg width="80" height={castle.h} viewBox={`0 0 80 ${castle.h}`} fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d={`M10 ${castle.h} L10 40 L40 10 L70 40 L70 ${castle.h} Z`} fill="#1e293b" />
+              <rect x="25" y="50" width="30" height="20" fill="#334155" />
+              <path d="M5 40 L75 40 L40 5 Z" fill="#0f172a" />
+            </svg>
+          </motion.div>
+        ))}
+      </div>
+
+      <div className="absolute inset-0 bg-gradient-to-tr from-slate-950 via-transparent to-slate-950/50" />
+      
+      {/* Character Center Placeholder */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <motion.div 
+          animate={{ y: [0, -10, 0] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          className="relative"
+        >
+          <svg width="200" height="300" viewBox="0 0 200 300" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_0_30px_rgba(255,100,100,0.3)]">
+             <circle cx="100" cy="60" r="15" fill="#f87171" opacity="0.8" />
+             <path d="M100 75 L100 130 L70 170 L50 210 M100 130 L130 170 L150 210 M80 100 L50 130 L60 150 M120 100 L150 130 L140 150" stroke="#f87171" strokeWidth="12" strokeLinecap="round" opacity="0.6" />
+             <path d="M70 210 Q100 230 130 210" stroke="#f87171" strokeWidth="10" strokeLinecap="round" opacity="0.6" />
+             <ellipse cx="100" cy="220" rx="60" ry="15" fill="black" opacity="0.4" />
+          </svg>
+          <div className="absolute inset-0 bg-red-500/20 blur-3xl rounded-full scale-150 animate-pulse" />
+        </motion.div>
+      </div>
+
+      <AnimatePresence mode="wait">
+        {view === 'main' ? (
+          <motion.div 
+            key="main"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 }}
+            className="absolute right-12 top-1/2 -translate-y-1/2 flex flex-col gap-6"
+          >
+            {[
+              { id: 'play', icon: <Flame className="w-8 h-8" />, color: 'bg-orange-500', label: t.play },
+              { id: 'settings', icon: <Settings className="w-8 h-8" />, color: 'bg-blue-600', label: t.settings },
+              { id: 'exit', icon: <X className="w-8 h-8" />, color: 'bg-red-600', label: t.exit }
+            ].map(btn => (
+              <div key={btn.id} className="flex items-center gap-4 justify-end group">
+                <span className="text-white font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 px-4 py-2 rounded-xl backdrop-blur-sm border border-white/10">{btn.label}</span>
+                <button
+                  onClick={() => btn.id === 'settings' && setView('settings')}
+                  className={`${btn.color} p-6 rounded-full text-white shadow-2xl hover:scale-110 active:scale-95 transition-all border-4 border-white/20 relative group-hover:shadow-[0_0_30px_rgba(255,255,255,0.3)]`}
+                >
+                  {btn.icon}
+                  <motion.div className="absolute inset-0 rounded-full border-4 border-white/0 group-hover:border-white/40 transition-all scale-110" />
+                </button>
+              </div>
+            ))}
+          </motion.div>
+        ) : (
+          <motion.div 
+            key="settings"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="absolute inset-0 flex flex-col p-12 bg-black/60 backdrop-blur-md"
+          >
+            {/* Settings Header */}
+            <h2 className="text-4xl font-black text-white/20 uppercase tracking-[1em] absolute top-12 left-1/2 -translate-x-1/2 select-none">{t.settings.toUpperCase()}</h2>
+            
+            <div className="grid grid-cols-2 gap-20 h-full items-center">
+              {/* Left Column: Quality & Fullscreen */}
+              <div className="space-y-12">
+                <div className="space-y-4">
+                  <h3 className="text-sm font-black text-white/40 uppercase tracking-widest">{t.quality}</h3>
+                  <div className="relative">
+                    <select 
+                      value={quality}
+                      onChange={(e) => setQuality(e.target.value)}
+                      className="w-full bg-white/10 border border-white/20 rounded-xl py-4 px-6 text-white text-sm font-bold appearance-none cursor-pointer hover:bg-white/20 transition-all focus:outline-none"
+                    >
+                      {['Very Low', 'Low', 'Medium', 'High', 'Very High', 'Ultra'].map(q => (
+                        <option key={q} value={q} className="bg-slate-900">{q}</option>
+                      ))}
+                    </select>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                      <ChevronRight className="w-4 h-4 text-white/40 rotate-90" />
+                    </div>
+                  </div>
+                </div>
+
+                  <div className="space-y-4">
+                  <h3 className="text-sm font-black text-white/40 uppercase tracking-widest">{t.res}</h3>
+                  <div className="relative">
+                    <select 
+                      value={resolution}
+                      onChange={(e) => setResolution(e.target.value)}
+                      className="w-full bg-white/10 border border-white/20 rounded-xl py-4 px-6 text-white text-[10px] font-bold appearance-none cursor-pointer hover:bg-white/20 transition-all focus:outline-none max-h-40 overflow-y-auto"
+                    >
+                      {[
+                        '640 x 480', '800 x 600', '1024 x 768', '1280 x 720', '1366 x 768', 
+                        '1600 x 900', '1920 x 1080', '2560 x 1440', '3840 x 2160', '7680 x 4320'
+                      ].map(r => (
+                        <option key={r} value={r} className="bg-slate-900">{r}</option>
+                      ))}
+                    </select>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                      <ChevronRight className="w-4 h-4 text-white/40 rotate-90" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4 group cursor-pointer" onClick={() => setIsFullscreen(!isFullscreen)}>
+                  <div className={`w-8 h-8 rounded-lg border-2 flex items-center justify-center transition-all ${isFullscreen ? 'bg-blue-600 border-blue-400' : 'bg-white/5 border-white/20'}`}>
+                    {isFullscreen && <Check className="w-5 h-5 text-white" />}
+                  </div>
+                  <span className="text-sm font-black text-white/60 uppercase tracking-widest group-hover:text-white transition-colors">{t.fs}</span>
+                </div>
+              </div>
+
+              {/* Right Column: Audio & Graphics & Language */}
+              <div className="space-y-12">
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-[10px] font-black text-white/40 uppercase">
+                      <span>{t.volume}</span>
+                      <span>{volume}%</span>
+                    </div>
+                    <input 
+                      type="range" min="0" max="100" value={volume} 
+                      onChange={(e) => setVolume(parseInt(e.target.value))}
+                      className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-[10px] font-black text-white/40 uppercase">
+                      <span>{t.music}</span>
+                      <span>{music}%</span>
+                    </div>
+                    <input 
+                      type="range" min="0" max="100" value={music} 
+                      onChange={(e) => setMusic(parseInt(e.target.value))}
+                      className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4">
+                  <button className="py-4 bg-white/10 border border-white/20 rounded-xl text-xs font-black text-white uppercase tracking-widest hover:bg-white/20 transition-all">{t.graphics}</button>
+                  <div className="relative">
+                    <button 
+                      onClick={() => setShowLanguageList(!showLanguageList)}
+                      className="w-full py-4 bg-white/10 border border-white/20 rounded-xl text-xs font-black text-white uppercase tracking-widest hover:bg-white/20 transition-all flex items-center justify-center gap-3"
+                    >
+                      {t.lang}: {language}
+                      <Globe className="w-4 h-4 text-blue-400" />
+                    </button>
+                    
+                    {showLanguageList && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="absolute bottom-full mb-2 w-full bg-slate-900 border border-white/20 rounded-xl overflow-hidden z-50 shadow-2xl"
+                      >
+                        {['Русский', 'English', 'Deutsch', 'Français', 'Español', '日本語', '한국어', '简体中文'].map(l => (
+                          <button 
+                            key={l}
+                            onClick={() => { setLanguage(l); setShowLanguageList(false); }}
+                            className="w-full py-3 px-4 text-left text-[10px] font-bold text-white/60 hover:text-white hover:bg-white/5 transition-all border-b border-white/5 last:border-none"
+                          >
+                            {l}
+                          </button>
+                        ))}
+                      </motion.div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Back Button */}
+            <button 
+              onClick={() => setView('main')}
+              className="absolute bottom-12 right-12 p-6 bg-blue-500 rounded-full text-white shadow-2xl hover:scale-110 active:scale-95 transition-all border-4 border-white/20"
+            >
+              <ArrowLeft className="w-8 h-8" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Atmospheric FX Overlay */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {[...Array(5)].map((_, i) => (
+          <motion.div 
+            key={i}
+            animate={{ 
+              x: [Math.random() * 800, Math.random() * 800],
+              y: [Math.random() * 500, Math.random() * 500],
+              opacity: [0, 0.3, 0],
+              scale: [1, 2, 1]
+            }}
+            transition={{ duration: 10 + Math.random() * 10, repeat: Infinity, ease: "linear" }}
+            className="absolute w-64 h-64 bg-blue-500/10 rounded-full blur-[100px]"
+          />
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+function ArrowLeft({ className, ...props }: any) {
+  return (
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      width="24" 
+      height="24" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      className={className} 
+      {...props}
+    >
+      <path d="m12 19-7-7 7-7" />
+      <path d="M19 12H5" />
+    </svg>
+  );
+}
+
 export default function App() {
   async function fetchWithRetry(url: string, retries = 5, delay = 1000) {
     for (let i = 0; i < retries; i++) {
@@ -371,7 +643,7 @@ export default function App() {
 
   const [kb, setKb] = useState<KBData | null>(null);
   const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info' | 'migration' | 'game_design' | 'game_help'>('chat');
-  const [appVersion, setAppVersion] = useState('17.18.0');
+  const [appVersion, setAppVersion] = useState('17.18.1');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -454,7 +726,7 @@ export default function App() {
   const [isMigrating, setIsMigrating] = useState(false);
   const [gameDesign, setGameDesign] = useState<any>(null);
   const [isSavingGameDesign, setIsSavingGameDesign] = useState(false);
-  const [designSubTab, setDesignSubTab] = useState<'World' | 'Castle System' | 'Heroes & Units' | 'Visuals & Nav' | 'Abilities' | 'Synergies' | 'Balancing & Rarity' | 'Economy' | 'Strategies' | 'Combat & Environment' | 'Potions & Alchemy'>('World');
+  const [designSubTab, setDesignSubTab] = useState<'World' | 'Castle System' | 'Heroes & Units' | 'Visuals & Nav' | 'Abilities' | 'Synergies' | 'Balancing & Rarity' | 'Economy' | 'Strategies' | 'Combat & Environment' | 'Potions & Alchemy' | 'Menu Studio'>('World');
   const [synergyHeroType, setSynergyHeroType] = useState<'simple' | 'main'>('simple');
 
   const fetchPackagesInfo = async () => {
@@ -516,7 +788,7 @@ export default function App() {
       "Глубокое сканирование проекта (Аудит)...",
       "Синхронизация с локальным хранилищем...",
       "Исправление найденных ошибок...",
-      "Обновление версии до 17.17.0...",
+      "Обновление версии до 17.18.1...",
       "Инициализация Omniversal Quantum Link...",
       "Установка Нейронного Моста (Blender & Unity)...",
       "Регенерация PROJECT_MASTER_BLUEPRINT.md (Quantum Link)..."
@@ -604,7 +876,7 @@ export default function App() {
         console.error("Failed to fetch KB after retries", err);
         setKb({
           name: "Unity AI Assistant",
-          version: "17.17.0",
+          version: "17.18.1",
           description: "Гибридный ИИ-помощник с Quantum Link",
           project_path: "Unknown",
           system_instruction: "Ты — экспертный ИИ-ассистент."
@@ -1268,7 +1540,7 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-sm font-bold text-white uppercase tracking-tighter">AI Assistant</h1>
-              <p className="text-[10px] text-slate-500 uppercase font-mono">v17.18.0</p>
+              <p className="text-[10px] text-slate-500 uppercase font-mono">v17.18.1</p>
             </div>
           </div>
 
@@ -1645,14 +1917,14 @@ export default function App() {
                 <Cpu className="w-12 h-12 text-blue-500" />
               </motion.div>
               
-              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v17.17.11</h2>
+              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v17.18.1</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg px-4">
                 Я полностью осведомлен о вашем проекте по пути <br/>
                 <code className="text-blue-400 break-all bg-white/5 px-2 py-1 rounded mt-2 inline-block">
                   {kb?.project_path || 'Загрузка...'}
                 </code>. 
                 <br/><br/>
-                Задавайте любые вопросы по Unity, Blender или Photoshop на русском языке. Модули продвинутого ИИ для RTS и Turn-Based стратегий, генерации обложек ВК и проект 'Континент судьбы' (v17.17.11) активированы.
+                Задавайте любые вопросы по Unity, Blender или Photoshop на русском языке. Модули продвинутого ИИ для RTS и Turn-Based стратегий, генерации обложек ВК и проект 'Континент судьбы' (v17.18.1) активированы.
               </p>
 
               {/* Cards removed as per user request */}
@@ -1691,7 +1963,7 @@ export default function App() {
                       {msg.audioVariants && (
                         <div className="mt-6 space-y-4 pt-6 border-t border-white/5">
                            <h4 className="text-[10px] font-bold text-white uppercase tracking-widest flex items-center gap-2">
-                            <Music className="w-3 h-3 text-blue-400" /> Сгенерированные аудио-варианты (v17.17.8):
+                            <Music className="w-3 h-3 text-blue-400" /> Сгенерированные аудио-варианты (v17.18.1):
                           </h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {msg.audioVariants.map((variant, vi) => (
@@ -2015,7 +2287,7 @@ export default function App() {
 
                 {/* Sub-tabs for Game Design */}
                 <div className="flex items-center gap-2 p-1.5 bg-black/40 rounded-2xl border border-white/5 w-fit overflow-x-auto max-w-full no-scrollbar">
-                  {['World', 'Castle System', 'Heroes & Units', 'Visuals & Nav', 'Abilities', 'Synergies', 'Balancing & Rarity', 'Economy', 'Strategies', 'Combat & Environment', 'Potions & Alchemy'].map((tab) => (
+                  {['World', 'Castle System', 'Heroes & Units', 'Visuals & Nav', 'Abilities', 'Synergies', 'Balancing & Rarity', 'Economy', 'Strategies', 'Combat & Environment', 'Potions & Alchemy', 'Menu Studio'].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setDesignSubTab(tab as any)}
@@ -3492,6 +3764,8 @@ export default function App() {
                        </div>
                     </div>
                   </motion.div>
+                ) : designSubTab === 'Menu Studio' ? (
+                  <MenuStudioPreview />
                 ) : (
                   <motion.div 
                     initial={{ opacity: 0, y: 20 }}
@@ -3593,7 +3867,7 @@ export default function App() {
                         <ExternalLink className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v17.17.8)</h2>
+                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v17.18.1)</h2>
                         <p className="text-xs text-slate-400">Прямое управление Blender и Unity через нейронный мост.</p>
                       </div>
                     </div>
@@ -4840,7 +5114,7 @@ export default function App() {
                     <ImageIcon className="w-8 h-8" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Генератор Обложек VK v17.17.8</h3>
+                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Генератор Обложек VK v17.18.1</h3>
                     <p className="text-xs text-slate-500 uppercase tracking-[0.2em] font-bold">Континент Судьбы • Умный Синтез</p>
                   </div>
                 </div>
