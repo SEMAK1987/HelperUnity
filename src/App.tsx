@@ -192,7 +192,7 @@ function GameHelpView() {
              <BookOpen className="w-8 h-8 text-blue-500" />
              Помощь По Игре (Unity 6)
           </h2>
-          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v17.18.2</p>
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v17.18.4</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -643,7 +643,7 @@ export default function App() {
 
   const [kb, setKb] = useState<KBData | null>(null);
   const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info' | 'migration' | 'game_design' | 'game_help'>('chat');
-  const [appVersion, setAppVersion] = useState('17.18.2');
+  const [appVersion, setAppVersion] = useState('17.18.4');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -788,7 +788,7 @@ export default function App() {
       "Глубокое сканирование проекта (Аудит)...",
       "Синхронизация с локальным хранилищем...",
       "Исправление найденных ошибок...",
-      "Обновление версии до 17.18.2...",
+      "Обновление версии до 17.18.4...",
       "Инициализация Omniversal Quantum Link...",
       "Установка Нейронного Моста (Blender & Unity)...",
       "Регенерация PROJECT_MASTER_BLUEPRINT.md (Quantum Link)..."
@@ -876,7 +876,7 @@ export default function App() {
         console.error("Failed to fetch KB after retries", err);
         setKb({
           name: "Unity AI Assistant",
-          version: "17.18.2",
+          version: "17.18.4",
           description: "Гибридный ИИ-помощник с Quantum Link",
           project_path: "Unknown",
           system_instruction: "Ты — экспертный ИИ-ассистент."
@@ -1427,8 +1427,7 @@ export default function App() {
       setIsFetchingMigration(false);
     }
   };
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
+  const uploadFiles = async (files: FileList | File[]) => {
     if (!files || files.length === 0) return;
 
     setIsUploading(true);
@@ -1436,7 +1435,6 @@ export default function App() {
     setUploadTimeRemaining(null);
 
     const formData = new FormData();
-    const totalSize = Array.from(files).reduce((acc, f) => acc + f.size, 0);
     Array.from(files).forEach(f => formData.append('files', f));
 
     try {
@@ -1505,7 +1503,30 @@ export default function App() {
         setUploadProgress(0);
         setUploadTimeRemaining(null);
       }, 1000);
+    }
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      uploadFiles(e.target.files);
       if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const items = e.clipboardData.items;
+    const files: File[] = [];
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf("image") !== -1) {
+        const blob = items[i].getAsFile();
+        if (blob) {
+          const file = new File([blob], `pasted-image-${Date.now()}-${i}.png`, { type: blob.type });
+          files.push(file);
+        }
+      }
+    }
+    if (files.length > 0) {
+      uploadFiles(files);
     }
   };
 
@@ -1540,7 +1561,7 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-sm font-bold text-white uppercase tracking-tighter">AI Assistant</h1>
-              <p className="text-[10px] text-slate-500 uppercase font-mono">v17.18.2</p>
+              <p className="text-[10px] text-slate-500 uppercase font-mono">v17.18.4</p>
             </div>
           </div>
 
@@ -1917,14 +1938,14 @@ export default function App() {
                 <Cpu className="w-12 h-12 text-blue-500" />
               </motion.div>
               
-              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v17.18.2</h2>
+              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v17.18.4</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg px-4">
                 Я полностью осведомлен о вашем проекте по пути <br/>
                 <code className="text-blue-400 break-all bg-white/5 px-2 py-1 rounded mt-2 inline-block">
                   {kb?.project_path || 'Загрузка...'}
                 </code>. 
                 <br/><br/>
-                Задавайте любые вопросы по Unity, Blender или Photoshop на русском языке. Модули продвинутого ИИ для RTS и Turn-Based стратегий, генерации обложек ВК и проект 'Континент судьбы' (v17.18.2) активированы.
+                Задавайте любые вопросы по Unity, Blender или Photoshop на русском языке. Модули продвинутого ИИ для RTS и Turn-Based стратегий, генерации обложек ВК и проект 'Континент судьбы' (v17.18.4) активированы.
               </p>
 
               {/* Cards removed as per user request */}
@@ -1963,7 +1984,7 @@ export default function App() {
                       {msg.audioVariants && (
                         <div className="mt-6 space-y-4 pt-6 border-t border-white/5">
                            <h4 className="text-[10px] font-bold text-white uppercase tracking-widest flex items-center gap-2">
-                            <Music className="w-3 h-3 text-blue-400" /> Сгенерированные аудио-варианты (v17.18.2):
+                            <Music className="w-3 h-3 text-blue-400" /> Сгенерированные аудио-варианты (v17.18.4):
                           </h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {msg.audioVariants.map((variant, vi) => (
@@ -2150,6 +2171,7 @@ export default function App() {
                 <textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
+                  onPaste={handlePaste}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
@@ -3867,7 +3889,7 @@ export default function App() {
                         <ExternalLink className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v17.18.2)</h2>
+                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v17.18.4)</h2>
                         <p className="text-xs text-slate-400">Прямое управление Blender и Unity через нейронный мост.</p>
                       </div>
                     </div>
@@ -5114,7 +5136,7 @@ export default function App() {
                     <ImageIcon className="w-8 h-8" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Генератор Обложек VK v17.18.2</h3>
+                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Генератор Обложек VK v17.18.4</h3>
                     <p className="text-xs text-slate-500 uppercase tracking-[0.2em] font-bold">Континент Судьбы • Умный Синтез</p>
                   </div>
                 </div>
