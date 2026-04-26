@@ -19,6 +19,7 @@ import {
   Layers,
   Paperclip,
   FileText,
+  Upload,
   Image as ImageIcon,
   Video,
   Music,
@@ -192,7 +193,7 @@ function GameHelpView() {
              <BookOpen className="w-8 h-8 text-blue-500" />
              Помощь По Игре (Unity 6)
           </h2>
-          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v17.18.6</p>
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v17.18.9</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -355,7 +356,7 @@ function VKImageCard({ res, type, showNotification, onZoom }: { res: any, type: 
 
 
 // --- Menu Studio Preview ---
-function MenuStudioPreview() {
+function MenuStudioPreview({ onDownload }: { onDownload: () => void }) {
   const [view, setView] = useState<'main' | 'settings'>('main');
   const [quality, setQuality] = useState('Ultra');
   const [resolution, setResolution] = useState('1920 x 1080');
@@ -384,6 +385,16 @@ function MenuStudioPreview() {
     >
       {/* Background Layer: Animated Castles & Landscape */}
       <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=2070')] bg-cover bg-center opacity-40" />
+      
+      {/* Download Direct Link for User */}
+      <div className="absolute top-6 left-6 z-50 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button 
+          onClick={onDownload}
+          className="flex items-center gap-2 px-4 py-2 bg-black/60 backdrop-blur-md border border-white/20 rounded-xl text-[10px] font-black text-white uppercase tracking-widest hover:bg-blue-600 transition-all shadow-2xl cursor-pointer"
+        >
+          <Download className="w-3 h-3" /> Скачать Фон (JPG 4K)
+        </button>
+      </div>
       
       {/* Castles Silhouette Layer */}
       <div className="absolute inset-0 flex items-end justify-between px-20 pb-10 pointer-events-none opacity-50">
@@ -643,10 +654,12 @@ export default function App() {
 
   const [kb, setKb] = useState<KBData | null>(null);
   const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info' | 'migration' | 'game_design' | 'game_help'>('chat');
-  const [appVersion, setAppVersion] = useState('17.18.6');
+  const [appVersion, setAppVersion] = useState('17.18.9');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [sourceImage, setSourceImage] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -659,7 +672,6 @@ export default function App() {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [blenderPresets, setBlenderPresets] = useState<BlenderPreset[]>([]);
   const [isClearingChat, setIsClearingChat] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadTimeRemaining, setUploadTimeRemaining] = useState<string | null>(null);
   const [showGithubGuide, setShowGithubGuide] = useState(false);
@@ -788,7 +800,7 @@ export default function App() {
       "Глубокое сканирование проекта (Аудит)...",
       "Синхронизация с локальным хранилищем...",
       "Исправление найденных ошибок...",
-      "Обновление версии до 17.18.6...",
+      "Обновление версии до 17.18.9...",
       "Инициализация Omniversal Quantum Link...",
       "Установка Нейронного Моста (Blender & Unity)...",
       "Регенерация PROJECT_MASTER_BLUEPRINT.md (Quantum Link)..."
@@ -876,7 +888,7 @@ export default function App() {
         console.error("Failed to fetch KB after retries", err);
         setKb({
           name: "Unity AI Assistant",
-          version: "17.18.6",
+          version: "17.18.9",
           description: "Гибридный ИИ-помощник с Quantum Link",
           project_path: "Unknown",
           system_instruction: "Ты — экспертный ИИ-ассистент."
@@ -1318,7 +1330,8 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           prompt: vkPrompt,
-          type: vkType
+          type: vkType,
+          sourceImage: sourceImage // Passing the image for advanced synthesis
         })
       });
       const data = await res.json();
@@ -1330,6 +1343,40 @@ export default function App() {
       showNotification("Ошибка генерации обложек.", "error");
     } finally {
       setIsGeneratingVK(false);
+    }
+  };
+
+  const handleVKFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 50 * 1024 * 1024) {
+      showNotification("Файл слишком большой! Максимум 50МБ.", "error");
+      return;
+    }
+    setIsUploading(true);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setSourceImage(reader.result as string);
+      setIsUploading(false);
+      showNotification("Фото успешно загружено для синтеза!", "success");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const downloadBackground = async () => {
+    const imageUrl = 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=100&w=3840&fm=jpg';
+    const proxyUrl = `/api/download-proxy?url=${encodeURIComponent(imageUrl)}&filename=Continental_of_Fate_Background.jpg&t=${Date.now()}`;
+    
+    try {
+      const link = document.createElement('a');
+      link.href = proxyUrl;
+      link.setAttribute('download', 'Continental_of_Fate_Background.jpg');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error("Download failed:", err);
+      window.open(proxyUrl, '_blank');
     }
   };
 
@@ -1561,7 +1608,7 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-sm font-bold text-white uppercase tracking-tighter">AI Assistant</h1>
-              <p className="text-[10px] text-slate-500 uppercase font-mono">v17.18.6</p>
+              <p className="text-[10px] text-slate-500 uppercase font-mono">v17.18.9</p>
             </div>
           </div>
 
@@ -1938,14 +1985,14 @@ export default function App() {
                 <Cpu className="w-12 h-12 text-blue-500" />
               </motion.div>
               
-              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v17.18.6</h2>
+              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v17.18.9</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg px-4">
                 Я полностью осведомлен о вашем проекте по пути <br/>
                 <code className="text-blue-400 break-all bg-white/5 px-2 py-1 rounded mt-2 inline-block">
                   {kb?.project_path || 'Загрузка...'}
                 </code>. 
                 <br/><br/>
-                Задавайте любые вопросы по Unity, Blender или Photoshop на русском языке. Модули продвинутого ИИ для RTS и Turn-Based стратегий, генерации обложек ВК и проект 'Континент судьбы' (v17.18.6) активированы.
+                Задавайте любые вопросы по Unity, Blender или Photoshop на русском языке. Модули продвинутого ИИ для RTS и Turn-Based стратегий, генерации обложек ВК и проект 'Континент судьбы' (v17.18.9) активированы.
               </p>
 
               {/* Cards removed as per user request */}
@@ -1984,7 +2031,7 @@ export default function App() {
                       {msg.audioVariants && (
                         <div className="mt-6 space-y-4 pt-6 border-t border-white/5">
                            <h4 className="text-[10px] font-bold text-white uppercase tracking-widest flex items-center gap-2">
-                            <Music className="w-3 h-3 text-blue-400" /> Сгенерированные аудио-варианты (v17.18.6):
+                            <Music className="w-3 h-3 text-blue-400" /> Сгенерированные аудио-варианты (v17.18.9):
                           </h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {msg.audioVariants.map((variant, vi) => (
@@ -3787,7 +3834,7 @@ export default function App() {
                     </div>
                   </motion.div>
                 ) : designSubTab === 'Menu Studio' ? (
-                  <MenuStudioPreview />
+                  <MenuStudioPreview onDownload={downloadBackground} />
                 ) : (
                   <motion.div 
                     initial={{ opacity: 0, y: 20 }}
@@ -3889,7 +3936,7 @@ export default function App() {
                         <ExternalLink className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v17.18.6)</h2>
+                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v17.18.9)</h2>
                         <p className="text-xs text-slate-400">Прямое управление Blender и Unity через нейронный мост.</p>
                       </div>
                     </div>
@@ -5136,7 +5183,7 @@ export default function App() {
                     <ImageIcon className="w-8 h-8" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Генератор Обложек VK v17.18.6</h3>
+                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Генератор Обложек VK v17.18.9</h3>
                     <p className="text-xs text-slate-500 uppercase tracking-[0.2em] font-bold">Континент Судьбы • Умный Синтез</p>
                   </div>
                 </div>
@@ -5198,12 +5245,57 @@ export default function App() {
                   </div>
 
                   <div className="space-y-6">
-                    <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">3. Промпт Манифестации</h4>
+                    <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">3. Исходное Фото (Опционально)</h4>
+                    <div 
+                      className={`relative border-2 border-dashed rounded-3xl p-6 transition-all group flex flex-col items-center justify-center gap-3 ${sourceImage ? 'border-blue-500/50 bg-blue-500/5' : 'border-white/10 hover:border-white/30 bg-white/5'}`}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        const file = e.dataTransfer.files[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onloadend = () => setSourceImage(reader.result as string);
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    >
+                      {sourceImage ? (
+                        <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-2xl">
+                          <img src={sourceImage} className="w-full h-full object-cover" alt="Source" />
+                          <button 
+                            onClick={() => setSourceImage(null)}
+                            className="absolute top-2 right-2 p-2 bg-red-500/80 hover:bg-red-500 text-white rounded-full transition-all backdrop-blur-sm"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-slate-500 group-hover:text-blue-400 transition-colors">
+                            <Upload className="w-6 h-6" />
+                          </div>
+                          <div className="text-center">
+                            <p className="text-[10px] font-bold text-white uppercase tracking-widest">Загрузить фото</p>
+                            <p className="text-[8px] text-slate-500 mt-1 uppercase">Любой формат до 50MB</p>
+                          </div>
+                          <input 
+                            type="file" 
+                            className="absolute inset-0 opacity-0 cursor-pointer" 
+                            accept="image/*"
+                            onChange={handleVKFileUpload}
+                          />
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">4. Промпт Манифестации</h4>
                     <div className="space-y-6">
                       <textarea 
                         value={vkPrompt}
                         onChange={(e) => setVkPrompt(e.target.value)}
-                        placeholder="Опишите видение обложки..."
+                        placeholder="Добавьте замки, героев или смените окружение на загруженном фото..."
                         className="w-full bg-black/40 border border-white/10 rounded-3xl p-5 text-sm text-white focus:outline-none focus:border-blue-500/50 min-h-[140px] transition-all resize-none shadow-inner"
                       />
                       <button 
@@ -5223,7 +5315,7 @@ export default function App() {
                         ) : (
                           <>
                             <Sparkles className="w-5 h-5" />
-                            Генерировать 6 фото
+                            Генерировать 10 вариантов
                           </>
                         )}
                       </button>

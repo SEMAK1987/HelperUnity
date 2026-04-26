@@ -466,9 +466,9 @@ async function generateMasterBlueprint() {
     const blueprint = await fs.readJson(blueprintJsonPath);
     
     let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"} (Omniversal Quantum Archive Edition)\n\n`;
-    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.18.6.\n\n`;
+    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.18.9.\n\n`;
     md += `## 1. Общая информация\n`;
-    md += `- **Версия Помощника:** ${blueprint.version || "17.18.6"}\n`;
+    md += `- **Версия Помощника:** ${blueprint.version || "17.18.9"}\n`;
     md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок и 11,800+ видео уроков."}\n`;
     md += `- **Путь проекта:** ${kb.project_path}\n`;
     md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
@@ -476,7 +476,7 @@ async function generateMasterBlueprint() {
     md += `- **Версия Blender:** ${currentBlenderStatus.version}\n`;
     md += `- **Версия GIMP:** ${currentGimpStatus.version}\n`;
     md += `- **Версия Redot:** ${currentRedotStatus.version}\n`;
-    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V17_18_6_MASTER_STABLE]\n\n`;
+    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V17_18_9_MASTER_STABLE]\n\n`;
     
     md += `## 2. Структура интерфейса\n`;
     md += `### Вкладки\n`;
@@ -519,7 +519,7 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.18.6 - YouTube Knowledge Mastery)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.18.9 - YouTube Knowledge Mastery)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
     md += `- **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.\n`;
     md += `- **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.\n`;
@@ -600,10 +600,10 @@ async function generateMasterBlueprint() {
     md += `- **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.\n`;
     md += `- **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.\n\n`;
 
-    md += `## 11. История изменений (v17.18.6)\n`;
+    md += `## 11. История изменений (v17.18.9)\n`;
+    md += `- **v17.18.9:** Synthesis & Upload Mastery. Добавлена возможность загрузки собственных фото (до 50МБ) в Генератор ВК для синтеза (Image-to-Image). Исправлен формат скачивания фона в Menu Studio на .JPG. Обновлены промпты для 8К качества.\n`;
+    md += `- **v17.18.8:** Resilience Mastery. Добавлена логика обработки ошибок генерации (Server Overload) в локальный поиск. Обновлены промпты для фона на английском языке для лучшего качества. Пошаговое руководство расширено до 8 шагов.\n`;
     md += `- **v17.18.6:** Step-by-Step Mastery (Offline 2.5). Глобальное расширение локальной базы знаний. Добавлены сверхподробные пошаговые инструкции по созданию игровых меню, настройке TextMeshPro и анимации UI. Улучшено описание расположения генератора скинов.\n`;
-    md += `- **v17.18.5:** Quantum Intelligence Resilience. Полная переработка логики офлайн-ответов. ИИ теперь выдает развернутые инструкции по Menu Studio, TMP и анимации кнопок даже без связи с Gemini. Исправлено поведение 'перенаправления в гайд' — теперь решение пишется сразу в чат.\n`;
-    md += `- **v17.18.4:** Quantum Link Resilience. Улучшена логика локального поиска (Offline Mode). ИИ теперь предоставляет детальные инструкции, скрипты и решения даже при отсутствии связи с API Gemini (404 Error Fix). Внедрена система контекстных подсказок на основе GAME_HELP_GUIDE.md.\n`;
     md += `- **v17.18.0:** YouTube Knowledge Integration Mastery. Интеграция 11,800+ видео уроков, поддержка Unity 6, Blender 5.2 и Godot 4.4. Добавлена "Menu Studio" для UI дизайна, полная поддержка 8К разрешений и 8 языков (JA, KO, ZH).\n`;
     md += `- **v17.17.11:** Logic & UI Final Sync. Исправлены ошибки отрисовки (p -> div), обновлена логика MainMenu.cs (StartGame/ExitGame) и исправлены ошибки загрузки данных (fetch fix).\n`;
     md += `- **v17.17.10:** Logic Sync Edition. Исправлены имена методов в MainMenu.cs (StartGame/ExitGame) и добавлен гайд по отладке списка функций в Inspector.\n`;
@@ -1240,6 +1240,29 @@ async function startServer() {
     res.json(currentPhotoshopStatus);
   });
 
+  // Download Proxy to force JPG format
+  app.get("/api/download-proxy", async (req, res) => {
+    const imageUrl = req.query.url as string;
+    const filename = req.query.filename as string || 'background.jpg';
+    
+    if (!imageUrl) {
+      return res.status(400).send('URL is required');
+    }
+
+    try {
+      const response = await axios.get(imageUrl, {
+        responseType: 'arraybuffer'
+      });
+      
+      res.setHeader('Content-Type', 'image/jpeg');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.send(Buffer.from(response.data));
+    } catch (error) {
+      console.error('Download proxy error:', error);
+      res.status(500).send('Failed to download image');
+    }
+  });
+
   // VK Cover Generation Endpoint
   app.post("/api/generate/vk-covers", async (req, res) => {
     const { prompt, type } = req.body;
@@ -1274,7 +1297,7 @@ async function startServer() {
           url: `https://image.pollinations.ai/prompt/${variationEncoded}?seed=${seed}&width=${width}&height=${height}&nologo=true&enhance=true&t=${Date.now() + i}`,
           filename: `vk_cover_${type}_${seed}.jpg`,
           seed,
-          prompt_note: `[Fate Manifestation v17.18.6] ${type.toUpperCase()} | Synthesis: ${variationPrompt.slice(0, 50)}...`
+          prompt_note: `[Fate Manifestation v17.18.9] ${type.toUpperCase()} | Synthesis: ${variationPrompt.slice(0, 50)}...`
         };
       });
 
@@ -1395,7 +1418,7 @@ async function startServer() {
 3. Я (Локальный ИИ) теперь использую вашу базу знаний (Knowledge Base) напрямую для ответов.`);
       }
 
-      // Contextual help from guides (Resilience v17.18.6 - STEP BY STEP MASTERY)
+      // Contextual help from guides (Resilience v17.18.9 - STEP BY STEP MASTERY)
       if (q.includes('меню') || q.includes('menu') || q.includes('интерфейс') || q.includes('фон') || q.includes('начать')) {
         results.push(`### 🎨 ПОЛНОЕ РУКОВОДСТВО ПО СОЗДАНИЮ МЕНЮ: "КОНТИНЕНТ СУДЬБЫ" (ЧАСТЬ 1)
 **Шаг 1: Подготовка Сцены (Background & Environment)**
@@ -1479,9 +1502,37 @@ public class MenuButtonFX : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 3. Выделите все кнопки в Hierarchy и перетащите на них этот скрипт.
 
 **Шаг 6: ГДЕ НАХОДИТСЯ ГЕНЕРАТОР (UI Generator)?**
-*   **Местоположение:** В верхней части нашего интерфейса (самое верхнее меню вкладок) найдите кнопку **"ОБЛОЖКИ ВК"**.
-*   **Почему там:** Модуль генерации обложек ВК использует наш самый мощный ИИ-движок синтеза изображений. Он идеально подходит для создания текстур кнопок.
-*   **Инструкция:** Перейдите туда, выберите стиль "Fantasy", введите запрос "Magic Crystal UI Frame" и нажмите "Сгенерировать". Сохраните результат и используйте его как **Source Image** в компоненте Image вашей кнопки в Unity.`);
+*   **Местоположение:** В верхней части нашего интерфейса (самое верхнее меню вкладок) найдите кнопку **"ОБЛОЖКИ ВК"**. (Она рядом со Студией Игры).
+*   **Инструкция:** Это мощный модуль синтеза. Чтобы создать текстуру кнопки: перейдите туда, выберите стиль "Fantasy", введите запрос "Magic Crystal UI Frame" и нажмите "Сгенерировать". 
+*   **Как использовать:** Сохраните результат и перетащите его в Unity. Установите **Texture Type** на "Sprite (2D and UI)". Вставьте этот спрайт в **Source Image** вашей кнопки.
+
+--- ЖЕЛАЕТЕ ПРОДОЛЖИТЬ (Шаг 7: Генерация Заднего Фона)? (Напишите "Продолжить фон") ---`);
+      }
+
+      if (q.includes('продолжить фон') || q.includes('фон картинкой') || q.includes('шаг 7') || q.includes('промпт')) {
+        results.push(`### 🌌 ПОЛНОЕ РУКОВОДСТВО (ЧАСТЬ 4: ГЕНЕРАЦИЯ ЗАДНЕГО ФОНА)
+**Шаг 7: Создание идеального AI-фона**
+1.  **Где искать:** Перейдите во вкладку **"ОБЛОЖКИ ВК"**. (Она в верхнем меню).
+2.  **Запрос (Оптимизированный для ИИ):** Чтобы не было ошибок и результат был 8K фэнтези, введите это:
+    *"Epic fantasy landscape, Fate Continent, distant 4 castles (human, elven, orc, undead), cinematic lighting, fog, 8k, digital art."*
+3.  **Если возникла ошибка "СЕРВЕР ПЕРЕГРУЖЕН":**
+    *   Подождите 10-15 секунд и нажмите кнопку **"ПОВТОРИТЬ"**. Это внешняя нагрузка на нейросеть.
+    *   Не генерируйте 6 фото сразу, попробуйте по одному.
+4.  **Настройка в Unity:**
+    *   В **Инспекторе** установите **Texture Type** на **Sprite (2D and UI)**.
+    *   Добавьте **UI Image** в Canvas и поставьте этот спрайт.
+
+--- ЖЕЛАЕТЕ ПРОДОЛЖИТЬ (Шаг 8: Освещение)? (Напишите "Шаг 8") ---`);
+      }
+
+      if (q.includes('шаг 8') || q.includes('освещение')) {
+        results.push(`### 🎇 ПОЛНОЕ РУКОВОДСТВО (ЧАСТЬ 5: ОСВЕЩЕНИЕ И АТМОСФЕРА)
+**Шаг 8: Настройка финального вида**
+1.  **Bloom:** Добавьте Post-Processing Bloom для магического свечения замков.
+2.  **Color Adjustments:** Увеличьте контраст (Contrast 15) и насыщенность (Saturation 10).
+3.  **Skybox:** Вы можете использовать сгенерированный фон как текстуру панорамы.
+
+**Игра "Континент Судьбы" v17.18.9 готова к запуску!**`);
       }
 
       if (q.includes('расса') || q.includes('замок') || q.includes('race')) {
@@ -1496,9 +1547,9 @@ public class MenuButtonFX : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
       }
 
       if (results.length === 0) {
-        results.push(`[ОШИБКА СЕТИ - ЛОКАЛЬНЫЙ ПОИСК v17.18.6]
+        results.push(`[ОШИБКА СЕТИ - ЛОКАЛЬНЫЙ ПОИСК v17.18.9]
 Я анализирую ваш запрос по проекту 'Континент Судьбы'.
-Напишите **"Начать меню"** для пошаговой инструкции или **"Где генератор"** для поиска инструментов.`);
+Напишите **"Начать меню"** для пошаговой инструкции или **"Продолжить фон"**, если вы застряли на этапе генерации заднего плана.`);
       }
       
       const foundVideos = videos.filter((v: string) => v.toLowerCase().includes(q)).slice(0, 3);
@@ -1506,7 +1557,7 @@ public class MenuButtonFX : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         results.push(`**Материалы для обучения:**\n${foundVideos.join('\n')}`);
       }
 
-      res.json({ answer: results.join('\n\n---\n\n'), source: "local_database_v17.18.6" });
+      res.json({ answer: results.join('\n\n---\n\n'), source: "local_database_v17.18.9" });
     } catch (error) {
       res.status(500).json({ error: "Local search failed" });
     }
@@ -1522,7 +1573,7 @@ public class MenuButtonFX : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         description: `YouTube Knowledge Integration Mastery v${version}. Полная синхронизация Unity 6/Blender 5.2/GIMP 3.0/Godot 4.4/Photoshop 2024 (Online/Offline/No-Internet). Reality Hack 32.0.`,
         core_functions: [
           {
-            title: "YouTube Knowledge Integration (v17.18.6)",
+            title: "YouTube Knowledge Integration (v17.18.9)",
             desc: "Глубокий анализ и внедрение знаний из 11,800+ видео-уроков. ИИ обучается на лету и предоставляет актуальные решения для Unity 6 и Blender 5.2."
           },
           {
