@@ -466,9 +466,9 @@ async function generateMasterBlueprint() {
     const blueprint = await fs.readJson(blueprintJsonPath);
     
     let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"} (Omniversal Quantum Archive Edition)\n\n`;
-    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.18.1.\n\n`;
+    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.18.2.\n\n`;
     md += `## 1. Общая информация\n`;
-    md += `- **Версия Помощника:** ${blueprint.version || "17.18.0"}\n`;
+    md += `- **Версия Помощника:** ${blueprint.version || "17.18.2"}\n`;
     md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок и 11,800+ видео уроков."}\n`;
     md += `- **Путь проекта:** ${kb.project_path}\n`;
     md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
@@ -476,7 +476,7 @@ async function generateMasterBlueprint() {
     md += `- **Версия Blender:** ${currentBlenderStatus.version}\n`;
     md += `- **Версия GIMP:** ${currentGimpStatus.version}\n`;
     md += `- **Версия Redot:** ${currentRedotStatus.version}\n`;
-    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V17_18_1_MASTER_STABLE]\n\n`;
+    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V17_18_2_MASTER_STABLE]\n\n`;
     
     md += `## 2. Структура интерфейса\n`;
     md += `### Вкладки\n`;
@@ -519,7 +519,7 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.18.1 - YouTube Knowledge Mastery)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.18.2 - YouTube Knowledge Mastery)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
     md += `- **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.\n`;
     md += `- **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.\n`;
@@ -600,7 +600,8 @@ async function generateMasterBlueprint() {
     md += `- **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.\n`;
     md += `- **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.\n\n`;
 
-    md += `## 11. История изменений (v17.18.1)\n`;
+    md += `## 11. История изменений (v17.18.2)\n`;
+    md += `- **v17.18.2:** Menu Studio Documentation Mastery. Полная переработка вкладки 'Помощь по игре' под стандарты Menu Studio. Добавлены пошаговые инструкции по созданию атмосферных фонов, замков расс и скинов интерфейса.\n`;
     md += `- **v17.18.1:** Master Persistence & Master Sync. Внедрена система сохранения настроек (Звук, Язык, Разрешение) через PlayerPrefs и Singleton. Добавлена визуализация всех расс (Замки) в Menu Studio. Обновлен Game Help Guide с инструкциями по синхронизации.\n`;
     md += `- **v17.18.0:** YouTube Knowledge Integration Mastery. Интеграция 11,800+ видео уроков, поддержка Unity 6, Blender 5.2 и Godot 4.4. Добавлена "Menu Studio" для UI дизайна, полная поддержка 8К разрешений и 8 языков (JA, KO, ZH).\n`;
     md += `- **v17.17.11:** Logic & UI Final Sync. Исправлены ошибки отрисовки (p -> div), обновлена логика MainMenu.cs (StartGame/ExitGame) и исправлены ошибки загрузки данных (fetch fix).\n`;
@@ -1272,7 +1273,7 @@ async function startServer() {
           url: `https://image.pollinations.ai/prompt/${variationEncoded}?seed=${seed}&width=${width}&height=${height}&nologo=true&enhance=true&t=${Date.now() + i}`,
           filename: `vk_cover_${type}_${seed}.jpg`,
           seed,
-          prompt_note: `[Fate Manifestation v17.18.1] ${type.toUpperCase()} | Synthesis: ${variationPrompt.slice(0, 50)}...`
+          prompt_note: `[Fate Manifestation v17.18.2] ${type.toUpperCase()} | Synthesis: ${variationPrompt.slice(0, 50)}...`
         };
       });
 
@@ -1389,7 +1390,7 @@ async function startServer() {
       
       results.push(`Проект содержит ${stats.scripts.length} скриптов. Рекомендуется использовать DOTS для оптимизации.`);
 
-      res.json({ answer: results.join('\n\n'), source: "local_database_v17.18.1" });
+      res.json({ answer: results.join('\n\n'), source: "local_database_v17.18.2" });
     } catch (error) {
       res.status(500).json({ error: "Local search failed" });
     }
@@ -1405,7 +1406,7 @@ async function startServer() {
         description: `YouTube Knowledge Integration Mastery v${version}. Полная синхронизация Unity 6/Blender 5.2/GIMP 3.0/Godot 4.4/Photoshop 2024 (Online/Offline/No-Internet). Reality Hack 32.0.`,
         core_functions: [
           {
-            title: "YouTube Knowledge Integration (v17.18.1)",
+            title: "YouTube Knowledge Integration (v17.18.2)",
             desc: "Глубокий анализ и внедрение знаний из 11,800+ видео-уроков. ИИ обучается на лету и предоставляет актуальные решения для Unity 6 и Blender 5.2."
           },
           {

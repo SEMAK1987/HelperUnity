@@ -1,9 +1,9 @@
 # PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Omniversal Quantum Archive Edition)
 
-> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.18.1.
+> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.18.2.
 
 ## 1. Общая информация
-- **Версия Помощника:** 17.18.1
+- **Версия Помощника:** 17.18.2
 - **Описание:** Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок и 11,800+ видео уроков.
 - **Путь проекта:** /app/applet
 - **Локальное хранилище:** Не задано
@@ -11,7 +11,7 @@
 - **Версия Blender:** unknown
 - **Версия GIMP:** unknown
 - **Версия Redot:** unknown
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V17_18_0_MASTER_STABLE]
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V17_18_2_MASTER_STABLE]
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -46,7 +46,7 @@
 ```
 
 
-## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.18.1 - YouTube Knowledge Mastery)
+## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.18.2 - YouTube Knowledge Mastery)
 ### Режимы работы и Архитектурные уровни
 - **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.
 - **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.
@@ -123,7 +123,9 @@
 - **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.
 - **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.
 
-## 11. История изменений (v17.18.1)
+## 11. История изменений (v17.18.2)
+- **v17.18.2:** Menu Studio Documentation Mastery. Полная переработка вкладки 'Помощь по игре' под стандарты Menu Studio. Добавлены пошаговые инструкции по созданию атмосферных фонов, замков расс и скинов интерфейса.
+- **v17.18.1:** Master Persistence & Master Sync. Внедрена система сохранения настроек (Звук, Язык, Разрешение) через PlayerPrefs и Singleton. Добавлена визуализация всех расс (Замки) в Menu Studio. Обновлен Game Help Guide с инструкциями по синхронизации.
 - **v17.18.0:** YouTube Knowledge Integration Mastery. Интеграция 11,800+ видео уроков, поддержка Unity 6, Blender 5.2 и Godot 4.4. Добавлена "Menu Studio" для UI дизайна, полная поддержка 8К разрешений и 8 языков (JA, KO, ZH).
 - **v17.17.11:** Logic & UI Final Sync. Исправлены ошибки отрисовки (p -> div), обновлена логика MainMenu.cs (StartGame/ExitGame) и исправлены ошибки загрузки данных (fetch fix).
 - **v17.17.10:** Logic Sync Edition. Исправлены имена методов в MainMenu.cs (StartGame/ExitGame) и добавлен гайд по отладке списка функций в Inspector.
