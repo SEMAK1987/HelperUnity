@@ -466,9 +466,9 @@ async function generateMasterBlueprint() {
     const blueprint = await fs.readJson(blueprintJsonPath);
     
     let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"} (Omniversal Quantum Archive Edition)\n\n`;
-    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.18.4.\n\n`;
+    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.18.6.\n\n`;
     md += `## 1. Общая информация\n`;
-    md += `- **Версия Помощника:** ${blueprint.version || "17.18.4"}\n`;
+    md += `- **Версия Помощника:** ${blueprint.version || "17.18.6"}\n`;
     md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок и 11,800+ видео уроков."}\n`;
     md += `- **Путь проекта:** ${kb.project_path}\n`;
     md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
@@ -476,7 +476,7 @@ async function generateMasterBlueprint() {
     md += `- **Версия Blender:** ${currentBlenderStatus.version}\n`;
     md += `- **Версия GIMP:** ${currentGimpStatus.version}\n`;
     md += `- **Версия Redot:** ${currentRedotStatus.version}\n`;
-    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V17_18_4_MASTER_STABLE]\n\n`;
+    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V17_18_6_MASTER_STABLE]\n\n`;
     
     md += `## 2. Структура интерфейса\n`;
     md += `### Вкладки\n`;
@@ -519,7 +519,7 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.18.4 - YouTube Knowledge Mastery)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.18.6 - YouTube Knowledge Mastery)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
     md += `- **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.\n`;
     md += `- **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.\n`;
@@ -600,10 +600,10 @@ async function generateMasterBlueprint() {
     md += `- **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.\n`;
     md += `- **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.\n\n`;
 
-    md += `## 11. История изменений (v17.18.4)\n`;
+    md += `## 11. История изменений (v17.18.6)\n`;
+    md += `- **v17.18.6:** Step-by-Step Mastery (Offline 2.5). Глобальное расширение локальной базы знаний. Добавлены сверхподробные пошаговые инструкции по созданию игровых меню, настройке TextMeshPro и анимации UI. Улучшено описание расположения генератора скинов.\n`;
+    md += `- **v17.18.5:** Quantum Intelligence Resilience. Полная переработка логики офлайн-ответов. ИИ теперь выдает развернутые инструкции по Menu Studio, TMP и анимации кнопок даже без связи с Gemini. Исправлено поведение 'перенаправления в гайд' — теперь решение пишется сразу в чат.\n`;
     md += `- **v17.18.4:** Quantum Link Resilience. Улучшена логика локального поиска (Offline Mode). ИИ теперь предоставляет детальные инструкции, скрипты и решения даже при отсутствии связи с API Gemini (404 Error Fix). Внедрена система контекстных подсказок на основе GAME_HELP_GUIDE.md.\n`;
-    md += `- **v17.18.3:** Clipboard Image Mastery. Внедрена поддержка вставки изображений (скриншотов) напрямую в чат из буфера обмена. Автоматическая привязка изображений к запросу для мгновенного анализа ИИ.\n`;
-    md += `- **v17.18.2:** Menu Studio Documentation Mastery. Полная переработка вкладки 'Помощь по игре' под стандарты Menu Studio. Добавлены пошаговые инструкции по созданию атмосферных фонов, замков расс и скинов интерфейса.\n`;
     md += `- **v17.18.0:** YouTube Knowledge Integration Mastery. Интеграция 11,800+ видео уроков, поддержка Unity 6, Blender 5.2 и Godot 4.4. Добавлена "Menu Studio" для UI дизайна, полная поддержка 8К разрешений и 8 языков (JA, KO, ZH).\n`;
     md += `- **v17.17.11:** Logic & UI Final Sync. Исправлены ошибки отрисовки (p -> div), обновлена логика MainMenu.cs (StartGame/ExitGame) и исправлены ошибки загрузки данных (fetch fix).\n`;
     md += `- **v17.17.10:** Logic Sync Edition. Исправлены имена методов в MainMenu.cs (StartGame/ExitGame) и добавлен гайд по отладке списка функций в Inspector.\n`;
@@ -1274,7 +1274,7 @@ async function startServer() {
           url: `https://image.pollinations.ai/prompt/${variationEncoded}?seed=${seed}&width=${width}&height=${height}&nologo=true&enhance=true&t=${Date.now() + i}`,
           filename: `vk_cover_${type}_${seed}.jpg`,
           seed,
-          prompt_note: `[Fate Manifestation v17.18.4] ${type.toUpperCase()} | Synthesis: ${variationPrompt.slice(0, 50)}...`
+          prompt_note: `[Fate Manifestation v17.18.6] ${type.toUpperCase()} | Synthesis: ${variationPrompt.slice(0, 50)}...`
         };
       });
 
@@ -1395,30 +1395,110 @@ async function startServer() {
 3. Я (Локальный ИИ) теперь использую вашу базу знаний (Knowledge Base) напрямую для ответов.`);
       }
 
-      // Contextual help from guides
-      if (q.includes('меню') || q.includes('menu') || q.includes('интерфейс')) {
-        results.push(`**СОВЕТ ПО НИЗИННОМУ ИНТЕРФЕЙСУ (Menu Studio):**
-Для создания атмосферного меню используйте слои параллакса и шейдеры Rim Light для игрока. Все инструкции доступны в GAME_HELP_GUIDE.md в Главе 13.
-Скрипт \`AtmosphericMotion.cs\` готов к внедрению в проект.`);
+      // Contextual help from guides (Resilience v17.18.6 - STEP BY STEP MASTERY)
+      if (q.includes('меню') || q.includes('menu') || q.includes('интерфейс') || q.includes('фон') || q.includes('начать')) {
+        results.push(`### 🎨 ПОЛНОЕ РУКОВОДСТВО ПО СОЗДАНИЮ МЕНЮ: "КОНТИНЕНТ СУДЬБЫ" (ЧАСТЬ 1)
+**Шаг 1: Подготовка Сцены (Background & Environment)**
+1.  **Создание:** Hierarchy -> Create -> 3D Object -> Plane (или готовый Terrain). Растяните его (Scale: 10, 1, 10).
+2.  **Камера:** Выделите Main Camera. Позиция (0, 3, -15), Поворот (10, 0, 0).
+3.  **Замки Рас (Задний план):** 
+    *   Создайте 4 пустых объекта (Empty) вдали (Z: 50). 
+    *   Расставьте в них модели замков (Люди, Эльфы, Орки, Нежить).
+    *   Для **Нежити:** Добавьте компонент *Light* зеленого цвета внутри замка для эффекта магического свечения.
+4.  **Туман:** Window -> Rendering -> Lighting. Вкладка Environment. Включите **Fog**. Mode: *Exponential Squared*. Density: 0.01. Это создаст глубину и скроет край плоскости.
+
+**Шаг 2: Модель Героя (Передний план)**
+1.  Поставьте префаб вашего героя прямо перед камерой. Координаты (0, 0, -12).
+2.  **Освещение Героя:** Hierarchy -> Light -> Point Light. Поставьте его чуть выше и правее головы героя. Цвет: Тёплый оранжевый (имитация костра) или Холодный Голубой (магия).
+
+--- ЖЕЛАЕТЕ ПРОДОЛЖИТЬ (Шаг 3: Название и TMP)? (Напишите "Продолжить") ---`);
+      }
+
+      if (q.includes('продолжить') || q.includes('дальше') || q.includes('текст') || q.includes('название') || q.includes('tmp')) {
+        results.push(`### 🎨 ПОЛНОЕ РУКОВОДСТВО ПО СОЗДАНИЮ МЕНЮ (ЧАСТЬ 2: TEXTMESHPRO)
+**Шаг 3: Эпическое Название "Континент Судьбы"**
+1.  **Создание:** Hierarchy -> UI -> TextMeshPro - Text. (Если предложит импортировать TMP Essentials - нажмите Import).
+2.  **Canvas:** Убедитесь, что UI Scale Mode установлен в "Scale With Screen Size" (1920x1080).
+3.  **Текст:** Введите "КОНТИНЕНТ СУДЬБЫ".
+4.  **Стиль (Font Settings):** 
+    *   **Font Asset:** Используйте Bold-шрифт (например, LiberationSans или Cinzel).
+    *   **Face Color:** Тёмно-Золотой.
+    *   **Outline:** Толщина 0.3, Цвет: Чёрный или Тёмно-коричневый.
+5.  **Тень (Underlay):** 
+    *   В инспекторе материала TMP (внизу) найдите раздел **Underlay**.
+    *   Включите его. Offset X: 2, Y: -2. Dilate: 0.5. Softness: 0.1. Это добавит невероятный объем буквам.
+
+**Шаг 4: Размещение кнопок**
+*   Создайте пустой объект "ButtonContainer" внутри Canvas.
+*   Добавьте компонент **Vertical Layout Group**. Padding Top: 200, Spacing: 20.
+*   Создайте внутри 3 кнопки (UI -> Button - TextMeshPro).
+
+--- ЖЕЛАЕТЕ ПРОДОЛЖИТЬ (Шаг 5: Анимация и UI Generator)? (Напишите "Продолжить кнопки") ---`);
+      }
+
+      if (q.includes('кнопк') || q.includes('кнопка') || q.includes('button') || q.includes('анимация') || q.includes('продолжить кнопки')) {
+        results.push(`### ⚡ ПОЛНОЕ РУКОВОДСТВО (ЧАСТЬ 3: АНИМАЦИЯ И ГЕНЕРАТОР)
+**Шаг 5: Программирование Живых Кнопок (Hover Effect)**
+1.  Создайте в Unity скрипт \`MenuButtonFX.cs\`.
+2.  Напишите в нем этот продвинутый код:
+\`\`\`csharp
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using TMPro;
+
+public class MenuButtonFX : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler {
+    public Vector3 hoverScale = new Vector3(1.15f, 1.15f, 1.15f);
+    public Color hoverColor = new Color(1f, 0.8f, 0f); // Золотой при наведении
+    private Vector3 originalScale;
+    private Color originalColor;
+    private TextMeshProUGUI btnText;
+
+    void Start() {
+        originalScale = transform.localScale;
+        btnText = GetComponentInChildren<TextMeshProUGUI>();
+        if(btnText != null) originalColor = btnText.color;
+    }
+
+    public void OnPointerEnter(PointerEventData eventData) {
+        transform.localScale = hoverScale;
+        if(btnText != null) btnText.color = hoverColor;
+        // Звук наведения (опционально)
+    }
+
+    public void OnPointerExit(PointerEventData eventData) {
+        transform.localScale = originalScale;
+        if(btnText != null) btnText.color = originalColor;
+    }
+
+    public void OnPointerDown(PointerEventData eventData) {
+        transform.localScale = originalScale * 0.9f; // Эффект нажатия
+    }
+}
+\`\`\`
+3. Выделите все кнопки в Hierarchy и перетащите на них этот скрипт.
+
+**Шаг 6: ГДЕ НАХОДИТСЯ ГЕНЕРАТОР (UI Generator)?**
+*   **Местоположение:** В верхней части нашего интерфейса (самое верхнее меню вкладок) найдите кнопку **"ОБЛОЖКИ ВК"**.
+*   **Почему там:** Модуль генерации обложек ВК использует наш самый мощный ИИ-движок синтеза изображений. Он идеально подходит для создания текстур кнопок.
+*   **Инструкция:** Перейдите туда, выберите стиль "Fantasy", введите запрос "Magic Crystal UI Frame" и нажмите "Сгенерировать". Сохраните результат и используйте его как **Source Image** в компоненте Image вашей кнопки в Unity.`);
       }
 
       if (q.includes('расса') || q.includes('замок') || q.includes('race')) {
-        results.push(`**ВИЗУАЛИЗАЦИЯ РАСС (Quantum Registry):**
-В Menu Studio добавлены Замки для 4 основных рас: Люди (Human), Эльфы (Elf), Орки (Orc) и Нежить (Undead).
-Используйте "Split Collection" стратегию для PII данных игроков.`);
-      }
+        results.push(`### 🏰 ПОДРОБНОЕ РУКОВОДСТВО ПО ЗАМКАМ (Quantum Registry)
+Чтобы сделать меню по-настоящему живым, настройте Замки четырех великих сил:
+1.  **Замок Людей (The Sunspire):** Используйте Cylinder и Cube. Установите Point Light внутри окон с белым свечением.
+2.  **Замок Нежити (The Floating Citadel):** Разместите объект высоко в воздухе. Добавьте скрипт плавного покачивания (Sinusoid Motion).
+3.  **Замок Эльфов (The World-Tree):** Используйте текстуры коры и много плоскостей (Planes) с прозрачностью для листвы.
+4.  **Замок Орков (The Iron Hold):** Используйте темный металл, красные флаги и систему частиц (Particle System) для дыма из труб.
 
-      if (q.includes('dots') || q.includes('оптимизация') || q.includes('тормоз')) {
-        results.push(`**ОПТИМИЗАЦИЯ (Quantum Performance):**
-Проект содержит ${stats.scripts.length} скриптов. 
-1. Используйте **GPU Resident Drawer** (Unity 6).
-2. Переведите тяжелые вычисления (AI NPC) на **Burst Compiler & Job System**.
-3. Избегайте лишних GetComponent в Loop-функциях.`);
+**Как переставлять:** Используйте инструмент **Move Tool (W)** в Unity Scene View. Удерживайте **V** для привязки (Vertex Snapping) к поверхности террейна.`);
       }
 
       if (results.length === 0) {
-        results.push(`[ОШИБКА СЕТИ - ЛОКАЛЬНЫЙ ПОИСК v17.18.4]
-Я анализирую ваш запрос в автономном режиме. Используйте вкладку "ВОЗМОЖНОСТИ ИИ" для просмотра всех доступных модулей.`);
+        results.push(`[ОШИБКА СЕТИ - ЛОКАЛЬНЫЙ ПОИСК v17.18.6]
+Я анализирую ваш запрос по проекту 'Континент Судьбы'.
+Напишите **"Начать меню"** для пошаговой инструкции или **"Где генератор"** для поиска инструментов.`);
       }
       
       const foundVideos = videos.filter((v: string) => v.toLowerCase().includes(q)).slice(0, 3);
@@ -1426,7 +1506,7 @@ async function startServer() {
         results.push(`**Материалы для обучения:**\n${foundVideos.join('\n')}`);
       }
 
-      res.json({ answer: results.join('\n\n---\n\n'), source: "local_database_v17.18.4" });
+      res.json({ answer: results.join('\n\n---\n\n'), source: "local_database_v17.18.6" });
     } catch (error) {
       res.status(500).json({ error: "Local search failed" });
     }
@@ -1442,7 +1522,7 @@ async function startServer() {
         description: `YouTube Knowledge Integration Mastery v${version}. Полная синхронизация Unity 6/Blender 5.2/GIMP 3.0/Godot 4.4/Photoshop 2024 (Online/Offline/No-Internet). Reality Hack 32.0.`,
         core_functions: [
           {
-            title: "YouTube Knowledge Integration (v17.18.4)",
+            title: "YouTube Knowledge Integration (v17.18.6)",
             desc: "Глубокий анализ и внедрение знаний из 11,800+ видео-уроков. ИИ обучается на лету и предоставляет актуальные решения для Unity 6 и Blender 5.2."
           },
           {
