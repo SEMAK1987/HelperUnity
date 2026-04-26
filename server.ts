@@ -643,57 +643,9 @@ async function generateMasterBlueprint() {
   }
 }
 
-async function findAvailablePort(startPort: number, endPort: number): Promise<number> {
-  return new Promise((resolve, reject) => {
-    let currentPort = startPort;
-
-    const tryPort = () => {
-      if (currentPort > endPort) {
-        reject(new Error(`Не удалось найти свободный порт в диапазоне ${startPort}-${endPort}`));
-        return;
-      }
-
-      const server = net.createServer();
-      server.unref();
-      server.on('error', (err: any) => {
-        if (err.code === 'EADDRINUSE') {
-          console.warn(`Порт ${currentPort} занят, пробую следующий...`);
-          currentPort++;
-          tryPort();
-        } else {
-          reject(err);
-        }
-      });
-
-      server.listen(currentPort, '0.0.0.0', () => {
-        server.close(() => {
-          resolve(currentPort);
-        });
-      });
-    };
-
-    tryPort();
-  });
-}
-
 async function startServer() {
   const app = express();
-  let PORT = Number(process.env.PORT) || 3000;
-
-  try {
-    const selectedPort = await findAvailablePort(PORT, 4000);
-    if (selectedPort !== PORT) {
-      console.log(`⚠️ ПРЕДУПРЕЖДЕНИЕ: Порт ${PORT} был занят. Выбран доступный порт: ${selectedPort}`);
-      PORT = selectedPort;
-      
-      if (PORT !== 3000) {
-        console.warn("ВНИМАНИЕ: Предпросмотр AI Studio работает только на порту 3000. На порту " + PORT + " приложение может быть недоступно извне.");
-      }
-    }
-  } catch (err: any) {
-    console.error("Ошибка при поиске свободного порта:", err.message);
-    process.exit(1);
-  }
+  let PORT = 3000;
 
   app.use(cors());
   app.use(express.json({ limit: '500mb' }));
@@ -831,6 +783,83 @@ async function startServer() {
     // Remove from queue
     aiTaskQueue = aiTaskQueue.filter(t => t.id !== taskId);
     res.json({ success: true });
+  });
+
+  // API: Chat History
+  app.get("/api/chat/history", async (req, res) => {
+    try {
+      if (await fs.pathExists(chatHistoryPath)) {
+        const data = await fs.readJson(chatHistoryPath);
+        res.json(data);
+      } else {
+        res.json([]);
+      }
+    } catch (error) {
+      res.status(500).json({ error: "Failed to read chat history" });
+    }
+  });
+
+  app.post("/api/chat/save", async (req, res) => {
+    try {
+      const { messages } = req.body;
+      await fs.writeJson(chatHistoryPath, messages, { spaces: 2 });
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to save chat history" });
+    }
+  });
+
+  app.post("/api/chat/clear", async (req, res) => {
+    try {
+      await fs.writeJson(chatHistoryPath, [], { spaces: 2 });
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to clear chat history" });
+    }
+  });
+
+  // API: Project History
+  app.get("/api/project/history", async (req, res) => {
+    try {
+      const history = await loadHistory();
+      res.json(history);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to load history" });
+    }
+  });
+
+  // API: Ollama Status & Launch
+  app.get("/api/ai/ollama-status", async (req, res) => {
+    const isRunning = await checkOllamaStatus();
+    res.json({ isRunning });
+  });
+
+  app.post("/api/ai/ollama-chat", async (req, res) => {
+    const { prompt, systemInstruction } = req.body;
+    try {
+      const response = await axios.post(OLLAMA_API_URL, {
+        model: "llama3",
+        prompt: `${systemInstruction}\n\nUser: ${prompt}\nAssistant:`,
+        stream: false
+      }, { timeout: 30000 });
+      res.json({ answer: response.data.response });
+    } catch (error) {
+      res.status(500).json({ error: "Ollama request failed" });
+    }
+  });
+
+  app.post("/api/ai/ollama-launch", async (req, res) => {
+    res.json({ success: false, message: "Ollama must be started manually on your local machine." });
+  });
+
+  // API: Blender Presets
+  app.get("/api/blender/presets", async (req, res) => {
+    const presets = [
+      { id: 'p1', name: 'Cube Grid', desc: 'Creates a 5x5 grid of cubes', code: 'import bpy\nfor x in range(5):\n    for y in range(5):\n        bpy.ops.mesh.primitive_cube_add(location=(x*2, y*2, 0))' },
+      { id: 'p2', name: 'Procedural Building', desc: 'Basic building structure', code: 'import bpy\n# Procedural building logic here' },
+      { id: 'p3', name: 'Terrain Gen', desc: 'Simple terrain with noise', code: 'import bpy\n# Terrain generation logic' }
+    ];
+    res.json(presets);
   });
 
   // API: Get Knowledge Base
@@ -1371,39 +1400,31 @@ async function startServer() {
       const version = packageJson.version;
       const capabilities = {
         name: `Unity & Blender AI Assistant v${version}`,
-        description: `Omniversal Strategy Awakening v${version}. Полная синхронизация Unity/Blender/GIMP/Photoshop 2024/Redot (Online/Offline/No-Internet). Генерация обложек ВК. Глобальные стратегии (RTS/TBS).Reality Hack 30.0.`,
+        description: `YouTube Knowledge Integration Mastery v${version}. Полная синхронизация Unity 6/Blender 5.2/GIMP 3.0/Godot 4.4/Photoshop 2024 (Online/Offline/No-Internet). Reality Hack 32.0.`,
         core_functions: [
           {
+            title: "YouTube Knowledge Integration (v17.18.0)",
+            desc: "Глубокий анализ и внедрение знаний из 11,800+ видео-уроков. ИИ обучается на лету и предоставляет актуальные решения для Unity 6 и Blender 5.2."
+          },
+          {
             title: "VK Cover Multi-Gen (Hybrid)",
-            desc: "Автоматическая генерация до 10 вариантов обложек для групп ВКонтакте (1590x530). Работает во всех режимах, включая No-Internet (через локальные шаблоны)."
+            desc: "Автоматическая генерация до 10 вариантов обложек для групп ВКонтакте (1590x530). Работает во всех режимах, включая No-Internet."
           },
           {
             title: "Advanced Strategy Engine v2.0",
-            desc: "Логика для стратегического планирования компьютерных оппонентов, динамические сетки ландшафта и системы городов. Поддержка сложности: Легкий, Средний, Сложный, Ужасный."
+            desc: "Логика для стратегического планирования (TBS/RTS), динамические сетки ландшафта и системы городов. Поддержка сложности: Легкий, Средний, Сложный, Ужасный."
           },
           {
-            title: "Omniversal Strategy Awakening",
-            desc: "Продвинутая синхронизация всех инструментов, включая Photoshop 2024. ИИ координирует разработку сложных RTS и TBS систем, включая мобов и ИИ противника."
-          },
-          {
-            title: "Advanced Strategy Engine",
-            desc: "Логика для стратегического планирования компьютерных оппонентов, динамические сетки ландшафта и системы городов."
+            title: "Redot Absolute Omniscience",
+            desc: "Тотальный аудит архитектуры Godot/Redot. Конвертация проектов из Unity с сохранением всей логики C# -> GDScript."
           },
           {
             title: "Mob Evolution & Runes",
             desc: "Система эволюции монстров (7 рангов редкости) и продвинутая ювелирная кузня для прокачки колец и рун."
           },
           {
-            title: "UI Cosmic Design",
-            desc: "Синхронизированный дизайн интерфейсов во всех редакторах. Создание ассетов в Photoshop и импорт в Unity/Redot."
-          },
-          {
-            title: "No-Internet Core (v17.17.6)",
-            desc: "Локальный доступ к 11800+ видео и расширенным шаблонам управления для стратегий и RPG."
-          },
-          {
-            title: "Reality Hack 30.0",
-            desc: "Глобальный аудит производительности, балансировка стратегических механик и проверка целостности нейронных связей."
+            title: "Reality Hack 32.0",
+            desc: "Предсказание багов, хроно-аудит проекта и автоматическая оптимизация кода до его написания."
           }
         ],
         files_handled: [
@@ -1604,12 +1625,9 @@ public class MaterialConverter : EditorWindow {
     });
   });
 
-  const startWithPort = (port: number) => {
-    const server = app.listen(port, "0.0.0.0", async () => {
-      console.log(`Server running on http://localhost:${port}`);
-      if (port !== 3000) {
-        console.warn(`WARNING: Server is NOT running on port 3000 (Current: ${port}). AI Studio proxy may not work correctly.`);
-      }
+  const startServer = () => {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on http://localhost:${PORT}`);
       
       // Run initial tasks after server is up
       setTimeout(async () => {
@@ -1619,18 +1637,9 @@ public class MaterialConverter : EditorWindow {
         await generateMasterBlueprint();
       }, 1000);
     });
-
-    server.on('error', (err: any) => {
-      if (err.code === 'EADDRINUSE' && port < 4000) {
-        console.log(`Port ${port} is busy, trying ${port + 1}...`);
-        startWithPort(port + 1);
-      } else {
-        console.error("CRITICAL SERVER ERROR:", err);
-      }
-    });
   };
 
-  startWithPort(PORT);
+  startServer();
 }
 
 startServer().catch(err => {

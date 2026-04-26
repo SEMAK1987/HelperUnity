@@ -371,7 +371,7 @@ export default function App() {
 
   const [kb, setKb] = useState<KBData | null>(null);
   const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info' | 'migration' | 'game_design' | 'game_help'>('chat');
-  const [appVersion, setAppVersion] = useState('17.17.11');
+  const [appVersion, setAppVersion] = useState('17.18.0');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -1268,7 +1268,7 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-sm font-bold text-white uppercase tracking-tighter">AI Assistant</h1>
-              <p className="text-[10px] text-slate-500 uppercase font-mono">v{kb?.version || '12.0'}</p>
+              <p className="text-[10px] text-slate-500 uppercase font-mono">v17.18.0</p>
             </div>
           </div>
 
@@ -3950,40 +3950,6 @@ export default function App() {
                     </button>
                   </div>
                 </div>
-              </div>
-            </div>
-          ) : activeTab === 'menu' ? (
-            <div className="flex-1 flex flex-col items-center justify-center p-8 relative overflow-hidden h-full">
-              <AtmosphereOverlay type={weatherType} />
-              
-              <motion.div 
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="relative z-10 flex flex-col items-center gap-12"
-              >
-                {/* Logo / Title Area */}
-                <div className="text-center space-y-2">
-                  <motion.h1 
-                    initial={{ letterSpacing: '0.5em', opacity: 0 }}
-                    animate={{ letterSpacing: '0.1em', opacity: 1 }}
-                    className="text-7xl font-black text-white italic uppercase tracking-[0.2em] drop-shadow-[0_0_30px_rgba(59,130,246,0.5)]"
-                  >
-                    CONTINENT
-                    <span className="block text-blue-500 mt-2">OF DESTINY</span>
-                  </motion.h1>
-                  <p className="text-[10px] text-slate-500 uppercase tracking-[0.5em] font-black">Powered by Neural Quantum Link • v{appVersion}</p>
-                </div>
-
-                <div className="flex flex-col items-center gap-6">
-                  {renderMenuContent()}
-                </div>
-              </motion.div>
-
-              {/* Decorative side markers */}
-              <div className="absolute left-10 top-1/2 -translate-y-1/2 flex flex-col gap-2 items-center opacity-20">
-                <div className="w-[1px] h-32 bg-white" />
-                <span className="text-[8px] font-black uppercase text-white [writing-mode:vertical-lr] tracking-[0.5em]">System Status: Online</span>
-                <div className="w-[1px] h-32 bg-white" />
               </div>
             </div>
           ) : null}

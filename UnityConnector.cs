@@ -24,7 +24,7 @@ namespace AI_Assistant_Quantum
 
         private void OnGUI()
         {
-            GUILayout.Label("v17.17.0 - Omniversal Divine Architect Supreme (Supreme Edition)", EditorStyles.boldLabel);
+            GUILayout.Label("v17.18.0 - YouTube Knowledge Integration Mastery (Supreme Edition)", EditorStyles.boldLabel);
             
             serverUrl = EditorGUILayout.TextField("Server URL", serverUrl);
             mode = (Mode)EditorGUILayout.EnumPopup("Mode", mode);

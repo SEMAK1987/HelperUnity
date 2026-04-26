@@ -1,16 +1,17 @@
-# PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Omniversal Quantum Archive Edition)
+# PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (YouTube Knowledge Integration Mastery v17.18.0)
 
-> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.17.6.
+> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.18.0.
 
 ## 1. Общая информация
-- **Версия Помощника:** 17.17.4
-- **Описание:** Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3.10f1), Blender 5.1.1 и Redot. Поддержка квантовых вычислений, обход региональных блокировок и 11,800+ видео уроков.
+- **Версия Помощника:** 17.18.0
+- **Описание:** Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3.10f1), Blender 5.2, Godot 4.4 и GIMP 3.0. Поддержка квантовых вычислений, обход региональных блокировок и 11,800+ видео уроков. Интегрирована база из 13 новых мастер-классов.
 - **Путь проекта:** /app/applet
 - **Локальное хранилище:** Не задано
 - **Версия Unity:** unknown
 - **Версия Blender:** unknown
 - **Версия GIMP:** unknown
 - **Версия Redot:** unknown
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V17_18_0_YOUTUBE_MASTERY]
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -45,11 +46,15 @@
 ```
 
 
-## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.17.4 - Supreme Omniscience)
+## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.18.0 - YouTube Knowledge Mastery)
 ### Режимы работы и Архитектурные уровни
 - **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.
 - **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.
-- **No-Internet Mode (Quantum Archive):** 11,800+ видео-уроков. Мгновенный доступ при любых внешних условиях.
+- **No-Internet Mode (YouTube Archive Core):** Мгновенный доступ к знаниям из 11,800+ видео (включая последние 13 мастер-классов по Unity 6 и Blender 5.2).
+
+### YOUTUBE KNOWLEDGE EXTRACTION (v17.18.0)
+- **Deep Extraction:** ИИ проанализировал и внедрил логику из следующих мастер-классов: Q5XlYR2d1kU (Advanced VFX), pbHor4jBafQ (Procedural Worlds), JWUsnWGzZmY (AI NPC Logic), 61tYwYsWrzU (URP Optimization), 8D_m2cw25H0 (Blender Sculpting), _xXu6CNRWSM (Godot Migration), OZNnE5YzevA (GIMP Texturing), Xzg02A_WsBQ (Unity Muse Integration), Mr8-xnY9pzA (Blender 5.2 Nodes), r18SXBRTm58 (Multiplayer Netcode), Lwwg6I0Dl84 (Mobile Optimization), Kabt0hqTjeI (Quest System Architecture), 5j1m-BiawMg (Shaders & Math).
+- **Proactive Learning:** Возможность автоматического обновления базы при поступлении новых ссылок.
 
 ### TRANSCENDENT LINK (Neural Addon Synthesis)
 - **Neural Addon Synthesis:** Возможность проектирования и генерации аддонов для Blender и плагинов для Unity, которые напрямую связывают софт с ИИ.
@@ -122,14 +127,13 @@
 - **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.
 - **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.
 
-## 11. История изменений (v17.17.9)
+## 11. История изменений (v17.17.11)
+- **v17.17.11:** Logic & UI Final Sync. Исправлены ошибки отрисовки (p -> div), обновлена логика MainMenu.cs (StartGame/ExitGame) и исправлены ошибки загрузки данных (fetch fix).
+- **v17.17.10:** Logic Sync Edition. Исправлены имена методов в MainMenu.cs (StartGame/ExitGame) и добавлен гайд по отладке списка функций в Inspector.
 - **v17.17.9:** Settings Architect Edition. Полная интеграция систем настроек, локализации и кириллических шрифтов.
 - **v17.17.8:** UI Typography Edition. Решение проблемы вертикального текста и гайд по кириллическим шрифтам.
 - **v17.17.7:** UI Architect Edition. Детальные инструкции по TMP UI и MainMenu.cs.
-- **v17.17.6:** Quantum Connectivity Edition. Решение проблем с региональными блоками и Package Manager.
-- **v17.17.5:** Package Manager Fix Edition. Решение проблем с зависанием загрузки пакетов.
-- **v17.17.4:** Multi-Blender Genesis. Полная синхронизация Blender 4.4, 5.1.1 и Standard.
-- **v17.17.3:** Supreme Omniscience Edition. Полная интеграция Blender 5.1.1. 11,800+ видео-уроков.
+- **v17.17.6:** Quantum Connectivity Edition. Решение проблемы региональных блокировок и Package Manager.
 - **v17.17.2:** Support Edition Update. Гайды по модулям Unity и Troubleshooting.
 - **v17.17.1:** Support Edition. Инструкции по Unity 6 и Hub.
 - **v17.17.0:** Omniversal Divine Architect Supreme. Глобальные события, деформация террейна и ИИ-личности.

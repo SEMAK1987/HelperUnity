@@ -1,12 +1,18 @@
 {
   "project_name": "Unity & Blender AI Assistant",
-  "version": "17.17.11",
+  "version": "17.18.0",
   "project_path": "/app/applet",
   "unity_ai_assistant": {
-    "description": "Центральный архив знаний Квантового ИИ v17.17.11 (Logic & UI Final Sync)",
-    "combined_knowledge": "# О ВОЗМОЖНОСТЯХ ИИ (v17.17.11 - LOGIC & UI FINAL SYNC)\n\n## 1. Студия Разработки Игр (Omni-Game Studio)\n- **Активный Проект:** 'Континент Судьбы' (Fate Continent).\n- **Боевая система:** Сетка 10x10, учет ландшафта, деформация террейна.\n\n## 2. Глубокие знания ПО (Deep Software Mastery 2026)\n- **Unity 6 (6000.3.10f1):** Мастер URP 17+, решение проблем с инспектором событий UI, TMP скриптами, исправление ошибок гидратации React.\n- **Blender 4.4 & 5.1.1 & Legacy:** Полная поддержка мульти-версионности.\n\n## 3. Тотальная Синхронизация (Quantum Link Fusion)\n- **Quantum Link:** Статус программ: Unity 6 (Active), Blender Multi-Sync (Active).\n- **Workarounds:** Глубокая отладка C# скриптов и полная визуальная синхронизация интерфейса помощника.\n"
+    "description": "Центральный архив знаний Квантового ИИ v17.18.0 (YouTube Knowledge Integration Mastery)",
+    "combined_knowledge": "# О ВОЗМОЖНОСТЯХ ИИ (v17.18.0 - YOUTUBE INTEGRATION MASTERY)\n\n## 1. Студия Разработки Игр (Omni-Game Studio)\n- **Активный Проект:** 'Континент Судьбы' (Fate Continent).\n- **Боевая система:** Сетка 10x10, учет ландшафта, деформация террейна, ИИ-директор агрессии, система 'Руны & Редкость'.\n- **Глубокая Интеграция:** ИИ понимает архитектуру NPC, героев (1+10), систему статов и кузнечного дела.\n\n## 2. Глубокие знания ПО (Deep Software Mastery 2026)\n- **Unity 6 (6000.3.10f1):** Мастер URP 17+, GPU Resident Drawer, Render Graph, детальная отладка UI (TextMeshPro, MainMenu), решение проблем Package Manager.\n- **Blender 4.4 & 5.1.1 & 5.2 (Rumor Sync):** Geometry Nodes, Simulation Nodes, авто-риггинг, процедурная генерация монстров по JSON параметрам.\n- **Godot 4.3 & Redot v28:** Полная миграция с Unity, конвертация C# в GDScript, аудит производительности ядра.\n- **GIMP 3.0 & Photoshop 2024:** Автоматизация текстурирования, AI-генерация атласов, синхронизация слоев.\n\n## 3. Тотальная Синхронизация (Quantum Link Fusion)\n- **Quantum Link:** Мультимодальный анализ (скриншоты, GIF), предсказание багов, 11,800+ видео-память.\n- **Режимы:** Online (Gemini), Offline (Ollama), No-Internet (Local Archive).\n"
   },
   "youtube_videos": [
+    "https://youtu.be/Q5XlYR2d1kU",
+    "https://youtu.be/pbHor4jBafQ",
+    "https://youtu.be/JWUsnWGzZmY",
+    "https://youtu.be/61tYwYsWrzU",
+    "https://youtu.be/8D_m2cw25H0",
+    "https://youtu.be/_xXu6CNRWSM",
     "https://youtu.be/OZNnE5YzevA",
     "https://youtu.be/Xzg02A_WsBQ",
     "https://youtu.be/Mr8-xnY9pzA",
