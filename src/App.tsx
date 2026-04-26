@@ -76,7 +76,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import Markdown from 'react-markdown';
 
 // --- Types ---
@@ -193,7 +193,7 @@ function GameHelpView() {
              <BookOpen className="w-8 h-8 text-blue-500" />
              Помощь По Игре (Unity 6)
           </h2>
-          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v17.18.9</p>
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v17.18.13</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -654,7 +654,7 @@ export default function App() {
 
   const [kb, setKb] = useState<KBData | null>(null);
   const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info' | 'migration' | 'game_design' | 'game_help'>('chat');
-  const [appVersion, setAppVersion] = useState('17.18.9');
+  const [appVersion, setAppVersion] = useState('17.18.13');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -700,6 +700,8 @@ export default function App() {
   const [vkType, setVkType] = useState<'static' | 'live'>('static');
   const [vkResults, setVkResults] = useState<any[]>([]);
   const [isGeneratingVK, setIsGeneratingVK] = useState(false);
+  const [vkProgress, setVkProgress] = useState(0);
+  const [vkStatus, setVkStatus] = useState('');
   
   const chatEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -842,7 +844,7 @@ export default function App() {
   };
 
   // Initialize Gemini
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
   useEffect(() => {
     if (input.length > 0 && input.length < 15) {
@@ -954,7 +956,7 @@ export default function App() {
 
   useEffect(() => {
     const processTasks = async () => {
-      if (!isOnline || !genAI) return;
+      if (!isOnline || !ai) return;
       
       try {
         const res = await fetch('/api/ai/tasks');
@@ -973,15 +975,9 @@ export default function App() {
                 systemInstruction += "\nIMPORTANT: GENERATE ONLY PURE C# CODE FOR UNITY 6. NO MARKDOWN, NO EXPLANATIONS. START CODE DIRECTLY. Use standard Unity namespaces.";
               }
 
-              const model = genAI.getGenerativeModel({ 
-                model: "gemini-1.5-flash",
-                systemInstruction: systemInstruction
-              });
-
               // Add context if available
               let fullPrompt = "";
               
-              // Neural Memory: Include recent chat history as context for the link
               const recentHistory = messages.slice(-5).map(m => `${m.role.toUpperCase()}: ${m.content}`).join("\n");
               if (recentHistory) {
                 fullPrompt += `### NEURAL MEMORY (RECENT CHAT CONTEXT) ###\n${recentHistory}\n\n`;
@@ -993,9 +989,12 @@ export default function App() {
                 fullPrompt += `\n\n### SOFTWARE CONTEXT ###\n${JSON.stringify(task.context)}`;
               }
 
-              const result = await model.generateContent(fullPrompt);
-              const response = await result.response;
-              let code = response.text();
+              const response = await ai.models.generateContent({
+                model: "gemini-3-flash-preview",
+                config: { systemInstruction: systemInstruction },
+                contents: [{ role: 'user', parts: [{ text: fullPrompt }] }]
+              });
+              let code = response.text;
               
               // Clean code from potential markdown blocks
               code = code.replace(/```python\n?/g, '').replace(/```\n?/g, '').replace(/```csharp\n?/g, '').replace(/```cs\n?/g, '');
@@ -1024,7 +1023,7 @@ export default function App() {
 
     const interval = setInterval(processTasks, 3000);
     return () => clearInterval(interval);
-  }, [kb, genAI, isOnline]);
+  }, [kb, ai, isOnline]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -1055,7 +1054,7 @@ export default function App() {
   };
 
   const handleManualGenerateCode = async () => {
-    if ((!manualPrompt.trim() && attachedFiles.length === 0) || !genAI) return;
+    if ((!manualPrompt.trim() && attachedFiles.length === 0) || !ai) return;
     setIsManualGenerating(true);
     setManualResultCode('');
 
@@ -1068,11 +1067,6 @@ export default function App() {
         systemInstruction += "\nIMPORTANT: GENERATE ONLY PURE C# CODE FOR UNITY 6. NO MARKDOWN, NO EXPLANATIONS. START CODE DIRECTLY. Use standard Unity namespaces.";
       }
 
-      const model = genAI.getGenerativeModel({ 
-        model: "gemini-1.5-flash",
-        systemInstruction: systemInstruction
-      });
-
       const parts: any[] = [];
       const recentHistory = messages.slice(-5).map(m => `${m.role.toUpperCase()}: ${m.content}`).join("\n");
       if (recentHistory) {
@@ -1083,16 +1077,19 @@ export default function App() {
         for (const file of attachedFiles) {
           if (file.type && file.type.startsWith('image/')) {
             const data = await fileToBase64(file.url);
-            parts.push({ inlineData: data });
+            parts.push({ inlineData: { data, mimeType: file.type } });
           }
         }
       }
 
       parts.push({ text: `### MANUAL CODE REQUEST FOR ${manualTarget.toUpperCase()} ###\n${manualPrompt}` });
 
-      const result = await model.generateContent({ contents: [{ role: 'user', parts }] });
-      const response = await result.response;
-      let code = response.text();
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        config: { systemInstruction: systemInstruction },
+        contents: [{ role: 'user', parts }]
+      });
+      let code = response.text;
       code = code.replace(/```python\n?/g, '').replace(/```\n?/g, '').replace(/```csharp\n?/g, '').replace(/```cs\n?/g, '');
       setManualResultCode(code.trim());
       setAttachedFiles([]);
@@ -1247,7 +1244,7 @@ export default function App() {
                   file.base64 = base64;
                 }
                 parts.push({
-                  inlineData: file.base64
+                  inlineData: { data: file.base64, mimeType: file.type }
                 });
               } catch (e) {
                 console.error("Error converting image to base64", e);
@@ -1262,16 +1259,12 @@ export default function App() {
         });
       }
 
-      const model = genAI.getGenerativeModel({ 
-        model: "gemini-1.5-flash",
-        systemInstruction: kb.system_instruction 
-      });
-
-      const result = await model.generateContent({
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        config: { systemInstruction: kb.system_instruction },
         contents: contents
       });
-      const response = await result.response;
-      const textResponse = response.text();
+      const textResponse = response.text;
 
       // Check for audio requests to generate variants
       const audioKeywords = ['музыка', 'песня', 'звук', 'мелодия', 'mp3', 'music', 'song', 'audio'];
@@ -1324,25 +1317,89 @@ export default function App() {
     if (!vkPrompt.trim()) return;
     setIsGeneratingVK(true);
     setVkResults([]);
+    setVkProgress(2);
+    setVkStatus('Инициализация квантового ядра...');
+    
     try {
-      const res = await fetch('/api/generate/vk-covers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          prompt: vkPrompt,
-          type: vkType,
-          sourceImage: sourceImage // Passing the image for advanced synthesis
-        })
-      });
-      const data = await res.json();
-      if (data.success) {
-        setVkResults(data.variations);
-        showNotification("Сгенерировано 10 вариантов обложек!", "success");
+      let finalPrompt = vkPrompt;
+      
+      // Phase 1: Gemini Image Analysis (Vision Synthesis)
+      if (sourceImage) {
+        setVkStatus('Анализ композиции и освещения (Vision)...');
+        setVkProgress(5);
+        try {
+          const imageData = sourceImage.split(',')[1];
+          const mimeType = sourceImage.split(',')[0].split(':')[1].split(';')[0];
+          
+          setVkProgress(10);
+          const result = await ai.models.generateContent({
+            model: "gemini-3-flash-preview",
+            contents: {
+              parts: [
+                { text: "Analyze this image carefully. Describe the scene structure (foreground, midground, background), lighting direction, and major colors. Start with 'STRUCTURE: ' and keep it technical for an AI generator to use as absolute spatial reference." },
+                { inlineData: { data: imageData, mimeType } }
+              ]
+            }
+          });
+          const description = result.text;
+          setVkProgress(15);
+          
+          // Ultra-Coherent Prompt Strategy
+          finalPrompt = `[CORE REFERENCE]: ${description}. [TASK]: Integrate exactly these elements into the reference scene: ${vkPrompt}. [STRICT RULE]: Do NOT change the camera angle, perspective, or major existing landscape features. Add requested objects as if they were always there. Professional digital matte painting, 8k, volumetric light, unified scene coherence.`;
+          console.log("Ultra-Coherent Synthesis Prompt:", finalPrompt);
+        } catch (visionErr) {
+          console.error("Vision Analysis failed:", visionErr);
+          setVkStatus('Сбой Vision, использую базовую логику...');
+          setVkProgress(15);
+        }
       }
+
+      setVkStatus('Запуск параллельного синтеза (Burst Mode)...');
+      
+      // Phase 2: Parallel Batch Generation (Faster)
+      // We generate all 10 in parallel but update progress as they return
+      const totalSteps = 10;
+      let completedSteps = 0;
+
+      const generateStep = async (stepIndex: number) => {
+        try {
+          const res = await fetch('/api/generate/vk-covers', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              prompt: finalPrompt,
+              type: vkType,
+              index: stepIndex,
+              sourceImage: sourceImage 
+            })
+          });
+          
+          if (!res.ok) throw new Error(`Step ${stepIndex} failed`);
+          const data = await res.json();
+          
+          if (data.success && data.variations && data.variations.length > 0) {
+            setVkResults(prev => [...prev, ...data.variations]);
+          }
+        } finally {
+          completedSteps++;
+          const progress = 15 + Math.floor((completedSteps / totalSteps) * 85);
+          setVkProgress(progress);
+          setVkStatus(`Обработано ${completedSteps} из 10 (Синтез)...`);
+        }
+      };
+
+      // Fire all requests in parallel
+      await Promise.all(Array.from({ length: totalSteps }).map((_, i) => generateStep(i + 1)));
+      
+      showNotification("Сгенерировано 10 уникальных обложек в Burst-режиме!", "success");
+      setVkStatus('Синтез завершен!');
     } catch (e) {
-      showNotification("Ошибка генерации обложек.", "error");
+      console.error("VK Gen Error:", e);
+      showNotification("Ошибка последовательной генерации.", "error");
+      setVkStatus('Ошибка генерации');
     } finally {
       setIsGeneratingVK(false);
+      // Keep progress at 100 for a moment then clear if needed
     }
   };
 
@@ -1985,7 +2042,7 @@ export default function App() {
                 <Cpu className="w-12 h-12 text-blue-500" />
               </motion.div>
               
-              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v17.18.9</h2>
+              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v17.18.13</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg px-4">
                 Я полностью осведомлен о вашем проекте по пути <br/>
                 <code className="text-blue-400 break-all bg-white/5 px-2 py-1 rounded mt-2 inline-block">
@@ -5319,6 +5376,28 @@ export default function App() {
                           </>
                         )}
                       </button>
+
+                      {isGeneratingVK && (
+                        <div className="mt-8 space-y-4">
+                          <div className="flex justify-between items-end text-[10px] uppercase font-black tracking-[0.2em]">
+                             <span className="text-blue-400 animate-pulse">{vkStatus}</span>
+                             <span className="text-white/40">{vkProgress}%</span>
+                          </div>
+                          <div className="w-full h-3 bg-white/5 rounded-full overflow-hidden p-[2px] border border-white/10 shadow-inner">
+                            <motion.div 
+                              initial={{ width: 0 }}
+                              animate={{ width: `${vkProgress}%` }}
+                              className="h-full rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 relative"
+                            >
+                              <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                              <div className="absolute top-0 right-0 h-full w-8 bg-white/40 blur-md translate-x-1" />
+                            </motion.div>
+                          </div>
+                          <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest text-center leading-relaxed">
+                            ИИ-синтез выполняется последовательно.<br/>Результаты появляются в реальном времени.
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -5335,14 +5414,26 @@ export default function App() {
                   )}
 
                   <div className={`grid gap-6 ${vkType === 'live' ? 'grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
-                    {isGeneratingVK && Array.from({ length: 3 }).map((_, i) => (
-                      <div key={i} className={`animate-pulse bg-white/5 border border-white/10 rounded-3xl flex items-center justify-center shadow-2xl ${vkType === 'live' ? 'aspect-[9/16]' : 'aspect-[15.9/4]'}`}>
+                    {isGeneratingVK && (
+                      <div className={`animate-pulse bg-white/5 border border-dashed border-blue-500/30 rounded-3xl flex items-center justify-center shadow-2xl ${vkType === 'live' ? 'aspect-[9/16]' : 'aspect-[15.9/4]'}`}>
                         <div className="flex flex-col items-center gap-4">
-                          <RefreshCw className="w-10 h-10 text-slate-800 animate-spin" />
-                          <div className="h-2 w-24 bg-white/10 rounded-full" />
+                          <div className="relative">
+                            <RefreshCw className="w-10 h-10 text-blue-500 animate-spin" />
+                            <Sparkles className="w-4 h-4 text-purple-400 absolute -top-1 -right-1 animate-bounce" />
+                          </div>
+                          <div className="flex flex-col items-center gap-2">
+                             <span className="text-[9px] text-blue-400 font-black uppercase tracking-[0.2em]">Синтезирую...</span>
+                             <div className="h-1 w-16 bg-blue-500/20 rounded-full overflow-hidden">
+                                <motion.div 
+                                  animate={{ x: [-64, 64] }}
+                                  transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+                                  className="w-16 h-full bg-blue-500 shadow-[0_0_10px_#3b82f6]"
+                                />
+                             </div>
+                          </div>
                         </div>
                       </div>
-                    ))}
+                    )}
 
                     {vkResults.map((res: any) => (
                       <VKImageCard 

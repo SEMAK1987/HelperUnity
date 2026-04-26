@@ -1,3 +1,7 @@
+// [FATE MANIFESTATION MODULE v17.18.13]
+// Unity Connector for Quantum AI Assistant
+// Updated: 2026-04-26 (Gemini 3 Flash & Vision Fixed Integration)
+
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.Networking;

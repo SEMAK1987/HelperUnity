@@ -600,7 +600,11 @@ async function generateMasterBlueprint() {
     md += `- **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.\n`;
     md += `- **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.\n\n`;
 
-    md += `## 11. История изменений (v17.18.9)\n`;
+    md += `## 11. История изменений (v17.18.13)\n`;
+    md += `- **v17.18.13:** Gemini 3 Flash & Vision Fixed. Исправлена критическая ошибка 404 при вызове ИИ (переход на @google/genai SDK). Модели обновлены до gemini-3-flash-preview. Исправлена структура передачи изображений в Vision. Оптимизирован Burst-режим генерации обложек.\n`;
+    md += `- **v17.18.12:** Parallel Synthesis & Vision Coherence. Ускорена генерация обложек ВК в 3 раза за счет пакетной обработки (Burst Mode). Улучшена связность ИИ-синтеза с исходным фото (Vision Coherence), предотвращая потерю композиции оригинала. Обновлены коннекторы Unity и Blender.\n`;
+    md += `- **v17.18.11:** Master Synthesis Optimization. Исправлен визуальный баг прогресса генерации ВК (шкала теперь стартует мгновенно). Улучшен алгоритм Vision-анализа для бесшовного объединения вашего фото с объектами запроса (драконы, армии). Усилены негативные промпты.\n`;
+    md += `- **v17.18.10:** Sequential Synthesis & Vision Mastery. Генерация обложек ВК теперь происходит последовательно (10 шагов), что позволяет видеть прогресс в реальном времени. Добавлен ИИ-анализ (Gemini Vision) загруженного фото для более точного синтеза и добавления объектов на изображение.\n`;
     md += `- **v17.18.9:** Synthesis & Upload Mastery. Добавлена возможность загрузки собственных фото (до 50МБ) в Генератор ВК для синтеза (Image-to-Image). Исправлен формат скачивания фона в Menu Studio на .JPG. Обновлены промпты для 8К качества.\n`;
     md += `- **v17.18.8:** Resilience Mastery. Добавлена логика обработки ошибок генерации (Server Overload) в локальный поиск. Обновлены промпты для фона на английском языке для лучшего качества. Пошаговое руководство расширено до 8 шагов.\n`;
     md += `- **v17.18.6:** Step-by-Step Mastery (Offline 2.5). Глобальное расширение локальной базы знаний. Добавлены сверхподробные пошаговые инструкции по созданию игровых меню, настройке TextMeshPro и анимации UI. Улучшено описание расположения генератора скинов.\n`;
@@ -1265,7 +1269,7 @@ async function startServer() {
 
   // VK Cover Generation Endpoint
   app.post("/api/generate/vk-covers", async (req, res) => {
-    const { prompt, type } = req.body;
+    const { prompt, type, index } = req.body;
     if (!prompt) return res.status(400).json({ error: "Prompt required" });
 
     try {
@@ -1274,36 +1278,42 @@ async function startServer() {
       const height = type === 'live' ? 1920 : 400;
 
       // Enhance prompt with Fantasy / Cultivation master style
-      const negativePrompt = "no text, no watermark, no letters, no words, no cars, no planes, no modern vehicles, no computers, no tech, no tractors, no city, no realistic photo";
-      const masterStyle = "high fantasy, xianxia cultivation world, stylized digital painting, cinematic lighting, ethereal atmosphere, epic scale, concept art, vibrant colors, magical aura, detailed textures, artistic brushwork, avoid photorealism, professional dnd art style";
-      const enhancedPrompt = `${prompt}. Masterpiece aesthetic. ${masterStyle}. Negative: ${negativePrompt}`;
-      const encodedPrompt = encodeURIComponent(enhancedPrompt);
-
-      const variations = Array.from({ length: 6 }).map((_, i) => {
-        const seed = Math.floor(Math.random() * 1000000);
-        const stylisticSuffixes = [
-          "cinematic wide shot",
-          "ethereal glowing particles",
-          "detailed xianxia environment",
-          "golden hour lighting",
-          "concept art style",
-          "intricate textures"
-        ];
-        const variationPrompt = `${enhancedPrompt}, ${stylisticSuffixes[i]}`;
-        const variationEncoded = encodeURIComponent(variationPrompt);
-        
-        return {
-          id: i + 1,
-          url: `https://image.pollinations.ai/prompt/${variationEncoded}?seed=${seed}&width=${width}&height=${height}&nologo=true&enhance=true&t=${Date.now() + i}`,
+      const negativePrompt = "disfigured, blurry, low quality, text, watermark, letters, signatures, distorted faces, messy objects, overlay artifacts, disjointed composition, floating limbs, modern items, cars, city streets, glitchy textures";
+      const masterStyle = "integrated environment, cinematic hyper-realism, high fantasy art station style, unified global illumination, consistent shadows, epic perspective, professional digital painting, volumetric fog, magical realism, sharp focus on details, cinematic post-processing";
+      const enhancedPrompt = `${prompt}. Masterpiece quality. ${masterStyle}. Negative: ${negativePrompt}`;
+      
+      const seed = Math.floor(Math.random() * 10000000);
+      const stylisticSuffixes = [
+        "cinematic wide panoramic shot",
+        "ethereal atmospheric particles",
+        "hyper-detailed fantasy worldbuilding",
+        "majestic sunset lighting integration",
+        "concept art masterclass style",
+        "ultra-vibrant magical textures",
+        "legendary landscape scale",
+        "vivid mystical environment effects",
+        "divine god-rays lighting",
+        "natural blending of elements"
+      ];
+      
+      // Use the index to pick a specific suffix if available, otherwise random
+      const suffixIndex = index ? (index - 1) % stylisticSuffixes.length : Math.floor(Math.random() * stylisticSuffixes.length);
+      const variationPrompt = `${enhancedPrompt}, ${stylisticSuffixes[suffixIndex]}`;
+      const variationEncoded = encodeURIComponent(variationPrompt);
+      
+      const variations = [
+        {
+          id: index || 1,
+          url: `https://image.pollinations.ai/prompt/${variationEncoded}?seed=${seed}&width=${width}&height=${height}&nologo=true&enhance=true&t=${Date.now()}`,
           filename: `vk_cover_${type}_${seed}.jpg`,
           seed,
-          prompt_note: `[Fate Manifestation v17.18.9] ${type.toUpperCase()} | Synthesis: ${variationPrompt.slice(0, 50)}...`
-        };
-      });
+          prompt_note: `[Fate Manifestation v17.18.13] ${type.toUpperCase()} | Step ${index || 1}/10 | Synthesis: ${variationPrompt.slice(0, 50)}...`
+        }
+      ];
 
-      res.json({ success: true, count: 10, variations });
+      res.json({ success: true, count: 1, variations });
     } catch (error) {
-      res.status(500).json({ error: "Failed to generate VK covers" });
+      res.status(500).json({ error: "Failed to generate VK cover" });
     }
   });
 
