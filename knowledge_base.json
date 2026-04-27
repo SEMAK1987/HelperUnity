@@ -1,12 +1,29 @@
 {
   "project_name": "Unity & Blender AI Assistant",
-  "version": "17.18.13",
+  "version": "17.18.16",
   "project_path": "/app/applet",
   "unity_ai_assistant": {
-    "description": "Центральный архив знаний Квантового ИИ v17.18.13 (Gemini 3 Flash & Vision Fixed)",
-    "combined_knowledge": "# О ВОЗМОЖНОСТЯХ ИИ (v17.18.4 - YOUTUBE INTEGRATION MASTERY)\n\n## 1. Студия Разработки Игр (Omni-Game Studio)\n- **Активный Проект:** 'Континент Судьбы' (Fate Continent).\n- **Боевая система:** Сетка 10x10, учет ландшафта, деформация террейна, ИИ-директор агрессии, система 'Руны & Редкость'.\n- **Глубокая Интеграция:** ИИ понимает архитектуру NPC, героев (1+10), систему статов и кузнечного дела.\n- **UI/UX Спецификации:** Создание иммерсивных меню с использованием Animator Controller и Custom Skinning для кнопок. Использование Raycast All для выбора элементов в 3D пространстве.\n\n## 2. Глубокие знания ПО (Deep Software Mastery 2026)\n- **Unity 6 (6000.3.10f1):** Мастер URP 17+, GPU Resident Drawer, Render Graph, детальная отладка UI (TextMeshPro, MainMenu), решение проблем Package Manager.\n- **Blender 4.4 & 5.1.1 & 5.2 (Rumor Sync):** Geometry Nodes, Simulation Nodes, авто-риггинг, процедурная генерация монстров по JSON параметрам.\n- **Animation Mastery:**\n    - **Unity Animator:** Создание многослойных стейт-машин (Base Layer, UI Layer). Использование Parameters (Trigger, Float) для плавных переходов.\n    - **Button Skinning:** Процедурное создание скинов через Sprite Atlas. Оригинальные варианты: 'Void Crystal', 'Ethereal Mist', 'Runed Obsidian'.\n- **Godot 4.3 & Redot v28:** Полная миграция с Unity, конвертация C# в GDScript, аудит производительности ядра.\n- **GIMP 3.0 & Photoshop 2024:** Автоматизация текстурирования, AI-генерация атласов, синхронизация слоев.\n\n## 3. Тотальная Синхронизация (Quantum Link Fusion)\n- **Quantum Link:** Мультимодальный анализ (скриншоты, GIF), предсказание багов, 11,800+ видео-память.\n- **Режимы:** Online (Gemini), Offline (Ollama), No-Internet (Local Archive).\n"
+    "description": "Центральный архив знаний Квантового ИИ v17.18.16 (Scene Creation Mastery & Strict UI Logic)",
+    "combined_knowledge": "# О ВОЗМОЖНОСТЯХ ИИ (v17.18.16 - SCENE CREATION MASTERY)\n\n## 1. Студия Разработки Игр (Omni-Game Studio)\n- **Активный Проект:** 'Континент Судьбы' (Fate Continent).\n- **Боевая система:** Сетка 10x10, учет ландшафта, деформация террейна, ИИ-директор агрессии, система 'Руны & Редкость'.\n- **Глубокая Интеграция:** ИИ понимает архитектуру NPC, героев (1+10), систему статов и кузнечного дела.\n- **UI/UX Спецификации (СТРОГО):** Использование исключительно системы UGUI (Canvas). Запрещено использовать Plane/Terrain для создания меню. Стандартная иерархия: Canvas -> Panel (Background) -> Image/TextMeshPro -> Button. Использование Scale Mode: Scale With Screen Size (1920x1080). Если пользователь хочет альтернативный подход (UI Toolkit/World Space), ИИ должен детально расписать процесс настройки.\n\n## 2. Глубокие знания ПО (Deep Software Mastery 2026)\n- **Unity (Все версии + Unity 6):** Мастер создания полноценных 3D-сцен по запросу. Настройка освещения (Lighting), запекание (Baking), Post-Processing. Логика квестов, цепочки событий, системы баффов/дебаффов. Генерация зданий, ландшафтов и огромных континентов.\n- **Blender 4.4 - 5.2:** Geometry Nodes, процедурная генерация монстров и окружения.\n- **Godot 4.4 & Redot v28:** Оперативная миграция и настройка графов.\n\n## 3. Тотальная Синхронизация (Quantum Link Fusion)\n- **Quantum Link:** Burst-обработка 10 вариантов. Синхронизация всех открытых вкладок и помощников (Blender, Unity, GIMP, Photoshop, Redot).\n- **Server Logic:** Строгое использование порта 3000 в iFrame. В локальном режиме (Offline) поиск порта 3000-3010.\n- **Conversation Flow:** Поддержка команды 'Продолжить' (Continue) для бесконечных рассуждений и дописывания длинного кода.\n- **Modes:** Online (Gemini 3 Flash), Offline (Neural Archive), No-Internet (Local Sync).\n"
   },
   "youtube_videos": [
+    "https://youtu.be/whCM9V9J-mU",
+    "https://youtu.be/FwtbopvJgb0",
+    "https://youtu.be/Yf1oyQ4JHJ0",
+    "https://youtu.be/M3kdODHDDDo",
+    "https://youtu.be/OA6zlzGPHR8",
+    "https://youtu.be/C6XU6rqtw5c",
+    "https://youtu.be/ANKHvdBK_s8",
+    "https://youtu.be/DyjfhIcM6hI",
+    "https://youtu.be/2_cWqvtn74Y",
+    "https://youtu.be/lQLsXvdWYbM",
+    "https://youtu.be/mRN1iZBoA9k",
+    "https://youtu.be/lCBnE8MeyYw",
+    "https://www.youtube.com/watch?v=tYaZySyd2SM",
+    "https://www.youtube.com/watch?v=9HrX8qbIRVw",
+    "https://youtu.be/NTyY7J8bVx0",
+    "https://www.youtube.com/watch?v=gQFd3GX4xbI&list=PLY0-NP4oWBNOTlgXW86JngM2qvTZFwN3t&index=2",
+    "https://www.youtube.com/watch?v=wm30MN-eXkw&list=PLY0-NP4oWBNOTlgXW86JngM2qvTZFwN3t&index=3",
     "https://youtu.be/Q5XlYR2d1kU",
     "https://youtu.be/pbHor4jBafQ",
     "https://youtu.be/JWUsnWGzZmY",

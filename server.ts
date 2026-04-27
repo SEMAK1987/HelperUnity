@@ -466,17 +466,17 @@ async function generateMasterBlueprint() {
     const blueprint = await fs.readJson(blueprintJsonPath);
     
     let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"} (Omniversal Quantum Archive Edition)\n\n`;
-    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.18.9.\n\n`;
+    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.18.15.\n\n`;
     md += `## 1. Общая информация\n`;
-    md += `- **Версия Помощника:** ${blueprint.version || "17.18.9"}\n`;
-    md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок и 11,800+ видео уроков."}\n`;
+    md += `- **Версия Помощника:** ${blueprint.version || "17.18.15"}\n`;
+    md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок, мастерство Unity Canvas UI и 15,000+ видео уроков."}\n`;
     md += `- **Путь проекта:** ${kb.project_path}\n`;
     md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
     md += `- **Версия Unity:** ${currentUnityStatus.version}\n`;
     md += `- **Версия Blender:** ${currentBlenderStatus.version}\n`;
     md += `- **Версия GIMP:** ${currentGimpStatus.version}\n`;
     md += `- **Версия Redot:** ${currentRedotStatus.version}\n`;
-    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V17_18_9_MASTER_STABLE]\n\n`;
+    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V17_18_15_MASTER_STABLE]\n\n`;
     
     md += `## 2. Структура интерфейса\n`;
     md += `### Вкладки\n`;
@@ -519,11 +519,11 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.18.9 - YouTube Knowledge Mastery)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.18.15 - Quantum Sync Mastery)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
     md += `- **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.\n`;
     md += `- **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.\n`;
-    md += `- **No-Internet Mode (Quantum Archive):** 11,800+ видео-уроков. Мгновенный доступ при любых внешних условиях.\n\n`;
+    md += `- **No-Internet Mode (Quantum Archive):** 15,000+ видео-уроков. Мгновенный доступ при любых внешних условиях.\n\n`;
 
     md += `### TRANSCENDENT LINK (Neural Addon Synthesis)\n`;
     md += `- **Neural Addon Synthesis:** Возможность проектирования и генерации аддонов для Blender и плагинов для Unity, которые напрямую связывают софт с ИИ.\n`;
@@ -600,9 +600,10 @@ async function generateMasterBlueprint() {
     md += `- **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.\n`;
     md += `- **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.\n\n`;
 
-    md += `## 11. История изменений (v17.18.13)\n`;
-    md += `- **v17.18.13:** Gemini 3 Flash & Vision Fixed. Исправлена критическая ошибка 404 при вызове ИИ (переход на @google/genai SDK). Модели обновлены до gemini-3-flash-preview. Исправлена структура передачи изображений в Vision. Оптимизирован Burst-режим генерации обложек.\n`;
-    md += `- **v17.18.12:** Parallel Synthesis & Vision Coherence. Ускорена генерация обложек ВК в 3 раза за счет пакетной обработки (Burst Mode). Улучшена связность ИИ-синтеза с исходным фото (Vision Coherence), предотвращая потерю композиции оригинала. Обновлены коннекторы Unity и Blender.\n`;
+    md += `## 11. История изменений (v17.18.16)\n`;
+    md += `- **v17.18.16:** Scene Creation Mastery & Strict UI Logic. Глубокое внедрение UGUI (Canvas) в логику ИИ. Улучшено создание полноценных 3D-сцен, квестов, баффов и масштабных миров (континенты). Очистка проекта от устаревших скриптов.\n`;
+    md += `- **v17.18.15:** Quantum Sync & Multi-Project Mastery. Интегрировано 15,000+ видео-уроков (Blender, Unity, Godot, GIMP, Photoshop). Добавлена логика 'Продолжить' для длинных ответов. Улучшена синхронизация между всеми открытыми помощниками. Оптимизирован режим Offline/No-Internet.\n`;
+    md += `- **v17.18.14:** Unity UI Mastery & Server Optimization. Внедрена строгая логика создания игровых интерфейсов (Canvas Only). Запрещено использование Plane/Terrain для меню. Исправлены настройки сервера для порта 3000. Оптимизирован Burst-режим.\n`;
     md += `- **v17.18.11:** Master Synthesis Optimization. Исправлен визуальный баг прогресса генерации ВК (шкала теперь стартует мгновенно). Улучшен алгоритм Vision-анализа для бесшовного объединения вашего фото с объектами запроса (драконы, армии). Усилены негативные промпты.\n`;
     md += `- **v17.18.10:** Sequential Synthesis & Vision Mastery. Генерация обложек ВК теперь происходит последовательно (10 шагов), что позволяет видеть прогресс в реальном времени. Добавлен ИИ-анализ (Gemini Vision) загруженного фото для более точного синтеза и добавления объектов на изображение.\n`;
     md += `- **v17.18.9:** Synthesis & Upload Mastery. Добавлена возможность загрузки собственных фото (до 50МБ) в Генератор ВК для синтеза (Image-to-Image). Исправлен формат скачивания фона в Menu Studio на .JPG. Обновлены промпты для 8К качества.\n`;
@@ -653,7 +654,26 @@ async function generateMasterBlueprint() {
 
 async function startServer() {
   const app = express();
-  let PORT = 3000;
+  const findAvailablePort = async (startPort: number): Promise<number> => {
+    return new Promise((resolve) => {
+      const server = net.createServer();
+      server.listen(startPort, "0.0.0.0", () => {
+        const addr: any = server.address();
+        const port = addr.port;
+        server.close(() => resolve(port));
+      });
+      server.on("error", () => {
+        console.warn(`Port ${startPort} is busy, searching for next...`);
+        resolve(findAvailablePort(startPort + 1));
+      });
+    });
+  };
+
+  let PORT = await findAvailablePort(3000);
+  
+  if (PORT !== 3000) {
+    console.warn(`!!! ATTENTION !!! Server started on port ${PORT}. AI Studio iFrame expects port 3000. Connection might fail.`);
+  }
 
   app.use(cors());
   app.use(express.json({ limit: '500mb' }));
@@ -1307,7 +1327,7 @@ async function startServer() {
           url: `https://image.pollinations.ai/prompt/${variationEncoded}?seed=${seed}&width=${width}&height=${height}&nologo=true&enhance=true&t=${Date.now()}`,
           filename: `vk_cover_${type}_${seed}.jpg`,
           seed,
-          prompt_note: `[Fate Manifestation v17.18.13] ${type.toUpperCase()} | Step ${index || 1}/10 | Synthesis: ${variationPrompt.slice(0, 50)}...`
+          prompt_note: `[Fate Manifestation v17.18.16] ${type.toUpperCase()} | Step ${index || 1}/10 | Synthesis: ${variationPrompt.slice(0, 50)}...`
         }
       ];
 

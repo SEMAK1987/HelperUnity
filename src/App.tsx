@@ -193,7 +193,7 @@ function GameHelpView() {
              <BookOpen className="w-8 h-8 text-blue-500" />
              Помощь По Игре (Unity 6)
           </h2>
-          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v17.18.13</p>
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v17.18.16</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -654,7 +654,7 @@ export default function App() {
 
   const [kb, setKb] = useState<KBData | null>(null);
   const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info' | 'migration' | 'game_design' | 'game_help'>('chat');
-  const [appVersion, setAppVersion] = useState('17.18.13');
+  const [appVersion, setAppVersion] = useState('17.18.16');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -972,7 +972,7 @@ export default function App() {
               if (task.target === 'blender') {
                 systemInstruction += "\nIMPORTANT: GENERATE ONLY PURE PYTHON CODE FOR BLENDER 4.x. NO MARKDOWN, NO EXPLANATIONS. START CODE DIRECTLY. Focus on bpy modules.";
               } else if (task.target === 'unity') {
-                systemInstruction += "\nIMPORTANT: GENERATE ONLY PURE C# CODE FOR UNITY 6. NO MARKDOWN, NO EXPLANATIONS. START CODE DIRECTLY. Use standard Unity namespaces.";
+                systemInstruction += "\nIMPORTANT: GENERATE ONLY PURE C# CODE FOR UNITY 6. NO MARKDOWN, NO EXPLANATIONS. START CODE DIRECTLY. Use standard Unity namespaces.\nCRITICAL UI RULE: ALWAYS USE UGUI (CANVAS SYSTEM). DO NOT USE PLANES OR TERRAINS FOR UI. Hierarchy: Canvas -> Panel -> Image/TMP -> Button. Use Scale With Screen Size (1920x1080).";
               }
 
               // Add context if available
@@ -1064,7 +1064,7 @@ export default function App() {
       if (manualTarget === 'blender') {
         systemInstruction += "\nIMPORTANT: GENERATE ONLY PURE PYTHON CODE FOR BLENDER 4.x. NO MARKDOWN, NO EXPLANATIONS. START CODE DIRECTLY. Focus on bpy modules.";
       } else if (manualTarget === 'unity') {
-        systemInstruction += "\nIMPORTANT: GENERATE ONLY PURE C# CODE FOR UNITY 6. NO MARKDOWN, NO EXPLANATIONS. START CODE DIRECTLY. Use standard Unity namespaces.";
+        systemInstruction += "\nIMPORTANT: GENERATE ONLY PURE C# CODE FOR UNITY 6. NO MARKDOWN, NO EXPLANATIONS. START CODE DIRECTLY. Use standard Unity namespaces.\nCRITICAL UI RULE: ALWAYS USE UGUI (CANVAS SYSTEM). DO NOT USE PLANES OR TERRAINS FOR UI. Hierarchy: Canvas -> Panel -> Image/TMP -> Button. Use Scale With Screen Size (1920x1080).";
       }
 
       const parts: any[] = [];
@@ -1189,6 +1189,13 @@ export default function App() {
     setIsTyping(true);
 
     try {
+      let promptText = text;
+      const isContinue = text.toLowerCase() === 'продолжить' || text.toLowerCase() === 'continue';
+      
+      if (isContinue) {
+        promptText = "ПОЖАЛУЙСТА, ПРОДОЛЖИ СВОЙ ПРЕДЫДУЩИЙ ОТВЕТ С ТОГО МЕСТА, ГДЕ ОН ПРЕРВАЛСЯ. Не повторяй уже написанное, начни прямо с продолжения.";
+      }
+
       // Offline Fallback Check
       if (!isOnline) {
         if (ollamaRunning) {
@@ -1196,7 +1203,7 @@ export default function App() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
-              prompt: text, 
+              prompt: promptText, 
               systemInstruction: kb.system_instruction 
             })
           });
@@ -1261,8 +1268,10 @@ export default function App() {
 
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        config: { systemInstruction: kb.system_instruction },
-        contents: contents
+        config: { 
+          systemInstruction: kb.system_instruction + "\n\n### CRITICAL KNOWLEDGE UPDATE v17.18.16 ###\n- STRICT UI RULE: ALWAYS USE UGUI (Canvas). No Planes or Terrains for interfaces. Hierarchy: Canvas -> Panel -> Image/TMP -> Button.\n- FLEXIBILITY: If the user insists on a different UI method, provide a detailed setup guide.\n- SCENE MASTERY: You can create full scenes, complex quest chains, buff/debuff systems, and massive continents.\n- Multi-Project Sync: Active for Unity, Blender, GIMP, Photoshop, Redot.\n- Knowledge: All versions of Unity, including lighting, baking, and game logic."
+        },
+        contents: contents.map((c, i) => i === contents.length - 1 && isContinue ? { ...c, parts: [{ text: promptText }] } : c)
       });
       const textResponse = response.text;
 
@@ -2042,14 +2051,16 @@ export default function App() {
                 <Cpu className="w-12 h-12 text-blue-500" />
               </motion.div>
               
-              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v17.18.13</h2>
+              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v17.18.16</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg px-4">
                 Я полностью осведомлен о вашем проекте по пути <br/>
                 <code className="text-blue-400 break-all bg-white/5 px-2 py-1 rounded mt-2 inline-block">
                   {kb?.project_path || 'Загрузка...'}
                 </code>. 
                 <br/><br/>
-                Задавайте любые вопросы по Unity, Blender или Photoshop на русском языке. Модули продвинутого ИИ для RTS и Turn-Based стратегий, генерации обложек ВК и проект 'Континент судьбы' (v17.18.9) активированы.
+                Задавайте любые вопросы по Unity, Blender или Photoshop на русском языке. Модули продвинутого ИИ для RTS и Turn-Based стратегий, генерации обложек ВК и проект 'Континент судьбы' (v17.18.16) активированы.
+                <br/><br/>
+                <span className="text-xs text-orange-400 font-bold uppercase">Внимание: ИИ обучен создавать интерфейсы через Canvas (UGUI) и полноценные 3D сцены.</span>
               </p>
 
               {/* Cards removed as per user request */}
