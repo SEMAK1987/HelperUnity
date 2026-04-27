@@ -1432,7 +1432,7 @@ async function startServer() {
 
   // Local AI Search (Offline 2.0 - Total Knowledge Mastery)
   app.post("/api/ai/local-search", async (req, res) => {
-    const { query } = req.body;
+    const { query, history = [] } = req.body;
     if (!query) return res.status(400).json({ error: "Query required" });
 
     try {
@@ -1440,20 +1440,30 @@ async function startServer() {
       const kb = await fs.readJson(kbPath);
       const videos = kb.youtube_videos || [];
       const q = query.toLowerCase();
+      const isNewDialog = history.length <= 1;
       
       let results = [];
       let isErrorQuery = q.includes('ошибка') || q.includes('404') || q.includes('error') || q.includes('не удалось вызвать api') || q.includes('failed to fetch');
 
       if (isErrorQuery) {
-        results.push(`### [РЕЖИМ ВОССТАНОВЛЕНИЯ: КРИТИЧЕСКАЯ ОШИБКА API / FAILED TO FETCH]
-**Проблема:** Ошибка 'Failed to fetch' или 404 обычно означает отсутствие интернета, блокировку API Gemini или неверный путь запроса.
-**Решение:**
-1. Вы автоматически переведены в режим **Eternal Offline Archive (v17.18.18)**.
-2. Я использую локальный индекс (9500+ видео) для ответов.
-3. Все функции (Blender, Unity, GIMP) работают в автономном режиме.`);
+        results.push(`### [ОФЛАЙН-РЕЖИМ АКТИВИРОВАН]
+Я автоматически переключился на **Локальный Поиск (v17.18.18)**. 
+Это происходит, если основной ИИ (Gemini) недоступен. Я использую базу из 9500+ видеоуроков для ответов.`);
       }
 
-      // Contextual help from guides (Resilience v17.18.9 - STEP BY STEP MASTERY)
+      // Contextual start for new dialogs
+      if (isNewDialog && (q.includes('привет') || q.includes('начать') || q.includes('помощь'))) {
+        results.push(`### 🛡️ НОВЫЙ ПРОЕКТ: С ЧЕГО НАЧНЕМ?
+Вы начали новый диалог. Я готов помочь вам с чистого листа:
+- Пошаговое **создание Меню** для RPG.
+- Настройка **TextMeshPro** и кириллицы.
+- Программирование **C# скриптов** и DOTS.
+- Моделирование в **Blender** (Geometry Nodes).
+
+Если вы хотите продолжить старый проект, я увижу это в истории выше (если чат не был очищен).`);
+      }
+
+      // Contextual help from guides
       if (q.includes('меню') || q.includes('menu') || q.includes('интерфейс') || q.includes('фон') || q.includes('начать')) {
         results.push(`### 🎨 ПОЛНОЕ РУКОВОДСТВО ПО СОЗДАНИЮ МЕНЮ: "КОНТИНЕНТ СУДЬБЫ" (ЧАСТЬ 1)
 **Шаг 1: Подготовка Сцены (Background & Environment)**
@@ -1582,9 +1592,12 @@ public class MenuButtonFX : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
       }
 
       if (results.length === 0) {
-        results.push(`[ОШИБКА СЕТИ - ЛОКАЛЬНЫЙ ПОИСК v17.18.18]
-Я анализирую ваш запрос по проекту 'Континент Судьбы'.
-Напишите **"Начать меню"** для пошаговой инструкции или **"Продолжить фон"**, если вы застряли на этапе генерации заднего плана.`);
+        results.push(`### ☁️ ЛОКАЛЬНЫЙ ПОИСК (v17.18.18)
+Я проанализировал ваш вопрос: "${query}".
+В автономной базе найдено несколько совпадений. Так как основной ИИ недоступен, я предлагаю:
+- Использовать **Ollama** для полноценного общения без интернета (запустите её на ПК).
+- Задать более конкретный вопрос по компонентам Unity или Blender.
+- Если вы хотите начать новый проект, нажмите **"Очистить чат"** слева.`);
       }
       
       const foundVideos = videos.filter((v: string) => v.toLowerCase().includes(q)).slice(0, 3);

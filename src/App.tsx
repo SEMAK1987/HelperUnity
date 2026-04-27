@@ -1033,7 +1033,7 @@ export default function App() {
               let code = "";
               if (liveOnline && ai) {
                 const response = await ai.models.generateContent({
-                  model: "gemini-3-flash-preview",
+                  model: "gemini-1.5-flash",
                   config: { systemInstruction: systemInstruction },
                   contents: [{ role: 'user', parts: [{ text: fullPrompt }] }]
                 });
@@ -1144,7 +1144,7 @@ export default function App() {
         parts.push({ text: `### MANUAL CODE REQUEST FOR ${manualTarget.toUpperCase()} ###\n${manualPrompt}` });
 
         const response = await ai.models.generateContent({
-          model: "gemini-3-flash-preview",
+          model: "gemini-1.5-flash",
           config: { systemInstruction: systemInstruction },
           contents: [{ role: 'user', parts }]
         });
@@ -1294,7 +1294,10 @@ export default function App() {
         const localRes = await fetch('/api/ai/local-search', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: text })
+          body: JSON.stringify({ 
+            query: text,
+            history: newMessages.slice(-5) // Send some history for context
+          })
         });
         const localData = await localRes.json();
         setMessages(prev => [...prev, {
@@ -1339,7 +1342,7 @@ export default function App() {
       }
 
       const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-1.5-flash",
         config: { 
           systemInstruction: kb.system_instruction + "\n\n### CRITICAL KNOWLEDGE UPDATE v17.18.18 ###\n- TOTAL KNOWLEDGE EXPANSION: Integrated logic from 9500+ video tutorials (Unity, Blender, Godot, GIMP).\n- OMNI-ANSWER ENGINE: Advanced problem solving directly in chat. Master-level expertise in Game Dev architectures.\n- INTUITIVE LOGIC: Understand user intent even from incomplete requests.\n- STRICT UI RULE: ALWAYS USE UGUI (Canvas). No Planes or Terrains for interfaces.\n- ETERNAL OFFLINE: Full local archive support for No-Internet development."
         },
@@ -1374,7 +1377,10 @@ export default function App() {
         const localRes = await fetch('/api/ai/local-search', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: text })
+          body: JSON.stringify({ 
+            query: text,
+            history: newMessages.slice(-5)
+          })
         });
         const localData = await localRes.json();
         setMessages(prev => [...prev, {
@@ -1414,7 +1420,7 @@ export default function App() {
           
           setVkProgress(10);
           const result = await ai.models.generateContent({
-            model: "gemini-3-flash-preview",
+            model: "gemini-1.5-flash",
             contents: {
               parts: [
                 { text: "Analyze this image carefully. Describe the scene structure (foreground, midground, background), lighting direction, and major colors. Start with 'STRUCTURE: ' and keep it technical for an AI generator to use as absolute spatial reference." },
