@@ -357,6 +357,15 @@ function VKImageCard({ res, type, showNotification, onZoom }: { res: any, type: 
 
 // --- Menu Studio Preview ---
 function MenuStudioPreview({ onDownload }: { onDownload: () => void }) {
+  const atmosphericParticles = React.useMemo(() => [...Array(5)].map((_, i) => ({
+    id: i,
+    initialX: Math.random() * 800,
+    initialY: Math.random() * 500,
+    targetX: Math.random() * 800,
+    targetY: Math.random() * 500,
+    duration: 10 + Math.random() * 10
+  })), []);
+  
   const [view, setView] = useState<'main' | 'settings'>('main');
   const [quality, setQuality] = useState('Ultra');
   const [resolution, setResolution] = useState('1920 x 1080');
@@ -638,17 +647,38 @@ function ArrowLeft({ className, ...props }: any) {
   );
 }
 
-export default function App() {
-  // Atmospheric FX Overlay
-  const atmosphericParticles = React.useMemo(() => [...Array(5)].map((_, i) => ({
+function AtmosphericOverlay() {
+  const atmosphericParticles = React.useMemo(() => [...Array(8)].map((_, i) => ({
     id: i,
-    initialX: Math.random() * 800,
-    initialY: Math.random() * 500,
-    targetX: Math.random() * 800,
-    targetY: Math.random() * 500,
-    duration: 10 + Math.random() * 10
+    initialX: Math.random() * 1200,
+    initialY: Math.random() * 800,
+    targetX: Math.random() * 1200,
+    targetY: Math.random() * 800,
+    duration: 15 + Math.random() * 15
   })), []);
 
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+      {atmosphericParticles.map((p) => (
+        <motion.div 
+          key={p.id}
+          animate={{ 
+            x: [p.initialX, p.targetX, p.initialX],
+            y: [p.initialY, p.targetY, p.initialY],
+            opacity: [0, 0.15, 0],
+            scale: [1, 2, 1]
+          }}
+          transition={{ duration: p.duration, repeat: Infinity, ease: "linear" }}
+          className="absolute w-96 h-96 bg-blue-500/5 rounded-full blur-[120px]"
+        />
+      ))}
+    </div>
+  );
+}
+
+const MemoizedAtmosphericOverlay = React.memo(AtmosphericOverlay);
+
+export default function App() {
   async function fetchWithRetry(url: string, retries = 5, delay = 1000) {
     for (let i = 0; i < retries; i++) {
       try {
@@ -916,16 +946,12 @@ export default function App() {
       .then(data => setBlenderPresets(data));
 
     const statusInterval = setInterval(() => {
-      const liveOnline = navigator.onLine;
-      if (liveOnline !== isOnline) setIsOnline(liveOnline);
-
+      // Local API calls are safe even if offline from internet
       const fetchStatus = (url: string, setter: Function) => {
-        // Local API calls are safe even if offline from internet, 
-        // they only fail if the local server crashes.
         fetch(url)
           .then(res => res.ok ? res.json() : null)
           .then(data => data && setter(data))
-          .catch(() => {}); // Silent fail
+          .catch(() => {});
       };
 
       fetchStatus('/api/unity/status', setUnityStatus);
@@ -944,7 +970,7 @@ export default function App() {
         .then(data => setHistory(data))
         .catch(() => {});
       
-      if (liveOnline) {
+      if (navigator.onLine) {
         fetch('/api/ai/capabilities')
           .then(res => res.ok ? res.json() : null)
           .then(data => {
@@ -955,7 +981,7 @@ export default function App() {
           })
           .catch(() => {});
       }
-    }, 10000); // 10s interval for better performance and less noise
+    }, 10000);
 
     return () => {
       window.removeEventListener('online', handleOnline);
@@ -964,10 +990,18 @@ export default function App() {
     };
   }, []);
 
+  const messagesRef = useRef<Message[]>([]);
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
+
   useEffect(() => {
     const processTasks = async () => {
-      // If no internet and no local AI, we can't process complex tasks
-      if (!isOnline && !ollamaRunning) return;
+      // Get latest state values safely
+      const liveOnline = navigator.onLine;
+      if (liveOnline !== isOnline) setIsOnline(liveOnline);
+
+      if (!liveOnline && !ollamaRunning) return;
       
       try {
         const res = await fetch('/api/ai/tasks');
@@ -975,7 +1009,7 @@ export default function App() {
         
         if (tasks && tasks.length > 0) {
           for (const task of tasks) {
-            console.log(`[AI TASK] Processing ${task.id}: ${task.prompt} (Mode: ${isOnline ? 'Online' : 'Ollama'})`);
+            console.log(`[AI TASK] Processing ${task.id}: ${task.prompt} (Mode: ${liveOnline ? 'Online' : 'Ollama'})`);
             
             try {
               let systemInstruction = kb?.system_instruction || "You are a helpful assistant.";
@@ -987,7 +1021,7 @@ export default function App() {
               }
 
               let fullPrompt = "";
-              const recentHistory = messages.slice(-5).map(m => `${m.role.toUpperCase()}: ${m.content}`).join("\n");
+              const recentHistory = messagesRef.current.slice(-5).map(m => `${m.role.toUpperCase()}: ${m.content}`).join("\n");
               if (recentHistory) {
                 fullPrompt += `### NEURAL MEMORY (RECENT CHAT CONTEXT) ###\n${recentHistory}\n\n`;
               }
@@ -997,7 +1031,7 @@ export default function App() {
               }
 
               let code = "";
-              if (isOnline && ai) {
+              if (liveOnline && ai) {
                 const response = await ai.models.generateContent({
                   model: "gemini-3-flash-preview",
                   config: { systemInstruction: systemInstruction },
@@ -1005,7 +1039,6 @@ export default function App() {
                 });
                 code = response.text;
               } else if (ollamaRunning) {
-                // Use Ollama for offline automation!
                 const ollamaRes = await fetch('/api/ai/ollama-chat', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
@@ -1017,7 +1050,6 @@ export default function App() {
               
               if (!code) throw new Error("Empty AI response");
 
-              // Clean code from potential markdown blocks
               code = code.replace(/```python\n?/g, '').replace(/```\n?/g, '').replace(/```csharp\n?/g, '').replace(/```cs\n?/g, '');
               
               await fetch('/api/ai/complete', {
@@ -1038,13 +1070,13 @@ export default function App() {
           }
         }
       } catch (e) {
-        // Silent error for task polling
+        // Silent fail
       }
     };
 
     const interval = setInterval(processTasks, 4000);
     return () => clearInterval(interval);
-  }, [kb, ai, isOnline, ollamaRunning, messages]);
+  }, [kb, ai, ollamaRunning]); // Removed isOnline and messages from dependencies to avoid loop restarts
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -1088,29 +1120,48 @@ export default function App() {
         systemInstruction += "\nIMPORTANT: GENERATE ONLY PURE C# CODE FOR UNITY 6. NO MARKDOWN, NO EXPLANATIONS. START CODE DIRECTLY. Use standard Unity namespaces.\nCRITICAL UI RULE: ALWAYS USE UGUI (CANVAS SYSTEM). DO NOT USE PLANES OR TERRAINS FOR UI. Hierarchy: Canvas -> Panel -> Image/TMP -> Button. Use Scale With Screen Size (1920x1080).";
       }
 
-      const parts: any[] = [];
+      let code = "";
       const recentHistory = messages.slice(-5).map(m => `${m.role.toUpperCase()}: ${m.content}`).join("\n");
+      let fullPrompt = "";
       if (recentHistory) {
-        parts.push({ text: `### NEURAL MEMORY (RECENT CHAT CONTEXT) ###\n${recentHistory}\n\n` });
+        fullPrompt += `### NEURAL MEMORY (RECENT CHAT CONTEXT) ###\n${recentHistory}\n\n`;
       }
+      fullPrompt += `### MANUAL CODE REQUEST FOR ${manualTarget.toUpperCase()} ###\n${manualPrompt}`;
 
-      if (attachedFiles.length > 0) {
-        for (const file of attachedFiles) {
-          if (file.type && file.type.startsWith('image/')) {
-            const data = await fileToBase64(file.url);
-            parts.push({ inlineData: { data, mimeType: file.type } });
+      if (isOnline && ai) {
+        const parts: any[] = [];
+        if (recentHistory) parts.push({ text: `### NEURAL MEMORY (RECENT CHAT CONTEXT) ###\n${recentHistory}\n\n` });
+
+        if (attachedFiles.length > 0) {
+          for (const file of attachedFiles) {
+            if (file.type && file.type.startsWith('image/')) {
+              const data = await fileToBase64(file.url);
+              parts.push({ inlineData: { data, mimeType: file.type } });
+            }
           }
         }
+
+        parts.push({ text: `### MANUAL CODE REQUEST FOR ${manualTarget.toUpperCase()} ###\n${manualPrompt}` });
+
+        const response = await ai.models.generateContent({
+          model: "gemini-3-flash-preview",
+          config: { systemInstruction: systemInstruction },
+          contents: [{ role: 'user', parts }]
+        });
+        code = response.text;
+      } else if (ollamaRunning) {
+        const ollamaRes = await fetch('/api/ai/ollama-chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: fullPrompt, systemInstruction })
+        });
+        const ollamaData = await ollamaRes.json();
+        code = ollamaData.answer;
+      } else {
+        throw new Error("Нет доступа к ИИ (Офлайн и Ollama не активна)");
       }
 
-      parts.push({ text: `### MANUAL CODE REQUEST FOR ${manualTarget.toUpperCase()} ###\n${manualPrompt}` });
-
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        config: { systemInstruction: systemInstruction },
-        contents: [{ role: 'user', parts }]
-      });
-      let code = response.text;
+      if (!code) throw new Error("Empty AI response");
       code = code.replace(/```python\n?/g, '').replace(/```\n?/g, '').replace(/```csharp\n?/g, '').replace(/```cs\n?/g, '');
       setManualResultCode(code.trim());
       setAttachedFiles([]);
@@ -1354,7 +1405,7 @@ export default function App() {
       let finalPrompt = vkPrompt;
       
       // Phase 1: Gemini Image Analysis (Vision Synthesis)
-      if (sourceImage) {
+      if (sourceImage && isOnline) {
         setVkStatus('Анализ композиции и освещения (Vision)...');
         setVkProgress(5);
         try {
@@ -1382,6 +1433,9 @@ export default function App() {
           setVkStatus('Сбой Vision, использую базовую логику...');
           setVkProgress(15);
         }
+      } else if (sourceImage && !isOnline) {
+        setVkStatus('Офлайн режим: Анализ Vision пропущен...');
+        setVkProgress(15);
       }
 
       setVkStatus('Запуск параллельного синтеза (Burst Mode)...');
@@ -1688,7 +1742,8 @@ export default function App() {
   }
 
   return (
-    <div className="h-screen bg-[#0a0a0c] text-slate-300 font-sans flex overflow-hidden">
+    <div className="h-screen bg-[#0a0a0c] text-slate-300 font-sans flex overflow-hidden relative">
+      <MemoizedAtmosphericOverlay />
       
       {/* Sidebar for Stats and Status */}
       <aside className="w-64 border-r border-white/5 bg-black/40 flex flex-col z-50 overflow-y-auto scrollbar-none">
