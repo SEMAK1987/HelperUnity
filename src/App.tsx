@@ -599,17 +599,17 @@ function MenuStudioPreview({ onDownload }: { onDownload: () => void }) {
 
       {/* Atmospheric FX Overlay */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[...Array(5)].map((_, i) => (
+        {atmosphericParticles.map((p) => (
           <motion.div 
-            key={i}
+            key={p.id}
             animate={{ 
-              x: [Math.random() * 800, Math.random() * 800],
-              y: [Math.random() * 500, Math.random() * 500],
-              opacity: [0, 0.3, 0],
-              scale: [1, 2, 1]
+              x: [p.initialX, p.targetX, p.initialX],
+              y: [p.initialY, p.targetY, p.initialY],
+              opacity: [0, 0.2, 0],
+              scale: [1, 1.5, 1]
             }}
-            transition={{ duration: 10 + Math.random() * 10, repeat: Infinity, ease: "linear" }}
-            className="absolute w-64 h-64 bg-blue-500/10 rounded-full blur-[100px]"
+            transition={{ duration: p.duration, repeat: Infinity, ease: "linear" }}
+            className="absolute w-64 h-64 bg-blue-500/5 rounded-full blur-[100px]"
           />
         ))}
       </div>
@@ -639,6 +639,16 @@ function ArrowLeft({ className, ...props }: any) {
 }
 
 export default function App() {
+  // Atmospheric FX Overlay
+  const atmosphericParticles = React.useMemo(() => [...Array(5)].map((_, i) => ({
+    id: i,
+    initialX: Math.random() * 800,
+    initialY: Math.random() * 500,
+    targetX: Math.random() * 800,
+    targetY: Math.random() * 500,
+    duration: 10 + Math.random() * 10
+  })), []);
+
   async function fetchWithRetry(url: string, retries = 5, delay = 1000) {
     for (let i = 0; i < retries; i++) {
       try {
@@ -906,46 +916,46 @@ export default function App() {
       .then(data => setBlenderPresets(data));
 
     const statusInterval = setInterval(() => {
-      fetch('/api/unity/status')
-        .then(res => res.json())
-        .then(status => setUnityStatus(status));
-      
-      fetch('/api/blender/status')
-        .then(res => res.json())
-        .then(status => setBlenderStatus(status));
+      const liveOnline = navigator.onLine;
+      if (liveOnline !== isOnline) setIsOnline(liveOnline);
 
-      fetch('/api/gimp/status')
-        .then(res => res.json())
-        .then(status => setGimpStatus(status));
+      const fetchStatus = (url: string, setter: Function) => {
+        // Local API calls are safe even if offline from internet, 
+        // they only fail if the local server crashes.
+        fetch(url)
+          .then(res => res.ok ? res.json() : null)
+          .then(data => data && setter(data))
+          .catch(() => {}); // Silent fail
+      };
 
-      fetch('/api/redot/status')
-        .then(res => res.json())
-        .then(status => setRedotStatus(status));
-
-      fetch('/api/photoshop/status')
-        .then(res => res.json())
-        .then(status => setPhotoshopStatus(status));
+      fetchStatus('/api/unity/status', setUnityStatus);
+      fetchStatus('/api/blender/status', setBlenderStatus);
+      fetchStatus('/api/gimp/status', setGimpStatus);
+      fetchStatus('/api/redot/status', setRedotStatus);
+      fetchStatus('/api/photoshop/status', setPhotoshopStatus);
       
       fetch('/api/ai/ollama-status')
-        .then(res => res.json())
-        .then(data => setOllamaRunning(data.isRunning));
+        .then(res => res.ok ? res.json() : { isRunning: false })
+        .then(data => setOllamaRunning(data.isRunning))
+        .catch(() => setOllamaRunning(false));
 
       fetch('/api/project/history')
-        .then(res => res.json())
-        .then(data => setHistory(data));
+        .then(res => res.ok ? res.json() : [])
+        .then(data => setHistory(data))
+        .catch(() => {});
       
-      fetch('/api/project/scan')
-        .then(res => res.json())
-        .then(data => data.success && setProjectScan(data.scan));
-
-      // Fetch Version
-      fetch('/api/ai/capabilities')
-        .then(res => res.json())
-        .then(data => {
-          const v = data.name.match(/v([\d.]+)/)?.[1] || '17.6.0';
-          setAppVersion(v);
-        });
-    }, 5000);
+      if (liveOnline) {
+        fetch('/api/ai/capabilities')
+          .then(res => res.ok ? res.json() : null)
+          .then(data => {
+            if (data) {
+              const v = data.name.match(/v([\d.]+)/)?.[1] || '17.18.18';
+              setAppVersion(v);
+            }
+          })
+          .catch(() => {});
+      }
+    }, 10000); // 10s interval for better performance and less noise
 
     return () => {
       window.removeEventListener('online', handleOnline);
@@ -956,7 +966,8 @@ export default function App() {
 
   useEffect(() => {
     const processTasks = async () => {
-      if (!isOnline || !ai) return;
+      // If no internet and no local AI, we can't process complex tasks
+      if (!isOnline && !ollamaRunning) return;
       
       try {
         const res = await fetch('/api/ai/tasks');
@@ -964,7 +975,7 @@ export default function App() {
         
         if (tasks && tasks.length > 0) {
           for (const task of tasks) {
-            console.log(`[AI TASK] Processing ${task.id}: ${task.prompt}`);
+            console.log(`[AI TASK] Processing ${task.id}: ${task.prompt} (Mode: ${isOnline ? 'Online' : 'Ollama'})`);
             
             try {
               let systemInstruction = kb?.system_instruction || "You are a helpful assistant.";
@@ -975,27 +986,37 @@ export default function App() {
                 systemInstruction += "\nIMPORTANT: GENERATE ONLY PURE C# CODE FOR UNITY 6. NO MARKDOWN, NO EXPLANATIONS. START CODE DIRECTLY. Use standard Unity namespaces.\nCRITICAL UI RULE: ALWAYS USE UGUI (CANVAS SYSTEM). DO NOT USE PLANES OR TERRAINS FOR UI. Hierarchy: Canvas -> Panel -> Image/TMP -> Button. Use Scale With Screen Size (1920x1080).";
               }
 
-              // Add context if available
               let fullPrompt = "";
-              
               const recentHistory = messages.slice(-5).map(m => `${m.role.toUpperCase()}: ${m.content}`).join("\n");
               if (recentHistory) {
                 fullPrompt += `### NEURAL MEMORY (RECENT CHAT CONTEXT) ###\n${recentHistory}\n\n`;
               }
-
               fullPrompt += `### TASK FOR ${task.target.toUpperCase()} ###\n${task.prompt}`;
-              
               if (task.context) {
                 fullPrompt += `\n\n### SOFTWARE CONTEXT ###\n${JSON.stringify(task.context)}`;
               }
 
-              const response = await ai.models.generateContent({
-                model: "gemini-3-flash-preview",
-                config: { systemInstruction: systemInstruction },
-                contents: [{ role: 'user', parts: [{ text: fullPrompt }] }]
-              });
-              let code = response.text;
+              let code = "";
+              if (isOnline && ai) {
+                const response = await ai.models.generateContent({
+                  model: "gemini-3-flash-preview",
+                  config: { systemInstruction: systemInstruction },
+                  contents: [{ role: 'user', parts: [{ text: fullPrompt }] }]
+                });
+                code = response.text;
+              } else if (ollamaRunning) {
+                // Use Ollama for offline automation!
+                const ollamaRes = await fetch('/api/ai/ollama-chat', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ prompt: fullPrompt, systemInstruction })
+                });
+                const ollamaData = await ollamaRes.json();
+                code = ollamaData.answer;
+              }
               
+              if (!code) throw new Error("Empty AI response");
+
               // Clean code from potential markdown blocks
               code = code.replace(/```python\n?/g, '').replace(/```\n?/g, '').replace(/```csharp\n?/g, '').replace(/```cs\n?/g, '');
               
@@ -1021,9 +1042,9 @@ export default function App() {
       }
     };
 
-    const interval = setInterval(processTasks, 3000);
+    const interval = setInterval(processTasks, 4000);
     return () => clearInterval(interval);
-  }, [kb, ai, isOnline]);
+  }, [kb, ai, isOnline, ollamaRunning, messages]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -1466,10 +1487,14 @@ export default function App() {
   const fetchCapabilities = async () => {
     try {
       const data = await fetchWithRetry('/api/ai/capabilities');
-      setCapabilities(data);
-      setShowCapabilities(true);
+      if (data) {
+        setCapabilities(data);
+        setShowCapabilities(true);
+      }
     } catch (error) {
-      showNotification("Не удалось загрузить информацию о возможностях.", "error");
+      if (navigator.onLine) {
+        showNotification("Не удалось загрузить информацию о возможностях.", "error");
+      }
     }
   };
 

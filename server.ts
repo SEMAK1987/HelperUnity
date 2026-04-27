@@ -602,7 +602,7 @@ async function generateMasterBlueprint() {
 
     md += `## 11. История изменений (v17.18.18)\n`;
     md += `- **v17.18.18:** Total Knowledge Expansion (9500+ Video Index). Интеграция 100+ новых обучающих видео. Расширен раздел 'О ВОЗМОЖНОСТЯХ ИИ' для Unity, Blender, Godot, GIMP. Улучшен Omni-Answer Engine для ответов на базе свежих мастер-классов. Оптимизирован режим Eternal Offline Archive.\n`;
-    md += `- **v17.18.17:** Intuitive Neural Context & Omni-Answer Engine. Внедрена система понимания запросов 'с полуслова'. Расширена логика ответов не только через Quantum Link, но и через прямой контекстный анализ чата. Оптимизирован режим Eternal Offline Archive.\n`;
+    md += `- **v17.18.17:** Intuitive Neural Context & Omni-Answer Engine. Внедрена система понимания запросов 'с полуслова'. Расширена логика ответов не только через Quantum Link, но и через прямой контекстный анализ чата.\n`;
     md += `- **v17.18.16:** Scene Creation Mastery & Strict UI Logic. Глубокое внедрение UGUI (Canvas) в логику ИИ. Улучшено создание полноценных 3D-сцен, квестов, баффов и масштабных миров (континенты). Очистка проекта от устаревших скриптов.\n`;
     md += `- **v17.18.15:** Quantum Sync & Multi-Project Mastery. Интегрировано 15,000+ видео-уроков (Blender, Unity, Godot, GIMP, Photoshop). Добавлена логика 'Продолжить' для длинных ответов. Улучшена синхронизация между всеми открытыми помощниками. Оптимизирован режим Offline/No-Internet.\n`;
     md += `- **v17.18.14:** Unity UI Mastery & Server Optimization. Внедрена строгая логика создания игровых интерфейсов (Canvas Only). Запрещено использование Plane/Terrain для меню. Исправлены настройки сервера для порта 3000. Оптимизирован Burst-режим.\n`;

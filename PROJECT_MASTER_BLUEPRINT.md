@@ -7,10 +7,10 @@
 - **Описание:** Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок, мастерство Unity Canvas UI и 9,500+ видео уроков.
 - **Путь проекта:** /app/applet
 - **Локальное хранилище:** Не задано
-- **Версия Unity:** 6000.3
-- **Версия Blender:** 5.2
-- **Версия GIMP:** 3.0
-- **Версия Redot:** 4.4
+- **Версия Unity:** unknown
+- **Версия Blender:** unknown
+- **Версия GIMP:** unknown
+- **Версия Redot:** unknown
 - **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V17_18_18_TOTAL_STABLE]
 
 ## 2. Структура интерфейса
@@ -26,7 +26,7 @@
 - **Top Bar**: Панель управления и статуса
 - **Right Sidebar**: Логи и статус Unity/Blender/GIMP/Redot
 
-## 3. Иерархия ИИ-Агентов (9500+ агентов)
+## 3. Иерархия ИИ-Агентов (52 агентов)
 - **Core AI Agent:** Центральный мозг системы.
 - **Unity Expert Agent:** Специалист по C#, DOTS и Unity 6.
 - **Blender Master Agent:** Эксперт по Geometry Nodes и рендерингу.
