@@ -1,6 +1,6 @@
-// [FATE MANIFESTATION MODULE v17.18.16]
+// [FATE MANIFESTATION MODULE v17.18.18]
 // Unity Connector for Quantum AI Assistant
-// Updated: 2026-04-27 (Scene Creation Mastery & Strict UI Logic)
+// Updated: 2026-04-27 (Total Knowledge Expansion & Omni-Answer)
 
 using UnityEngine;
 using UnityEditor;
@@ -28,7 +28,7 @@ namespace AI_Assistant_Quantum
 
         private void OnGUI()
         {
-            GUILayout.Label("v17.18.16 - Scene Creation Mastery (Advanced Scenes Active)", EditorStyles.boldLabel);
+            GUILayout.Label("v17.18.18 - Total Knowledge Mastery (Neural Link Active)", EditorStyles.boldLabel);
             
             serverUrl = EditorGUILayout.TextField("Server URL", serverUrl);
             mode = (Mode)EditorGUILayout.EnumPopup("Mode", mode);
