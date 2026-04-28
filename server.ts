@@ -11,7 +11,7 @@ import AdmZip from "adm-zip";
 import { exec } from "child_process";
 import { promisify } from "util";
 import net from "net";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
 const execAsync = promisify(exec);
 
@@ -1436,44 +1436,37 @@ async function startServer() {
     const { contents, systemInstruction, model = "gemini-1.5-flash" } = req.body;
     
     if (!process.env.GEMINI_API_KEY) {
-      return res.status(500).json({ error: "GEMINI_API_KEY not configured on server." });
+      return res.status(500).json({ error: "GEMINI_API_KEY not configured on server. Please set it in AI Studio settings." });
     }
 
     try {
-      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-      const geminiModel = genAI.getGenerativeModel({ 
-        model: model,
-        systemInstruction: systemInstruction
-      });
-
-      // Format history for @google/generative-ai
-      // It expects [{ role: 'user' | 'model', parts: [{ text: '...' }] }]
-      // But it might also need images.
+      const apiKey = process.env.GEMINI_API_KEY;
+      const ai = new GoogleGenAI({ apiKey });
       
-      const chatHistory = contents.slice(0, -1).map((c: any) => ({
-        role: c.role === 'assistant' || c.role === 'model' ? 'model' : 'user',
-        parts: c.parts.map((p: any) => {
-           if (p.text) return { text: p.text };
-           if (p.inlineData) return { inlineData: p.inlineData };
-           return p;
-        })
-      }));
+      // Try gemini-1.5-flash primarily, then-latest and flash-8b as fallbacks
+      const tryModels = [model, "gemini-1.5-flash", "gemini-1.5-flash-latest"];
+      let lastError = null;
 
-      const lastMessage = contents[contents.length - 1];
-      const chat = geminiModel.startChat({
-        history: chatHistory,
-      });
-
-      const response = await chat.sendMessage(lastMessage.parts.map((p: any) => {
-          if (p.text) return { text: p.text };
-          if (p.inlineData) return { inlineData: p.inlineData };
-          return p;
-      }));
+      for (const m of tryModels) {
+        try {
+          console.log(`Server attempting Gemini call with model: ${m}`);
+          const response = await ai.models.generateContent({
+            model: m,
+            config: { systemInstruction: systemInstruction },
+            contents: contents
+          });
+          return res.json({ text: response.text });
+        } catch (e: any) {
+          console.warn(`Server Gemini Model ${m} failed:`, e.message);
+          lastError = e;
+          // If quota exceeded or unauthenticated, don't keep trying models
+          if (e.message?.includes('429') || e.message?.includes('Quota') || e.message?.includes('401') || e.message?.includes('key')) break;
+        }
+      }
       
-      const text = response.response.text();
-      res.json({ text });
+      throw lastError || new Error("All Gemini models failed on server.");
     } catch (error: any) {
-      console.error("Server Gemini Error:", error);
+      console.error("Final Server Gemini Error:", error);
       res.status(500).json({ error: error.message || "Internal Gemini Error" });
     }
   });

@@ -76,6 +76,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { GoogleGenAI } from "@google/genai";
 import Markdown from 'react-markdown';
 
 // --- Types ---
@@ -882,7 +883,44 @@ export default function App() {
     }
   };
 
-  // Gemini initialization removed - using server-side proxy
+  // Initialize Gemini
+  const ai = React.useMemo(() => {
+    try {
+      // Robustly check for API key in different environments
+      let apiKey = "";
+      try {
+        if (typeof (import.meta as any).env !== 'undefined') {
+          apiKey = (import.meta as any).env.VITE_GEMINI_API_KEY || "";
+        }
+      } catch (e) {}
+      
+      if (!apiKey) {
+        try {
+          if (typeof process !== 'undefined' && process.env) {
+            apiKey = (process.env as any).GEMINI_API_KEY || "";
+          }
+        } catch (e) {}
+      }
+
+      if (!apiKey) return null;
+      return new GoogleGenAI({ apiKey });
+    } catch (e) {
+      console.warn("Local Gemini init failed:", e);
+      return null;
+    }
+  }, []);
+
+  // Monitor online status
+  React.useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   useEffect(() => {
     if (input.length > 0 && input.length < 15) {
@@ -1031,21 +1069,32 @@ export default function App() {
               let code = "";
               if (liveOnline && isOnline) {
                 try {
-                  const response = await fetch('/api/ai/gemini-chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      contents: [{ role: 'user', parts: [{ text: fullPrompt }] }],
-                      systemInstruction: systemInstruction,
-                      model: "gemini-1.5-flash"
-                    })
+                  const response = await ai.models.generateContent({
+                    model: "gemini-1.5-flash",
+                    config: { systemInstruction: systemInstruction },
+                    contents: [{ role: 'user', parts: [{ text: fullPrompt }] }]
                   });
-                  const data = await response.json();
-                  if (!response.ok) throw new Error(data.error || "Gemini Server Error");
-                  code = data.text;
+                  code = response.text;
                 } catch (err) {
-                  console.error("Assistant Code Gen Error:", err);
-                  throw err;
+                  console.error("Assistant Code Gen Error (Frontend):", err);
+                  // Fallback to server proxy if frontend fails
+                  try {
+                    const response = await fetch('/api/ai/gemini-chat', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        contents: [{ role: 'user', parts: [{ text: fullPrompt }] }],
+                        systemInstruction: systemInstruction,
+                        model: "gemini-1.5-flash"
+                      })
+                    });
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.error || "Gemini Server Error");
+                    code = data.text;
+                  } catch (serverErr) {
+                    console.error("Assistant Code Gen Error (Server):", serverErr);
+                    throw err;
+                  }
                 }
               } else if (ollamaRunning) {
                 const ollamaRes = await fetch('/api/ai/ollama-chat', {
@@ -1151,23 +1200,33 @@ export default function App() {
         }
 
         parts.push({ text: `### MANUAL CODE REQUEST FOR ${manualTarget.toUpperCase()} ###\n${manualPrompt}` });
-
+        
         try {
-          const response = await fetch('/api/ai/gemini-chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ role: 'user', parts }],
-              systemInstruction: systemInstruction,
-              model: "gemini-1.5-flash"
-            })
+          const response = await ai.models.generateContent({
+            model: "gemini-1.5-flash",
+            config: { systemInstruction: systemInstruction },
+            contents: [{ role: 'user', parts }]
           });
-          const data = await response.json();
-          if (!response.ok) throw new Error(data.error || "Gemini Server Error");
-          code = data.text;
+          code = response.text;
         } catch (err) {
-          console.error("Manual Code Gen Error:", err);
-          throw err;
+          console.error("Manual Code Gen Error (Frontend):", err);
+          try {
+            const response = await fetch('/api/ai/gemini-chat', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ role: 'user', parts }],
+                systemInstruction: systemInstruction,
+                model: "gemini-1.5-flash"
+              })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || "Gemini Server Error");
+            code = data.text;
+          } catch (serverErr) {
+            console.error("Manual Code Gen Error (Server):", serverErr);
+            throw err;
+          }
         }
       } else if (ollamaRunning) {
         const ollamaRes = await fetch('/api/ai/ollama-chat', {
@@ -1288,6 +1347,7 @@ export default function App() {
     setIsTyping(true);
 
     try {
+      if (!navigator.onLine) throw new Error("Offline");
       // Offline Fallback Check (Only if we really want to skip Gemini entirely)
       // Removed automatic skip - we will try Gemini first and only fallback in the catch block
 
@@ -1324,18 +1384,37 @@ export default function App() {
         });
       }
 
-      const response = await fetch('/api/ai/gemini-chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: contents.map((c, i) => i === contents.length - 1 && isContinue ? { ...c, parts: [{ text: promptText }] } : c),
-          systemInstruction: kb.system_instruction + "\n\n### CRITICAL KNOWLEDGE UPDATE v17.18.18 ###\n- TOTAL KNOWLEDGE EXPANSION: Integrated logic from 9500+ video tutorials (Unity, Blender, Godot, GIMP).\n- OMNI-ANSWER ENGINE: Advanced problem solving directly in chat. Master-level expertise in Game Dev architectures.\n- INTUITIVE LOGIC: Understand user intent even from incomplete requests.\n- STRICT UI RULE: ALWAYS USE UGUI (Canvas). No Planes or Terrains for interfaces.\n- ETERNAL OFFLINE: Full local archive support for No-Internet development.",
-          model: "gemini-1.5-flash"
-        })
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Gemini Server Error");
-      const textResponse = data.text;
+      let textResponse = "";
+      const systemInst = kb.system_instruction + "\n\n### CRITICAL KNOWLEDGE UPDATE v17.18.18 ###\n- TOTAL KNOWLEDGE EXPANSION: Integrated logic from 9500+ video tutorials (Unity, Blender, Godot, GIMP).\n- OMNI-ANSWER ENGINE: Advanced problem solving directly in chat. Master-level expertise in Game Dev architectures.\n- INTUITIVE LOGIC: Understand user intent even from incomplete requests.\n- STRICT UI RULE: ALWAYS USE UGUI (Canvas). No Planes or Terrains for interfaces.\n- ETERNAL OFFLINE: Full local archive support for No-Internet development.";
+
+      try {
+        if (!ai) throw new Error("AI not ready");
+        const response = await ai.models.generateContent({
+          model: "gemini-1.5-flash",
+          config: { systemInstruction: systemInst },
+          contents: contents.map((c, i) => i === contents.length - 1 && isContinue ? { ...c, parts: [{ text: promptText }] } : c)
+        });
+        textResponse = response.text;
+      } catch (err) {
+        console.error("Chat Error (Frontend):", err);
+        try {
+          const response = await fetch('/api/ai/gemini-chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: contents.map((c, i) => i === contents.length - 1 && isContinue ? { ...c, parts: [{ text: promptText }] } : c),
+              systemInstruction: systemInst,
+              model: "gemini-1.5-flash"
+            })
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || "Gemini Server Error");
+          textResponse = data.text;
+        } catch (serverErr) {
+          console.error("Chat Error (Server):", serverErr);
+          throw new Error("AI Failed");
+        }
+      }
 
       // Check for audio requests to generate variants
       const audioKeywords = ['музыка', 'песня', 'звук', 'мелодия', 'mp3', 'music', 'song', 'audio'];
@@ -1427,23 +1506,46 @@ export default function App() {
           const mimeType = sourceImage.split(',')[0].split(':')[1].split(';')[0];
           
           setVkProgress(10);
-          const response = await fetch('/api/ai/gemini-chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
+          let description = "";
+          const visionPrompt = "Analyze this image carefully. Describe the scene structure (foreground, midground, background), lighting direction, and major colors. Start with 'STRUCTURE: ' and keep it technical for an AI generator to use as absolute spatial reference.";
+          
+          try {
+            const result = await ai.models.generateContent({
+              model: "gemini-1.5-flash",
               contents: [{
                 role: 'user',
                 parts: [
-                  { text: "Analyze this image carefully. Describe the scene structure (foreground, midground, background), lighting direction, and major colors. Start with 'STRUCTURE: ' and keep it technical for an AI generator to use as absolute spatial reference." },
+                  { text: visionPrompt },
                   { inlineData: { data: imageData, mimeType } }
                 ]
-              }],
-              model: "gemini-1.5-flash"
-            })
-          });
-          const data = await response.json();
-          if (!response.ok) throw new Error(data.error || "Vision Server Error");
-          const description = data.text;
+              }]
+            });
+            description = result.text;
+          } catch (err) {
+            console.error("Vision Error (Frontend):", err);
+            try {
+              const response = await fetch('/api/ai/gemini-chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  contents: [{
+                    role: 'user',
+                    parts: [
+                      { text: visionPrompt },
+                      { inlineData: { data: imageData, mimeType } }
+                    ]
+                  }],
+                  model: "gemini-1.5-flash"
+                })
+              });
+              const data = await response.json();
+              if (!response.ok) throw new Error(data.error || "Vision Server Error");
+              description = data.text;
+            } catch (serverErr) {
+              console.error("Vision Error (Server):", serverErr);
+              throw err;
+            }
+          }
           setVkProgress(15);
           
           // Ultra-Coherent Prompt Strategy
