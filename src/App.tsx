@@ -1470,8 +1470,26 @@ export default function App() {
     } catch (error: any) {
       console.error("Gemini Error:", error);
       const errorText = error.toString();
-      const isKeyError = errorText.includes('ключ') || errorText.includes('API_KEY_INVALID') || errorText.includes('key');
+      const isKeyError = errorText.includes('ключ') || errorText.includes('API_KEY_INVALID') || errorText.includes('key') || errorText.includes('401');
       
+      if (isKeyError) {
+         setMessages(prev => [...prev, {
+           role: 'assistant',
+           content: `### ❌ ОШИБКА КОНФИГУРАЦИИ API
+Ваш ключ Gemini определен как недействительный. 
+
+**Как исправить:**
+1. Нажмите на ⚙️ **Настройки** слева.
+2. Откройте вкладку **Секреты**.
+3. Найдите \`GEMINI_API_KEY\`.
+4. Убедитесь, что там вставлен **код** (например: \`AIzaSy... \`), а не текст "Бесплатный уровень".
+5. Нажмите **Применить изменения**.
+
+*Пока ключ не исправлен, я буду отвечать из локального архива знаний.*`,
+           timestamp: Date.now()
+         }]);
+      }
+
       // Fallback Strategy: Ollama -> Local Search
       try {
         if (ollamaRunning) {

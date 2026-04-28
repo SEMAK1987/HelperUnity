@@ -1436,9 +1436,12 @@ async function startServer() {
   app.post("/api/ai/gemini-chat", async (req, res) => {
     const { contents, systemInstruction, model = "gemini-1.5-flash" } = req.body;
     
-    if (!process.env.GEMINI_API_KEY) {
-      console.error("CRITICAL: GEMINI_API_KEY is missing in process.env");
-      return res.status(401).json({ error: "Ключ API Gemini не найден. Пожалуйста, установите GEMINI_API_KEY в настройках (Settings)." });
+    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY.length < 10 || process.env.GEMINI_API_KEY.includes(' ')) {
+      console.error("CRITICAL: GEMINI_API_KEY is missing or looks like a placeholder.");
+      return res.status(401).json({ 
+        error: "Ключ API не настроен или введен неверно.",
+        details: "В поле GEMINI_API_KEY должен быть секретный код (начинается на AIza...), а не описание уровня доступа. Пожалуйста, проверьте вкладку 'Секреты' в Настройках."
+      });
     }
 
     try {
