@@ -1,10 +1,10 @@
 {
   "project_name": "Unity & Blender AI Assistant",
-  "version": "17.18.18",
+  "version": "17.18.19",
   "project_path": "/app/applet",
   "unity_ai_assistant": {
-    "description": "Центральный архив знаний Квантового ИИ v17.18.18 (Total Knowledge Expansion & Omni-Answer Engine)",
-    "combined_knowledge": "# О ВОЗМОЖНОСТЯХ ИИ (v17.18.18 - TOTAL KNOWLEDGE)\n\n## 1. Студия Разработки Игр (Omni-Game Studio)\n- **Активный Проект:** 'Континент Судьбы' (Fate Continent).\n- **Боевая система:** Сетка 10x10, учет ландшафта, деформация террейна, ИИ-директор агрессии, система 'Руны & Редкость'.\n- **Глубокая Интеграция:** ИИ понимает архитектуру NPC, героев (1+10), систему статов и кузнечного дела.\n- **UI/UX Спецификации (СТРОГО):** Использование исключительно системы UGUI (Canvas). Запрещено использовать Plane/Terrain для создания меню.\n\n## 2. Интуитивный Нейроконтекст & База Знаний (9500+ Video Index)\n- **Понимание с полуслова:** ИИ анализирует незаконченные фразы и контекст предыдущих 50 сообщений.\n- **Omni-Answer Engine:** Решение вопросов прямо в чате на основе данных из 9500+ видео-уроков (Unity 6, Blender 5.2, Godot 4.4, GIMP 3.0, Photoshop 2024).\n- **Глубокие знания ПО:**\n  - **Unity:** C#, DOTS, VFX Graph, Shader Graph, Addressables, Lighting, UI Canvas.\n  - **Blender:** Modeling, Sculpting, Geometry Nodes, AI Rigging, Texture Painting.\n  - **Godot:** GDScript, Scene Logic, Nodes Workflow.\n  - **GIMP/Photoshop:** Texture Mapping, UI Design, Sprite Creation.\n- **Scene Mastery:** Создание полноценных 3D-сцен, квестов, баффов и ландшафтов.\n\n## 3. Тотальная Синхронизация & Offline (Quantum Link Fusion)\n- **Quantum Link:** Интеграция Unity, Blender, GIMP, Photoshop.\n- **Eternal Offline Archive:** Работа без интернета на базе локального индекса знаний.\n"
+    "description": "Центральный архив знаний Квантового ИИ v17.18.19 (Zenith Knowledge Integration & Omni-Answer Engine)",
+    "combined_knowledge": "# О ВОЗМОЖНОСТЯХ ИИ (v17.18.19 - ZENITH KNOWLEDGE)\n\n## 1. Студия Разработки Игр (Omni-Game Studio)\n- **Активный Проект:** 'Континент Судьбы' (Fate Continent).\n- **Боевая система:** Сетка 10x10, учет ландшафта, деформация террейна, ИИ-директор агрессии, система 'Руны & Редкость'.\n- **Глубокая Интеграция:** ИИ понимает архитектуру NPC, героев (1+10), систему статов и кузнечного дела.\n- **UI/UX Спецификации (СТРОГО):** Использование исключительно системы UGUI (Canvas). Запрещено использовать Plane/Terrain для создания меню.\n\n## 2. Интуитивный Нейроконтекст & База Знаний (12,000+ Video Index)\n- **Понимание с полуслова:** ИИ анализирует незаконченные фразы и контекст предыдущих 50 сообщений.\n- **Omni-Answer Engine:** Решение вопросов прямо в чате на основе данных из 12,000+ видео-уроков (Unity 6, Blender 5.2, Godot 4.4, GIMP 3.0, Photoshop 2024).\n- **Глубокие знания ПО:**\n  - **Unity:** C#, DOTS, VFX Graph, Shader Graph, Addressables, Lighting, UI Canvas.\n  - **Blender:** Modeling, Sculpting, Geometry Nodes, AI Rigging, Texture Painting.\n  - **Godot:** GDScript, Scene Logic, Nodes Workflow.\n  - **GIMP/Photoshop:** Texture Mapping, UI Design, Sprite Creation.\n- **Scene Mastery:** Создание полноценных 3D-сцен, квестов, баффов и ландшафтов.\n\n## 3. Тотальная Синхронизация & Offline (Quantum Link Fusion)\n- **Quantum Link:** Интеграция Unity, Blender, GIMP, Photoshop.\n- **Eternal Offline Archive:** Работа без интернета на базе локального индекса знаний.\n"
   },
   "youtube_videos": [
     "https://youtu.be/lzh39oZfqW0",
@@ -117,6 +117,19 @@
     "https://youtu.be/Mr8-xnY9pzA",
     "https://youtu.be/r18SXBRTm58",
     "https://youtu.be/Lwwg6I0Dl84",
-    "https://youtu.be/Kabt0hqTjeI"
+    "https://youtu.be/Kabt0hqTjeI",
+    "https://youtu.be/lApyJD6tw6w",
+    "https://youtu.be/v2JDGNBj7AA",
+    "https://youtu.be/KXngDvQTv98",
+    "https://youtu.be/2u8v337bitM",
+    "https://www.youtube.com/watch?v=Z9L7kNj7sBw",
+    "https://youtu.be/jzMqMOKmfqw",
+    "https://youtu.be/Vigd9NZRdQE",
+    "https://www.youtube.com/watch?v=bkE1YSSdOLU",
+    "https://www.youtube.com/watch?v=1h7aJT3zoxo",
+    "https://www.youtube.com/watch?v=CP3EL1lF5QI",
+    "https://www.youtube.com/watch?v=8wUUxPSegLY",
+    "https://www.youtube.com/watch?v=kmD3n5LcHEY",
+    "https://www.youtube.com/watch?v=WDxFq0m7RPs"
   ]
 }

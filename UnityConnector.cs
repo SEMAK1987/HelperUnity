@@ -1,4 +1,4 @@
-// [FATE MANIFESTATION MODULE v17.18.18]
+// [FATE MANIFESTATION MODULE v17.18.19]
 // Unity Connector for Quantum AI Assistant
 // Updated: 2026-04-27 (Total Knowledge Expansion & Omni-Answer)
 
@@ -28,7 +28,7 @@ namespace AI_Assistant_Quantum
 
         private void OnGUI()
         {
-            GUILayout.Label("v17.18.18 - Total Knowledge Mastery (Neural Link Active)", EditorStyles.boldLabel);
+            GUILayout.Label("v17.18.19 - Zenith Knowledge Integration (Neural Link Active)", EditorStyles.boldLabel);
             
             serverUrl = EditorGUILayout.TextField("Server URL", serverUrl);
             mode = (Mode)EditorGUILayout.EnumPopup("Mode", mode);

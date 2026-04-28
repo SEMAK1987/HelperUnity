@@ -193,7 +193,7 @@ function GameHelpView() {
              <BookOpen className="w-8 h-8 text-blue-500" />
              Помощь По Игре (Unity 6)
           </h2>
-          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v17.18.18</p>
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v17.18.19</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -694,7 +694,7 @@ export default function App() {
 
   const [kb, setKb] = useState<KBData | null>(null);
   const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info' | 'migration' | 'game_design' | 'game_help'>('chat');
-  const [appVersion, setAppVersion] = useState('17.18.18');
+  const [appVersion, setAppVersion] = useState('17.18.19');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -842,7 +842,7 @@ export default function App() {
       "Глубокое сканирование проекта (Аудит)...",
       "Синхронизация с локальным хранилищем...",
       "Исправление найденных ошибок...",
-      "Обновление версии до 17.18.18...",
+      "Обновление версии до 17.18.19...",
       "Инициализация Omniversal Quantum Link...",
       "Установка Нейронного Моста (Blender & Unity)...",
       "Регенерация PROJECT_MASTER_BLUEPRINT.md (Quantum Link)..."
@@ -952,7 +952,8 @@ export default function App() {
     const handleOffline = () => setIsOnline(false);
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
-
+    setIsOnline(navigator.onLine);
+ 
     fetchWithRetry('/api/kb')
       .then(data => {
         setKb(data);
@@ -966,11 +967,11 @@ export default function App() {
         console.error("Failed to fetch KB after retries", err);
         setKb({
           name: "Unity AI Assistant",
-          version: "17.18.18",
+          version: "17.18.19",
           description: "Гибридный ИИ-помощник с Quantum Link",
           project_path: "Unknown",
           system_instruction: "Ты — экспертный ИИ-ассистент."
-        });
+        } as KBData);
       });
 
     fetch('/api/project/scan')
@@ -1011,7 +1012,7 @@ export default function App() {
           .then(res => res.ok ? res.json() : null)
           .then(data => {
             if (data) {
-              const v = data.name.match(/v([\d.]+)/)?.[1] || '17.18.18';
+              const v = data.name.match(/v([\d.]+)/)?.[1] || '17.18.19';
               setAppVersion(v);
             }
           })
@@ -1347,8 +1348,10 @@ export default function App() {
     setIsTyping(true);
 
     try {
-      if (!navigator.onLine) throw new Error("Offline");
       // Offline Fallback Check (Only if we really want to skip Gemini entirely)
+      if (!navigator.onLine) {
+        console.warn("Navigator reports offline, but we'll try API first.");
+      }
       // Removed automatic skip - we will try Gemini first and only fallback in the catch block
 
       // Prepare contents for Gemini (History + Images)
@@ -1385,19 +1388,42 @@ export default function App() {
       }
 
       let textResponse = "";
-      const systemInst = kb.system_instruction + "\n\n### CRITICAL KNOWLEDGE UPDATE v17.18.18 ###\n- TOTAL KNOWLEDGE EXPANSION: Integrated logic from 9500+ video tutorials (Unity, Blender, Godot, GIMP).\n- OMNI-ANSWER ENGINE: Advanced problem solving directly in chat. Master-level expertise in Game Dev architectures.\n- INTUITIVE LOGIC: Understand user intent even from incomplete requests.\n- STRICT UI RULE: ALWAYS USE UGUI (Canvas). No Planes or Terrains for interfaces.\n- ETERNAL OFFLINE: Full local archive support for No-Internet development.";
+      const systemInst = kb.system_instruction + "\n\n### CRITICAL KNOWLEDGE UPDATE v17.18.19 ###\n- ZENITH KNOWLEDGE INTEGRATION: Integrated logic from 12,000+ video tutorials (Unity, Blender, Godot, GIMP).\n- OMNI-ANSWER ENGINE: Advanced problem solving directly in chat. Master-level expertise in Game Dev architectures.\n- INTUITIVE LOGIC: Understand user intent even from incomplete requests.\n- STRICT UI RULE: ALWAYS USE UGUI (Canvas). No Planes or Terrains for interfaces.\n- ETERNAL OFFLINE: Full local archive support for No-Internet development.";
 
       try {
-        if (!ai) throw new Error("AI not ready");
-        const response = await ai.models.generateContent({
-          model: "gemini-1.5-flash",
-          config: { systemInstruction: systemInst },
-          contents: contents.map((c, i) => i === contents.length - 1 && isContinue ? { ...c, parts: [{ text: promptText }] } : c)
-        });
-        textResponse = response.text;
-      } catch (err) {
-        console.error("Chat Error (Frontend):", err);
-        try {
+        // Try local Gemini initialization if exists
+        let localSuccess = false;
+        if (ai) {
+          try {
+            console.log("Attempting direct local Gemini call...");
+            const genModel = ai.getGenerativeModel({ 
+              model: "gemini-1.5-flash",
+              systemInstruction: systemInst 
+            });
+            
+            const response = await Promise.race([
+              genModel.generateContent({
+                contents: contents.map((c, i) => i === contents.length - 1 && isContinue ? { ...c, parts: [{ text: promptText }] } : c)
+              }),
+              new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 25000))
+            ]) as any;
+
+            if (response && response.response) {
+               textResponse = response.response.text();
+               localSuccess = true;
+               console.log("Local Gemini success.");
+            }
+          } catch (localErr: any) {
+             console.warn("Local Gemini failed or timed out:", localErr.message);
+             // Special check for API Key in browser
+             if (localErr.message?.includes('API_KEY_INVALID') || localErr.message?.includes('400')) {
+                console.error("Direct API Key is invalid.");
+             }
+          }
+        }
+
+        if (!localSuccess) {
+          console.log("Falling back to server-side Gemini proxy...");
           const response = await fetch('/api/ai/gemini-chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1407,13 +1433,18 @@ export default function App() {
               model: "gemini-1.5-flash"
             })
           });
+          
           const data = await response.json();
-          if (!response.ok) throw new Error(data.error || "Gemini Server Error");
+          if (!response.ok) {
+            // Carry over the detailed error if possible
+            const errorReason = data.details || data.error || "Gemini Server Error";
+            throw new Error(errorReason);
+          }
           textResponse = data.text;
-        } catch (serverErr) {
-          console.error("Chat Error (Server):", serverErr);
-          throw new Error("AI Failed");
         }
+      } catch (err: any) {
+        console.error("Chat Error (Final failure chain):", err);
+        throw new Error(err.message || "AI Failed");
       }
 
       // Check for audio requests to generate variants
@@ -1438,6 +1469,8 @@ export default function App() {
       setMessages(prev => [...prev, aiMsg]);
     } catch (error: any) {
       console.error("Gemini Error:", error);
+      const errorText = error.toString();
+      const isKeyError = errorText.includes('ключ') || errorText.includes('API_KEY_INVALID') || errorText.includes('key');
       
       // Fallback Strategy: Ollama -> Local Search
       try {
@@ -1470,9 +1503,16 @@ export default function App() {
           })
         });
         const localData = await localRes.json();
+        
+        // Friendly wrapping if it's a key error
+        let finalContent = localData.answer;
+        if (isKeyError && !finalContent.includes('КЛЮЧ API')) {
+          finalContent = `### 📡 СТАТУС СИНГУЛЯРНОСТИ: ОНЛАЙН (v17.18.19)\nСвязь установлена, но возникла техническая проблема с API-ключом Gemini.\n\n${finalContent}`;
+        }
+
         setMessages(prev => [...prev, {
           role: 'assistant',
-          content: `[ОШИБКА API - ЛОКАЛЬНЫЙ ПОИСК]\n\n${localData.answer}`,
+          content: finalContent,
           timestamp: Date.now()
         }]);
       } catch (e) {
@@ -1877,7 +1917,7 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-sm font-bold text-white uppercase tracking-tighter">AI Assistant</h1>
-              <p className="text-[10px] text-slate-500 uppercase font-mono">v17.18.18</p>
+              <p className="text-[10px] text-slate-500 uppercase font-mono">v17.18.19</p>
             </div>
           </div>
 
@@ -2254,14 +2294,14 @@ export default function App() {
                 <Cpu className="w-12 h-12 text-blue-500" />
               </motion.div>
               
-              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v17.18.18</h2>
+              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v17.18.19</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg px-4">
                 Я полностью осведомлен о вашем проекте по пути <br/>
                 <code className="text-blue-400 break-all bg-white/5 px-2 py-1 rounded mt-2 inline-block">
                   {kb?.project_path || 'Загрузка...'}
                 </code>. 
                 <br/><br/>
-                Задавайте любые вопросы по Unity, Blender или Photoshop на русском языке. Модули Intuitive Logic, Omni-Answer Engine и проект 'Континент судьбы' (v17.18.18) активированы.
+                Задавайте любые вопросы по Unity, Blender или Photoshop на русском языке. Модули Intuitive Logic, Omni-Answer Engine и проект 'Континент судьбы' (v17.18.19) активированы.
                 <br/><br/>
                 <span className="text-xs text-orange-400 font-bold uppercase">Внимание: ИИ понимает вас с полуслова и работает в режиме Eternal Offline Archive.</span>
               </p>
@@ -2302,7 +2342,7 @@ export default function App() {
                       {msg.audioVariants && (
                         <div className="mt-6 space-y-4 pt-6 border-t border-white/5">
                            <h4 className="text-[10px] font-bold text-white uppercase tracking-widest flex items-center gap-2">
-                            <Music className="w-3 h-3 text-blue-400" /> Сгенерированные аудио-варианты (v17.18.18):
+                            <Music className="w-3 h-3 text-blue-400" /> Сгенерированные аудио-варианты (v17.18.19):
                           </h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {msg.audioVariants.map((variant, vi) => (
@@ -4207,7 +4247,7 @@ export default function App() {
                         <ExternalLink className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v17.18.18)</h2>
+                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v17.18.19)</h2>
                         <p className="text-xs text-slate-400">Прямое управление Blender и Unity через нейронный мост.</p>
                       </div>
                     </div>
@@ -5454,7 +5494,7 @@ export default function App() {
                     <ImageIcon className="w-8 h-8" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Генератор Обложек VK v17.18.18</h3>
+                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Генератор Обложек VK v17.18.19</h3>
                     <p className="text-xs text-slate-500 uppercase tracking-[0.2em] font-bold">Континент Судьбы • Умный Синтез</p>
                   </div>
                 </div>

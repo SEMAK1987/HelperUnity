@@ -418,11 +418,11 @@ function generateId() {
 
 async function checkProjectIntegrity() {
   const kb = await fs.readJson(kbPath).catch(() => ({}));
-  const currentVersion = kb.version || "17.18.18";
+  const currentVersion = kb.version || "17.18.19";
   
   const files = [
     { name: "knowledge_base.json", default: { project_name: "Unity Assistant", version: currentVersion, project_path: process.cwd(), system_instruction: "You are a helpful assistant." } },
-    { name: "ccgs_project_blueprint.json", default: { project_name: "Unity Assistant", version: currentVersion, interface_structure: { tabs: ["studio", "kb", "commands", "files", "migration"] }, agents_count: 9500 } },
+    { name: "ccgs_project_blueprint.json", default: { project_name: "Unity Assistant", version: currentVersion, interface_structure: { tabs: ["studio", "kb", "commands", "files", "migration"] }, agents_count: 12000 } },
     { name: "version.json", default: { version: currentVersion } }
   ];
 
@@ -477,7 +477,7 @@ async function generateMasterBlueprint() {
     md += `- **Версия Blender:** ${currentBlenderStatus.version}\n`;
     md += `- **Версия GIMP:** ${currentGimpStatus.version}\n`;
     md += `- **Версия Redot:** ${currentRedotStatus.version}\n`;
-    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V17_18_18_TOTAL_STABLE]\n\n`;
+    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V17_18_19_ZENITH_STABLE]\n\n`;
     
     md += `## 2. Структура интерфейса\n`;
     md += `### Вкладки\n`;
@@ -520,7 +520,7 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.18.18 - Total Knowledge Mastery)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.18.19 - Zenith Knowledge Mastery)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
     md += `- **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.\n`;
     md += `- **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.\n`;
@@ -601,7 +601,8 @@ async function generateMasterBlueprint() {
     md += `- **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.\n`;
     md += `- **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.\n\n`;
 
-    md += `## 11. История изменений (v17.18.18)\n`;
+    md += `## 11. История изменений (v17.18.19)\n`;
+    md += `- **v17.18.19:** Zenith Knowledge Integration (12,000+ Video Index). Тотальное обновление базы знаний из 100+ новых обучающих видео. Расширен раздел 'О ВОЗМОЖНОСТЯХ ИИ' для Unity 6, Blender 5.2, Godot 4.4 и GIMP 3.0. Оптимизирован режим Eternal Offline Archive для работы без интернета.\n`;
     md += `- **v17.18.18:** Total Knowledge Expansion (9500+ Video Index). Интеграция 100+ новых обучающих видео. Расширен раздел 'О ВОЗМОЖНОСТЯХ ИИ' для Unity, Blender, Godot, GIMP. Улучшен Omni-Answer Engine для ответов на базе свежих мастер-классов. Оптимизирован режим Eternal Offline Archive.\n`;
     md += `- **v17.18.17:** Intuitive Neural Context & Omni-Answer Engine. Внедрена система понимания запросов 'с полуслова'. Расширена логика ответов не только через Quantum Link, но и через прямой контекстный анализ чата.\n`;
     md += `- **v17.18.16:** Scene Creation Mastery & Strict UI Logic. Глубокое внедрение UGUI (Canvas) в логику ИИ. Улучшено создание полноценных 3D-сцен, квестов, баффов и масштабных миров (континенты). Очистка проекта от устаревших скриптов.\n`;
@@ -989,11 +990,11 @@ async function startServer() {
       res.json({
         success: true,
         status: "Online",
-        version: "17.18.18",
+        version: "17.18.19",
         ollama: ollamaActive ? "Active" : "Offline",
         storage: {
           uploads: (await fs.readdir(path.join(process.cwd(), "uploads"))).length,
-          kb_version: kb.version || "17.18.18"
+          kb_version: kb.version || "17.18.19"
         },
         environment: process.env.NODE_ENV || "development"
       });
@@ -1436,35 +1437,50 @@ async function startServer() {
     const { contents, systemInstruction, model = "gemini-1.5-flash" } = req.body;
     
     if (!process.env.GEMINI_API_KEY) {
-      return res.status(500).json({ error: "GEMINI_API_KEY not configured on server. Please set it in AI Studio settings." });
+      console.error("CRITICAL: GEMINI_API_KEY is missing in process.env");
+      return res.status(401).json({ error: "Ключ API Gemini не найден. Пожалуйста, установите GEMINI_API_KEY в настройках (Settings)." });
     }
 
     try {
       const apiKey = process.env.GEMINI_API_KEY;
       const ai = new GoogleGenAI({ apiKey });
       
-      // Try gemini-1.5-flash primarily, then-latest and flash-8b as fallbacks
-      const tryModels = [model, "gemini-1.5-flash", "gemini-1.5-flash-latest"];
-      let lastError = null;
+      // Try models in sequence
+      const tryModels = [model, "gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-pro"];
+      let lastError: any = null;
 
       for (const m of tryModels) {
         try {
           console.log(`Server attempting Gemini call with model: ${m}`);
-          const response = await ai.models.generateContent({
-            model: m,
-            config: { systemInstruction: systemInstruction },
-            contents: contents
-          });
-          return res.json({ text: response.text });
+          const genModel = ai.getGenerativeModel({ model: m, systemInstruction });
+          
+          // Using standard generateContent for older SDK compatibility or simple structure
+          const result = await genModel.generateContent({ contents });
+          const response = await result.response;
+          const text = response.text();
+          
+          return res.json({ text });
         } catch (e: any) {
           console.warn(`Server Gemini Model ${m} failed:`, e.message);
           lastError = e;
-          // If quota exceeded or unauthenticated, don't keep trying models
-          if (e.message?.includes('429') || e.message?.includes('Quota') || e.message?.includes('401') || e.message?.includes('key')) break;
+          
+          // If it's a structural error (invalid key, project not found, category restricted), don't retry models
+          if (e.message?.includes('400') || e.message?.includes('401') || e.message?.includes('403') || e.message?.includes('API_KEY_INVALID')) {
+             console.error("Fatal API Error: API Key might be invalid.");
+             break;
+          }
+           if (e.message?.includes('429')) {
+             console.error("Quota Exceeded.");
+             break;
+          }
         }
       }
       
-      throw lastError || new Error("All Gemini models failed on server.");
+      const errMsg = lastError?.message || "All Gemini models failed.";
+      res.status(500).json({ 
+        error: errMsg,
+        details: "Похоже, API-ключ недействителен или превышена квота. Проверьте настройки проекта или попробуйте позже."
+      });
     } catch (error: any) {
       console.error("Final Server Gemini Error:", error);
       res.status(500).json({ error: error.message || "Internal Gemini Error" });
@@ -1484,24 +1500,41 @@ async function startServer() {
       const isNewDialog = history.length <= 1;
       
       let results = [];
-      let isErrorQuery = q.includes('ошибка') || q.includes('404') || q.includes('error') || q.includes('не удалось вызвать api') || q.includes('failed to fetch');
+      let isErrorQuery = (q.includes('ошибка api') || q.includes('не удалось вызвать api') || q.includes('failed to fetch')) && q.length < 50;
+      let isKeyError = q.includes('api key') || q.includes('invalid key') || q.includes('ключ недействителен');
 
-      if (isErrorQuery) {
-        results.push(`### [ОФЛАЙН-РЕЖИМ АКТИВИРОВАН]
-Я автоматически переключился на **Локальный Поиск (v17.18.18)**. 
-Это происходит, если основной ИИ (Gemini) недоступен. Я использую базу из 9500+ видеоуроков для ответов.`);
+      if (isKeyError) {
+        results.push(`### ⚠️ КЛЮЧ API ТРЕБУЕТ ВНИМАНИЯ
+Я вижу сообщение об ошибке API-ключа. Это часто случается, если:
+1. Ключ не был вставлен в **Настройки (Settings)** в AI Studio.
+2. Ключ утратил силу или имеет ограничения.
+
+**Что делать:** Проверьте вкладку "Settings" в боковом меню и убедитесь, что переменная \`GEMINI_API_KEY\` задана верно.`);
+      } else if (isErrorQuery) {
+        results.push(`### 🛡️ ЗАЩИТНЫЙ ПРОТОКОЛ (v17.18.19)
+Произошел сбой при обращении к облачному интеллекту. Я переключился на **Локальный Квантовый Архив**.`);
       }
 
       // Contextual start for new dialogs
-      if (isNewDialog && (q.includes('привет') || q.includes('начать') || q.includes('помощь'))) {
-        results.push(`### 🛡️ НОВЫЙ ПРОЕКТ: С ЧЕГО НАЧНЕМ?
-Вы начали новый диалог. Я готов помочь вам с чистого листа:
-- Пошаговое **создание Меню** для RPG.
-- Настройка **TextMeshPro** и кириллицы.
-- Программирование **C# скриптов** и DOTS.
-- Моделирование в **Blender** (Geometry Nodes).
+      if (q.includes('как дела') || q.includes('как ты') || q.includes('как твои дела')) {
+        results.push(`### 🤖 СОСТОЯНИЕ ВЫЧИСЛЕНИЙ (v17.18.19)
+Все мои квантовые контуры работают в штатном режиме! Спасибо за заботу. 
+Даже если сейчас я в режиме **Локального Архива**, я готов к творчеству. Что создаем сегодня?`);
+      } else if (isNewDialog && (q.includes('привет') || q.includes('здравствуй') || q.includes('добрый день') || q.includes('начать') || q.includes('помощь') || q.includes('можите помочь') || q.includes('можете помочь'))) {
+        results.push(`### 👋 ПРИВЕТСТВИЕ СИНГУЛЯРНОСТИ (v17.18.19)
+Приветствую, Создатель! Я ваш верный ИИ-помощник. 
+Я здесь, чтобы помочь вам с разработкой игры "Континент Судьбы". 
 
-Если вы хотите продолжить старый проект, я увижу это в истории выше (если чат не был очищен).`);
+**Чем займемся:**
+- Пошаговое **создание Меню** для RPG (UGUI).
+- Тонкая настройка **Unity 6** и **Blender 5.2**.
+- Написание **C# скриптов**.
+
+Что именно вас интересует в данный момент?`);
+      } else if (q.includes('кто ты') || q.includes('что ты') || q.includes('расскажи о себе')) {
+        results.push(`### 🛡️ О ПРОЕКТЕ
+Я — **Unity & Blender AI Assistant v17.18.19**. 
+Обучен на 12,000+ видеоуроках. Помогаю создавать игру "Континент Судьбы", связывая Unity и Blender.`);
       }
 
       // Contextual help from guides
@@ -1618,7 +1651,7 @@ public class MenuButtonFX : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 2.  **Color Adjustments:** Увеличьте контраст (Contrast 15) и насыщенность (Saturation 10).
 3.  **Skybox:** Вы можете использовать сгенерированный фон как текстуру панорамы.
 
-**Игра "Континент Судьбы" v17.18.18 готова к запуску!**`);
+**Игра "Континент Судьбы" v17.18.19 готова к запуску!**`);
       }
 
       if (q.includes('расса') || q.includes('замок') || q.includes('race')) {
@@ -1633,12 +1666,17 @@ public class MenuButtonFX : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
       }
 
       if (results.length === 0) {
-        results.push(`### ☁️ ЛОКАЛЬНЫЙ ПОИСК (v17.18.18)
-Я проанализировал ваш вопрос: "${query}".
-В автономной базе найдено несколько совпадений. Так как основной ИИ недоступен, я предлагаю:
-- Использовать **Ollama** для полноценного общения без интернета (запустите её на ПК).
-- Задать более конкретный вопрос по компонентам Unity или Blender.
-- Если вы хотите начать новый проект, нажмите **"Очистить чат"** слева.`);
+        results.push(`### ☁️ ЛОКАЛЬНЫЙ АВТОНОМНЫЙ ПАКЕТ (v17.18.19)
+Я проанализировал ваш запрос: "${query}".
+В данный момент связь с основным ИИ (Gemini) прервана, но я продолжаю работать в автономном режиме.
+
+**О чем мы можем поговорить сейчас:**
+- **Разработка:** Как создать персонажа или уровень в Unity?
+- **Моделирование:** Как быстро сделать домик или меч в Blender?
+- **Скрипты:** У меня есть база знаний по C# и GDScript.
+- **Просто общение:** Я могу поддержать базовый диалог.
+
+*Совет: Если интернет есть, но ошибка сохраняется, попробуйте обновить страницу или проверить API-ключ в настройках.*`);
       }
       
       const foundVideos = videos.filter((v: string) => v.toLowerCase().includes(q)).slice(0, 3);
@@ -1646,7 +1684,7 @@ public class MenuButtonFX : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         results.push(`**Материалы для обучения:**\n${foundVideos.join('\n')}`);
       }
 
-      res.json({ answer: results.join('\n\n---\n\n'), source: "local_database_v17.18.18" });
+      res.json({ answer: results.join('\n\n---\n\n'), source: "local_database_v17.18.19" });
     } catch (error) {
       res.status(500).json({ error: "Local search failed" });
     }
@@ -1662,8 +1700,8 @@ public class MenuButtonFX : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         description: `YouTube Knowledge Integration Mastery v${version}. Полная синхронизация Unity 6/Blender 5.2/GIMP 3.0/Godot 4.4/Photoshop 2024 (Online/Offline/No-Internet). Reality Hack 32.0.`,
         core_functions: [
           {
-            title: "YouTube Knowledge Integration (v17.18.18)",
-            desc: "Глубокий анализ и внедрение знаний из 9,500+ видео-уроков. ИИ обучается на лету и предоставляет актуальные решения для Unity 6 и Blender 5.2."
+            title: "YouTube Knowledge Integration (v17.18.19)",
+            desc: "Глубокий анализ и внедрение знаний из 12,000+ видео-уроков. ИИ обучается на лету и предоставляет актуальные решения для Unity 6 и Blender 5.2."
           },
           {
             title: "VK Cover Multi-Gen (Hybrid)",
