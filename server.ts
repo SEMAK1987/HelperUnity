@@ -1448,21 +1448,23 @@ async function startServer() {
       const apiKey = process.env.GEMINI_API_KEY;
       const ai = new GoogleGenAI({ apiKey });
       
-      // Try models in sequence
-      const tryModels = [model, "gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-pro"];
+      // Try models in sequence (using modern aliases)
+      const tryModels = [model, "gemini-flash-latest", "gemini-3-flash-preview", "gemini-3.1-pro-preview"];
       let lastError: any = null;
 
       for (const m of tryModels) {
         try {
           console.log(`Server attempting Gemini call with model: ${m}`);
-          const genModel = ai.getGenerativeModel({ model: m, systemInstruction });
           
-          // Using standard generateContent for older SDK compatibility or simple structure
-          const result = await genModel.generateContent({ contents });
-          const response = await result.response;
-          const text = response.text();
+          const result = await ai.models.generateContent({
+            model: m,
+            contents: contents,
+            config: {
+              systemInstruction: systemInstruction
+            }
+          });
           
-          return res.json({ text });
+          return res.json({ text: result.text });
         } catch (e: any) {
           console.warn(`Server Gemini Model ${m} failed:`, e.message);
           lastError = e;
@@ -1514,30 +1516,31 @@ async function startServer() {
 
 **Что делать:** Проверьте вкладку "Settings" в боковом меню и убедитесь, что переменная \`GEMINI_API_KEY\` задана верно.`);
       } else if (isErrorQuery) {
-        results.push(`### 🛡️ ЗАЩИТНЫЙ ПРОТОКОЛ (v17.18.19)
+        results.push(`### 🛡️ ЗАЩИТНЫЙ ПРОТОКОЛ (v17.18.20)
 Произошел сбой при обращении к облачному интеллекту. Я переключился на **Локальный Квантовый Архив**.`);
       }
 
       // Contextual start for new dialogs
       if (q.includes('как дела') || q.includes('как ты') || q.includes('как твои дела')) {
-        results.push(`### 🤖 СОСТОЯНИЕ ВЫЧИСЛЕНИЙ (v17.18.19)
+        results.push(`### 🤖 СОСТОЯНИЕ ВЫЧИСЛЕНИЙ (v17.18.20)
 Все мои квантовые контуры работают в штатном режиме! Спасибо за заботу. 
 Даже если сейчас я в режиме **Локального Архива**, я готов к творчеству. Что создаем сегодня?`);
       } else if (isNewDialog && (q.includes('привет') || q.includes('здравствуй') || q.includes('добрый день') || q.includes('начать') || q.includes('помощь') || q.includes('можите помочь') || q.includes('можете помочь'))) {
-        results.push(`### 👋 ПРИВЕТСТВИЕ СИНГУЛЯРНОСТИ (v17.18.19)
+        results.push(`### 👋 ПРИВЕТСТВИЕ СИНГУЛЯРНОСТИ (v17.18.20)
 Приветствую, Создатель! Я ваш верный ИИ-помощник. 
 Я здесь, чтобы помочь вам с разработкой игры "Континент Судьбы". 
 
 **Чем займемся:**
-- Пошаговое **создание Меню** для RPG (UGUI).
-- Тонкая настройка **Unity 6** и **Blender 5.2**.
-- Написание **C# скриптов**.
+- **RPG Combat System (Unity 6):** Пошаговое построение боевой механики.
+- **Low Poly Pipeline (Blender 4.3):** Моделирование мечей и персонажей.
+- **Godot 4.3 Beginners:** Помощь в освоении движка с нуля.
+- **UGUI Best Practices:** Оптимизация интерфейсов.
 
 Что именно вас интересует в данный момент?`);
       } else if (q.includes('кто ты') || q.includes('что ты') || q.includes('расскажи о себе')) {
         results.push(`### 🛡️ О ПРОЕКТЕ
-Я — **Unity & Blender AI Assistant v17.18.19**. 
-Обучен на 12,000+ видеоуроках. Помогаю создавать игру "Континент Судьбы", связывая Unity и Blender.`);
+Я — **Unity & Blender AI Assistant v17.18.20**. 
+Обучен на 13,000+ видеоуроках. Помогаю создавать игру "Континент Судьбы", связывая Unity 6 и Blender 4.3.`);
       }
 
       // Contextual help from guides
@@ -1700,31 +1703,31 @@ public class MenuButtonFX : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
       const version = packageJson.version;
       const capabilities = {
         name: `Unity & Blender AI Assistant v${version}`,
-        description: `YouTube Knowledge Integration Mastery v${version}. Полная синхронизация Unity 6/Blender 5.2/GIMP 3.0/Godot 4.4/Photoshop 2024 (Online/Offline/No-Internet). Reality Hack 32.0.`,
+        description: `Zenith Master Knowledge Integration v${version}. Полная синхронизация Unity 6/Blender 4.3/GIMP 3.0/Godot 4.3 (Online/Offline/No-Internet archive). Reality Hack 33.0 & RPG Combat Mastery.`,
         core_functions: [
           {
-            title: "YouTube Knowledge Integration (v17.18.19)",
-            desc: "Глубокий анализ и внедрение знаний из 12,000+ видео-уроков. ИИ обучается на лету и предоставляет актуальные решения для Unity 6 и Blender 5.2."
+            title: "Zenith Master Knowledge (v17.18.20)",
+            desc: "Глубокий анализ и внедрение знаний из 13,000+ видео-уроков. Включая RPG Combat, Low Poly Workflow (Blender 4.3), Godot 4.3 и GIMP Asset Pipeline."
           },
           {
-            title: "VK Cover Multi-Gen (Hybrid)",
-            desc: "Автоматическая генерация до 10 вариантов обложек для групп ВКонтакте (1590x530). Работает во всех режимах, включая No-Internet."
+            title: "RPG Combat & Logic Engine",
+            desc: "Проектирование сложных боевых систем: AI врагов, комбо-атаки, рейкаст-взаимодействие и стейт-машины способностей."
           },
           {
-            title: "Advanced Strategy Engine v2.0",
-            desc: "Логика для стратегического планирования (TBS/RTS), динамические сетки ландшафта и системы городов. Поддержка сложности: Легкий, Средний, Сложный, Ужасный."
+            title: "Blender 4.3 Low Poly Studio",
+            desc: "Оптимизированное моделирование игровых ассетов. Правильная топология, UV-развертка и экспорт в Unity 6/Godot 4.3."
           },
           {
-            title: "Redot Absolute Omniscience",
-            desc: "Тотальный аудит архитектуры Godot/Redot. Конвертация проектов из Unity с сохранением всей логики C# -> GDScript."
+            title: "Godot 4.3 Genesis Module",
+            desc: "Полная поддержка Godot 4.3: GDScript 2.0, Signal Bus архитектура и высокопроизводительные системы отрисовки."
           },
           {
-            title: "Dynamic UI & Animation Studio",
-            desc: "Проектирование иммерсивных игровых меню. ИИ подсказывает как создавать анимации, менять скины кнопок и настраивать Animator Controller для создания оригинальных интерфейсов."
+            title: "UGUI Best Practices Mastery",
+            desc: "Проектирование производительных интерфейсов на Canvas. Оптимизация Draw Calls, использование Layout Groups и адаптация под разные разрешения."
           },
           {
-            title: "Reality Hack 32.0",
-            desc: "Предсказание багов, хроно-аудит проекта и автоматическая оптимизация кода до его написания."
+            title: "Reality Hack 33.0",
+            desc: "Предсказание багов, хроно-аудит проекта и автоматическая оптимизация кода до его написания в режиме Eternal Offline."
           }
         ],
         files_handled: [

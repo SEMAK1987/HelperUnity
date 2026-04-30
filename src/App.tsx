@@ -193,7 +193,7 @@ function GameHelpView() {
              <BookOpen className="w-8 h-8 text-blue-500" />
              Помощь По Игре (Unity 6)
           </h2>
-          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v17.18.19</p>
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v17.18.20</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -1388,7 +1388,7 @@ export default function App() {
       }
 
       let textResponse = "";
-      const systemInst = kb.system_instruction + "\n\n### CRITICAL KNOWLEDGE UPDATE v17.18.19 ###\n- ZENITH KNOWLEDGE INTEGRATION: Integrated logic from 12,000+ video tutorials (Unity, Blender, Godot, GIMP).\n- OMNI-ANSWER ENGINE: Advanced problem solving directly in chat. Master-level expertise in Game Dev architectures.\n- INTUITIVE LOGIC: Understand user intent even from incomplete requests.\n- STRICT UI RULE: ALWAYS USE UGUI (Canvas). No Planes or Terrains for interfaces.\n- ETERNAL OFFLINE: Full local archive support for No-Internet development.";
+      const systemInst = kb.system_instruction + "\n\n### CRITICAL KNOWLEDGE UPDATE v17.18.20 ###\n- ZENITH MASTER KNOWLEDGE INTEGRATION: Integrated logic from 13,000+ video tutorials (Unity 6, Blender 4.3, Godot 4.3, GIMP 3.0).\n- RPG COMBAT MASTER: Advanced RPG combat logic, AI states, and combo systems.\n- LOW POLY WORKFLOW: Expert modeling in Blender 4.3 specifically for Unity 6 performance.\n- OMNI-ANSWER ENGINE: Mastery in problem solving across all linked software.\n- STRICT UI RULE: ALWAYS USE UGUI (Canvas). No Planes or Terrains for interfaces.\n- ETERNAL OFFLINE: Full local archive support for No-Internet development.";
 
       try {
         // Try local Gemini initialization if exists
@@ -1396,20 +1396,20 @@ export default function App() {
         if (ai) {
           try {
             console.log("Attempting direct local Gemini call...");
-            const genModel = ai.getGenerativeModel({ 
-              model: "gemini-1.5-flash",
-              systemInstruction: systemInst 
-            });
             
             const response = await Promise.race([
-              genModel.generateContent({
-                contents: contents.map((c, i) => i === contents.length - 1 && isContinue ? { ...c, parts: [{ text: promptText }] } : c)
+              ai.models.generateContent({
+                model: "gemini-flash-latest",
+                contents: contents.map((c, i) => i === contents.length - 1 && isContinue ? { ...c, parts: [{ text: promptText }] } : c),
+                config: {
+                  systemInstruction: systemInst
+                }
               }),
               new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 25000))
             ]) as any;
 
-            if (response && response.response) {
-               textResponse = response.response.text();
+            if (response && response.text) {
+               textResponse = response.text;
                localSuccess = true;
                console.log("Local Gemini success.");
             }
@@ -1525,7 +1525,7 @@ export default function App() {
         // Friendly wrapping if it's a key error
         let finalContent = localData.answer;
         if (isKeyError && !finalContent.includes('КЛЮЧ API')) {
-          finalContent = `### 📡 СТАТУС СИНГУЛЯРНОСТИ: ОНЛАЙН (v17.18.19)\nСвязь установлена, но возникла техническая проблема с API-ключом Gemini.\n\n${finalContent}`;
+          finalContent = `### 📡 СТАТУС СИНГУЛЯРНОСТИ: ОНЛАЙН (v17.18.20)\nСвязь установлена, но возникла техническая проблема с API-ключом Gemini.\n\n${finalContent}`;
         }
 
         setMessages(prev => [...prev, {
@@ -1935,7 +1935,7 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-sm font-bold text-white uppercase tracking-tighter">AI Assistant</h1>
-              <p className="text-[10px] text-slate-500 uppercase font-mono">v17.18.19</p>
+              <p className="text-[10px] text-slate-500 uppercase font-mono">v17.18.20</p>
             </div>
           </div>
 
@@ -2312,14 +2312,14 @@ export default function App() {
                 <Cpu className="w-12 h-12 text-blue-500" />
               </motion.div>
               
-              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v17.18.19</h2>
+              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v17.18.20</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg px-4">
                 Я полностью осведомлен о вашем проекте по пути <br/>
                 <code className="text-blue-400 break-all bg-white/5 px-2 py-1 rounded mt-2 inline-block">
                   {kb?.project_path || 'Загрузка...'}
                 </code>. 
                 <br/><br/>
-                Задавайте любые вопросы по Unity, Blender или Photoshop на русском языке. Модули Intuitive Logic, Omni-Answer Engine и проект 'Континент судьбы' (v17.18.19) активированы.
+                Задавайте любые вопросы по Unity, Blender или Photoshop на русском языке. Модули Intuitive Logic, Omni-Answer Engine и проект 'Континент судьбы' (v17.18.20) активированы.
                 <br/><br/>
                 <span className="text-xs text-orange-400 font-bold uppercase">Внимание: ИИ понимает вас с полуслова и работает в режиме Eternal Offline Archive.</span>
               </p>
@@ -2360,7 +2360,7 @@ export default function App() {
                       {msg.audioVariants && (
                         <div className="mt-6 space-y-4 pt-6 border-t border-white/5">
                            <h4 className="text-[10px] font-bold text-white uppercase tracking-widest flex items-center gap-2">
-                            <Music className="w-3 h-3 text-blue-400" /> Сгенерированные аудио-варианты (v17.18.19):
+                            <Music className="w-3 h-3 text-blue-400" /> Сгенерированные аудио-варианты (v17.18.20):
                           </h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {msg.audioVariants.map((variant, vi) => (
@@ -4265,7 +4265,7 @@ export default function App() {
                         <ExternalLink className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v17.18.19)</h2>
+                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v17.18.20)</h2>
                         <p className="text-xs text-slate-400">Прямое управление Blender и Unity через нейронный мост.</p>
                       </div>
                     </div>
@@ -5512,7 +5512,7 @@ export default function App() {
                     <ImageIcon className="w-8 h-8" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Генератор Обложек VK v17.18.19</h3>
+                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Генератор Обложек VK v17.18.20</h3>
                     <p className="text-xs text-slate-500 uppercase tracking-[0.2em] font-bold">Континент Судьбы • Умный Синтез</p>
                   </div>
                 </div>
