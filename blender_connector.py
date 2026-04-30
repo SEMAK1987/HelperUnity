@@ -1,10 +1,10 @@
 bl_info = {
     "name": "AI Assistant Link",
-    "author": "Omniversal World Architect v17.18.20",
-    "version": (17, 18, 20),
+    "author": "Omniversal World Architect v17.18.25",
+    "version": (17, 18, 25),
     "blender": (2, 80, 0),
     "location": "View3D > N-Panel > AI Assistant",
-    "description": "Direct bridge to the World Architect Divine Architect Supreme with project level GOD.",
+    "description": "Direct bridge to the World Architect Divine Architect Supreme with project level GOD Synergy.",
     "warning": "",
     "doc_url": "",
     "category": "Interface",
@@ -101,7 +101,7 @@ class AI_ASSISTANT_PT_Panel(bpy.types.Panel):
         props = context.scene.ai_assistant_props
         
         col = layout.column(align=True)
-        col.label(text="v17.18.20 - Zenith Master Knowledge Integration (Omni-Answer Engine)")
+        col.label(text="v17.18.25 - Zenith Multi-Tool Synergy (Photoshop & GIMP Sync)")
         col.prop(props, "server_url")
         col.prop(props, "mode")
         

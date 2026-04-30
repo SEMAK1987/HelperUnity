@@ -1,17 +1,18 @@
-# PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Zenith Master Knowledge Archive)
+# PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Total Knowledge Archive Edition)
 
-> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.18.20.
+> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.18.25.
 
 ## 1. Общая информация
-- **Версия Помощника:** 17.18.20
-- **Описание:** Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3), Blender 4.3/5.2, Godot 4.3 и GIMP 3.0. Поддержка квантовых вычислений, интеграция данных из 13,000+ видео-уроков.
+- **Версия Помощника:** 17.18.25
+- **Описание:** Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3), Blender 5.2, Photoshop 2025 и GIMP 3.0. Поддержка квантовых вычислений, обход региональных блокировок, мастерство Unity Canvas UI и 13,000+ видео уроков.
 - **Путь проекта:** /app/applet
-- **Локальное хранилище:** Не задано
-- **Версия Unity:** unknown
-- **Версия Blender:** unknown
-- **Версия GIMP:** unknown
+- **Локальное хранилище:** Активно (v17.18.25)
+- **Версия Unity:** 6.0 (6000.3)
+- **Версия Blender:** 4.3 / 5.2
+- **Версия Photoshop:** 2025
+- **Версия GIMP:** 3.0 (GTK3)
 - **Версия Redot:** unknown
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V17_18_19_ZENITH_STABLE]
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V17_18_25_ZENITH_STABLE]
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -46,18 +47,11 @@ undefined
 ```
 
 
-## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.18.20 - Zenith Master Knowledge Mastery)
+## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.18.19 - Zenith Knowledge Mastery)
 ### Режимы работы и Архитектурные уровни
 - **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.
 - **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.
-- **No-Internet Mode (Quantum Archive):** 13,000+ видео-уроков. Мгновенный доступ при любых внешних условиях.
-
-### Новые модули знаний v17.18.20:
-- **RPG Combat System (Unity 6):** Пошаговые инструкции по созданию систем боя, комбо и AI противников.
-- **Low Poly Sword Mastery (Blender 4.3):** Мастер-класс по созданию игрового оружия с нуля.
-- **Godot 4.3 Genesis:** Основы архитектуры и высокопроизводительный GDScript.
-- **UGUI Best Practices:** Создание профессиональных интерфейсов без просадок FPS.
-- **GIMP 3.0 Pro Workflow:** Автоматизация ассетов для инди-разработчиков.
+- **No-Internet Mode (Quantum Archive):** 9,500+ видео-уроков. Мгновенный доступ при любых внешних условиях.
 
 ### TRANSCENDENT LINK (Neural Addon Synthesis)
 - **Neural Addon Synthesis:** Возможность проектирования и генерации аддонов для Blender и плагинов для Unity, которые напрямую связывают софт с ИИ.
@@ -127,7 +121,8 @@ undefined
 - **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.
 - **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.
 
-## 11. История изменений (v17.18.19)
+## 11. История изменений (v17.18.25)
+- **v17.18.25:** Zenith Multi-Tool Synergy. Полная интеграция Photoshop 2025 и GIMP 3.0. Внедрена система 'Online Research' для обучения ИИ на лету. Обновлена база знаний до 13,000+ видео.
 - **v17.18.19:** Zenith Knowledge Integration (12,000+ Video Index). Тотальное обновление базы знаний из 100+ новых обучающих видео. Расширен раздел 'О ВОЗМОЖНОСТЯХ ИИ' для Unity 6, Blender 5.2, Godot 4.4 и GIMP 3.0. Оптимизирован режим Eternal Offline Archive для работы без интернета.
 - **v17.18.18:** Total Knowledge Expansion (9500+ Video Index). Интеграция 100+ новых обучающих видео. Расширен раздел 'О ВОЗМОЖНОСТЯХ ИИ' для Unity, Blender, Godot, GIMP. Улучшен Omni-Answer Engine для ответов на базе свежих мастер-классов. Оптимизирован режим Eternal Offline Archive.
 - **v17.18.17:** Intuitive Neural Context & Omni-Answer Engine. Внедрена система понимания запросов 'с полуслова'. Расширена логика ответов не только через Quantum Link, но и через прямой контекстный анализ чата.

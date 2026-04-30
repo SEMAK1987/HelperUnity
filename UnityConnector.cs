@@ -1,6 +1,6 @@
-// [FATE MANIFESTATION MODULE v17.18.20]
+// [ZENITH MULTI-TOOL SYNERGY v17.18.25]
 // Unity Connector for Quantum AI Assistant
-// Updated: 2026-04-30 (Zenith Master Knowledge Integration)
+// Updated: 2026-04-30 (Synced with Photoshop 2025 & GIMP 3.0)
 
 using UnityEngine;
 using UnityEditor;
@@ -28,7 +28,7 @@ namespace AI_Assistant_Quantum
 
         private void OnGUI()
         {
-            GUILayout.Label("v17.18.20 - Zenith Master Knowledge Integration (Neural Link Active)", EditorStyles.boldLabel);
+            GUILayout.Label("v17.18.25 - Zenith Multi-Tool Synergy (Neural Link Active)", EditorStyles.boldLabel);
             
             serverUrl = EditorGUILayout.TextField("Server URL", serverUrl);
             mode = (Mode)EditorGUILayout.EnumPopup("Mode", mode);

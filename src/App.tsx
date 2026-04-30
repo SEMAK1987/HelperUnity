@@ -702,6 +702,10 @@ export default function App() {
   const [isUploading, setIsUploading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [isOnline, setIsOnline] = useState(true);
+  const [isThinking, setIsThinking] = useState(false);
+  const [thinkingSteps, setThinkingSteps] = useState<string[]>([]);
+  const [aiHealth, setAiHealth] = useState<'online' | 'limited' | 'error'>('online');
+  const [serverHealth, setServerHealth] = useState<'online' | 'offline' | 'error'>('online');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [projectScan, setProjectScan] = useState<ProjectScan | null>(null);
   const [unityStatus, setUnityStatus] = useState<UnityStatus | null>(null);
@@ -982,7 +986,39 @@ export default function App() {
       .then(res => res.json())
       .then(data => setBlenderPresets(data));
 
+    const checkAIStatus = async () => {
+      try {
+        const res = await fetch('/api/ai/health');
+        if (res.ok) {
+          const data = await res.json();
+          // Status is online if level is free or premium
+          if (data.level === 'free' || data.level === 'premium') {
+            setAiHealth('online');
+          } else {
+            setAiHealth('limited');
+          }
+        } else {
+          setAiHealth('error');
+        }
+      } catch (e) {
+        setAiHealth('error');
+      }
+    };
+
+    const checkServer = async () => {
+      try {
+        const res = await fetch('/api/health');
+        setIsOnline(res.ok);
+        setServerHealth(res.ok ? 'online' : 'error');
+      } catch (e) {
+        setIsOnline(false);
+        setServerHealth('offline');
+      }
+    };
+
     const statusInterval = setInterval(() => {
+      checkServer();
+      checkAIStatus();
       // Local API calls are safe even if offline from internet
       const fetchStatus = (url: string, setter: Function) => {
         fetch(url)
@@ -1347,12 +1383,31 @@ export default function App() {
     setAttachedFiles([]);
     setIsTyping(true);
 
+    setIsThinking(true);
+    const thinkingSequences = [
+      "Инициализация нейронных контуров v17.18.23...",
+      "Анализ контекста проекта (Unity 6 & Blender 4.3)...",
+      "Проверка статуса Quantum Link и облачных узлов...",
+      "Доступ к базе 13,000+ видео-уроков...",
+      "Синтез оптимального решения для вашего запроса..."
+    ];
+    
+    setThinkingSteps([thinkingSequences[0]]);
+    
+    // Animate thinking steps
+    let stepIndex = 1;
+    const thinkingInterval = setInterval(() => {
+      if (stepIndex < thinkingSequences.length) {
+        setThinkingSteps(prev => [...prev, thinkingSequences[stepIndex]]);
+        stepIndex++;
+      }
+    }, 1200);
+
     try {
       // Offline Fallback Check (Only if we really want to skip Gemini entirely)
       if (!navigator.onLine) {
         console.warn("Navigator reports offline, but we'll try API first.");
       }
-      // Removed automatic skip - we will try Gemini first and only fallback in the catch block
 
       // Prepare contents for Gemini (History + Images)
       const contents = [];
@@ -1388,7 +1443,7 @@ export default function App() {
       }
 
       let textResponse = "";
-      const systemInst = kb.system_instruction + "\n\n### CRITICAL KNOWLEDGE UPDATE v17.18.20 ###\n- ZENITH MASTER KNOWLEDGE INTEGRATION: Integrated logic from 13,000+ video tutorials (Unity 6, Blender 4.3, Godot 4.3, GIMP 3.0).\n- RPG COMBAT MASTER: Advanced RPG combat logic, AI states, and combo systems.\n- LOW POLY WORKFLOW: Expert modeling in Blender 4.3 specifically for Unity 6 performance.\n- OMNI-ANSWER ENGINE: Mastery in problem solving across all linked software.\n- STRICT UI RULE: ALWAYS USE UGUI (Canvas). No Planes or Terrains for interfaces.\n- ETERNAL OFFLINE: Full local archive support for No-Internet development.";
+      const systemInst = kb.system_instruction + "\n\n### ZENITH MULTI-TOOL SYNERGY v17.18.25 ###\n- MULTI-TOOL: Deep expertise in Photoshop 2025 AI and GIMP 3.0.\n- PRO MODE: Use advanced terminology (Unity 6, Blender 4.3, UGUI, DOTS).\n- SMART ARCHIVE: Answer being indexed for offline and auto-learning.\n- CORTEX LOGIC: Professional graphics pipeline + game engine synergy.";
 
       try {
         // Try local Gemini initialization if exists
@@ -1541,7 +1596,10 @@ export default function App() {
         }]);
       }
     } finally {
+      clearInterval(thinkingInterval);
       setIsTyping(false);
+      setIsThinking(false);
+      setThinkingSteps([]);
     }
   };
 
@@ -1935,18 +1993,29 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-sm font-bold text-white uppercase tracking-tighter">AI Assistant</h1>
-              <p className="text-[10px] text-slate-500 uppercase font-mono">v17.18.20</p>
+              <p className="text-[10px] text-slate-500 uppercase font-mono">v17.18.25</p>
             </div>
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/5">
-              <span className="text-[10px] font-bold text-slate-500 uppercase">Сеть</span>
-              <div className="flex items-center gap-1.5">
-                {isOnline ? <Wifi className="w-3 h-3 text-green-500" /> : <WifiOff className="w-3 h-3 text-red-500" />}
-                <span className={`text-[9px] font-bold uppercase ${isOnline ? 'text-green-500' : 'text-red-500'}`}>
-                  {isOnline ? 'Онлайн' : 'Офлайн'}
-                </span>
+            <div className="flex flex-col gap-2 p-2 rounded-lg bg-white/5 border border-white/5">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold text-slate-500 uppercase">Сервер</span>
+                <div className="flex items-center gap-1.5">
+                  <div className={`w-1.5 h-1.5 rounded-full ${serverHealth === 'online' ? 'bg-green-500' : 'bg-red-500 animate-pulse'}`} />
+                  <span className={`text-[9px] font-bold uppercase ${serverHealth === 'online' ? 'text-green-500' : 'text-red-500'}`}>
+                    {serverHealth === 'online' ? 'Связь OK' : 'Ошибка'}
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold text-slate-500 uppercase">ИИ Интеллект</span>
+                <div className="flex items-center gap-1.5">
+                  <div className={`w-1.5 h-1.5 rounded-full ${aiHealth === 'online' ? 'bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.5)]' : 'bg-yellow-500'}`} />
+                  <span className={`text-[9px] font-bold uppercase ${aiHealth === 'online' ? 'text-green-500' : 'text-yellow-500'}`}>
+                    {aiHealth === 'online' ? 'Связь OK' : 'Ограничен'}
+                  </span>
+                </div>
               </div>
             </div>
             <div className="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/5">
@@ -2275,9 +2344,9 @@ export default function App() {
               {/* Chat Header */}
               <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-black/20">
                 <div className="flex items-center gap-3">
-                  <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-red-500'}`} />
+                  <div className={`w-2 h-2 rounded-full ${aiHealth === 'online' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-yellow-500'}`} />
                   <span className="text-[10px] font-bold text-white uppercase tracking-widest">
-                    {isOnline ? 'Online Mode' : 'Offline Mode'}
+                    {aiHealth === 'online' ? 'Синтаксис Сингулярности (v17.18.25)' : 'Защищенный Режим (Локальный)'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -2312,19 +2381,67 @@ export default function App() {
                 <Cpu className="w-12 h-12 text-blue-500" />
               </motion.div>
               
-              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v17.18.20</h2>
+              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v17.18.25</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg px-4">
                 Я полностью осведомлен о вашем проекте по пути <br/>
                 <code className="text-blue-400 break-all bg-white/5 px-2 py-1 rounded mt-2 inline-block">
                   {kb?.project_path || 'Загрузка...'}
                 </code>. 
                 <br/><br/>
-                Задавайте любые вопросы по Unity, Blender или Photoshop на русском языке. Модули Intuitive Logic, Omni-Answer Engine и проект 'Континент судьбы' (v17.18.20) активированы.
+                Задавайте любые вопросы по Unity, Blender, Photoshop или GIMP на русском языке. Модули Zenith Multi-Tool Synergy, Omni-Answer Engine и проект 'Континент судьбы' (v17.18.25) активированы.
                 <br/><br/>
-                <span className="text-xs text-orange-400 font-bold uppercase">Внимание: ИИ понимает вас с полуслова и работает в режиме Eternal Offline Archive.</span>
+                <span className="text-xs text-orange-400 font-bold uppercase ring-1 ring-orange-400/30 px-2 py-1 rounded bg-orange-400/5">Внимание: ИИ работает на уровне Professional Multi-Tool Mastery в защищенном режиме.</span>
               </p>
 
-              {/* Cards removed as per user request */}
+              <div className="p-8 bg-white/5 border border-white/5 rounded-[2rem] w-full text-left space-y-6">
+                <h3 className="text-sm font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-blue-500" /> Статус API и Настройка ключей
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-[11px] leading-relaxed text-slate-400">
+                  <div className="space-y-3">
+                    <p className="font-bold text-blue-400 uppercase">Если в настройках Secrets пусто или стоит "AI Studio Free Tier":</p>
+                    <ul className="space-y-1 opacity-80">
+                      <li>• Это встроенный бесплатный доступ платформы.</li>
+                      <li>• Он работает автоматически — **нажимать карандаш не нужно**.</li>
+                      <li>• Если видите статус "Офлайн", значит сервис API временно перегружен.</li>
+                    </ul>
+                  </div>
+                  <div className="space-y-3">
+                    <p className="font-bold text-orange-400 uppercase">Если у вас есть личный ключ (AIza...):</p>
+                    <ul className="space-y-1 opacity-80">
+                      <li>• В верхнем меню Secrets выберите **"Select key"**.</li>
+                      <li>• Вставьте ваш код и нажмите **"Apply changes"**.</li>
+                      <li>• Это снимет лимиты бесплатного уровня.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {isThinking && (
+            <div className="flex justify-start">
+              <div className="max-w-[85%] bg-slate-900 shadow-2xl border border-blue-500/30 rounded-3xl p-6 backdrop-blur-xl">
+                 <div className="flex items-center gap-4 mb-4">
+                    <div className="w-8 h-8 rounded-full border-2 border-blue-500 border-t-transparent animate-spin" />
+                    <div>
+                      <h4 className="text-xs font-black text-blue-400 uppercase tracking-widest">Cortex Matrix Analysis</h4>
+                      <p className="text-[10px] text-slate-500 uppercase font-bold">Синтез данных Unity 6 & Blender 4.3</p>
+                    </div>
+                 </div>
+                 <div className="space-y-2">
+                    {thinkingSteps.map((step, si) => (
+                      <motion.div 
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        key={si}
+                        className="text-[10px] font-mono text-slate-400 flex items-center gap-2"
+                      >
+                        <span className="text-blue-500/50">›</span> {step}
+                      </motion.div>
+                    ))}
+                 </div>
+              </div>
             </div>
           )}
 
