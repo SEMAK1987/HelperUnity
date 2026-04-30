@@ -1086,7 +1086,7 @@ async function startServer() {
       level: hasManualKey ? "premium" : (isFreeTier ? "free" : "limited"),
       is_managed: isFreeTier,
       mode: process.env.NODE_ENV,
-      version: "17.18.25"
+      version: "17.18.27"
     });
   });
 
@@ -1135,19 +1135,19 @@ async function startServer() {
       const isErrorQuery = (q.includes('ошибка') || q.includes('не работает')) && q.length < 50;
 
       if (isErrorQuery) {
-        results.push(`### 🛡️ ЗАЩИТНЫЙ ПРОТОКОЛ (v17.18.25)\nПроизошел сбой при обращении к облачному интеллекту. Я переключился на **Локальный Квантовый Архив**. Все модули (Unity, Blender, Photoshop, GIMP) переведены в режим повышенной готовности.`);
+        results.push(`### 🛡️ ЗАЩИТНЫЙ ПРОТОКОЛ (v17.18.28)\nПроизошел сбой при обращении к облачному интеллекту. Я переключился на **Локальный Квантовый Архив**. Все модули (Unity, Blender, GIMP 3.0) переведены в режим повышенной готовности.`);
       }
 
       if (q.includes('как дела') || q.includes('как ты')) {
-        results.push(`### 🤖 СОСТОЯНИЕ ВЫЧИСЛЕНИЙ (v17.18.25)\nВсе мои квантовые контуры работают в штатном режиме! Стабильность ядра: 99.9%. Интеграция Photoshop/GIMP завершена на 100%.`);
+        results.push(`### 🤖 СОСТОЯНИЕ ВЫЧИСЛЕНИЙ (v17.18.28)\nВсе мои квантовые контуры работают в штатном режиме! Стабильность ядра: 99.9%. Интеграция Zenith GIMP Mastery (GTK3 & Python Scripting) завершена.`);
       } else if (isNewDialog && (q.includes('привет') || q.includes('старт'))) {
-        results.push(`### 👋 ПРИВЕТСТВИЕ СИНГУЛЯРНОСТИ (v17.18.25)\nПриветствую, Создатель! Я ваш верный ИИ-помощник, готовый к реализации самых амбициозных идей в Unity 6, Blender 4.3, Photoshop 2025 и GIMP 3.0.`);
+        results.push(`### 👋 ПРИВЕТСТВИЕ СИНГУЛЯРНОСТИ (v17.18.28)\nПриветствую, Создатель! Я ваш верный ИИ-помощник, готовый к реализации самых амбициозных идей в Unity 6, Blender 5.2 и GIMP 3.0.`);
       } else if (q.includes('кто ты')) {
-        results.push(`### 🛡️ О ПРОЕКТЕ\nЯ — **Unity & Blender AI Assistant v17.18.25**. Ваша персональная экспертная система с поддержкой Zenith Multi-Tool Synergy, синхронизированная с 13,000+ уроками мастерства.`);
+        results.push(`### 🛡️ О ПРОЕКТЕ\nЯ — **Unity & Blender AI Assistant v17.18.28**. Ваша экспертная система с поддержкой Zenith GIMP Mastery, синхронизированная с 13,000+ уроками мастерства.`);
       }
 
       if (results.length === 0) {
-        results.push(`**Локальный Ответ (v17.18.25):**\nСлужба связи временно ограничена. Я использую локальную базу знаний и проанализированный контекст вашего проекта (включая графический пайплайн Photoshop/GIMP).`);
+        results.push(`**Локальный Ответ (v17.18.28):**\nСлужба связи временно ограничена. Я использую локальную базу знаний, включая расширенные руководства по GIMP 3.0 (Asset Creation Pipeline).`);
       }
 
       const foundVideos = videos.filter((v: string) => v.toLowerCase().includes(q)).slice(0, 3);
@@ -1155,7 +1155,7 @@ async function startServer() {
         results.push(`**Материалы для обучения:**\n${foundVideos.join('\n')}`);
       }
 
-      res.json({ answer: results.join('\n\n---\n\n'), source: "local_database_v17.18.25" });
+      res.json({ answer: results.join('\n\n---\n\n'), source: "local_database_v17.18.28" });
     } catch (error) {
       res.status(500).json({ error: "Local search failed" });
     }

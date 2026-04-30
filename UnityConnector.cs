@@ -1,6 +1,6 @@
-// [ZENITH MULTI-TOOL SYNERGY v17.18.25]
+// [ZENITH MULTI-TOOL SYNERGY v17.18.28 - GIMP mastery]
 // Unity Connector for Quantum AI Assistant
-// Updated: 2026-04-30 (Synced with Photoshop 2025 & GIMP 3.0)
+// Updated: 2026-04-30 (Synced with GIMP 3.0 Zenith Mastery)
 
 using UnityEngine;
 using UnityEditor;

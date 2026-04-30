@@ -376,14 +376,206 @@ function MenuStudioPreview({ onDownload }: { onDownload: () => void }) {
   const [showLanguageList, setShowLanguageList] = useState(false);
 
   const t = {
-    'Русский': { play: 'Играть', settings: 'Настройки', exit: 'Выход', back: 'Назад', volume: 'Звук', music: 'Музыка', quality: 'Качество', res: 'Разрешение', fs: 'Весь экран', graphics: 'Графика', lang: 'Язык' },
-    'English': { play: 'Play', settings: 'Settings', exit: 'Exit', back: 'Back', volume: 'Sound', music: 'Music', quality: 'Quality', res: 'Resolution', fs: 'Fullscreen', graphics: 'Graphics', lang: 'Language' },
-    'Deutsch': { play: 'Spielen', settings: 'Einstellungen', exit: 'Beenden', back: 'Zurück', volume: 'Ton', music: 'Musik', quality: 'Qualität', res: 'Auflösung', fs: 'Vollbild', graphics: 'Grafik', lang: 'Sprache' },
-    'Français': { play: 'Jouer', settings: 'Paramètres', exit: 'Quitter', back: 'Retour', volume: 'Son', music: 'Musique', quality: 'Qualité', res: 'Résolution', fs: 'Plein écran', graphics: 'Graphisme', lang: 'Langue' },
-    'Español': { play: 'Jugar', settings: 'Ajustes', exit: 'Salir', back: 'Volver', volume: 'Sonido', music: 'Música', quality: 'Calidad', res: 'Resolución', fs: 'Pantalla completa', graphics: 'Gráficos', lang: 'Idioma' },
-    '日本語': { play: 'プレイ', settings: '設定', exit: '終了', back: '戻る', volume: '音量', music: '音楽', quality: '品質', res: '解像度', fs: '全画面', graphics: 'グラフィック', lang: '言語' },
-    '한국어': { play: '플레이', settings: '설정', exit: '나가기', back: '뒤로', volume: '소리', music: '음악', quality: '품질', res: '해상도', fs: '전체 화면', graphics: '그래픽', lang: '언어' },
-    '简体中文': { play: '开始', settings: '设置', exit: '退出', back: '返回', volume: '音量', music: '音乐', quality: '画质', res: '分辨率', fs: '全屏', graphics: '图像', lang: '语言' }
+    'Русский': { 
+      play: 'Играть', 
+      settings: 'Настройки', 
+      exit: 'Выход', 
+      back: 'Назад', 
+      volume: 'Звук', 
+      music: 'Музыка', 
+      quality: 'Качество', 
+      res: 'Разрешение', 
+      fs: 'Весь экран', 
+      graphics: 'Графика', 
+      lang: 'Язык',
+      help: 'Помощь По Игре',
+      capabilities: 'Возможности ИИ',
+      ollama: 'Ollama: OK',
+      ollamaOff: 'Ollama: Off',
+      sync: 'Синтаксис Сингулярности',
+      offline: 'Защищенный Режим',
+      clear: 'Очистить',
+      clearing: 'Очистка...',
+      thinking: 'Cortex Matrix Analysis',
+      synth: 'Синтез данных Unity 6 & Blender 4.3',
+      proMastery: 'Professional Multi-Tool Mastery',
+      downloadBg: 'Скачать Фон (JPG 4K)'
+    },
+    'English': { 
+      play: 'Play', 
+      settings: 'Settings', 
+      exit: 'Exit', 
+      back: 'Back', 
+      volume: 'Sound', 
+      music: 'Music', 
+      quality: 'Quality', 
+      res: 'Resolution', 
+      fs: 'Fullscreen', 
+      graphics: 'Graphics', 
+      lang: 'Language',
+      help: 'Game Help',
+      capabilities: 'AI Capabilities',
+      ollama: 'Ollama: OK',
+      ollamaOff: 'Ollama: Off',
+      sync: 'Singularity Syntax',
+      offline: 'Secure Mode',
+      clear: 'Clear',
+      clearing: 'Clearing...',
+      thinking: 'Cortex Matrix Analysis',
+      synth: 'Synthesizing Unity 6 & Blender 4.3 data',
+      proMastery: 'Professional Multi-Tool Mastery',
+      downloadBg: 'Download Background (JPG 4K)'
+    },
+    'Deutsch': { 
+      play: 'Spielen', 
+      settings: 'Einstellungen', 
+      exit: 'Beenden', 
+      back: 'Zurück', 
+      volume: 'Ton', 
+      music: 'Musik', 
+      quality: 'Qualität', 
+      res: 'Auflösung', 
+      fs: 'Vollbild', 
+      graphics: 'Grafik', 
+      lang: 'Sprache',
+      help: 'Spielhilfe',
+      capabilities: 'KI-Fähigkeiten',
+      ollama: 'Ollama: OK',
+      ollamaOff: 'Ollama: Off',
+      sync: 'Singularitäts-Syntax',
+      offline: 'Gesicherter Modus',
+      clear: 'Löschen',
+      clearing: 'Löschen...',
+      thinking: 'Cortex-Matrix-Analyse',
+      synth: 'Synthese von Unity 6 & Blender 4.3 Daten',
+      proMastery: 'Professionelle Multi-Tool-Meisterschaft',
+      downloadBg: 'Hintergrund Herunterladen (JPG 4K)'
+    },
+    'Français': { 
+      play: 'Jouer', 
+      settings: 'Paramètres', 
+      exit: 'Quitter', 
+      back: 'Retour', 
+      volume: 'Son', 
+      music: 'Musique', 
+      quality: 'Qualité', 
+      res: 'Résolution', 
+      fs: 'Plein écran', 
+      graphics: 'Graphisme', 
+      lang: 'Langue',
+      help: 'Aide au Jeu',
+      capabilities: 'Capacités de l\'IA',
+      ollama: 'Ollama: OK',
+      ollamaOff: 'Ollama: Off',
+      sync: 'Syntaxe de Singularité',
+      offline: 'Mode Sécurisé',
+      clear: 'Effacer',
+      clearing: 'Effacement...',
+      thinking: 'Analyse de la Matrice Cortex',
+      synth: 'Synthèse des données Unity 6 & Blender 4.3',
+      proMastery: 'Maîtrise Professionnelle Multi-Tool',
+      downloadBg: 'Télécharger le Fond (JPG 4K)'
+    },
+    'Español': { 
+      play: 'Jugar', 
+      settings: 'Ajustes', 
+      exit: 'Salir', 
+      back: 'Volver', 
+      volume: 'Sonido', 
+      music: 'Música', 
+      quality: 'Calidad', 
+      res: 'Resolución', 
+      fs: 'Pantalla completa', 
+      graphics: 'Gráficos', 
+      lang: 'Idioma',
+      help: 'Ayuda del Juego',
+      capabilities: 'Capacidades de IA',
+      ollama: 'Ollama: OK',
+      ollamaOff: 'Ollama: Off',
+      sync: 'Sintaxis de Singularidad',
+      offline: 'Modo Seguro',
+      clear: 'Limpiar',
+      clearing: 'Limpiando...',
+      thinking: 'Análisis de la Matriz Cortex',
+      synth: 'Sintetizando datos de Unity 6 y Blender 4.3',
+      proMastery: 'Maestría Profesional Multiherramienta',
+      downloadBg: 'Descargar Fondo (JPG 4K)'
+    },
+    '日本語': { 
+      play: 'プレイ', 
+      settings: '設定', 
+      exit: '終了', 
+      back: '戻る', 
+      volume: '音量', 
+      music: '音楽', 
+      quality: '品質', 
+      res: '解像度', 
+      fs: '全画面', 
+      graphics: 'グラフィック', 
+      lang: '言語',
+      help: 'ゲームヘルプ',
+      capabilities: 'AI機能',
+      ollama: 'Ollama: OK',
+      ollamaOff: 'Ollama: オフ',
+      sync: 'シンギュラリティ構文',
+      offline: 'セキュアモード',
+      clear: 'クリア',
+      clearing: 'クリア中...',
+      thinking: '皮質マトリックス分析',
+      synth: 'Unity 6とBlender 4.3のデータを統合中',
+      proMastery: 'プロフェッショナルマルチツールマスタリー',
+      downloadBg: '背景をダウンロード (JPG 4K)'
+    },
+    '한국어': { 
+      play: '플레이', 
+      settings: '설정', 
+      exit: '나가기', 
+      back: '뒤로', 
+      volume: '소리', 
+      music: '음악', 
+      quality: '품질', 
+      res: '해상도', 
+      fs: '전체 화면', 
+      graphics: '그래픽', 
+      lang: '언어',
+      help: '게임 도움말',
+      capabilities: 'AI 능력',
+      ollama: 'Ollama: 확인',
+      ollamaOff: 'Ollama: 꺼짐',
+      sync: '특이점 구문',
+      offline: '보안 모드',
+      clear: '지우기',
+      clearing: '지우는 중...',
+      thinking: '피질 매트릭스 분석',
+      synth: 'Unity 6 및 Blender 4.3 데이터 합성 중',
+      proMastery: '전문 멀티 툴 마스터리',
+      downloadBg: '배경 다운로드 (JPG 4K)'
+    },
+    '简体中文': { 
+      play: '开始', 
+      settings: '设置', 
+      exit: '退出', 
+      back: '返回', 
+      volume: '音量', 
+      music: '音乐', 
+      quality: '画质', 
+      res: '分辨率', 
+      fs: '全屏', 
+      graphics: '图像', 
+      lang: '语言',
+      help: '游戏帮助',
+      capabilities: 'AI 能力',
+      ollama: 'Ollama: 正常',
+      ollamaOff: 'Ollama: 关闭',
+      sync: '奇点语法',
+      offline: '安全模式',
+      clear: '清除',
+      clearing: '正在清除...',
+      thinking: '皮层矩阵分析',
+      synth: '综合 Unity 6 & Blender 4.3 数据',
+      proMastery: '专业多工具大师级',
+      downloadBg: '下载背景 (JPG 4K)'
+    }
   }[language as keyof typeof t] || { play: 'Играть', settings: 'Настройки', exit: 'Выход', back: 'Назад', volume: 'Звук', music: 'Музыка', quality: 'Качество', res: 'Разрешение', fs: 'Весь экран', graphics: 'Графика', lang: 'Язык' };
 
   return (
@@ -395,13 +587,12 @@ function MenuStudioPreview({ onDownload }: { onDownload: () => void }) {
       {/* Background Layer: Animated Castles & Landscape */}
       <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=2070')] bg-cover bg-center opacity-40" />
       
-      {/* Download Direct Link for User */}
-      <div className="absolute top-6 left-6 z-50 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="absolute top-6 left-6 z-50 opacity-0 group-hover:opacity-100 transition-all duration-700">
         <button 
           onClick={onDownload}
-          className="flex items-center gap-2 px-4 py-2 bg-black/60 backdrop-blur-md border border-white/20 rounded-xl text-[10px] font-black text-white uppercase tracking-widest hover:bg-blue-600 transition-all shadow-2xl cursor-pointer"
+          className="flex items-center gap-2 px-4 py-2 bg-black/40 backdrop-blur-xl border border-white/10 rounded-xl text-[10px] font-black text-white uppercase tracking-widest hover:bg-blue-600/80 hover:shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all shadow-2xl cursor-pointer"
         >
-          <Download className="w-3 h-3" /> Скачать Фон (JPG 4K)
+          <Download className="w-3 h-3" /> {t.downloadBg}
         </button>
       </div>
       
@@ -452,38 +643,51 @@ function MenuStudioPreview({ onDownload }: { onDownload: () => void }) {
         {view === 'main' ? (
           <motion.div 
             key="main"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
+            initial={{ opacity: 0, x: 100, filter: 'blur(10px)' }}
+            animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, x: -100, filter: 'blur(10px)' }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="absolute right-12 top-1/2 -translate-y-1/2 flex flex-col gap-6"
           >
             {[
               { id: 'play', icon: <Flame className="w-8 h-8" />, color: 'bg-orange-500', label: t.play },
               { id: 'settings', icon: <Settings className="w-8 h-8" />, color: 'bg-blue-600', label: t.settings },
               { id: 'exit', icon: <X className="w-8 h-8" />, color: 'bg-red-600', label: t.exit }
-            ].map(btn => (
-              <div key={btn.id} className="flex items-center gap-4 justify-end group">
-                <span className="text-white font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 px-4 py-2 rounded-xl backdrop-blur-sm border border-white/10">{btn.label}</span>
+            ].map((btn, idx) => (
+              <motion.div 
+                key={btn.id} 
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 * idx, duration: 0.5 }}
+                className="flex items-center gap-4 justify-end group"
+              >
+                <span className="text-white font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all duration-500 bg-black/40 px-4 py-2 rounded-xl backdrop-blur-xl border border-white/10 translate-x-4 group-hover:translate-x-0">{btn.label}</span>
                 <button
                   onClick={() => btn.id === 'settings' && setView('settings')}
-                  className={`${btn.color} p-6 rounded-full text-white shadow-2xl hover:scale-110 active:scale-95 transition-all border-4 border-white/20 relative group-hover:shadow-[0_0_30px_rgba(255,255,255,0.3)]`}
+                  className={`${btn.color} p-6 rounded-full text-white shadow-2xl hover:scale-110 active:scale-90 transition-all duration-500 border-4 border-white/20 relative group-hover:shadow-[0_0_40px_rgba(255,255,255,0.4)] overflow-hidden`}
                 >
-                  {btn.icon}
-                  <motion.div className="absolute inset-0 rounded-full border-4 border-white/0 group-hover:border-white/40 transition-all scale-110" />
+                  <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="relative z-10">{btn.icon}</div>
+                  <motion.div 
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="absolute inset-0 rounded-full border-4 border-white/0 group-hover:border-white/20 transition-all" 
+                  />
                 </button>
-              </div>
+              </motion.div>
             ))}
           </motion.div>
         ) : (
           <motion.div 
             key="settings"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="absolute inset-0 flex flex-col p-12 bg-black/60 backdrop-blur-md"
+            initial={{ opacity: 0, y: 100, filter: 'blur(20px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, y: 100, filter: 'blur(20px)' }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute inset-0 flex flex-col p-12 bg-black/40 backdrop-blur-3xl"
           >
             {/* Settings Header */}
-            <h2 className="text-4xl font-black text-white/20 uppercase tracking-[1em] absolute top-12 left-1/2 -translate-x-1/2 select-none">{t.settings.toUpperCase()}</h2>
+            <h2 className="text-6xl font-black text-white/5 uppercase tracking-[1em] absolute top-24 left-1/2 -translate-x-1/2 select-none pointer-events-none">{t.settings.toUpperCase()}</h2>
             
             <div className="grid grid-cols-2 gap-20 h-full items-center">
               {/* Left Column: Quality & Fullscreen */}
@@ -756,6 +960,210 @@ export default function App() {
   const [updateProgress, setUpdateProgress] = useState(0);
   const [ollamaRunning, setOllamaRunning] = useState(false);
   const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([]);
+  const [language, setLanguage] = useState('Русский');
+
+  const t = {
+    'Русский': { 
+      play: 'Играть', 
+      settings: 'Настройки', 
+      exit: 'Выход', 
+      back: 'Назад', 
+      volume: 'Звук', 
+      music: 'Музыка', 
+      quality: 'Качество', 
+      res: 'Разрешение', 
+      fs: 'Весь экран', 
+      graphics: 'Графика', 
+      lang: 'Язык',
+      help: 'Помощь По Игре',
+      capabilities: 'Возможности ИИ',
+      ollama: 'Ollama: OK',
+      ollamaOff: 'Ollama: Off',
+      sync: 'Синтаксис Сингулярности',
+      offline: 'Защищенный Режим',
+      clear: 'Очистить',
+      clearing: 'Очистка...',
+      thinking: 'Cortex Matrix Analysis',
+      synth: 'Синтез данных Unity 6 & Blender 4.3',
+      proMastery: 'Professional Multi-Tool Mastery',
+      downloadBg: 'Скачать Фон (JPG 4K)'
+    },
+    'English': { 
+      play: 'Play', 
+      settings: 'Settings', 
+      exit: 'Exit', 
+      back: 'Back', 
+      volume: 'Sound', 
+      music: 'Music', 
+      quality: 'Quality', 
+      res: 'Resolution', 
+      fs: 'Fullscreen', 
+      graphics: 'Graphics', 
+      lang: 'Language',
+      help: 'Game Help',
+      capabilities: 'AI Capabilities',
+      ollama: 'Ollama: OK',
+      ollamaOff: 'Ollama: Off',
+      sync: 'Singularity Syntax',
+      offline: 'Secure Mode',
+      clear: 'Clear',
+      clearing: 'Clearing...',
+      thinking: 'Cortex Matrix Analysis',
+      synth: 'Synthesizing Unity 6 & Blender 4.3 data',
+      proMastery: 'Professional Multi-Tool Mastery',
+      downloadBg: 'Download Background (JPG 4K)'
+    },
+    'Deutsch': { 
+      play: 'Spielen', 
+      settings: 'Einstellungen', 
+      exit: 'Beenden', 
+      back: 'Zurück', 
+      volume: 'Ton', 
+      music: 'Musik', 
+      quality: 'Qualität', 
+      res: 'Auflösung', 
+      fs: 'Vollbild', 
+      graphics: 'Grafik', 
+      lang: 'Sprache',
+      help: 'Spielhilfe',
+      capabilities: 'KI-Fähigkeiten',
+      ollama: 'Ollama: OK',
+      ollamaOff: 'Ollama: Off',
+      sync: 'Singularitäts-Syntax',
+      offline: 'Gesicherter Modus',
+      clear: 'Löschen',
+      clearing: 'Löschen...',
+      thinking: 'Cortex-Matrix-Analyse',
+      synth: 'Synthese von Unity 6 & Blender 4.3 Daten',
+      proMastery: 'Professionelle Multi-Tool-Meisterschaft',
+      downloadBg: 'Hintergrund Herunterladen (JPG 4K)'
+    },
+    'Français': { 
+      play: 'Jouer', 
+      settings: 'Paramètres', 
+      exit: 'Quitter', 
+      back: 'Retour', 
+      volume: 'Son', 
+      music: 'Musique', 
+      quality: 'Qualité', 
+      res: 'Résolution', 
+      fs: 'Plein écran', 
+      graphics: 'Graphisme', 
+      lang: 'Langue',
+      help: 'Aide au Jeu',
+      capabilities: 'Capacités de l\'IA',
+      ollama: 'Ollama: OK',
+      ollamaOff: 'Ollama: Off',
+      sync: 'Syntaxe de Singularité',
+      offline: 'Mode Sécurisé',
+      clear: 'Effacer',
+      clearing: 'Effacement...',
+      thinking: 'Analyse de la Matrice Cortex',
+      synth: 'Synthèse des données Unity 6 & Blender 4.3',
+      proMastery: 'Maîtrise Professionnelle Multi-Tool',
+      downloadBg: 'Télécharger le Fond (JPG 4K)'
+    },
+    'Español': { 
+      play: 'Jugar', 
+      settings: 'Ajustes', 
+      exit: 'Salir', 
+      back: 'Volver', 
+      volume: 'Sonido', 
+      music: 'Música', 
+      quality: 'Calidad', 
+      res: 'Resolución', 
+      fs: 'Pantalla completa', 
+      graphics: 'Gráficos', 
+      lang: 'Idioma',
+      help: 'Ayuda del Juego',
+      capabilities: 'Capacidades de IA',
+      ollama: 'Ollama: OK',
+      ollamaOff: 'Ollama: Off',
+      sync: 'Sintaxis de Singularidad',
+      offline: 'Modo Seguro',
+      clear: 'Limpiar',
+      clearing: 'Limpiando...',
+      thinking: 'Análisis de la Matriz Cortex',
+      synth: 'Sintetizando datos de Unity 6 y Blender 4.3',
+      proMastery: 'Maestría Profesional Multiherramienta',
+      downloadBg: 'Descargar Fondo (JPG 4K)'
+    },
+    '日本語': { 
+      play: 'プレイ', 
+      settings: '設定', 
+      exit: '終了', 
+      back: '戻る', 
+      volume: '音量', 
+      music: '音楽', 
+      quality: '品質', 
+      res: '解像度', 
+      fs: '全画面', 
+      graphics: 'グラフィック', 
+      lang: '言語',
+      help: 'ゲームヘルプ',
+      capabilities: 'AI機能',
+      ollama: 'Ollama: OK',
+      ollamaOff: 'Ollama: オフ',
+      sync: 'シンギュラリティ構文',
+      offline: 'セキュアモード',
+      clear: 'クリア',
+      clearing: 'クリア中...',
+      thinking: '皮質マトリックス分析',
+      synth: 'Unity 6とBlender 4.3のデータを統合中',
+      proMastery: 'プロフェッショナルマルチツールマスタリー',
+      downloadBg: '背景を下载 (JPG 4K)'
+    },
+    '한국어': { 
+      play: '플레이', 
+      settings: '설정', 
+      exit: '나가기', 
+      back: '뒤로', 
+      volume: '소리', 
+      music: '음악', 
+      quality: '품질', 
+      res: '해상도', 
+      fs: '전체 화면', 
+      graphics: '그래픽', 
+      lang: '언어',
+      help: '게임 도움말',
+      capabilities: 'AI 능력',
+      ollama: 'Ollama: 확인',
+      ollamaOff: 'Ollama: 꺼짐',
+      sync: '특이점 구문',
+      offline: '보안 모드',
+      clear: '지우기',
+      clearing: '지우는 중...',
+      thinking: '피질 매트릭스 분석',
+      synth: 'Unity 6 및 Blender 4.3 데이터 합성 중',
+      proMastery: '전문 멀티 툴 마스터리',
+      downloadBg: '배경 다운로드 (JPG 4K)'
+    },
+    '简体中文': { 
+      play: '开始', 
+      settings: '设置', 
+      exit: '退出', 
+      back: '返回', 
+      volume: '音量', 
+      music: '音乐', 
+      quality: '画质', 
+      res: '分辨率', 
+      fs: '全屏', 
+      graphics: '图像', 
+      lang: '语言',
+      help: '游戏帮助',
+      capabilities: 'AI 能力',
+      ollama: 'Ollama: 正常',
+      ollamaOff: 'Ollama: 关闭',
+      sync: '奇点语法',
+      offline: '安全模式',
+      clear: '清除',
+      clearing: '正在清除...',
+      thinking: '皮层矩阵分析',
+      synth: '综合 Unity 6 & Blender 4.3 数据',
+      proMastery: '专业多工具大师级',
+      downloadBg: '下载背景 (JPG 4K)'
+    }
+  }[language as keyof any] || { play: 'Играть', settings: 'Настройки', exit: 'Выход', back: 'Назад', volume: 'Звук', music: 'Музыка', quality: 'Качество', res: 'Разрешение', fs: 'Весь экран', graphics: 'Графика', lang: 'Язык' };
 
   const fileToBase64 = async (url: string): Promise<{ mimeType: string; data: string }> => {
     try {
@@ -1443,7 +1851,7 @@ export default function App() {
       }
 
       let textResponse = "";
-      const systemInst = kb.system_instruction + "\n\n### ZENITH MULTI-TOOL SYNERGY v17.18.25 ###\n- MULTI-TOOL: Deep expertise in Photoshop 2025 AI and GIMP 3.0.\n- PRO MODE: Use advanced terminology (Unity 6, Blender 4.3, UGUI, DOTS).\n- SMART ARCHIVE: Answer being indexed for offline and auto-learning.\n- CORTEX LOGIC: Professional graphics pipeline + game engine synergy.";
+      const systemInst = kb.system_instruction + "\n\n### ZENITH 3D MASTERY v17.18.27 ###\n- 3D EXPERT: Deep expertise in Blender 4.3/5.2 (Hard Surface, Sculpting, Nodes).\n- TEACHING MODE: When asked about asset creation, provide detailed step-by-step instructions.\n- PRO MODE: Use advanced terminology (Unity 6, Blender 4.3, UGUI, DOTS).\n- CORTEX LOGIC: Professional graphics pipeline + game engine synergy.";
 
       try {
         // Try local Gemini initialization if exists
@@ -1993,7 +2401,7 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-sm font-bold text-white uppercase tracking-tighter">AI Assistant</h1>
-              <p className="text-[10px] text-slate-500 uppercase font-mono">v17.18.25</p>
+              <p className="text-[10px] text-slate-500 uppercase font-mono">v17.18.27</p>
             </div>
           </div>
 
@@ -2300,16 +2708,16 @@ export default function App() {
               <button 
                 onClick={() => setActiveTab('game_help')}
                 className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 ${
-                  activeTab === 'game_help' ? 'bg-green-600 text-white shadow-lg shadow-green-600/20' : 'text-green-400 hover:bg-green-600/10 border border-green-500/20'
-                }`}
+                  activeTab === 'game_help' ? 'bg-green-600 text-white shadow-lg shadow-green-600/40' : 'text-green-400 hover:bg-green-600/10 border border-green-500/20'
+                } hover:scale-105 active:scale-95 duration-300`}
               >
-                <HelpCircle className="w-3.5 h-3.5" /> Помощь По Игре
+                <HelpCircle className="w-3.5 h-3.5" /> {t.help}
               </button>
               <button 
                 onClick={fetchCapabilities}
-                className="px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 text-blue-400 hover:bg-blue-600/10"
+                className="px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 text-blue-400 hover:bg-blue-600/10 hover:scale-105 active:scale-95 duration-300"
               >
-                <Info className="w-3.5 h-3.5" /> Возможности ИИ
+                <Info className="w-3.5 h-3.5" /> {t.capabilities}
               </button>
             </nav>
           </div>
@@ -2319,14 +2727,14 @@ export default function App() {
               onClick={handleLaunchOllama}
               className={`px-4 py-2 rounded-xl border transition-all group flex items-center gap-2 shadow-lg ${
                 ollamaRunning 
-                ? 'bg-cyan-600/20 border-cyan-500/50 text-cyan-400 shadow-cyan-600/20' 
+                ? 'bg-cyan-600/20 border-cyan-500/50 text-cyan-400 shadow-cyan-600/40' 
                 : 'bg-slate-800/20 border-white/5 text-slate-500 shadow-none'
-              }`}
-              title={ollamaRunning ? "Ollama активна" : "Ollama: Off"}
+              } hover:shadow-cyan-500/20 active:scale-95 duration-300`}
+              title={ollamaRunning ? t.ollama : t.ollamaOff}
             >
               <Cpu className={`w-4 h-4 group-hover:scale-110 transition-transform ${ollamaRunning ? 'animate-pulse' : ''}`} />
               <span className="text-[10px] font-bold uppercase tracking-widest hidden sm:inline">
-                {ollamaRunning ? 'Ollama: OK' : 'Ollama: Off'}
+                {ollamaRunning ? t.ollama : t.ollamaOff}
               </span>
             </button>
             <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-full border border-white/5">
@@ -2344,21 +2752,21 @@ export default function App() {
               {/* Chat Header */}
               <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-black/20">
                 <div className="flex items-center gap-3">
-                  <div className={`w-2 h-2 rounded-full ${aiHealth === 'online' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-yellow-500'}`} />
-                  <span className="text-[10px] font-bold text-white uppercase tracking-widest">
-                    {aiHealth === 'online' ? 'Синтаксис Сингулярности (v17.18.25)' : 'Защищенный Режим (Локальный)'}
+                  <div className={`w-2 h-2 rounded-full ${aiHealth === 'online' ? 'bg-green-500 shadow-[0_0_12px_rgba(34,197,94,0.6)]' : 'bg-yellow-500'}`} />
+                  <span className="text-[10px] font-bold text-white uppercase tracking-widest group">
+                    {aiHealth === 'online' ? `${t.sync} (v17.18.28)` : `${t.offline} (v17.18.28)`}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <button 
                     onClick={handleClearChat}
                     disabled={isClearingChat}
-                    className="p-2 hover:bg-white/5 rounded-lg text-slate-500 hover:text-red-400 transition-all flex items-center gap-2 disabled:opacity-50"
-                    title="Очистить историю чата"
+                    className="p-2 hover:bg-white/5 rounded-lg text-slate-500 hover:text-red-400 transition-all flex items-center gap-2 disabled:opacity-50 hover:shadow-glow active:scale-95"
+                    title={t.clear}
                   >
                     <Trash2 className={`w-4 h-4 ${isClearingChat ? 'animate-spin' : ''}`} />
                     <span className="text-[9px] font-bold uppercase hidden sm:inline">
-                      {isClearingChat ? 'Очистка...' : 'Очистить'}
+                      {isClearingChat ? t.clearing : t.clear}
                     </span>
                   </button>
                   <button 
@@ -2381,17 +2789,32 @@ export default function App() {
                 <Cpu className="w-12 h-12 text-blue-500" />
               </motion.div>
               
-              <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">Unity AI Assistant v17.18.25</h2>
-              <p className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg px-4">
-                Я полностью осведомлен о вашем проекте по пути <br/>
-                <code className="text-blue-400 break-all bg-white/5 px-2 py-1 rounded mt-2 inline-block">
-                  {kb?.project_path || 'Загрузка...'}
-                </code>. 
-                <br/><br/>
-                Задавайте любые вопросы по Unity, Blender, Photoshop или GIMP на русском языке. Модули Zenith Multi-Tool Synergy, Omni-Answer Engine и проект 'Континент судьбы' (v17.18.25) активированы.
-                <br/><br/>
-                <span className="text-xs text-orange-400 font-bold uppercase ring-1 ring-orange-400/30 px-2 py-1 rounded bg-orange-400/5">Внимание: ИИ работает на уровне Professional Multi-Tool Mastery в защищенном режиме.</span>
-              </p>
+              <h2 className="text-2xl font-black text-white mb-4 uppercase tracking-tighter shadow-blue-500/10 drop-shadow-xl transition-all duration-700">Unity AI Assistant v17.18.28</h2>
+              <div className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg px-4 font-medium">
+                {language === 'Русский' ? (
+                  <>
+                    Я полностью осведомлен о вашем проекте по пути <br/>
+                    <code className="text-blue-400 break-all bg-white/5 px-2 py-1 rounded mt-2 inline-block shadow-inner ring-1 ring-white/5">
+                      {kb?.project_path || 'Загрузка...'}
+                    </code>. 
+                    <br/><br/>
+                    Задавайте любые вопросы по Unity, Blender, Photoshop или GIMP. Модули Zenith 3D Mastery, Omni-Answer Engine и проект 'Континент судьбы' (v17.18.27) активированы.
+                    <br/><br/>
+                    <span className="text-xs text-orange-400 font-black uppercase ring-1 ring-orange-400/30 px-3 py-1.5 rounded-full bg-orange-400/5 shadow-lg shadow-orange-500/5 inline-block animate-pulse">Внимание: {t.proMastery}</span>
+                  </>
+                ) : (
+                  <>
+                    I am fully aware of your project at path <br/>
+                    <code className="text-blue-400 break-all bg-white/5 px-2 py-1 rounded mt-2 inline-block shadow-inner ring-1 ring-white/5">
+                      {kb?.project_path || 'Loading...'}
+                    </code>. 
+                    <br/><br/>
+                    Ask any questions about Unity, Blender, Photoshop, or GIMP. Zenith 3D Mastery, Omni-Answer Engine, and project 'Fate Continent' (v17.18.27) are active.
+                    <br/><br/>
+                    <span className="text-xs text-orange-400 font-black uppercase ring-1 ring-orange-400/30 px-3 py-1.5 rounded-full bg-orange-400/5 shadow-lg shadow-orange-500/5 inline-block animate-pulse">Attention: {t.proMastery}</span>
+                  </>
+                )}
+              </div>
 
               <div className="p-8 bg-white/5 border border-white/5 rounded-[2rem] w-full text-left space-y-6">
                 <h3 className="text-sm font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
@@ -2423,10 +2846,10 @@ export default function App() {
             <div className="flex justify-start">
               <div className="max-w-[85%] bg-slate-900 shadow-2xl border border-blue-500/30 rounded-3xl p-6 backdrop-blur-xl">
                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-8 h-8 rounded-full border-2 border-blue-500 border-t-transparent animate-spin" />
+                    <div className="w-8 h-8 rounded-full border-2 border-blue-500 border-t-transparent animate-spin shadow-[0_0_15px_rgba(59,130,246,0.3)]" />
                     <div>
-                      <h4 className="text-xs font-black text-blue-400 uppercase tracking-widest">Cortex Matrix Analysis</h4>
-                      <p className="text-[10px] text-slate-500 uppercase font-bold">Синтез данных Unity 6 & Blender 4.3</p>
+                      <h4 className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">{t.thinking}</h4>
+                      <p className="text-[9px] text-slate-500 uppercase font-black tracking-widest">{t.synth}</p>
                     </div>
                  </div>
                  <div className="space-y-2">

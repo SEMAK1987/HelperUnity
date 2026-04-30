@@ -1,7 +1,7 @@
 bl_info = {
     "name": "AI Assistant Link",
-    "author": "Omniversal World Architect v17.18.25",
-    "version": (17, 18, 25),
+    "author": "Omniversal World Architect v17.18.28",
+    "version": (17, 18, 28),
     "blender": (2, 80, 0),
     "location": "View3D > N-Panel > AI Assistant",
     "description": "Direct bridge to the World Architect Divine Architect Supreme with project level GOD Synergy.",

@@ -1,6 +1,6 @@
 {
-  "name": "Unity & Blender AI Assistant v17.18.25",
-  "description": "Квантовый ИИ v17.18.25 (Zenith Multi-Tool Synergy). Полный стек для Unity 6, Blender 5.2, Photoshop 2025 и GIMP 3.0. Поддержка Online Research и 13,000+ видео-уроков.",
+  "name": "Unity & Blender AI Assistant v17.18.28",
+  "description": "Квантовый ИИ v17.18.28 (Zenith GIMP Mastery). Полный стек для Unity 6, Blender 5.2 и профессионального GIMP 3.0. Поддержка Hard Surface, Sculpting и текстурного пайплайна.",
   "requestFramePermissions": [
     "camera",
     "microphone",
