@@ -1,4 +1,4 @@
-# Помощь По Игре - Unity 6 (6000.3.10f1) Ultimate Guide (v17.18.2)
+# Помощь По Игре - Unity 6 (6000.3.10f1) Ultimate Guide (v17.18.30)
 
 Этот документ является динамическим руководством по созданию игры "Континент Судьбы". Здесь описаны пошаговые инструкции, скрипты и настройки для Unity, дополненные деталями по сохранению данных, визуализации рас и продвинутому UI из Menu Studio.
 
@@ -383,7 +383,7 @@ public class UnityMenuMaster : MonoBehaviour {
         foreach (var r in resolutions) resOptions.Add($"{r.width}x{r.height}");
         resDropdown.AddOptions(resOptions);
 
-        // Языки (Master Sync v17.18.2)
+        // Языки (Fate Master Sync v17.18.30)
         langDropdown.ClearOptions();
         langDropdown.AddOptions(new List<string> { 
             "Русский", "English", "Deutsch", "Français", 
@@ -417,7 +417,7 @@ public class UnityMenuMaster : MonoBehaviour {
 *   `Assets/UI/Icons/` - иконки (Flame, Gear, X).
 
 ---
-*Документ полностью переработан для версии v17.18.2 (Menu Studio Visuals Mastery)
+*Документ полностью переработан для версии v17.18.30 (Menu Studio Visuals Mastery & Fate Continent)
 
 ## 💎 ГЛАВА 13: Визуализация "Menu Studio" (Атмосфера и Замки)
 

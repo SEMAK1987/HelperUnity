@@ -779,6 +779,7 @@ export default function App() {
   const [isGeneratingVK, setIsGeneratingVK] = useState(false);
   const [vkProgress, setVkProgress] = useState(0);
   const [vkStatus, setVkStatus] = useState('');
+  const [showStudioGuide, setShowStudioGuide] = useState(false);
   
   const chatEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -4817,7 +4818,22 @@ export default function App() {
                     </div>
                   </motion.div>
                 ) : designSubTab === 'Menu Studio' ? (
-                  <MenuStudioPreview onDownload={downloadBackground} />
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between px-6">
+                      <div>
+                        <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">Menu Studio Visuals Mastery</h3>
+                        <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mt-1">Интерактивный предпросмотр UI v17.18.30</p>
+                      </div>
+                      <button 
+                        onClick={() => setShowStudioGuide(true)}
+                        className="flex items-center gap-2 px-6 py-3 bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/30 rounded-2xl transition-all font-black uppercase text-[10px] tracking-widest shadow-xl shadow-blue-500/10"
+                      >
+                        <Info className="w-4 h-4" />
+                        Полное описание Меню
+                      </button>
+                    </div>
+                    <MenuStudioPreview onDownload={downloadBackground} />
+                  </div>
                 ) : (
                   <motion.div 
                     initial={{ opacity: 0, y: 20 }}
@@ -4995,8 +5011,8 @@ export default function App() {
                         <MapIcon className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Континент Судьбы: Генератор Уровней</h2>
-                        <p className="text-xs text-slate-400">Процедурное моделирование городов и ландшафтов v17.18.30</p>
+                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Fate Continent: Camera Mastery v17.18.30</h2>
+                        <p className="text-xs text-slate-400">Исправление иерархии: точки камеры должны быть вне Canvas!</p>
                       </div>
                     </div>
 
@@ -6601,7 +6617,7 @@ export default function App() {
                   </div>
                   <div>
                     <h2 className="text-xl font-bold text-white">Настройки ИИ</h2>
-                    <p className="text-xs text-slate-500 uppercase tracking-widest mt-1">Версия {version}</p>
+                    <p className="text-xs text-slate-500 uppercase tracking-widest mt-1">Версия {appVersion}</p>
                   </div>
                 </div>
                 <button 
@@ -6715,6 +6731,135 @@ export default function App() {
                   className="flex-1 px-6 py-4 rounded-2xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20"
                 >
                   Сохранить
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Studio Guide Modal */}
+      <AnimatePresence>
+        {showStudioGuide && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-xl"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 50 }}
+              animate={{ scale: 1, y: 0 }}
+              className="w-full max-w-4xl bg-slate-900/90 border border-white/10 rounded-[3rem] overflow-hidden shadow-[0_0_100px_rgba(37,99,235,0.2)] flex flex-col max-h-[90vh]"
+            >
+              <div className="p-8 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border-b border-white/10 flex items-center justify-between">
+                <div>
+                  <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic flex items-center gap-3">
+                    <Sparkles className="w-6 h-6 text-blue-400" />
+                    Menu Studio: Архитектура UI v17.18.30
+                  </h3>
+                  <p className="text-[10px] text-slate-400 uppercase font-bold tracking-[0.2em] mt-1">Описано на основе ваших скриншотов для переноса в другие нейросети</p>
+                </div>
+                <button 
+                  onClick={() => setShowStudioGuide(false)}
+                  className="p-3 bg-white/5 hover:bg-red-500/20 text-slate-400 hover:text-red-400 rounded-2xl border border-white/10 transition-all"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-10 space-y-12 custom-scrollbar">
+                <section className="space-y-6">
+                  <div className="flex items-center gap-3 text-blue-400">
+                    <Layout className="w-5 h-5" />
+                    <h4 className="font-black uppercase tracking-widest text-sm">Общая Концепция и Стиль</h4>
+                  </div>
+                  <div className="bg-white/5 border border-white/10 rounded-3xl p-6 text-sm text-slate-300 leading-relaxed font-medium">
+                    Стиль <strong>Zenith Glassmorphism</strong> (Темный Матовый). Интерфейс построен на принципах профессионального UI/UX для RPG: глубокая прозрачность, мягкое размытие (Backdrop Blur), градиенты от темно-синего к черному и яркие цветовые акценты (Оранжевый, Синий, Красный) для ключевых действий.
+                  </div>
+                </section>
+
+                <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-3 text-orange-400">
+                      <Gamepad2 className="w-5 h-5" />
+                      <h4 className="font-black uppercase tracking-widest text-sm">Главное Меню</h4>
+                    </div>
+                    <ul className="space-y-4">
+                      {[
+                        { t: "Кнопка ИГРАТЬ", d: "Оранжевый круг (#f97316), иконка Пламени (Flame), белый текст в плашке." },
+                        { t: "Кнопка НАСТРОЙКИ", d: "Синий круг (#2563eb), иконка Шестеренки (Gear), белый текст." },
+                        { t: "Кнопка ВЫХОД", d: "Красный круг (#dc2626), иконка Креста (X), белый текст." },
+                        { t: "Анимация", d: "Плавное появление текста слева при наведении, пульсация кнопок." }
+                      ].map((item, i) => (
+                        <li key={i} className="flex gap-4 p-4 bg-white/5 rounded-2xl border border-white/5">
+                          <div className="w-1.5 h-1.5 rounded-full bg-orange-400 mt-2 shrink-0" />
+                          <div className="text-xs text-slate-400"><span className="text-white font-bold block mb-1">{item.t}</span>{item.d}</div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-3 text-blue-400">
+                      <Settings className="w-5 h-5" />
+                      <h4 className="font-black uppercase tracking-widest text-sm">Панель Настроек</h4>
+                    </div>
+                    <ul className="space-y-4">
+                      {[
+                        { t: "Заголовок", d: "Крупный текст 'НАСТРОЙКИ' в центре, разрядка символов (tracking-[1em])." },
+                        { t: "Выбор Качества", d: "Выпадающее меню: Very Low, Low, Medium, High, Very High, Ultra (8K)." },
+                        { t: "Разрешение", d: "От мобильных 640x480 до 8K (7680x4320). Акцент на Ultra-качество." },
+                        { t: "Звук и Музыка", d: "Синие ползунки (Sliders) с круглыми хэндлами и %% индикацией." }
+                      ].map((item, i) => (
+                        <li key={i} className="flex gap-4 p-4 bg-white/5 rounded-2xl border border-white/5">
+                          <div className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-2 shrink-0" />
+                          <div className="text-xs text-slate-400"><span className="text-white font-bold block mb-1">{item.t}</span>{item.d}</div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </section>
+
+                <section className="space-y-6">
+                   <div className="flex items-center gap-3 text-purple-400">
+                    <Globe className="w-5 h-5" />
+                    <h4 className="font-black uppercase tracking-widest text-sm">Локализация и Дополнительно</h4>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="p-6 bg-white/5 border border-white/10 rounded-3xl space-y-3">
+                       <h5 className="text-[10px] font-black text-white uppercase tracking-widest italic">Языки (8+)</h5>
+                       <p className="text-[9px] text-slate-400 leading-relaxed">Полная поддержка RU, EN, DE, FR, ES, JA, KO, ZH. Отдельное выпадающее меню со списком и иконкой глобуса.</p>
+                    </div>
+                    <div className="p-6 bg-white/5 border border-white/10 rounded-3xl space-y-3">
+                       <h5 className="text-[10px] font-black text-white uppercase tracking-widest italic">Визуал</h5>
+                       <p className="text-[9px] text-slate-400 leading-relaxed">Эффекты частиц (Atmospheric FX), динамическое освещение Castle Silhouette, поддержка 8K разрешений.</p>
+                    </div>
+                    <div className="p-6 bg-white/5 border border-white/10 rounded-3xl space-y-3">
+                       <h5 className="text-[10px] font-black text-white uppercase tracking-widest italic">Навигация</h5>
+                       <p className="text-[9px] text-slate-400 leading-relaxed">Кнопка 'Назад' (Back) - большой синий круг в углу с белой стрелкой, повторяет стиль кнопок главного меню.</p>
+                    </div>
+                  </div>
+                </section>
+
+                <section className="p-8 bg-blue-600/10 border border-blue-500/20 rounded-[2.5rem] space-y-4">
+                  <h4 className="text-xs font-black text-blue-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                    <ImageIcon className="w-4 h-4" /> Промпт для Нейросети
+                  </h4>
+                  <div className="p-6 bg-black/40 rounded-3xl border border-white/5 font-mono text-[10px] text-white leading-relaxed select-all cursor-copy" title="Нажмите, чтобы скопировать">
+                    "Modern cinematic RPG game UI, settings menu, high-end visual style. Background: blurred atmospheric fantasy landscape with mountains and castles. Theme: dark semi-transparent glassmorphism (slate background with blur). Typography: bold uppercase white headings, subtitle 'НАСТРОЙКИ' with extreme letter spacing. Components: quality dropdown (Very Low to Ultra 8K), resolution list including 3840x2160 and 7680x4320, circular sliders for volume with bright blue round handles. Icons: minimalist white gear (settings), flame (play), cross (exit) inside glowing color-coded circles (blue, orange, red). Navigation: large blue back button circle with white arrow icon in bottom right. Professional UI/UX, 8K resolution, sharp lines, cinematic bloom, high-quality rendering."
+                  </div>
+                  <p className="text-[9px] text-slate-500 italic">Используйте этот текст в Midjourney, DALL-E 3 или других ИИ для воссоздания точно такого же дизайна.</p>
+                </section>
+              </div>
+
+              <div className="p-8 bg-black/40 border-t border-white/10 flex items-center justify-between">
+                <p className="text-[9px] text-slate-500 uppercase font-black tracking-widest">© Menu Studio Visuals Mastery • v17.18.30</p>
+                <button 
+                  onClick={() => setShowStudioGuide(false)}
+                  className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl transition-all shadow-xl shadow-blue-500/20"
+                >
+                  Закрыть
                 </button>
               </div>
             </motion.div>
