@@ -1,6 +1,6 @@
-// [ZENITH MULTI-TOOL SYNERGY v17.18.28 - GIMP mastery]
+// [ZENITH MULTI-TOOL SYNERGY v17.18.29 - Menu Studio Visuals]
 // Unity Connector for Quantum AI Assistant
-// Updated: 2026-04-30 (Synced with GIMP 3.0 Zenith Mastery)
+// Updated: 2026-04-30 (Synced with GIMP 3.0 & Menu Studio Mastery)
 
 using UnityEngine;
 using UnityEditor;

@@ -1,12 +1,75 @@
 {
   "project_name": "Unity & Blender AI Assistant",
-  "version": "17.18.28",
+  "version": "17.18.29",
   "project_path": "/app/applet",
   "unity_ai_assistant": {
-    "description": "Центральный архив знаний Квантового ИИ v17.18.28 (Zenith GIMP Mastery)",
-    "combined_knowledge": "# О ВОЗМОЖНОСТЯХ ИИ (v17.18.28 - ZENITH GIMP MASTERY)\n\n## 1. Профессиональное Мастерство в GIMP 3.0 (GTK3)\n- **Levels of Mastery:**\n  - **Basic:** Интерфейс, слои, базовые инструменты выделения и коррекции.\n  - **Intermediate:** Режимы наложения (Overlay, Multiply), маски слоев, кисти MyPaint.\n  - **Advanced:** 32-битный цвет (High Bit Depth), работа с ICC профилями, создание PBR-карт.\n  - **Professional:** Автоматизация на Python 3, пакетная обработка (Batch), GEGL-фильтры (неразрушаемое редактирование).\n- **Unity/Blender Pipeline:** Бесшовный экспорт текстур, запекание карт нормалей, создание атласов спрайтов для Unity 6.\n\n## 2. Продвинутое Моделирование в Blender 5.2\n- **Hard Surface Workflow:** Использование модификаторов Booleans, Bevel, Weighted Normals. Работа с Crease/Sharp краями для сабдива.\n- **Sculpting & Auto-Skinning:** Dynamic Topology, Voxel Remesh, Automatic Weights.\n- **Geometry & Simulation Nodes:** Процедурные миры и симуляции (Cloth, Hair, Fluid).\n\n## 3. Интеграция с Unity 6 (LTS)\n- **FBX/USD Export Pipeline:** Правильная настройка осей, иерархии костей и анимаций.\n- **GPU Resident Drawer:** Оптимизация моделей для движка отрисовки Unity 6.\n"
+    "description": "Центральный архив знаний Квантового ИИ v17.18.29 (Menu Studio Visuals Mastery)",
+    "combined_knowledge": "# О ВОЗМОЖНОСТЯХ ИИ (v17.18.29 - MENU STUDIO VISUALS MASTERY)\n\n## 1. Menu Studio Visuals Mastery\n- **High-DPI & 8K Optimization:** Использование векторных ассетов, SDF-шрифтов (TextMeshPro) и динамического масштабирования интерфейса.\n- **Fluid Animations:** Применение Motion (framer-motion) для бесшовных переходов, пружинных анимаций и физически корректного отклика.\n- **Glassmorphism & Effects:** Реализация блюр-эффектов, градиентных обводок и продвинутых систем освещения UI.\n- **Multilingual Support:** Полная поддержка 8 языков (RU, EN, KR, CN, JP, DE, FR, ES) с автоматической подгонкой размеров элементов.\n\n## 2. Континент Судьбы (Procedural Generation)\n- **City Types:** \n  - *Горная крепость:* Упор на вертикальность, защитные сооружения (стены, башни), дефицит площадки, бонус к защите.\n  - *Торговый форт:* Множество рынков, портовые доки, открытая планировка, бонус к золоту, уязвимость к атакам.\n- **Generation Algorithm:** \n  - Слой 1: Рельеф (Mountain, Plains, Coast).\n  - Слой 2: Дорожная сеть (Radial, Grid, Organic).\n  - Слой 3: Зонирование (Residential, Military, Commercial).\n  - Слой 4: События (Bandit camps, Resource nodules).\n- **Modeling:** Процедурное размещение строений через Blender Geometry Nodes с учетом расовых особенностей (Humans, Elves, Orcs, Undead).\n\n## 3. Профессиональный GIMP 3.0 (GTK3)\n- **Pipeline:** Автоматизация через Python 3, GEGL-фильтры, 32-битный цвет.\n\n## 4. Продвинутый Blender 5.2 & Unity 6\n- **3D Mastery:** Hard Surface, Sculpting, Retopology, Geometry Nodes.\n- **Automation:** 'Автоматический аудит сцен Unity' - проверка коллизий, текстур и веса моделей.\n- **Offline AI:** Поддержка Ollama для локальной работы без интернета и лимитов.
+
+## 5. Методы улучшения ИИ-понимания (AI Understanding v17.18.29)
+### Стратегии сбора контекста
+- **Анализ проекта:** Перед ответом ИИ сканирует структуру папок, ищет `.unity`, `.prefab`, `.cs` и `.meta` файлы для понимания состава сцены.
+- **История диалога:** ИИ учитывает предыдущие шаги разработки, сохраняя контекст выбранного стиля (например, 'High Fantasy').
+- **Технические спецификации:** Использовать точные версии ПО (Unity 6.0, Blender 5.2) в промптах.
+
+### Уточнение неопределенных запросов
+- **Clarification Loop:** Если запрос "сделай замок" слишком общий, ИИ предложит выбрать тип (Горная крепость, Торговый форт) или предложит процедурную генерацию.
+- **Подсказки по параметрам:** ИИ задает вопросы о целевой платформе (Mobile vs PC) для выбора уровня оптимизации моделей.
+
+### Принципы 'Menu Studio Visuals Mastery'
+- **Релевантные предложения:** Предложения по UI строятся на основе принципов Glassmorphism и SDF-шрифтов для обеспечения 8K четкости.
+- **Визуальный отклик:** ИИ рекомендует анимации пружинного типа (spring physics) для кнопок, чтобы интерфейс ощущался "живым".\n"
   },
   "youtube_videos": [
+    "https://www.youtube.com/watch?v=KW6R8Jnkf9s&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=5",
+    "https://www.youtube.com/watch?v=q0XfjLKDwQ4&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=4",
+    "https://www.youtube.com/watch?v=arGL_eCqHFQ&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=4",
+    "https://www.youtube.com/watch?v=eKST4KnaDNE&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=4",
+    "https://www.youtube.com/watch?v=WlTOCmFC4eU&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=4",
+    "https://www.youtube.com/watch?v=mkMkM64nnCs&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=4",
+    "https://www.youtube.com/watch?v=K2Tn8Nw-1v4&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=4",
+    "https://www.youtube.com/watch?v=bWuocK9z7zg&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=4",
+    "https://www.youtube.com/watch?v=Q-l9WK5JgOA&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=4",
+    "https://www.youtube.com/watch?v=48inEqSQSNU&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=4",
+    "https://www.youtube.com/watch?v=dSrItfFc0rQ&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=4",
+    "https://www.youtube.com/watch?v=yAs_JNIOvl8&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=3",
+    "https://www.youtube.com/watch?v=oRiGM-Pl7dk&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=3",
+    "https://www.youtube.com/watch?v=obBL5RbReAI&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=3",
+    "https://www.youtube.com/watch?v=v2dyypR2MX8&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=3",
+    "https://www.youtube.com/watch?v=Y4MV2-LmpcE&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=3",
+    "https://www.youtube.com/watch?v=lK5j33JYnBQ&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=3",
+    "https://www.youtube.com/watch?v=RDcGQLXRlTY&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=3",
+    "https://www.youtube.com/watch?v=VA_fHMlHS-c&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=3",
+    "https://www.youtube.com/watch?v=4OSEb4gWIAg&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=3",
+    "https://www.youtube.com/watch?v=PbzD0Q7UPlQ&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=3",
+    "https://www.youtube.com/watch?v=pw5x8Cr2U_8&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=2",
+    "https://www.youtube.com/watch?v=u48zVQxQBgI&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=2",
+    "https://www.youtube.com/watch?v=agpDTz4ZqYA&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=2",
+    "https://www.youtube.com/watch?v=wXk2vzYSaLA&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=2",
+    "https://www.youtube.com/watch?v=IVtrAdMhTys&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=2",
+    "https://www.youtube.com/watch?v=g9mR_JWnfsQ&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=2",
+    "https://www.youtube.com/watch?v=UjyNjBBE5Gc&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=2",
+    "https://www.youtube.com/watch?v=SQ4oJYBtfb0&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=2",
+    "https://www.youtube.com/watch?v=5avEJxy6Zt4&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=2",
+    "https://www.youtube.com/watch?v=WJeK2_iaBqA&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=2",
+    "https://www.youtube.com/watch?v=3lEVKHKUoEk&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=1",
+    "https://www.youtube.com/watch?v=6KlFtRJmyu0&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=1",
+    "https://www.youtube.com/watch?v=BzFwtfkWPlI&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=1",
+    "https://www.youtube.com/watch?v=-9MfLee2wi8&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=1",
+    "https://www.youtube.com/watch?v=twuE1uVATEI&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=1",
+    "https://www.youtube.com/watch?v=ZOOYPet_lko&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=1",
+    "https://www.youtube.com/watch?v=KS71F2hoO3A&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=1",
+    "https://www.youtube.com/watch?v=873CkvjIg6g&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=1",
+    "https://www.youtube.com/watch?v=LP1hhak0TgM&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=1",
+    "https://www.youtube.com/watch?v=NfHtrt7MXZo&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=1",
+    "https://www.youtube.com/watch?v=dGm94y1bRls&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=9",
+    "https://www.youtube.com/watch?v=mpLYMFAWeBM&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=8",
+    "https://www.youtube.com/watch?v=GtmWVnZqsMo&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=7",
+    "https://www.youtube.com/watch?v=JBnzAAEPggQ&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=6",
+    "https://www.youtube.com/watch?v=q9nu8S9d2Xo&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=5",
+    "https://www.youtube.com/watch?v=CyZlULorfZo&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=4",
+    "https://www.youtube.com/watch?v=RBEz5CocI4k&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=3",
+    "https://www.youtube.com/watch?v=8ndTwXXOJhw&list=PLW8vJPl-yTABJDYVHC0hiWvrW8g9irBIR&index=2",
     "https://www.youtube.com/watch?v=R1o36XR_mAA",
     "https://www.youtube.com/watch?v=WMJx-Sy3kaw",
     "https://www.youtube.com/watch?v=88JM2tagCjg",
@@ -246,5 +309,11 @@
     "https://www.youtube.com/watch?v=8wUUxPSegLY",
     "https://www.youtube.com/watch?v=kmD3n5LcHEY",
     "https://www.youtube.com/watch?v=WDxFq0m7RPs"
-  ]
+  ],
+  "software_support": {
+    "unity": "6000.3.5",
+    "blender": "5.2",
+    "godot_redot": "4.4",
+    "gimp": "3.0"
+  }
 }
