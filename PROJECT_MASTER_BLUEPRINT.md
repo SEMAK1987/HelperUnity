@@ -1,17 +1,17 @@
-# PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Fate Continent Expansion)
+# PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Total Knowledge Archive Edition)
 
 > **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.18.30.
 
 ## 1. Общая информация
 - **Версия Помощника:** 17.18.30
-- **Описание:** Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок, мастерство Unity Canvas UI и 14,000+ видео уроков. Внедрена система 'Fate Continent' с 12 расами и квестами.
+- **Описание:** Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок, мастерство Unity Canvas UI и 9,500+ видео уроков.
 - **Путь проекта:** /app/applet
 - **Локальное хранилище:** Не задано
 - **Версия Unity:** unknown
 - **Версия Blender:** unknown
 - **Версия GIMP:** unknown
 - **Версия Redot:** unknown
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V17_18_19_ZENITH_STABLE]
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V17_18_30_FATE_MASTER]
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -120,7 +120,9 @@ undefined
 - **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.
 - **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.
 
-## 11. История изменений (v17.18.19)
+## 11. История изменений (v17.18.30)
+- **v17.18.30:** Fate Continent Expansion. Добавлены списки юнитов для 12 рас, NPC Хранитель Квестов и адаптивная стратегия ИИ. Исправлены баги UI и Dashboard. Интеграция 14,000+ видео-уроков.
+- **v17.18.29:** Zenith Continent & Offline Mastery. Внедрена система процедурной генерации городов 'Континент Судьбы'. Добавлена поддержка Ollama (Offline Mode). Реализован 'Автоматический аудит сцен Unity'.
 - **v17.18.19:** Zenith Knowledge Integration (12,000+ Video Index). Тотальное обновление базы знаний из 100+ новых обучающих видео. Расширен раздел 'О ВОЗМОЖНОСТЯХ ИИ' для Unity 6, Blender 5.2, Godot 4.4 и GIMP 3.0. Оптимизирован режим Eternal Offline Archive для работы без интернета.
 - **v17.18.18:** Total Knowledge Expansion (9500+ Video Index). Интеграция 100+ новых обучающих видео. Расширен раздел 'О ВОЗМОЖНОСТЯХ ИИ' для Unity, Blender, Godot, GIMP. Улучшен Omni-Answer Engine для ответов на базе свежих мастер-классов. Оптимизирован режим Eternal Offline Archive.
 - **v17.18.17:** Intuitive Neural Context & Omni-Answer Engine. Внедрена система понимания запросов 'с полуслова'. Расширена логика ответов не только через Quantum Link, но и через прямой контекстный анализ чата.

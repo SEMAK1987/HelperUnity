@@ -197,7 +197,7 @@ function GameHelpView() {
              <BookOpen className="w-8 h-8 text-blue-500" />
              Помощь По Игре (Unity 6)
           </h2>
-          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v17.18.29</p>
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v17.18.30</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -726,7 +726,7 @@ export default function App() {
 
   const [kb, setKb] = useState<KBData | null>(null);
   const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info' | 'migration' | 'game_design' | 'game_help'>('chat');
-  const [appVersion, setAppVersion] = useState('17.18.29');
+  const [appVersion, setAppVersion] = useState('17.18.30');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -1085,7 +1085,7 @@ export default function App() {
       "Глубокое сканирование проекта (Аудит)...",
       "Синхронизация с локальным хранилищем...",
       "Исправление найденных ошибок...",
-      "Обновление версии до 17.18.19...",
+      "Обновление версии до 17.18.30...",
       "Инициализация Omniversal Quantum Link...",
       "Установка Нейронного Моста (Blender & Unity)...",
       "Регенерация PROJECT_MASTER_BLUEPRINT.md (Quantum Link)..."
@@ -1210,7 +1210,7 @@ export default function App() {
         console.error("Failed to fetch KB after retries", err);
         setKb({
           name: "Unity AI Assistant",
-          version: "17.18.19",
+          version: "17.18.30",
           description: "Гибридный ИИ-помощник с Quantum Link",
           project_path: "Unknown",
           system_instruction: "Ты — экспертный ИИ-ассистент."
@@ -1287,7 +1287,7 @@ export default function App() {
           .then(res => res.ok ? res.json() : null)
           .then(data => {
             if (data) {
-              const v = data.name.match(/v([\d.]+)/)?.[1] || '17.18.19';
+              const v = data.name.match(/v([\d.]+)/)?.[1] || '17.18.30';
               setAppVersion(v);
             }
           })
@@ -1624,7 +1624,7 @@ export default function App() {
 
     setIsThinking(true);
     const thinkingSequences = [
-      "Инициализация нейронных контуров v17.18.23...",
+      "Инициализация нейронных контуров v17.18.30...",
       "Анализ контекста проекта (Unity 6 & Blender 4.3)...",
       "Проверка статуса Quantum Link и облачных узлов...",
       "Доступ к базе 13,000+ видео-уроков...",
@@ -1682,7 +1682,7 @@ export default function App() {
       }
 
       let textResponse = "";
-      const systemInst = kb.system_instruction + "\n\n### ZENITH CONTINENT MASTERY v17.18.29 ###\n- 3D EXPERT: Deep expertise in Blender 5.2 & Unity 6.\n- OLLAMA MODE: Local AI processing active.\n- CONTINENT OF FATE: Specialized knowledge in procedural city generation.\n- CORTEX LOGIC: Professional graphics pipeline + game engine synergy.";
+      const systemInst = kb.system_instruction + "\n\n### ZENITH CONTINENT MASTERY v17.18.30 ###\n- 3D EXPERT: Deep expertise in Blender 5.2 & Unity 6.\n- OLLAMA MODE: Local AI processing active.\n- CONTINENT OF FATE: Specialized knowledge in procedural city generation.\n- CORTEX LOGIC: Professional graphics pipeline + game engine synergy.";
 
       try {
         let localSuccess = false;
@@ -1691,7 +1691,7 @@ export default function App() {
         if (isOllamaMode) {
           try {
             console.log("Attempting Ollama local call via proxy...");
-            const ollamaPrompt = `You are a helpful AI Assistant for Unity and Blender. Your knowledge base is version 17.18.29.
+            const ollamaPrompt = `You are a helpful AI Assistant for Unity and Blender. Your knowledge base is version 17.18.30.
             System Instruction: ${systemInst}
             
             History:
@@ -1854,7 +1854,7 @@ export default function App() {
         // Friendly wrapping if it's a key error
         let finalContent = localData.answer;
         if (isKeyError && !finalContent.includes('КЛЮЧ API')) {
-          finalContent = `### 📡 СТАТУС СИНГУЛЯРНОСТИ: ОНЛАЙН (v17.18.20)\nСвязь установлена, но возникла техническая проблема с API-ключом Gemini.\n\n${finalContent}`;
+          finalContent = `### 📡 СТАТУС СИНГУЛЯРНОСТИ: ОНЛАЙН (v17.18.30)\nСвязь установлена, но возникла техническая проблема с API-ключом Gemini.\n\n${finalContent}`;
         }
 
         setMessages(prev => [...prev, {
@@ -2267,7 +2267,7 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-sm font-bold text-white uppercase tracking-tighter">AI Assistant</h1>
-              <p className="text-[10px] text-slate-500 uppercase font-mono">v17.18.27</p>
+              <p className="text-[10px] text-slate-500 uppercase font-mono">v17.18.30</p>
             </div>
           </div>
 
@@ -2629,7 +2629,7 @@ export default function App() {
                 <div className="flex items-center gap-3">
                   <div className={`w-2 h-2 rounded-full ${aiHealth === 'online' ? 'bg-green-500 shadow-[0_0_12px_rgba(34,197,94,0.6)]' : 'bg-yellow-500'}`} />
                   <span className="text-[10px] font-bold text-white uppercase tracking-widest group">
-                    {aiHealth === 'online' ? `${t.sync} (v17.18.29)` : `${t.offline} (v17.18.29)`}
+                    {aiHealth === 'online' ? `${t.sync} (v17.18.30)` : `${t.offline} (v17.18.30)`}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -2665,7 +2665,7 @@ export default function App() {
                 <Cpu className="w-12 h-12 text-blue-500 group-hover:text-blue-400 group-hover:rotate-12 transition-all" />
               </motion.div>
               
-              <h2 className="text-2xl font-black text-white mb-4 uppercase tracking-tighter shadow-blue-500/10 drop-shadow-xl transition-all duration-700">Unity AI Assistant v17.18.29</h2>
+              <h2 className="text-2xl font-black text-white mb-4 uppercase tracking-tighter shadow-blue-500/10 drop-shadow-xl transition-all duration-700">Unity AI Assistant v17.18.30</h2>
               <div className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg px-4 font-medium italic">
                 {language === 'Русский' ? (
                   <>
@@ -2674,7 +2674,7 @@ export default function App() {
                       {kb?.project_path || 'Загрузка...'}
                     </code>. 
                     <br/><br/>
-                    Задавайте любые вопросы по Unity, Blender, Photoshop или GIMP. Модули Menu Studio Visuals Mastery, Omni-Answer Engine и проект 'Континент судьбы' (v17.18.29) активированы.
+                    Задавайте любые вопросы по Unity, Blender, Photoshop или GIMP. Модули Menu Studio Visuals Mastery, Omni-Answer Engine и проект 'Континент судьбы' (v17.18.30) активированы.
                     <br/><br/>
                     <span className="text-xs text-orange-400 font-black uppercase ring-1 ring-orange-400/30 px-3 py-1.5 rounded-full bg-orange-400/5 shadow-lg shadow-orange-500/5 inline-block animate-pulse">Внимание: {t.proMastery}</span>
                   </>
@@ -2685,7 +2685,7 @@ export default function App() {
                       {kb?.project_path || 'Loading...'}
                     </code>. 
                     <br/><br/>
-                    Ask any questions about Unity, Blender, Photoshop, or GIMP. Zenith 3D Mastery, Omni-Answer Engine, and project 'Fate Continent' (v17.18.29) are active.
+                    Ask any questions about Unity, Blender, Photoshop, or GIMP. Zenith 3D Mastery, Omni-Answer Engine, and project 'Fate Continent' (v17.18.30) are active.
                     <br/><br/>
                     <span className="text-xs text-orange-400 font-black uppercase ring-1 ring-orange-400/30 px-3 py-1.5 rounded-full bg-orange-400/5 shadow-lg shadow-orange-500/5 inline-block animate-pulse">Attention: {t.proMastery}</span>
                   </>
@@ -2776,7 +2776,7 @@ export default function App() {
                       {msg.audioVariants && (
                         <div className="mt-6 space-y-4 pt-6 border-t border-white/5">
                            <h4 className="text-[10px] font-bold text-white uppercase tracking-widest flex items-center gap-2">
-                            <Music className="w-3 h-3 text-blue-400" /> Сгенерированные аудио-варианты (v17.18.20):
+                            <Music className="w-3 h-3 text-blue-400" /> Сгенерированные аудио-варианты (v17.18.30):
                           </h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {msg.audioVariants.map((variant, vi) => (
@@ -4919,7 +4919,7 @@ export default function App() {
                         <ExternalLink className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v17.18.20)</h2>
+                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v17.18.30)</h2>
                         <p className="text-xs text-slate-400">Прямое управление Blender и Unity через нейронный мост.</p>
                       </div>
                     </div>
@@ -4996,7 +4996,7 @@ export default function App() {
                       </div>
                       <div>
                         <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Континент Судьбы: Генератор Уровней</h2>
-                        <p className="text-xs text-slate-400">Процедурное моделирование городов и ландшафтов v17.18.29</p>
+                        <p className="text-xs text-slate-400">Процедурное моделирование городов и ландшафтов v17.18.30</p>
                       </div>
                     </div>
 
@@ -6293,7 +6293,7 @@ export default function App() {
                     <ImageIcon className="w-8 h-8" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Генератор Обложек VK v17.18.20</h3>
+                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Генератор Обложек VK v17.18.30</h3>
                     <p className="text-xs text-slate-500 uppercase tracking-[0.2em] font-bold">Континент Судьбы • Умный Синтез</p>
                   </div>
                 </div>

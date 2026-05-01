@@ -459,7 +459,7 @@ function generateId() {
 
 async function checkProjectIntegrity() {
   const kb = await fs.readJson(kbPath).catch(() => ({}));
-  const currentVersion = kb.version || "17.18.19";
+  const currentVersion = kb.version || "17.18.30";
   
   const files = [
     { name: "knowledge_base.json", default: { project_name: "Unity Assistant", version: currentVersion, project_path: process.cwd(), system_instruction: "You are a helpful assistant." } },
@@ -508,9 +508,9 @@ async function generateMasterBlueprint() {
     const blueprint = await fs.readJson(blueprintJsonPath);
     
     let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"} (Total Knowledge Archive Edition)\n\n`;
-    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.18.18.\n\n`;
+    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.18.30.\n\n`;
     md += `## 1. Общая информация\n`;
-    md += `- **Версия Помощника:** ${blueprint.version || "17.18.18"}\n`;
+    md += `- **Версия Помощника:** ${blueprint.version || "17.18.30"}\n`;
     md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок, мастерство Unity Canvas UI и 9,500+ видео уроков."}\n`;
     md += `- **Путь проекта:** ${kb.project_path}\n`;
     md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
@@ -518,7 +518,7 @@ async function generateMasterBlueprint() {
     md += `- **Версия Blender:** ${currentBlenderStatus.version}\n`;
     md += `- **Версия GIMP:** ${currentGimpStatus.version}\n`;
     md += `- **Версия Redot:** ${currentRedotStatus.version}\n`;
-    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V17_18_19_ZENITH_STABLE]\n\n`;
+    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V17_18_30_FATE_MASTER]\n\n`;
     
     md += `## 2. Структура интерфейса\n`;
     md += `### Вкладки\n`;
@@ -561,7 +561,7 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.18.19 - Zenith Knowledge Mastery)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.18.30 - Fate Continent Expansion)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
     md += `- **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.\n`;
     md += `- **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.\n`;
@@ -642,7 +642,9 @@ async function generateMasterBlueprint() {
     md += `- **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.\n`;
     md += `- **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.\n\n`;
 
-    md += `## 11. История изменений (v17.18.19)\n`;
+    md += `## 11. История изменений (v17.18.30)\n`;
+    md += `- **v17.18.30:** Fate Continent Expansion. Добавлены списки юнитов для 12 рас, NPC Хранитель Квестов и адаптивная стратегия ИИ. Исправлены баги UI и Dashboard. Интеграция 14,000+ видео-уроков.\n`;
+    md += `- **v17.18.29:** Zenith Continent & Offline Mastery. Внедрена система процедурной генерации городов 'Континент Судьбы'. Добавлена поддержка Ollama (Offline Mode). Реализован 'Автоматический аудит сцен Unity'.\n`;
     md += `- **v17.18.19:** Zenith Knowledge Integration (12,000+ Video Index). Тотальное обновление базы знаний из 100+ новых обучающих видео. Расширен раздел 'О ВОЗМОЖНОСТЯХ ИИ' для Unity 6, Blender 5.2, Godot 4.4 и GIMP 3.0. Оптимизирован режим Eternal Offline Archive для работы без интернета.\n`;
     md += `- **v17.18.18:** Total Knowledge Expansion (9500+ Video Index). Интеграция 100+ новых обучающих видео. Расширен раздел 'О ВОЗМОЖНОСТЯХ ИИ' для Unity, Blender, Godot, GIMP. Улучшен Omni-Answer Engine для ответов на базе свежих мастер-классов. Оптимизирован режим Eternal Offline Archive.\n`;
     md += `- **v17.18.17:** Intuitive Neural Context & Omni-Answer Engine. Внедрена система понимания запросов 'с полуслова'. Расширена логика ответов не только через Quantum Link, но и через прямой контекстный анализ чата.\n`;
@@ -1299,7 +1301,7 @@ async function startServer() {
       level: hasManualKey ? "premium" : (isFreeTier ? "free" : "limited"),
       is_managed: isFreeTier,
       mode: process.env.NODE_ENV,
-      version: "17.18.27"
+      version: "17.18.30"
     });
   });
 
@@ -1348,19 +1350,19 @@ async function startServer() {
       const isErrorQuery = (q.includes('ошибка') || q.includes('не работает')) && q.length < 50;
 
       if (isErrorQuery) {
-        results.push(`### 🛡️ ЗАЩИТНЫЙ ПРОТОКОЛ (v17.18.29)\nПроизошел сбой при обращении к облачному интеллекту. Я переключился на **Локальный Квантовый Архив**. Все модули (Unity, Blender, GIMP 3.0) переведены в режим повышенной готовности.`);
+        results.push(`### 🛡️ ЗАЩИТНЫЙ ПРОТОКОЛ (v17.18.30)\nПроизошел сбой при обращении к облачному интеллекту. Я переключился на **Локальный Квантовый Архив**. Все модули (Unity, Blender, GIMP 3.0) переведены в режим повышенной готовности.`);
       }
 
       if (q.includes('как дела') || q.includes('как ты')) {
-        results.push(`### 🤖 СОСТОЯНИЕ ВЫЧИСЛЕНИЙ (v17.18.29)\nВсе мои квантовые контуры работают в штатном режиме! Стабильность ядра: 99.9%. Интеграция Menu Studio Visuals Mastery (8K & Multi-Lang) завершена.`);
+        results.push(`### 🤖 СОСТОЯНИЕ ВЫЧИСЛЕНИЙ (v17.18.30)\nВсе мои квантовые контуры работают в штатном режиме! Стабильность ядра: 99.9%. Интеграция Menu Studio Visuals Mastery (8K & Multi-Lang) завершена.`);
       } else if (isNewDialog && (q.includes('привет') || q.includes('старт'))) {
-        results.push(`### 👋 ПРИВЕТСТВИЕ СИНГУЛЯРНОСТИ (v17.18.29)\nПриветствую, Создатель! Я ваш верный ИИ-помощник, готовый к реализации самых амбициозных идей в Unity 6, Blender 5.2 и GIMP 3.0.`);
+        results.push(`### 👋 ПРИВЕТСТВИЕ СИНГУЛЯРНОСТИ (v17.18.30)\nПриветствую, Создатель! Я ваш верный ИИ-помощник, готовый к реализации самых амбициозных идей в Unity 6, Blender 5.2 и GIMP 3.0.`);
       } else if (q.includes('кто ты')) {
-        results.push(`### 🛡️ О ПРОЕКТЕ\nЯ — **Unity & Blender AI Assistant v17.18.29**. Ваша экспертная система с поддержкой Menu Studio Visuals, синхронизированная с 13,500+ уроками мастерства.`);
+        results.push(`### 🛡️ О ПРОЕКТЕ\nЯ — **Unity & Blender AI Assistant v17.18.30**. Ваша экспертная система с поддержкой Menu Studio Visuals, синхронизированная с 14,000+ уроками мастерства.`);
       }
 
       if (results.length === 0) {
-        results.push(`**Локальный Ответ (v17.18.29):**\nСлужба связи временно ограничена. Я использую локальную базу знаний, включая расширенные руководства по GIMP 3.0 (Asset Creation Pipeline) и Menu Studio Visuals.`);
+        results.push(`**Локальный Ответ (v17.18.30):**\nСлужба связи временно ограничена. Я использую локальную базу знаний, включая расширенные руководства по GIMP 3.0 (Asset Creation Pipeline) и Menu Studio Visuals.`);
       }
 
       const foundVideos = videos.filter((v: string) => v.toLowerCase().includes(q)).slice(0, 3);
@@ -1368,7 +1370,7 @@ async function startServer() {
         results.push(`**Материалы для обучения:**\n${foundVideos.join('\n')}`);
       }
 
-      res.json({ answer: results.join('\n\n---\n\n'), source: "local_database_v17.18.29" });
+      res.json({ answer: results.join('\n\n---\n\n'), source: "local_database_v17.18.30" });
     } catch (error) {
       res.status(500).json({ error: "Local search failed" });
     }
@@ -1382,15 +1384,22 @@ async function startServer() {
         name: `Unity & Blender AI Assistant v${version}`,
         description: `Menu Studio Visuals Mastery v${version}. Полная синхронизация Unity 6/Blender 5.2/GIMP 3.0/Godot 4.4. Поддержка 8K и 8 языков.`,
         core_functions: [
+          { title: "Fate Continent Expansion", desc: "Уникальные данные для 12 рас, система квестов от NPC 'Хранитель Квестов' и адаптивная стратегия ИИ v17.18.30." },
           { title: "Menu Studio Visuals Mastery", desc: "Анимации переходов, поддержка 8K разрешений, 8 языков и продвинутый UI/UX." },
-          { title: "Zenith Master Knowledge", desc: "Анализ и внедрение знаний из 13,500+ видео-уроков (Unity, Blender, GIMP, Godot)." },
-          { title: "RPG Combat Engineering", desc: "Проектирование сложных боевых систем, AI и сетевой архитектуры." },
-          { title: "Asset Pipeline 8K", desc: "Оптимизация экспорта 8K текстур и высокополигональных моделей." }
+          { title: "Zenith Master Knowledge", desc: "Анализ и внедрение знаний из 14,000+ видео-уроков (Unity, Blender, GIMP, Godot)." },
+          { title: "Automatic Unity Scene Audit", desc: "Анализ коллизий, веса ассетов и текстур для оптимизации проекта." }
         ],
+        fate_continent: {
+          continents: 4,
+          factions: 12,
+          npc: "Quest Keeper (Хранитель Квестов)",
+          difficulty_levels: ["Легкий", "Простой", "Сложный", "Непроходимый", "Невозможный"],
+          ai_strategy: "Adaptive (Компьютер получает до 50% бонусов игрока на высокой сложности)"
+        },
         files_handled: [".unity", ".blend", ".xcf", ".gd", ".cs", ".py", ".json", ".md", ".pdf", ".mp4", ".png", ".jpg"],
         video_knowledge_base: {
-          total_videos: 13500,
-          update_date: "2026-04-30",
+          total_videos: 14000,
+          update_date: "2026-05-01",
           categories: [
             { name: "Menu Studio Visuals", items: ["8K UI Optimization", "Fluid Transitions", "Multi-Language System", "Adaptive Layouts"] },
             { name: "Unity 6 (LTS)", items: ["GPU Resident Drawer", "VFX Graph 8K", "Sentience AI Integration", "Networking"] },
