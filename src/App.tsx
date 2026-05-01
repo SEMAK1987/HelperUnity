@@ -43,6 +43,10 @@ import {
   Save,
   Map as MapIcon,
   Users,
+  User,
+  Scroll,
+  ShieldCheck,
+  CheckCircle,
   Shield,
   ArrowRight,
   Target,
@@ -1017,7 +1021,9 @@ export default function App() {
   const [isMigrating, setIsMigrating] = useState(false);
   const [gameDesign, setGameDesign] = useState<any>(null);
   const [isSavingGameDesign, setIsSavingGameDesign] = useState(false);
-  const [designSubTab, setDesignSubTab] = useState<'World' | 'Castle System' | 'Heroes & Units' | 'Visuals & Nav' | 'Abilities' | 'Synergies' | 'Balancing & Rarity' | 'Economy' | 'Strategies' | 'Combat & Environment' | 'Potions & Alchemy' | 'Menu Studio'>('World');
+  const [designSubTab, setDesignSubTab] = useState<'World' | 'Castle System' | 'Heroes & Units' | 'Visuals & Nav' | 'Abilities' | 'Synergies' | 'Balancing & Rarity' | 'Economy' | 'Strategies' | 'Combat & Environment' | 'Potions & Alchemy' | 'Menu Studio' | 'Quests & NPC' | 'AI Strategies'>('World');
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('Средний');
+  const [activeQuests, setActiveQuests] = useState<any[]>([]);
   const [synergyHeroType, setSynergyHeroType] = useState<'simple' | 'main'>('simple');
 
   const fetchPackagesInfo = async () => {
@@ -3110,7 +3116,7 @@ export default function App() {
 
                 {/* Sub-tabs for Game Design */}
                 <div className="flex items-center gap-2 p-1.5 bg-black/40 rounded-2xl border border-white/5 w-fit overflow-x-auto max-w-full no-scrollbar">
-                  {['World', 'Castle System', 'Heroes & Units', 'Visuals & Nav', 'Abilities', 'Synergies', 'Balancing & Rarity', 'Economy', 'Strategies', 'Combat & Environment', 'Potions & Alchemy', 'Menu Studio'].map((tab) => (
+                  {['World', 'Castle System', 'Heroes & Units', 'Visuals & Nav', 'Abilities', 'Synergies', 'Balancing & Rarity', 'Economy', 'Strategies', 'Combat & Environment', 'Potions & Alchemy', 'Quests & NPC', 'AI Strategies', 'Menu Studio'].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setDesignSubTab(tab as any)}
@@ -4587,6 +4593,229 @@ export default function App() {
                        </div>
                     </div>
                   </motion.div>
+                ) : designSubTab === 'Quests & NPC' ? (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="space-y-12"
+                  >
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                      <div className="lg:col-span-1 space-y-8">
+                        <div className="p-10 rounded-[3rem] bg-gradient-to-br from-indigo-900/40 to-black border border-indigo-500/30 space-y-6 relative overflow-hidden group">
+                          <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <User className="w-32 h-32 text-indigo-400" />
+                          </div>
+                          <div className="relative z-10 space-y-4">
+                            <div className="flex items-center gap-4">
+                              <div className="p-4 bg-indigo-600 rounded-2xl shadow-xl shadow-indigo-600/20">
+                                <User className="w-8 h-8 text-white" />
+                              </div>
+                              <div>
+                                <h4 className="text-xl font-black text-white uppercase italic tracking-tighter">Хранитель Квестов</h4>
+                                <div className="text-[10px] text-indigo-400 font-bold uppercase tracking-widest">NPC Наставник</div>
+                              </div>
+                            </div>
+                            <div className="p-6 bg-black/60 rounded-[2rem] border border-white/5 text-[11px] text-slate-300 italic leading-relaxed">
+                              "Приветствую, путник. Континент Судьбы полон опасностей. Выбери свое испытание, и я дарую тебе силу, соразмерную твоему мужеству."
+                            </div>
+                            <div className="space-y-4 pt-4">
+                              <div className="text-[9px] text-slate-500 font-black uppercase tracking-widest px-2">Выберите сложность игры</div>
+                              <div className="grid grid-cols-2 gap-2">
+                                {gameDesign?.logic?.difficulty_settings?.map((d: any) => (
+                                  <button
+                                    key={d.level}
+                                    onClick={() => setSelectedDifficulty(d.level)}
+                                    className={`p-3 rounded-xl border text-[10px] font-black uppercase transition-all ${
+                                      selectedDifficulty === d.level 
+                                      ? 'bg-indigo-600 border-indigo-400 text-white shadow-lg' 
+                                      : 'bg-white/5 border-white/10 text-slate-500 hover:text-white'
+                                    }`}
+                                  >
+                                    {d.level}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="p-8 rounded-[2.5rem] bg-black/40 border border-white/10 space-y-6">
+                           <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2 flex items-center gap-2">
+                             <Zap className="w-3 h-3 text-yellow-500" /> Активные Бонусы
+                           </h4>
+                           <div className="space-y-3">
+                              {activeQuests.length === 0 ? (
+                                <div className="p-6 text-center text-slate-600 italic text-[10px]">Нет активных эффектов. Выполните квест Хранителя.</div>
+                              ) : (
+                                activeQuests.map((q: any, i: number) => (
+                                  <div key={i} className="p-4 bg-indigo-600/10 border border-indigo-500/20 rounded-2xl flex items-center justify-between">
+                                    <div className="flex flex-col gap-0.5">
+                                      <span className="text-[10px] font-black text-white uppercase italic">{q.title}</span>
+                                      <span className="text-[9px] text-indigo-400">Множитель: x{(gameDesign?.logic?.difficulty_settings?.find((d: any) => d.level === selectedDifficulty)?.player_bonus_multiplier || 1).toFixed(1)}</span>
+                                    </div>
+                                    <Sparkles className="w-4 h-4 text-indigo-400 animate-pulse" />
+                                  </div>
+                                ))
+                              )}
+                           </div>
+                        </div>
+                      </div>
+
+                      <div className="lg:col-span-2 space-y-8">
+                        <div className="flex items-center justify-between px-4">
+                          <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] flex items-center gap-2">
+                            <Scroll className="w-3 h-3" /> Доступные Задания
+                          </h3>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          {gameDesign?.quest_system?.quest_pool?.map((quest: any) => (
+                            <div key={quest.id} className="p-8 rounded-[3rem] bg-black/40 border border-white/10 space-y-6 group hover:border-indigo-500/30 transition-all flex flex-col">
+                              <div className="flex items-center justify-between">
+                                <div className="space-y-1">
+                                  <h4 className="text-lg font-black text-white uppercase italic tracking-tighter leading-none">{quest.title}</h4>
+                                  <div className="flex gap-1">
+                                    {gameDesign?.quest_system?.difficulties.map((d: string, di: number) => (
+                                      <div key={di} className={`w-1.5 h-1.5 rounded-full ${di < 2 ? 'bg-green-500/30' : di < 4 ? 'bg-orange-500/30' : 'bg-red-500/30'}`} />
+                                    ))}
+                                  </div>
+                                </div>
+                                <div className="p-3 bg-white/5 rounded-2xl">
+                                  <Scroll className="w-5 h-5 text-indigo-400" />
+                                </div>
+                              </div>
+                              
+                              <div className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-2">
+                                <div className="text-[8px] text-slate-600 uppercase font-black">Условие выполнения:</div>
+                                <div className="text-[11px] text-white font-bold italic">{quest.condition}</div>
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-3 mt-auto pt-4">
+                                <button 
+                                  onClick={() => {
+                                    if (!activeQuests.find(aq => aq.id === quest.id)) {
+                                      setActiveQuests([...activeQuests, quest]);
+                                    }
+                                  }}
+                                  className="py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-[10px] font-black text-white uppercase tracking-widest transition-all shadow-lg shadow-indigo-600/20"
+                                >
+                                  Принять
+                                </button>
+                                <button className="py-3 bg-white/5 hover:bg-white/10 rounded-xl text-[10px] font-black text-slate-400 uppercase tracking-widest transition-all">Детали</button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                ) : designSubTab === 'AI Strategies' ? (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="space-y-12"
+                  >
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                      <div className="p-10 rounded-[3rem] bg-black/40 border border-white/10 space-y-8">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">Фракционные Стратегии</h4>
+                          <Cpu className="w-5 h-5 text-blue-400" />
+                        </div>
+                        <div className="space-y-4">
+                          {Object.entries(gameDesign?.logic?.ai_strategies || {}).map(([race, strategy]: any) => (
+                            <div key={race} className="p-6 rounded-[2rem] bg-white/5 border border-white/5 space-y-3 group hover:bg-blue-600/5 transition-all">
+                              <div className="flex items-center justify-between">
+                                <span className="text-[11px] font-black text-white uppercase italic tracking-widest">{race}</span>
+                                <div className="flex gap-1">
+                                  <div className="w-1 h-3 bg-blue-500 rounded-full" />
+                                  <div className="w-1 h-3 bg-blue-500/40 rounded-full" />
+                                  <div className="w-1 h-3 bg-blue-500/20 rounded-full" />
+                                </div>
+                              </div>
+                              <p className="text-[10px] text-slate-400 leading-relaxed italic">{strategy}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-8">
+                        <div className="p-10 rounded-[3rem] bg-gradient-to-br from-red-900/20 to-black border border-red-500/20 space-y-6">
+                          <div className="flex items-center gap-4">
+                            <div className="p-4 bg-red-600 rounded-2xl shadow-xl">
+                              <AlertCircle className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                              <h4 className="text-[10px] font-black text-red-500 uppercase tracking-widest">Адаптивная Сложность</h4>
+                              <div className="text-xl font-black text-white uppercase italic tracking-tighter">AI Questing System</div>
+                            </div>
+                          </div>
+                          <p className="text-[11px] text-slate-300 leading-relaxed italic">
+                            {gameDesign?.logic?.computer_ai}
+                          </p>
+                          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/10">
+                            <div className="space-y-1">
+                              <div className="text-[8px] text-slate-500 uppercase font-black">AI Bonus Player-Rel</div>
+                              <div className="text-xs text-white font-bold">50% от Игрока</div>
+                            </div>
+                            <div className="space-y-1 text-right">
+                              <div className="text-[8px] text-slate-500 uppercase font-black">Trigger Threshold</div>
+                              <div className="text-xs text-white font-bold">Сложный / Ужасный</div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="p-10 rounded-[3rem] bg-black/40 border border-white/10 space-y-8">
+                          <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Таблица Сложности AI</h4>
+                          <div className="overflow-hidden rounded-2xl border border-white/5 bg-black/20">
+                            <table className="w-full text-left text-[10px]">
+                              <thead>
+                                <tr className="text-slate-600 border-b border-white/5 uppercase tracking-widest">
+                                  <th className="p-4 font-black">Уровень</th>
+                                  <th className="p-4 font-black">AI Bonus</th>
+                                  <th className="p-4 font-black">Квесты AI</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-white/5">
+                                {gameDesign?.logic?.difficulty_settings?.map((d: any, i: number) => (
+                                  <tr key={i} className="group hover:bg-white/5">
+                                    <td className="p-4 font-black text-white">{d.level}</td>
+                                    <td className="p-4 text-blue-400 font-bold">{Math.round(d.ai_bonus_multiplier * 100)}%</td>
+                                    <td className="p-4">
+                                      {d.quest_access_ai ? (
+                                        <CheckCircle className="w-4 h-4 text-green-500" />
+                                      ) : (
+                                        <X className="w-4 h-4 text-red-500" />
+                                      )}
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-10 rounded-[4rem] bg-indigo-600/5 border border-indigo-500/20 space-y-6">
+                      <div className="flex items-center justify-between">
+                         <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.4em]">Логика Атаки ИИ</h4>
+                         <ShieldCheck className="w-5 h-5 text-indigo-400" />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                         {[
+                           { t: "Приоритет", d: "Самые слабые юниты игрока" },
+                           { t: "Защита", d: "Контратака при угрозе столице" },
+                           { t: "Разведка", d: "Активный поиск редких локаций" },
+                           { t: "Группировка", d: "Наступление только при 1.5x перевесе" }
+                         ].map((l, i) => (
+                           <div key={i} className="p-6 bg-black/40 rounded-[2rem] border border-white/5 space-y-2">
+                             <div className="text-[9px] text-slate-500 uppercase font-black">{l.t}</div>
+                             <div className="text-[10px] text-white font-bold italic leading-tight">{l.d}</div>
+                           </div>
+                         ))}
+                      </div>
+                    </div>
+                  </motion.div>
                 ) : designSubTab === 'Menu Studio' ? (
                   <MenuStudioPreview onDownload={downloadBackground} />
                 ) : (
@@ -4898,7 +5127,7 @@ export default function App() {
                       <h3 className="text-xs font-bold text-white uppercase tracking-widest">Оптимизация</h3>
                     </div>
                     <div className="text-2xl font-bold text-white mb-1">
-                      {(projectScan?.analysis?.asset_stats?.total_size ? (projectScan.analysis.asset_stats.total_size / 1024 / 1024).toFixed(1) : 0)} MB
+                      {(projectScan?.analysis?.asset_stats?.total_size ? (projectScan?.analysis?.asset_stats?.total_size / 1024 / 1024).toFixed(1) : 0)} MB
                     </div>
                     <p className="text-[10px] text-slate-500 uppercase">Общий вес ассетов</p>
                   </div>
@@ -4979,25 +5208,33 @@ export default function App() {
                       <h3 className="text-sm font-bold text-white uppercase tracking-widest">Naming Standard</h3>
                     </div>
                     <p className="text-xs text-slate-400">
-                      Генератор имен по стандарту (T_Texture, M_Material, P_Prefab). Помогает поддерживать порядок в проекте.
-                    </p>
-                    <button 
-                      onClick={() => showNotification("Стандарты именования: T_ (Texture), M_ (Material), P_ (Prefab), S_ (Script)", "info")}
-                      className="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-[10px] font-bold text-white uppercase tracking-widest transition-all"
-                    >
-                      Показать стандарт
-                    </button>
+                      Генератор имен по стандарту (T_Texture, M_Material                <div className="mt-12 p-10 rounded-[3rem] bg-gradient-to-br from-indigo-900/40 to-black border border-indigo-500/30 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-all duration-700">
+                    <ShieldCheck className="w-32 h-32 text-indigo-400" />
                   </div>
-
-                  <div className="p-8 rounded-[2.5rem] bg-black/40 border border-white/5 space-y-6">
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 bg-pink-600/20 rounded-2xl text-pink-400">
-                        <Sparkles className="w-5 h-5" />
+                  <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
+                    <div className="flex items-center gap-6">
+                      <div className="p-5 bg-indigo-600 rounded-[2rem] shadow-[0_0_30px_rgba(79,70,229,0.3)]">
+                        <FileText className="w-8 h-8 text-white" />
                       </div>
-                      <h3 className="text-sm font-bold text-white uppercase tracking-widest">Shader Assistant</h3>
+                      <div className="space-y-1">
+                        <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter">PROJECT MASTER BLUEPRINT</h3>
+                        <div className="flex items-center gap-3">
+                          <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-[9px] font-bold text-indigo-400">v17.18.30</span>
+                          <p className="text-xs text-slate-400 font-medium">Документ синхронизации обновлен и готов к работе.</p>
+                        </div>
+                      </div>
                     </div>
-                    <p className="text-xs text-slate-400">
-                      Библиотека готовых решений для Shader Graph и HLSL. Офлайн-подсказки по созданию эффектов.
+                    <div className="flex items-center gap-4">
+                       <button 
+                         onClick={() => setShowSettings(true)}
+                         className="px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-indigo-600/20 border border-indigo-400/30"
+                       >
+                         Конвейер Настроек
+                       </button>
+                    </div>
+                  </div>
+                </div>� решений для Shader Graph и HLSL. Офлайн-подсказки по созданию эффектов.
                     </p>
                     <button 
                       onClick={() => showNotification("Функция в разработке. Используйте чат для запроса шейдеров.", "info")}
@@ -6354,16 +6591,17 @@ export default function App() {
                 <div className="flex items-center gap-4">
                   <button 
                     onClick={() => setShowSettings(false)}
-                    className="p-2 hover:bg-white/5 rounded-lg text-slate-500 hover:text-white transition-all sm:hidden"
+                    className="p-2 bg-white/5 hover:bg-white/10 rounded-xl text-slate-300 hover:text-white transition-all flex items-center gap-2"
                   >
                     <ChevronLeft className="w-5 h-5" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest pr-2 hidden sm:block">Назад</span>
                   </button>
                   <div className="p-3 bg-blue-600/20 rounded-2xl">
                     <Settings className="w-6 h-6 text-blue-400" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-white">Локальное хранение</h2>
-                    <p className="text-xs text-slate-500 uppercase tracking-widest mt-1">Настройка пути для обучения ИИ</p>
+                    <h2 className="text-xl font-bold text-white">Настройки ИИ</h2>
+                    <p className="text-xs text-slate-500 uppercase tracking-widest mt-1">Версия {version}</p>
                   </div>
                 </div>
                 <button 

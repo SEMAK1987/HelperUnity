@@ -1,6 +1,6 @@
-// [ZENITH MULTI-TOOL SYNERGY v17.18.29 - Menu Studio Visuals]
+// [ZENITH MULTI-TOOL SYNERGY v17.18.30 - Fate Continent Expansion]
 // Unity Connector for Quantum AI Assistant
-// Updated: 2026-04-30 (Synced with GIMP 3.0 & Menu Studio Mastery)
+// Updated: 2026-05-01 (Synced with Faction Data & Quest System)
 
 using UnityEngine;
 using UnityEditor;
