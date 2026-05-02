@@ -459,7 +459,7 @@ function generateId() {
 
 async function checkProjectIntegrity() {
   const kb = await fs.readJson(kbPath).catch(() => ({}));
-  const currentVersion = kb.version || "17.18.30";
+  const currentVersion = kb.version || "18.0.0";
   
   const files = [
     { name: "knowledge_base.json", default: { project_name: "Unity Assistant", version: currentVersion, project_path: process.cwd(), system_instruction: "You are a helpful assistant." } },
@@ -508,7 +508,7 @@ async function generateMasterBlueprint() {
     const blueprint = await fs.readJson(blueprintJsonPath);
     
     let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"} (Total Knowledge Archive Edition)\n\n`;
-    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v17.18.30.\n\n`;
+    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание запредельных возможностей ИИ v18.0.0.\n\n`;
     md += `## 1. Общая информация\n`;
     md += `- **Версия Помощника:** ${blueprint.version || "17.18.30"}\n`;
     md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок, мастерство Unity Canvas UI и 9,500+ видео уроков."}\n`;
@@ -561,7 +561,7 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v17.18.30 - Fate Continent Expansion)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.0.0 - Fate Continent Expansion)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
     md += `- **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.\n`;
     md += `- **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.\n`;
@@ -1301,7 +1301,7 @@ async function startServer() {
       level: hasManualKey ? "premium" : (isFreeTier ? "free" : "limited"),
       is_managed: isFreeTier,
       mode: process.env.NODE_ENV,
-      version: "17.18.30"
+      version: "18.0.0"
     });
   });
 
@@ -1354,7 +1354,7 @@ async function startServer() {
       }
 
       if (q.includes('как дела') || q.includes('как ты')) {
-        results.push(`### 🤖 СОСТОЯНИЕ ВЫЧИСЛЕНИЙ (v17.18.30)\nВсе мои квантовые контуры работают в штатном режиме! Стабильность ядра: 99.9%. Интеграция Menu Studio Visuals Mastery (8K & Multi-Lang) завершена.`);
+        results.push(`### 🤖 СОСТОЯНИЕ ВЫЧИСЛЕНИЙ (v18.0.0)\nВсе мои квантовые контуры работают в штатном режиме! Стабильность ядра: 99.9%. Интеграция Menu Studio Visuals Mastery (8K & Multi-Lang) завершена.`);
       } else if (isNewDialog && (q.includes('привет') || q.includes('старт'))) {
         results.push(`### 👋 ПРИВЕТСТВИЕ СИНГУЛЯРНОСТИ (v17.18.30)\nПриветствую, Создатель! Я ваш верный ИИ-помощник, готовый к реализации самых амбициозных идей в Unity 6, Blender 5.2 и GIMP 3.0.`);
       } else if (q.includes('кто ты')) {

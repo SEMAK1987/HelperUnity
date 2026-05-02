@@ -1,9 +1,9 @@
 {
   "project_name": "Континент Судьбы (Quantum AI Assistant)",
-  "version": "17.18.30",
+  "version": "18.0.0",
   "project_path": "/app/applet",
   "unity_ai_assistant": {
-    "description": "Центральный архив знаний Квантового ИИ v17.18.30 (Fate Continent Mastery)",
-    "combined_knowledge": "# О ВОЗМОЖНОСТЯХ ИИ (v17.18.30 - FATE CONTINENT MASTERY)\n\n## 1. Fate Continent Expansion\n- **Massive Faction Data:** Подробные списки юнитов для 12 рас (Гномы, Водные люди, Лесные жители, Сожители, Эльфы, Русалки, Горные жители, Орки, Орки-Короли, Гномы-Короли, Высшие Эльфы, Элементали, Империя).\n- **Quest System:** Динамические задания от NPC 'Хранитель Квестов' с 5 уровнями сложности: Легкий, Простой, Сложный, Непроходимый, Невозможный.\n- **Adaptive AI Rewards:** Система бонусов для ИИ на уровнях 'Сложный' и 'Ужасный' (50% от игровых баффов).\n\n## 2. Menu Studio Visuals Mastery\n- **High-DPI & 8K Optimization:** Использование векторных ассетов и SDF-шрифтов.\n- **Fluid Animations:** Применение пружинных физических анимаций для UI.\n\n## 3. Континент Судьбы (Procedural Generation)\n- **Generation Algorithm:** 4 континента с уникальной биосферой и процедурными городами.\n- **Modeling:** Blender Geometry Nodes для расовой архитектуры.\n\n## 4. Продвинутый Blender 5.2 & Unity 6\n- **Automation:** Автоматический аудит сцен и оптимизация ассетов.\n- **Offline AI:** Поддержка Ollama для работы в любых условиях.\n"
+    "description": "Центральный архив знаний Квантового ИИ v18.0.0 (Global Knowledge Edition)",
+    "combined_knowledge": "# О ВОЗМОЖНОСТЯХ ИИ (v18.0.0 - FATE CONTINENT MASTERY)\n\n## 1. Fate Continent Expansion\n- **Massive Faction Data:** Подробные списки юнитов для 12 рас.\n- **Step-by-Step Mastery:** Система пошагового обучения (43 шага).\n- **Adaptive AI Strategist:** Улучшенная логика принятия решений.\n"
   }
 }
