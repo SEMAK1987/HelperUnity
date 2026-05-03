@@ -4,7 +4,7 @@
 
 ## 1. Общая информация
 - **Версия Помощника:** 18.0.2
-- **Описание:** Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок, мастерство Unity Canvas UI и 9,500+ видео уроков.
+- **Описание:** Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок, мастерство Unity Canvas UI и 12,000+ видео уроков.
 - **Путь проекта:** /app/applet
 - **Локальное хранилище:** Не задано
 - **Версия Unity:** unknown
@@ -46,7 +46,7 @@ undefined
 ```
 
 
-## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.0.0 - Fate Continent Expansion)
+## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.0.2 - Fate Continent Expansion)
 ### Режимы работы и Архитектурные уровни
 - **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.
 - **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.

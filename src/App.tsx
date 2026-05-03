@@ -197,7 +197,7 @@ function GameHelpView() {
              <BookOpen className="w-8 h-8 text-blue-500" />
              Помощь По Игре (Unity 6)
           </h2>
-          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v18.0.0</p>
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v18.0.2</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -726,7 +726,7 @@ export default function App() {
 
   const [kb, setKb] = useState<KBData | null>(null);
   const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info' | 'migration' | 'game_design' | 'game_help'>('chat');
-  const [appVersion, setAppVersion] = useState('18.0.0');
+  const [appVersion, setAppVersion] = useState('18.0.2');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -1625,7 +1625,7 @@ export default function App() {
 
     setIsThinking(true);
     const thinkingSequences = [
-      "Инициализация нейронных контуров v18.0.0...",
+      "Инициализация нейронных контуров v18.0.2...",
       "Анализ контекста проекта (Unity 6 & Blender 4.3)...",
       "Проверка статуса Quantum Link и облачных узлов...",
       "Доступ к базе 13,000+ видео-уроков...",
@@ -1683,7 +1683,7 @@ export default function App() {
       }
 
       let textResponse = "";
-      const systemInst = kb.system_instruction + "\n\n### GLOBAL PROJECT MASTERY v18.0.0 ###\n- CORE KNOWLEDGE: Integrated PDF Manual (Parts 1-8) & Game Master Spec.\n- FATE CONTINENT: Specialized in RPG architecture and Zenith Glassmorphism.\n- 3D & ENGINE: Elite Unity 6 & Blender expertise.\n- CORTEX SYNC: Local Database + Automated AI Repair active.";
+      const systemInst = kb.system_instruction + "\n\n### GLOBAL PROJECT MASTERY v18.0.2 ###\n- CORE KNOWLEDGE: Integrated PDF Manual (Parts 1-8) & Game Master Spec.\n- FATE CONTINENT: Specialized in RPG architecture and Zenith Glassmorphism.\n- 3D & ENGINE: Elite Unity 6 & Blender expertise.\n- CORTEX SYNC: Local Database + Automated AI Repair active.";
 
       try {
         let localSuccess = false;
@@ -1860,7 +1860,7 @@ export default function App() {
         // Friendly wrapping if it's a key error
         let finalContent = localData.answer;
         if (isKeyError && !finalContent.includes('КЛЮЧ API')) {
-          finalContent = `### 📡 СТАТУС СИНГУЛЯРНОСТИ: ОНЛАЙН (v18.0.0)\nСвязь установлена, но возникла техническая проблема с API-ключом Gemini.\n\n${finalContent}`;
+          finalContent = `### 📡 СТАТУС СИНГУЛЯРНОСТИ: ОНЛАЙН (v18.0.2)\nСвязь установлена, но возникла техническая проблема с API-ключом Gemini.\n\n${finalContent}`;
         }
 
         setMessages(prev => [...prev, {
@@ -2273,7 +2273,7 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-sm font-bold text-white uppercase tracking-tighter">AI Assistant</h1>
-              <p className="text-[10px] text-slate-500 uppercase font-mono">v18.0.0</p>
+              <p className="text-[10px] text-slate-500 uppercase font-mono">v18.0.2</p>
             </div>
           </div>
 
@@ -2635,7 +2635,7 @@ export default function App() {
                 <div className="flex items-center gap-3">
                   <div className={`w-2 h-2 rounded-full ${aiHealth === 'online' ? 'bg-green-500 shadow-[0_0_12px_rgba(34,197,94,0.6)]' : 'bg-yellow-500'}`} />
                   <span className="text-[10px] font-bold text-white uppercase tracking-widest group">
-                    {aiHealth === 'online' ? `${t.sync} (v18.0.0)` : `${t.offline} (v18.0.0)`}
+                    {aiHealth === 'online' ? `${t.sync} (v18.0.2)` : `${t.offline} (v18.0.2)`}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -2671,7 +2671,7 @@ export default function App() {
                 <Cpu className="w-12 h-12 text-blue-500 group-hover:text-blue-400 group-hover:rotate-12 transition-all" />
               </motion.div>
               
-              <h2 className="text-2xl font-black text-white mb-4 uppercase tracking-tighter shadow-blue-500/10 drop-shadow-xl transition-all duration-700">Unity AI Assistant v18.0.0</h2>
+              <h2 className="text-2xl font-black text-white mb-4 uppercase tracking-tighter shadow-blue-500/10 drop-shadow-xl transition-all duration-700">Unity AI Assistant v18.0.2</h2>
               <div className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg px-4 font-medium italic">
                 {language === 'Русский' ? (
                   <>
@@ -2680,7 +2680,7 @@ export default function App() {
                       {kb?.project_path || 'Загрузка...'}
                     </code>. 
                     <br/><br/>
-                    Задавайте любые вопросы по Unity, Blender, Photoshop или GIMP. Модули Menu Studio Visuals Mastery, Omni-Answer Engine и проект 'Континент судьбы' (v18.0.0) активированы.
+                    Задавайте любые вопросы по Unity, Blender, Photoshop или GIMP. Модули Menu Studio Visuals Mastery, Omni-Answer Engine и проект 'Континент судьбы' (v18.0.2) активированы.
                     <br/><br/>
                     <span className="text-xs text-orange-400 font-black uppercase ring-1 ring-orange-400/30 px-3 py-1.5 rounded-full bg-orange-400/5 shadow-lg shadow-orange-500/5 inline-block animate-pulse">Внимание: {t.proMastery}</span>
                   </>
@@ -6855,7 +6855,7 @@ export default function App() {
               </div>
 
               <div className="p-8 bg-black/40 border-t border-white/10 flex items-center justify-between">
-                <p className="text-[9px] text-slate-500 uppercase font-black tracking-widest">© Menu Studio Visuals Mastery • v18.0.0</p>
+                <p className="text-[9px] text-slate-500 uppercase font-black tracking-widest">© Menu Studio Visuals Mastery • v18.0.2</p>
                 <button 
                   onClick={() => setShowStudioGuide(false)}
                   className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl transition-all shadow-xl shadow-blue-500/20"

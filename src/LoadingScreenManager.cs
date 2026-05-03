@@ -53,13 +53,15 @@ public class LoadingScreenManager : MonoBehaviour
             if (progressText != null)
                 progressText.text = (progress * 100f).ToString("F0") + "%";
 
-            // Если загрузка почти завершена (0.9 в Unity - это максимум загрузки до активации)
+            // Если загрузка почти завершена
             if (operation.progress >= 0.9f)
             {
                 if (statusText != null)
                     statusText.text = "Нажмите любую клавишу для продолжения...";
+                else
+                    Debug.Log("[FATE CORE] Загрузка завершена. Ожидание активации...");
 
-                if (Input.anyKey || operation.progress >= 0.9f) // Можно убрать проверку клавиши для авто-загрузки
+                if (Input.anyKey || operation.progress >= 0.9f)
                 {
                     operation.allowSceneActivation = true;
                 }

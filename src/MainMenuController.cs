@@ -8,14 +8,21 @@ public class MainMenuController : MonoBehaviour
 
     public void PlayGame()
     {
-        Debug.Log("[FATE CORE] Загрузка основной сцены...");
-        // Используем менеджер экрана загрузки вместо прямой загрузки
+        Debug.Log("[FATE CORE] Загрузка основной сцены (Индекс 1)...");
+        
+        // Пытаемся найти менеджер, если инстанс не подхватился
+        if (LoadingScreenManager.Instance == null)
+        {
+            LoadingScreenManager.Instance = FindFirstObjectByType<LoadingScreenManager>();
+        }
+
         if (LoadingScreenManager.Instance != null)
         {
             LoadingScreenManager.Instance.LoadScene(1);
         }
         else
         {
+            Debug.LogWarning("[FATE CORE] LoadingScreenManager не найден! Загрузка без экрана...");
             SceneManager.LoadScene(1);
         }
     }
