@@ -4,6 +4,6 @@
   "project_path": "/app/applet",
   "unity_ai_assistant": {
     "description": "Центральный архив знаний Квантового ИИ v18.0.0 (Global Knowledge Edition)",
-    "combined_knowledge": "# О ВОЗМОЖНОСТЯХ ИИ (v18.0.0 - FATE CONTINENT MASTERY)\n\n## 1. Fate Continent Expansion\n- **Massive Faction Data:** Подробные списки юнитов для 12 рас.\n- **Step-by-Step Mastery:** Система пошагового обучения (43 шага).\n- **Adaptive AI Strategist:** Улучшенная логика принятия решений.\n"
+    "combined_knowledge": "# О ВОЗМОЖНОСТЯХ ИИ (v18.0.0 - FATE CONTINENT MASTERY)\n\n## 1. Fate Continent Expansion\n- **Massive Faction Data:** Подробные списки юнитов для 12 рас.\n- **Step-by-Step Mastery:** Система пошагового обучения (43 шага).\n- **Adaptive AI Strategist:** Улучшенная логика принятия решений.\n\n## 2. Visual Systems (Zenith Glassmorphism)\n- **2D Background Mastery:** Использование Canvas (Screen Space - Camera) со статичным 3D-спрайтом для стабильного отображения на всех разрешениях.\n- **Weather System (Particles):** Настройка Particle System поверх 2D фона с использованием Sorting Layers (слой Weather выше Background).\n- **Camera Optimization:** Отказ от динамического движения камеры в пользу стабильной композиции на основном Canvas.\n"
   }
 }

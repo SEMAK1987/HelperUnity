@@ -58,9 +58,11 @@ public class MenuBackgroundCamera_Fate : MonoBehaviour
             t = Mathf.SmoothStep(0f, 1f, timer);
         }
 
-        // Интерполяция позиции и вращения
-        transform.position = Vector3.Lerp(castlePoints[currentIndex].position, castlePoints[nextIndex].position, t);
-        transform.rotation = Quaternion.Lerp(castlePoints[currentIndex].rotation, castlePoints[nextIndex].rotation, t);
+        // Интерполяция позиции (сохраняем Z от точек, но даем возможность ручной правки)
+        Vector3 targetPos = Vector3.Lerp(castlePoints[currentIndex].position, castlePoints[nextIndex].position, t);
+        transform.position = targetPos;
+        
+        transform.rotation = Quaternion.Slerp(castlePoints[currentIndex].rotation, castlePoints[nextIndex].rotation, t);
     }
 
     // Метод для ручного переключения (например, при клике на фракцию)
