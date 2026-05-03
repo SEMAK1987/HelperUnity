@@ -1,4 +1,4 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.0.0)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.0.2)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)

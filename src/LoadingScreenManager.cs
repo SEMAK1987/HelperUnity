@@ -53,15 +53,19 @@ public class LoadingScreenManager : MonoBehaviour
             if (progressText != null)
                 progressText.text = (progress * 100f).ToString("F0") + "%";
 
-            // Если загрузка почти завершена
+            // Если загрузка завершена (в Unity 0.9 означает 100% готовность к активации)
             if (operation.progress >= 0.9f)
             {
-                if (statusText != null)
-                    statusText.text = "Нажмите любую клавишу для продолжения...";
-                else
-                    Debug.Log("[FATE CORE] Загрузка завершена. Ожидание активации...");
-
-                if (Input.anyKey || operation.progress >= 0.9f)
+                if (statusText != null) 
+                {
+                    statusText.text = "— ЗАГРУЗКА ЗАВЕРШЕНА —\nНАЖМИТЕ ЛЮБУЮ КЛАВИШУ";
+                    
+                    // Эффект пульсации для привлечения внимания
+                    float pulse = 0.95f + Mathf.PingPong(Time.time * 2f, 0.1f);
+                    statusText.transform.localScale = new Vector3(pulse, pulse, 1f);
+                }
+                
+                if (Input.anyKey)
                 {
                     operation.allowSceneActivation = true;
                 }
