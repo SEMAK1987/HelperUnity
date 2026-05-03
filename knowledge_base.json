@@ -1,9 +1,9 @@
 {
   "project_name": "Континент Судьбы (Quantum AI Assistant)",
-  "version": "18.0.0",
+  "version": "18.0.1",
   "project_path": "/app/applet",
   "unity_ai_assistant": {
-    "description": "Центральный архив знаний Квантового ИИ v18.0.0 (Global Knowledge Edition)",
-    "combined_knowledge": "# О ВОЗМОЖНОСТЯХ ИИ (v18.0.0 - FATE CONTINENT MASTERY)\n\n## 1. Fate Continent Expansion\n- **Massive Faction Data:** Подробные списки юнитов для 12 рас.\n- **Step-by-Step Mastery:** Система пошагового обучения (43 шага).\n- **Adaptive AI Strategist:** Улучшенная логика принятия решений.\n\n## 2. Visual Systems (Zenith Glassmorphism)\n- **2D Background Mastery:** Использование Canvas (Screen Space - Camera) со статичным 3D-спрайтом для стабильного отображения на всех разрешениях.\n- **Weather System (Particles):** Настройка Particle System поверх 2D фона с использованием Sorting Layers (слой Weather выше Background).\n- **Camera Optimization:** Отказ от динамического движения камеры в пользу стабильной композиции на основном Canvas.\n"
+    "description": "Центральный архив знаний Квантового ИИ v18.0.2 (UI & Transitions Update)",
+    "combined_knowledge": "# О ВОЗМОЖНОСТЯХ ИИ (v18.0.2 - FATE CONTINENT MASTERY)\n\n## 1. Fate Continent Expansion\n- **Massive Faction Data:** Подробные списки юнитов для 12 рас.\n- **Step-by-Step Mastery:** Система пошагового обучения (43 шага).\n- **Adaptive AI Strategist:** Улучшенная логика принятия решений.\n- **Build Settings Order:** 0: MainMenu, 1: CharacterSelection, 2: GameScene, 3: BattleScene.\n\n## 2. Visual Systems (Zenith Glassmorphism)\n- **2D Background Mastery:** Canvas (Screen Space - Camera) со статичным фоном.\n- **Weather System:** Particle System поверх фона (Sorting Layers: Weather > Background).\n- **Zenith UI Buttons:** Узкие прозрачные кнопки (Alpha 160) с эффектом стекла.\n- **Hover Effects:** UIButtonHoverEffect для плавного масштабирования и смены курсора.\n- **Loading System:** Асинхронная загрузка сцен с реальной полоской прогресса (LoadingScreenManager).\n"
   }
 }

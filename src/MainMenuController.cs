@@ -9,8 +9,15 @@ public class MainMenuController : MonoBehaviour
     public void PlayGame()
     {
         Debug.Log("[FATE CORE] Загрузка основной сцены...");
-        // Загружаем сцену под индексом 1 (GameScene)
-        SceneManager.LoadScene(1);
+        // Используем менеджер экрана загрузки вместо прямой загрузки
+        if (LoadingScreenManager.Instance != null)
+        {
+            LoadingScreenManager.Instance.LoadScene(1);
+        }
+        else
+        {
+            SceneManager.LoadScene(1);
+        }
     }
 
     public void OpenSettings()

@@ -1,6 +1,6 @@
 {
-  "name": "Unity & Blender AI Assistant v18.0.0",
-  "description": "Глобальное обновление v18.0.0 с полной базой знаний по проекту 'Fate Continent'. Квантовый ИИ (Zenith UI), интеграция Unity 6/Blender 5.2 и 8K экспорт.",
+  "name": "Fate Continent AI Assistant v18.0.2",
+  "description": "Квантовый ИИ v18.0.2 (Visual Stability & UI). Полная база знаний проекта 'Fate Continent', поддержка асинхронной загрузки и Zenith Glassmorphism.",
   "requestFramePermissions": [
     "camera",
     "microphone",
