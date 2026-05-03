@@ -4,44 +4,37 @@ using UnityEngine.UI;
 
 public class UIButtonHoverEffect : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    [Header("Настройки курсора")]
-    public Texture2D hoverCursor; // Текстура для курсора при наведении
-    public Vector2 hotspot = Vector2.zero;
-
-    [Header("Визуальный эффект кнопки")]
-    public float scaleMultiplier = 1.05f;
-    public float animationSpeed = 10f;
+    [Header("Настройки")]
+    public float scaleMultiplier = 1.15f;
+    public float animationSpeed = 15f;
+    public Texture2D hoverCursor;
     
     private Vector3 originalScale;
     private Vector3 targetScale;
     private Image buttonImage;
     private Color originalColor;
-    private Color hoverColor;
 
-    void Start()
+    void Awake()
     {
         originalScale = transform.localScale;
         targetScale = originalScale;
         buttonImage = GetComponent<Image>();
-        if (buttonImage != null)
-        {
-            originalColor = buttonImage.color;
-            hoverColor = new Color(originalColor.r + 0.1f, originalColor.g + 0.1f, originalColor.b + 0.2f, originalColor.a);
-        }
+        if (buttonImage != null) originalColor = buttonImage.color;
     }
 
     void Update()
     {
+        // Плавное изменение размера
         transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime * animationSpeed);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
         targetScale = originalScale * scaleMultiplier;
-        if (buttonImage != null) buttonImage.color = hoverColor;
+        if (buttonImage != null) buttonImage.color = new Color(originalColor.r + 0.15f, originalColor.g + 0.15f, originalColor.b + 0.25f, originalColor.a);
         
         if (hoverCursor != null)
-            Cursor.SetCursor(hoverCursor, hotspot, CursorMode.Auto);
+            Cursor.SetCursor(hoverCursor, Vector2.zero, CursorMode.Auto);
     }
 
     public void OnPointerExit(PointerEventData eventData)

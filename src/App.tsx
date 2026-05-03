@@ -2691,7 +2691,7 @@ export default function App() {
                       {kb?.project_path || 'Loading...'}
                     </code>. 
                     <br/><br/>
-                    Ask any questions about Unity, Blender, Photoshop, or GIMP. Zenith 3D Mastery, Omni-Answer Engine, and project 'Fate Continent' (v18.0.0) are active.
+                    Ask any questions about Unity, Blender, Photoshop, or GIMP. Zenith 3D Mastery, Omni-Answer Engine, and project 'Fate Continent' (v18.0.2) are active.
                     <br/><br/>
                     <span className="text-xs text-orange-400 font-black uppercase ring-1 ring-orange-400/30 px-3 py-1.5 rounded-full bg-orange-400/5 shadow-lg shadow-orange-500/5 inline-block animate-pulse">Attention: {t.proMastery}</span>
                   </>
@@ -2782,7 +2782,7 @@ export default function App() {
                       {msg.audioVariants && (
                         <div className="mt-6 space-y-4 pt-6 border-t border-white/5">
                            <h4 className="text-[10px] font-bold text-white uppercase tracking-widest flex items-center gap-2">
-                            <Music className="w-3 h-3 text-blue-400" /> Сгенерированные аудио-варианты (v18.0.0):
+                            <Music className="w-3 h-3 text-blue-400" /> Сгенерированные аудио-варианты (v18.0.2):
                           </h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {msg.audioVariants.map((variant, vi) => (
@@ -4827,7 +4827,7 @@ export default function App() {
                     <div className="flex items-center justify-between px-6">
                       <div>
                         <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">Menu Studio Visuals Mastery</h3>
-                        <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mt-1">Интерактивный предпросмотр UI v18.0.0</p>
+                        <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mt-1">Интерактивный предпросмотр UI v18.0.2</p>
                       </div>
                       <button 
                         onClick={() => setShowStudioGuide(true)}
@@ -4936,7 +4936,7 @@ export default function App() {
                         <ExternalLink className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v18.0.0)</h2>
+                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v18.0.2)</h2>
                         <p className="text-xs text-slate-400">Прямое управление Blender и Unity через нейронный мост.</p>
                       </div>
                     </div>
@@ -5012,7 +5012,7 @@ export default function App() {
                         <MapIcon className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Fate Continent: Camera Mastery v18.0.0</h2>
+                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Fate Continent: Camera Mastery v18.0.2</h2>
                         <p className="text-xs text-slate-400">Исправление иерархии: точки камеры должны быть вне Canvas!</p>
                       </div>
                     </div>
@@ -5237,7 +5237,7 @@ export default function App() {
                       <div className="space-y-1">
                         <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter">PROJECT MASTER BLUEPRINT</h3>
                         <div className="flex items-center gap-3">
-                          <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-[9px] font-bold text-indigo-400">v18.0.0</span>
+                          <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-[9px] font-bold text-indigo-400">v18.0.2</span>
                           <p className="text-xs text-slate-400 font-medium">Документ синхронизации обновлен и готов к работе.</p>
                         </div>
                       </div>
@@ -6310,7 +6310,7 @@ export default function App() {
                     <ImageIcon className="w-8 h-8" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Генератор Обложек VK v18.0.0</h3>
+                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Генератор Обложек VK v18.0.2</h3>
                     <p className="text-xs text-slate-500 uppercase tracking-[0.2em] font-bold">Континент Судьбы • Умный Синтез</p>
                   </div>
                 </div>
@@ -6757,7 +6757,7 @@ export default function App() {
                 <div>
                   <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic flex items-center gap-3">
                     <Sparkles className="w-6 h-6 text-blue-400" />
-                    Menu Studio: Архитектура UI v18.0.0
+                    Menu Studio: Архитектура UI v18.0.2
                   </h3>
                   <p className="text-[10px] text-slate-400 uppercase font-bold tracking-[0.2em] mt-1">Описано на основе ваших скриншотов для переноса в другие нейросети</p>
                 </div>
