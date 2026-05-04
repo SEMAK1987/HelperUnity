@@ -197,7 +197,7 @@ function GameHelpView() {
              <BookOpen className="w-8 h-8 text-blue-500" />
              Помощь По Игре (Unity 6)
           </h2>
-          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v18.0.2</p>
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v18.2.0</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -726,7 +726,7 @@ export default function App() {
 
   const [kb, setKb] = useState<KBData | null>(null);
   const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info' | 'migration' | 'game_design' | 'game_help'>('chat');
-  const [appVersion, setAppVersion] = useState('18.0.2');
+  const [appVersion, setAppVersion] = useState('18.2.0');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -1069,6 +1069,7 @@ export default function App() {
       if (data.available) {
         setShowUpdateModal(true);
       } else {
+        setAppVersion('18.2.0');
         showNotification("У вас уже установлена последняя версия!", "info");
       }
     } catch (error) {
@@ -1086,7 +1087,7 @@ export default function App() {
       "Глубокое сканирование проекта (Аудит)...",
       "Синхронизация с локальным хранилищем...",
       "Исправление найденных ошибок...",
-      "Обновление версии до 18.0.0...",
+      "Обновление версии до 18.2.0...",
       "Инициализация Omniversal Quantum Link...",
       "Установка Нейронного Моста (Blender & Unity)...",
       "Регенерация PROJECT_MASTER_BLUEPRINT.md (Quantum Link)..."
@@ -1211,7 +1212,7 @@ export default function App() {
         console.error("Failed to fetch KB after retries", err);
         setKb({
           name: "Unity AI Assistant",
-          version: "18.0.0",
+          version: "18.2.0",
           description: "Гибридный ИИ-помощник с Quantum Link",
           project_path: "Unknown",
           system_instruction: "Ты — экспертный ИИ-ассистент."
@@ -1250,6 +1251,7 @@ export default function App() {
         const res = await fetch('/api/health');
         setIsOnline(res.ok);
         setServerHealth(res.ok ? 'online' : 'error');
+        setAppVersion('18.2.0'); // Force sync version
       } catch (e) {
         setIsOnline(false);
         setServerHealth('offline');
@@ -1288,7 +1290,7 @@ export default function App() {
           .then(res => res.ok ? res.json() : null)
           .then(data => {
             if (data) {
-              const v = data.name.match(/v([\d.]+)/)?.[1] || '18.0.0';
+              const v = data.name.match(/v([\d.]+)/)?.[1] || '18.2.0';
               setAppVersion(v);
             }
           })
@@ -1625,7 +1627,7 @@ export default function App() {
 
     setIsThinking(true);
     const thinkingSequences = [
-      "Инициализация нейронных контуров v18.0.2...",
+      "Инициализация нейронных контуров v18.2.0...",
       "Анализ контекста проекта (Unity 6 & Blender 4.3)...",
       "Проверка статуса Quantum Link и облачных узлов...",
       "Доступ к базе 13,000+ видео-уроков...",
@@ -1683,7 +1685,7 @@ export default function App() {
       }
 
       let textResponse = "";
-      const systemInst = kb.system_instruction + "\n\n### GLOBAL PROJECT MASTERY v18.0.2 ###\n- CORE KNOWLEDGE: Integrated PDF Manual (Parts 1-8) & Game Master Spec.\n- FATE CONTINENT: Specialized in RPG architecture and Zenith Glassmorphism.\n- 3D & ENGINE: Elite Unity 6 & Blender expertise.\n- CORTEX SYNC: Local Database + Automated AI Repair active.";
+      const systemInst = kb.system_instruction + "\n\n### GLOBAL PROJECT MASTERY v18.2.0 ###\n- CORE KNOWLEDGE: Integrated PDF Manual (Parts 1-8) & Game Master Spec.\n- FATE CONTINENT: Specialized in RPG architecture and Zenith Glassmorphism.\n- 3D & ENGINE: Elite Unity 6 & Blender expertise.\n- CORTEX SYNC: Local Database + Automated AI Repair active.";
 
       try {
         let localSuccess = false;
@@ -1692,7 +1694,7 @@ export default function App() {
         if (isOllamaMode) {
           try {
             console.log("Attempting Ollama local call via proxy...");
-            const ollamaPrompt = `You are a helpful AI Assistant for Unity and Blender. Your knowledge base is version 18.0.0.
+            const ollamaPrompt = `You are a helpful AI Assistant for Unity and Blender. Your knowledge base is version 18.2.0.
             Authorized reference: Fate Continent Documentation (Internal MD files).
             Directives:
             1. Always refer to technical manual sections (Part 1-8).
@@ -1860,7 +1862,7 @@ export default function App() {
         // Friendly wrapping if it's a key error
         let finalContent = localData.answer;
         if (isKeyError && !finalContent.includes('КЛЮЧ API')) {
-          finalContent = `### 📡 СТАТУС СИНГУЛЯРНОСТИ: ОНЛАЙН (v18.0.2)\nСвязь установлена, но возникла техническая проблема с API-ключом Gemini.\n\n${finalContent}`;
+          finalContent = `### 📡 СТАТУС СИНГУЛЯРНОСТИ: ОНЛАЙН (v18.2.0)\nСвязь установлена, но возникла техническая проблема с API-ключом Gemini.\n\n${finalContent}`;
         }
 
         setMessages(prev => [...prev, {
@@ -2273,7 +2275,7 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-sm font-bold text-white uppercase tracking-tighter">AI Assistant</h1>
-              <p className="text-[10px] text-slate-500 uppercase font-mono">v18.0.2</p>
+              <p className="text-[10px] text-slate-500 uppercase font-mono">v18.2.0</p>
             </div>
           </div>
 
@@ -2635,7 +2637,7 @@ export default function App() {
                 <div className="flex items-center gap-3">
                   <div className={`w-2 h-2 rounded-full ${aiHealth === 'online' ? 'bg-green-500 shadow-[0_0_12px_rgba(34,197,94,0.6)]' : 'bg-yellow-500'}`} />
                   <span className="text-[10px] font-bold text-white uppercase tracking-widest group">
-                    {aiHealth === 'online' ? `${t.sync} (v18.0.2)` : `${t.offline} (v18.0.2)`}
+                    {aiHealth === 'online' ? `${t.sync} (v18.2.0)` : `${t.offline} (v18.2.0)`}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -2671,7 +2673,7 @@ export default function App() {
                 <Cpu className="w-12 h-12 text-blue-500 group-hover:text-blue-400 group-hover:rotate-12 transition-all" />
               </motion.div>
               
-              <h2 className="text-2xl font-black text-white mb-4 uppercase tracking-tighter shadow-blue-500/10 drop-shadow-xl transition-all duration-700">Unity AI Assistant v18.0.2</h2>
+              <h2 className="text-2xl font-black text-white mb-4 uppercase tracking-tighter shadow-blue-500/10 drop-shadow-xl transition-all duration-700">Unity AI Assistant v18.2.0</h2>
               <div className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg px-4 font-medium italic">
                 {language === 'Русский' ? (
                   <>
@@ -2680,7 +2682,7 @@ export default function App() {
                       {kb?.project_path || 'Загрузка...'}
                     </code>. 
                     <br/><br/>
-                    Задавайте любые вопросы по Unity, Blender, Photoshop или GIMP. Модули Menu Studio Visuals Mastery, Omni-Answer Engine и проект 'Континент судьбы' (v18.0.2) активированы.
+                    Задавайте любые вопросы по Unity, Blender, Photoshop или GIMP. Модули Menu Studio Visuals Mastery, Omni-Answer Engine и проект 'Континент судьбы' (v18.2.0) активированы.
                     <br/><br/>
                     <span className="text-xs text-orange-400 font-black uppercase ring-1 ring-orange-400/30 px-3 py-1.5 rounded-full bg-orange-400/5 shadow-lg shadow-orange-500/5 inline-block animate-pulse">Внимание: {t.proMastery}</span>
                   </>
@@ -2691,7 +2693,7 @@ export default function App() {
                       {kb?.project_path || 'Loading...'}
                     </code>. 
                     <br/><br/>
-                    Ask any questions about Unity, Blender, Photoshop, or GIMP. Zenith 3D Mastery, Omni-Answer Engine, and project 'Fate Continent' (v18.0.2) are active.
+                    Ask any questions about Unity, Blender, Photoshop, or GIMP. Zenith 3D Mastery, Omni-Answer Engine, and project 'Fate Continent' (v18.2.0) are active.
                     <br/><br/>
                     <span className="text-xs text-orange-400 font-black uppercase ring-1 ring-orange-400/30 px-3 py-1.5 rounded-full bg-orange-400/5 shadow-lg shadow-orange-500/5 inline-block animate-pulse">Attention: {t.proMastery}</span>
                   </>
@@ -2782,7 +2784,7 @@ export default function App() {
                       {msg.audioVariants && (
                         <div className="mt-6 space-y-4 pt-6 border-t border-white/5">
                            <h4 className="text-[10px] font-bold text-white uppercase tracking-widest flex items-center gap-2">
-                            <Music className="w-3 h-3 text-blue-400" /> Сгенерированные аудио-варианты (v18.0.2):
+                            <Music className="w-3 h-3 text-blue-400" /> Сгенерированные аудио-варианты (v18.2.0):
                           </h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {msg.audioVariants.map((variant, vi) => (
@@ -4827,7 +4829,7 @@ export default function App() {
                     <div className="flex items-center justify-between px-6">
                       <div>
                         <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">Menu Studio Visuals Mastery</h3>
-                        <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mt-1">Интерактивный предпросмотр UI v18.0.2</p>
+                        <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mt-1">Интерактивный предпросмотр UI v18.2.0</p>
                       </div>
                       <button 
                         onClick={() => setShowStudioGuide(true)}
@@ -4936,7 +4938,7 @@ export default function App() {
                         <ExternalLink className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v18.0.2)</h2>
+                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Quantum Link Integration (v18.2.0)</h2>
                         <p className="text-xs text-slate-400">Прямое управление Blender и Unity через нейронный мост.</p>
                       </div>
                     </div>
@@ -5012,7 +5014,7 @@ export default function App() {
                         <MapIcon className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Fate Continent: Camera Mastery v18.0.2</h2>
+                        <h2 className="text-xl font-bold text-white uppercase tracking-tighter">Fate Continent: Camera Mastery v18.2.0</h2>
                         <p className="text-xs text-slate-400">Исправление иерархии: точки камеры должны быть вне Canvas!</p>
                       </div>
                     </div>
@@ -5237,7 +5239,7 @@ export default function App() {
                       <div className="space-y-1">
                         <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter">PROJECT MASTER BLUEPRINT</h3>
                         <div className="flex items-center gap-3">
-                          <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-[9px] font-bold text-indigo-400">v18.0.2</span>
+                          <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-[9px] font-bold text-indigo-400">v18.2.0</span>
                           <p className="text-xs text-slate-400 font-medium">Документ синхронизации обновлен и готов к работе.</p>
                         </div>
                       </div>
@@ -6310,7 +6312,7 @@ export default function App() {
                     <ImageIcon className="w-8 h-8" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Генератор Обложек VK v18.0.2</h3>
+                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Генератор Обложек VK v18.2.0</h3>
                     <p className="text-xs text-slate-500 uppercase tracking-[0.2em] font-bold">Континент Судьбы • Умный Синтез</p>
                   </div>
                 </div>
@@ -6757,7 +6759,7 @@ export default function App() {
                 <div>
                   <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic flex items-center gap-3">
                     <Sparkles className="w-6 h-6 text-blue-400" />
-                    Menu Studio: Архитектура UI v18.0.2
+                    Menu Studio: Архитектура UI v18.2.0
                   </h3>
                   <p className="text-[10px] text-slate-400 uppercase font-bold tracking-[0.2em] mt-1">Описано на основе ваших скриншотов для переноса в другие нейросети</p>
                 </div>
@@ -6855,7 +6857,7 @@ export default function App() {
               </div>
 
               <div className="p-8 bg-black/40 border-t border-white/10 flex items-center justify-between">
-                <p className="text-[9px] text-slate-500 uppercase font-black tracking-widest">© Menu Studio Visuals Mastery • v18.0.2</p>
+                <p className="text-[9px] text-slate-500 uppercase font-black tracking-widest">© Menu Studio Visuals Mastery • v18.2.0</p>
                 <button 
                   onClick={() => setShowStudioGuide(false)}
                   className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl transition-all shadow-xl shadow-blue-500/20"

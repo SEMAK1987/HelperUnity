@@ -1,9 +1,9 @@
 {
   "project_name": "Континент Судьбы (Quantum AI Assistant)",
-  "version": "18.0.5",
+  "version": "18.2.0",
   "project_path": "/app/applet",
   "unity_ai_assistant": {
-    "description": "Центральный архив знаний Квантового ИИ v18.0.5 (Anti-Void Click Update)",
-    "combined_knowledge": "# О ВОЗМОЖНОСТЯХ ИИ (v18.0.5 - FATE CONTINENT MASTERY)\n\n## 1. Решение проблемы «Нажатия в пустоте»\n- **Метод А (Спрайты):** Нажмите на спрайт кнопки в папке Assets -> Inspector -> Advanced -> Поставьте галочку 'Read/Write Enabled'. В скрипте UIButtonHoverEffect установите 'Alpha Threshold' на 0.5. Теперь кнопка будет игнорировать прозрачные области.\n- **Метод Б (Padding):** В компоненте Image есть 'Raycast Padding'. Если кнопка ловит клик слишком рано сверху/снизу, впишите туда положительные числа (например, Top: 50, Bottom: 50). Это «сожмет» невидимую зону клика.\n- **Метод В (Transform):** Проверьте, что Scale у кнопок (1, 1, 1). Если вы увеличивали их через Scale, клик-зона может исказиться. Меняйте только Width/Height в RectTransform.\n\n## 2. Исправление текста «Столбом»\n- **Width (Ширина):** Текст в LoadingScreenManager сворачивается в колонку, если его рамка (Width) слишком узкая. Установите Width = 1000-1200 для объекта 'StatusText'.\n- **Scaling:** Не используйте Scale для текста, используйте Font Size и Width/Height.\n\n## 3. Visual Systems\n- **Loading Pulse:** Статус-текст пульсирует при готовности (0.9 прогресса).\n- **Hover Toggles:** В UIButtonHoverEffect можно выключить 'Use Scale Animation', если хотите только смену курсора.\n"
+    "description": "Центральный архив знаний Квантового ИИ v18.2.0 (Full UI & Logic Sync)",
+    "combined_knowledge": "# ОБНОВЛЕНИЕ СИСТЕМЫ v18.2.0\n\n## 1. Исправление навигации (Menu_Game)\n- Добавлены функции `OnClickLoadGameChoices` и `OnBackToMainMenu` для управления вложенными панелями.\n- Все связи кнопок теперь поддерживают Choice_Menu и возврат в главное меню.\n\n## 2. Настройка TMP_Dropdown\n- Для Quality: [Низкое, Среднее, Высокое, Ультра].\n- Для Language: [Русский, English].\n- Связка через SettingsManager.SetLanguage(int) в разделе Dynamic Int.\n\n## 3. UI Layout Mastery\n- Stretch Mode: Для панелей на весь экран (Overlay/Choice) необходимо установить Scale = (1, 1, 1) для родительских объектов.\n- Scale Fix: Если родитель (Overlay_Layer) имеет масштаб 0.1, UI будет микроскопическим. Сбросьте в (1, 1, 1).\n- Hover Effects: Использование компонента UIButtonHoverEffect для всех кнопок.\n"
   }
 }
