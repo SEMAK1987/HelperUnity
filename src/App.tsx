@@ -197,7 +197,7 @@ function GameHelpView() {
              <BookOpen className="w-8 h-8 text-blue-500" />
              Помощь По Игре (Unity 6)
           </h2>
-          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v18.2.0</p>
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v18.3.0</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -726,7 +726,7 @@ export default function App() {
 
   const [kb, setKb] = useState<KBData | null>(null);
   const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info' | 'migration' | 'game_design' | 'game_help'>('chat');
-  const [appVersion, setAppVersion] = useState('18.2.0');
+  const [appVersion, setAppVersion] = useState('18.3.0');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -2275,7 +2275,7 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-sm font-bold text-white uppercase tracking-tighter">AI Assistant</h1>
-              <p className="text-[10px] text-slate-500 uppercase font-mono">v18.2.0</p>
+              <p className="text-[10px] text-slate-500 uppercase font-mono">v18.3.0</p>
             </div>
           </div>
 
@@ -2673,7 +2673,7 @@ export default function App() {
                 <Cpu className="w-12 h-12 text-blue-500 group-hover:text-blue-400 group-hover:rotate-12 transition-all" />
               </motion.div>
               
-              <h2 className="text-2xl font-black text-white mb-4 uppercase tracking-tighter shadow-blue-500/10 drop-shadow-xl transition-all duration-700">Unity AI Assistant v18.2.0</h2>
+              <h2 className="text-2xl font-black text-white mb-4 uppercase tracking-tighter shadow-blue-500/10 drop-shadow-xl transition-all duration-700">Unity AI Assistant v18.3.0</h2>
               <div className="text-slate-400 text-sm leading-relaxed mb-10 max-w-lg px-4 font-medium italic">
                 {language === 'Русский' ? (
                   <>

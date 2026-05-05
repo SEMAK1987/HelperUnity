@@ -1,19 +1,31 @@
 # PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Total Knowledge Archive Edition)
 
-> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.0.2.
+> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.3.0.
 
 ## 1. Общая информация
-- **Версия Помощника:** 17.18.2
-- **Описание:** Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок, мастерство Unity Canvas UI и 9,500+ видео уроков.
+- **Версия Помощника:** 18.3.0
+- **Описание:** Гибридный ИИ-помощник нового поколения. Полная интеграция систем локализации и исправленные UI-макросы для Unity 6.
 - **Путь проекта:** /app/applet
-- **Локальное хранилище:** Не задано
-- **Версия Unity:** unknown
-- **Версия Blender:** unknown
-- **Версия GIMP:** unknown
-- **Версия Redot:** unknown
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V17_18_30_FATE_MASTER]
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_3_0_INTEGRATION_MASTER]
 
-## 2. Структура интерфейса
+## 2. Специальные исправления (Hotfixes)
+### ⚠️ Input Manager vs Input System (Unity 6)
+Если вы видите ошибку "This project uses Input Manager...":
+1. Перейдите в **Edit -> Project Settings -> Player**.
+2. В **Other Settings -> Configuration**, установите **Active Input Handling** в **Both**.
+3. Unity перезапустится, и ошибка исчезнет.
+
+### 🔘 Как правильно привязать переключение языка
+1. Кликните на **Dropdown_Language** в Иерархии.
+2. В событии **On Value Changed**, в поле **Object**, перетащите **Dropdown_Language** из окна **Hierarchy** (Иерархии).
+3. Выберите **LanguageSelector -> SetLanguage** (раздел **Dynamic int**).
+
+### 🔠 Проблема с квадратиками (Иероглифы)
+1. Установите шрифт с поддержкой Unicode (например, Noto Sans) в `Assets/Resources/f/`.
+2. Создайте **TMP Font Asset**.
+3. Назначьте его в **Default Font** на объекте **_Translator**.
+
+## 3. Структура интерфейса
 ### Вкладки
 - **STUDIO**: Главная студия разработки
 - **KB**: База знаний
@@ -46,7 +58,7 @@ undefined
 ```
 
 
-## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.0.2 - Fate Continent Expansion)
+## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.3.0 - Quantum Integration Release)
 ### Режимы работы и Архитектурные уровни
 - **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.
 - **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.

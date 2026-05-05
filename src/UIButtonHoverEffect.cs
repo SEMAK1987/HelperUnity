@@ -37,8 +37,7 @@ public class UIButtonHoverEffect : MonoBehaviour, IPointerEnterHandler, IPointer
                 // ВАЖНО: Требует 'Read/Write Enabled' в настройках импорта спрайта!
                 buttonImage.alphaHitTestMinimumThreshold = alphaThreshold; 
             } catch (System.Exception) {
-                // Если Read/Write не включен, просто логируем напоминание
-                Debug.LogWarning("[FATE CORE] Для точных кликов включите 'Read/Write Enabled' в настройках спрайта " + buttonImage.sprite.name);
+                // Warning is muted to prevent console spam for non-readable textures
             }
         }
     }

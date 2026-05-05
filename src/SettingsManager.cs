@@ -75,29 +75,12 @@ public class SettingsManager : MonoBehaviour
 
     public void SetLanguage(int langIndex)
     {
-        GameObject translatorObj = GameObject.Find("_Translator");
-        if (translatorObj != null)
-        {
-            string lang = langIndex == 0 ? "ru" : "en";
-            // Безопасный вызов без прямой ссылки на класс
-            translatorObj.SendMessage("ChangeLanguage", lang, SendMessageOptions.DontRequireReceiver);
-            
-            // Обновляем тексты (ищем везде, где может быть Menu_Game)
-            GameObject menuManager = GameObject.Find("_GameManager");
-            if (menuManager != null) menuManager.SendMessage("UpdateLocalizedTexts", SendMessageOptions.DontRequireReceiver);
-            
-            GameObject menuCanvas = GameObject.Find("Canvas_MainMenu");
-            if (menuCanvas != null) menuCanvas.SendMessage("UpdateLocalizedTexts", SendMessageOptions.DontRequireReceiver);
-        }
-        else
-        {
-            Debug.LogWarning("[FATE CORE] _Translator не найден. Проверьте имя объекта в сцене.");
-        }
+        Translator.SelectLanguage(langIndex);
+        Debug.Log($"[SettingsManager] Язык изменен на индекс: {langIndex}");
     }
 
     public void OnBackToMenu()
     {
-        GameObject gm = GameObject.Find("_GameManager");
-        if (gm != null) gm.SendMessage("ShowMainMenu", SendMessageOptions.DontRequireReceiver);
+        Menu_Game.Instance?.ShowMainMenu();
     }
 }

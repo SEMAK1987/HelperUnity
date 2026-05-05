@@ -1,6 +1,6 @@
-// [ZENITH MULTI-TOOL SYNERGY v17.18.30 - Fate Continent Expansion]
+// [ZENITH MULTI-TOOL SYNERGY v18.3.0 - Quantum Integration Release]
 // Unity Connector for Quantum AI Assistant
-// Updated: 2026-05-01 (Synced with Faction Data & Quest System)
+// Updated: 2026-05-05 (Synced with Localization & Input System)
 
 using UnityEngine;
 using UnityEditor;
