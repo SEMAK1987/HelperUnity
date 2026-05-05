@@ -4,28 +4,32 @@
 
 ## 1. Общая информация
 - **Версия Помощника:** 18.3.0
-- **Описание:** Гибридный ИИ-помощник нового поколения. Полная интеграция систем локализации и исправленные UI-макросы для Unity 6.
+- **Описание:** Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок, мастерство Unity Canvas UI и 15,000+ видео уроков.
 - **Путь проекта:** /app/applet
 - **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_3_0_INTEGRATION_MASTER]
 
-## 2. Специальные исправления (Hotfixes)
+## 2. Специальные исправления (Hotfixes v18.3.0)
 ### ⚠️ Input Manager vs Input System (Unity 6)
 Если вы видите ошибку "This project uses Input Manager...":
 1. Перейдите в **Edit -> Project Settings -> Player**.
 2. В **Other Settings -> Configuration**, установите **Active Input Handling** в **Both**.
 3. Unity перезапустится, и ошибка исчезнет.
 
-### 🔘 Как правильно привязать переключение языка
-1. Кликните на **Dropdown_Language** в Иерархии.
-2. В событии **On Value Changed**, в поле **Object**, перетащите **Dropdown_Language** из окна **Hierarchy** (Иерархии).
-3. Выберите **LanguageSelector -> SetLanguage** (раздел **Dynamic int**).
+### 🔠 Настройка Unicode и Шрифтов (Fix "Квадратиков")
+Если вместо текста "квадратики":
+1. Откройте **Window -> TextMeshPro -> Font Asset Creator**.
+2. В поле **Source Font File** выберите ваш `.ttf` шрифт (например, Noto Sans).
+3. **Character Set:** Выберите **Unicode Range**.
+4. **Character Sequence (Hex):** Вставьте `32-126, 160-255, 1024-1279, 4352-4607, 11904-40959`.
+5. Нажмите **Generate Font Atlas**, затем **Save**. Сохраните как `NotoSans_Global_SDF`.
+6. Назначьте этот файл в **Default Font** на объекте **_Translator** в сцене.
 
-### 🔠 Проблема с квадратиками (Иероглифы)
-1. Установите шрифт с поддержкой Unicode (например, Noto Sans) в `Assets/Resources/f/`.
-2. Создайте **TMP Font Asset**.
-3. Назначьте его в **Default Font** на объекте **_Translator**.
+### 🔘 Привязка переключения языка (Dropdown)
+1. Выберите **Dropdown_Language** в Иерархии.
+2. В **On Value Changed**, перетащите сам объект **Dropdown_Language** из Иерархии в поле **Object**.
+3. В списке функций выберите **LanguageSelector -> SetLanguage** (из раздела **Dynamic int**).
 
-## 3. Структура интерфейса
+## 2. Структура интерфейса
 ### Вкладки
 - **STUDIO**: Главная студия разработки
 - **KB**: База знаний
@@ -132,7 +136,9 @@ undefined
 - **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.
 - **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.
 
-## 11. История изменений (v17.18.30)
+## 11. История изменений (v18.3.0)
+- **v18.3.0:** Quantum Integration Release. Полная система локализации (9 языков), исправление Input System и гайд по Unicode шрифтам.
+- **v18.2.0:** Исправление навигации Menu_Game и возврата в меню.
 - **v17.18.30:** Fate Continent Expansion. Добавлены списки юнитов для 12 рас, NPC Хранитель Квестов и адаптивная стратегия ИИ. Исправлены баги UI и Dashboard. Интеграция 14,000+ видео-уроков.
 - **v17.18.29:** Zenith Continent & Offline Mastery. Внедрена система процедурной генерации городов 'Континент Судьбы'. Добавлена поддержка Ollama (Offline Mode). Реализован 'Автоматический аудит сцен Unity'.
 - **v17.18.19:** Zenith Knowledge Integration (12,000+ Video Index). Тотальное обновление базы знаний из 100+ новых обучающих видео. Расширен раздел 'О ВОЗМОЖНОСТЯХ ИИ' для Unity 6, Blender 5.2, Godot 4.4 и GIMP 3.0. Оптимизирован режим Eternal Offline Archive для работы без интернета.
