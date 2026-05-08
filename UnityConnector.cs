@@ -1,6 +1,6 @@
-// [ZENITH MULTI-TOOL SYNERGY v18.3.0 - Quantum Integration Release]
+// [ZENITH MULTI-TOOL SYNERGY v18.4.1 - Stability & Log Update]
 // Unity Connector for Quantum AI Assistant
-// Updated: 2026-05-05 (Synced with Localization & Input System)
+// Updated: 2026-05-07 (Synced with Hex Fonts & Animation Scripts)
 
 using UnityEngine;
 using UnityEditor;

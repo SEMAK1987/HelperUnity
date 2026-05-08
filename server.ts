@@ -459,12 +459,13 @@ function generateId() {
 
 async function checkProjectIntegrity() {
   const kb = await fs.readJson(kbPath).catch(() => ({}));
-  const currentVersion = kb.version || "18.3.0";
+  const currentVersion = kb.version || "18.4.1";
   
   const files = [
     { name: "knowledge_base.json", default: { project_name: "Unity Assistant", version: currentVersion, project_path: process.cwd(), system_instruction: "You are a helpful assistant." } },
     { name: "ccgs_project_blueprint.json", default: { project_name: "Unity Assistant", version: currentVersion, interface_structure: { tabs: ["studio", "kb", "commands", "files", "migration"] }, agents_count: 12000 } },
-    { name: "version.json", default: { version: currentVersion } }
+    { name: "version.json", default: { version: currentVersion, release_date: new Date().toISOString().split('T')[0], changelog: ["Initial release"] } },
+    { name: "DEVELOPMENT_LOG.md", default: "# DEVELOPMENT LOG\n\n## [2026-05-01]\n- Начало разработки проекта.\n## [2026-05-07]\n- Версия 18.4.1: Stability Fix." }
   ];
 
   for (const file of files) {

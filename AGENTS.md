@@ -1,15 +1,16 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.3.0)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.4.3)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** 18.3.0
+- **Version:** 18.4.4
 - **Engine:** Unity 6 (6000.3.10f1)
+- **Updates:** Stability, Quality Automation & Shader Fixes integrated May 8, 2026.
 - **Design System:** Zenith Glassmorphism (8K Ultra-High Density)
 
 ## 📑 Core Documentation References
-All system reasoning must prioritize data from the following files:
-1. `FATE_CONTINENT_FULL_DOCUMENTATION.md` - Complete technical manual (Parts 1-8).
-2. `GAME_MASTER_SPECIFICATION_v17.18.30.md` - Game lore, races, and UI prompts.
+1. `FATE_CONTINENT_FULL_DOCUMENTATION.md` - Complete technical manual.
+2. `PROJECT_MASTER_BLUEPRINT.md` - Hotfixes, translation IDs, and Unicode Hex ranges.
+3. `DEVELOPMENT_LOG.md` - Daily progress history from May 1, 2026.
 
 ## 🛠️ Technical Constraints & Rules
 - **Folder Structure:** Must strictly follow the hierarchy defined in `FATE_CONTINENT_FULL_DOCUMENTATION.md` Section 1.1.
