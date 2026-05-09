@@ -87,6 +87,7 @@ public class Translator : MonoBehaviour
     static public void Add(Transtable_Text idtext) { if (!listId.Contains(idtext)) listId.Add(idtext); }
     static public void Delete(Transtable_Text idtext) { listId.Remove(idtext); }
 
+    // --- Система Dropdown (Автоматический перевод списков) ---
     static public void AddDropdown(Transtable_Dropdown dd) { if (!listDropdowns.Contains(dd)) listDropdowns.Add(dd); }
     static public void DeleteDropdown(Transtable_Dropdown dd) { listDropdowns.Remove(dd); }
 
