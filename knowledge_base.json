@@ -1,9 +1,21 @@
 {
-  "project_name": "Континент Судьбы (Quantum AI Assistant)",
-  "version": "18.3.0",
-  "project_path": "/app/applet",
-  "unity_ai_assistant": {
-    "description": "Центральный архив знаний Квантового ИИ v18.3.0 (Localization & UI Sync)",
-    "combined_knowledge": "# ОБНОВЛЕНИЕ СИСТЕМЫ v18.3.0\n\n## 1. Новая система локализации\n- Интегрированы скрипты `Translator.cs`, `Transtable_Text.cs` и `LanguageSelector.cs`.\n- Поддержка 9 языков: English, Русский, Deutsch, Français, Español, Português, 日本語, 한국어, 简体中文.\n- Шрифты переключаются автоматически (RussianFont для кириллицы).\n\n## 2. Исправление UI Scaling (Choice_Menu)\n- **Проблема:** Кнопка Alt+Shift не растягивает панель.\n- **Решение:** Проверьте масштаб (Scale) у `Overlay_Layer` и `Canvas_MainMenu`. Если он не (1, 1, 1), то дочерние элементы будут отображаться некорректно. Сбросьте Scale в 1.\n- **Anchors:** Убедитесь, что Pivot установлен в (0.5, 0.5).\n\n## 3. Навигация и События\n- Кнопка Назад (Choice_Menu) -> `Menu_Game.OnBackToMainMenu`.\n- Кнопка Назад (Options) -> `SettingsManager.OnBackToMenu`.\n- Добавлены эффекты наведения через `UIButtonHoverEffect` на все новые кнопки.\n"
-  }
+  "project": "Fate Continent",
+  "version": "18.4.7",
+  "modules": [
+    {
+      "name": "Localization System",
+      "scripts": ["Translator.cs", "Transtable_Text.cs", "Transtable_Dropdown.cs"],
+      "features": ["9 languages", "Auto-dropdown translation", "TMP Font synchronization"]
+    },
+    {
+      "name": "Visual Systems",
+      "scripts": ["SimpleFloatAnimation.cs"],
+      "techniques": ["HDR Glow", "Shader: TMPro Distance Field"]
+    },
+    {
+      "name": "Input Master",
+      "mode": "Input System Package (New)",
+      "compatibility": "Unity 6 Standard"
+    }
+  ]
 }

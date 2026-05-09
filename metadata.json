@@ -1,6 +1,6 @@
 {
-  "name": "Fate Continent AI Assistant v18.3.0",
-  "description": "Квантовый ИИ v18.3.0 (Localization & Integration). Полная база знаний проекта 'Fate Continent', поддержка локализации на 9 языков и исправление Input System Unity.",
+  "name": "Fate Continent AI Assistant v18.4.7",
+  "description": "Квантовый ИИ v18.4.7 (Master HDR & Sync). Полная база знаний проекта 'Fate Continent', автоматизация Dropdown-переводов и HDR Glow визуализация.",
   "requestFramePermissions": [
     "camera",
     "microphone",

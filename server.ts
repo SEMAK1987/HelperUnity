@@ -509,9 +509,9 @@ async function generateMasterBlueprint() {
     const blueprint = await fs.readJson(blueprintJsonPath);
     
     let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"} (Total Knowledge Archive Edition)\n\n`;
-    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.3.0.\n\n`;
+    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.4.7.\n\n`;
     md += `## 1. Общая информация\n`;
-    md += `- **Версия Помощника:** ${blueprint.version || "17.18.30"}\n`;
+    md += `- **Версия Помощника:** ${blueprint.version || "18.4.7"}\n`;
     md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок, мастерство Unity Canvas UI и 9,500+ видео уроков."}\n`;
     md += `- **Путь проекта:** ${kb.project_path}\n`;
     md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
@@ -519,7 +519,7 @@ async function generateMasterBlueprint() {
     md += `- **Версия Blender:** ${currentBlenderStatus.version}\n`;
     md += `- **Версия GIMP:** ${currentGimpStatus.version}\n`;
     md += `- **Версия Redot:** ${currentRedotStatus.version}\n`;
-    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V17_18_30_FATE_MASTER]\n\n`;
+    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_4_7_FATE_MASTER]\n\n`;
     
     md += `## 2. Структура интерфейса\n`;
     md += `### Вкладки\n`;
@@ -562,7 +562,7 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.3.0 - Quantum Integration Release)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.4.7 - Quantum Integration Release)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
     md += `- **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.\n`;
     md += `- **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.\n`;
@@ -643,8 +643,9 @@ async function generateMasterBlueprint() {
     md += `- **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.\n`;
     md += `- **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.\n\n`;
 
-    md += `## 11. История изменений (v17.18.30)\n`;
-    md += `- **v17.18.30:** Fate Continent Expansion. Добавлены списки юнитов для 12 рас, NPC Хранитель Квестов и адаптивная стратегия ИИ. Исправлены баги UI и Dashboard. Интеграция 14,000+ видео-уроков.\n`;
+    md += `## 11. История изменений (v18.4.7)\n`;
+    md += `- **v18.4.7:** Final HDR Color values added. Script sync fix. Input System normalization.\n`;
+    md += `- **v18.4.6:** Master stability update.\n`;
     md += `- **v17.18.29:** Zenith Continent & Offline Mastery. Внедрена система процедурной генерации городов 'Континент Судьбы'. Добавлена поддержка Ollama (Offline Mode). Реализован 'Автоматический аудит сцен Unity'.\n`;
     md += `- **v17.18.19:** Zenith Knowledge Integration (12,000+ Video Index). Тотальное обновление базы знаний из 100+ новых обучающих видео. Расширен раздел 'О ВОЗМОЖНОСТЯХ ИИ' для Unity 6, Blender 5.2, Godot 4.4 и GIMP 3.0. Оптимизирован режим Eternal Offline Archive для работы без интернета.\n`;
     md += `- **v17.18.18:** Total Knowledge Expansion (9500+ Video Index). Интеграция 100+ новых обучающих видео. Расширен раздел 'О ВОЗМОЖНОСТЯХ ИИ' для Unity, Blender, Godot, GIMP. Улучшен Omni-Answer Engine для ответов на базе свежих мастер-классов. Оптимизирован режим Eternal Offline Archive.\n`;
