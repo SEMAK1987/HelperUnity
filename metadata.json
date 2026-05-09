@@ -1,6 +1,6 @@
 {
-  "name": "Fate Continent AI Assistant v18.4.7",
-  "description": "Квантовый ИИ v18.4.7 (Master HDR & Sync). Полная база знаний проекта 'Fate Continent', автоматизация Dropdown-переводов и HDR Glow визуализация.",
+  "name": "Fate Continent AI Assistant v18.4.9",
+  "description": "Квантовый ИИ v18.4.9 (Ultimate Sync). Полная база знаний проекта 'Fate Continent', HDR Bloom визуализация и авто-синхронизация версий.",
   "requestFramePermissions": [
     "camera",
     "microphone",

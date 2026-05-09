@@ -1,46 +1,55 @@
-# PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Total Knowledge Archive Edition)
+# PROJECT MASTER BLUEPRINT: Fate Continent AI Assistant (Total Knowledge Archive Edition)
 
-> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.4.7.
+> **ВНИМАНИЕ:** Этот документ — источник истины v18.4.9. Содержит финальные настройки HDR, инструкции по шрифтам и ускорению Unity.
 
 ## 1. Общая информация
-- **Версия Помощника:** 18.4.7
-- **Описание:** Гибридный ИИ-помощник v18.7. Полная синхронизация Dropdown, HDR Glow Setup и Input System Master.
-- **Путь проекта:** /app/applet
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_4_7_HDR_STABILITY]
+- **Версия Помощника:** 18.4.9
+- **Описание:** Ultimate Master Build. Синхронизированные скрипты, HDR Bloom Master Guide и Font Fallback System.
+- **Флаги:** [V18_4_9_ULTIMATE_SYNC], [FONT_FIX_ACTIVE]
 
-## 2. Специальные исправления (Hotfixes v18.4.7)
+## 2. Специальные исправления (Hotfixes v18.4.9)
 
-### ⚠️ Исправление ошибок компиляции (AddDropdown)
-Если вы получили ошибку `CS0117`, значит скрипт `Translator.cs` устарел. 
-**Решение:** Помощник уже обновил `Translator.cs`. Убедитесь, что в нем есть методы `AddDropdown` и `DeleteDropdown`. Теперь `Transtable_Dropdown.cs` работает идеально.
+### 🔳 ИСПРАВЛЕНИЕ «КВАДРАТИКОВ» (Font Fallback Fix)
+**Проблема:** Ошибки Unicode (\uD55C, \uAD6D) и "квадраты" вместо букв (Корейский, Китайский, Японский). Стандартный шрифт `LiberationSans SDF` не поддерживает эти языки.
 
-### 🎨 ИДЕАЛЬНОЕ СВЕЧЕНИЕ (HDR Glow Setup)
-**Пошагово (по вашему скриншоту):**
-1. **Shader:** Убедитесь, что выбран `TextMeshPro -> Distance Field`.
-2. **Glow:** Поставьте галочку **Enable**.
-3. **Color (HDR):** Кликните на цвет. В окне **HDR Color** введите:
-   - **R:** 0
-   - **G:** 255
-   - **B:** 255 (Яркий Циан / Неоново-голубой)
-   - **Intensity:** Поднимите ползунок до `+1` или `+1.5` для эффекта "свечения в темноте".
-4. **Parameters:**
-   - **Offset:** 0
-   - **Inner:** 0.3
-   - **Outer:** 0.4
-   - **Power:** 1.0
+**Решение (Как добавить поддержку всех языков):**
+1. **Скачайте шрифт с поддержкой UTF-8:** Рекомендую **Noto Sans** или **Arial Unicode MS**.
+2. **Создайте SDF Font Asset:** Перетащите шрифт в Unity -> ПКМ -> **Create -> TextMeshPro -> Font Asset**.
+3. **Настройте Fallback:**
+   - Выберите ваш основной шрифт (`LiberationSans SDF`).
+   - В инспекторе найдите раздел **Fallback Font Assets**.
+   - Нажмите **+** и перетащите туда созданный вами новый SDF шрифт.
+4. **Результат:** Unity сам будет брать буквы из этого шрифта, когда их нет в основном. Квадраты исчезнут!
 
-### 🔘 Настройка Dropdown (Качество)
-1. Объект: **Quality Dropdown**.
-2. Компонент: `Transtable_Dropdown`.
-3. **Option IDs:** `37, 38, 39, 40, 41, 42`.
-4. Результат: Мгновенный перевод всех пунктов при переключении языка.
+### ↔️ ИСПРАВЛЕНИЕ СЛИПАНИЯ БУКВ (Overlap Fix)
+**Проблема:** В английском/немецком буквы "налазят" друг на друга.
 
-### ⚠️ Проблема Input System
-Используйте **только** `Input System Package (New)`. Это устраняет конфликты в Unity 6.
+**Решение:**
+1. Выберите объект с текстом.
+2. В компоненте **TextMeshPro - Text (UI)** найдите раздел **Extra Settings**.
+3. **Spacing Options:** 
+   - Увеличьте значение **Character** (поставьте `5` или `10`), если буквы слишком близко.
+   - Увеличьте **Word**, если слова сливаются.
+4. **Auto Size:** Если включено, проверьте **Min Size**. Если он слишком маленький (`10`), Unity может слишком сильно сжать текст. Поставьте Min Size на `18` или `24`.
 
-## 3. Структура интерфейса
-- **v18.4.7:** Все системы (Translator, Dropdown, HDR) полностью синхронизированы.
+### 🎨 ПОШАГОВАЯ НАСТРОЙКА СВЕЧЕНИЯ (Bloom)
+1. **Создайте Volume:** В иерархии Unity (Hierarchy) нажмите ПКМ -> **Volume -> Global Volume**.
+2. **Создайте Profile:** В инспекторе этого объекта нажмите кнопку **New** в поле Profile.
+3. **Добавьте Bloom:** Нажмите **Add Override -> Post-processing -> Bloom**.
+4. **Настройте Bloom:** Включите **Threshold** (0.9) и **Intensity** (1.0 - 2.0).
+5. **Проверьте Камеру:** Убедитесь, что в настройках **Main Camera** включена галочка **Post Processing**.
 
-## 11. История изменений (v18.4.7)
-- **v18.4.7:** Final HDR Color values added. Script sync fix. Input System normalization.
-- **v18.4.6:** Master stability update.
+### 🚀 УСКОРЕНИЕ ЗАПУСКА UNITY (Обход лагов и VPN)
+**Как сделать .bat файл для быстрого запуска:**
+1. Откройте Блокнот.
+2. Вставьте этот код:
+   ```batch
+   @echo off
+   echo Starting Unity 6 with No-Updates flag...
+   start "" "C:\Program Files\Unity\Hub\Editor\6000.3.10f1\Editor\Unity.exe" -projectPath . -no-updates
+   exit
+   ```
+3. Сохраните как `FastStart_Unity.bat` в ПАПКУ ВАШЕГО ПРОЕКТА.
+
+## 3. Архитектура v18.4.9
+Все системы автоматически синхронизируют версию из центрального `version.json`.

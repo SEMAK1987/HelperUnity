@@ -1,6 +1,6 @@
-// [ZENITH MULTI-TOOL SYNERGY v18.4.1 - Stability & Log Update]
+// [ZENITH MULTI-TOOL SYNERGY v18.4.9 - Ultimate Stable Sync]
 // Unity Connector for Quantum AI Assistant
-// Updated: 2026-05-07 (Synced with Hex Fonts & Animation Scripts)
+// Updated: 2026-05-09 (Synced with HDR Bloom & Global Localization)
 
 using UnityEngine;
 using UnityEditor;
@@ -28,7 +28,7 @@ namespace AI_Assistant_Quantum
 
         private void OnGUI()
         {
-            GUILayout.Label("v17.18.25 - Zenith Multi-Tool Synergy (Neural Link Active)", EditorStyles.boldLabel);
+            GUILayout.Label("v18.4.9 - Zenith Multi-Tool Synergy (Neural Link Active)", EditorStyles.boldLabel);
             
             serverUrl = EditorGUILayout.TextField("Server URL", serverUrl);
             mode = (Mode)EditorGUILayout.EnumPopup("Mode", mode);

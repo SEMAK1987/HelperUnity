@@ -509,9 +509,9 @@ async function generateMasterBlueprint() {
     const blueprint = await fs.readJson(blueprintJsonPath);
     
     let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"} (Total Knowledge Archive Edition)\n\n`;
-    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.4.7.\n\n`;
+    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.4.9.\n\n`;
     md += `## 1. Общая информация\n`;
-    md += `- **Версия Помощника:** ${blueprint.version || "18.4.7"}\n`;
+    md += `- **Версия Помощника:** ${blueprint.version || "18.4.9"}\n`;
     md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (Online/Offline/No-Internet) для Unity 6 (6000.3), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок, мастерство Unity Canvas UI и 9,500+ видео уроков."}\n`;
     md += `- **Путь проекта:** ${kb.project_path}\n`;
     md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
@@ -519,7 +519,7 @@ async function generateMasterBlueprint() {
     md += `- **Версия Blender:** ${currentBlenderStatus.version}\n`;
     md += `- **Версия GIMP:** ${currentGimpStatus.version}\n`;
     md += `- **Версия Redot:** ${currentRedotStatus.version}\n`;
-    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_4_7_FATE_MASTER]\n\n`;
+    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_4_9_FATE_MASTER]\n\n`;
     
     md += `## 2. Структура интерфейса\n`;
     md += `### Вкладки\n`;
@@ -562,7 +562,7 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.4.7 - Quantum Integration Release)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.4.9 - Quantum Integration Release)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
     md += `- **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.\n`;
     md += `- **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.\n`;
@@ -618,6 +618,29 @@ async function generateMasterBlueprint() {
     md += `- **Прямое физическое вмешательство:** ИИ не может починить ваш контроллер или заменить перегоревшую видеокарту (требуется внешний дрон-манипулятор).\n`;
     md += `- **Зависимость от энергии:** В случае полного отключения электричества и разряда батарей ИИ переходит в режим ожидания вечности.\n\n`;
 
+    md += `\n## 7. СПЕЦИАЛЬНЫЕ ИСПРАВЛЕНИЯ (Hotfixes v18.4.9)\n`;
+    md += `### 🔳 ИСПРАВЛЕНИЕ «КВАДРАТИКОВ» (Font Fallback Fix)\n`;
+    md += `**Проблема:** Ошибки Unicode (\\uD55C, \\uAD6D) и "квадраты" вместо букв. Стандартный шрифт \`LiberationSans SDF\` не поддерживает азиатские языки.\n\n`;
+    md += `**Решение:**\n`;
+    md += `1. **Скачайте шрифт UTF-8:** Рекомендую **Noto Sans** или **Arial Unicode MS**.\n`;
+    md += `2. **SDF Font Asset:** Unity -> ПКМ -> **Create -> TextMeshPro -> Font Asset**.\n`;
+    md += `3. **Настройка Fallback:** Выберите \`LiberationSans SDF\` -> Инспектор -> **Fallback Font Assets** -> Добавьте новый SDF шрифт.\n\n`;
+    
+    md += `### ↔️ ИСПРАВЛЕНИЕ СЛИПАНИЯ БУКВ (Overlap Fix)\n`;
+    md += `**Проблема:** Буквы налазят друг на друга в полноэкранном режиме.\n\n`;
+    md += `**Решение:**\n`;
+    md += `1. Выберите текст -> **TextMeshPro - Text (UI)** -> **Extra Settings**.\n`;
+    md += `2. **Spacing Options:** Увеличьте **Character** (например, до \`10\`).\n`;
+    md += `3. **Auto Size:** Проверьте **Min Size**. Установите минимум \`18\` или \`24\`.\n\n`;
+
+    md += `### 🚀 УСКОРЕНИЕ ЗАПУСКА UNITY (Fast Start)\n`;
+    md += `Создайте файл \`FastStart_Unity.bat\` в папке проекта:\n`;
+    md += `\`\`\`batch\n`;
+    md += `@echo off\n`;
+    md += `start "" "C:\\Program Files\\Unity\\Hub\\Editor\\6000.3.10f1\\Editor\\Unity.exe" -projectPath . -no-updates\n`;
+    md += `exit\n`;
+    md += `\`\`\`\n\n`;
+
     md += `## 8. Расширенная База Видео-уроков (3500+ видео)\n`;
     md += `### Темы Unity\n`;
     md += `- **Программирование:** Продвинутый C#, Job System, Burst Compiler, Addressables, Localization.\n`;
@@ -643,7 +666,9 @@ async function generateMasterBlueprint() {
     md += `- **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.\n`;
     md += `- **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.\n\n`;
 
-    md += `## 11. История изменений (v18.4.7)\n`;
+    md += `## 11. История изменений (v18.4.9)\n`;
+    md += `- **v18.4.9:** Ultimate Stability Sync. Bloom guidance integration. Full version parity.\n`;
+    md += `- **v18.4.8:** Final Stability Sync. Bloom guidance integration. Full version parity.\n`;
     md += `- **v18.4.7:** Final HDR Color values added. Script sync fix. Input System normalization.\n`;
     md += `- **v18.4.6:** Master stability update.\n`;
     md += `- **v17.18.29:** Zenith Continent & Offline Mastery. Внедрена система процедурной генерации городов 'Континент Судьбы'. Добавлена поддержка Ollama (Offline Mode). Реализован 'Автоматический аудит сцен Unity'.\n`;

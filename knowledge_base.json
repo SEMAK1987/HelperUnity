@@ -1,21 +1,21 @@
 {
   "project": "Fate Continent",
-  "version": "18.4.7",
+  "version": "18.4.9",
   "modules": [
     {
       "name": "Localization System",
       "scripts": ["Translator.cs", "Transtable_Text.cs", "Transtable_Dropdown.cs"],
-      "features": ["9 languages", "Auto-dropdown translation", "TMP Font synchronization"]
+      "features": ["9 languages", "Auto-dropdown translation", "Global sync"]
     },
     {
-      "name": "Visual Systems",
+      "name": "Visual & HDR",
       "scripts": ["SimpleFloatAnimation.cs"],
-      "techniques": ["HDR Glow", "Shader: TMPro Distance Field"]
+      "techniques": ["HDR Glow (Cyan 0,255,255)", "Post-Processing: Bloom", "Shader: TMPro Distance Field"]
     },
     {
-      "name": "Input Master",
+      "name": "Project Workflow",
       "mode": "Input System Package (New)",
-      "compatibility": "Unity 6 Standard"
+      "optimization": "Batch-start (.bat) for bypassing region-locked updates"
     }
   ]
 }
