@@ -621,22 +621,24 @@ async function generateMasterBlueprint() {
     md += `\n## 7. СПЕЦИАЛЬНЫЕ ИСПРАВЛЕНИЯ (Hotfixes v18.4.9)\n`;
     md += `### 🔳 ИСПРАВЛЕНИЕ «КВАДРАТИКОВ» (Font Fallback Fix)\n`;
     md += `**Проблема:** Ошибки Unicode (\\uD55C, \\uAD6D) и "квадраты" вместо букв. Стандартный шрифт \`LiberationSans SDF\` не поддерживает азиатские языки.\n\n`;
-    md += `**Решение:**\n`;
-    md += `1. **Скачайте шрифт UTF-8:** Рекомендую **Noto Sans** или **Arial Unicode MS**.\n`;
-    md += `2. **SDF Font Asset:** Unity -> ПКМ -> **Create -> TextMeshPro -> Font Asset**.\n`;
-    md += `3. **Настройка Fallback:** Выберите \`LiberationSans SDF\` -> Инспектор -> **Fallback Font Assets** -> Добавьте новый SDF шрифт.\n\n`;
+    md += `**Пошаговое решение (Dynamic Font):**\n`;
+    md += `1. **Создайте Dynamic Font Asset:** В окне Project найдите ваш шрифт (\`Шрифты/Noto_Sans/static/NotoSans-Regular\`). ПКМ -> **Create -> TextMeshPro -> Font Asset**.\n`;
+    md += `2. **Включите Dynamic Mode:** Выберите созданный Font Asset [F]. В Inspector измените **Atlas Population Mode** на **Dynamic**. Нажмите **Apply**.\n`;
+    md += `3. **Настройте Fallback:** Выберите основной шрифт \`LiberationSans SDF\` -> Inspector -> **Fallback Font Assets** -> Добавьте ваш новый **Dynamic** NotoSans.\n\n`;
     
-    md += `### ↔️ ИСПРАВЛЕНИЕ СЛИПАНИЯ БУКВ (Overlap Fix)\n`;
-    md += `**Проблема:** Буквы налазят друг на друга в полноэкранном режиме.\n\n`;
-    md += `**Решение:**\n`;
-    md += `1. Выберите текст -> **TextMeshPro - Text (UI)** -> **Extra Settings**.\n`;
-    md += `2. **Spacing Options:** Увеличьте **Character** (например, до \`10\`).\n`;
-    md += `3. **Auto Size:** Проверьте **Min Size**. Установите минимум \`18\` или \`24\`.\n\n`;
+    md += `### ↔️ ИСПРАВЛЕНИЕ СЛИПАНИЯ И ВЫЛЕТАНИЯ ТЕКСТА (Overlap Fix)\n`;
+    md += `**Проблема:** Текст не влезает в кнопки или буквы накладываются друг на друга.\n\n`;
+    md += `**Пошаговое решение:**\n`;
+    md += `1. **Auto Size:** В Inspector у текста включите галочку **Auto Size**. Установите **Min Size: 18**, чтобы текст не сжимался в кашу.\n`;
+    md += `2. **Character Spacing:** В разделе **Extra Settings** увеличьте **Character** до **10-15**, если буквы слишком плотно стоят.\n`;
+    md += `3. **Rect Tool:** Нажмите \`T\` и растяните рамку текста вширь, если слово (например, Português) всё равно не влезает.\n\n`;
 
-    md += `### 🚀 УСКОРЕНИЕ ЗАПУСКА UNITY (Fast Start)\n`;
-    md += `Создайте файл \`FastStart_Unity.bat\` в папке проекта:\n`;
+    md += `### 🚀 ПРАВИЛЬНЫЙ БАТ-ФАЙЛ (Минуя Unity Hub)\n`;
+    md += `Чтобы не ждать загрузки Хаба и обойти лаги, запускайте напрямую \`Unity.exe\`:\n`;
     md += `\`\`\`batch\n`;
     md += `@echo off\n`;
+    md += `echo Starting Unity 6 Engine...\n`;
+    md += `:: УКАЖИТЕ ПУТЬ К Unity.exe, а не к Unity Hub.exe!\n`;
     md += `start "" "C:\\Program Files\\Unity\\Hub\\Editor\\6000.3.10f1\\Editor\\Unity.exe" -projectPath . -no-updates\n`;
     md += `exit\n`;
     md += `\`\`\`\n\n`;
