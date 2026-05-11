@@ -1,6 +1,6 @@
-// [ZENITH MULTI-TOOL SYNERGY v18.4.9 - Ultimate Stable Sync]
+// [ZENITH MULTI-TOOL SYNERGY v18.5.2 - Ultimate Stable Sync]
 // Unity Connector for Quantum AI Assistant
-// Updated: 2026-05-11 (Synced with HDR Bloom, Fetch Fix & Game Confirmation Panels)
+// Updated: 2026-05-11 (Synced with HDR Bloom, Fetch Fix & Dropdown Template Patch)
 
 using UnityEngine;
 using UnityEditor;

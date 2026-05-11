@@ -1096,7 +1096,7 @@ export default function App() {
       if (data.available) {
         setShowUpdateModal(true);
       } else {
-        setAppVersion('18.4.9');
+        setAppVersion('18.5.0');
         showNotification("У вас уже установлена последняя версия!", "info");
       }
     } catch (error) {
@@ -1114,7 +1114,7 @@ export default function App() {
       "Глубокое сканирование проекта (Аудит)...",
       "Синхронизация с локальным хранилищем...",
       "Исправление найденных ошибок...",
-      "Обновление версии до 18.4.9...",
+      "Обновление версии до 18.5.0...",
       "Инициализация Omniversal Quantum Link...",
       "Установка Нейронного Моста (Blender & Unity)...",
       "Регенерация PROJECT_MASTER_BLUEPRINT.md (Quantum Link)..."
