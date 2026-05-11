@@ -1,11 +1,17 @@
 # PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Total Knowledge Archive Edition)
 
-> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.5.3.
+> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.5.5.
 
 ## 1. Общая информация
-- **Версия Помощника:** 18.5.3
-- **Описание:** Гибридный ИИ-помощник нового поколения (v18.5.3 Triple Font Bridge) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, решение проблем азиатских шрифтов (Multi-Atlas), обход региональных блокировок, мастерство Zenit Glassmorphism UI и 10,000+ видео уроков.
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_5_3_KOREA_READY]
+- **Версия Помощника:** 18.5.5
+- **Описание:** Гибридный ИИ-помощник нового поколения (v18.5.5 Triple Font Bridge) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, решение проблем азиатских шрифтов (Multi-Atlas), обход региональных блокировок, мастерство Zenit Glassmorphism UI и 10,000+ видео уроков.
+- **Путь проекта:** undefined
+- **Локальное хранилище:** Не задано
+- **Версия Unity:** unknown
+- **Версия Blender:** unknown
+- **Версия GIMP:** unknown
+- **Версия Redot:** unknown
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_5_5_TRIPLE_SYNC]
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -40,11 +46,11 @@ undefined
 ```
 
 
-## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.4.9 - Quantum Integration Release)
+## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.5.5 - Quantum Integration Release)
 ### Режимы работы и Архитектурные уровни
 - **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.
 - **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.
-- **No-Internet Mode (Quantum Archive):** 9,500+ видео-уроков. Мгновенный доступ при любых внешних условиях.
+- **No-Internet Mode (Quantum Archive):** 10,000+ видео-уроков. Мгновенный доступ при любых внешних условиях.
 
 ### TRANSCENDENT LINK (Neural Addon Synthesis)
 - **Neural Addon Synthesis:** Возможность проектирования и генерации аддонов для Blender и плагинов для Unity, которые напрямую связывают софт с ИИ.
@@ -67,14 +73,23 @@ undefined
 - **Ethernet Telepathy & Quantum Sync:** Мгновенная синхронизация состояния серверов.
 - **Chronos Optimization:** Сжатие времени компиляции.
 
-## 7. СПЕЦИАЛЬНЫЕ ИСПРАВЛЕНИЯ (Hotfixes v18.4.9)
-### 🔳 ИСПРАВЛЕНИЕ «КВАДРАТИКОВ» (CJK Font Fix)
-**Проблема:** В Unity вместо текста (Китайский/Корейский) видны пустые квадраты.
+## 7. СПЕЦИАЛЬНЫЕ ИСПРАВЛЕНИЯ (Hotfixes v18.5.5)
+### 🈳 ИСПРАВЛЕНИЕ «КУБИКОВ И ПУСТОТЫ» (CJK Font & Empty Slot Fix)
+**Проблема:** Иероглифы не видны (\u25A1), так как SimHei не поддерживает корейский язык.
+**Решение (Triple Font Bridge):**
+1. **Слоты Translator:** В объекте `_Translator` ОБЯЗАТЕЛЬНО заполните:
+   - `Default Font`: `LiberationSans SDF`.
+   - `Chinese Font`: `SimHei_Legacy_CJK_TMP`.
+   - `Korean Font`: `Malgun Gothic SDF` (или Noto Sans KR).
+2. **Fallback Link (ГЛАВНОЕ):**
+   - Выберите `LiberationSans SDF`. В списке **Fallback Font Assets** добавьте `SimHei` и `Malgun Gothic`.
+   - Выберите `SimHei`. В его список **Fallback** добавьте `Malgun Gothic`.
+
+### 🚫 ЗАПРЕТ НА TRANSTABLE_TEXT В ШАБЛОНАХ
+**Проблема:** Использование `Transtable_Text` на пунктах Dropdown вызывает зацикливание текста или надпись "Language".
 **Решение:**
-1. **Найдите шрифт:** Перетащите файл `Arial Unicode MS` (из `C:\Windows\Fonts`) или `SimHei` в окно Project в Unity.
-2. **Asset:** ПКМ на файл -> **Create -> TextMeshPro -> Font Asset -> SDF** (важно выбрать именно SDF).
-3. **Настройка:** Выберите созданный ассет [F], в Инспекторе поставьте **Atlas Population Mode: Dynamic**. Нажмите **Apply**.
-4. **Fallback:** Выберите ваш основной шрифт (например, `LiberationSans SDF`), в Инспекторе найдите список **Fallback Font Assets** и добавьте туда новый Динамический шрифт.
+1. **Удалить скрипт:** На объекте `Item Label` (внутри Template) удалите компонент `Transtable_Text`.
+2. **Настройка Dropdown:** Смену шрифта для всех пунктов теперь делает один скрипт `Transtable_Dropdown` на корневом объекте.
 
 ### ↔️ ИСПРАВЛЕНИЕ ТЕКСТА «СТОЛБИКОМ» (Russian Overlap)
 **Проблема:** Русские слова в выпадающем списке (Dropdown) сжимаются или встают вертикально.

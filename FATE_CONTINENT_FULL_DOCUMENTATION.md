@@ -1,17 +1,17 @@
-# 📘 FATE CONTINENT: MASTER KNOWLEDGE BASE (v3.0)
+# 📘 FATE CONTINENT: MASTER KNOWLEDGE BASE (v18.5.5)
 
 > **TECHNICAL OVERVIEW:**
-> - **Engine:** Unity 6000.3.10f1
+> - **Engine:** Unity 6 (6000.3.10f1)
 > - **Genre:** Turn-based Strategy / RPG
 > - **Style:** Zenith Glassmorphism (8K)
-> - **Platform:** PC Standalone (x86_64)
+> - **Updates:** Triple Font Bridge (v18.5.5). Korean Hangul Support. Compiler Fix.
 
 ---
 
 ## 🏗️ 1. CORE ARCHITECTURE
 Project uses a centralized management system:
 - `GlobalSettingsManager`: Handles sound, music, quality (Ultra 8K), and localization.
-- `Translator`: Supports 8 languages (RU, EN, DE, FR, ES, JA, KO, ZH) with specific font handling for RU/Asia.
+- `Translator`: Supports 9 languages (RU, EN, DE, FR, ES, PT, JA, KO, ZH) with specific font handling.
 - `DataLoader`: Loads `races_data.json` and `items_data.json` using `JsonUtility`.
 - `GameManager`: Persists across scenes (`DontDestroyOnLoad`), manages gold and difficulty.
 
@@ -36,13 +36,19 @@ Project uses a centralized management system:
   - `TimeValidator` for speedhack detection.
   - `ProcessMonitor` with blacklist (CheatEngine, etc.).
   - `IntegrityValidator` using HMAC-SHA256 for save file verification.
-- **Value Clamping**: All critical values (Gold, HP) use property wrappers to prevent memory editing.
 
-## 🚀 6. FUTURE SCALING (APPENDIX)
-1. **Multiplayer**: Integration via Photon Fusion or Unity Netcode.
-2. **Modding**: StreamingAssets-based loading for JSON mods.
-3. **Cloud Saves**: PlayFab / Steam Cloud integration.
-4. **DLC**: Addressables system for on-demand content loading.
+## 🈳 6. TRIPLE FONT BRIDGE (v18.5.5)
+- **Standard**: LiberationSans SDF.
+- **Chinese/Japanese**: SimHei Legacy CJK.
+- **Korean**: Malgun Gothic / Noto Sans KR.
+- **Logic**: Automatic fallbacks and singleton-safe static wrappers in `Translator.cs`.
+
+## 📘 15. ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.5.5 Sync)
+- [Unity 6 Physics Mastery](https://www.youtube.com/watch?v=9vuyis_Y-LY)
+- [Blender Advanced Rigging](https://www.youtube.com/watch?v=UKZp67dY1_w)
+- [Shader Graph Advanced](https://www.youtube.com/watch?v=-hvxjyzcSkI)
+- [Geometry Nodes Pro](https://www.youtube.com/watch?v=4YEB_Q8EOD8)
+- [AI & ML-Agents](https://www.youtube.com/watch?v=JBszeE_NgmA)
 
 ---
-*Information ingested from PDF Technical Manual v3.0*
+*Документация актуализирована (v18.5.5)*

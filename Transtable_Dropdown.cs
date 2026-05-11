@@ -15,9 +15,20 @@ public class Transtable_Dropdown : MonoBehaviour
         dropdown = GetComponent<TMP_Dropdown>();
     }
 
-    private void Start()
+    private void OnEnable()
     {
-        RefreshLocalizedOptions();
+        if (Translator.Instance != null)
+        {
+            Translator.Instance.AddDropdown(this);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (Translator.Instance != null)
+        {
+            Translator.Instance.DeleteDropdown(this);
+        }
     }
 
     public void RefreshLocalizedOptions()
@@ -25,28 +36,17 @@ public class Transtable_Dropdown : MonoBehaviour
         if (dropdown == null) dropdown = GetComponent<TMP_Dropdown>();
         if (Translator.Instance == null) return;
 
-        // Save current value to restore after update
-        int currentValue = dropdown.value;
-
-        // Localize the main Label
+        // Apply font to the main selection Label
         if (dropdown.captionText != null)
         {
             Translator.Instance.ApplyFont(dropdown.captionText as TextMeshProUGUI);
         }
 
-        // Localize the Items in the list
+        // Apply font to the Item template Label
+        // IMPORTANT: We do NOT put Transtable_Text on the Item Label itself!
         if (dropdown.itemText != null)
         {
             Translator.Instance.ApplyFont(dropdown.itemText as TextMeshProUGUI);
-        }
-
-        // IMPORTANT: If we manually change options, we need to ensure the list is correct
-        // If the user has custom labels, we don't want to see "Start"
-        for (int i = 0; i < dropdown.options.Count; i++)
-        {
-            // If you have a key-based system, localizing here:
-            // string key = optionKeys.Count > i ? optionKeys[i] : dropdown.options[i].text;
-            // dropdown.options[i].text = Translator.Instance.GetTranslation(key);
         }
 
         dropdown.RefreshShownValue();

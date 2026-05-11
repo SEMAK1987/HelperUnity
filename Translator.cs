@@ -6,46 +6,65 @@ public class Translator : MonoBehaviour
 {
     public static Translator Instance;
 
-    [Header("Font Assets")]
-    public TMP_FontAsset defaultFont;   // Standard (English, French, etc.)
-    public TMP_FontAsset cjkFont;       // SimHei (Chinese, Japanese, Korean)
+    [Header("Font Assets (Triple Bridge)")]
+    public TMP_FontAsset defaultFont;   // Standard (English, etc.)
+    public TMP_FontAsset chineseFont;   // SimHei
+    public TMP_FontAsset koreanFont;    // Malgun Gothic / Noto Sans KR
 
-    [Header("State")]
+    [Header("Data")]
+    public int LanguageID = 0; 
     public string currentLanguage = "Russian";
+
+    private List<Transtable_Text> textComponents = new List<Transtable_Text>();
+    private List<Transtable_Dropdown> dropdownComponents = new List<Transtable_Dropdown>();
 
     private void Awake()
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
         
-        // Initial setup
-        UpdateAllTexts();
+        DontDestroyOnLoad(gameObject);
     }
 
-    public void SetLanguage(int index)
+    public static void Add(Transtable_Text comp) { if (Instance != null && !Instance.textComponents.Contains(comp)) Instance.textComponents.Add(comp); }
+    public static void Remove(Transtable_Text comp) { if (Instance != null && Instance.textComponents.Contains(comp)) Instance.textComponents.Remove(comp); }
+    
+    public static void AddDropdown(Transtable_Dropdown comp) { if (Instance != null && !Instance.dropdownComponents.Contains(comp)) Instance.dropdownComponents.Add(comp); }
+    public static void DeleteDropdown(Transtable_Dropdown comp) { if (Instance != null && Instance.dropdownComponents.Contains(comp)) Instance.dropdownComponents.Remove(comp); }
+
+    public static void SelectLanguage(int index)
+    {
+        if (Instance != null) Instance.DoSelectLanguage(index);
+    }
+
+    public void DoSelectLanguage(int index)
     {
         string[] languages = { "Russian", "English", "German", "French", "Spanish", "Portuguese", "Japanese", "Korean", "Chinese" };
         if (index >= 0 && index < languages.Length)
         {
+            LanguageID = index;
             currentLanguage = languages[index];
-            UpdateAllTexts();
+            Update_texts();
         }
     }
 
-    public void UpdateAllTexts()
+    public static void SetLanguage(int index) => SelectLanguage(index);
+
+    public static void Update_texts()
     {
-        // Find all localized components
-        Transtable_Text[] allTexts = FindObjectsByType<Transtable_Text>(FindObjectsSortMode.None);
-        foreach (var text in allTexts)
+        if (Instance != null) Instance.DoUpdateTexts();
+    }
+
+    public void DoUpdateTexts()
+    {
+        foreach (var text in textComponents)
         {
-            ApplyFont(text.GetComponent<TextMeshProUGUI>());
+            if (text != null) text.Refresh();
         }
 
-        // Find all localized dropdowns
-        Transtable_Dropdown[] allDropdowns = FindObjectsByType<Transtable_Dropdown>(FindObjectsSortMode.None);
-        foreach (var dropdown in allDropdowns)
+        foreach (var dropdown in dropdownComponents)
         {
-            dropdown.RefreshLocalizedOptions();
+            if (dropdown != null) dropdown.RefreshLocalizedOptions();
         }
     }
 
@@ -53,28 +72,28 @@ public class Translator : MonoBehaviour
     {
         if (textComponent == null) return;
 
-        // Is it an Asian language?
-        bool isCJK = currentLanguage == "Japanese" || currentLanguage == "Korean" || currentLanguage == "Chinese";
+        textComponent.characterSpacing = 0;
+        textComponent.wordSpacing = 0;
+        textComponent.lineSpacing = 0;
 
-        if (isCJK && cjkFont != null)
+        if (currentLanguage == "Chinese" || currentLanguage == "Japanese")
         {
-            textComponent.font = cjkFont;
+            if (chineseFont != null) textComponent.font = chineseFont;
         }
-        else if (defaultFont != null)
+        else if (currentLanguage == "Korean")
         {
-            textComponent.font = defaultFont;
+            if (koreanFont != null) textComponent.font = koreanFont;
+            else if (chineseFont != null) textComponent.font = chineseFont; 
+        }
+        else
+        {
+            if (defaultFont != null) textComponent.font = defaultFont;
         }
     }
 
-    // Helper for strings
-    public string GetTranslation(string key)
+    public string GetTranslation(int id)
     {
-        // Simple mock dictionary (In real app, load from JSON)
-        if (key == "Quality") {
-            if (currentLanguage == "Russian") return "Качество";
-            if (currentLanguage == "English") return "Quality";
-            return key;
-        }
-        return key;
+        // Placeholder for real localization logic
+        return "Translated_" + id;
     }
 }

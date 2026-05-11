@@ -1,6 +1,6 @@
 {
-  "name": "Fate Continent AI Assistant v18.5.3",
-  "description": "Квантовый ИИ v18.5.3 (Triple Font Bridge). Решение проблем корейских шрифтов, исправление шаблонов Dropdown и полная локализация.",
+  "name": "Fate Continent AI Assistant v18.5.5",
+  "description": "Квантовый ИИ v18.5.5 (Triple Font Bridge). Решение проблем с компиляцией, корейскими шрифтами и шаблонами Dropdown.",
   "requestFramePermissions": [
     "camera",
     "microphone",

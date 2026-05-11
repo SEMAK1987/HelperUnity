@@ -1,7 +1,5 @@
 {
-  "app_name": "Fate Continent AI Assistant",
-  "version": "18.5.3",
-  "engine_compatibility": "Unity 6000.3.10f1",
-  "status": "Final Sync & Auto-Update Ready",
-  "last_sync": "2026-05-11"
+  "version": "18.5.5",
+  "name": "Fate Continent",
+  "description": "Unity & Blender AI Assistant v18.5.5"
 }

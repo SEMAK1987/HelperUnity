@@ -1,11 +1,24 @@
 {
   "project": "Fate Continent",
-  "version": "18.4.9",
+  "version": "18.5.5",
   "modules": [
     {
       "name": "Localization System",
       "scripts": ["Translator.cs", "Transtable_Text.cs", "Transtable_Dropdown.cs"],
-      "features": ["9 languages", "Auto-dropdown translation", "Global sync"]
+      "features": ["9 languages", "Auto-dropdown translation", "Global sync", "Triple Font Bridge (v18.5.5)"]
+    },
+    {
+      "name": "Tutorial Knowledge Sync",
+      "platform": "YouTube",
+      "playlist": "PLtCyldnITT2PCvJSOMBfUlQvPZDvr_nsb",
+      "videos": [
+        "https://www.youtube.com/watch?v=9vuyis_Y-LY",
+        "https://www.youtube.com/watch?v=UKZp67dY1_w",
+        "https://www.youtube.com/watch?v=-hvxjyzcSkI",
+        "https://www.youtube.com/watch?v=4YEB_Q8EOD8",
+        "https://www.youtube.com/watch?v=JBszeE_NgmA"
+      ],
+      "topics": ["Unity Physics", "Blender Geometry Nodes", "Shader Graph", "Advanced Rigging"]
     },
     {
       "name": "Visual & HDR",

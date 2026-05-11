@@ -17,47 +17,61 @@ public class Transtable_Dropdown : MonoBehaviour
 
     public void UpdateDropdown()
     {
-        if (dropdown == null || optionIDs == null || optionIDs.Length == 0) return;
-
-        // Определяем нужный шрифт
+        if (dropdown == null) return;
+        if (Translator.Instance == null) return;
+ 
+        int lang = Translator.LanguageID;
         TMP_FontAsset activeFont = null;
-        if (Translator.Instance != null)
+ 
+        // Font Mapping (Triple Bridge Sync)
+        if (lang == 7) // Korean
         {
-            int lang = Translator.LanguageID;
-            // Упрощенная логика: если не русский и нет дефолтного - берем русский (SimHei)
-            if (lang == 1) 
-            {
-                activeFont = Translator.Instance.russianFont;
-            }
-            else 
-            {
-                activeFont = Translator.Instance.defaultFont != null ? Translator.Instance.defaultFont : Translator.Instance.russianFont;
-            }
+            activeFont = Translator.Instance.koreanFont != null ? Translator.Instance.koreanFont : Translator.Instance.chineseFont;
         }
-
-        // Настраиваем основной заголовок (Selected Value)
+        else if (lang == 8 || lang == 6) // Chinese / Japanese
+        {
+            activeFont = Translator.Instance.chineseFont;
+        }
+        else // Russian / European / Default
+        {
+            activeFont = Translator.Instance.defaultFont;
+        }
+ 
+        // Global fallback if everything is empty
+        if (activeFont == null) activeFont = Translator.Instance.chineseFont;
+ 
+        // Apply to Caption (the selected item shown in the actual dropdown box)
         if (dropdown.captionText != null)
         {
-            dropdown.captionText.textWrappingMode = TextWrappingModes.NoWrap; 
-            dropdown.captionText.overflowMode = TextOverflowModes.Ellipsis; 
             if (activeFont != null) dropdown.captionText.font = activeFont;
+            dropdown.captionText.characterSpacing = 0;
+            dropdown.captionText.wordSpacing = 0;
+            dropdown.captionText.textWrappingMode = TextWrappingModes.NoWrap;
+            dropdown.captionText.overflowMode = TextOverflowModes.Ellipsis;
         }
-
-        // Настраиваем шаблон элементов (List Items)
+ 
+        // Apply to Template Items (the list that pops up)
         if (dropdown.itemText != null)
         {
-            dropdown.itemText.textWrappingMode = TextWrappingModes.NoWrap; 
-            dropdown.itemText.overflowMode = TextOverflowModes.Ellipsis; 
             if (activeFont != null) dropdown.itemText.font = activeFont;
+            dropdown.itemText.characterSpacing = 0;
+            dropdown.itemText.wordSpacing = 0;
+            dropdown.itemText.textWrappingMode = TextWrappingModes.NoWrap;
+            dropdown.itemText.overflowMode = TextOverflowModes.Ellipsis;
         }
-
-        for (int i = 0; i < dropdown.options.Count; i++)
+ 
+        // Translate options if IDs are assigned in the inspector
+        if (optionIDs != null && optionIDs.Length > 0)
         {
-            if (i < optionIDs.Length)
+            for (int i = 0; i < dropdown.options.Count; i++)
             {
-                dropdown.options[i].text = Translator.GetText(optionIDs[i]);
+                if (i < optionIDs.Length)
+                {
+                    dropdown.options[i].text = Translator.GetText(optionIDs[i]);
+                }
             }
         }
+        
         dropdown.RefreshShownValue(); 
     }
 

@@ -9,6 +9,8 @@ public class Transtable_Text : MonoBehaviour
     void Awake()
     {
         if (UIText == null) UIText = GetComponent<TextMeshProUGUI>();
+        if (UIText == null) UIText = GetComponentInChildren<TextMeshProUGUI>();
+        
         if (Translator.Instance != null) 
         { 
             Translator.Add(this); 

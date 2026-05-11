@@ -14,22 +14,13 @@ public class Translator : MonoBehaviour
     private static List<Transtable_Text> listId = new List<Transtable_Text>();
     private static List<Transtable_Dropdown> listDropdowns = new List<Transtable_Dropdown>();
 
-    public TMP_FontAsset russianFont; // Рекомендуется назначить SimHei_Legacy_CJK_TMP сюда
     public TMP_FontAsset defaultFont; 
+    public TMP_FontAsset chineseFont;   // SimHei
+    public TMP_FontAsset koreanFont;    // Malgun Gothic / Noto Sans KR
 
     private static string[,] LineText = 
     {
-        #region 0 - English
-        {
-            "Start", "Continue", "Options", "Credits", "Exit", "Sound volume", "Music volume", "Mouse inversion", "Mouse sensitivity", "Graphic", // 0-9
-            "Screen resolution", "Full screen", "Language", "Loading ...", "Previous save will be overwritten!", "Start New Game", "Game saved", "Restart", "Controls", "Back", // 10-19
-            "Quality", "Mouse Inversion", "Mouse Sensitivity", "Welcome, friend...", "Slot ", "Select Save Slot", "(Overwrite)", "(Empty)", // 20-27
-            "Hi ..., my name is Druzhok...", "The mice are still running around!", "Thanks ..., you caught them!", "Hello ..., my name is Khitrets...", "I'm busy right now.", "Press E", "Continue", "Save & Continue", "Mice collected: ", // 28-36
-            "Very Low", "Low", "Medium", "High", "Very High", "Ultra", // 37-42
-            "Are you sure you want to start a new game?", "Yes", "No" // 43, 44, 45
-        },
-        #endregion
-        #region 1 - Русский
+        #region 0 - Russian
         {
             "Старт", "Продолжить", "Опции", "Разработчик", "Выход", "Громкость звука", "Громкость музыки", "Инверсия мыши", "Чувствительность мыши", "Графика",
             "Разрешение экрана", "На весь экран", "Язык", "Загрузка ...", "Предыдущее сохранение будет перезаписано!", "Начать новую игру", "Игра сохранена", "Перезагрузка", "Управление", "Назад",
@@ -37,6 +28,16 @@ public class Translator : MonoBehaviour
             "Привет ..., меня зовут Дружок...", "Мыши все еще бегают...", "Спасибо ..., что помог нам...", "Здравствуй ..., меня зовут Хитрец...", "Я сейчас занят.", "Нажмите E", "Далее", "Сохранить и продолжить", "Мышей поймано: ",
             "Очень Низкое", "Низкое", "Среднее", "Высокое", "Очень Высокое", "Ультра",
             "Вы уверены, что хотите начать новую игру?", "Да", "Нет"
+        },
+        #endregion
+        #region 1 - English
+        {
+            "Start", "Continue", "Options", "Credits", "Exit", "Sound volume", "Music volume", "Mouse inversion", "Mouse sensitivity", "Graphic", // 0-9
+            "Screen resolution", "Full screen", "Language", "Loading ...", "Previous save will be overwritten!", "Start New Game", "Game saved", "Restart", "Controls", "Back", // 10-19
+            "Quality", "Mouse Inversion", "Mouse Sensitivity", "Welcome, friend...", "Slot ", "Select Save Slot", "(Overwrite)", "(Empty)", // 20-27
+            "Hi ..., my name is Druzhok...", "The mice are still running around!", "Thanks ..., you caught them!", "Hello ..., my name is Khitrets...", "I'm busy right now.", "Press E", "Continue", "Save & Continue", "Mice collected: ", // 28-36
+            "Very Low", "Low", "Medium", "High", "Very High", "Ultra", // 37-42
+            "Are you sure you want to start a new game?", "Yes", "No" // 43, 44, 45
         },
         #endregion
         #region 2 - Deutsch
@@ -79,7 +80,7 @@ public class Translator : MonoBehaviour
         { 
             "スタート", "続行", "設定", "クレジット", "終了", "音量", "音楽", "反転", "感度", "グラフィック", "解像度", "全画面", "言語", "読み込み中...", "上書きしますか？", "新しく始める", "保存完了", "再開", "操作", "戻る", 
             "品質", "反転", "感度", "ようこそ...", "スロット ", "スロット選択", "(上書き)", "(空き)", 
-            "こんにちは...", "ネズミが...", "ありがとう...", "こんにちは...", "忙しい...", "Eを押す", "次へ", "保存", "ネズミ: ", 
+            "こんにちは...", "ネズ미가...", "ありがとう...", "こんにちは...", "忙しい...", "Eを押す", "次へ", "保存", "ネズミ: ", 
             "最低", "低い", "中程度", "高い", "最高", "ウルトラ", 
             "よろしいですか？", "はい", "いいえ" 
         },
@@ -110,7 +111,7 @@ public class Translator : MonoBehaviour
         Instance = this; 
         DontDestroyOnLoad(gameObject); 
 
-        _languageID = PlayerPrefs.GetInt("Language", 1); 
+        _languageID = PlayerPrefs.GetInt("Language", 0); // 0 = Russian
         Update_texts(); 
     }
 
@@ -148,25 +149,29 @@ public class Translator : MonoBehaviour
             {
                 text.UIText.text = GetText(text.TextID);
                 
-                // ШРИФТЫ: Если Default Font не назначен, берем russianFont (в котором SimHei)
-                if (Instance.defaultFont == null)
+                // Reset spacing to prevent "vertical" or "thin" look
+                text.UIText.characterSpacing = 0;
+                text.UIText.wordSpacing = 0;
+                text.UIText.lineSpacing = 0;
+
+                // Font mapping
+                if (_languageID == 7) // Korean
                 {
-                    text.UIText.font = Instance.russianFont;
+                    if (Instance.koreanFont != null) text.UIText.font = Instance.koreanFont;
+                    else if (Instance.chineseFont != null) text.UIText.font = Instance.chineseFont;
                 }
-                else
+                else if (_languageID == 8 || _languageID == 6) // Chinese or Japanese
                 {
-                    if (_languageID == 1) text.UIText.font = Instance.russianFont;
-                    else text.UIText.font = Instance.defaultFont;
+                    if (Instance.chineseFont != null) text.UIText.font = Instance.chineseFont;
                 }
-                
-                // Азиатские языки всегда через SimHei для надежности
-                if (_languageID >= 6 && _languageID <= 8) 
+                else // Russian/European
                 {
-                     if (Instance.russianFont != null) text.UIText.font = Instance.russianFont;
+                    if (Instance.defaultFont != null) text.UIText.font = Instance.defaultFont;
                 }
 
-                if (text.UIText.font == null && Instance.russianFont != null) 
-                    text.UIText.font = Instance.russianFont;
+                // Global fallback if everything fails
+                if (text.UIText.font == null && Instance.chineseFont != null) 
+                    text.UIText.font = Instance.chineseFont;
             }
         }
 

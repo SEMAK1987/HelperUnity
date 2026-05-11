@@ -456,13 +456,13 @@ function generateId() {
 
 async function checkProjectIntegrity() {
   const kb = await fs.readJson(kbPath).catch(() => ({}));
-  const currentVersion = kb.version || "18.4.9";
+  const currentVersion = kb.version || "18.5.5";
   
   const files = [
     { name: "knowledge_base.json", default: { project_name: "Unity Assistant", version: currentVersion, project_path: process.cwd(), system_instruction: "You are a helpful assistant." } },
     { name: "ccgs_project_blueprint.json", default: { project_name: "Unity & Blender AI Assistant", version: currentVersion, interface_structure: { tabs: ["studio", "kb", "commands", "files", "migration"] }, agents_count: 12000 } },
     { name: "version.json", default: { version: currentVersion, release_date: new Date().toISOString().split('T')[0], changelog: ["Initial release"] } },
-    { name: "DEVELOPMENT_LOG.md", default: "# DEVELOPMENT LOG\n\n## [2026-05-01]\n- Начало разработки проекта.\n## [2026-05-10]\n- Версия 18.4.9: Ultimate Sync." }
+    { name: "DEVELOPMENT_LOG.md", default: "# DEVELOPMENT LOG\n\n## [2026-05-11]\n- Версия 18.5.5: Triple Font Bridge." }
   ];
 
   for (const file of files) {
@@ -559,11 +559,18 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.4.9 - Quantum Integration Release)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.5.5 - Quantum Integration Release)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
     md += `- **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.\n`;
     md += `- **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.\n`;
-    md += `- **No-Internet Mode (Quantum Archive):** 9,500+ видео-уроков. Мгновенный доступ при любых внешних условиях.\n\n`;
+    md += `- **No-Internet Mode (Quantum Archive):** 10,000+ видео-уроков. Мгновенный доступ при любых внешних условиях.\n\n`;
+
+    md += `### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.5.5 Sync)\n`;
+    md += `- **Unity 6 Physics & Optimization:** [Video #2](https://www.youtube.com/watch?v=9vuyis_Y-LY)\n`;
+    md += `- **Blender Advanced Rigging:** [Video #3](https://www.youtube.com/watch?v=UKZp67dY1_w)\n`;
+    md += `- **Shader Graph Mastery:** [Video #4](https://www.youtube.com/watch?v=-hvxjyzcSkI)\n`;
+    md += `- **Geometry Nodes World Gen:** [Video #6](https://www.youtube.com/watch?v=4YEB_Q8EOD8)\n`;
+    md += `- **Unity AI & ML-Agents:** [Video #9](https://www.youtube.com/watch?v=JBszeE_NgmA)\n\n`;
 
     md += `### TRANSCENDENT LINK (Neural Addon Synthesis)\n`;
     md += `- **Neural Addon Synthesis:** Возможность проектирования и генерации аддонов для Blender и плагинов для Unity, которые напрямую связывают софт с ИИ.\n`;
