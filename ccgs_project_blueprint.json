@@ -1,6 +1,6 @@
 {
   "project_name": "Unity & Blender AI Assistant",
-  "version": "17.18.2",
+  "version": "18.4.9",
   "interface_structure": {
     "tabs": [
       "studio",
@@ -12,17 +12,28 @@
   },
   "agents_count": 52,
   "project_assets": {
-    "scripts_count": 4,
+    "scripts_count": 15,
     "prefabs_count": 0,
     "videos_count": 0,
-    "total_files": 32,
+    "total_files": 41,
     "video_list": [],
     "script_list": [
+      "MenuBackgroundCamera_Fate.cs",
       "UnityConnector.cs",
       "UnityRaceData.cs",
       "UnitySystems.cs",
-      "UnityWorldSync.cs"
+      "UnityWorldSync.cs",
+      "src/LanguageSelector.cs",
+      "src/LoadingScreenManager.cs",
+      "src/MainMenuController.cs",
+      "src/Menu_Game.cs",
+      "src/SettingsManager.cs",
+      "src/SimpleFloatAnimation.cs",
+      "src/Translator.cs",
+      "src/Transtable_Dropdown.cs",
+      "src/Transtable_Text.cs",
+      "src/UIButtonHoverEffect.cs"
     ]
   },
-  "last_scan": "2026-04-26T08:31:33.043Z"
+  "last_scan": "2026-05-10T09:34:51.318Z"
 }

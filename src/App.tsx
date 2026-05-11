@@ -381,30 +381,41 @@ function MenuStudioPreview({ onDownload }: { onDownload: () => void }) {
 
   const t = {
     'Русский': { 
-      play: 'Играть', settings: 'Настройки', exit: 'Выход', back: 'Назад', volume: 'Звук', music: 'Музыка', quality: 'Качество (8K)', res: 'Разрешение (ULTRA)', fs: 'Весь экран', graphics: 'Графика', lang: 'Язык', help: 'Помощь По Игре', capabilities: 'Возможности ИИ', ollama: 'Ollama: OK', ollamaOff: 'Ollama: Off', sync: 'Синтаксис Сингулярности', offline: 'Защищенный Режим', clear: 'Очистить', clearing: 'Очистка...', thinking: 'Cortex Matrix Analysis (8K)', synth: 'Синтез данных Unity 6 & Blender 5.2', proMastery: 'Menu Studio Visuals Mastery', downloadBg: 'Скачать Фон (JPG 8K)'
+      play: 'Играть', settings: 'Настройки', exit: 'Выход', back: 'Назад', volume: 'Звук', music: 'Музыка', quality: 'Качество (8K)', res: 'Разрешение (ULTRA)', fs: 'Весь экран', graphics: 'Графика', lang: 'Язык', help: 'Помощь По Игре', capabilities: 'Возможности ИИ', ollama: 'Ollama: OK', ollamaOff: 'Ollama: Off', sync: 'Синтаксис Сингулярности', offline: 'Защищенный Режим', clear: 'Очистить', clearing: 'Очистка...', thinking: 'Cortex Matrix Analysis (8K)', synth: 'Синтез данных Unity 6 & Blender 5.2', proMastery: 'Menu Studio Visuals Mastery', downloadBg: 'Скачать Фон (JPG 8K)',
+      q_vlow: 'Очень Низкое', q_low: 'Низкое', q_med: 'Среднее', q_high: 'Высокое', q_vhigh: 'Очень Высокое', q_ultra: 'Ультра'
     },
     'English': { 
-      play: 'Play', settings: 'Settings', exit: 'Exit', back: 'Back', volume: 'Sound', music: 'Music', quality: 'Quality (8K)', res: 'Resolution (ULTRA)', fs: 'Fullscreen', graphics: 'Graphics', lang: 'Language', help: 'Game Help', capabilities: 'AI Capabilities', ollama: 'Ollama: OK', ollamaOff: 'Ollama: Off', sync: 'Singularity Syntax', offline: 'Secure Mode', clear: 'Clear', clearing: 'Clearing...', thinking: 'Cortex Matrix Analysis (8K)', synth: 'Synthesizing Unity 6 & Blender 5.2 data', proMastery: 'Menu Studio Visuals Mastery', downloadBg: 'Download Background (JPG 8K)'
+      play: 'Play', settings: 'Settings', exit: 'Exit', back: 'Back', volume: 'Sound', music: 'Music', quality: 'Quality (8K)', res: 'Resolution (ULTRA)', fs: 'Fullscreen', graphics: 'Graphics', lang: 'Language', help: 'Game Help', capabilities: 'AI Capabilities', ollama: 'Ollama: OK', ollamaOff: 'Ollama: Off', sync: 'Singularity Syntax', offline: 'Secure Mode', clear: 'Clear', clearing: 'Clearing...', thinking: 'Cortex Matrix Analysis (8K)', synth: 'Synthesizing Unity 6 & Blender 5.2 data', proMastery: 'Menu Studio Visuals Mastery', downloadBg: 'Download Background (JPG 8K)',
+      q_vlow: 'Very Low', q_low: 'Low', q_med: 'Medium', q_high: 'High', q_vhigh: 'Very High', q_ultra: 'Ultra'
     },
     'Deutsch': { 
-      play: 'Spielen', settings: 'Einstellungen', exit: 'Beenden', back: 'Zurück', volume: 'Ton', music: 'Musik', quality: 'Qualität (8K)', res: 'Auflösung (ULTRA)', fs: 'Vollbild', graphics: 'Grafik', lang: 'Sprache', help: 'Spielhilfe', capabilities: 'KI-Fähigkeiten', ollama: 'Ollama: OK', ollamaOff: 'Ollama: Off', sync: 'Singularitäts-Syntax', offline: 'Gesicherter Modus', clear: 'Löschen', clearing: 'Löschen...', thinking: 'Cortex-Matrix-Analyse (8K)', synth: 'Synthese von Unity 6 & Blender 5.2 Daten', proMastery: 'Menu Studio Visuals Mastery', downloadBg: 'Hintergrund Herunterladen (JPG 8K)'
+      play: 'Spielen', settings: 'Einstellungen', exit: 'Beenden', back: 'Zurück', volume: 'Ton', music: 'Musik', quality: 'Qualität (8K)', res: 'Auflösung (ULTRA)', fs: 'Vollbild', graphics: 'Grafik', lang: 'Sprache', help: 'Spielhilfe', capabilities: 'KI-Fähigkeiten', ollama: 'Ollama: OK', ollamaOff: 'Ollama: Off', sync: 'Singularitäts-Syntax', offline: 'Gesicherter Modus', clear: 'Löschen', clearing: 'Löschen...', thinking: 'Cortex-Matrix-Analyse (8K)', synth: 'Synthese von Unity 6 & Blender 5.2 Daten', proMastery: 'Menu Studio Visuals Mastery', downloadBg: 'Hintergrund Herunterladen (JPG 8K)',
+      q_vlow: 'Sehr Niedrig', q_low: 'Niedrig', q_med: 'Mittel', q_high: 'Hoch', q_vhigh: 'Sehr Hoch', q_ultra: 'Ultra'
     },
     'Français': { 
-      play: 'Jouer', settings: 'Paramètres', exit: 'Quitter', back: 'Retour', volume: 'Son', music: 'Musique', quality: 'Qualité (8K)', res: 'Résolution (ULTRA)', fs: 'Plein écran', graphics: 'Graphisme', lang: 'Langue', help: 'Aide au Jeu', capabilities: 'Capacités de l\'IA', ollama: 'Ollama: OK', ollamaOff: 'Ollama: Off', sync: 'Syntaxe de Singularité', offline: 'Mode Sécurisé', clear: 'Effacer', clearing: 'Effacement...', thinking: 'Analyse de la Matrice Cortex (8K)', synth: 'Synthèse des données Unity 6 & Blender 5.2', proMastery: 'Maîtrise Visuelle Menu Studio', downloadBg: 'Télécharger le Fond (JPG 8K)'
+      play: 'Jouer', settings: 'Paramètres', exit: 'Quitter', back: 'Retour', volume: 'Son', music: 'Musique', quality: 'Qualité (8K)', res: 'Résolution (ULTRA)', fs: 'Plein écran', graphics: 'Graphisme', lang: 'Langue', help: 'Aide au Jeu', capabilities: 'Capacités de l\'IA', ollama: 'Ollama: OK', ollamaOff: 'Ollama: Off', sync: 'Syntaxe de Singularité', offline: 'Mode Sécurisé', clear: 'Effacer', clearing: 'Effacement...', thinking: 'Analyse de la Matrice Cortex (8K)', synth: 'Synthèse des données Unity 6 & Blender 5.2', proMastery: 'Maîtrise Visuelle Menu Studio', downloadBg: 'Télécharger le Fond (JPG 8K)',
+      q_vlow: 'Très Bas', q_low: 'Bas', q_med: 'Moyen', q_high: 'Haut', q_vhigh: 'Très Haut', q_ultra: 'Ultra'
     },
     'Español': { 
-      play: 'Jugar', settings: 'Ajustes', exit: 'Salir', back: 'Volver', volume: 'Sonido', music: 'Música', quality: 'Calidad (8K)', res: 'Resolución (ULTRA)', fs: 'Pantalla completa', graphics: 'Gráficos', lang: 'Idioma', help: 'Ayuda del Juego', capabilities: 'Capacidades de IA', ollama: 'Ollama: OK', ollamaOff: 'Ollama: Off', sync: 'Sintaxis de Singularidad', offline: 'Modo Seguro', clear: 'Limpiar', clearing: 'Limpiando...', thinking: 'Análisis de la Matriz Cortex (8K)', synth: 'Sintetizando datos de Unity 6 y Blender 5.2', proMastery: 'Menu Studio Visuals Mastery', downloadBg: 'Descargar Fondo (JPG 8K)'
+      play: 'Jugar', settings: 'Ajustes', exit: 'Salir', back: 'Volver', volume: 'Sonido', music: 'Música', quality: 'Calidad (8K)', res: 'Resolución (ULTRA)', fs: 'Pantalla completa', graphics: 'Gráficos', lang: 'Idioma', help: 'Ayuda del Juego', capabilities: 'Capacidades de IA', ollama: 'Ollama: OK', ollamaOff: 'Ollama: Off', sync: 'Sintaxis de Singularidad', offline: 'Modo Seguro', clear: 'Limpiar', clearing: 'Limpiando...', thinking: 'Análisis de la Matriz Cortex (8K)', synth: 'Sintetizando datos de Unity 6 y Blender 5.2', proMastery: 'Menu Studio Visuals Mastery', downloadBg: 'Descargar Fondo (JPG 8K)',
+      q_vlow: 'Muy Bajo', q_low: 'Bajo', q_med: 'Medio', q_high: 'Alto', q_vhigh: 'Muy Alto', q_ultra: 'Ultra'
     },
     '日本語': { 
-      play: 'プレイ', settings: '設定', exit: '終了', back: '戻る', volume: '音量', music: '音乐', quality: '品質 (8K)', res: '解像度 (ULTRA)', fs: '全画面', graphics: 'グラフィック', lang: '言語', help: 'ゲームヘルプ', capabilities: 'AI機能', ollama: 'Ollama: OK', ollamaOff: 'Ollama: オフ', sync: 'シンギュラリティ構文', offline: 'セキュアモード', clear: 'クリア', clearing: 'クリア中...', thinking: '皮질 매트릭스 분석 (8K)', synth: 'Unity 6とBlender 5.2のデータを統合中', proMastery: 'Menu Studio Visuals Mastery', downloadBg: '背景をダウンロード (JPG 8K)'
+      play: 'プレイ', settings: '設定', exit: '終了', back: '戻る', volume: '音量', music: '音乐', quality: '品質 (8K)', res: '解像度 (ULTRA)', fs: '全画面', graphics: 'グラフィック', lang: '言語', help: 'ゲームヘルプ', capabilities: 'AI機能', ollama: 'Ollama: OK', ollamaOff: 'Ollama: オフ', sync: 'シンギュラリティ構文', offline: 'セキュアモード', clear: 'クリア', clearing: 'クリア中...', thinking: '皮질 매트릭스 분석 (8K)', synth: 'Unity 6とBlender 5.2のデータを統合中', proMastery: 'Menu Studio Visuals Mastery', downloadBg: '背景をダウンロード (JPG 8K)',
+      q_vlow: '非常に低い', q_low: '低い', q_med: '中くらい', q_high: '高い', q_vhigh: '非常に高い', q_ultra: 'ウルトラ'
     },
     '한국어': { 
-      play: '플레이', settings: '설정', exit: '나가기', back: '뒤로', volume: '소ри', music: '음악', quality: '품질 (8K)', res: '해상도 (ULTRA)', fs: '전체 화면', graphics: '그래픽', lang: '언어', help: '게임 도움말', capabilities: 'AI 능력', ollama: 'Ollama: 확인', ollamaOff: 'Ollama: 꺼짐', sync: '특이점 구문', offline: '보안 모д', clear: '지우기', clearing: '지우는 중...', thinking: '피질 매트릭스 분석 (8K)', synth: 'Unity 6 및 Blender 5.2 데이터 합성 중', proMastery: 'Menu Studio Visuals Mastery', downloadBg: '배경 다운로드 (JPG 8K)'
+      play: '플레이', settings: '설정', exit: '나가기', back: '뒤로', volume: '소리', music: '음악', quality: '품질 (8K)', res: '해상도 (ULTRA)', fs: '전체 화면', graphics: '그래픽', lang: '언어', help: '게임 도움말', capabilities: 'AI 능력', ollama: 'Ollama: 확인', ollamaOff: 'Ollama: 꺼짐', sync: '특이점 구문', offline: '보안 모д', clear: '지우기', clearing: '지우는 중...', thinking: '피질 매트릭스 분석 (8K)', synth: 'Unity 6 및 Blender 5.2 데이터 합성 중', proMastery: 'Menu Studio Visuals Mastery', downloadBg: '배경 다운로드 (JPG 8K)',
+      q_vlow: '매우 낮음', q_low: '낮음', q_med: '중간', q_high: '높음', q_vhigh: '매우 높음', q_ultra: '울트라'
     },
     '简体中文': { 
-      play: '开始', settings: '设置', exit: '退出', back: '返回', volume: '音量', music: '音乐', quality: '画质 (8K)', res: '分辨率 (ULTRA)', fs: '全屏', graphics: '图像', lang: '语言', help: '游戏帮助', capabilities: 'AI 能力', ollama: 'Ollama: 正常', ollamaOff: 'Ollama: 关闭', sync: '奇点语法', offline: '安全模式', clear: '清除', clearing: '正在清除...', thinking: '皮层矩阵分析 (8K)', synth: '综合 Unity 6 & Blender 5.2 数据', proMastery: 'Menu Studio Visuals Mastery', downloadBg: '下载背景 (JPG 8K)'
+      play: '开始', settings: '设置', exit: '退出', back: '返回', volume: '音量', music: '音乐', quality: '画质 (8K)', res: '分辨率 (ULTRA)', fs: '全屏', graphics: '图像', lang: '语言', help: '游戏帮助', capabilities: 'AI 能力', ollama: 'Ollama: 正常', ollamaOff: 'Ollama: 关闭', sync: '奇点语法', offline: '安全模式', clear: '清除', clearing: '正在清除...', thinking: '皮层矩阵分析 (8K)', synth: '综合 Unity 6 & Blender 5.2 数据', proMastery: 'Menu Studio Visuals Mastery', downloadBg: '下载背景 (JPG 8K)',
+      q_vlow: '极低', q_low: '低', q_med: '中', q_high: '高', q_vhigh: '极高', q_ultra: '终极'
     }
-  }[language as keyof typeof t] || { play: 'Play', settings: 'Settings', exit: 'Exit', back: 'Back', volume: 'Sound', music: 'Music', quality: 'Quality', res: 'Resolution', fs: 'Fullscreen', graphics: 'Graphics', lang: 'Language', downloadBg: 'Download' };
+  }[language as keyof typeof t] || { 
+    play: 'Play', settings: 'Settings', exit: 'Exit', back: 'Back', volume: 'Sound', music: 'Music', quality: 'Quality', res: 'Resolution', fs: 'Fullscreen', graphics: 'Graphics', lang: 'Language', downloadBg: 'Download',
+    q_vlow: 'Very Low', q_low: 'Low', q_med: 'Medium', q_high: 'High', q_vhigh: 'Very High', q_ultra: 'Ultra'
+  };
 
   return (
     <motion.div 
@@ -526,10 +537,17 @@ function MenuStudioPreview({ onDownload }: { onDownload: () => void }) {
                     <select 
                       value={quality}
                       onChange={(e) => setQuality(e.target.value)}
-                      className="w-full bg-white/10 border border-white/20 rounded-xl py-4 px-6 text-white text-sm font-bold appearance-none cursor-pointer hover:bg-white/20 transition-all focus:outline-none"
+                      className="w-full bg-white/10 border border-white/20 rounded-xl py-4 px-4 text-white text-[11px] font-bold appearance-none cursor-pointer hover:bg-white/20 transition-all focus:outline-none whitespace-nowrap overflow-hidden text-ellipsis"
                     >
-                      {['Very Low', 'Low', 'Medium', 'High', 'Very High', 'Ultra'].map(q => (
-                        <option key={q} value={q} className="bg-slate-900">{q}</option>
+                      {[
+                        { id: 'Very Low', label: t.q_vlow },
+                        { id: 'Low', label: t.q_low },
+                        { id: 'Medium', label: t.q_med },
+                        { id: 'High', label: t.q_high },
+                        { id: 'Very High', label: t.q_vhigh },
+                        { id: 'Ultra', label: t.q_ultra }
+                      ].map(q => (
+                        <option key={q.id} value={q.id} className="bg-slate-900">{q.label}</option>
                       ))}
                     </select>
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
@@ -730,8 +748,7 @@ export default function App() {
 
   useEffect(() => {
     // Автоматическая синхронизация версии с сервером
-    fetch('/version.json')
-      .then(res => res.json())
+    fetchWithRetry('/version.json')
       .then(data => {
         if (data && data.version) setAppVersion(data.version);
       })
@@ -1079,7 +1096,7 @@ export default function App() {
       if (data.available) {
         setShowUpdateModal(true);
       } else {
-        setAppVersion('18.2.0');
+        setAppVersion('18.4.9');
         showNotification("У вас уже установлена последняя версия!", "info");
       }
     } catch (error) {
@@ -1097,7 +1114,7 @@ export default function App() {
       "Глубокое сканирование проекта (Аудит)...",
       "Синхронизация с локальным хранилищем...",
       "Исправление найденных ошибок...",
-      "Обновление версии до 18.2.0...",
+      "Обновление версии до 18.4.9...",
       "Инициализация Omniversal Quantum Link...",
       "Установка Нейронного Моста (Blender & Unity)...",
       "Регенерация PROJECT_MASTER_BLUEPRINT.md (Quantum Link)..."

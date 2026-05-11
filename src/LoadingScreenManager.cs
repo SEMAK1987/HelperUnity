@@ -12,7 +12,8 @@ public class LoadingScreenManager : MonoBehaviour
     public GameObject loadingContainer; // Родитель всего экрана загрузки (в Overlay_Layer)
     public Slider progressBar;          // Полоска загрузки
     public TextMeshProUGUI progressText; // Текст процента
-    public TextMeshProUGUI statusText;   // Текст статуса (например, "Загрузка ресурсов...")
+    public TextMeshProUGUI statusText;   // Текст статуса
+    public float statusFontSize = 14f;   // Значительно уменьшаем шрифт
 
     private void Awake()
     {
@@ -24,14 +25,19 @@ public class LoadingScreenManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+            return; // Добавлено для безопасности
         }
         
         if (loadingContainer != null)
             loadingContainer.SetActive(false);
+
+        if (statusText != null)
+            statusText.fontSize = statusFontSize;
     }
 
     public void LoadScene(int sceneIndex)
     {
+        StopAllCoroutines(); // Останавливаем всё старое перед новым стартом
         StartCoroutine(LoadAsync(sceneIndex));
     }
 
@@ -41,40 +47,48 @@ public class LoadingScreenManager : MonoBehaviour
             loadingContainer.SetActive(true);
 
         AsyncOperation operation = SceneManager.LoadSceneAsync(sceneIndex);
-        operation.allowSceneActivation = false; // Ждем заполнения полоски
+        operation.allowSceneActivation = false; 
 
         while (!operation.isDone)
         {
             float progress = Mathf.Clamp01(operation.progress / 0.9f);
             
-            if (progressBar != null)
-                progressBar.value = progress;
-            
-            if (progressText != null)
-                progressText.text = (progress * 100f).ToString("F0") + "%";
+            if (progressBar != null) progressBar.value = progress;
+            if (progressText != null) progressText.text = (progress * 100f).ToString("F0") + "%";
 
-            // Если загрузка завершена (в Unity 0.9 означает 100% готовность к активации)
             if (operation.progress >= 0.9f)
             {
                 if (statusText != null) 
                 {
-                    statusText.text = "— ЗАГРУЗКА ЗАВЕРШЕНА —\nНАЖМИТЕ ЛЮБУЮ КЛАВИШУ";
-                    
-                    // Эффект пульсации для привлечения внимания
-                    float pulse = 0.95f + Mathf.PingPong(Time.time * 2f, 0.1f);
-                    statusText.transform.localScale = new Vector3(pulse, pulse, 1f);
+                    statusText.text = "— ЗАГРУЗКА ЗАВЕРШЕНА —";
                 }
                 
-                if (Input.anyKey)
-                {
-                    operation.allowSceneActivation = true;
-                }
+                // Сразу активируем сцену
+                operation.allowSceneActivation = true;
             }
 
             yield return null;
         }
 
-        if (loadingContainer != null)
-            loadingContainer.SetActive(false);
+        if (loadingContainer != null) loadingContainer.SetActive(false);
+    }
+
+    public void CancelLoading()
+    {
+        StopAllCoroutines(); 
+        if (loadingContainer != null) loadingContainer.SetActive(false);
+        
+        // В Unity нельзя прямо отменить LoadSceneAsync, но можно просто скрыть UI 
+        // и не активировать сцену. Принудительно вызываем ShowMainMenu.
+        if (Menu_Game.Instance != null) 
+        {
+            Menu_Game.Instance.ShowMainMenu();
+        }
+        else
+        {
+            // Если синглтон недоступен, пробуем найти его
+            Menu_Game mg = FindFirstObjectByType<Menu_Game>();
+            if (mg != null) mg.ShowMainMenu();
+        }
     }
 }

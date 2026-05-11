@@ -3,8 +3,8 @@ using UnityEngine;
 public class SimpleFloatAnimation : MonoBehaviour
 {
     [Header("Настройки анимации")]
-    public float amplitude = 10f; // Размах движения
-    public float speed = 2f;      // Скорость движения
+    public float amplitude = 3f; // Еще меньше размах (было 5)
+    public float speed = 0.5f;   // Еще медленнее (было 1)
     public bool useWorldSpace = false;
 
     private Vector3 startPos;

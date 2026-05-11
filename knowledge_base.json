@@ -15,7 +15,13 @@
     {
       "name": "Project Workflow",
       "mode": "Input System Package (New)",
-      "optimization": "Batch-start (.bat) for bypassing region-locked updates"
+      "optimization": "Batch-start (.bat) for bypassing region-locked updates",
+      "stability": ["fetchWithRetry for resilience", "Port 3000 strict lock"]
+    },
+    {
+      "name": "Game Menu System",
+      "scripts": ["Menu_Game.cs", "Translator.cs"],
+      "features": ["New Game Confirmation Panel", "Language-aware fonts"]
     }
   ]
 }

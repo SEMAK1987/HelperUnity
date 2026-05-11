@@ -8,29 +8,14 @@ public class MainMenuController : MonoBehaviour
 
     public void PlayGame()
     {
-        Debug.Log("[FATE CORE] Загрузка основной сцены (Индекс 1)...");
-        
-        // Пытаемся найти менеджер, если инстанс не подхватился
-        if (LoadingScreenManager.Instance == null)
-        {
-            LoadingScreenManager.Instance = FindFirstObjectByType<LoadingScreenManager>();
-        }
-
-        if (LoadingScreenManager.Instance != null)
-        {
-            LoadingScreenManager.Instance.LoadScene(1);
-        }
-        else
-        {
-            Debug.LogWarning("[FATE CORE] LoadingScreenManager не найден! Загрузка без экрана...");
-            SceneManager.LoadScene(1);
-        }
+        Debug.Log("[FATE CORE] MainMenuController.PlayGame() вызван. Если вы хотите переключать панели прямо в меню, используйте Menu_Game.OnStartButtonClicked на кнопке.");
+        SceneManager.LoadScene(1);
     }
 
     public void OpenSettings()
     {
-        Debug.Log("[FATE CORE] Открытие настроек...");
-        // Здесь мы позже добавим анимацию выезда панели настроек
+        Debug.Log("[FATE CORE] MainMenuController.OpenSettings() вызван.");
+        if (Menu_Game.Instance != null) Menu_Game.Instance.OnClickSettingsButton();
     }
 
     public void QuitGame()

@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent AI Assistant v18.4.9",
-  "description": "Квантовый ИИ v18.4.9 (Ultimate Sync). Полная база знаний проекта 'Fate Continent', HDR Bloom визуализация и авто-синхронизация версий.",
+  "description": "Квантовый ИИ v18.4.9 (Ultimate Sync). Полная база знаний проекта 'Fate Continent', HDR Bloom визуализация, CJK Font Fix и Offline Mode (Direct Launch).",
   "requestFramePermissions": [
     "camera",
     "microphone",
