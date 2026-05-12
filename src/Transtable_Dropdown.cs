@@ -48,6 +48,7 @@ public class Transtable_Dropdown : MonoBehaviour
             dropdown.captionText.wordSpacing = 0;
             dropdown.captionText.textWrappingMode = TextWrappingModes.NoWrap;
             dropdown.captionText.overflowMode = TextOverflowModes.Ellipsis;
+            dropdown.captionText.alignment = TextAlignmentOptions.Left; // Ensure left alignment for better look
         }
  
         // Apply to Template Items (the list that pops up)
@@ -58,6 +59,7 @@ public class Transtable_Dropdown : MonoBehaviour
             dropdown.itemText.wordSpacing = 0;
             dropdown.itemText.textWrappingMode = TextWrappingModes.NoWrap;
             dropdown.itemText.overflowMode = TextOverflowModes.Ellipsis;
+            dropdown.itemText.alignment = TextAlignmentOptions.Left;
         }
  
         // Translate options if IDs are assigned in the inspector
@@ -70,6 +72,30 @@ public class Transtable_Dropdown : MonoBehaviour
                     dropdown.options[i].text = Translator.GetText(optionIDs[i]);
                 }
             }
+        }
+        else if (dropdown.options.Count == 6) // Auto-detect Quality Dropdown
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                dropdown.options[i].text = Translator.GetText(37 + i); // 37-42 are quality labels
+            }
+        }
+        else if (dropdown.options.Count == 2) // Auto-detect Full Screen (Yes/No)
+        {
+            dropdown.options[0].text = Translator.GetText(44); // Yes
+            dropdown.options[1].text = Translator.GetText(45); // No
+        }
+        else if (dropdown.options.Count == 9) // Auto-detect Language Dropdown
+        {
+            dropdown.options[0].text = "English";
+            dropdown.options[1].text = "Русский";
+            dropdown.options[2].text = "Deutsch";
+            dropdown.options[3].text = "Français";
+            dropdown.options[4].text = "Español";
+            dropdown.options[5].text = "Português";
+            dropdown.options[6].text = "日本語";
+            dropdown.options[7].text = "한국어";
+            dropdown.options[8].text = "简体中文";
         }
         
         dropdown.RefreshShownValue(); 

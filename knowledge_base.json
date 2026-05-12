@@ -18,7 +18,7 @@
         "https://www.youtube.com/watch?v=4YEB_Q8EOD8",
         "https://www.youtube.com/watch?v=JBszeE_NgmA"
       ],
-      "topics": ["Unity Physics", "Blender Geometry Nodes", "Shader Graph", "Advanced Rigging"]
+      "topics": ["Unity Physics", "Blender Geometry Nodes", "Shader Graph", "Advanced Rigging", "ML-Agents"]
     },
     {
       "name": "Visual & HDR",
