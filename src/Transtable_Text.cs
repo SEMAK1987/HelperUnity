@@ -1,28 +1,34 @@
 using UnityEngine;
 using TMPro;
 
+[RequireComponent(typeof(TextMeshProUGUI))]
 public class Transtable_Text : MonoBehaviour
 {
     public int TextID;
-    public TextMeshProUGUI UIText;
+    [HideInInspector] public TextMeshProUGUI UIText;
 
     void Awake()
     {
+        UIText = GetComponent<TextMeshProUGUI>();
+    }
+
+    void OnEnable()
+    {
+        Translator.Add(this);
+        UpdateText();
+    }
+
+    void OnDisable()
+    {
+        Translator.Delete(this);
+    }
+
+    public void UpdateText()
+    {
         if (UIText == null) UIText = GetComponent<TextMeshProUGUI>();
-        if (UIText == null) UIText = GetComponentInChildren<TextMeshProUGUI>();
-        
-        if (Translator.Instance != null) 
-        { 
-            Translator.Add(this); 
+        if (UIText != null)
+        {
+            UIText.text = Translator.GetText(TextID);
         }
     }
-
-    void Start()
-    {
-        if (Translator.Instance != null) Translator.Update_texts();
-    }
-
-    void OnEnable() { if (Translator.Instance != null) { Translator.Add(this); Translator.Update_texts(); } }
-    void OnDisable() { if (Translator.Instance != null) Translator.Delete(this); }
-    void OnDestroy() { if (Translator.Instance != null) Translator.Delete(this); }
 }

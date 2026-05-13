@@ -1,71 +1,56 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Audio;
 using TMPro;
-using System.Collections.Generic;
 
 public class SettingsManager : MonoBehaviour
 {
     [Header("UI Элементы")]
-    public TMP_Dropdown resolutionDropdown;
+    public Slider soundSlider;
+    public Slider musicSlider;
+    public Slider sensitivitySlider;
     public TMP_Dropdown qualityDropdown;
-    public TMP_Dropdown languageDropdown;
-    public Toggle fullScreenToggle;
+    public TMP_Dropdown resolutionDropdown;
+    public Toggle fullscreenToggle;
 
-    private Resolution[] resolutions;
+    [Header("Аудио")]
+    public AudioMixer masterMixer; // Если используете AudioMixer
 
     void Start()
     {
-        // 1. Настройка разрешений экрана
-        resolutions = Screen.resolutions;
-        resolutionDropdown.ClearOptions();
-
-        List<string> options = new List<string>();
-        int currentResolutionIndex = 0;
-
-        for (int i = 0; i < resolutions.Length; i++)
-        {
-            string option = resolutions[i].width + " x " + resolutions[i].height;
-            options.Add(option);
-
-            if (resolutions[i].width == Screen.currentResolution.width &&
-                resolutions[i].height == Screen.currentResolution.height)
-            {
-                currentResolutionIndex = i;
-            }
-        }
-
-        resolutionDropdown.AddOptions(options);
-        resolutionDropdown.value = currentResolutionIndex;
-        resolutionDropdown.RefreshShownValue();
-
-        // 2. Настройка качества
-        qualityDropdown.value = QualitySettings.GetQualityLevel();
-        qualityDropdown.RefreshShownValue();
-
-        // 3. Настройка полноэкранного режима
-        fullScreenToggle.isOn = Screen.fullScreen;
-
-        // 4. Настройка языка (безопасная настройка через поиск)
-        GameObject translatorObj = GameObject.Find("_Translator");
-        if (languageDropdown != null && translatorObj != null)
-        {
-            // Устанавливаем значение по умолчанию (0 - Русский), обновление придет из скрипта локализации
-            languageDropdown.value = 0;
-        }
+        // Загружаем сохраненные значения или ставим стандартные
+        soundSlider.value = PlayerPrefs.GetFloat("SoundVolume", 0.75f);
+        musicSlider.value = PlayerPrefs.GetFloat("MusicVolume", 0.75f);
+        sensitivitySlider.value = PlayerPrefs.GetFloat("Sensitivity", 1.0f);
+        
+        // Применяем настройки при старте
+        SetSoundVolume(soundSlider.value);
+        SetMusicVolume(musicSlider.value);
     }
 
-    public void SetResolution(int resolutionIndex)
+    public void SetSoundVolume(float value)
     {
-        if (resolutions != null && resolutionIndex < resolutions.Length)
-        {
-            Resolution resolution = resolutions[resolutionIndex];
-            Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreen);
-        }
+        PlayerPrefs.SetFloat("SoundVolume", value);
+        // Здесь логика изменения громкости звука (например, через Mixer или AudioSource)
+        if (masterMixer != null) masterMixer.SetFloat("SoundVol", Mathf.Log10(value) * 20);
     }
 
-    public void SetQuality(int qualityIndex)
+    public void SetMusicVolume(float value)
     {
-        QualitySettings.SetQualityLevel(qualityIndex);
+        PlayerPrefs.SetFloat("MusicVolume", value);
+        if (masterMixer != null) masterMixer.SetFloat("MusicVol", Mathf.Log10(value) * 20);
+    }
+
+    public void SetSensitivity(float value)
+    {
+        PlayerPrefs.SetFloat("Sensitivity", value);
+        // Передаем значение в контроллер игрока
+    }
+
+    public void SetQuality(int index)
+    {
+        QualitySettings.SetQualityLevel(index);
+        PlayerPrefs.SetInt("QualityLevel", index);
     }
 
     public void SetFullscreen(bool isFullscreen)
@@ -73,14 +58,9 @@ public class SettingsManager : MonoBehaviour
         Screen.fullScreen = isFullscreen;
     }
 
-    public void SetLanguage(int langIndex)
-    {
-        Translator.SelectLanguage(langIndex);
-        Debug.Log($"[SettingsManager] Язык изменен на индекс: {langIndex}");
-    }
-
     public void OnBackToMenu()
     {
-        Menu_Game.Instance?.ShowMainMenu();
+        // Логика закрытия панели опций
+        GameObject.Find("Options_Menu_Panel")?.SetActive(false);
     }
 }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI; 
 using TMPro; 
-using UnityEngine.SceneManagement; 
 
 public class Translator : MonoBehaviour
 {
@@ -15,8 +14,8 @@ public class Translator : MonoBehaviour
     private static List<Transtable_Dropdown> listDropdowns = new List<Transtable_Dropdown>();
 
     public TMP_FontAsset defaultFont; 
-    public TMP_FontAsset chineseFont;   // SimHei
-    public TMP_FontAsset koreanFont;    // Malgun Gothic / Noto Sans KR
+    public TMP_FontAsset chineseFont;   
+    public TMP_FontAsset koreanFont;    
 
     private static string[,] LineText = 
     {
@@ -24,24 +23,24 @@ public class Translator : MonoBehaviour
         {
             "Старт", "Продолжить", "Опции", "Разработчик", "Выход", "Громкость звука", "Громкость музыки", "Инверсия мыши", "Чувствительность мыши", "Графика",
             "Разрешение экрана", "На весь экран", "Язык", "Загрузка ...", "Предыдущее сохранение будет перезаписано!", "Начать новую игру", "Игра сохранена", "Перезагрузка", "Управление", "Назад",
-            "Качество", "Инверсия мыши", "Чувствительность мыши", "Здравствуй друг...", "Слот ", "Выберите слот...", "(Перезаписать)", "(Пусто)",
+            "Качество", "Инверсия", "Чувствительность", "Здравствуй друг...", "Слот ", "Выберите слот...", "(Перезаписать)", "(Пусто)",
             "Привет ..., меня зовут Дружок...", "Мыши все еще бегают...", "Спасибо ..., что помог нам...", "Здравствуй ..., меня зовут Хитрец...", "Я сейчас занят.", "Нажмите E", "Далее", "Сохранить и продолжить", "Мышей поймано: ",
             "Очень Низкое", "Низкое", "Среднее", "Высокое", "Очень Высокое", "Ультра",
-            "Вы уверены, что хотите начать новую игру?", "Да", "Нет"
+            "Вы уверены?", "Да", "Нет"
         },
         // 1 - English
         {
-            "Start", "Continue", "Options", "Credits", "Exit", "Sound volume", "Music volume", "Mouse inversion", "Mouse sensitivity", "Graphic",
+            "Start", "Continue", "Options", "Credits", "Exit", "Sound volume", "Music volume", "Mouse inversion", "Mouse sensitivity", "Graphics",
             "Screen resolution", "Full Screen", "Language", "Loading ...", "Previous save will be overwritten!", "Start New Game", "Game saved", "Restart", "Controls", "Back",
-            "Quality", "Mouse Inversion", "Mouse Sensitivity", "Welcome, friend...", "Slot ", "Select Save Slot", "(Overwrite)", "(Empty)",
+            "Quality", "Inversion", "Sensitivity", "Welcome, friend...", "Slot ", "Select Save Slot", "(Overwrite)", "(Empty)",
             "Hi ..., my name is Druzhok...", "The mice are still running around!", "Thanks ..., you caught them!", "Hello ..., my name is Khitrets...", "I'm busy right now.", "Press E", "Continue", "Save & Continue", "Mice collected: ",
             "Very Low", "Low", "Medium", "High", "Very High", "Ultra",
-            "Are you sure you want to start a new game?", "Yes", "No"
+            "Are you sure?", "Yes", "No"
         },
         // 2 - Deutsch
         { 
-            "Start", "Weiter", "Optionen", "Credits", "Beenden", "Ton", "Musik", "Inversion", "Sensibilität", "Grafik", "Auflösung", "Vollbild", "Sprache", "Laden...", "Speicher überschreiben?", "Neues Spiel", "Gespeichert", "Neustart", "Steuerung", "Zurück", 
-            "Qualität", "Maus Inversion", "Sensibilität", "Willkommen...", "Slot ", "Slot wählen", "(Überschreiben)", "(Leer)", 
+            "Start", "Weiter", "Optionen", "Credits", "Beenden", "Ton", "Musik", "Inversion", "Sensibilität", "Grafik", "Auflösung", "Vollbild", "Sprache", "Laden...", "Speichern?", "Neues Spiel", "Gespeichert", "Neustart", "Steuerung", "Zurück", 
+            "Qualität", "Inversion", "Sensibilität", "Willkommen...", "Slot ", "Slot wählen", "(Überschreiben)", "(Leer)", 
             "Hallo...", "Mäuse...", "Danke...", "Hallo...", "Besetzt...", "E drücken", "Weiter", "Speichern", "Mäuse: ", 
             "Sehr Niedrig", "Niedrig", "Mittel", "Hoch", "Sehr Hoch", "Ultra", 
             "Sind Sie sicher?", "Ja", "Nein" 
@@ -60,20 +59,20 @@ public class Translator : MonoBehaviour
             "Calidad", "Inversión", "Sensibilidad", "Bienvenido...", "Slot ", "Slot", "(Sobreescribir)", "(Vacío)", 
             "Hola...", "Ratones...", "Gracias...", "Hola...", "Ocupado...", "E", "Continuar", "Guardar", "Ratones: ", 
             "Muy Bajo", "Bajo", "Medio", "Alto", "Muy Alto", "Ultra", 
-            "¿Stás seguro?", "Sí", "No" 
+            "¿Estás seguro?", "Sí", "No" 
         },
         // 5 - Português
         { 
             "Iniciar", "Continuar", "Opções", "Créditos", "Sair", "Som", "Música", "Inversão", "Sensibilidade", "Gráficos", "Resolução", "Tela cheia", "Idioma", "Carregando...", "Sobrescrever?", "Novo jogo", "Gravado", "Reiniciar", "Controles", "Voltar", 
             "Qualidade", "Inversão", "Sensibilidade", "Bem-vindo...", "Slot ", "Slot", "(Sobrescrever)", "(Vazio)", 
             "Olá...", "Ratos...", "Obrigado...", "Olá...", "Ocupado...", "E", "Continuar", "Salvar", "Ratos: ", 
-            "Muito Baixo", "Bajo", "Médio", "Alto", "Muito Alto", "Ultra", 
+            "Muito Baixo", "Baixo", "Médio", "Alto", "Muito Alto", "Ultra", 
             "Tem certeza?", "Sim", "Não" 
         },
         // 6 - 日本語
         { 
             "スタート", "続行", "設定", "クレジット", "終了", "音量", "音楽", "反転", "感度", "グラフィック", "解像度", "全画面", "言語", "読み込み中...", "上書きしますか？", "新しく始める", "保存完了", "再開", "操作", "戻る", 
-            "品質", "反転", "感도", "ようこそ...", "スロット ", "スロット選択", "(上書き)", "(空き)", 
+            "品質", "反転", "感度", "ようこそ...", "スロット ", "スロット選択", "(上書き)", "(空き)", 
             "こんにちは...", "ネズミが...", "ありがとう...", "こんにちは...", "忙しい...", "Eを押す", "次へ", "保存", "ネズミ: ", 
             "最低", "低い", "中程度", "高い", "最高", "ウルトラ", 
             "よろしいですか？", "はい", "いいえ" 
@@ -102,7 +101,7 @@ public class Translator : MonoBehaviour
         Instance = this; 
         DontDestroyOnLoad(gameObject); 
 
-        _languageID = PlayerPrefs.GetInt("Language", 0); // 0 = Russian
+        _languageID = PlayerPrefs.GetInt("Language", 0); 
         Update_texts(); 
     }
 
@@ -119,8 +118,7 @@ public class Translator : MonoBehaviour
         {
             if (textKey >= 0 && textKey < LineText.GetLength(1))
             {
-                string t = LineText[_languageID, textKey];
-                return string.IsNullOrEmpty(t) ? ("ID:" + textKey) : t;
+                return LineText[_languageID, textKey];
             }
         }
         return "ID:" + textKey; 
@@ -139,38 +137,17 @@ public class Translator : MonoBehaviour
             if (text != null && text.UIText != null)
             {
                 text.UIText.text = GetText(text.TextID);
-                
-                // Reset spacing to prevent "vertical" or "thin" look
                 text.UIText.characterSpacing = 0;
                 text.UIText.wordSpacing = 0;
                 text.UIText.lineSpacing = 0;
-                text.UIText.isRightToLeftText = false;
 
                 // Font mapping
-                if (_languageID == 7) // Korean
-                {
-                    if (Instance.koreanFont != null) text.UIText.font = Instance.koreanFont;
-                    else if (Instance.chineseFont != null) text.UIText.font = Instance.chineseFont;
-                }
-                else if (_languageID == 8 || _languageID == 6) // Chinese or Japanese
-                {
-                    if (Instance.chineseFont != null) text.UIText.font = Instance.chineseFont;
-                }
-                else // Russian/European
-                {
-                    if (Instance.defaultFont != null) text.UIText.font = Instance.defaultFont;
-                    else if (Instance.chineseFont != null) text.UIText.font = Instance.chineseFont; // Fallback to CJK if default missing
-                }
-
-                // Global fallback if everything fails
-                if (text.UIText.font == null && Instance.chineseFont != null) 
-                    text.UIText.font = Instance.chineseFont;
+                if (_languageID == 7) { if (Instance.koreanFont != null) text.UIText.font = Instance.koreanFont; }
+                else if (_languageID == 8 || _languageID == 6) { if (Instance.chineseFont != null) text.UIText.font = Instance.chineseFont; }
+                else { if (Instance.defaultFont != null) text.UIText.font = Instance.defaultFont; }
             }
         }
 
-        foreach (var dd in listDropdowns)
-        {
-            if (dd != null) dd.UpdateDropdown();
-        }
+        foreach (var dd in listDropdowns) { if (dd != null) dd.UpdateDropdown(); }
     }
 }
