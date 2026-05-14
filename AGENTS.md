@@ -1,10 +1,10 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.5.6)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.5.8)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** 18.5.6
+- **Version:** 18.5.8
 - **Engine:** Unity 6 (6000.3.10f1)
-- **Updates:** Triple Font Bridge (v18.5.6). Fixed Dropdown Options. Duplicate Cleanup Protocol.
+- **Updates:** Zenith Multi-Tool Synergy (v18.5.8). Settings & Localization Fix.
 - **Design System:** Zenith Glassmorphism (8K Ultra-High Density)
 
 ## 📑 Core Documentation References
@@ -22,10 +22,10 @@
 - **Localization:** Automatic sync through `Translator.cs` and `Transtable_Dropdown.cs`.
 
 ## 🚀 Протокол «Пошаговое Мастерство» (Step-by-Step Mastery)
-1. **Отслеживание прогресса:** Текущая версия v18.5.6 (Triple Font Sync).
+1. **Отслеживание прогресса:** Текущая версия v18.5.8 (Settings & Localization stable).
 2. **Чек-листы:** Инструкции по Multi-Atlas и Fallback шрифтам.
-3. **Обработка ошибок:** Исправлены CS0111 (Дубликаты). Авто-перевод Quality Dropdown.
+3. **Обработка ошибок:** Исправлены ошибки сборки Translator (UIText ref).
 4. **ОЧИСТКА:** Удалите `Translator.cs`, `Transtable_Dropdown.cs` и `Transtable_Text.cs` из `Assets/`. Используйте только версию в `Assets/src/`.
 
 ---
-*Ядро AI пересинхронизировано (v18.5.6). Авто-апдейтер активен.*
+*Ядро AI пересинхронизировано (v18.5.8). Авто-апдейтер активен.*

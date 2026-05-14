@@ -1,11 +1,11 @@
 {
   "project": "Fate Continent",
-  "version": "18.5.5",
+  "version": "18.5.8",
   "modules": [
     {
       "name": "Localization System",
       "scripts": ["Translator.cs", "Transtable_Text.cs", "Transtable_Dropdown.cs"],
-      "features": ["9 languages", "Auto-dropdown translation", "Global sync", "Triple Font Bridge (v18.5.5)"]
+      "features": ["9 languages", "Auto-dropdown translation", "Global sync", "Triple Font Bridge (v18.5.6)"]
     },
     {
       "name": "Tutorial Knowledge Sync",

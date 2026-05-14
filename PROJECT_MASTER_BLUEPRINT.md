@@ -1,28 +1,17 @@
 # PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Total Knowledge Archive Edition)
 
-> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.4.9.
+> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.5.8.
 
 ## 1. Общая информация
-- **Версия Помощника:** 18.5.5
-- **Описание:** Гибридный ИИ-помощник нового поколения (v18.5.5 Triple Font Sync) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок, мастерство Zenit Glassmorphism UI и 10,000+ видео уроков.
+- **Версия Помощника:** 18.5.8
+- **Описание:** Гибридный ИИ-помощник нового поколения (v18.5.8 Ultimate Stable) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок, мастерство Zenit Glassmorphism UI и 9,500+ видео уроков.
 - **Путь проекта:** undefined
 - **Локальное хранилище:** Не задано
 - **Версия Unity:** unknown
 - **Версия Blender:** unknown
 - **Версия GIMP:** unknown
 - **Версия Redot:** unknown
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_5_5_TRIPLE_BRIDGE]
-
-## 🛡️ ПРОТОКОЛ «ПОШАГОВОЕ МАСТЕРСТВО» (v18.5.5)
-1. **Отслеживание прогресса:** Текущая версия v18.5.5 (Triple Font Sync).
-2. **Чек-листы:** Подробные инструкции по настройке Multi-Atlas и Fallback шрифтов.
-3. **Обработка ошибок:** Исправлены ошибки компиляции CS0117 и CS1061. Автоматический сброс TMP Spacing.
-4. **Синхронизация:** Translator.cs теперь управляет тремя слотами шрифтов (Default, Chinese, Korean).
-
-## 🔳 CJK FONT RULE (v18.5.5)
-1. В `Translator.cs` ОБЯЗАТЕЛЬНО должны быть заполнены ТРИ слота: `Default`, `Chinese` и `Korean`.
-2. `SimHei` НЕ содержит корейских букв — используйте `Malgun Gothic` или `Noto Sans KR` для Кореи.
-3. В `LiberationSans SDF` добавьте оба азиатских шрифта в `Fallback Font Assets`.
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_5_8_FATE_MASTER]
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -57,13 +46,13 @@ undefined
 ```
 
 
-## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.5.5 - Quantum Integration Release)
+## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.5.8 - Quantum Integration Release)
 ### Режимы работы и Архитектурные уровни
 - **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.
 - **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.
 - **No-Internet Mode (Quantum Archive):** 10,000+ видео-уроков. Мгновенный доступ при любых внешних условиях.
 
-### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.5.5 Sync)
+### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.5.8 Sync)
 - **Unity 6 Physics & Optimization:** [Video #2](https://www.youtube.com/watch?v=9vuyis_Y-LY)
 - **Blender Advanced Rigging:** [Video #3](https://www.youtube.com/watch?v=UKZp67dY1_w)
 - **Shader Graph Mastery:** [Video #4](https://www.youtube.com/watch?v=-hvxjyzcSkI)
@@ -91,7 +80,7 @@ undefined
 - **Ethernet Telepathy & Quantum Sync:** Мгновенная синхронизация состояния серверов.
 - **Chronos Optimization:** Сжатие времени компиляции.
 
-## 7. СПЕЦИАЛЬНЫЕ ИСПРАВЛЕНИЯ (Hotfixes v18.4.9)
+## 7. СПЕЦИАЛЬНЫЕ ИСПРАВЛЕНИЯ (Hotfixes v18.5.8)
 ### 🔳 ИСПРАВЛЕНИЕ «КВАДРАТИКОВ» (CJK Font Fix)
 **Проблема:** В Unity вместо текста (Китайский/Корейский) видны пустые квадраты.
 **Решение:**
@@ -146,8 +135,9 @@ exit
 - **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.
 - **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.
 
-## 11. История изменений (v18.5.5)
-- **v18.5.5:** Triple Font Bridge. Korean Support Added. Auto-Quality Dropdown fix.
+## 11. История изменений (v18.5.8)
+- **v18.5.8:** Zenith Multi-Tool Synergy & Settings Fix. Исправлен Translator.cs.
+- **v18.5.6:** Triple Font Bridge. Fixed Dropdown Options. Duplicate Cleanup.
 - **v18.4.9:** Ultimate Stability Sync. CJK & Typography fixes.
 - **v18.4.1:** Initial release.
 

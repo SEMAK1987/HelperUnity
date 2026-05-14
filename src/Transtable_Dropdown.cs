@@ -45,7 +45,7 @@ public class Transtable_Dropdown : MonoBehaviour
         // AUTO-DETECT Logic
         if (dropdown.options.Count == 9) // Language List
         {
-            string[] langs = { "English", "Русский", "Deutsch", "Français", "Español", "Português", "日本語", "한국어", "简体中文" };
+            string[] langs = { "Русский", "English", "Deutsch", "Français", "Español", "Português", "日本語", "한국어", "简体中文" };
             for (int i = 0; i < 9; i++) dropdown.options[i].text = langs[i];
         }
         else if (dropdown.options.Count == 6) // Quality List (ID 37-42)

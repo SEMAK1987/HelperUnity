@@ -456,13 +456,13 @@ function generateId() {
 
 async function checkProjectIntegrity() {
   const kb = await fs.readJson(kbPath).catch(() => ({}));
-  const currentVersion = kb.version || "18.5.5";
+  const currentVersion = kb.version || "18.5.8";
   
   const files = [
     { name: "knowledge_base.json", default: { project_name: "Unity Assistant", version: currentVersion, project_path: process.cwd(), system_instruction: "You are a helpful assistant." } },
     { name: "ccgs_project_blueprint.json", default: { project_name: "Unity & Blender AI Assistant", version: currentVersion, interface_structure: { tabs: ["studio", "kb", "commands", "files", "migration"] }, agents_count: 12000 } },
     { name: "version.json", default: { version: currentVersion, release_date: new Date().toISOString().split('T')[0], changelog: ["Initial release"] } },
-    { name: "DEVELOPMENT_LOG.md", default: "# DEVELOPMENT LOG\n\n## [2026-05-11]\n- Версия 18.5.5: Triple Font Bridge." }
+    { name: "DEVELOPMENT_LOG.md", default: "# DEVELOPMENT LOG\n\n## [2026-05-14]\n- Версия 18.5.8: Zenith Multi-Tool Synergy & Settings Fix." }
   ];
 
   for (const file of files) {
@@ -506,17 +506,17 @@ async function generateMasterBlueprint() {
     const blueprint = await fs.readJson(blueprintJsonPath);
     
     let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"} (Total Knowledge Archive Edition)\n\n`;
-    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.4.9.\n\n`;
+    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.5.8.\n\n`;
     md += `## 1. Общая информация\n`;
-    md += `- **Версия Помощника:** ${blueprint.version || "18.4.9"}\n`;
-    md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (v18.4.9 Ultimate Stable) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок, мастерство Zenit Glassmorphism UI и 9,500+ видео уроков."}\n`;
+    md += `- **Версия Помощника:** ${blueprint.version || "18.5.8"}\n`;
+    md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (v18.5.8 Ultimate Stable) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок, мастерство Zenit Glassmorphism UI и 9,500+ видео уроков."}\n`;
     md += `- **Путь проекта:** ${kb.project_path}\n`;
     md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
     md += `- **Версия Unity:** ${currentUnityStatus.version}\n`;
     md += `- **Версия Blender:** ${currentBlenderStatus.version}\n`;
     md += `- **Версия GIMP:** ${currentGimpStatus.version}\n`;
     md += `- **Версия Redot:** ${currentRedotStatus.version}\n`;
-    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_4_9_FATE_MASTER]\n\n`;
+    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_5_8_FATE_MASTER]\n\n`;
     
     md += `## 2. Структура интерфейса\n`;
     md += `### Вкладки\n`;
@@ -559,13 +559,13 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.5.5 - Quantum Integration Release)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.5.8 - Quantum Integration Release)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
     md += `- **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.\n`;
     md += `- **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.\n`;
     md += `- **No-Internet Mode (Quantum Archive):** 10,000+ видео-уроков. Мгновенный доступ при любых внешних условиях.\n\n`;
 
-    md += `### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.5.5 Sync)\n`;
+    md += `### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.5.8 Sync)\n`;
     md += `- **Unity 6 Physics & Optimization:** [Video #2](https://www.youtube.com/watch?v=9vuyis_Y-LY)\n`;
     md += `- **Blender Advanced Rigging:** [Video #3](https://www.youtube.com/watch?v=UKZp67dY1_w)\n`;
     md += `- **Shader Graph Mastery:** [Video #4](https://www.youtube.com/watch?v=-hvxjyzcSkI)\n`;
@@ -593,7 +593,7 @@ async function generateMasterBlueprint() {
     md += `- **Ethernet Telepathy & Quantum Sync:** Мгновенная синхронизация состояния серверов.\n`;
     md += `- **Chronos Optimization:** Сжатие времени компиляции.\n\n`;
 
-    md += `## 7. СПЕЦИАЛЬНЫЕ ИСПРАВЛЕНИЯ (Hotfixes v18.4.9)\n`;
+    md += `## 7. СПЕЦИАЛЬНЫЕ ИСПРАВЛЕНИЯ (Hotfixes v18.5.8)\n`;
     md += `### 🔳 ИСПРАВЛЕНИЕ «КВАДРАТИКОВ» (CJK Font Fix)\n`;
     md += `**Проблема:** В Unity вместо текста (Китайский/Корейский) видны пустые квадраты.\n`;
     md += `**Решение:**\n`;
@@ -655,7 +655,9 @@ async function generateMasterBlueprint() {
     md += `- **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.\n`;
     md += `- **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.\n\n`;
 
-    md += `## 11. История изменений (v18.4.9)\n`;
+    md += `## 11. История изменений (v18.5.8)\n`;
+    md += `- **v18.5.8:** Zenith Multi-Tool Synergy & Settings Fix.\n`;
+    md += `- **v18.5.6:** Triple Font Bridge. Fixed Dropdown Options. Duplicate Cleanup.\n`;
     md += `- **v18.4.9:** Ultimate Stability Sync. CJK & Typography fixes.\n`;
     md += `- **v18.4.1:** Initial release.\n\n`;
 
@@ -1100,7 +1102,7 @@ async function startServer() {
       status: "online", 
       is_managed: isFreeTier,
       mode: process.env.NODE_ENV,
-      version: "18.4.9"
+      version: "18.5.8"
     });
   });
 

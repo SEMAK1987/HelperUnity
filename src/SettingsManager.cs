@@ -8,43 +8,52 @@ public class SettingsManager : MonoBehaviour
     [Header("UI Элементы")]
     public Slider soundSlider;
     public Slider musicSlider;
-    public Slider sensitivitySlider;
     public TMP_Dropdown qualityDropdown;
     public TMP_Dropdown resolutionDropdown;
     public Toggle fullscreenToggle;
 
     [Header("Аудио")]
-    public AudioMixer masterMixer; // Если используете AudioMixer
+    public AudioMixer masterMixer; 
 
     void Start()
     {
-        // Загружаем сохраненные значения или ставим стандартные
-        soundSlider.value = PlayerPrefs.GetFloat("SoundVolume", 0.75f);
-        musicSlider.value = PlayerPrefs.GetFloat("MusicVolume", 0.75f);
-        sensitivitySlider.value = PlayerPrefs.GetFloat("Sensitivity", 1.0f);
+        // Загружаем сохраненные значения
+        if (soundSlider != null) {
+            soundSlider.value = PlayerPrefs.GetFloat("SoundVolume", 0.75f);
+            SetSoundVolume(soundSlider.value);
+        }
         
-        // Применяем настройки при старте
-        SetSoundVolume(soundSlider.value);
-        SetMusicVolume(musicSlider.value);
+        if (musicSlider != null) {
+            musicSlider.value = PlayerPrefs.GetFloat("MusicVolume", 0.75f);
+            SetMusicVolume(musicSlider.value);
+        }
+
+        if (qualityDropdown != null) {
+            qualityDropdown.value = PlayerPrefs.GetInt("QualityLevel", QualitySettings.GetQualityLevel());
+            SetQuality(qualityDropdown.value);
+        }
+
+        if (fullscreenToggle != null) {
+            fullscreenToggle.isOn = Screen.fullScreen;
+        }
     }
 
     public void SetSoundVolume(float value)
     {
         PlayerPrefs.SetFloat("SoundVolume", value);
-        // Здесь логика изменения громкости звука (например, через Mixer или AudioSource)
-        if (masterMixer != null) masterMixer.SetFloat("SoundVol", Mathf.Log10(value) * 20);
+        if (masterMixer != null) {
+            float vol = value > 0 ? Mathf.Log10(value) * 20 : -80;
+            masterMixer.SetFloat("SoundVol", vol);
+        }
     }
 
     public void SetMusicVolume(float value)
     {
         PlayerPrefs.SetFloat("MusicVolume", value);
-        if (masterMixer != null) masterMixer.SetFloat("MusicVol", Mathf.Log10(value) * 20);
-    }
-
-    public void SetSensitivity(float value)
-    {
-        PlayerPrefs.SetFloat("Sensitivity", value);
-        // Передаем значение в контроллер игрока
+        if (masterMixer != null) {
+            float vol = value > 0 ? Mathf.Log10(value) * 20 : -80;
+            masterMixer.SetFloat("MusicVol", vol);
+        }
     }
 
     public void SetQuality(int index)
@@ -58,9 +67,18 @@ public class SettingsManager : MonoBehaviour
         Screen.fullScreen = isFullscreen;
     }
 
+    public void SetResolution(int index)
+    {
+        Resolution[] resolutions = Screen.resolutions;
+        if (index < resolutions.Length)
+        {
+            Resolution res = resolutions[index];
+            Screen.SetResolution(res.width, res.height, Screen.fullScreen);
+        }
+    }
+
     public void OnBackToMenu()
     {
-        // Логика закрытия панели опций
-        GameObject.Find("Options_Menu_Panel")?.SetActive(false);
+        gameObject.SetActive(false);
     }
 }

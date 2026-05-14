@@ -1,9 +1,8 @@
 {
-  "name": "Fate Continent AI Assistant v18.5.5",
-  "description": "Квантовый ИИ v18.5.5 (Triple Font Bridge). Решение проблем с компиляцией, корейскими шрифтами и шаблонами Dropdown.",
-  "requestFramePermissions": [
-    "camera",
-    "microphone",
-    "geolocation"
+  "name": "Fate Continent",
+  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.5.8. Zenith Multi-Tool Synergy with Quantum Link and Triple Font Bridge.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
   ]
 }
