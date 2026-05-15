@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.5.8. Zenith Multi-Tool Synergy with Quantum Link and Triple Font Bridge.",
+  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.6.0. Zenith Multi-Tool Synergy with Quantum Link, Triple Font Bridge and Z-Databank.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

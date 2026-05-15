@@ -1,10 +1,10 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.5.8)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.6.0)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** 18.5.8
+- **Version:** 18.6.0
 - **Engine:** Unity 6 (6000.3.10f1)
-- **Updates:** Zenith Multi-Tool Synergy (v18.5.8). Settings & Localization Fix.
+- **Updates:** Zenith Multi-Tool Synergy (v18.6.0). Z-Databank & AudioMixer Mastery.
 - **Design System:** Zenith Glassmorphism (8K Ultra-High Density)
 
 ## 📑 Core Documentation References
@@ -22,10 +22,10 @@
 - **Localization:** Automatic sync through `Translator.cs` and `Transtable_Dropdown.cs`.
 
 ## 🚀 Протокол «Пошаговое Мастерство» (Step-by-Step Mastery)
-1. **Отслеживание прогресса:** Текущая версия v18.5.8 (Settings & Localization stable).
+1. **Отслеживание прогресса:** Текущая версия v18.6.0 (Z-Databank Active).
 2. **Чек-листы:** Инструкции по Multi-Atlas и Fallback шрифтам.
-3. **Обработка ошибок:** Исправлены ошибки сборки Translator (UIText ref).
+3. **Обработка ошибок:** Исправлены ошибки сборки Translator (UIText ref). Настройка AudioMixer Mastery.
 4. **ОЧИСТКА:** Удалите `Translator.cs`, `Transtable_Dropdown.cs` и `Transtable_Text.cs` из `Assets/`. Используйте только версию в `Assets/src/`.
 
 ---
-*Ядро AI пересинхронизировано (v18.5.8). Авто-апдейтер активен.*
+*Ядро AI пересинхронизировано (v18.6.0). Авто-апдейтер активен.*

@@ -1,6 +1,6 @@
 {
   "project": "Fate Continent",
-  "version": "18.5.8",
+  "version": "18.6.0",
   "modules": [
     {
       "name": "Localization System",
@@ -16,7 +16,13 @@
         "https://www.youtube.com/watch?v=UKZp67dY1_w",
         "https://www.youtube.com/watch?v=-hvxjyzcSkI",
         "https://www.youtube.com/watch?v=4YEB_Q8EOD8",
-        "https://www.youtube.com/watch?v=JBszeE_NgmA"
+        "https://www.youtube.com/watch?v=JBszeE_NgmA",
+        "https://www.youtube.com/watch?v=7PrHjnBl-Dw",
+        "https://www.youtube.com/watch?v=IJgAUkjsomA",
+        "https://www.youtube.com/watch?v=hmzlNvqziVI",
+        "https://www.youtube.com/watch?v=JgmIM7qhGh8",
+        "https://www.youtube.com/watch?v=AKKpPmxx07w",
+        "https://www.youtube.com/watch?v=juSKjpD3G7o"
       ],
       "topics": ["Unity Physics", "Blender Geometry Nodes", "Shader Graph", "Advanced Rigging", "ML-Agents"]
     },

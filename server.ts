@@ -506,11 +506,10 @@ async function generateMasterBlueprint() {
     const blueprint = await fs.readJson(blueprintJsonPath);
     
     let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"} (Total Knowledge Archive Edition)\n\n`;
-    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.5.8.\n\n`;
+    md += `> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.6.0.\n\n`;
     md += `## 1. Общая информация\n`;
-    md += `- **Версия Помощника:** ${blueprint.version || "18.5.8"}\n`;
-    md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (v18.5.8 Ultimate Stable) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок, мастерство Zenit Glassmorphism UI и 9,500+ видео уроков."}\n`;
-    md += `- **Путь проекта:** ${kb.project_path}\n`;
+    md += `- **Версия Помощника:** ${blueprint.version || "18.6.0"}\n`;
+    md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (v18.6.0 Ultimate Stable) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок, мастерство Zenit Glassmorphism UI и 25,000+ видео уроков."}\n`;    md += `- **Путь проекта:** ${kb.project_path}\n`;
     md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
     md += `- **Версия Unity:** ${currentUnityStatus.version}\n`;
     md += `- **Версия Blender:** ${currentBlenderStatus.version}\n`;
@@ -1102,7 +1101,7 @@ async function startServer() {
       status: "online", 
       is_managed: isFreeTier,
       mode: process.env.NODE_ENV,
-      version: "18.5.8"
+      version: "18.6.0"
     });
   });
 

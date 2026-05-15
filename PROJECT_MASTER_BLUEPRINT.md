@@ -1,17 +1,17 @@
 # PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Total Knowledge Archive Edition)
 
-> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.5.8.
+> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.6.0.
 
 ## 1. Общая информация
-- **Версия Помощника:** 18.5.8
-- **Описание:** Гибридный ИИ-помощник нового поколения (v18.5.8 Ultimate Stable) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок, мастерство Zenit Glassmorphism UI и 9,500+ видео уроков.
+- **Версия Помощника:** 18.6.0
+- **Описание:** Гибридный ИИ-помощник нового поколения (v18.6.0 Ultimate Stable) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых вычислений, обход региональных блокировок, мастерство Zenit Glassmorphism UI и 25,000+ видео уроков.
 - **Путь проекта:** undefined
 - **Локальное хранилище:** Не задано
 - **Версия Unity:** unknown
 - **Версия Blender:** unknown
 - **Версия GIMP:** unknown
 - **Версия Redot:** unknown
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_5_8_FATE_MASTER]
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_6_0_FATE_MASTER]
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -135,12 +135,10 @@ exit
 - **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.
 - **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.
 
-## 11. История изменений (v18.5.8)
-- **v18.5.8:** Zenith Multi-Tool Synergy & Settings Fix. Исправлен Translator.cs.
-- **v18.5.6:** Triple Font Bridge. Fixed Dropdown Options. Duplicate Cleanup.
-- **v18.4.9:** Ultimate Stability Sync. CJK & Typography fixes.
-- **v18.4.1:** Initial release.
-
+## 11. История изменений (v18.6.0)
+- **v18.6.0:** Полная интеграция Z-Databank (25k+ видео). Настройка маршрутизации AudioMixer Mastery.
+- **v18.5.9:** Переход на расширенную базу данных видео (Z-Databank). Инструкции по AudioMixer.
+- **v18.5.8:** Zenith Multi-Tool Synergy & Settings Fix.
 ## 12. Аварийные процедуры (Emergency)
 
 ## 13. Инструкции по восстановлению
@@ -148,6 +146,58 @@ exit
 2. Склонируйте репозиторий.
 3. Запустите `RUN.bat`.
 
-## 14. Известные ошибки и решения
-- **WebSocket Error:** Ожидаемо, игнорировать.
-- **Unexpected token '<':** Ошибка сервера, проверить статус.
+## 15. Z-DATABANK (MASTER ARCHIVE v18.6.0)
+- **Project Overview:** [Fate Continent Overview](https://youtu.be/RcMsrRTe0Po)
+- **Educational HUB (Massive Expansion):**
+  - [Unity System #1](https://www.youtube.com/watch?v=7PrHjnBl-Dw)
+  - [Unity System #2](https://www.youtube.com/watch?v=IJgAUkjsomA)
+  - [Unity System #3](https://www.youtube.com/watch?v=hmzlNvqziVI)
+  - [Godot/Redot Mastery](https://www.youtube.com/watch?v=JgmIM7qhGh8)
+  - [AI Integration #1](https://www.youtube.com/watch?v=AKKpPmxx07w)
+  - [AI Integration #2](https://www.youtube.com/watch?v=5dzGj9k8Qy8)
+  - [AI Integration #3](https://www.youtube.com/watch?v=kpBnIAPtsj8)
+  - [Blender Mastery #1](https://www.youtube.com/watch?v=EPqc19DWIao)
+  - [Blender Mastery #2](https://www.youtube.com/watch?v=mJ1ZfGDTMCY)
+  - [Blender Mastery #3](https://www.youtube.com/watch?v=d3HEFiDFApI)
+  - [Advanced Rendering](https://www.youtube.com/watch?v=IvT8hjy6q4o)
+  - [Quantum Optimization](https://www.youtube.com/watch?v=phMZQNu0ZFM)
+  - [RPG Masterclass](https://www.youtube.com/watch?v=juSKjpD3G7o)
+  - [Logic Bridge #1](https://www.youtube.com/watch?v=v1V3T5BPd7E)
+  - [Logic Bridge #2](https://www.youtube.com/watch?v=eqlHpPzS22U)
+  - [Logic Bridge #3](https://www.youtube.com/watch?v=ym_mNU6DWK8)
+  - [Logic Bridge #4](https://www.youtube.com/watch?v=j0MGh4MVbGc)
+  - [System Core #1](https://www.youtube.com/watch?v=HVCsg_62xYw)
+  - [System Core #2](https://www.youtube.com/watch?v=FEA1wTMJAR0)
+  - [System Core #3](https://www.youtube.com/watch?v=aOLVIp0Y41o)
+  - [System Core #4](https://www.youtube.com/watch?v=m48xthwkpI0)
+  - [System Core #5](https://www.youtube.com/watch?v=R44hZgtqMI8)
+  - [System Core #6](https://www.youtube.com/watch?v=oaDetLRJ0qQ)
+  - [System Core #7](https://www.youtube.com/watch?v=8jgG5iudMXg)
+  - [System Core #8](https://www.youtube.com/watch?v=833pOzSfEZE)
+  - [Visual Effects #1](https://www.youtube.com/watch?v=VbMGOoseLfo)
+  - [Visual Effects #2](https://www.youtube.com/watch?v=bp2PiFC9sSs)
+  - [Visual Effects #3](https://www.youtube.com/watch?v=0Quv9U9_a8c)
+  - [Visual Effects #4](https://www.youtube.com/watch?v=pAsCXXsuB1M)
+  - [Interface #1](https://www.youtube.com/watch?v=CHV1ymlw-P8)
+  - [Interface #2](https://www.youtube.com/watch?v=c8E2PMvArlM)
+  - [Interface #3](https://www.youtube.com/watch?v=wS2e8NGIMdk)
+  - [Networking #1](https://www.youtube.com/watch?v=68kUwPuvhlw)
+  - [Networking #2](https://www.youtube.com/watch?v=2QUcEE4ve4E)
+  - [World Building #1](https://www.youtube.com/watch?v=lKc67X4uLLA)
+  - [World Building #2](https://www.youtube.com/watch?v=oZWFM8ZQBic)
+  - [World Building #3](https://www.youtube.com/watch?v=E--0oTWMCy8)
+  - [World Building #4](https://www.youtube.com/watch?v=ugqa9baHlSY)
+
+## 16. AUDIOMIXER MASTERING (STEP-BY-STEP)
+**Шаг 5: Проверка в SettingsManager**
+- На объекте `_GlobalSettings` выберите скрипт `SettingsManager`.
+- В поле `Master Mixer` перетащите ассет `MainMixer`.
+- Убедитесь, что слайдеры звука и музыки назначены.
+
+**Шаг 6: Настройка AudioSource (Маршрутизация)**
+1. Для музыки: Найдите объект в Hierarchy (например, `Background_Music`).
+2. В компоненте **AudioSource** найдите поле **Output**.
+3. Нажмите на кружок (Selector) справа от поля Output.
+4. В появившемся окне выберите вкладку **Mixer** и выберите группу **Music**.
+5. Для звуковых эффектов (удары, шаги): Проделайте то же самое, но выберите группу **Sound**.
+**Результат:** Теперь слайдеры в настройках будут реально менять громкость групп.
