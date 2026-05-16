@@ -1,6 +1,6 @@
-// [ZENITH MULTI-TOOL SYNERGY v18.6.0 - Ultimate Stable Sync]
+// [ZENITH MULTI-TOOL SYNERGY v18.6.2 - Ultimate Stable Sync]
 // Unity Connector for Quantum AI Assistant
-// Updated: 2026-05-15 (Synced with Video Z-Databank & AudioMixer Mastery)
+// Updated: 2026-05-16 (Synced with External Bridge & RPG Prompts)
 
 using UnityEngine;
 using UnityEditor;
@@ -15,7 +15,7 @@ namespace AI_Assistant_Quantum
         private string prompt = "";
         private string serverUrl = "http://localhost:3000";
         private Mode mode = Mode.Online;
-        private string status = "Ready for Quantum Manifestation v18.6.0";
+        private string status = "Ready for Quantum Manifestation v18.6.2";
         private bool isProcessing = false;
 
         public enum Mode { Online, Offline, NoInternet }
@@ -28,7 +28,7 @@ namespace AI_Assistant_Quantum
 
         private void OnGUI()
         {
-            GUILayout.Label("v18.6.0 - Zenith Multi-Tool Synergy (Neural Link Active)", EditorStyles.boldLabel);
+            GUILayout.Label("v18.6.2 - Zenith Multi-Tool Synergy (Neural Link Active)", EditorStyles.boldLabel);
             
             serverUrl = EditorGUILayout.TextField("Server URL", serverUrl);
             mode = (Mode)EditorGUILayout.EnumPopup("Mode", mode);
