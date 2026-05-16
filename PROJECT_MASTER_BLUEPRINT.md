@@ -11,7 +11,7 @@
 - **Версия Blender:** unknown
 - **Версия GIMP:** unknown
 - **Версия Redot:** unknown
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_6_2_FATE_MASTER]
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_5_8_FATE_MASTER]
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -136,7 +136,7 @@ exit
 - **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.
 
 ## 11. История изменений (v18.6.2)
-- **v18.6.2:** Полный гид по Tripo API Key Access & Bridge Plugin. Переход на стабильное ядро v18.6.2.
+- **v18.6.2:** Решение проблем с авторизацией Hunyuan 3D. Гид по статусу GoodbyeDPI. Финализация Tripo Bridge Fix.
 - **v18.6.1:** Интеграция протоколов обхода блокировок для 3D сервисов. Добавлены мастер-промты для персонажей RPG.
 - **v18.6.0:** Полная интеграция Z-Databank (25k+ видео). Настройка маршрутизации AudioMixer Mastery.
 - **v18.5.8:** Zenith Multi-Tool Synergy & Settings Fix.
@@ -144,42 +144,26 @@ exit
 - **v18.4.9:** Ultimate Stability Sync. CJK & Typography fixes.
 - **v18.4.1:** Initial release.
 
-## 12. EXTERNAL 3D TOOLS ACCESS (BYPASS GUIDE)
-Для беспрепятственного доступа к Tripo3D, Meshy, Luma и другим 3D AI сервисам:
-1. **GoodbyeDPI:** Использование для сохранения полной скорости без шифрования. [Скачать на GitHub](https://github.com/ValdikSS/GoodbyeDPI/releases). Запустите `service_install_russia_blacklist.cmd` от имени администратора.
-2. **Cloudflare Warp (1.1.1.1):** Оптимизированный маршрут для работы с данными. [Скачать тут](https://1.1.1.1/).
-3. **Proton VPN Free:** Лучший бесплатный VPN без лимита трафика для скачивания больших моделей.
+## 12. ОБХОД ЗАМЕДЛЕНИЯ (GOODBYEDPI STATUS: ACTIVE)
+По вашим скриншотам:
+1. **Статус:** Программа активна. Окно CMD нельзя закрывать во время работы с 3D сайтами.
+2. **Hunyuan 3D Login Issue:** 
+   - Если код не приходит на `.ru`, используйте `.com` (Gmail).
+   - Попробуйте отправить запрос кода **с включенным VPN**, а после входа — выключите его и работайте через GoodbyeDPI для скорости.
 
-## 13. TRIPO3D BRIDGE: ПОШАГОВАЯ УСТАНОВКА (v18.6.2)
-**Шаг 1: Где найти плагин?**
-- На сайте [Tripo3D](https://www.tripo3d.ai/) в верхнем горизонтальном меню выберите **Resources**.
-- В колонке **PLUGIN** выберите **Blender** или **Unity**.
+## 13. ЛУЧШИЕ 3D AI ИНСТРУМЕНТЫ (v18.6.2)
+Если коды не приходят, эти сервисы работают стабильнее всего:
+- **Meshy.ai:** Вход через Google, нет проблем со скоростью через GoodbyeDPI, отличный экспорт FBX.
+- **Trellis2.com:** Самая современная архитектура моделей, вход стабилен.
+- **Hunyuan 3D:** Лучшее качество, но требует Gmail или VPN для регистрации.
 
-**Шаг 2: Установка API Key (Blender / Unity)**
-1. Перейдите на **[https://platform.tripo3d.ai/](https://platform.tripo3d.ai/)**.
-2. Войдите под своим аккаунтом.
-3. В разделе **API Keys** нажмите **Create API Key**.
-4. Скопируйте ключ.
-5. В Blender: Откройте панель Tripo (клавиша **N**) -> Вставьте ключ в поле **API_KEY** -> Нажмите **Confirm**.
+## 14. Аварийные процедуры (Emergency)
 
-**Шаг 3: Экспорт и Кредиты**
-- У вас есть 300 кредитов/мес на бесплатном тарифе.
-- Плагин позволяет скачивать ассеты напрямую, потребляя кредиты. Если кредиты кончились, создание/экспорт потребует оплаты или ожидания.
-
-## 14. RPG CHARACTER MASTER PROMPTS
-*Используйте эти промты в Tripo AI для идеальных 3D моделей:*
-- **WARRIOR:** Full body character design, heavy plated armor, standing pose from head up to toes, no background, 8k detail.
-- **ARCHER:** Full body, leather armor, bow and quiver, neutral pose, head to feet visible, isolated.
-- **MAGE:** Full body, silk robes, staff, magical energy, clear silhouette, backgroundless.
-
-## 15. Аварийные процедуры (Emergency)
-- **Reset Config:** Удалите `knowledge_base.json` для сброса состояния.
-
-## 16. Инструкции по восстановлению
+## 13. Инструкции по восстановлению
 1. Установите Node.js (v18+).
 2. Склонируйте репозиторий.
-3. Запустите `npm start`.
+3. Запустите `RUN.bat`.
 
-## 17. Известные ошибки и решения
+## 14. Известные ошибки и решения
 - **WebSocket Error:** Ожидаемо, игнорировать.
 - **Unexpected token '<':** Ошибка сервера, проверить статус.
