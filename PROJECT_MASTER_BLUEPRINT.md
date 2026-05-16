@@ -11,7 +11,7 @@
 - **Версия Blender:** unknown
 - **Версия GIMP:** unknown
 - **Версия Redot:** unknown
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_5_8_FATE_MASTER]
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_6_2_FATE_MASTER]
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -136,7 +136,7 @@ exit
 - **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.
 
 ## 11. История изменений (v18.6.2)
-- **v18.6.2:** Решение проблем с авторизацией Hunyuan 3D. Гид по статусу GoodbyeDPI. Финализация Tripo Bridge Fix.
+- **v18.6.2:** Ultimate Stability Release. AudioMixer Mastery, 3D AI Bypass (GoodbyeDPI) & Tripo Bridge Fix.
 - **v18.6.1:** Интеграция протоколов обхода блокировок для 3D сервисов. Добавлены мастер-промты для персонажей RPG.
 - **v18.6.0:** Полная интеграция Z-Databank (25k+ видео). Настройка маршрутизации AudioMixer Mastery.
 - **v18.5.8:** Zenith Multi-Tool Synergy & Settings Fix.
@@ -144,26 +144,31 @@ exit
 - **v18.4.9:** Ultimate Stability Sync. CJK & Typography fixes.
 - **v18.4.1:** Initial release.
 
-## 12. ОБХОД ЗАМЕДЛЕНИЯ (GOODBYEDPI STATUS: ACTIVE)
-По вашим скриншотам:
-1. **Статус:** Программа активна. Окно CMD нельзя закрывать во время работы с 3D сайтами.
-2. **Hunyuan 3D Login Issue:** 
-   - Если код не приходит на `.ru`, используйте `.com` (Gmail).
-   - Попробуйте отправить запрос кода **с включенным VPN**, а после входа — выключите его и работайте через GoodbyeDPI для скорости.
+## 12. ОБХОД ЗАМЕДЛЕНИЯ & 3D AI (v18.6.2)
+1. **GoodbyeDPI:** Запустите `1_russia_blacklist_YOUTUBE.cmd` для доступа к Tripo, Meshy, Hunyuan на полной скорости.
+2. **Meshy.ai / Trellis2.com:** Используйте эти сервисы для генерации 3D по промту или фото. Экспортируйте в **FBX 4K**.
+3. **Tripo Bridge:** На [platform.tripo3d.ai](https://platform.tripo3d.ai/) скопируйте Secret Key чрез кнопку **COPY** и подтвердите его в Blender кнопкой **Confirm**.
 
-## 13. ЛУЧШИЕ 3D AI ИНСТРУМЕНТЫ (v18.6.2)
-Если коды не приходят, эти сервисы работают стабильнее всего:
-- **Meshy.ai:** Вход через Google, нет проблем со скоростью через GoodbyeDPI, отличный экспорт FBX.
-- **Trellis2.com:** Самая современная архитектура моделей, вход стабилен.
-- **Hunyuan 3D:** Лучшее качество, но требует Gmail или VPN для регистрации.
+## 13. AUDIOMIXER MASTERY (v18.6.2)
+1. **Groups:** Создайте иерархию Master -> Music, SFX, UI.
+2. **Expose:** В Inspector ПКМ на Volume каждой группы -> *Expose to script*.
+3. **Parameters:** Переименуйте в `MasterVol`, `MusicVol`, `SFXVol` во вкладке Exposed Parameters.
+4. **Scripting:** Используйте `mainMixer.SetFloat("MusicVol", Mathf.Log10(volume) * 20)` для изменения громкости из UI.
 
-## 14. Аварийные процедуры (Emergency)
+## 14. RPG CHARACTER MASTER PROMPTS
+*Используйте эти промты в 3D AI для идеальных моделей:*
+- **WARRIOR:** Full body character design, heavy plated armor, standing pose, 8k detail.
+- **ARCHER:** Full body, leather armor, bow and quiver, isolated.
+- **MAGE:** Full body, silk robes, staff, magical energy.
 
-## 13. Инструкции по восстановлению
+## 15. Аварийные процедуры (Emergency)
+- **Reset Config:** Удалите `knowledge_base.json` для сброса состояния.
+
+## 16. Инструкции по восстановлению
 1. Установите Node.js (v18+).
 2. Склонируйте репозиторий.
-3. Запустите `RUN.bat`.
+3. Запустите `npm start`.
 
-## 14. Известные ошибки и решения
+## 17. Известные ошибки и решения
 - **WebSocket Error:** Ожидаемо, игнорировать.
 - **Unexpected token '<':** Ошибка сервера, проверить статус.
