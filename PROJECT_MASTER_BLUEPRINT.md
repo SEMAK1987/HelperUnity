@@ -3,15 +3,15 @@
 > **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.6.2.
 
 ## 1. Общая информация
-- **Версия Помощника:** 18.6.2
-- **Описание:** Гибридный ИИ-помощник нового поколения (v18.6.2 Ultimate Stable) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых изысканий, обход региональных блокировок, мастерство Zenit Glassмorphism UI и 25,000+ видео уроков.
+- **Версия Помощника:** 18.6.3
+- **Описание:** Гибридный ИИ-помощник нового поколения (v18.6.3 Ultimate Stable) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых изысканий, обход региональных блокировок, мастерство Zenit Glassмorphism UI и 25,000+ видео уроков.
 - **Путь проекта:** undefined
 - **Локальное хранилище:** Не задано
 - **Версия Unity:** unknown
 - **Версия Blender:** unknown
 - **Версия GIMP:** unknown
 - **Версия Redot:** unknown
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_6_2_FATE_MASTER]
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_5_8_FATE_MASTER]
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -135,40 +135,47 @@ exit
 - **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.
 - **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.
 
-## 11. История изменений (v18.6.2)
+## 11. История изменений (v18.6.3)
+- **v18.6.3:** Создан пошаговый гид по интеграции Unity AudioMixer + UI Slider. Обновление документации.
 - **v18.6.2:** Ultimate Stability Release. AudioMixer Mastery, 3D AI Bypass (GoodbyeDPI) & Tripo Bridge Fix.
-- **v18.6.1:** Интеграция протоколов обхода блокировок для 3D сервисов. Добавлены мастер-промты для персонажей RPG.
-- **v18.6.0:** Полная интеграция Z-Databank (25k+ видео). Настройка маршрутизации AudioMixer Mastery.
 - **v18.5.8:** Zenith Multi-Tool Synergy & Settings Fix.
 - **v18.5.6:** Triple Font Bridge. Fixed Dropdown Options. Duplicate Cleanup.
 - **v18.4.9:** Ultimate Stability Sync. CJK & Typography fixes.
 - **v18.4.1:** Initial release.
 
-## 12. ОБХОД ЗАМЕДЛЕНИЯ & 3D AI (v18.6.2)
-1. **GoodbyeDPI:** Запустите `1_russia_blacklist_YOUTUBE.cmd` для доступа к Tripo, Meshy, Hunyuan на полной скорости.
-2. **Meshy.ai / Trellis2.com:** Используйте эти сервисы для генерации 3D по промту или фото. Экспортируйте в **FBX 4K**.
-3. **Tripo Bridge:** На [platform.tripo3d.ai](https://platform.tripo3d.ai/) скопируйте Secret Key чрез кнопку **COPY** и подтвердите его в Blender кнопкой **Confirm**.
+## 12. AUDIOMIXER & SLIDER: ПОШАГОВАЯ УСТАНОВКА (v18.6.3)
+**Шаг 1: Подготовка Mixer**
+1. В окне *Project* -> Create -> **Audio Mixer**. Назовите его `MainMixer`.
+2. Откройте его (Window -> Audio -> Audio Mixer).
+3. В колонке *Groups* нажмите "+" у Master и создайте группы `Music`, `SFX`, `UI`.
 
-## 13. AUDIOMIXER MASTERY (v18.6.2)
-1. **Groups:** Создайте иерархию Master -> Music, SFX, UI.
-2. **Expose:** В Inspector ПКМ на Volume каждой группы -> *Expose to script*.
-3. **Parameters:** Переименуйте в `MasterVol`, `MusicVol`, `SFXVol` во вкладке Exposed Parameters.
-4. **Scripting:** Используйте `mainMixer.SetFloat("MusicVol", Mathf.Log10(volume) * 20)` для изменения громкости из UI.
+**Шаг 2: "Вынос" (Expose) параметров**
+1. Нажмите на группу `Music`. В окне *Inspector* найдите **Volume**.
+2. Нажмите ПРАВОЙ кнопкой мыши на слово **Volume** -> **Expose 'Volume (of Music)' to script**.
+3. В окне Mixer сверху справа нажмите на вкладку **Exposed Parameters**.
+4. Дважды кликните на `MyExposedParam` и переименуйте его строго в `MusicVol`.
 
-## 14. RPG CHARACTER MASTER PROMPTS
-*Используйте эти промты в 3D AI для идеальных моделей:*
-- **WARRIOR:** Full body character design, heavy plated armor, standing pose, 8k detail.
-- **ARCHER:** Full body, leather armor, bow and quiver, isolated.
-- **MAGE:** Full body, silk robes, staff, magical energy.
+**Шаг 3: Написание кода**
+1. Создайте скрипт `AudioManager.cs`.
+2. Добавьте: `using UnityEngine.Audio;`.
+3. Ссылка на миксер: `public AudioMixer mainMixer;`.
+4. Метод: `public void SetMusicVolume(float value) { mainMixer.SetFloat("MusicVol", Mathf.Log10(value) * 20); }`.
 
-## 15. Аварийные процедуры (Emergency)
-- **Reset Config:** Удалите `knowledge_base.json` для сброса состояния.
+**Шаг 4: Настройка UI Slider**
+1. В *Hierarchy* -> UI -> **Slider**.
+2. В настройках Slider: **Min Value = 0.0001**, **Max Value = 1**.
+3. В блоке **On Value Changed**:
+   - Нажмите "+".
+   - Перетащите объект со скриптом в поле.
+   - Выберите `AudioManager -> SetMusicVolume` (раздел *Dynamic float*).
 
-## 16. Инструкции по восстановлению
+## 13. Аварийные процедуры (Emergency)
+
+## 13. Инструкции по восстановлению
 1. Установите Node.js (v18+).
 2. Склонируйте репозиторий.
-3. Запустите `npm start`.
+3. Запустите `RUN.bat`.
 
-## 17. Известные ошибки и решения
+## 14. Известные ошибки и решения
 - **WebSocket Error:** Ожидаемо, игнорировать.
 - **Unexpected token '<':** Ошибка сервера, проверить статус.

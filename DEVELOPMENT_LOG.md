@@ -1,20 +1,16 @@
 # DEVELOPMENT LOG
 
+## [2026-05-17]
+- Версия 18.6.3: AudioMixer & UI Slider Integration.
+- Детальный гайд по экспонированию параметров (Expose Parameters).
+- Настройка динамических событий (Dynamic float) для UI Slider.
+
 ## [2026-05-16]
 - Версия 18.6.2: Ultimate Stability Release.
-- Полный гид по настройке Unity AudioMixer (Groups, Exposed Parameters, Log10 scaling).
-- Добавлен воркфлоу для альтернативных 3D AI инструментов (Meshy, Trellis).
-- Подтвержден статус GoodbyeDPI.
-- Решена проблема с копированием Secret Key в Tripo Bridge.
-
-## [2026-05-16]
-- Версия 18.6.1: External AI Bridge & RPG Prototype Prompts.
-- Добавлены мастер-промты для героев RPG.
-
-## [2026-05-15]
-- Версия 18.6.0: Z-Databank Mastery (25,000+ видео).
-- Интегрированы обучающие материалы по Unity/Blender/Godot.
-- Настройка AudioMixer Mastery.
+- Полный гид по GoodbyeDPI (выбор архива, запуск, установка службы).
+- Анализ и воркфлоу для лучших 3D AI инструментов (Meshy, Trellis, Hunyuan).
+- Исправлено руководство по Tripo API Key (использование кнопки COPY).
+- Оптимизирован импорт FBX 4K при сбоях MCP Server.
 
 ## [2026-05-14]
 - Версия 18.5.8: Zenith Multi-Tool Synergy & Settings Fix.
