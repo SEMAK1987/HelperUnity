@@ -1,17 +1,17 @@
 # PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Total Knowledge Archive Edition)
 
-> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.6.2.
+> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.6.4.
 
 ## 1. Общая информация
-- **Версия Помощника:** 18.6.3
-- **Описание:** Гибридный ИИ-помощник нового поколения (v18.6.3 Ultimate Stable) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых изысканий, обход региональных блокировок, мастерство Zenit Glassмorphism UI и 25,000+ видео уроков.
+- **Версия Помощника:** 18.6.4
+- **Описание:** Гибридный ИИ-помощник нового поколения (v18.6.4 Ultimate Stable) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых изысканий, обход региональных блокировок, мастерство Zenit Glassмorphism UI и 25,000+ видео уроков.
 - **Путь проекта:** undefined
 - **Локальное хранилище:** Не задано
 - **Версия Unity:** unknown
 - **Версия Blender:** unknown
 - **Версия GIMP:** unknown
 - **Версия Redot:** unknown
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_5_8_FATE_MASTER]
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_6_4_FATE_MASTER]
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -135,41 +135,43 @@ exit
 - **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.
 - **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.
 
-## 11. История изменений (v18.6.3)
-- **v18.6.3:** Создан пошаговый гид по интеграции Unity AudioMixer + UI Slider. Обновление документации.
+## 11. История изменений (v18.6.4)
+- **v18.6.4:** Централизация AudioMixer в SettingsManager. Исправление ошибок Missing Components. Добавлены RPG промты для персонажей (T-pose) и оружия отдельно.
 - **v18.6.2:** Ultimate Stability Release. AudioMixer Mastery, 3D AI Bypass (GoodbyeDPI) & Tripo Bridge Fix.
 - **v18.5.8:** Zenith Multi-Tool Synergy & Settings Fix.
 - **v18.5.6:** Triple Font Bridge. Fixed Dropdown Options. Duplicate Cleanup.
 - **v18.4.9:** Ultimate Stability Sync. CJK & Typography fixes.
-- **v18.4.1:** Initial release.
 
-## 12. AUDIOMIXER & SLIDER: ПОШАГОВАЯ УСТАНОВКА (v18.6.3)
-**Шаг 1: Подготовка Mixer**
-1. В окне *Project* -> Create -> **Audio Mixer**. Назовите его `MainMixer`.
-2. Откройте его (Window -> Audio -> Audio Mixer).
-3. В колонке *Groups* нажмите "+" у Master и создайте группы `Music`, `SFX`, `UI`.
+## 12. ОБХОД ЗАМЕДЛЕНИЯ & 3D AI (v18.6.4)
+1. **GoodbyeDPI:** Запустите `1_russia_blacklist_YOUTUBE.cmd` для доступа к Tripo, Meshy, Hunyuan на полной скорости. Окно CMD не закрывать!
+2. **Meshy.ai / Trellis2.com:** Используйте эти сервисы для генерации 3D по промту или фото. Экспортируйте в **FBX 4K**.
+3. **Tripo Bridge:** На [platform.tripo3d.ai](https://platform.tripo3d.ai/) скопируйте Secret Key чрез кнопку **COPY** и подтвердите его в Blender кнопкой **Confirm**.
 
-**Шаг 2: "Вынос" (Expose) параметров**
-1. Нажмите на группу `Music`. В окне *Inspector* найдите **Volume**.
-2. Нажмите ПРАВОЙ кнопкой мыши на слово **Volume** -> **Expose 'Volume (of Music)' to script**.
-3. В окне Mixer сверху справа нажмите на вкладку **Exposed Parameters**.
-4. Дважды кликните на `MyExposedParam` и переименуйте его строго в `MusicVol`.
+## 13. AUDIOMIXER & SETTINGSMANAGER: ПОШАГОВАЯ УСТАНОВКА (v18.6.4)
+**Шаг 1: Настройка в Unity (Expose Parameters)**
+1. В Audio Mixer ПКМ на Volume группы (Music/Sound) -> **Expose 'Volume' to script**.
+2. В окне Mixer (справа сверху) во вкладке **Exposed Parameters** переименуйте их в `MusicVol` и `SoundVol`.
 
-**Шаг 3: Написание кода**
-1. Создайте скрипт `AudioManager.cs`.
-2. Добавьте: `using UnityEngine.Audio;`.
-3. Ссылка на миксер: `public AudioMixer mainMixer;`.
-4. Метод: `public void SetMusicVolume(float value) { mainMixer.SetFloat("MusicVol", Mathf.Log10(value) * 20); }`.
+**Шаг 2: Настройка UI Slider (Slider_Music / Slider_Sound)**
+1. **Min Value = 0.0001**, **Max Value = 1**.
+2. В событии **On Value Changed**: Перетащите объект `_GlobalSettings` -> Выберите `SettingsManager -> SetMusicVolume` (раздел **Dynamic float**).
 
-**Шаг 4: Настройка UI Slider**
-1. В *Hierarchy* -> UI -> **Slider**.
-2. В настройках Slider: **Min Value = 0.0001**, **Max Value = 1**.
-3. В блоке **On Value Changed**:
-   - Нажмите "+".
-   - Перетащите объект со скриптом в поле.
-   - Выберите `AudioManager -> SetMusicVolume` (раздел *Dynamic float*).
+**Шаг 3: Оптимизация иерархии**
+- Удалите лишний объект `AudioHandler`, если настройки теперь в `SettingsManager`.
+- Убедитесь, что в инспекторе `SettingsManager` поле `Master Mixer` заполнено файлом `MainMixer`.
 
-## 13. Аварийные процедуры (Emergency)
+## 14. RPG MASTER PROMPTS (v18.6.4)
+*Используйте в Meshy/Hunyuan/Trellis для 3D персонажей (T-Pose, без оружия, 8k, белый фон):*
+- **Warrior:** `Heroic warrior in ornate heavy golden-silver armor, T-pose, arms spread, legs straight, no weapons, empty hands, 8k, cinematic, white background.`
+- **Mage:** `Young wizard in flowing blue robes with silver patterns, T-pose, arms spread, no staff, empty hands, 8k, detailed textures, white background.`
+- **Archer:** `Elven ranger in light green leather armor, T-pose, arms spread, no bow, no quiver, empty hands, sharp 8k details, white background.`
+
+*Оружие (Отдельно для экспорта в 3D):*
+- **Sword:** `Legendary silver claymore sword, ornate gold hilt with blue sapphire, high detail, side view, white background.`
+- **Staff:** `Ancient wizard staff made of white wood with a glowing crystal top, high-end 3D asset style, white background.`
+- **Bow:** `Ornate recurve bow made of white oak and silver wire, high resolution, white background.`
+
+## 15. Аварийные процедуры (Emergency)
 
 ## 13. Инструкции по восстановлению
 1. Установите Node.js (v18+).
