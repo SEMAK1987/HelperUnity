@@ -1,10 +1,10 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.6.5)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.6.6)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** 18.6.5
+- **Version:** 18.6.6
 - **Engine:** Unity 6 (6000.3.10f1)
-- **Updates:** Zenith Multi-Tool Synergy (v18.6.5). Stable Character Sync.
+- **Updates:** Zenith Multi-Tool Synergy (v18.6.6). Stable Character Sync & UI Hotfixes.
 - **Design System:** Zenith Glassmorphism (8K Ultra-High Density)
 
 ## 📑 Core Documentation References
@@ -23,9 +23,9 @@
 - **Localization:** Automatic sync through `Translator.cs` and `Transtable_Dropdown.cs`.
 
 ## 🚀 Протокол «Пошаговое Мастерство» (Step-by-Step Mastery)
-1. **Отслеживание прогресса:** Текущая версия v18.6.5 (Stable Character Sync).
-2. **Чек-листы:** Инструкции по GLB-скачиванию и импорту в Blender/Unity.
-3. **Обработка ошибок:** Исправлены проблемы загрузки Meshy (GLB/XDM). Центр управления звуком активен.
+1. **Отслеживание прогресса:** Текущая версия v18.6.6 (Character & UI Active).
+2. **Чек-листы:** Инструкции по GLB-скачиванию и TMP-восстановлению.
+3. **Обработка ошибок:** Исправлены проблемы загрузки Meshy и Missing Components (v18.6.6).
 4. **ОЧИСТКА:** Используйте только `SettingsManager.cs` для аудио. Удалите `AudioHandler` и `AudioManager` скрипты.
 
 ---

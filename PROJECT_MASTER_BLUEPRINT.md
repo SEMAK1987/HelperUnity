@@ -1,17 +1,17 @@
 # PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Total Knowledge Archive Edition)
 
-> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.6.5.
+> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.6.6.
 
 ## 1. Общая информация
-- **Версия Помощника:** 18.6.5
-- **Описание:** Гибридный ИИ-помощник нового поколения (v18.6.5 Stable Stable) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых изысканий, обход региональных блокировок, мастерство Zenit Glassмorphism UI и 25,000+ видео уроков.
+- **Версия Помощника:** 18.6.6
+- **Описание:** Гибридный ИИ-помощник нового поколения (v18.6.6 Stable Stable) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых изысканий, обход региональных блокировок, мастерство Zenit Glassмorphism UI и 25,000+ видео уроков.
 - **Путь проекта:** undefined
 - **Локальное хранилище:** Не задано
 - **Версия Unity:** unknown
 - **Версия Blender:** unknown
 - **Версия GIMP:** unknown
 - **Версия Redot:** unknown
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_6_5_FATE_MASTER]
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_6_6_FATE_MASTER]
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -135,9 +135,14 @@ exit
 - **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.
 - **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.
 
-## 11. История изменений (v18.6.5)
+## 11. История изменений (v18.6.6)
+- **v18.6.6:** UI Component Stability. Исправлены ошибки Missing Required Components для Transtable_Text на объектах Btn_LoadGameChoice и Choice_Menu.
 - **v18.6.5:** Stable Character Sync Release. Решена проблема скачивания 3D (GLB/XDM). Глобальная синхронизация версий.
 - **v18.6.4:** Централизация AudioMixer в SettingsManager. Исправление ошибок Missing Components и MonoBehaviour. Добавлены RPG промты для персонажей (T-pose) и оружия отдельно.
+- **v18.5.8:** Zenith Multi-Tool Synergy & Settings Fix.
+- **v18.5.6:** Triple Font Bridge. Fixed Dropdown Options. Duplicate Cleanup.
+- **v18.4.9:** Ultimate Stability Sync. CJK & Typography fixes.
+- **v18.4.1:** Initial release.
 
 ## 12. Аварийные процедуры (Emergency)
 
