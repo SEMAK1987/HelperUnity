@@ -1,11 +1,21 @@
 {
   "project": "Fate Continent",
-  "version": "18.6.2",
+  "version": "18.6.5",
   "modules": [
     {
-      "name": "Localization System",
+      "name": "Localization & Fonts",
       "scripts": ["Translator.cs", "Transtable_Text.cs", "Transtable_Dropdown.cs"],
-      "features": ["9 languages", "Auto-dropdown translation", "Global sync", "Triple Font Bridge (v18.5.6)"]
+      "features": ["9 languages", "Triple Font Bridge (v18.5.6)", "Missing Component Fix (v18.6.4)"]
+    },
+    {
+      "name": "Audio & Settings Integration",
+      "scripts": ["SettingsManager.cs"],
+      "features": ["Centralized Audio Control", "MasterMixer Logarithmic Scaling", "Removed legacy AudioHandler"]
+    },
+    {
+      "name": "Character & Weapon Fabrication",
+      "features": ["T-Pose RPG Prototyping", "Separate Weapon Export Workflow (GLB/XDM Stable)", "Meshy/Hunyuan 8k Synthesis"],
+      "prompts": ["Heroic Warrior", "Grand Mage", "Elven Archer", "Legendary Weapons"]
     },
     {
       "name": "Tutorial Knowledge Sync",
