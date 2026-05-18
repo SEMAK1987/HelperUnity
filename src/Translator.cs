@@ -70,6 +70,9 @@ public class Translator : MonoBehaviour
         Update_texts(); 
     }
 
+    // Alias for compatibility
+    static public void ChangeLanguage(int id) => SelectLanguage(id);
+
     static public string GetText(int textKey) 
     {
         if (_languageID >= 0 && _languageID < LineText.GetLength(0))

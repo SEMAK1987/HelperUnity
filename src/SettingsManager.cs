@@ -10,6 +10,7 @@ public class SettingsManager : MonoBehaviour
     public Slider musicSlider;
     public TMP_Dropdown qualityDropdown;
     public TMP_Dropdown resolutionDropdown;
+    public TMP_Dropdown languageDropdown;
     public Toggle fullscreenToggle;
 
     [Header("Аудио")]
@@ -33,16 +34,26 @@ public class SettingsManager : MonoBehaviour
             SetQuality(qualityDropdown.value);
         }
 
+        if (languageDropdown != null) {
+            languageDropdown.value = PlayerPrefs.GetInt("Language", 0);
+            // LanguageSelector.cs handles the logic, but we sync the value here
+        }
+
         if (resolutionDropdown != null) {
             resolutionDropdown.ClearOptions();
             Resolution[] resolutions = Screen.resolutions;
             List<string> options = new List<string>();
+            List<Resolution> uniqueResolutions = new List<Resolution>();
             int currentResIndex = 0;
+            
             for (int i = 0; i < resolutions.Length; i++) {
                 string option = resolutions[i].width + " x " + resolutions[i].height;
-                options.Add(option);
-                if (resolutions[i].width == Screen.currentResolution.width && resolutions[i].height == Screen.currentResolution.height) {
-                    currentResIndex = i;
+                if (!options.Contains(option)) {
+                    options.Add(option);
+                    uniqueResolutions.Add(resolutions[i]);
+                    if (resolutions[i].width == Screen.currentResolution.width && resolutions[i].height == Screen.currentResolution.height) {
+                        currentResIndex = options.Count - 1;
+                    }
                 }
             }
             resolutionDropdown.AddOptions(options);
@@ -86,10 +97,21 @@ public class SettingsManager : MonoBehaviour
 
     public void SetResolution(int index)
     {
-        Resolution[] resolutions = Screen.resolutions;
-        if (index < resolutions.Length)
+        List<Resolution> uniqueResolutions = new List<Resolution>();
+        List<string> options = new List<string>();
+        Resolution[] allResolutions = Screen.resolutions;
+        
+        for (int i = 0; i < allResolutions.Length; i++) {
+            string option = allResolutions[i].width + " x " + allResolutions[i].height;
+            if (!options.Contains(option)) {
+                options.Add(option);
+                uniqueResolutions.Add(allResolutions[i]);
+            }
+        }
+
+        if (index < uniqueResolutions.Count)
         {
-            Resolution res = resolutions[index];
+            Resolution res = uniqueResolutions[index];
             Screen.SetResolution(res.width, res.height, Screen.fullScreen);
             PlayerPrefs.SetInt("Resolution", index);
         }
