@@ -33,6 +33,23 @@ public class SettingsManager : MonoBehaviour
             SetQuality(qualityDropdown.value);
         }
 
+        if (resolutionDropdown != null) {
+            resolutionDropdown.ClearOptions();
+            Resolution[] resolutions = Screen.resolutions;
+            List<string> options = new List<string>();
+            int currentResIndex = 0;
+            for (int i = 0; i < resolutions.Length; i++) {
+                string option = resolutions[i].width + " x " + resolutions[i].height;
+                options.Add(option);
+                if (resolutions[i].width == Screen.currentResolution.width && resolutions[i].height == Screen.currentResolution.height) {
+                    currentResIndex = i;
+                }
+            }
+            resolutionDropdown.AddOptions(options);
+            resolutionDropdown.value = PlayerPrefs.GetInt("Resolution", currentResIndex);
+            resolutionDropdown.RefreshShownValue();
+        }
+
         if (fullscreenToggle != null) {
             fullscreenToggle.isOn = Screen.fullScreen;
         }
@@ -74,6 +91,7 @@ public class SettingsManager : MonoBehaviour
         {
             Resolution res = resolutions[index];
             Screen.SetResolution(res.width, res.height, Screen.fullScreen);
+            PlayerPrefs.SetInt("Resolution", index);
         }
     }
 

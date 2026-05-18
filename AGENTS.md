@@ -1,10 +1,10 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.6.6)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.6.7)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** 18.6.6
+- **Version:** 18.6.7
 - **Engine:** Unity 6 (6000.3.10f1)
-- **Updates:** Zenith Multi-Tool Synergy (v18.6.6). Stable Character Sync & UI Hotfixes.
+- **Updates:** Zenith Multi-Tool Synergy (v18.6.7). UI Harmony & Language synchronization.
 - **Design System:** Zenith Glassmorphism (8K Ultra-High Density)
 
 ## 📑 Core Documentation References
