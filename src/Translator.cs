@@ -26,7 +26,7 @@ public class Translator : MonoBehaviour
             "Качество", "Инверсия", "", "Приветствую...", "Слот ", "Выбор слота", "(Перезапись)", "(Пусто)",
             "Привет...", "Мыши бегают!", "Спасибо!", "Привет...", "Я занят.", "Нажми E", "Далее", "Сохранить", "Мышей: ",
             "Очень низко", "Низко", "Средне", "Высоко", "Очень высоко", "Ультра",
-            "Вы уверены?", "Да", "Нет"
+            "Вы уверены?", "Да", "Нет", "Загрузить"
         },
         // 1 - English
         {
@@ -35,22 +35,22 @@ public class Translator : MonoBehaviour
             "Quality", "Inversion", "", "Welcome...", "Slot ", "Select Slot", "(Overwrite)", "(Empty)",
             "Hi...", "Mice are running!", "Thanks!", "Hello...", "I'm busy.", "Press E", "Continue", "Save", "Mice: ",
             "Very Low", "Low", "Medium", "High", "Very High", "Ultra",
-            "Are you sure?", "Yes", "No"
+            "Are you sure?", "Yes", "No", "Load"
         },
         // 2 - Deutsch (German)
-        { "Start", "Weiter", "Optionen", "Credits", "Beenden", "Ton", "Musik", "Inversion", "", "Grafik", "Auflösung", "Vollbild", "Sprache", "Laden...", "Speichern?", "Neues Spiel", "Gespeichert", "Neustart", "Steuerung", "Zurück", "Qualität", "Inversion", "", "Willkommen...", "Slot ", "Slot wählen", "(Überschreiben)", "(Leer)", "Hallo...", "Mäuse...", "Danke...", "Hallo...", "Besetzt...", "E drücken", "Weiter", "Speichern", "Mäuse: ", "Sehr Niedrig", "Niedrig", "Mittel", "Hoch", "Sehr Hoch", "Ultra", "Sind Sie sicher?", "Ja", "Nein" },
+        { "Start", "Weiter", "Optionen", "Credits", "Beenden", "Ton", "Musik", "Inversion", "", "Grafik", "Auflösung", "Vollbild", "Sprache", "Laden...", "Speichern?", "Neues Spiel", "Gespeichert", "Neustart", "Steuerung", "Zurück", "Qualität", "Inversion", "", "Willkommen...", "Slot ", "Slot wählen", "(Überschreiben)", "(Leer)", "Hallo...", "Mäuse...", "Danke...", "Hallo...", "Besetzt...", "E drücken", "Weiter", "Speichern", "Mäuse: ", "Sehr Niedrig", "Niedrig", "Mittel", "Hoch", "Sehr Hoch", "Ultra", "Sind Sie sicher?", "Ja", "Nein", "Laden" },
         // 3 - Français (French)
-        { "Démarrer", "Continuer", "Options", "Crédits", "Quitter", "Son", "Musique", "Inversion", "", "Graphiques", "Résolution", "Plein écran", "Langue", "Chargement...", "Écraser?", "Nouvelle partie", "Sauvegardé", "Relancer", "Commandes", "Retour", "Qualité", "Inversion", "", "Bienvenue...", "Slot ", "Slot", "(Écraser)", "(Vide)", "Salut...", "Souris...", "Merci...", "Salut...", "Occupé...", "E", "Continuer", "Sauvegarder", "Souris: ", "Très Bas", "Bas", "Moyen", "Haut", "Très Haut", "Ultra", "Êtes-vous sûr?", "Oui", "Non" },
+        { "Démarrer", "Continuer", "Options", "Crédits", "Quitter", "Son", "Musique", "Inversion", "", "Graphiques", "Résolution", "Plein écran", "Langue", "Chargement...", "Écraser?", "Nouvelle partie", "Sauvegardé", "Relancer", "Commandes", "Retour", "Qualité", "Inversion", "", "Bienvenue...", "Slot ", "Slot", "(Écraser)", "(Vide)", "Salut...", "Souris...", "Merci...", "Salut...", "Occupé...", "E", "Continuer", "Sauvegarder", "Souris: ", "Très Bas", "Bas", "Moyen", "Haut", "Très Haut", "Ultra", "Êtes-vous sûr?", "Oui", "Non", "Charger" },
         // 4 - Español (Spanish)
-        { "Inicio", "Continuar", "Opciones", "Créditos", "Salir", "Sonido", "Música", "Inversión", "", "Gráficos", "Resolución", "Pantalla completa", "Idioma", "Cargando...", "Sobreescribir?", "Nueva partida", "Guardado", "Reiniciar", "Controles", "Atrás", "Calidad", "Inversión", "", "Bienvenido...", "Slot ", "Slot", "(Sobreescribir)", "(Vacío)", "Hola...", "Ratones...", "Gracias...", "Hola...", "Ocupado...", "E", "Continuar", "Guardar", "Ratones: ", "Muy Bajo", "Bajo", "Medio", "Alto", "Muy Alto", "Ultra", "¿Estás seguro?", "Sí", "No" },
+        { "Inicio", "Continuar", "Opciones", "Créditos", "Salir", "Sonido", "Música", "Inversión", "", "Gráficos", "Resolución", "Pantalla completa", "Idioma", "Cargando...", "Sobreescribir?", "Nueva partida", "Guardado", "Reiniciar", "Controles", "Atrás", "Calidad", "Inversión", "", "Bienvenido...", "Slot ", "Slot", "(Sobreescribir)", "(Vacío)", "Hola...", "Ratones...", "Gracias...", "Hola...", "Ocupado...", "E", "Continuar", "Guardar", "Ratones: ", "Muy Bajo", "Bajo", "Medio", "Alto", "Muy Alto", "Ultra", "¿Estás seguro?", "Sí", "No", "Cargar" },
         // 5 - Português (Portuguese)
-        { "Iniciar", "Continuar", "Opções", "Créditos", "Sair", "Som", "Música", "Inversão", "", "Gráficos", "Resolução", "Tela cheia", "Idioma", "Carregando...", "Sobrescrever?", "Novo jogo", "Gravado", "Reiniciar", "Controles", "Voltar", "Qualidade", "Inversão", "", "Bem-vindo...", "Slot ", "Slot", "(Sobrescrever)", "(Vazio)", "Olá...", "Ratos...", "Оbrigado...", "Olá...", "Ocupado...", "E", "Continuar", "Salvar", "Ratos: ", "Muito Baixo", "Baixo", "Médio", "Alto", "Muito Alto", "Ultra", "Tem certeza?", "Sim", "Não" },
+        { "Iniciar", "Continuar", "Opções", "Créditos", "Sair", "Som", "Música", "Inversão", "", "Gráficos", "Resolução", "Tela cheia", "Idioma", "Carregando...", "Sobrescrever?", "Novo jogo", "Gravado", "Reiniciar", "Controles", "Voltar", "Qualidade", "Inversão", "", "Bem-vindo...", "Slot ", "Slot", "(Sobrescrever)", "(Vazio)", "Olá...", "Ratos...", "Оbrigado...", "Olá...", "Ocupado...", "E", "Continuar", "Salvar", "Ratos: ", "Muito Baixo", "Baixo", "Médio", "Alto", "Muito Alto", "Ultra", "Tem certeza?", "Sim", "Não", "Carregar" },
         // 6 - 日本語 (Japanese)
-        { "スタート", "続行", "設定", "クレジット", "終了", "音量", "音楽", "反転", "", "グラフィック", "解像度", "全画面", "言語", "読み込み中...", "上書きしますか？", "新しく始める", "保存完了", "再開", "操作", "戻る", "品質", "反転", "", "ようこそ...", "スロット ", "スロット選択", "(上書き)", "(空き)", "こんにちは...", "ネズミが...", "ありがとう...", "こんにちは...", "忙しい...", "Eを押す", "次へ", "保存", "ネズミ: ", "最低", "低い", "中程度", "高い", "最高", "ウルトラ", "よろしいですか？", "はい", "いいえ" },
+        { "スタート", "続行", "設定", "クレジット", "終了", "音量", "音楽", "反転", "", "グラフィック", "解像度", "全画面", "言語", "読み込み中...", "上書きしますか？", "新しく始める", "保存完了", "再開", "操作", "戻る", "品質", "反転", "", "ようこそ...", "スロット ", "スロット選択", "(上書き)", "(空き)", "こんにちは...", "ネズミが...", "ありがとう...", "こんにちは...", "忙しい...", "Eを押す", "次へ", "保存", "ネズミ: ", "最低", "低い", "中程度", "高い", "最高", "ウルトラ", "よろしいですか？", "はい", "いいえ", "ロード" },
         // 7 - 한국어 (Korean)
-        { "시작", "계속", "옵션", "크레딧", "종료", "사운드", "음악", "반전", "", "그래픽", "해상도", "전체 화면", "언어", "로딩 중...", "덮어쓰기?", "새 게임", "저장됨", "재시작", "조작", "뒤로", "품질", "반전", "", "환영합니다...", "슬롯 ", "슬롯 선택", "(덮어쓰기)", "(비어있음)", "안녕...", "쥐가...", "고마워...", "안녕...", "바쁨...", "E 누르기", "계속", "저장", "쥐: ", "매우 낮음", "낮음", "중간", "높음", "매우 낮음", "울트라", "진짜 시작할까요?", "네", "아니요" },
+        { "시작", "계속", "옵션", "크레딧", "종료", "사운드", "음악", "반전", "", "그래픽", "해상도", "전체 화면", "언어", "로딩 중...", "덮어쓰기?", "새 게임", "저장됨", "재시작", "조작", "뒤로", "품질", "반전", "", "환영합니다...", "슬롯 ", "슬롯 선택", "(덮어쓰기)", "(비어있음)", "안녕...", "쥐가...", "고마워...", "안녕...", "바쁨...", "E 누르기", "계속", "저장", "쥐: ", "매우 낮음", "낮음", "중간", "높음", "매우 낮음", "울트라", "진짜 시작할까요?", "네", "아니요", "로드" },
         // 8 - 简体中文 (Chinese)
-        { "开始", "继续", "选项", "制作人员", "退出", "音量", "音乐", "反转", "", "画面", "分辨率", "全屏", "语言", "载入中...", "覆盖存档？", "新游戏", "已保存", "重启", "控制", "返回", "质量", "反转", "", "欢迎...", "槽位 ", "选择槽位", "(覆盖)", "(空)", "你好...", "老鼠...", "谢谢...", "你好...", "正忙...", "按E", "继续", "保存", "老鼠: ", "极低", "低", "中", "高", "超高", "极高", "你确定吗？", "是", "否" }
+        { "开始", "继续", "选项", "制作人员", "退出", "音量", "音乐", "反转", "", "画面", "分辨率", "全屏", "语言", "载入中...", "覆盖存档？", "新游戏", "已保存", "重启", "控制", "返回", "质量", "反转", "", "欢迎...", "槽位 ", "选择槽位", "(覆盖)", "(空)", "你好...", "老鼠...", "谢谢...", "你好...", "正忙...", "按E", "继续", "保存", "老鼠: ", "极低", "低", "中", "高", "超高", "极高", "你确定吗？", "是", "否", "加载" }
     };
 
     private void Awake()
