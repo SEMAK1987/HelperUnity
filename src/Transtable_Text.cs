@@ -31,7 +31,7 @@ public class Transtable_Text : MonoBehaviour
         
         if (UIText != null)
         {
-            UIText.text = Translator.GetText(TextID);
+            Translator.FormatText(this);
         }
     }
 

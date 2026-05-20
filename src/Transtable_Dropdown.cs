@@ -29,14 +29,17 @@ public class Transtable_Dropdown : MonoBehaviour
 
         int lang = Translator.LanguageID;
         TMP_FontAsset font = Translator.Instance.defaultFont;
+        float charSpacing = 0f;
+
         if (lang == 7) font = Translator.Instance.koreanFont;
         else if (lang == 8 || lang == 6) font = Translator.Instance.chineseFont;
+        else if (lang == 0) charSpacing = Translator.Instance.russianCharacterSpacing;
 
         // Reset spacing for Asian fonts and Apply Font
         if (dropdown.captionText != null)
         {
             dropdown.captionText.font = font;
-            dropdown.captionText.characterSpacing = 0;
+            dropdown.captionText.characterSpacing = charSpacing;
             dropdown.captionText.wordSpacing = 0;
             dropdown.captionText.alignment = TextAlignmentOptions.Left;
         }
@@ -44,7 +47,7 @@ public class Transtable_Dropdown : MonoBehaviour
         if (dropdown.itemText != null)
         {
             dropdown.itemText.font = font;
-            dropdown.itemText.characterSpacing = 0;
+            dropdown.itemText.characterSpacing = charSpacing;
             dropdown.itemText.wordSpacing = 0;
             dropdown.itemText.alignment = TextAlignmentOptions.Left;
         }

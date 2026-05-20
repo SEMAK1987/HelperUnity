@@ -9,13 +9,21 @@ public class Translator : MonoBehaviour
     public static Translator Instance { get; private set; } 
 
     private static int _languageID = 0; // 0 = Russian, 1 = English
-    public static int LanguageID => _languageID; 
+    public static int LanguageID 
+    { 
+        get { return _languageID; } 
+        set { _languageID = value; } 
+    }
     private static List<Transtable_Text> listId = new List<Transtable_Text>();
     private static List<Transtable_Dropdown> listDropdowns = new List<Transtable_Dropdown>();
 
     public TMP_FontAsset defaultFont; 
     public TMP_FontAsset chineseFont;   
     public TMP_FontAsset koreanFont;    
+
+    [Header("Настройки Сближения Букв")]
+    [Tooltip("Настройка сближения букв для русского языка (рекомендуется диапазон от -5 до -25, если буквы растянуты из-за CJK-fallback)")]
+    public float russianCharacterSpacing = -12f;    
 
     private static string[][] LineText = 
     {
@@ -95,36 +103,51 @@ public class Translator : MonoBehaviour
     static public void AddDropdown(Transtable_Dropdown dd) { if (!listDropdowns.Contains(dd)) listDropdowns.Add(dd); }
     static public void DeleteDropdown(Transtable_Dropdown dd) { listDropdowns.Remove(dd); }
 
+    static public void FormatText(Transtable_Text text)
+    {
+        if (text == null || text.UIText == null) return;
+        
+        text.UIText.text = GetText(text.TextID);
+        
+        // Фикс сдвига и вертикального текста
+        text.UIText.characterSpacing = 0f;
+        text.UIText.wordSpacing = 0f;
+        text.UIText.lineSpacing = 0f;
+        text.UIText.textWrappingMode = TextWrappingModes.NoWrap; 
+        text.UIText.overflowMode = TextOverflowModes.Overflow; 
+
+        if (Instance == null) return;
+
+        // Font mapping (restores original font for non-asian languages to maintain beautiful styling)
+        if (_languageID == 7) 
+        { 
+            if (Instance.koreanFont != null) text.UIText.font = Instance.koreanFont; 
+        }
+        else if (_languageID == 8 || _languageID == 6) 
+        { 
+            if (Instance.chineseFont != null) text.UIText.font = Instance.chineseFont; 
+        }
+        else 
+        { 
+            if (text.originalFont != null) text.UIText.font = text.originalFont;
+            else if (Instance.defaultFont != null) text.UIText.font = Instance.defaultFont; 
+
+            // Специфичный фикс для русского языка, если он растянут
+            if (_languageID == 0) 
+            {
+                text.UIText.characterSpacing = Instance.russianCharacterSpacing;
+            }
+        }
+    }
+
     static public void Update_texts() 
     {
         if (Instance == null) return;
         foreach (var text in listId)
         {
-            if (text != null && text.UIText != null)
+            if (text != null)
             {
-                text.UIText.text = GetText(text.TextID);
-                
-                // Фикс сдвига и вертикального текста
-                text.UIText.characterSpacing = 0;
-                text.UIText.wordSpacing = 0;
-                text.UIText.lineSpacing = 0;
-                text.UIText.textWrappingMode = TextWrappingModes.NoWrap; 
-                text.UIText.overflowMode = TextOverflowModes.Overflow; 
-
-                // Font mapping (restores original font for non-asian languages to maintain beautiful styling)
-                if (_languageID == 7) 
-                { 
-                    if (Instance.koreanFont != null) text.UIText.font = Instance.koreanFont; 
-                }
-                else if (_languageID == 8 || _languageID == 6) 
-                { 
-                    if (Instance.chineseFont != null) text.UIText.font = Instance.chineseFont; 
-                }
-                else 
-                { 
-                    if (text.originalFont != null) text.UIText.font = text.originalFont;
-                    else if (Instance.defaultFont != null) text.UIText.font = Instance.defaultFont; 
-                }
+                FormatText(text);
             }
         }
 

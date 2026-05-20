@@ -19,14 +19,24 @@ public class SettingsManager : MonoBehaviour
 
     void Start()
     {
-        // Загружаем сохраненные значения
+        // Загружаем сохраненные значения и настраиваем плавность слайдеров
         if (soundSlider != null) {
+            soundSlider.wholeNumbers = false;
+            soundSlider.minValue = 0f;
+            soundSlider.maxValue = 1f;
             soundSlider.value = PlayerPrefs.GetFloat("SoundVolume", 0.75f);
+            soundSlider.onValueChanged.RemoveAllListeners();
+            soundSlider.onValueChanged.AddListener(SetSoundVolume);
             SetSoundVolume(soundSlider.value);
         }
         
         if (musicSlider != null) {
+            musicSlider.wholeNumbers = false;
+            musicSlider.minValue = 0f;
+            musicSlider.maxValue = 1f;
             musicSlider.value = PlayerPrefs.GetFloat("MusicVolume", 0.75f);
+            musicSlider.onValueChanged.RemoveAllListeners();
+            musicSlider.onValueChanged.AddListener(SetMusicVolume);
             SetMusicVolume(musicSlider.value);
         }
 
@@ -138,19 +148,21 @@ public class SettingsManager : MonoBehaviour
         {
             int lang = PlayerPrefs.GetInt("Language", 0);
             TMP_FontAsset font = Translator.Instance != null ? Translator.Instance.defaultFont : null;
+            float charSpacing = 0f;
             if (lang == 7 && Translator.Instance != null) font = Translator.Instance.koreanFont;
             else if ((lang == 8 || lang == 6) && Translator.Instance != null) font = Translator.Instance.chineseFont;
+            else if (lang == 0 && Translator.Instance != null) charSpacing = Translator.Instance.russianCharacterSpacing;
 
             // Apply font and clear any spacing offset for the Quality dropdown
             if (qualityDropdown.captionText != null)
             {
                 if (font != null) qualityDropdown.captionText.font = font;
-                qualityDropdown.captionText.characterSpacing = 0;
+                qualityDropdown.captionText.characterSpacing = charSpacing;
             }
             if (qualityDropdown.itemText != null)
             {
                 if (font != null) qualityDropdown.itemText.font = font;
-                qualityDropdown.itemText.characterSpacing = 0;
+                qualityDropdown.itemText.characterSpacing = charSpacing;
             }
 
             // Populate localized quality names (IDs 37 to 42)
