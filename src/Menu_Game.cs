@@ -66,6 +66,9 @@ public class Menu_Game : MonoBehaviour
             }
         }
 
+        // Автоматическая первоначальная настройка слотов и кнопок возврата в панели слотов
+        UpdateSlotButtons();
+
         ShowMainMenu();
     }
 
@@ -126,7 +129,8 @@ public class Menu_Game : MonoBehaviour
 
     public void OnConfirmNewGameYes()
     {
-        Debug.Log("[FATE CORE] Новая игра ПОДТВЕРЖДЕНА. Загрузка сцены 1 (Выбор героя).");
+        Debug.Log("[FATE CORE] Новая игра ПОДТВЕРЖДЕНА. Сброс игровых данных и загрузка сцены 1 (Выбор героя).");
+        SaveGameSystem.ResetData(); // Сбрасываем старые данные перед запуском новой игры
         SceneManager.LoadScene(1);
     }
 
@@ -145,10 +149,85 @@ public class Menu_Game : MonoBehaviour
         {
             loadGameSlotsPanel.SetActive(true);
             if (startBackgroundPanel != null) startBackgroundPanel.SetActive(true);
+            UpdateSlotButtons(); // Тексты и слушатели кнопок обновляются во время перехода
         }
         else 
         {
             Debug.LogError("[FATE CORE] ОШИБКА: loadGameSlotsPanel НЕ НАЗНАЧЕН в Menu_Game!");
+        }
+    }
+
+    public void OnClickBackFromLoad()
+    {
+        Debug.Log("[FATE CORE] Назад из меню слотов. Показываем панель выбора.");
+        OnStartButtonClicked(); // Возвращает в меню выбора Новая игра / Загрузить
+    }
+
+    public void UpdateSlotButtons()
+    {
+        if (loadGameSlotsPanel == null) return;
+
+        Button[] buttons = loadGameSlotsPanel.GetComponentsInChildren<Button>(true);
+        int slotIndex = 0;
+        foreach (Button btn in buttons)
+        {
+            if (btn == null) continue;
+
+            // Находим кнопку Назад по имени или содержанию "back"
+            if (btn.name == "Btn_BackLoad" || btn.name == "Btn_BackSlots" || btn.name.ToLower().Contains("back"))
+            {
+                btn.onClick.RemoveAllListeners();
+                btn.onClick.AddListener(OnClickBackFromLoad);
+                Debug.Log("[FATE CORE] Кнопка КЛЮЧ_НАЗАД автоматически привязана: " + btn.name);
+                continue;
+            }
+
+            // Настраиваем 3 основные кнопки слотов в середине
+            if (slotIndex < 3)
+            {
+                int currentSlot = slotIndex; // Локальный индекс для безопасного замыкания лямбды
+
+                // Обновляем текст кнопки на основе текущего языка
+                TMP_Text txt = btn.GetComponentInChildren<TMP_Text>();
+                if (txt != null)
+                {
+                    bool hasSave = PlayerPrefs.HasKey("Save_Slot_" + currentSlot);
+                    if (hasSave)
+                    {
+                        string saveInfo = PlayerPrefs.GetString("Save_Slot_" + currentSlot + "_Info", "Saved Game");
+                        txt.text = Translator.GetText(24) + (currentSlot + 1) + " - " + saveInfo; // "Слот X - [Данные]"
+                    }
+                    else
+                    {
+                        txt.text = Translator.GetText(24) + (currentSlot + 1) + " " + Translator.GetText(27); // "Слот X (Пусто)"
+                    }
+                }
+
+                // Привязываем слушатель
+                btn.onClick.RemoveAllListeners();
+                btn.onClick.AddListener(() => OnSlotClicked(currentSlot));
+
+                slotIndex++;
+            }
+        }
+    }
+
+    public void OnSlotClicked(int slotIndex)
+    {
+        if (PlayerPrefs.HasKey("Save_Slot_" + slotIndex))
+        {
+            Debug.Log("[FATE CORE] Загрузка игры из сохраненного слота " + slotIndex);
+            
+            // Загружаем все параметры персонажа, квесты и загружаем сцену через SaveGameSystem
+            bool loadSuccess = SaveGameSystem.Load(slotIndex);
+            if (!loadSuccess)
+            {
+                Debug.LogError("[FATE CORE] Ошибка при чтении или десериализации файла сохранения!");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[FATE CORE] Попытка загрузки: Слот " + slotIndex + " пуст.");
         }
     }
 
