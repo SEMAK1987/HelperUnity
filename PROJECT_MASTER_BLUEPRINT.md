@@ -1,17 +1,17 @@
 # PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Total Knowledge Archive Edition)
 
-> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.6.7.
+> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.6.8.
 
 ## 1. Общая информация
-- **Версия Помощника:** 18.6.7
-- **Описание:** Гибридный ИИ-помощник нового поколения (v18.6.7 Stable UI Harmony) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых изысканий, обход региональных блокировок, мастерство Zenit Glassмorphism UI и 25,000+ видео уроков.
+- **Версия Помощника:** 18.4.9
+- **Описание:** Гибридный ИИ-помощник нового поколения (v18.6.8 Ultimate Stable) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых изысканий, синхронизация UI и языковых ассетов (SDF), исправление дубликатов разрешений.
 - **Путь проекта:** undefined
 - **Локальное хранилище:** Не задано
 - **Версия Unity:** unknown
 - **Версия Blender:** unknown
 - **Версия GIMP:** unknown
 - **Версия Redot:** unknown
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_5_8_FATE_MASTER]
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_6_8_FATE_MASTER]
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -46,13 +46,13 @@ undefined
 ```
 
 
-## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.5.8 - Quantum Integration Release)
+## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.6.8 - Zenith Sync Release)
 ### Режимы работы и Архитектурные уровни
 - **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.
 - **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.
 - **No-Internet Mode (Quantum Archive):** 10,000+ видео-уроков. Мгновенный доступ при любых внешних условиях.
 
-### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.5.8 Sync)
+### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.6.8 Sync)
 - **Unity 6 Physics & Optimization:** [Video #2](https://www.youtube.com/watch?v=9vuyis_Y-LY)
 - **Blender Advanced Rigging:** [Video #3](https://www.youtube.com/watch?v=UKZp67dY1_w)
 - **Shader Graph Mastery:** [Video #4](https://www.youtube.com/watch?v=-hvxjyzcSkI)
@@ -135,12 +135,13 @@ exit
 - **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.
 - **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.
 
-## 11. История изменений (v18.6.7)
-- **v18.6.7:** UI Harmony & Language synchronization. Исправлена смена языков (English/Русский) и невидимые иероглифы. Починен список разрешений экрана.
-- **v18.6.6:** UI Component Stability. Исправлены ошибки Missing Required Components для Transtable_Text на объектах Btn_LoadGameChoice и Choice_Menu.
-- **v18.6.5:** Stable Character Sync Release. Решена проблема скачивания 3D (GLB/XDM). Глобальная синхронизация версий.
-- **v18.6.4:** Централизация AudioMixer в SettingsManager. Исправление ошибок Missing Components и MonoBehaviour. Добавлены RPG промты для персонажей (T-pose) и оружия отдельно.
+## 11. История изменений (v18.6.8)
+- **v18.6.8:** Zenith Multi-Tool Synergy - Robust Font sync, Cyrillic / CJK Original Font styling restore & direct Quality localization link bindings.
+- **v18.6.7:** Zenith Multi-Tool Synergy - UI & Language Synchronization. Resolution filtering and CS1061 Hotfix.
 - **v18.5.8:** Zenith Multi-Tool Synergy & Settings Fix.
+- **v18.5.6:** Triple Font Bridge. Fixed Dropdown Options. Duplicate Cleanup.
+- **v18.4.9:** Ultimate Stability Sync. CJK & Typography fixes.
+- **v18.4.1:** Initial release.
 
 ## 12. Аварийные процедуры (Emergency)
 

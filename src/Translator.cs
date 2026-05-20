@@ -75,12 +75,18 @@ public class Translator : MonoBehaviour
 
     static public string GetText(int textKey) 
     {
-        if (_languageID >= 0 && _languageID < LineText.GetLength(0))
+        int lang = _languageID;
+        int maxLang = LineText.GetLength(0);
+        int maxKeys = LineText.GetLength(1);
+
+        if (lang < 0 || lang >= maxLang)
         {
-            if (textKey >= 0 && textKey < LineText.GetLength(1))
-            {
-                return LineText[_languageID, textKey];
-            }
+            lang = 1; // Fallback to English to prevent ID:X from ever showing
+        }
+
+        if (textKey >= 0 && textKey < maxKeys)
+        {
+            return LineText[lang, textKey];
         }
         return "ID:" + textKey; 
     }
@@ -106,10 +112,20 @@ public class Translator : MonoBehaviour
                 text.UIText.textWrappingMode = TextWrappingModes.NoWrap; 
                 text.UIText.overflowMode = TextOverflowModes.Overflow; 
 
-                // Font mapping
-                if (_languageID == 7) { if (Instance.koreanFont != null) text.UIText.font = Instance.koreanFont; }
-                else if (_languageID == 8 || _languageID == 6) { if (Instance.chineseFont != null) text.UIText.font = Instance.chineseFont; }
-                else { if (Instance.defaultFont != null) text.UIText.font = Instance.defaultFont; }
+                // Font mapping (restores original font for non-asian languages to maintain beautiful styling)
+                if (_languageID == 7) 
+                { 
+                    if (Instance.koreanFont != null) text.UIText.font = Instance.koreanFont; 
+                }
+                else if (_languageID == 8 || _languageID == 6) 
+                { 
+                    if (Instance.chineseFont != null) text.UIText.font = Instance.chineseFont; 
+                }
+                else 
+                { 
+                    if (text.originalFont != null) text.UIText.font = text.originalFont;
+                    else if (Instance.defaultFont != null) text.UIText.font = Instance.defaultFont; 
+                }
             }
         }
 

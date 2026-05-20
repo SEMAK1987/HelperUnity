@@ -50,6 +50,22 @@ public class Menu_Game : MonoBehaviour
         if (confirmYesButton != null) confirmYesButton.onClick.AddListener(OnConfirmNewGameYes);
         if (confirmNoButton != null) confirmNoButton.onClick.AddListener(OnConfirmNewGameNo);
 
+        // Автоматическая настройка кнопки "Btn_BackSettings" в панели опций
+        if (settingsPanel != null)
+        {
+            Button[] buttons = settingsPanel.GetComponentsInChildren<Button>(true);
+            foreach (Button btn in buttons)
+            {
+                if (btn != null && btn.name == "Btn_BackSettings")
+                {
+                    btn.onClick.RemoveAllListeners();
+                    btn.onClick.AddListener(ShowMainMenu);
+                    Debug.Log("[FATE CORE] Автоматически настроена кнопка Btn_BackSettings!");
+                    break;
+                }
+            }
+        }
+
         ShowMainMenu();
     }
 

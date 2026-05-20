@@ -6,10 +6,12 @@ public class Transtable_Text : MonoBehaviour
 {
     public int TextID;
     [HideInInspector] public TextMeshProUGUI UIText;
+    [System.NonSerialized] public TMP_FontAsset originalFont;
 
     void Awake()
     {
         UIText = GetComponent<TextMeshProUGUI>();
+        if (UIText != null) originalFont = UIText.font;
     }
 
     void OnEnable()

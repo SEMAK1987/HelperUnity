@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Audio;
 using TMPro;
+using System.Collections.Generic;
 
 public class SettingsManager : MonoBehaviour
 {
@@ -36,8 +37,11 @@ public class SettingsManager : MonoBehaviour
 
         if (languageDropdown != null) {
             languageDropdown.value = PlayerPrefs.GetInt("Language", 0);
-            // LanguageSelector.cs handles the logic, but we sync the value here
+            languageDropdown.onValueChanged.RemoveAllListeners();
+            languageDropdown.onValueChanged.AddListener(OnLanguageChanged);
         }
+
+        UpdateDropdownTranslations();
 
         if (resolutionDropdown != null) {
             resolutionDropdown.ClearOptions();
@@ -120,5 +124,44 @@ public class SettingsManager : MonoBehaviour
     public void OnBackToMenu()
     {
         gameObject.SetActive(false);
+    }
+
+    public void OnLanguageChanged(int index)
+    {
+        Translator.SelectLanguage(index);
+        UpdateDropdownTranslations();
+    }
+
+    public void UpdateDropdownTranslations()
+    {
+        if (qualityDropdown != null)
+        {
+            int lang = PlayerPrefs.GetInt("Language", 0);
+            TMP_FontAsset font = Translator.Instance != null ? Translator.Instance.defaultFont : null;
+            if (lang == 7 && Translator.Instance != null) font = Translator.Instance.koreanFont;
+            else if ((lang == 8 || lang == 6) && Translator.Instance != null) font = Translator.Instance.chineseFont;
+
+            // Apply font and clear any spacing offset for the Quality dropdown
+            if (qualityDropdown.captionText != null)
+            {
+                if (font != null) qualityDropdown.captionText.font = font;
+                qualityDropdown.captionText.characterSpacing = 0;
+            }
+            if (qualityDropdown.itemText != null)
+            {
+                if (font != null) qualityDropdown.itemText.font = font;
+                qualityDropdown.itemText.characterSpacing = 0;
+            }
+
+            // Populate localized quality names (IDs 37 to 42)
+            if (qualityDropdown.options.Count == 6)
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    qualityDropdown.options[i].text = Translator.GetText(37 + i);
+                }
+            }
+            qualityDropdown.RefreshShownValue();
+        }
     }
 }
