@@ -154,7 +154,17 @@ public class SettingsManager : MonoBehaviour
             }
 
             // Populate localized quality names (IDs 37 to 42)
-            if (qualityDropdown.options.Count == 6)
+            if (qualityDropdown.options.Count != 6)
+            {
+                qualityDropdown.ClearOptions();
+                List<string> qOptions = new List<string>();
+                for (int i = 0; i < 6; i++)
+                {
+                    qOptions.Add(Translator.GetText(37 + i));
+                }
+                qualityDropdown.AddOptions(qOptions);
+            }
+            else
             {
                 for (int i = 0; i < 6; i++)
                 {

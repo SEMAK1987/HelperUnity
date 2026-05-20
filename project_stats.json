@@ -1,5 +1,21 @@
 {
-  "scripts": [],
+  "scripts": [
+    "MenuBackgroundCamera_Fate.cs",
+    "UnityConnector.cs",
+    "UnityRaceData.cs",
+    "UnitySystems.cs",
+    "UnityWorldSync.cs",
+    "src/LanguageSelector.cs",
+    "src/LoadingScreenManager.cs",
+    "src/MainMenuController.cs",
+    "src/Menu_Game.cs",
+    "src/SettingsManager.cs",
+    "src/SimpleFloatAnimation.cs",
+    "src/Translator.cs",
+    "src/Transtable_Dropdown.cs",
+    "src/Transtable_Text.cs",
+    "src/UIButtonHoverEffect.cs"
+  ],
   "prefabs": [],
   "scenes": [],
   "animations": [],
@@ -7,15 +23,90 @@
   "pdfs": [],
   "videos": [],
   "others": [],
-  "total_files": 24,
+  "total_files": 42,
   "analysis": {
     "audit_issues": [],
     "todos": [],
     "asset_stats": {
-      "total_size": 316231,
+      "total_size": 660238,
       "large_files": []
     },
-    "dependencies": {}
+    "dependencies": {
+      "MenuBackgroundCamera_Fate": [
+        "UnityEngine"
+      ],
+      "UnityConnector": [
+        "UnityEngine",
+        "UnityEditor",
+        "UnityEngine.Networking",
+        "System.Collections",
+        "System.Collections.Generic"
+      ],
+      "RaceData": [
+        "UnityEngine",
+        "System.Collections.Generic"
+      ],
+      "SmartCameraController": [
+        "UnityEngine"
+      ],
+      "WorldObjectData": [
+        "UnityEngine",
+        "System.IO"
+      ],
+      "LanguageSelector": [
+        "UnityEngine",
+        "TMPro",
+        "System.Collections.Generic"
+      ],
+      "LoadingScreenManager": [
+        "UnityEngine",
+        "UnityEngine.UI",
+        "UnityEngine.SceneManagement",
+        "System.Collections",
+        "TMPro"
+      ],
+      "MainMenuController": [
+        "UnityEngine",
+        "UnityEngine.SceneManagement"
+      ],
+      "Menu_Game": [
+        "UnityEngine",
+        "UnityEngine.SceneManagement",
+        "UnityEngine.UI",
+        "TMPro"
+      ],
+      "SettingsManager": [
+        "UnityEngine",
+        "UnityEngine.UI",
+        "UnityEngine.Audio",
+        "TMPro",
+        "System.Collections.Generic"
+      ],
+      "SimpleFloatAnimation": [
+        "UnityEngine"
+      ],
+      "Translator": [
+        "System.Collections",
+        "System.Collections.Generic",
+        "UnityEngine",
+        "UnityEngine.UI",
+        "TMPro"
+      ],
+      "Transtable_Dropdown": [
+        "System.Collections.Generic",
+        "UnityEngine",
+        "TMPro"
+      ],
+      "Transtable_Text": [
+        "UnityEngine",
+        "TMPro"
+      ],
+      "UIButtonHoverEffect": [
+        "UnityEngine",
+        "UnityEngine.EventSystems",
+        "UnityEngine.UI"
+      ]
+    }
   },
-  "last_updated": "2026-04-18T15:39:59.133Z"
+  "last_updated": "2026-05-20T06:09:47.358Z"
 }
