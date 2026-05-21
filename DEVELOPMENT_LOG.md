@@ -1,11 +1,19 @@
 # DEVELOPMENT LOG
 
+## [2026-05-20]
+### Версия 18.7.1 - Suno & Udio Track Extensions & Seamless Looping Sync
+- **Аудио-генераторы:** Добавлены пошаговые гайдлайны продления песен (Extend) в Suno и Udio в базу знаний проекта.
+- **Бесшовные петли:** Описан правильный метод сведения инструментов концовки трека к начальным для цикличной работы `musicSource.loop = true`.
+- **Очистка провайдеров:** Отключен и выведен из обращения ElevenLabs (блокировки и нестабильность SFX), убраны любые упоминания.
+- **Версионный синхронизатор:** Проведена полная переиндексация файлов (version.json, knowledge_base.json, server.ts, App.tsx, UnityConnector.cs, blender_connector.py, AGENTS.md, metadata.json, package.json) на версию 18.7.1.
+
 ## [2026-05-19]
-- **Версия 18.6.7**: Zenith Multi-Tool Synergy - UI & Language Synchronization.
-- **Фикс CS1061**: Добавлен Alias `ChangeLanguage` в `Translator.cs` для совместимости с `LanguageSelector.cs`.
-- **Фикс Resolution Dropdown**: Оптимизирована логика в `SettingsManager.cs`, удалена дупликация разрешений, добавлена поддержка `languageDropdown`.
-- **Локализация**: Добавлен текст "Загрузить" (ID 46) для всех языков в `Translator.cs`.
-- **Шрифты**: Обновлены инструкции по использованию SDF-ассетов для корректного отображения иероглифов в выпадающих списках.
+### Версия 18.7.0 - Zenith Audio & RPG Saves Synergy
+- **Сохранения:** Полная интеграция `SaveGameSystem.cs` с 3 PlayerPrefs-слотами и автоматической генерацией описаний.
+- **Аудио-промпты:** Добавлены 40+ эпических промптов для игровых треков под Suno, Udio и Stable Audio.
+- **Интеграция настроек:** Централизация управления звуком исключительно через `SettingsManager.cs`, удаление дублей.
 
 ## [2026-05-14]
-- Версия 18.5.8: Zenith Multi-Tool Synergy & Settings Fix.
+### Версия 18.5.8 - Zenith Multi-Tool Synergy & Settings Fix
+- **Шрифты (CJK):** Внедрение тройного моста (Triple Font Bridge) для корейских и китайских SDF шрифтов.
+- **Разрешения:** Исправление ошибок фильтрации разрешений экрана и CS1061.

@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.6.8. Stable NPC Pipeline, UI Language & Resolution Fixes, and Centralized Settings.",
+  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.7.1. Suno and Udio Track Extension & Seamless Looping, Core RPG Saves, and Language Synchronization.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

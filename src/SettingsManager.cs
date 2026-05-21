@@ -77,6 +77,21 @@ public class SettingsManager : MonoBehaviour
 
         if (fullscreenToggle != null) {
             fullscreenToggle.isOn = Screen.fullScreen;
+            fullscreenToggle.onValueChanged.RemoveAllListeners();
+            fullscreenToggle.onValueChanged.AddListener(SetFullscreen);
+
+            // Форсируем ID текста 11 ("Весь экран" / "Full Screen"), чтобы убрать дефолтный "Старт" (ID 0)
+            Transtable_Text tt = fullscreenToggle.GetComponentInChildren<Transtable_Text>(true);
+            if (tt != null)
+            {
+                tt.TextID = 11;
+                tt.UpdateText();
+            }
+            else
+            {
+                TMP_Text txt = fullscreenToggle.GetComponentInChildren<TMP_Text>(true);
+                if (txt != null) txt.text = Translator.GetText(11);
+            }
         }
     }
 
@@ -184,6 +199,36 @@ public class SettingsManager : MonoBehaviour
                 }
             }
             qualityDropdown.RefreshShownValue();
+        }
+
+        // Автоматически переводим текст тогла полноэкранного режима при смене языка
+        if (fullscreenToggle != null)
+        {
+            Transtable_Text tt = fullscreenToggle.GetComponentInChildren<Transtable_Text>(true);
+            if (tt != null)
+            {
+                tt.TextID = 11;
+                tt.UpdateText();
+            }
+            else
+            {
+                TMP_Text txt = fullscreenToggle.GetComponentInChildren<TMP_Text>(true);
+                if (txt != null)
+                {
+                    txt.text = Translator.GetText(11);
+                    
+                    // Применяем настройки шрифтов CJK к тогле
+                    int lang = PlayerPrefs.GetInt("Language", 0);
+                    TMP_FontAsset font = Translator.Instance != null ? Translator.Instance.defaultFont : null;
+                    float charSpacing = 0f;
+                    if (lang == 7 && Translator.Instance != null) font = Translator.Instance.koreanFont;
+                    else if ((lang == 8 || lang == 6) && Translator.Instance != null) font = Translator.Instance.chineseFont;
+                    else if (lang == 0 && Translator.Instance != null) charSpacing = Translator.Instance.russianCharacterSpacing;
+
+                    if (font != null) txt.font = font;
+                    txt.characterSpacing = charSpacing;
+                }
+            }
         }
     }
 }

@@ -130,6 +130,8 @@ public class Translator : MonoBehaviour
     // Alias for compatibility
     static public void ChangeLanguage(int id) => SelectLanguage(id);
 
+    public void SetLanguage(int id) => SelectLanguage(id);
+
     static public string GetText(int textKey) 
     {
         int lang = _languageID;

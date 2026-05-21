@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Разработчик: Fate Continent (Континент Судьбы)
-/// Zenith Multi-Tool Synergy (v18.6.8)
+/// Zenith Multi-Tool Synergy (v18.7.0)
 /// Скрипт глобальной системы сохранения и загрузки прогресса.
 /// Интегрируется со слотами сохранения панели SaveSlots_Panel в меню.
 /// </summary>

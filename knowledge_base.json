@@ -1,6 +1,6 @@
 {
   "project": "Fate Continent",
-  "version": "18.6.8",
+  "version": "18.7.1",
   "modules": [
     {
       "name": "Localization & Fonts",
@@ -10,7 +10,7 @@
     {
       "name": "Audio & Settings Integration",
       "scripts": ["SettingsManager.cs"],
-      "features": ["Centralized Audio Control", "MasterMixer Logarithmic Scaling", "Resolution Duplicate Cleanup (v18.6.7)", "Language Dropdown Direct Quality Link (v18.6.8)"]
+      "features": ["Centralized Audio Control", "MasterMixer Logarithmic Scaling", "Resolution Duplicate Cleanup (v18.6.7)", "Language Dropdown Direct Quality Link (v18.6.8)", "UI Hover Sound clips & Loop playlists system", "40+ specialized Audio Prompts for AI generators (Suno, Udio, Stable Audio)", "Suno/Udio Song Extension & Seamless Loop Guidelines (v18.7.1)"]
     },
     {
       "name": "Character & Weapon Fabrication",
@@ -49,8 +49,8 @@
     },
     {
       "name": "Game Menu System",
-      "scripts": ["Menu_Game.cs", "Translator.cs"],
-      "features": ["New Game Confirmation Panel", "Language-aware fonts"]
+      "scripts": ["Menu_Game.cs", "Translator.cs", "SaveGameSystem.cs"],
+      "features": ["New Game Confirmation Panel", "Language-aware fonts", "3 PlayerPrefs-backed Core Save slots (SaveGameSystem)", "Language-adaptive save metadata level prefixes (Ур/Lvl/레벨/等级)"]
     }
   ]
 }
