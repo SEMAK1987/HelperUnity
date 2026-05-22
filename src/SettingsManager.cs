@@ -6,6 +6,8 @@ using System.Collections.Generic;
 
 public class SettingsManager : MonoBehaviour
 {
+    public static SettingsManager Instance { get; private set; }
+
     [Header("UI Элементы")]
     public Slider soundSlider;
     public Slider musicSlider;
@@ -14,8 +16,35 @@ public class SettingsManager : MonoBehaviour
     public TMP_Dropdown languageDropdown;
     public Toggle fullscreenToggle;
 
-    [Header("Аудио")]
+    [Header("Смеситель Аудио")]
     public AudioMixer masterMixer; 
+
+    [Header("Источники Звука")]
+    [SerializeField] private AudioSource sfxSource;   // Источник для коротких эффектов (Hover/Click)
+    [SerializeField] private AudioSource musicSource; // Источник для фоновой музыки (Looped)
+
+    [Header("Каталог Hover Эффектов")]
+    [Tooltip("Массив из 10 эффектов наведения на кнопки интерфейса")]
+    [SerializeField] private AudioClip[] hoverSounds = new AudioClip[10];
+
+    [Header("Каталог Плейлистов (В каждом по 5-10 треков)")]
+    [SerializeField] private AudioClip[] mainMenuPlaylist;
+    [SerializeField] private AudioClip[] charSelectionPlaylist;
+    [SerializeField] private AudioClip[] worldExplorationPlaylist;
+    [SerializeField] private AudioClip[] battlePlaylist;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject); // Переживает смену сцен в Unity
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     void Start()
     {
@@ -95,12 +124,60 @@ public class SettingsManager : MonoBehaviour
         }
     }
 
+    // Воспроизведение звука наведения по индексу (0-9)
+    public void PlayHoverSound(int index)
+    {
+        if (sfxSource == null) return;
+        if (index >= 0 && index < hoverSounds.Length && hoverSounds[index] != null)
+        {
+            sfxSource.PlayOneShot(hoverSounds[index]);
+        }
+    }
+
+    // Воспроизведение произвольного звукового эффекта (например, из UIButtonSfxBinder)
+    public void PlaySoundEffect(AudioClip clip)
+    {
+        if (sfxSource == null || clip == null) return;
+        sfxSource.PlayOneShot(clip);
+    }
+
+    // Переключение Музыки в зависимости от состояния игры.
+    // playlistIndex: 0 = Меню, 1 = Выбор Персонажей, 2 = Карта/Ходьба, 3 = Бой
+    // trackIndex: номер трека в конкретном плейлисте (0-9)
+    public void PlayMusicTrack(int playlistIndex, int trackIndex)
+    {
+        if (musicSource == null) return;
+
+        AudioClip[] targetPlaylist = null;
+        switch (playlistIndex)
+        {
+            case 0: targetPlaylist = mainMenuPlaylist; break;
+            case 1: targetPlaylist = charSelectionPlaylist; break;
+            case 2: targetPlaylist = worldExplorationPlaylist; break;
+            case 3: targetPlaylist = battlePlaylist; break;
+        }
+
+        if (targetPlaylist != null && trackIndex >= 0 && trackIndex < targetPlaylist.Length)
+        {
+            AudioClip clip = targetPlaylist[trackIndex];
+            if (clip != null && musicSource.clip != clip)
+            {
+                musicSource.Stop();
+                musicSource.clip = clip;
+                musicSource.loop = true; // Зацикливание всегда активно для фоновой музыки
+                musicSource.Play();
+            }
+        }
+    }
+
+    // Сохранение и логарифмическая настройка громкости
     public void SetSoundVolume(float value)
     {
         PlayerPrefs.SetFloat("SoundVolume", value);
         if (masterMixer != null) {
             float vol = value > 0 ? Mathf.Log10(value) * 20 : -80;
-            masterMixer.SetFloat("SoundVol", vol);
+            // В вашем микшере экспортирован ровно один параметр для звуков: SoundVol
+            TrySetMixerFloat("SoundVol", vol);
         }
     }
 
@@ -109,7 +186,17 @@ public class SettingsManager : MonoBehaviour
         PlayerPrefs.SetFloat("MusicVolume", value);
         if (masterMixer != null) {
             float vol = value > 0 ? Mathf.Log10(value) * 20 : -80;
-            masterMixer.SetFloat("MusicVol", vol);
+            // В вашем микшере экспортирован ровно один параметр для музыки: MusicVol
+            TrySetMixerFloat("MusicVol", vol);
+        }
+    }
+
+    // Вспомогательный метод: безопасно задает значение в AudioMixer
+    private void TrySetMixerFloat(string parameterName, float volValue)
+    {
+        if (masterMixer != null)
+        {
+            masterMixer.SetFloat(parameterName, volValue);
         }
     }
 

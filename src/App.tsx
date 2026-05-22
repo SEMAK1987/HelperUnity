@@ -744,7 +744,7 @@ export default function App() {
 
   const [kb, setKb] = useState<KBData | null>(null);
   const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info' | 'migration' | 'game_design' | 'game_help'>('chat');
-  const [appVersion, setAppVersion] = useState('18.7.1');
+  const [appVersion, setAppVersion] = useState('18.7.4');
 
   useEffect(() => {
     // Автоматическая синхронизация версии с сервером

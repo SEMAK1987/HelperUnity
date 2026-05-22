@@ -1,6 +1,6 @@
 {
   "project": "Fate Continent",
-  "version": "18.7.1",
+  "version": "18.7.4",
   "modules": [
     {
       "name": "Localization & Fonts",
@@ -10,7 +10,19 @@
     {
       "name": "Audio & Settings Integration",
       "scripts": ["SettingsManager.cs"],
-      "features": ["Centralized Audio Control", "MasterMixer Logarithmic Scaling", "Resolution Duplicate Cleanup (v18.6.7)", "Language Dropdown Direct Quality Link (v18.6.8)", "UI Hover Sound clips & Loop playlists system", "40+ specialized Audio Prompts for AI generators (Suno, Udio, Stable Audio)", "Suno/Udio Song Extension & Seamless Loop Guidelines (v18.7.1)"]
+      "features": [
+        "Centralized Audio Control",
+        "MasterMixer Logarithmic Scaling",
+        "Resolution Duplicate Cleanup (v18.6.7)",
+        "Language Dropdown Direct Quality Link (v18.6.8)",
+        "UI Hover Sound clips & Loop playlists system",
+        "40+ specialized Audio Prompts for AI generators (Suno, Udio, Stable Audio)",
+        "Suno/Udio Song Extension & Seamless Loop Guidelines (v18.7.1)",
+        "Pixabay CC0 Search Guidelines & Dedicated UI/Game Event Prompts (v18.7.2)",
+        "Unity AudioMixer Button Connection with Mixer Group Routing (v18.7.2)",
+        "Zenith Audio Synergy v18.7.3: Deep Pixabay sound navigation guides, expansive custom prompt dictionaries (clinging clicks, inventories, gear, monsters, map selections, combat starts), and robust UIButtonSfxBinder / SettingsManager scripting.",
+        "Zenith Audio Calibration v18.7.4: Eliminated AudioMixer parameter existence warnings by using silent direct SetFloat writes, customized UIButtonSfxBinder to trigger only on full button Clicks, and added explicit back/escape button name checking (back/exit/close/return/cancel/назад/arrow) to play a custom backClickSound clip."
+      ]
     },
     {
       "name": "Character & Weapon Fabrication",
@@ -51,6 +63,15 @@
       "name": "Game Menu System",
       "scripts": ["Menu_Game.cs", "Translator.cs", "SaveGameSystem.cs"],
       "features": ["New Game Confirmation Panel", "Language-aware fonts", "3 PlayerPrefs-backed Core Save slots (SaveGameSystem)", "Language-adaptive save metadata level prefixes (Ур/Lvl/레벨/等级)"]
+    },
+    {
+      "name": "Pixabay Sound & AudioMixer Integration Help DB",
+      "features": [
+        "Step-by-step guideline on downloading audios from Pixabay.com",
+        "List of English search prompts for game sounds (UI, Inventory, Battle, Movement, Map, Interface, Monster noises)",
+        "Unity Button event binding methods to trigger SettingsManager sound clips connected to the corresponding AudioMixer group",
+        "Comparison breakdown of music/SFX AI engines (Suno, Udio, Stable Audio, ElevenLabs)"
+      ]
     }
   ]
 }

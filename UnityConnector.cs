@@ -1,6 +1,6 @@
-// [ZENITH MULTI-TOOL SYNERGY v18.7.1 - Stable UI Sync]
+// [ZENITH MULTI-TOOL SYNERGY v18.7.4 - Stable UI Sync]
 // Unity Connector for Quantum AI Assistant
-// Updated: 2026-05-20 (Synced with Stable v18.7.1)
+// Updated: 2026-05-21 (Synced with Stable v18.7.4)
 
 using UnityEngine;
 using UnityEditor;
@@ -15,7 +15,7 @@ namespace AI_Assistant_Quantum
         private string prompt = "";
         private string serverUrl = "http://localhost:3000";
         private Mode mode = Mode.Online;
-        private string status = "Ready for Quantum Manifestation v18.7.1";
+        private string status = "Ready for Quantum Manifestation v18.7.4";
         private bool isProcessing = false;
 
         public enum Mode { Online, Offline, NoInternet }
@@ -28,7 +28,7 @@ namespace AI_Assistant_Quantum
 
         private void OnGUI()
         {
-            GUILayout.Label("v18.7.1 - Zenith Multi-Tool Synergy (Neural Link Active)", EditorStyles.boldLabel);
+            GUILayout.Label("v18.7.4 - Zenith Multi-Tool Synergy (Neural Link Active)", EditorStyles.boldLabel);
             
             serverUrl = EditorGUILayout.TextField("Server URL", serverUrl);
             mode = (Mode)EditorGUILayout.EnumPopup("Mode", mode);

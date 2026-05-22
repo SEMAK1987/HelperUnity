@@ -456,7 +456,7 @@ function generateId() {
 
 async function checkProjectIntegrity() {
   const kb = await fs.readJson(kbPath).catch(() => ({}));
-  const currentVersion = kb.version || "18.7.1";
+  const currentVersion = kb.version || "18.7.4";
   
   const files = [
     { name: "knowledge_base.json", default: { project_name: "Unity Assistant", version: currentVersion, project_path: process.cwd(), system_instruction: "You are a helpful assistant." } },
@@ -506,17 +506,17 @@ async function generateMasterBlueprint() {
     const blueprint = await fs.readJson(blueprintJsonPath);
     
     let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"} (Total Knowledge Archive Edition)\n\n`;
-    md += `> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.7.1.\n\n`;
+    md += `> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.7.4.\n\n`;
     md += `## 1. Общая информация\n`;
-    md += `- **Версия Помощника:** ${blueprint.version || "18.7.1"}\n`;
-    md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (v18.7.1 Live Audio & RPG Solution) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых изысканий, синхронизации UI, глобального менеджера сохранений SaveGameSystem.cs и языковых ассетов (SDF), а также передовых гайдлайнов Suno и Udio."}\n`;
+    md += `- **Версия Помощника:** ${blueprint.version || "18.7.4"}\n`;
+    md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (v18.7.4 Live Audio & RPG Solution) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых изысканий, синхронизации UI, глобального менеджера сохранений SaveGameSystem.cs и языковых ассетов (SDF), а также передовых гайдлайнов Suno, Udio и Pixabay Sound Effects с AudioMixer. Полная справочная база по озвучке элементов UI, сумок, навыков, монстров, а также по маршрутизации AudioMixer в Unity."}\n`;
     md += `- **Путь проекта:** ${kb.project_path || "Не задан"}\n`;
     md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
     md += `- **Версия Unity:** ${currentUnityStatus.version}\n`;
     md += `- **Версия Blender:** ${currentBlenderStatus.version}\n`;
     md += `- **Версия GIMP:** ${currentGimpStatus.version}\n`;
     md += `- **Версия Redot:** ${currentRedotStatus.version}\n`;
-    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_7_1_FATE_MASTER]\n\n`;
+    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_7_4_FATE_MASTER]\n\n`;
     
     md += `## 2. Структура интерфейса\n`;
     md += `### Вкладки\n`;
@@ -559,13 +559,13 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.7.1 - Zenith Sync Release)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.7.4 - Zenith Audio Calibration)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
     md += `- **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.\n`;
     md += `- **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.\n`;
     md += `- **No-Internet Mode (Quantum Archive):** 10,000+ видео-уроков. Мгновенный доступ при любых внешних условиях.\n\n`;
 
-    md += `### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.7.1 Sync)\n`;
+    md += `### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.7.4 Sync)\n`;
     md += `- **Unity 6 Physics & Optimization:** [Video #2](https://www.youtube.com/watch?v=9vuyis_Y-LY)\n`;
     md += `- **Blender Advanced Rigging:** [Video #3](https://www.youtube.com/watch?v=UKZp67dY1_w)\n`;
     md += `- **Shader Graph Mastery:** [Video #4](https://www.youtube.com/watch?v=-hvxjyzcSkI)\n`;
@@ -655,6 +655,90 @@ async function generateMasterBlueprint() {
     md += `- **loop = true:** В коде нашего SettingsManager.cs при вызове PlayMusicTrack уже автоматически прописано свойство \`musicSource.loop = true\`. Музыка в вашей игре будет крутиться циклично и атмосферно без использования ElevenLabs!\n\n`;
 
     md += `## 11. База бесплатных ресурсов и локального звукового ИИ (Freesound, Pixabay, Local Generator & RTX 4060)\n\n`;
+    md += `### 🎙️ Промпты для поиска звуков нашей игры на Freesound и Pixabay\n`;
+    md += `*(Используйте именно английские слова в поиске для наилучшего качества!)*\n\n`;
+    md += `| Действие / Область игры | Английский промпт (копируйте в поиск) | Описание характера звука |\n`;
+    md += `| :--- | :--- | :--- |\n`;
+    md += `| **Клик по обычной кнопке** | \`ui click modern\`, \`interface button click\`, \`menu select\` | Короткий, чистый, приятный щелчок |\n`;
+    md += `| **Наведение на кнопку (Hover)**| \`ui hover quiet\`, \`menu focus soft\`, \`button roll over\` | Легкий шелест, тихий затухающий звук |\n`;
+    md += `| **Клик по рюкзаку / мешку** | \`leather pouch rustle\`, \`open inventory bag\`, \`leather bag open\` | Характерный кожаный шорох или скрип |\n`;
+    md += `| **Клик по персонажу (выбор)** | \`character selection hum\`, \`hero select warp\`, \`voice select chime\` | Приятный свист, подтверждающий звон или вздох |\n`;
+    md += `| **Клик по мобам / выбор врага** | \`target lock click\`, \`monster select growl\`, \`beast threat roar\` | Мрачный короткий рык или кошачье фырканье |\n`;
+    md += `| **Движение в инвентаре/вещах** | \`item pickup drop\`, \`coins clashing\`, \`inventory items shuffling\` | Металлический звон, пересыпание монет, шуршание |\n`;
+    md += `| **Зелья (выпить / нажать)** | \`drinking potion gulp\`, \`liquid swallow potion\`, \`glass bottle clink\` | Бульканье жидкости с явным глотком в конце |\n`;
+    md += `| **Клики по снаряжению (лат)** | \`equip metal armor click\`, \`leather strap pull\`, \`metal equipment wear\` | Скрежет латных пластин, натяжение кожаных ремней |\n`;
+    md += `| **Клики по оружию (мечу)** | \`sword equip unsheathe\`, \`blade metal slice\`, \`sword clash draw\` | Металлический звон извлекаемого из ножен клинка |\n`;
+    md += `| **Клик по мобам / монстрам** | \`monster selecting click\`, \`beast target select\`, \`growl click\` | Короткий рык, выделение цели |\n`;
+    md += `| **Клик по инвентарю / вещам** | \`loot sound\`, \`item pickup drop\`, \`inventory items shuffling\` | Звон монет, шуршание |\n`;
+    md += `| **Зелья (выпить / клик)** | \`drinking potion gulp\`, \`liquid swallow potion\`, \`glass bottle clink\` | Бульканье и глоток |\n`;
+    md += `| **Снаряжение / броня / мечи**| \`equip metal armor click\`, \`leather strap gear adjustment\`, \`sword equip\`| Звон лат или вытягивание клинка |\n`;
+    md += `| **Навыки / Скиллы (клик)** | \`magic charge up generator\`, \`spell power build up\`, \`skill unlock chime\`| Нарастающий гул магического заряда |\n`;
+    md += `| **Навыки (применение магии)** | \`magic spell cast swoop\`, \`wizard burst wand blow\`, \`divine heal aura\`| Свист пролетающей волшебной стрелы |\n`;
+    md += `| **Кнопка закрытия (Close)**| \`ui close back button\`, \`window close exit click\`, \`panel dismiss slate\`| Деревянный хлоп или глухой щелчок назад |\n`;
+    md += `| **Начало нападения (Combat)**| \`combat fight alert horn\`, \`battle start drum build up\`, \`clash start alert\`| Горн или тяжелая барабанная дробь |\n`;
+    md += `| **Физическая атака (удар)**| \`blunt impact hit\`, \`melee punch strike\`, \`fist weapon smash\` | Реалистичный сокрушительный удар |\n`;
+    md += `| **Звуки монстров (рык / хит)**| \`monster roar growl angry\`, \`beast scream screech\`, \`monster attack cry\` | Вопли монстров, рычание, хрипли |\n`;
+    md += `| **Крики атаки героя** | \`male hero battle cry\`, \`warrior grunt attack yell\`, \`shout combat grunt\`| Боевой крик главного героя |\n`;
+    md += `| **Звук движения (ходьба)** | \`footsteps concrete stone\`, \`walking footsteps gravel\`, \`footsteps grass loop\` | Размеренные шаги по разным поверхностям |\n`;
+    md += `| **Звук движения (бег)** | \`running footsteps fast grass\`, \`fast running steps concrete\`, \`sprint grass\` | Быстрый, частый бег в атаке |\n`;
+    md += `| **Выбор локации на карте** | \`map travel select\`, \`point of interest click\`, \`parchment scroll unfold\` | Свиток карты, звон цели |\n`;
+    md += `| **Победный джингл (Victory)**| \`victory fanfare short medieval\`, \`quest completed jingle\`, \`victory win trumpet\`| Короткая духовая фанфара оркестра |\n`;
+    md += `| **Поражение / Смерть**     | \`game over defeat fail sound\`, \`sad dramatic game over\`, \`hero collapse grunt\` | Спадающий минорный аккорд смерти |\n\n`;
+
+    md += `---\n\n`;
+    md += `## 12. Применение звуков кликов в Unity: Скрипты и AudioMixer\n\n`;
+    md += `### 🎛️ Настройка AudioMixer в Unity 6 (Пошагово)\n`;
+    md += `Для создания профессиональной звуковой картины мы используем встроенную маршрутизацию Unity через **AudioMixer**:\n`;
+    md += `1. **Создание AudioMixer:** В окне Project нажмите **Right Click -> Create -> Audio Mixer** и назовите его \`MainMixer\`.\n`;
+    md += `2. **Добавление групп (Groups):** Откройте окно Audio Mixer. Под группой \`Master\` создайте две дочерние группы:\n`;
+    md += `   - **Music** (для фоновой музыки)\n`;
+    md += `   - **SFX** (для всех кликов, ударов, умений и звуков монстров)\n`;
+    md += `3. **Назначение AudioSource:** На объектах с компонентом \`AudioSource\` перетащите соответствующую группу в поле **Output** компонентов:\n`;
+    md += `   - Музыкальный фоновый объект -> выход \`Music (MainMixer)\`.\n`;
+    md += `   - Кнопки / Спецэффекты -> выход \`SFX (MainMixer)\`.\n`;
+    md += `4. **Настройка громкости с логарифмической шкалой:** Чтобы регуляторы громкости из меню настроек (Settings Panel) управляли микшером плавно (человеческое ухо воспринимает звук логарифмически):\n`;
+    md += `   - Кликните на группу \`SFX\` в AudioMixer, в Инспекторе нажмите правой кнопкой мыши по свойству **Volume** -> Выберите **Expose 'Volume' to script**.\n`;
+    md += `   - Переименуйте выставленный параметр во вкладке *"Exposed Parameters"* в правой верхней части AudioMixer в \`Volume_SFX\`.\n`;
+    md += `   - Проделайте то же самое для музыки, назвав параметр \`Volume_Music\`.\n`;
+    md += `   - В коде \`SettingsManager.cs\` при изменении Slider используйте логарифмическую формулу:\n`;
+    md += `     \`\`\`csharp\n`;
+    md += `     // sliderValue лежит в диапазоне от 0.0001f до 1.0f\n`;
+    md += `     float dbVolume = Mathf.Log10(sliderValue) * 20f;\n`;
+    md += `     audioMixer.SetFloat("Volume_SFX", dbVolume);\n`;
+    md += `     \`\`\`\n\n`;
+
+    md += `### 🔗 Связывание кнопок и кликов со скриптами (UIButtonSfxBinder.cs)\n`;
+    md += `Чтобы не настраивать руками клики для каждой отдельной кнопки в Inspector, рекомендуется написать простой менеджер автоматического назначения:\n`;
+    md += `\`\`\`csharp\n`;
+    md += `using UnityEngine;\n`;
+    md += `using UnityEngine.UI;\n`;
+    md += `using UnityEngine.EventSystems;\n\n`;
+    md += `public class UIButtonSfxBinder : MonoBehaviour\n`;
+    md += `{\n`;
+    md += `    public AudioClip clickSound;\n`;
+    md += `    public AudioClip hoverSound;\n\n`;
+    md += `    void Start()\n`;
+    md += `    {\n`;
+    md += `        Button[] buttons = GetComponentsInChildren<Button>(true);\n`;
+    md += `        foreach (Button btn in buttons)\n`;
+    md += `        {\n`;
+    md += `            btn.onClick.AddListener(() => {\n`;
+    md += `                if (SettingsManager.Instance != null && clickSound != null)\n`;
+    md += `                    SettingsManager.Instance.PlaySoundEffect(clickSound);\n`;
+    md += `            });\n\n`;
+    md += `            EventTrigger trigger = btn.gameObject.GetComponent<EventTrigger>();\n`;
+    md += `            if (trigger == null) trigger = btn.gameObject.AddComponent<EventTrigger>();\n\n`;
+    md += `            EventTrigger.Entry entry = new EventTrigger.Entry();\n`;
+    md += `            entry.eventID = EventTriggerType.PointerEnter;\n`;
+    md += `            entry.callback.AddListener((data) => {\n`;
+    md += `                if (SettingsManager.Instance != null && hoverSound != null)\n`;
+    md += `                    SettingsManager.Instance.PlaySoundEffect(hoverSound);\n`;
+    md += `            });\n`;
+    md += `            trigger.triggers.Add(entry);\n`;
+    md += `        }\n`;
+    md += `    }\n`;
+    md += `}\n`;
+    md += `\`\`\`\n\n`;
     md += `### 📊 Авторские права и плагиат ИИ (Правовой Ликбез)\n`;
     md += `1. **Генерация UI / Иконок / Меню (Midjourney, Stable Diffusion и др.):**\n`;
     md += `   - **Абсолютно безопасно.** Картинки, сгенерированные ИИ на общедоступных сайтах (или локально), не охраняются авторским правом в большинстве стран мира (включая США, ЕС и РФ), так как нет автора-человека.\n`;
@@ -681,35 +765,7 @@ async function generateMasterBlueprint() {
     md += `3. Нажмите на название понравившегося звука (ссылка-заголовок).\n`;
     md += `4. На открывшейся странице звука нажмите большую кнопку **Download** (она находится справа под волновым графиком).\n`;
     md += `5. Если вы не авторизованы, сайт предложит быстро войти через ваш аккаунт Google или созданный профиль. После этого скачивание начнется мгновенно.\n\n`;
-    md += `---\n\n`;
-    md += `### 🎙️ Промпты для поиска звуков игры в Freesound и Pixabay\n`;
-    md += `*(Используйте именно английские слова в поиске для получения наилучшего результата)*\n\n`;
-    md += `| Игровое событие / Действие | Английский промпт (копируйте в поиск) | Пояснения |\n`;
-    md += `| :--- | :--- | :--- |\n`;
-    md += `| **Нажатие обычной кнопки** | \`ui click modern\`, \`interface button click\`, \`menu select\` | Чистые, короткие клики |\n`;
-    md += `| **Наведение курсора на кнопку** | \`ui hover quiet\`, \`menu focus soft\`, \`button roll over\` | Легкие шелестящие звуки |\n`;
-    md += `| **Магическая атака** | \`magic attack fireball\`, \`spell cast wind swoop\`, \`wizard blast\` | Взрывные волшебные звуки |\n`;
-    md += `| **Магическая защита / Щит** | \`magic shield activate\`, \`energy barrier hum\`, \`forcefield\` | Гудящий, барьерный звук |\n`;
-    md += `| **Физические удары** | \`blunt impact hit\`, \`melee punch strike\`, \`fist thud\` | Тяжелые глухие удары |\n`;
-    md += `| **Удары по монстрам (плоть)** | \`organic squish impact\`, \`flesh hit slap\`, \`monster damage hit\` | Удары по мягкой плоти |\n`;
-    md += `| **Удар монстра (атака)** | \`monster swipe claw\`, \`beast attack roar heavy\`, \`monster hit growl\` | Взмах когтей с рыком |\n`;
-    md += `| **Удар мечом** | \`sword slash strike\`, \`blade metal slice\`, \`sword clash clink\` | Металлический срез и звон |\n`;
-    md += `| **Каст магии (подготовка)** | \`magic charge up generator\`, \`spell power build up\`, \`spell charging\` | Зарядка энергии |\n`;
-    md += `| **Выпить зелье** | \`drinking potion gulp\`, \`bottle liquid swallow\`, \`potion glass sound\` | Глотки жидкости |\n`;
-    md += `| **Ходьба обычная** | \`footsteps concrete stone\`, \`walking footsteps loop\` | Обычные шаги |\n`;
-    md += `| **Ходьба по траве** | \`footsteps grass rustle\`, \`walking on lawn rustling\` | Ходьба по газону, траве |\n`;
-    md += `| **Ходьба по горам/камням** | \`footsteps gravel stone crunch\`, \`footsteps dirt rock\` | Хруст гравия и почвы |\n`;
-    md += `| **Клик по снаряжению (броня)**| \`equip armor click\`, \`leather gear slide\`, \`metal equipment wear\`| Ремни и металл |\n`;
-    md += `| **Открытие сумки/рюкзака** | \`inventory open leather bag\`, \`zipper backpack open\` | Кожаный скрип или молния |\n`;
-    md += `| **Положить/взять из сумки** | \`bag loot items search\`, \`item pickup drop\`, \`loot sound\` | Звон монет, шуршание |\n`;
-    md += `| **Бег** | \`fast running footsteps grass\`, \`running steps fast loop\` | Быстрый темп бега |\n`;
-    md += `| **Клик / Рык монстра** | \`monster roar growl angry\`, \`beast scream screech shrieking\` | Вопль или крик монстра |\n`;
-    md += `| **Атака героя (крик ярости)**| \`male hero battle cry\`, \`warrior grunt attack yell\`, \`shout combat\` | Ворчание бойца в атаке |\n`;
-    md += `| **Победа в бою (jingle)** | \`victory fanfare short medieval\`, \`quest completed jingle\` | Торжественная фанфара |\n`;
-    md += `| **Смерть / Поражение** | \`game over defeat fail sound\`, \`sad dramatic game over\` | Грустный аккорд |\n\n`;
-    md += `---\n\n`;
-
-    md += `### 🧠 Разбор Moshi & HuggingFace (Что выбрать для RTX 4060 8GB?)\n\n`;
+    md += `\n### 🧠 Разбор Moshi & HuggingFace (Что выбрать для RTX 4060 8GB?)\n\n`;
     md += `Проект **Moshi** от Kyutai — это **голосовой ИИ-собеседник в реальном времени**. Он служит для общения голосом и озвучки текста, но **он НЕ умеет создавать музыку**.\n`;
     md += `- **Попробовать Moshi онлайн:** Без установки, просто перейдите по официальной ссылке: **https://moshi.chat/** и нажмите кнопку микрофона, чтобы поговорить.\n\n`;
 
@@ -722,7 +778,7 @@ async function generateMasterBlueprint() {
     md += `1. Скачайте программу-браузер нейросетей **https://pinokio.computer/** для Windows.\n`;
     md += `2. В поиске внутри Pinokio найдите **Audiocraft** или **MusicGen**.\n`;
     md += `3. Нажмите **Download**, затем **Install**.\n`;
-    md += `4. После завершения нажмите кнопку **Start**. Откроется локальная веб-страничка (\`http://localhost:7860\`), где вы сможете ввести любой промпт и получать чистые треки без ограничений!\n\n`;
+    md += `4. После завершения нажмите кнопку **Start**. Откроется локальная веб-страничка (**http://localhost:7860**), где вы сможете ввести любой промпт и получать чистые треки без ограничений!\n\n`;
 
     md += `## 12. Архитектура Offline & Hybrid\n`;
     md += `- **LLM Provider:** Ollama (localhost:11434).\n`;
@@ -730,7 +786,10 @@ async function generateMasterBlueprint() {
     md += `- **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.\n`;
     md += `- **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.\n\n`;
 
-    md += `## 13. История изменений (v18.7.1)\n`;
+    md += `## 13. История изменений (v18.7.4)\n`;
+    md += `- **v18.7.4:** Zenith Audio Calibration - Eliminated AudioMixer parameter existence warnings by using silent direct SetFloat writes, customized UIButtonSfxBinder to trigger only on full button Clicks, and added explicit back/escape button name checking (back/exit/close/return/cancel/назад/arrow) to play a custom backClickSound clip.\n`;
+    md += `- **v18.7.3:** Zenith Audio Synergy - Deep Pixabay sound navigation guides, expansive custom prompt dictionaries (clinging clicks, inventories, gear, monsters, map selections, combat starts), and robust UIButtonSfxBinder / SettingsManager scripting.\n`;
+    md += `- **v18.7.2:** Zenith Multi-Tool Synergy - Sound Prompt Extensions, Pixabay Search Guides, & Unity AudioMixer SettingsManager Integration. Core RPG Saves & Sound Routing.\n`;
     md += `- **v18.7.1:** Suno & Udio Track Extensions & Seamless Looping guidelines integration, SettingsManager.cs looping rules enforcement, ElevenLabs reference deprecation.\n`;
     md += `- **v18.7.0:** Zenith Multi-Tool Synergy - Epic Game Audio Prompts & Sound Integration, Core RPG Saves, and Language Synchronization.\n`;
     md += `- **v18.6.9:** Zenith Multi-Tool Synergy - Core RPG Save slots system integration, Fullscreen Toggle Translation sync fix (Transtable Text ID 11 auto-assignment).\n`;
@@ -759,7 +818,7 @@ async function generateMasterBlueprint() {
 
     md += `## 16. Известные ошибки и решения\n`;
     md += `- **WebSocket Error:** Ожидаемо, игнорировать.\n`;
-    md += `- **Unexpected token '<':** Ошибка сервера, проверить статус.\n`;
+    md += `- **Unexpected token '<':** Ошибка сервера, проверить статус.\n\n`;
 
     await fs.writeFile(masterBlueprintMdPath, md);
     console.log("Master blueprint generated successfully.");

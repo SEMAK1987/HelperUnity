@@ -1,17 +1,17 @@
 # PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Total Knowledge Archive Edition)
 
-> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.7.1.
+> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.7.4.
 
 ## 1. Общая информация
-- **Версия Помощника:** 18.6.9
-- **Описание:** Гибридный ИИ-помощник нового поколения (v18.7.1 Live Audio & RPG Solution) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых изысканий, синхронизации UI, глобального менеджера сохранений SaveGameSystem.cs и языковых ассетов (SDF), а также передовых гайдлайнов Suno и Udio.
-- **Путь проекта:** undefined
+- **Версия Помощника:** 18.7.4
+- **Описание:** Гибридный ИИ-помощник нового поколения (v18.7.4 Live Audio & RPG Solution) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых изысканий, синхронизации UI, глобального менеджера сохранений SaveGameSystem.cs и языковых ассетов (SDF), а также передовых гайдлайнов Suno, Udio и Pixabay Sound Effects с AudioMixer. Полная справочная база по озвучке элементов UI, сумок, навыков, монстров, а также по маршрутизации AudioMixer в Unity.
+- **Путь проекта:** Не задан
 - **Локальное хранилище:** Не задано
 - **Версия Unity:** unknown
 - **Версия Blender:** unknown
 - **Версия GIMP:** unknown
 - **Версия Redot:** unknown
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_7_1_FATE_MASTER]
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_7_4_FATE_MASTER]
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -46,13 +46,13 @@ undefined
 ```
 
 
-## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.7.1 - Zenith Sync Release)
+## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.7.4 - Zenith Audio Calibration)
 ### Режимы работы и Архитектурные уровни
 - **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.
 - **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.
 - **No-Internet Mode (Quantum Archive):** 10,000+ видео-уроков. Мгновенный доступ при любых внешних условиях.
 
-### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.7.1 Sync)
+### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.7.4 Sync)
 - **Unity 6 Physics & Optimization:** [Video #2](https://www.youtube.com/watch?v=9vuyis_Y-LY)
 - **Blender Advanced Rigging:** [Video #3](https://www.youtube.com/watch?v=UKZp67dY1_w)
 - **Shader Graph Mastery:** [Video #4](https://www.youtube.com/watch?v=-hvxjyzcSkI)
@@ -69,46 +69,16 @@ undefined
 - **Molecular Texture Synthesis:** Singularity Edition - создание текстур с учетом квантовых свойств поверхности.
 
 ### ВОЗМОЖНОСТИ GODOT/REDOT (Genesis Edition)
-- **Redot Absolute Omniscience:** Тотальный аудит архитектуры. ИИ переписывает ядро Godot для достижения сверхпроводимости кода.
-- **Galactic Network Connection:** Доступ к закрытым библиотекам разработчиков из других галактик. Решения задач, которые еще не возникли на Земле.
-- **Blender Texture Extraction:** Пакетная обработка текстур, генерация карт нормалей и атласов через Python-скрипты.
-- **Redot/Godot Migration:** Интеллектуальный конвертер C# -> GDScript и автоматическая адаптация ресурсов под движок Redot.
-
-### Продвинутые и Экспериментальные функции
-- **Neural Sync 2.0 (Mind Link):** Полное слияние со стилем кодинга разработчика.
-- **Quantum Debugging (Предсказание багов):** Симуляция выполнения кода в параллельных потоках времени.
-- **Ethernet Telepathy & Quantum Sync:** Мгновенная синхронизация состояния серверов.
-- **Chronos Optimization:** Сжатие времени компиляции.
-
-## 7. СПЕЦИАЛЬНЫЕ ИСПРАВЛЕНИЯ (Hotfixes v18.5.8)
-### 🔳 ИСПРАВЛЕНИЕ «КВАДРАТИКОВ» (CJK Font Fix)
-**Проблема:** В Unity вместо текста (Китайский/Корейский) видны пустые квадраты.
-**Решение:**
-1. **Найдите шрифт:** Перетащите файл `Arial Unicode MS` (из `C:\Windows\Fonts`) или `SimHei` в окно Project в Unity.
-2. **Asset:** ПКМ на файл -> **Create -> TextMeshPro -> Font Asset -> SDF** (важно выбрать именно SDF).
-3. **Настройка:** Выберите созданный ассет [F], в Инспекторе поставьте **Atlas Population Mode: Dynamic**. Нажмите **Apply**.
-4. **Fallback:** Выберите ваш основной шрифт (например, `LiberationSans SDF`), в Инспекторе найдите список **Fallback Font Assets** и добавьте туда новый Динамический шрифт.
+- **Redot Absolute Omniscience:** Полная поддержка Godot 4.4 и форка Redot для миграции.
 
 ### ↔️ ИСПРАВЛЕНИЕ ТЕКСТА «СТОЛБИКОМ» (Russian Overlap)
 **Проблема:** Русские слова в выпадающем списке (Dropdown) сжимаются или встают вертикально.
 **Решение:**
-1. **Rect Tool:** Выберите текстовый объект внутри Dropdown (обычно это `Item Text`), нажмите **T** и **растяните рамку максимально широко** в стороны.
-2. **Auto Size:** В настройках TMP включите **Auto Size** (Min: 14, Max: 24).
-3. **Spacing:** В **Extra Settings** установите **Character Spacing: 0 или 5** (если стоит 15 — текст слипается).
-
-### 🚀 МОЛНИЕНОСНЫЙ ЗАПУСК (Offline Mode)
-Флаг `-offline` отключает проверку лицензии и обновлений Unity через интернет.
-```batch
-@echo off
-echo Starting Fate Continent Engine (Bypass Network)...
-start "" "C:\Program Files\Unity\Hub\Editor\6000.3.10f1\Editor\Unity.exe" -projectPath . -no-updates -offline
-exit
-```
+1. **Rect Tool:** Выберите текстовый объект внутри Dropdown (обычно это `Item Text`), нажмите **T** и **растяните рамку по ширине**, чтобы текст влезал полностью. Либо уменьшите размер шрифта в компоненте TextMeshPro.
 
 ### 🖼️ УДАЛЕНИЕ ПРИВЕТСТВЕННОГО ЭКРАНА URP
 Если в углу мешает значок "URP Empty Template":
 **Действие:** Найдите файл `Readme` в папке Assets. В Инспекторе нажмите кнопку **"Remove Readme Assets"**. Это удалит обучающий контент и значок.
-
 
 ## 8. Расширенная База Видео-уроков (3500+ видео)
 ### Темы Unity
@@ -146,17 +116,17 @@ exit
   - **Инструментал или текст:** Убедитесь, что включен переключатель **Instrumental** для треков без слов.
 - **Шаг 3: Генерация и Склеивание:** Нажмите красную кнопку Create. Udio сгенерирует два новых варианта продления. Выберите лучший и продолжайте дальше!
 - **Шаг 4: Как бесплатно обойти ограничения и скачать песню (Download Bypass):**
-  - **Причина ограничений:** Udio блокирует прямое бесплатное скачивание (показывает окно платной подписки) и кодирует аудиоплеер в виде дробленых фрагментов `.m4s` (вместо одного чистого MP3), чтобы защитить поток от скачивания через F12 на рабочей странице.
+  - **Причина ограничений:** Udio блокирует прямое бесплатное скачивание (показывает окно платной подписки) и кодирует аудиоплеер в виде дробленых фрагментов ".m4s" (вместо одного чистого MP3), чтобы защитить поток от скачивания через F12 на рабочей странице.
   - **Способ А (Самый простой — Через сторонний загрузчик):**
     1. Нажмите кнопку **Share** под карточкой трека.
-    2. Скопируйте публичную ссылку на композицию (например, `https://www.udio.com/songs/...`).
-    3. Откройте любой бесплатный сервис загрузки Udio в новой вкладке (например, **udiodownloader.com**, **udiolink.com** или специализированный бот Telegram вроде `@UdioDownloaderBot`).
-    4. Вставьте ссылку и мгновенно скачайте готовый `.mp3` файл без регистрации и подписок.
+    2. Скопируйте публичную ссылку на композицию (например, "https://www.udio.com/songs/...").
+    3. Откройте любой бесплатный сервис загрузки Udio в новой вкладке (например, udiodownloader.com, udiolink.com или специализированный бот Telegram вроде @UdioDownloaderBot).
+    4. Вставьте ссылку и мгновенно скачайте готовый ".mp3" файл без регистрации и подписок.
   - **Способ Б (Запись вкладки браузера — 100% рабочий и чистый метод):**
     1. Установите бесплатное расширение Chrome: **Chrome Audio Capture** (или любой "внутренний диктофон аудио-вкладок").
     2. Откройте страницу трека Udio, запустите расширение и нажмите **Start Capture**.
-    3. Включите воспроизведение песни. После завершения прослушивания нажмите **Save Capture** — расширение сохранит чистую, идеальную запись цифрового аудио в формате `.mp3` прямо на ваш компьютер.
-  - **Способ В (Разбор через код страницы):** Перейдите по скопированной ссылке `https://www.udio.com/songs/...` в режиме инкогнито, откройте F12, перейдите на вкладку Network, отфильтруйте по ключевому слову `mp3` или в категории `Media`. Запустите трек. Так как на публичной индивидуальной странице защита слабее, в сетевых событиях часто появляется прямой временный CDN-адрес к `.mp3` или `.wav`. Кликните по нему правой кнопкой мыши -> *Open in new tab* -> *Ctrl+S*.
+    3. Включите воспроизведение песни. После завершения прослушивания нажмите **Save Capture** — расширение сохранит чистую, идеальную запись цифрового аудио в формате ".mp3" прямо на ваш компьютер.
+  - **Способ В (Разбор через код страницы):** Перейдите по скопированной ссылке "https://www.udio.com/songs/..." в режиме инкогнито, откройте F12, перейдите на вкладку Network, отфильтруйте по ключевому слову "mp3" или в категории "Media". Запустите трек. Так как на публичной индивидуальной странице защита слабее, в сетевых событиях часто появляется прямой временный CDN-адрес к ".mp3" или ".wav". Кликните по нему правой кнопкой мыши -> Open in new tab -> Ctrl+S.
 
 ### ☀️ Инструкция для Suno: Как продлевать треки и делать «Get Whole Song»
 В Suno система удлинения позволяет автоматически склеивать все части в один монолитный файл.
@@ -172,13 +142,161 @@ exit
 - **Плавный хвост:** При продлении в самом конце трека (последние 5-10 секунд) постарайтесь промптом вернуть звучание к тем инструментам, с которых композиция начиналась (например, если трек начинался с тихого соло на арфе, пусть в конце останется только арка/арфа).
 - **loop = true:** В коде нашего SettingsManager.cs при вызове PlayMusicTrack уже автоматически прописано свойство `musicSource.loop = true`. Музыка в вашей игре будет крутиться циклично и атмосферно без использования ElevenLabs!
 
-## 11. Архитектура Offline & Hybrid
+## 11. База бесплатных ресурсов и локального звукового ИИ (Freesound, Pixabay, Local Generator & RTX 4060)
+
+### 🎙️ Промпты для поиска звуков нашей игры на Freesound и Pixabay
+*(Используйте именно английские слова в поиске для наилучшего качества!)*
+
+| Действие / Область игры | Английский промпт (копируйте в поиск) | Описание характера звука |
+| :--- | :--- | :--- |
+| **Клик по обычной кнопке** | `ui click modern`, `interface button click`, `menu select` | Короткий, чистый, приятный щелчок |
+| **Наведение на кнопку (Hover)**| `ui hover quiet`, `menu focus soft`, `button roll over` | Легкий шелест, тихий затухающий звук |
+| **Клик по рюкзаку / мешку** | `leather pouch rustle`, `open inventory bag`, `leather bag open` | Характерный кожаный шорох или скрип |
+| **Клик по персонажу (выбор)** | `character selection hum`, `hero select warp`, `voice select chime` | Приятный свист, подтверждающий звон или вздох |
+| **Клик по мобам / выбор врага** | `target lock click`, `monster select growl`, `beast threat roar` | Мрачный короткий рык или кошачье фырканье |
+| **Движение в инвентаре/вещах** | `item pickup drop`, `coins clashing`, `inventory items shuffling` | Металлический звон, пересыпание монет, шуршание |
+| **Зелья (выпить / нажать)** | `drinking potion gulp`, `liquid swallow potion`, `glass bottle clink` | Бульканье жидкости с явным глотком в конце |
+| **Клики по снаряжению (лат)** | `equip metal armor click`, `leather strap pull`, `metal equipment wear` | Скрежет латных пластин, натяжение кожаных ремней |
+| **Клики по оружию (мечу)** | `sword equip unsheathe`, `blade metal slice`, `sword clash draw` | Металлический звон извлекаемого из ножен клинка |
+| **Клик по мобам / монстрам** | `monster selecting click`, `beast target select`, `growl click` | Короткий рык, выделение цели |
+| **Клик по инвентарю / вещам** | `loot sound`, `item pickup drop`, `inventory items shuffling` | Звон монет, шуршание |
+| **Зелья (выпить / клик)** | `drinking potion gulp`, `liquid swallow potion`, `glass bottle clink` | Бульканье и глоток |
+| **Снаряжение / броня / мечи**| `equip metal armor click`, `leather strap gear adjustment`, `sword equip`| Звон лат или вытягивание клинка |
+| **Навыки / Скиллы (клик)** | `magic charge up generator`, `spell power build up`, `skill unlock chime`| Нарастающий гул магического заряда |
+| **Навыки (применение магии)** | `magic spell cast swoop`, `wizard burst wand blow`, `divine heal aura`| Свист пролетающей волшебной стрелы |
+| **Кнопка закрытия (Close)**| `ui close back button`, `window close exit click`, `panel dismiss slate`| Деревянный хлоп или глухой щелчок назад |
+| **Начало нападения (Combat)**| `combat fight alert horn`, `battle start drum build up`, `clash start alert`| Горн или тяжелая барабанная дробь |
+| **Физическая атака (удар)**| `blunt impact hit`, `melee punch strike`, `fist weapon smash` | Реалистичный сокрушительный удар |
+| **Звуки монстров (рык / хит)**| `monster roar growl angry`, `beast scream screech`, `monster attack cry` | Вопли монстров, рычание, хрипли |
+| **Крики атаки героя** | `male hero battle cry`, `warrior grunt attack yell`, `shout combat grunt`| Боевой крик главного героя |
+| **Звук движения (ходьба)** | `footsteps concrete stone`, `walking footsteps gravel`, `footsteps grass loop` | Размеренные шаги по разным поверхностям |
+| **Звук движения (бег)** | `running footsteps fast grass`, `fast running steps concrete`, `sprint grass` | Быстрый, частый бег в атаке |
+| **Выбор локации на карте** | `map travel select`, `point of interest click`, `parchment scroll unfold` | Свиток карты, звон цели |
+| **Победный джингл (Victory)**| `victory fanfare short medieval`, `quest completed jingle`, `victory win trumpet`| Короткая духовая фанфара оркестра |
+| **Поражение / Смерть**     | `game over defeat fail sound`, `sad dramatic game over`, `hero collapse grunt` | Спадающий минорный аккорд смерти |
+
+---
+
+## 12. Применение звуков кликов в Unity: Скрипты и AudioMixer
+
+### 🎛️ Настройка AudioMixer в Unity 6 (Пошагово)
+Для создания профессиональной звуковой картины мы используем встроенную маршрутизацию Unity через **AudioMixer**:
+1. **Создание AudioMixer:** В окне Project нажмите **Right Click -> Create -> Audio Mixer** и назовите его `MainMixer`.
+2. **Добавление групп (Groups):** Откройте окно Audio Mixer. Под группой `Master` создайте две дочерние группы:
+   - **Music** (для фоновой музыки)
+   - **SFX** (для всех кликов, ударов, умений и звуков монстров)
+3. **Назначение AudioSource:** На объектах с компонентом `AudioSource` перетащите соответствующую группу в поле **Output** компонентов:
+   - Музыкальный фоновый объект -> выход `Music (MainMixer)`.
+   - Кнопки / Спецэффекты -> выход `SFX (MainMixer)`.
+4. **Настройка громкости с логарифмической шкалой:** Чтобы регуляторы громкости из меню настроек (Settings Panel) управляли микшером плавно (человеческое ухо воспринимает звук логарифмически):
+   - Кликните на группу `SFX` в AudioMixer, в Инспекторе нажмите правой кнопкой мыши по свойству **Volume** -> Выберите **Expose 'Volume' to script**.
+   - Переименуйте выставленный параметр во вкладке *"Exposed Parameters"* в правой верхней части AudioMixer в `Volume_SFX`.
+   - Проделайте то же самое для музыки, назвав параметр `Volume_Music`.
+   - В коде `SettingsManager.cs` при изменении Slider используйте логарифмическую формулу:
+     ```csharp
+     // sliderValue лежит в диапазоне от 0.0001f до 1.0f
+     float dbVolume = Mathf.Log10(sliderValue) * 20f;
+     audioMixer.SetFloat("Volume_SFX", dbVolume);
+     ```
+
+### 🔗 Связывание кнопок и кликов со скриптами (UIButtonSfxBinder.cs)
+Чтобы не настраивать руками клики для каждой отдельной кнопки в Inspector, рекомендуется написать простой менеджер автоматического назначения:
+```csharp
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+
+public class UIButtonSfxBinder : MonoBehaviour
+{
+    public AudioClip clickSound;
+    public AudioClip hoverSound;
+
+    void Start()
+    {
+        Button[] buttons = GetComponentsInChildren<Button>(true);
+        foreach (Button btn in buttons)
+        {
+            btn.onClick.AddListener(() => {
+                if (SettingsManager.Instance != null && clickSound != null)
+                    SettingsManager.Instance.PlaySoundEffect(clickSound);
+            });
+
+            EventTrigger trigger = btn.gameObject.GetComponent<EventTrigger>();
+            if (trigger == null) trigger = btn.gameObject.AddComponent<EventTrigger>();
+
+            EventTrigger.Entry entry = new EventTrigger.Entry();
+            entry.eventID = EventTriggerType.PointerEnter;
+            entry.callback.AddListener((data) => {
+                if (SettingsManager.Instance != null && hoverSound != null)
+                    SettingsManager.Instance.PlaySoundEffect(hoverSound);
+            });
+            trigger.triggers.Add(entry);
+        }
+    }
+}
+```
+
+### 📊 Авторские права и плагиат ИИ (Правовой Ликбез)
+1. **Генерация UI / Иконок / Меню (Midjourney, Stable Diffusion и др.):**
+   - **Абсолютно безопасно.** Картинки, сгенерированные ИИ на общедоступных сайтах (или локально), не охраняются авторским правом в большинстве стран мира (включая США, ЕС и РФ), так как нет автора-человека.
+   - Вы можете использовать их в коммерческой игре без каких-либо рисков получить иск за плагиат. Никаких подписок или прав покупать **не нужно**.
+2. **Скачивание музыки через обход (Запись вкладки / Загрузчики):**
+   - **Для личного пользования / хобби / некоммерческих проектов (бесплатная игра):** Полностью безопасно, никто не будет вас преследовать.
+   - **Для коммерческой продажи игры (в Steam, Google Play, itch.io):** Если вы решите коммерциализировать свою игру, то использование треков, сгенерированных на бесплатном аккаунте Udio/Suno через обходные утилиты, технически нарушает Пользовательское соглашение (Terms of Service) этих сайтов. Если вы хотите продавать игру, рекомендуется использовать музыку с открытыми лицензиями (CC0/Public Domain) или запустить бесплатный ИИ-генератор локально у себя на компьютере.
+
+---
+
+### 📥 Подробная инструкция: Как качать с Freesound.org и Pixabay.com
+
+#### 1. Pixabay.com (Музыка и Звуковые эффекты)
+Pixabay — самый дружелюбный сайт, все звуки здесь бесплатны для коммерческого использования, регистрация не требует подтверждений, а интерфейс очень прост:
+1. Перейдите на **https://pixabay.com/sound-effects/** (или выберите "Sound Effects" в верхнем выпадающем меню).
+2. Напишите нужный промпт (на английском языке, список ниже) в поисковую строку.
+3. Каждая карточка звука имеет кнопку **Play** для прослушивания и зеленую кнопку **Download** справа.
+4. Нажмите **Download** — файл `.mp3` или `.wav` сразу же скачется на ваш ПК. Никаких подтверждений или указания авторства не требуется!
+
+#### 2. Freesound.org (Огромная база профессиональных звуков)
+Freesound содержит миллионы звуков от инди-разработчиков и звукорежиссеров. Здесь критически важно смотреть на тип лицензии:
+- **CC0 (Creative Commons 0 / Public Domain):** Полная свобода действий! Можно использовать в коммерческих играх, менять, продавать, авторство указывать НЕ нужно.
+- **Attribution (CC-BY):** Использовать можно бесплатно в коммерции, но вы **обязаны** указать никнейм автора звука в титрах вашей игры.
+- **Non-commercial (CC-NC):** Нельзя использовать в платных играх (только в бесплатных проектах).
+
+**Как скачивать на Freesound:**
+1. Введите поисковый запрос (например, `sword hit`) в строку поиска сверху.
+2. В левой колонке найдите блок **LICENSE** (Лицензия) и **обязательно кликните на "Creative Commons 0"** (это отфильтрует звуки, чтобы остались только те, которые не требуют никаких прав и упоминаний в титрах).
+3. Нажмите на название понравившегося звука (ссылка-заголовок).
+4. На открывшейся странице звука нажмите большую кнопку **Download** (она находится справа под волновым графиком).
+5. Если вы не авторизованы, сайт предложит быстро войти через ваш аккаунт Google или созданный профиль. После этого скачивание начнется мгновенно.
+
+
+### 🧠 Разбор Moshi & HuggingFace (Что выбрать для RTX 4060 8GB?)
+
+Проект **Moshi** от Kyutai — это **голосовой ИИ-собеседник в реальном времени**. Он служит для общения голосом и озвучки текста, но **он НЕ умеет создавать музыку**.
+- **Попробовать Moshi онлайн:** Без установки, просто перейдите по официальной ссылке: **https://moshi.chat/** и нажмите кнопку микрофона, чтобы поговорить.
+
+### 🚀 Вариант: Запуск музыкальных генераторов у себя на ПК (RTX 4060 8GB)
+
+У вас отличная видеокарта **NVIDIA RTX 4060 с 8 ГБ VRAM**. Вы можете запускать локальные модели музыки на ней бесплатно!
+#### Лучший выбор: Meta MusicGen (из библиотеки Audiocraft)
+- Модель `musicgen-small` (300M параметров) — полностью помещается в 4 ГБ видеопамяти вашей RTX 4060 и генерирует треки мгновенно.
+- Модель `musicgen-medium` (1.5B параметров) — забирает до 7.5 ГБ VRAM, генерирует музыку потрясающего качества.
+
+#### ⚙️ Установка в 1 клик через Pinokio:
+1. Скачайте программу-браузер нейросетей **https://pinokio.computer/** для Windows.
+2. В поиске внутри Pinokio найдите **Audiocraft** или **MusicGen**.
+3. Нажмите **Download**, затем **Install**.
+4. После завершения нажмите кнопку **Start**. Откроется локальная веб-страничка (**http://localhost:7860**), где вы сможете ввести любой промпт и получать чистые треки без ограничений!
+
+## 12. Архитектура Offline & Hybrid
 - **LLM Provider:** Ollama (localhost:11434).
 - **Fallback Logic:** При отсутствии интернета запросы перенаправляются на локальный API Ollama.
 - **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.
 - **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.
 
-## 12. История изменений (v18.7.1)
+## 13. История изменений (v18.7.4)
+- **v18.7.4:** Zenith Audio Calibration - Eliminated AudioMixer parameter existence warnings by using silent direct `SetFloat` writes, customized UIButtonSfxBinder to trigger only on full button Clicks, and added explicit back/escape button name checking (back/exit/close/return/cancel/назад/arrow) to play a custom backClickSound clip.
+- **v18.7.3:** Zenith Audio Synergy - Deep Pixabay sound navigation guides, expansive custom prompt dictionaries (clinging clicks, inventories, gear, monsters, map selections, combat starts), and robust UIButtonSfxBinder / SettingsManager scripting.
+- **v18.7.2:** Zenith Multi-Tool Synergy - Sound Prompt Extensions, Pixabay Search Guides, & Unity AudioMixer SettingsManager Integration. Core RPG Saves & Sound Routing.
 - **v18.7.1:** Suno & Udio Track Extensions & Seamless Looping guidelines integration, SettingsManager.cs looping rules enforcement, ElevenLabs reference deprecation.
 - **v18.7.0:** Zenith Multi-Tool Synergy - Epic Game Audio Prompts & Sound Integration, Core RPG Saves, and Language Synchronization.
 - **v18.6.9:** Zenith Multi-Tool Synergy - Core RPG Save slots system integration, Fullscreen Toggle Translation sync fix (Transtable Text ID 11 auto-assignment).
@@ -189,117 +307,14 @@ exit
 - **v18.4.9:** Ultimate Stability Sync. CJK & Typography fixes.
 - **v18.4.1:** Initial release.
 
-## 13. Аварийные процедуры (Emergency)
+## 14. Аварийные процедуры (Emergency)
 
-## 13. Инструкции по восстановлению
+## 15. Инструкции по восстановлению
 1. Установите Node.js (v18+).
 2. Склонируйте репозиторий.
 3. Запустите `RUN.bat`.
 
-## 14. Известные ошибки и решения
+## 16. Известные ошибки и решения
 - **WebSocket Error:** Ожидаемо, игнорировать.
 - **Unexpected token '<':** Ошибка сервера, проверить статус.
-
-## 15. Локальный ИИ на ПК: Установка Pinokio + MusicGen (RTX 4060) и Лицензии
-
-### 📊 Авторские права и плагиат локального ИИ (Правовой Ликбез)
-
-1. **Законно ли продавать музыку, созданную локально на своей видеокарте (RTX 4060) через MusicGen?**
-   - **Да, это на 100% законно и безопасно.** 
-   - Модель **MusicGen** от компании **Meta** распространяется под свободной открытой лицензией (Code - MIT License, Weights - CC-BY-NC 4.0 или аналогичные открытые исследовательские лицензии для мелких коммерческих/инди проектов, а дообученные сообществом версии на HuggingFace часто имеют полностью коммерческие лицензии вроде **Apache 2.0** или **MIT**).
-   - Главное: **Результат работы ИИ (выходные аудиофайлы) не имеет автора-человека и не защищен авторским правом.** Вы можете использовать эту музыку, продавать её, выкладывать в Steam или на платные сайты (Epidemic Sound, AudioJungle, Bandcamp и др.). Никто не сможет назвать это плагиатом, так как аудио создано с нуля математическим путем на вашем собственном оборудовании.
-   - **Как это обойти/сделать абсолютно "белым":** Когда вы заливаете музыку на платные площадки, они могут спрашивать: *"Использовался ли ИИ?"*. Если вы доработаете трек вручную (например, разрежете его на петли, добавите сверху эффекты, ударные, сведете несколько сгенерированных фрагментов в один полноценный микс с эффектом нарастания), то вы становитесь **соавтором** этого произведения. В таком случае трек защищается авторским правом в полном объеме как ваш авторский творческий коллаж/микс! Это убирает любые теоретические претензии.
-
----
-
-### 📥 Пошаговая инструкция по установке Pinokio и запуску MusicGen (с нуля)
-
-Ваша видеокарта **NVIDIA RTX 4060 с 8 ГБ видеопамяти** — идеальное "железо". Программа **Pinokio** автоматизирует всю установку (вам не нужно знать программирование, базы данных, Python или консольные команды - скрипты сделают все за вас).
-
-#### Шаг 1: Скачивание и установка Pinokio
-1. Перейдите на официальный сайт: **https://pinokio.computer/**
-2. Нажмите большую кнопку **Download**.
-3. Выберите версию для вашей операционной системы (для Windows это будет файл `.exe` или `.zip` архив).
-4. Извлеките архив (если скачался архив) и запустите установочный файл `Pinokio.exe`.
-5. Установите программу, следуя стандартным инструкциям на экране (просто нажимайте "Далее/Next").
-
-#### Шаг 2: Первичная настройка (внутри программы)
-1. При первом запуске Pinokio создаст рабочую папку для мини-систем и модулей. Вы можете оставить путь по умолчанию (в папке пользователя) или выбрать свой диск (например, `D:\pinokio`), если на диске `C:` мало места. Емкость диска важна — модели музыки весят от 2 до 5 ГБ каждую!
-2. Нажмите кнопку **Save** или **Apply**. Программа сама загрузит и настроит базовые системные утилиты (`git`, `conda`, `nodejs`), которые ей понадобятся для скачивания нейросетей.
-
-#### Шаг 3: Поиск и установка Audiocraft (MusicGen)
-1. В верхнем правом углу главного окна Pinokio найдите поисковую строку (с кнопкой **Discover**).
-2. Наберите на английском языке: `audiocraft` или `musicgen`.
-3. В результатах поиска вы увидите карточку **Audiocraft** от Meta (или пакет `audiocraft-pinokio`). Нажмите на нее.
-4. Откроется страница приложения. Нажмите большую синюю кнопку **Download** на боковой или верхней панели.
-5. Откроется список необходимых компонентов. Просто нажимайте **Install** (или **Download**). Pinokio начнет скачивать исходный код, библиотеки PyTorch для работы с видеокартой RTX 4060 и настроит автоматическое виртуальное окружение. *Внимание: Этот процесс может занять 5-15 минут в зависимости от скорости вашего интернета.*
-
-#### Шаг 4: Первый запуск, настройка интерфейса и готовая база промптов для RPG Fate Continent
-
-После нажатия кнопки **Install** на странице требований и завершения загрузки базовых весов (около 7.25 ГБ), запустится графический веб-интерфейс **AudioCraft Plus v2.0.1**. 
-
-##### ⚙️ Полный разбор интерфейса и тонкая настройка по пунктам:
-
-1. **Где писать промпты (основная музыка)?**
-   - Промпты для генерации музыки вписываются в поле **Input Text** во вкладке **MusicGen** -> **Generation**.
-   - На скриншоте в самом верху есть выдвижная панель **Structure Prompts** (с маленькой белой стрелочкой справа). Если её открыть и поставить галочку **Enable** (как на вашем втором скриншоте интерфейса), появятся дополнительные настройки структуры:
-     - **BPM** (темп/скорость трека): Например, `120` для таверны и спокойного меню, или `140-160` для боевой музыки.
-     - **Key** (тональность): Например, `C`, `A`, `G` (до, ля, соль) и т.д.
-     - **Scale** (лад): Выберите **Major** (Мажор) для веселой, победной и светлой музыки, или **Minor** (Минор) для эпичной, боевой, таинственной, грустной или напряженной музыки.
-     - **Global Prompt**: Поле для глобальных настроек (например, `solo acoustic lute instrument` или `epic dramatic dark full orchestra`).
-
-2. **Настройка длины песни (Duration):**
-   - Ползунок **Duration** управляет длиной генерируемого фрагмента в секундах. По умолчанию стоит `10` секунд. С вашей картой RTX 4060 вы спокойно можете установить **30** секунд (или даже **60** секунд), чтобы получить полноценную длинную зацикленную дорожку.
-   - Ползунок **Overlap** (перекрытие): Оставьте по умолчанию (`12`). Он помогает ИИ бесшовно сшивать аудиофрагменты при длительной генерации.
-   - Настройка **Seed** (зерно генерации): По умолчанию стоит `-1` (генерирует абсолютно случайный трек каждый раз). Если вам понравился какой-то трек, скопируйте его Seed (он пишется в панели результатов) и вставьте в это поле, чтобы сгенерировать похожие вариации.
-
-3. **Будет ли программа работать всегда бесплатно и без интернета?**
-   - **Да, абсолютно бесплатно и навсегда.** Все вычисления происходят прямо на ядрах вашей видеокарты RTX 4060.
-   - Вы можете полностью отключить интернет, и генератор продолжит великолепно работать, создавая бесконечное количество музыки. Никаких подписок, кредитов или ограничений здесь нет!
-
-4. **Как сделать, чтобы настройки сохранялись при закрытии?**
-   - В интерфейсе во вкладке **Settings** (внутри блока настроек рядом с Customization) или в параметрах запуска Pinokio вы можете найти кнопку **Save Configuration** (Сохранить конфигурацию). 
-   - Тем не менее, Pinokio запускает веб-интерфейс на базе Gradio, который обычно автоматически запоминает последние выставленные значения ползунков (`Duration`, `BPM` и т.д.) в кэше вашего браузера.
-
----
-
-### 🎵 Готовая библиотека музыкальных промптов для RPG Fate Continent
-
-Каждый промпт составлен профессионально: сначала идет жанр/инструменты, затем атмосфера/эмоция, скорость/темп и указание на качество звука. Копируйте английский текст в поле **Input Text**:
-
-#### 🏰 1. Главное меню игры (Main Menu & Titles)
-*   **Эпичное классическое фэнтези (Симфонический оркестр):**
-    `main menu game fantasy orchestral theme, beautiful emotional transition, wide stereo, slow build up, cinematic woodwinds, horns, cellos, magical harp, high quality, studio recording`
-    *(Настройки: BPM 100, Scale Minor, Key A)*
-*   **Таинственное и древнее меню (Музыка рун/мистика):**
-    `mystical high fantasy title music, ancient deep chants, dynamic female soft vocals, acoustic celtic harp, light atmospheric pad, dark spacey reverb, ambient, immersive atmosphere, masterpiece`
-    *(Настройки: BPM 85, Scale Minor, Key D)*
-
-#### ⚔️ 2. Боевые сцены (Combat / Boss Battle)
-*   **Динамичный бой с боссом (Тяжелые барабаны и хор):**
-    `epic gaming battle loop, extremely fast heavy cinematic drums, orchestral choir chants, intense brass chords, aggressive staccato violins, high suspense, warrior combat metal, heroic brass`
-    *(Настройки: BPM 145, Scale Minor, Key E)*
-*   **Быстрая боевая тема (С элементами гитары и электроники):**
-    `rpg battlefield theme, fast-paced hybrid metal orchestral, electric guitar riffs, punchy synthetic drums, driving bassline, retro fantasy arcade adventure, energetic, looping`
-    *(Настройки: BPM 150, Scale Minor, Key F)*
-
-#### 🌲 3. Локации и Исследования (Ambient / Town / Nature)
-*   **Стартовая мирная деревня / Портал:**
-    `cozy medieval village theme, bright acoustic guitar, sweet solo flute improvisation, peaceful violin, warm sunny afternoon vibe, fantasy town ambient, relaxing, looping, clean sound`
-    *(Настройки: BPM 110, Scale Major, Key G)*
-*   **Темное подземелье / Заброшенный замок:**
-    `dark ambient dungeon exploration music, low ominous drone synth, quiet wet water droplets echo, haunting acoustic bells, slow distant footsteps pulse, high suspense, horror fantasy, immersive`
-    *(Настройки: BPM 75, Scale Minor, Key C)*
-*   **Волшебный эльфийский лес:**
-    `ethereal elven forest soundtrack, wind chimes, magical stardust synth, slow warm string pads, acoustic woodwind flute, tranquil forest streams, fantasy RPG exploration, cinematic, masterpiece`
-    *(Настройки: BPM 90, Scale Major, Key E)*
-
-#### 🍺 4. Специальные локации
-*   **Веселая таверна (Шумная пивная):**
-    `lively medieval tavern music, fast tempo, uptempo acoustic folk lute, happy irish flute, rustic cabin fireplace, dancing people ambient clinking glasses, epic celtic party, loopable`
-    *(Настройки: BPM 130, Scale Major, Key D)*
-*   **Победный финал / Уровень завершен (Фанфары):**
-    `triumphant victory fanfare jingle, royal medieval brass trumpets, epic orchestral smash, quest completed theme, short glorious heroic motif, high quality`
-    *(Настройки: BPM 120, Scale Major, Key C)*
-
 
