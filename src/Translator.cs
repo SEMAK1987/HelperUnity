@@ -112,19 +112,63 @@ public class Translator : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
-        Instance = this; 
-        DontDestroyOnLoad(gameObject); 
+        if (Instance == null)
+        {
+            // Чтобы предотвратить перенос всего Canvas, фонов или других UI-объектов из-за DontDestroyOnLoad(gameObject),
+            // мы всегда инициализируем синглтон на чистом, отдельно созданном при старте GameObject.
+            if (gameObject.name != "FATE_TRANSLATOR")
+            {
+                Debug.Log($"[FATE TRANSLATOR] Инициализация синглтона на чистом объекте. Защищаем '{gameObject.name}' от DontDestroyOnLoad переноса при переходе на другие сцены.");
+                
+                GameObject translatorObject = new GameObject("FATE_TRANSLATOR");
+                Translator customTranslator = translatorObject.AddComponent<Translator>();
+                
+                // Копируем все настройки шрифтов и параметров сближения
+                customTranslator.defaultFont = this.defaultFont;
+                customTranslator.chineseFont = this.chineseFont;
+                customTranslator.koreanFont = this.koreanFont;
+                customTranslator.russianCharacterSpacing = this.russianCharacterSpacing;
+                
+                Instance = customTranslator;
+                DontDestroyOnLoad(translatorObject);
+                
+                _languageID = PlayerPrefs.GetInt("Language", 0);
+                Translator.Update_texts();
+                
+                // Уничтожаем только этот дублирующий скрипт-компонент на исходном объекте,
+                // чтобы сам GameObject со всеми UI элементами остался внутри Canvas!
+                Destroy(this);
+                return;
+            }
 
-        _languageID = PlayerPrefs.GetInt("Language", 0); 
-        Update_texts(); 
+            Instance = this;
+            Debug.Log("[FATE TRANSLATOR] Глобальный синглтон Translator успешно запущен на выделенном объекте.");
+            _languageID = PlayerPrefs.GetInt("Language", 0);
+            Translator.Update_texts();
+        }
+        else
+        {
+            if (Instance != this)
+            {
+                // Если мы зашли в меню повторно, передаем новые шрифты глобальному синглтону
+                Instance.defaultFont = this.defaultFont;
+                Instance.chineseFont = this.chineseFont;
+                Instance.koreanFont = this.koreanFont;
+                Instance.russianCharacterSpacing = this.russianCharacterSpacing;
+                
+                Translator.Update_texts();
+                
+                // Уничтожаем этот дублирующий компонент в новой сцене
+                Destroy(this);
+            }
+        }
     }
 
     static public void SelectLanguage(int id) 
     {
         _languageID = id; 
         PlayerPrefs.SetInt("Language", _languageID); 
-        Update_texts(); 
+        Translator.Update_texts(); 
     }
 
     // Alias for compatibility

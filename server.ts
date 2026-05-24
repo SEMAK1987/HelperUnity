@@ -456,7 +456,7 @@ function generateId() {
 
 async function checkProjectIntegrity() {
   const kb = await fs.readJson(kbPath).catch(() => ({}));
-  const currentVersion = kb.version || "18.7.4";
+  const currentVersion = kb.version || "18.7.7";
   
   const files = [
     { name: "knowledge_base.json", default: { project_name: "Unity Assistant", version: currentVersion, project_path: process.cwd(), system_instruction: "You are a helpful assistant." } },
@@ -506,17 +506,17 @@ async function generateMasterBlueprint() {
     const blueprint = await fs.readJson(blueprintJsonPath);
     
     let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"} (Total Knowledge Archive Edition)\n\n`;
-    md += `> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.7.4.\n\n`;
+    md += `> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.7.7.\n\n`;
     md += `## 1. Общая информация\n`;
-    md += `- **Версия Помощника:** ${blueprint.version || "18.7.4"}\n`;
-    md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (v18.7.4 Live Audio & RPG Solution) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых изысканий, синхронизации UI, глобального менеджера сохранений SaveGameSystem.cs и языковых ассетов (SDF), а также передовых гайдлайнов Suno, Udio и Pixabay Sound Effects с AudioMixer. Полная справочная база по озвучке элементов UI, сумок, навыков, монстров, а также по маршрутизации AudioMixer в Unity."}\n`;
+    md += `- **Версия Помощника:** ${blueprint.version || "18.7.7"}\n`;
+    md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (v18.7.7 Canvas Lifecycle Mastery) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых изысканий, синхронизации UI, глобального менеджера сохранений SaveGameSystem.cs и языковых ассетов (SDF), а также передовых гайдлайнов Suno, Udio и Pixabay Sound Effects с AudioMixer. Полная справочная база по озвучке элементов UI, сумок, навыков, монстров, а также по маршрутизации AudioMixer в Unity."}\n`;
     md += `- **Путь проекта:** ${kb.project_path || "Не задан"}\n`;
     md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
     md += `- **Версия Unity:** ${currentUnityStatus.version}\n`;
     md += `- **Версия Blender:** ${currentBlenderStatus.version}\n`;
     md += `- **Версия GIMP:** ${currentGimpStatus.version}\n`;
     md += `- **Версия Redot:** ${currentRedotStatus.version}\n`;
-    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_7_4_FATE_MASTER]\n\n`;
+    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_7_7_FATE_MASTER]\n\n`;
     
     md += `## 2. Структура интерфейса\n`;
     md += `### Вкладки\n`;
@@ -559,13 +559,13 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.7.4 - Zenith Audio Calibration)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.7.7 - Zenith Canvas Lifecycle Mastery)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
     md += `- **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.\n`;
     md += `- **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.\n`;
     md += `- **No-Internet Mode (Quantum Archive):** 10,000+ видео-уроков. Мгновенный доступ при любых внешних условиях.\n\n`;
 
-    md += `### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.7.4 Sync)\n`;
+    md += `### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.7.7 Sync)\n`;
     md += `- **Unity 6 Physics & Optimization:** [Video #2](https://www.youtube.com/watch?v=9vuyis_Y-LY)\n`;
     md += `- **Blender Advanced Rigging:** [Video #3](https://www.youtube.com/watch?v=UKZp67dY1_w)\n`;
     md += `- **Shader Graph Mastery:** [Video #4](https://www.youtube.com/watch?v=-hvxjyzcSkI)\n`;
@@ -786,7 +786,10 @@ async function generateMasterBlueprint() {
     md += `- **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.\n`;
     md += `- **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.\n\n`;
 
-    md += `## 13. История изменений (v18.7.4)\n`;
+    md += `## 13. История изменений (v18.7.7)\n`;
+    md += `- **v18.7.7:** Zenith Canvas Lifecycle Mastery - Resolves active UI panels duplicating or failing back-to-menu navigation states on reload through automatic reference recycling and event binding resets in Menu_Game.\n`;
+    md += `- **v18.7.6:** Zenith Safe Transition - Zero Editor/Canvas leak on Scene reload, separated the UI Panels and SettingsManager standalone lifecycle to guarantee there are no Canvas duplicates or overlaps upon loading scenes back-and-forth.\n`;
+    md += `- **v18.7.5:** Zenith Audio Autonomy - Standalone fallback sound calibration in UIButtonSelectionHover.\n`;
     md += `- **v18.7.4:** Zenith Audio Calibration - Eliminated AudioMixer parameter existence warnings by using silent direct SetFloat writes, customized UIButtonSfxBinder to trigger only on full button Clicks, and added explicit back/escape button name checking (back/exit/close/return/cancel/назад/arrow) to play a custom backClickSound clip.\n`;
     md += `- **v18.7.3:** Zenith Audio Synergy - Deep Pixabay sound navigation guides, expansive custom prompt dictionaries (clinging clicks, inventories, gear, monsters, map selections, combat starts), and robust UIButtonSfxBinder / SettingsManager scripting.\n`;
     md += `- **v18.7.2:** Zenith Multi-Tool Synergy - Sound Prompt Extensions, Pixabay Search Guides, & Unity AudioMixer SettingsManager Integration. Core RPG Saves & Sound Routing.\n`;

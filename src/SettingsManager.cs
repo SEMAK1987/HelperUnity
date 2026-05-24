@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Audio;
+using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections.Generic;
 
@@ -37,18 +38,142 @@ public class SettingsManager : MonoBehaviour
     {
         if (Instance == null)
         {
+            // Чтобы предотвратить перенос всего Canvas, настроек, кнопок или фона из-за DontDestroyOnLoad(gameObject),
+            // мы всегда инициализируем синглтон на чистом, отдельно созданном при старте GameObject.
+            if (gameObject.name != "FATE_SETTINGS_MANAGER")
+            {
+                Debug.Log($"[FATE SETTINGS] Инициализация синглтона на чистом объекте. Защищаем '{gameObject.name}' от DontDestroyOnLoad переноса при переходе на другие сцены.");
+                
+                GameObject sfxObject = new GameObject("FATE_SETTINGS_MANAGER");
+                SettingsManager customManager = sfxObject.AddComponent<SettingsManager>();
+                
+                // Копируем все настройки каталогов звуков и музыки
+                customManager.hoverSounds = this.hoverSounds;
+                customManager.mainMenuPlaylist = this.mainMenuPlaylist;
+                customManager.charSelectionPlaylist = this.charSelectionPlaylist;
+                customManager.worldExplorationPlaylist = this.worldExplorationPlaylist;
+                customManager.battlePlaylist = this.battlePlaylist;
+                customManager.masterMixer = this.masterMixer;
+                
+                // Обязательно копируем UI ссылки на слайдеры, дропдауны и тоглы
+                customManager.soundSlider = this.soundSlider;
+                customManager.musicSlider = this.musicSlider;
+                customManager.qualityDropdown = this.qualityDropdown;
+                customManager.resolutionDropdown = this.resolutionDropdown;
+                customManager.languageDropdown = this.languageDropdown;
+                customManager.fullscreenToggle = this.fullscreenToggle;
+
+                // Создаем и переносим источники звука на новый объект
+                if (this.sfxSource != null)
+                {
+                    AudioSource newSfx = sfxObject.AddComponent<AudioSource>();
+                    CopyAudioSource(this.sfxSource, newSfx);
+                    customManager.sfxSource = newSfx;
+                }
+                else
+                {
+                    customManager.sfxSource = sfxObject.AddComponent<AudioSource>();
+                }
+
+                if (this.musicSource != null)
+                {
+                    AudioSource newMusic = sfxObject.AddComponent<AudioSource>();
+                    CopyAudioSource(this.musicSource, newMusic);
+                    customManager.musicSource = newMusic;
+                }
+                else
+                {
+                    customManager.musicSource = sfxObject.AddComponent<AudioSource>();
+                }
+                
+                Instance = customManager;
+                DontDestroyOnLoad(sfxObject);
+                
+                // Сразу же привязываем UI элементы в первой сцене
+                Instance.BindLoadedUIElements();
+
+                // Уничтожаем только этот дублирующий скрипт-компонент на исходной панели настроек,
+                // чтобы сам GameObject панели со всеми UI кнопками, слайдерами и событиями остался внутри Canvas!
+                Destroy(this);
+                return;
+            }
+
             Instance = this;
-            DontDestroyOnLoad(gameObject); // Переживает смену сцен в Unity
+            Debug.Log("[FATE SETTINGS] Глобальный синглтон SettingsManager успешно запущен на выделенном объекте FATE_SETTINGS_MANAGER.");
         }
         else
         {
-            Destroy(gameObject);
+            if (Instance != this)
+            {
+                // Если мы зашли в меню повторно, передаем новые инспекторные ссылки на кнопки глобальному синглтону
+                Instance.soundSlider = this.soundSlider;
+                Instance.musicSlider = this.musicSlider;
+                Instance.qualityDropdown = this.qualityDropdown;
+                Instance.resolutionDropdown = this.resolutionDropdown;
+                Instance.languageDropdown = this.languageDropdown;
+                Instance.fullscreenToggle = this.fullscreenToggle;
+
+                Instance.BindLoadedUIElements();
+
+                // Уничтожаем этот дублирующий компонент, так как синглтон уже привязан к новым UI элементам
+                Destroy(this);
+            }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+    }
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (Instance == this)
+        {
+            BindLoadedUIElements();
         }
     }
 
     void Start()
     {
-        // Загружаем сохраненные значения и настраиваем плавность слайдеров
+        if (Instance == this)
+        {
+            BindLoadedUIElements();
+        }
+    }
+
+    private void CopyAudioSource(AudioSource source, AudioSource target)
+    {
+        if (source == null || target == null) return;
+        target.clip = source.clip;
+        target.volume = source.volume;
+        target.pitch = source.pitch;
+        target.loop = source.loop;
+        target.playOnAwake = source.playOnAwake;
+        target.outputAudioMixerGroup = source.outputAudioMixerGroup;
+        target.mute = source.mute;
+        target.bypassEffects = source.bypassEffects;
+        target.bypassListenerEffects = source.bypassListenerEffects;
+        target.bypassReverbZones = source.bypassReverbZones;
+    }
+
+    public void BindLoadedUIElements()
+    {
+        Debug.Log("[FATE SETTINGS] Регистрация кнопок и слайдеров в активном синглтоне SettingsManager...");
+
         if (soundSlider != null) {
             soundSlider.wholeNumbers = false;
             soundSlider.minValue = 0f;
@@ -57,6 +182,7 @@ public class SettingsManager : MonoBehaviour
             soundSlider.onValueChanged.RemoveAllListeners();
             soundSlider.onValueChanged.AddListener(SetSoundVolume);
             SetSoundVolume(soundSlider.value);
+            Debug.Log("[FATE SETTINGS] soundSlider успешно привязан.");
         }
         
         if (musicSlider != null) {
@@ -67,17 +193,22 @@ public class SettingsManager : MonoBehaviour
             musicSlider.onValueChanged.RemoveAllListeners();
             musicSlider.onValueChanged.AddListener(SetMusicVolume);
             SetMusicVolume(musicSlider.value);
+            Debug.Log("[FATE SETTINGS] musicSlider успешно привязан.");
         }
 
         if (qualityDropdown != null) {
             qualityDropdown.value = PlayerPrefs.GetInt("QualityLevel", QualitySettings.GetQualityLevel());
+            qualityDropdown.onValueChanged.RemoveAllListeners();
+            qualityDropdown.onValueChanged.AddListener(SetQuality);
             SetQuality(qualityDropdown.value);
+            Debug.Log("[FATE SETTINGS] qualityDropdown успешно привязан.");
         }
 
         if (languageDropdown != null) {
             languageDropdown.value = PlayerPrefs.GetInt("Language", 0);
             languageDropdown.onValueChanged.RemoveAllListeners();
             languageDropdown.onValueChanged.AddListener(OnLanguageChanged);
+            Debug.Log("[FATE SETTINGS] languageDropdown успешно привязан.");
         }
 
         UpdateDropdownTranslations();
@@ -102,6 +233,7 @@ public class SettingsManager : MonoBehaviour
             resolutionDropdown.AddOptions(options);
             resolutionDropdown.value = PlayerPrefs.GetInt("Resolution", currentResIndex);
             resolutionDropdown.RefreshShownValue();
+            Debug.Log("[FATE SETTINGS] resolutionDropdown успешно привязан.");
         }
 
         if (fullscreenToggle != null) {
@@ -121,6 +253,7 @@ public class SettingsManager : MonoBehaviour
                 TMP_Text txt = fullscreenToggle.GetComponentInChildren<TMP_Text>(true);
                 if (txt != null) txt.text = Translator.GetText(11);
             }
+            Debug.Log("[FATE SETTINGS] fullscreenToggle успешно привязан.");
         }
     }
 

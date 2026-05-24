@@ -9,8 +9,73 @@ public class Menu_Game : MonoBehaviour
 
     void Awake()
     {
-        if (Instance == null) Instance = this;
-        else if (Instance != this) Destroy(gameObject);
+        if (Instance == null)
+        {
+            Instance = this;
+            // Раскомментируйте строку ниже, если ваш Menu_Game должен выживать между сценами:
+            // DontDestroyOnLoad(gameObject);
+        }
+        else if (Instance != this)
+        {
+            Debug.Log("[FATE CORE] Найден дубликат Menu_Game. Передаем ссылки на кнопки новому интерфейсу и уничтожаем дубликат.");
+            
+            // АВТОМАТИЧЕСКОЕ СПАСЕНИЕ ССЫЛОК:
+            // Если выживший синглтон остался в сцене, а мы вернулись обратно — 
+            // новый дубликат передаст свои свежие ссылки на кнопки из новой сцены старому инстансу.
+            Instance.TransferNewReferences(this);
+            
+            Destroy(gameObject);
+            return;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+    }
+
+    // Метод переноса свежих ссылок при перезапуске или возврате в сцену меню
+    public void TransferNewReferences(Menu_Game newInstance)
+    {
+        try
+        {
+            Debug.Log("[FATE CORE] Перенос UI ссылок в выживший Синглтон...");
+            
+            // Копируем ссылки на панели
+            this.mainMenuPanel = newInstance.mainMenuPanel;
+            this.settingsPanel = newInstance.settingsPanel;
+            this.gameTitle = newInstance.gameTitle;
+            this.newGameOrLoadChoicePanel = newInstance.newGameOrLoadChoicePanel;
+            this.loadGameSlotsPanel = newInstance.loadGameSlotsPanel;
+            this.startBackgroundPanel = newInstance.startBackgroundPanel;
+            this.newGameConfirmPanel = newInstance.newGameConfirmPanel;
+
+            // Копируем ссылки на кнопки
+            this.startButton = newInstance.startButton;
+            this.settingsButton = newInstance.settingsButton;
+            this.exitButton = newInstance.exitButton;
+            
+            this.newGameButton = newInstance.newGameButton;
+            this.loadGameChoiceButton = newInstance.loadGameChoiceButton;
+            this.backToMainMenuButton = newInstance.backToMainMenuButton;
+            
+            this.confirmYesButton = newInstance.confirmYesButton;
+            this.confirmNoButton = newInstance.confirmNoButton;
+
+            this.characterSelectionSceneName = newInstance.characterSelectionSceneName;
+            this.characterSelectionSceneIndex = newInstance.characterSelectionSceneIndex;
+            this.loadByName = newInstance.loadByName;
+
+            // Инициализируем заново слушатели событий для свежих кнопок на сцене!
+            this.SetupListeners();
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"[FATE CORE ERROR] Критическая ошибка при автоматическом переносе ссылок: {ex}");
+        }
     }
 
     [Header("Кнопки Главного Меню")]
@@ -34,49 +99,101 @@ public class Menu_Game : MonoBehaviour
     public Button confirmYesButton;
     public Button confirmNoButton;
 
+    [Header("Настройки сцены")]
+    [Tooltip("Название сцены выбора персонажа, если загружаем по имени")]
+    public string characterSelectionSceneName = "CharacterSelection";
+    [Tooltip("Индекс сцены выбора персонажа, если загружаем по индексу (по умолчанию 1)")]
+    public int characterSelectionSceneIndex = 1;
+    [Tooltip("Включите это свойство, чтобы загружать сцену по Имени вместо Индекса")]
+    public bool loadByName = false;
+
     void Start()
     {
-        // Привязка событий кнопкам
-        if (startButton != null) startButton.onClick.AddListener(OnStartButtonClicked);
-        if (settingsButton != null) settingsButton.onClick.AddListener(OnClickSettingsButton);
-        if (exitButton != null) exitButton.onClick.AddListener(OnClickExitButton);
-        
-        // Кнопки в панели выбора
-        if (newGameButton != null) newGameButton.onClick.AddListener(OnClickNewGameButton);
-        if (loadGameChoiceButton != null) loadGameChoiceButton.onClick.AddListener(OnClickLoadGameChoices);
-        if (backToMainMenuButton != null) backToMainMenuButton.onClick.AddListener(ShowMainMenu);
+        SetupListeners();
+    }
 
-        // Кнопки подтверждения
-        if (confirmYesButton != null) confirmYesButton.onClick.AddListener(OnConfirmNewGameYes);
-        if (confirmNoButton != null) confirmNoButton.onClick.AddListener(OnConfirmNewGameNo);
-
-        // Автоматическая настройка кнопки "Btn_BackSettings" в панели опций
-        if (settingsPanel != null)
+    // Слушатели событий теперь настраиваются безопасно из одного метода
+    public void SetupListeners()
+    {
+        try
         {
-            Button[] buttons = settingsPanel.GetComponentsInChildren<Button>(true);
-            foreach (Button btn in buttons)
+            // Очищаем старые подписки (RemoveAllListeners) во избежание дублирования вызовов кликов
+            if (startButton != null) { startButton.onClick.RemoveAllListeners(); startButton.onClick.AddListener(OnStartButtonClicked); }
+            if (settingsButton != null) { settingsButton.onClick.RemoveAllListeners(); settingsButton.onClick.AddListener(OnClickSettingsButton); }
+            if (exitButton != null) { exitButton.onClick.RemoveAllListeners(); exitButton.onClick.AddListener(OnClickExitButton); }
+            
+            // Кнопки во вспомогательной панели выбора
+            if (newGameButton != null) { newGameButton.onClick.RemoveAllListeners(); newGameButton.onClick.AddListener(OnClickNewGameButton); }
+            if (loadGameChoiceButton != null) { loadGameChoiceButton.onClick.RemoveAllListeners(); loadGameChoiceButton.onClick.AddListener(OnClickLoadGameChoices); }
+            if (backToMainMenuButton != null) { backToMainMenuButton.onClick.RemoveAllListeners(); backToMainMenuButton.onClick.AddListener(ShowMainMenu); }
+
+            // Кнопки подтверждения
+            if (confirmYesButton != null) { confirmYesButton.onClick.RemoveAllListeners(); confirmYesButton.onClick.AddListener(OnConfirmNewGameYes); }
+            if (confirmNoButton != null) { confirmNoButton.onClick.RemoveAllListeners(); confirmNoButton.onClick.AddListener(OnConfirmNewGameNo); }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"[FATE CORE ERROR] Ошибка при привязке кнопок в Menu_Game.SetupListeners: {ex}");
+        }
+
+        try
+        {
+            // Автонастройка обратной кнопки настроек и альтернативных кнопок выхода в панели настроек
+            if (settingsPanel != null)
             {
-                if (btn != null && btn.name == "Btn_BackSettings")
+                Button[] buttons = settingsPanel.GetComponentsInChildren<Button>(true);
+                foreach (Button btn in buttons)
                 {
-                    btn.onClick.RemoveAllListeners();
-                    btn.onClick.AddListener(ShowMainMenu);
-                    Debug.Log("[FATE CORE] Автоматически настроена кнопка Btn_BackSettings!");
-                    break;
+                    if (btn != null)
+                    {
+                        string nameLower = btn.name.ToLower();
+                        if (btn.name == "Btn_BackSettings" || 
+                            nameLower.Contains("back") || 
+                            nameLower.Contains("return") || 
+                            nameLower.Contains("назад") || 
+                            nameLower.Contains("выход") ||
+                            nameLower.Contains("arrow") ||
+                            nameLower.Contains("streл"))
+                        {
+                            btn.onClick.RemoveAllListeners();
+                            btn.onClick.AddListener(ShowMainMenu);
+                            Debug.Log($"[FATE CORE] Автоматически настроена кнопка настроек НАЗАД: {btn.name}!");
+                        }
+                    }
                 }
             }
         }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"[FATE CORE ERROR] Ошибка при автоматическом сопоставлении кнопок возврата настроек: {ex}");
+        }
 
-        // Автоматическая первоначальная настройка слотов и кнопок возврата в панели слотов
-        UpdateSlotButtons();
+        try
+        {
+            // Настройка кнопок слотов и их обратных слушателей
+            UpdateSlotButtons();
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"[FATE CORE ERROR] Ошибка при обновлении слотов сохранения: {ex}");
+        }
 
-        ShowMainMenu();
+        try
+        {
+            ShowMainMenu();
+            Debug.Log("[FATE CORE] Состояние панелей сброшено. Активно Главное Меню.");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"[FATE CORE ERROR] Ошибка при вызове ShowMainMenu: {ex}");
+        }
     }
 
     public void ShowMainMenu()
     {
         HideAllPanels();
         if (mainMenuPanel != null) mainMenuPanel.SetActive(true);
-        if (gameTitle != null) gameTitle.SetActive(true); // Показываем логотип
+        if (gameTitle != null) gameTitle.SetActive(true); 
         if (startBackgroundPanel != null) startBackgroundPanel.SetActive(false);
     }
 
@@ -84,7 +201,7 @@ public class Menu_Game : MonoBehaviour
     {
         if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
         if (settingsPanel != null) settingsPanel.SetActive(false);
-        if (gameTitle != null) gameTitle.SetActive(false); // Скрываем логотип
+        if (gameTitle != null) gameTitle.SetActive(false); 
         if (newGameOrLoadChoicePanel != null) newGameOrLoadChoicePanel.SetActive(false);
         if (loadGameSlotsPanel != null) loadGameSlotsPanel.SetActive(false);
         if (newGameConfirmPanel != null) newGameConfirmPanel.SetActive(false);
@@ -122,22 +239,43 @@ public class Menu_Game : MonoBehaviour
         }
         else
         {
-            // Если панель не назначена, запускаем сразу
             OnConfirmNewGameYes();
         }
     }
 
     public void OnConfirmNewGameYes()
     {
-        Debug.Log("[FATE CORE] Новая игра ПОДТВЕРЖДЕНА. Сброс игровых данных и загрузка сцены 1 (Выбор героя).");
-        SaveGameSystem.ResetData(); // Сбрасываем старые данные перед запуском новой игры
-        SceneManager.LoadScene(1);
+        Debug.Log($"[FATE CORE] Новая игра ПОДТВЕРЖДЕНА. Сброс игровых данных и загрузка сцены выбора героя {(loadByName ? characterSelectionSceneName : characterSelectionSceneIndex.ToString())}.");
+        SaveGameSystem.ResetData(); 
+        
+        if (loadByName)
+        {
+            if (LoadingScreenManager.Instance != null)
+            {
+                LoadingScreenManager.Instance.LoadScene(characterSelectionSceneName);
+            }
+            else
+            {
+                SceneManager.LoadScene(characterSelectionSceneName);
+            }
+        }
+        else
+        {
+            if (LoadingScreenManager.Instance != null)
+            {
+                LoadingScreenManager.Instance.LoadScene(characterSelectionSceneIndex);
+            }
+            else
+            {
+                SceneManager.LoadScene(characterSelectionSceneIndex);
+            }
+        }
     }
 
     public void OnConfirmNewGameNo()
     {
         Debug.Log("[FATE CORE] Отмена новой игры. Возврат в меню выбора.");
-        OnStartButtonClicked(); // Это вернет нас к панели выбора
+        OnStartButtonClicked(); 
     }
 
     public void OnClickLoadGameChoices()
@@ -149,7 +287,7 @@ public class Menu_Game : MonoBehaviour
         {
             loadGameSlotsPanel.SetActive(true);
             if (startBackgroundPanel != null) startBackgroundPanel.SetActive(true);
-            UpdateSlotButtons(); // Тексты и слушатели кнопок обновляются во время перехода
+            UpdateSlotButtons(); 
         }
         else 
         {
@@ -160,7 +298,7 @@ public class Menu_Game : MonoBehaviour
     public void OnClickBackFromLoad()
     {
         Debug.Log("[FATE CORE] Назад из меню слотов. Показываем панель выбора.");
-        OnStartButtonClicked(); // Возвращает в меню выбора Новая игра / Загрузить
+        OnStartButtonClicked(); 
     }
 
     public void UpdateSlotButtons()
@@ -173,7 +311,6 @@ public class Menu_Game : MonoBehaviour
         {
             if (btn == null) continue;
 
-            // Находим кнопку Назад по имени или содержанию "back"
             if (btn.name == "Btn_BackLoad" || btn.name == "Btn_BackSlots" || btn.name.ToLower().Contains("back"))
             {
                 btn.onClick.RemoveAllListeners();
@@ -182,12 +319,10 @@ public class Menu_Game : MonoBehaviour
                 continue;
             }
 
-            // Настраиваем 3 основные кнопки слотов в середине
             if (slotIndex < 3)
             {
-                int currentSlot = slotIndex; // Локальный индекс для безопасного замыкания лямбды
+                int currentSlot = slotIndex; 
 
-                // Обновляем текст кнопки на основе текущего языка
                 TMP_Text txt = btn.GetComponentInChildren<TMP_Text>();
                 if (txt != null)
                 {
@@ -195,15 +330,14 @@ public class Menu_Game : MonoBehaviour
                     if (hasSave)
                     {
                         string saveInfo = PlayerPrefs.GetString("Save_Slot_" + currentSlot + "_Info", "Saved Game");
-                        txt.text = Translator.GetText(24) + (currentSlot + 1) + " - " + saveInfo; // "Слот X - [Данные]"
+                        txt.text = Translator.GetText(24) + (currentSlot + 1) + " - " + saveInfo; 
                     }
                     else
                     {
-                        txt.text = Translator.GetText(24) + (currentSlot + 1) + " " + Translator.GetText(27); // "Слот X (Пусто)"
+                        txt.text = Translator.GetText(24) + (currentSlot + 1) + " " + Translator.GetText(27); 
                     }
                 }
 
-                // Привязываем слушатель
                 btn.onClick.RemoveAllListeners();
                 btn.onClick.AddListener(() => OnSlotClicked(currentSlot));
 
@@ -218,7 +352,6 @@ public class Menu_Game : MonoBehaviour
         {
             Debug.Log("[FATE CORE] Загрузка игры из сохраненного слота " + slotIndex);
             
-            // Загружаем все параметры персонажа, квесты и загружаем сцену через SaveGameSystem
             bool loadSuccess = SaveGameSystem.Load(slotIndex);
             if (!loadSuccess)
             {

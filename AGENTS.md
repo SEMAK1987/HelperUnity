@@ -1,10 +1,10 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.7.4)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.7.7)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** 18.7.4
+- **Version:** 18.7.7
 - **Engine:** Unity 6 (6000.3.10f1)
-- **Updates:** Zenith Audio Calibration - Silent volume settings, click-only UIButtonSfxBinder & Back-button sound redirect mappings (v18.7.4). Core RPG Saves & Sound Routing.
+- **Updates:** Zenith Canvas Lifecycle Mastery - Resolves active UI panels duplicating or failing back-to-menu navigation states on reload through automatic reference recycling and event binding resets in Menu_Game. (v18.7.7). Core RPG Saves & Sound Routing.
 - **Design System:** Zenith Glassmorphism (8K Ultra-High Density)
 
 ## 📑 Core Documentation References
@@ -25,10 +25,10 @@
 - **Audio Rule (CRITICAL):** Используйте только `SettingsManager.cs` для управления звуком и музыкой (включая hover-эффекты и списки воспроизведения). Скрипты `AudioHandler` и `AudioManager` должны быть полностью удалены для чистоты проекта. Музыкальные клипы продлеваются через Suno/Udio и настраиваются на бесшовное зацикливание (`loop = true`). Звуковые файлы берем с Pixabay/Freesound по CC0-лицензии и подключаем напрямую к SettingsManager или через AudioMixer.
 
 ## 🚀 Протокол «Пошаговое Мастерство» (Step-by-Step Mastery)
-1. **Отслеживание прогресса:** Текущая версия v18.7.4 (Zenith Audio Calibration - Clean volume settings without mixer warnings, click-only UIButtonSfxBinder triggers, and Back-button sound redirect mappings).
+1. **Отслеживание прогресса:** Текущая версия v18.7.7 (Zenith Canvas Lifecycle Mastery - Resolves active UI panels duplicating or failing back-to-menu navigation states on reload through automatic reference recycling and event binding resets in Menu_Game. v18.7.7).
 2. **Чек-листы:** Инструкции по GLB-скачиванию, TMP-восстановлению, настройке триггеров сохранения, продлению треков в Suno / Udio (Extend, Get Whole Song), бесшовным музыкальным петлям, навигации по Pixabay, СС0 фильтрации, поисковым промптам, UIButtonSfxBinder автоматизации и маршрутизации звука через AudioMixer в Unity.
-3. **Обработка ошибок:** Исправлены проблемы CS1061, дублирования разрешений, сброса шрифтов, некорректной локализации, некорректной фильтрации, некорректного применения аудио-эффектов, устаревших аудио-провайдеров и предупреждений "Exposed name does not exist" в микшере.
+3. **Обработка ошибок:** Исправлены проблемы CS1061, CS0155 (catch exceptions type, New Input System), дублирования разрешений, сброса шрифтов, некорректной локализации, некорректной фильтрации, некорректного применения аудио-эффектов, устаревших аудио-провайдеров и предупреждений "Exposed name does not exist" в микшере, а также добавлена работа звука без привязки к сцене в редакторе.
 4. **ОЧИСТКА:** Используйте только `SettingsManager.cs` для аудио. Удалите `AudioHandler` и `AudioManager` скрипты. Не использовать ElevenLabs.
 
 ---
-*Ядро AI пересинхронизировано (v18.7.4). Авто-апдейтер активен.*
+*Ядро AI пересинхронизировано (v18.7.7). Авто-апдейтер активен.*

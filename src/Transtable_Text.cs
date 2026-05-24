@@ -10,7 +10,7 @@ public class Transtable_Text : MonoBehaviour
 
     void Awake()
     {
-        UIText = GetComponent<TextMeshProUGUI>();
+        UIText = this.GetComponent<TextMeshProUGUI>();
         if (UIText != null) originalFont = UIText.font;
     }
 
@@ -27,7 +27,7 @@ public class Transtable_Text : MonoBehaviour
 
     public void UpdateText()
     {
-        if (UIText == null) UIText = GetComponent<TextMeshProUGUI>();
+        if (UIText == null) UIText = this.GetComponent<TextMeshProUGUI>();
         
         if (UIText != null)
         {
@@ -38,7 +38,7 @@ public class Transtable_Text : MonoBehaviour
     // Метод для вызова из инспектора при изменении ID
     private void OnValidate()
     {
-        if (UIText == null) UIText = GetComponent<TextMeshProUGUI>();
+        if (UIText == null) UIText = this.GetComponent<TextMeshProUGUI>();
         if (UIText != null) UIText.text = Translator.GetText(TextID);
     }
 }

@@ -1,6 +1,6 @@
 {
   "project": "Fate Continent",
-  "version": "18.7.4",
+  "version": "18.7.7",
   "modules": [
     {
       "name": "Localization & Fonts",
@@ -21,7 +21,10 @@
         "Pixabay CC0 Search Guidelines & Dedicated UI/Game Event Prompts (v18.7.2)",
         "Unity AudioMixer Button Connection with Mixer Group Routing (v18.7.2)",
         "Zenith Audio Synergy v18.7.3: Deep Pixabay sound navigation guides, expansive custom prompt dictionaries (clinging clicks, inventories, gear, monsters, map selections, combat starts), and robust UIButtonSfxBinder / SettingsManager scripting.",
-        "Zenith Audio Calibration v18.7.4: Eliminated AudioMixer parameter existence warnings by using silent direct SetFloat writes, customized UIButtonSfxBinder to trigger only on full button Clicks, and added explicit back/escape button name checking (back/exit/close/return/cancel/назад/arrow) to play a custom backClickSound clip."
+        "Zenith Audio Calibration v18.7.4: Eliminated AudioMixer parameter existence warnings by using silent direct SetFloat writes, customized UIButtonSfxBinder to trigger only on full button Clicks, and added explicit back/escape button name checking (back/exit/close/return/cancel/назад/arrow) to play a custom backClickSound clip.",
+        "Zenith Audio Autonomy v18.7.5: Fully autonomous standalone fallback sound system in UIButtonSelectionHover.cs that creates local temporary AudioSources as fallbacks in the Editor if SettingsManager/UIButtonSfxBinder singletons are not in the active scene. Resolved CharacterSelectionController CS0155 catch type error using universal system exception safety blocks.",
+        "Zenith Safe Transition v18.7.6: Zero Editor/Canvas leak on Scene reload, separated the UI Panels and SettingsManager standalone lifecycle to guarantee there are no Canvas duplicates or overlaps upon loading scenes back-and-forth.",
+        "Zenith Canvas Lifecycle Mastery v18.7.7: Resolves active UI panels duplicating or failing back-to-menu navigation states on reload through automatic reference recycling in Menu_Game."
       ]
     },
     {

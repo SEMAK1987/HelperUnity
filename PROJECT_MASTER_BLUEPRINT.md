@@ -1,17 +1,17 @@
 # PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Total Knowledge Archive Edition)
 
-> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.7.4.
+> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.7.7.
 
 ## 1. Общая информация
-- **Версия Помощника:** 18.7.4
-- **Описание:** Гибридный ИИ-помощник нового поколения (v18.7.4 Live Audio & RPG Solution) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых изысканий, синхронизации UI, глобального менеджера сохранений SaveGameSystem.cs и языковых ассетов (SDF), а также передовых гайдлайнов Suno, Udio и Pixabay Sound Effects с AudioMixer. Полная справочная база по озвучке элементов UI, сумок, навыков, монстров, а также по маршрутизации AudioMixer в Unity.
+- **Версия Помощника:** 18.7.7
+- **Описание:** Гибридный ИИ-помощник нового поколения (v18.7.7 Canvas Lifecycle Mastery) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка квантовых изысканий, синхронизации UI, глобального менеджера сохранений SaveGameSystem.cs и языковых ассетов (SDF), а также передовых гайдлайнов Suno, Udio и Pixabay Sound Effects с AudioMixer. Полная справочная база по озвучке элементов UI, сумок, навыков, монстров, а также по маршрутизации AudioMixer в Unity.
 - **Путь проекта:** Не задан
 - **Локальное хранилище:** Не задано
 - **Версия Unity:** unknown
 - **Версия Blender:** unknown
 - **Версия GIMP:** unknown
 - **Версия Redot:** unknown
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_7_4_FATE_MASTER]
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_7_7_FATE_MASTER]
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -46,13 +46,13 @@ undefined
 ```
 
 
-## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.7.4 - Zenith Audio Calibration)
+## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.7.7 - Zenith Canvas Lifecycle Mastery)
 ### Режимы работы и Архитектурные уровни
 - **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.
 - **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.
 - **No-Internet Mode (Quantum Archive):** 10,000+ видео-уроков. Мгновенный доступ при любых внешних условиях.
 
-### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.7.4 Sync)
+### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.7.7 Sync)
 - **Unity 6 Physics & Optimization:** [Video #2](https://www.youtube.com/watch?v=9vuyis_Y-LY)
 - **Blender Advanced Rigging:** [Video #3](https://www.youtube.com/watch?v=UKZp67dY1_w)
 - **Shader Graph Mastery:** [Video #4](https://www.youtube.com/watch?v=-hvxjyzcSkI)
@@ -294,7 +294,7 @@ Freesound содержит миллионы звуков от инди-разр�
 - **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.
 
 ## 13. История изменений (v18.7.4)
-- **v18.7.4:** Zenith Audio Calibration - Eliminated AudioMixer parameter existence warnings by using silent direct `SetFloat` writes, customized UIButtonSfxBinder to trigger only on full button Clicks, and added explicit back/escape button name checking (back/exit/close/return/cancel/назад/arrow) to play a custom backClickSound clip.
+- **v18.7.4:** Zenith Audio Calibration - Eliminated AudioMixer parameter existence warnings by using silent direct SetFloat writes, customized UIButtonSfxBinder to trigger only on full button Clicks, and added explicit back/escape button name checking (back/exit/close/return/cancel/назад/arrow) to play a custom backClickSound clip.
 - **v18.7.3:** Zenith Audio Synergy - Deep Pixabay sound navigation guides, expansive custom prompt dictionaries (clinging clicks, inventories, gear, monsters, map selections, combat starts), and robust UIButtonSfxBinder / SettingsManager scripting.
 - **v18.7.2:** Zenith Multi-Tool Synergy - Sound Prompt Extensions, Pixabay Search Guides, & Unity AudioMixer SettingsManager Integration. Core RPG Saves & Sound Routing.
 - **v18.7.1:** Suno & Udio Track Extensions & Seamless Looping guidelines integration, SettingsManager.cs looping rules enforcement, ElevenLabs reference deprecation.

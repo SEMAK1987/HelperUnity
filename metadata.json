@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.7.4. Zenith Audio Calibration - Clean volume adjustments, click-only UIButtonSfxBinder & Back-button sound redirect mappings.",
+  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.7.7. Zenith Canvas Lifecycle Mastery - Resolves active UI panels duplicating or failing back-to-menu navigation states on reload through automatic reference recycling.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
