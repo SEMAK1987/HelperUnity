@@ -8,20 +8,20 @@ using TMPro;
 namespace FateContinent
 {
     /// <summary>
-    /// Разработчик: Fate Continent (Континент Судьбы) • Версия v18.7.7
-    /// Zenith Canvas Lifecycle Mastery & Game Pause Manager
+    /// Разработчик: Fate Continent (Континент Судьбы) • Версия v18.7.9
+    /// Zenith Self-Healing UI & Ultimate Pause Manager
     /// Управляет паузой (ESC) и системой сохранения во время геймплея.
-    /// Предоставляет 3 слота для обычного сохранения, 1 слот для автосохранения,
-    /// и изолированное окно подтверждения выхода в главное меню.
+    /// Автоматически устраняет неверные биндинги текста и кнопок в инспекторе.
+    /// Изолирует элементы паузы во время отображения окна подтверждения выхода, исключая наложение интерфейсов.
     /// </summary>
     public class GamePause_Manager : MonoBehaviour
     {
         public static GamePause_Manager Instance { get; private set; }
 
         [Header("🖥️ Панели Интерфейса")]
-        [Tooltip("Основная панель паузы. Если пуста, будет сгенерирована автоматически при старте.")]
+        [Tooltip("Основная панель паузы. Если пуста, будет найдена на сцене или сгенерирована.")]
         public GameObject pauseMenuPanel;
-        [Tooltip("Панель подтверждения выхода. Если пуста, будет сгенерирована автоматически.")]
+        [Tooltip("Панель подтверждения выхода. Если пуста, будет найдена на сцене или сгенерирована.")]
         public GameObject confirmExitPanel;
 
         [Header("🎛️ Кнопки Меню Паузы")]
@@ -68,7 +68,31 @@ namespace FateContinent
 
         private void Start()
         {
-            // Проверяем, созданы ли UI панели в редакторе. Если нет, создаем красивую Zenith Glassmorphism панель в реальном времени!
+            // СИСТЕМА ДИНАМИЧЕСКОГО САМОЛЕЧЕНИЯ И АВТОПОИСКА (Zenith Auto-Discovery System)
+            if (pauseMenuPanel == null)
+            {
+                var foundPause = GameObject.Find("PausePanel");
+                if (foundPause == null) foundPause = GameObject.Find("Pause_Panel");
+                if (foundPause != null)
+                {
+                    pauseMenuPanel = foundPause;
+                    Debug.Log($"[FATE SELF-HEAL] Автоматически обнаружена существующая панель паузы в сцене: '{foundPause.name}'");
+                }
+            }
+
+            if (confirmExitPanel == null)
+            {
+                var foundConfirm = GameObject.Find("ConfirmPanel");
+                if (foundConfirm == null) foundConfirm = GameObject.Find("Confirm_Exit_Panel");
+                if (foundConfirm == null) foundConfirm = GameObject.Find("ConfirmExitPanel");
+                if (foundConfirm != null)
+                {
+                    confirmExitPanel = foundConfirm;
+                    Debug.Log($"[FATE SELF-HEAL] Автоматически обнаружена панель подтверждения выхода: '{foundConfirm.name}'");
+                }
+            }
+
+            // Если панелей все еще нет в сцене и инспекторе, генерируем красивую Zenith Glassmorphism панель в рантайме
             if (pauseMenuPanel == null)
             {
                 CreateRuntimePauseUI();
@@ -198,7 +222,9 @@ namespace FateContinent
             Time.timeScale = 0f; // Полная заморозка времени физики и апдейтов
 
             if (pauseMenuPanel != null) pauseMenuPanel.SetActive(true);
-            if (confirmExitPanel != null) confirmExitPanel.SetActive(false); // Прячем окно выхода на старте паузы
+            
+            // Включаем нормальное меню паузы (скрываем подтверждение выхода и показываем кнопки сохранений)
+            SetPauseMenuState(false);
 
             Debug.Log("[FATE PAUSE] Игра поставлена на ПАУЗУ.");
         }
@@ -210,8 +236,52 @@ namespace FateContinent
 
             if (pauseMenuPanel != null) pauseMenuPanel.SetActive(false);
             if (confirmExitPanel != null) confirmExitPanel.SetActive(false);
+            if (confirmPromptText != null) confirmPromptText.gameObject.SetActive(false);
 
             Debug.Log("[FATE PAUSE] Возобновление нормального хода времени.");
+        }
+
+        /// <summary>
+        /// Zenith State Manager: Контролирует фазы отображения паузы
+        /// Если isConfirmMode = true: скрываются кнопки сохранений и возврата в игру, 
+        /// отображается только изолированный диалог выхода без наложения графических плашек.
+        /// </summary>
+        private void SetPauseMenuState(bool isConfirmMode)
+        {
+            bool showNormalPauseElements = !isConfirmMode;
+
+            // 1. Управляем видимостью кнопок сохранений и возврата
+            if (saveSlot1Button != null) saveSlot1Button.gameObject.SetActive(showNormalPauseElements);
+            if (saveSlot2Button != null) saveSlot2Button.gameObject.SetActive(showNormalPauseElements);
+            if (saveSlot3Button != null) saveSlot3Button.gameObject.SetActive(showNormalPauseElements);
+            if (autosaveButton != null) autosaveButton.gameObject.SetActive(showNormalPauseElements);
+            if (resumeGameButton != null) resumeGameButton.gameObject.SetActive(showNormalPauseElements);
+            if (exitToMenuButton != null) exitToMenuButton.gameObject.SetActive(showNormalPauseElements);
+
+            // Скрываем заголовок паузы во время диалога выхода во избежание визуального наслоения
+            if (pauseTitleText != null) pauseTitleText.gameObject.SetActive(showNormalPauseElements);
+
+            // 2. Управляем видимостью предупреждения выхода
+            if (confirmPromptText != null)
+            {
+                confirmPromptText.gameObject.SetActive(isConfirmMode);
+            }
+
+            // 3. Управляем видимостью панели подтверждения (ДА/НЕТ кнопки)
+            if (confirmExitPanel != null)
+            {
+                confirmExitPanel.SetActive(isConfirmMode);
+            }
+
+            // На всякий случай дублируем скрытие кнопок подтверждения под их непосредственную активность, если они лежат вне панели
+            if (confirmYesButton != null) confirmYesButton.gameObject.SetActive(isConfirmMode);
+            if (confirmNoButton != null) confirmNoButton.gameObject.SetActive(isConfirmMode);
+
+            // Скрываем плашку уведомления о сохранении во время выхода
+            if (isConfirmMode && toastNotificationText != null)
+            {
+                toastNotificationText.gameObject.SetActive(false);
+            }
         }
 
         private void SetupButtonListeners()
@@ -285,14 +355,8 @@ namespace FateContinent
 
         public void ShowExitConfirmation()
         {
-            if (confirmExitPanel != null)
-            {
-                confirmExitPanel.SetActive(true);
-            }
-            else
-            {
-                OnConfirmExitYes(); // Если нет панели - сразу выходим
-            }
+            // Включаем режим подтверждения выхода
+            SetPauseMenuState(true);
         }
 
         public void OnConfirmExitYes()
@@ -327,10 +391,8 @@ namespace FateContinent
         public void OnConfirmExitNo()
         {
             Debug.Log("[FATE PAUSE] Выход отменен. Возврат на паузу.");
-            if (confirmExitPanel != null)
-            {
-                confirmExitPanel.SetActive(false);
-            }
+            // Выключаем режим подтверждения выхода и возвращаем элементы меню паузы back
+            SetPauseMenuState(false);
         }
 
         private void ShowToastMessage(string message)
@@ -513,16 +575,16 @@ namespace FateContinent
         {
             switch (Translator.LanguageID)
             {
-                case 0: return "Вы уверены, что хотите выйти? Весь несохраненный игровой прогресс будет навсегда потерян.";
+                case 0: return "Вы уверены, что хотите выйти? Весь несохраненный прогресс будет утерян.";
                 case 2: return "Bist du sicher, dass du beenden willst? Ungespeicherter Fortschritt geht verloren.";
-                case 3: return "Êtes-vous sûr de vouloir quitter ? Progression non sauvegardée sera perdue.";
+                case 3: return "Êtes-vous sûr de vouloir quitter ? Progression non sauvegarde de l'échec.";
                 case 4: return "¿Estás seguro de que quieres salir? El progreso no guardado se perderá.";
                 case 5: return "Tem certeza de que deseja sair? O progresso não salvo será perdido.";
                 case 6: return "本当に終了しますか？保存されていない進行状況は失われます。";
                 case 7: return "정말 종료하시겠습니까? 저장되지 않은 진행 상황은 사라집니다.";
                 case 8: return "您确定要退出吗？未保存的进度将会丢失。";
                 case 1:
-                default: return "Are you sure you want to exit? All unsaved game progress will be permanently lost.";
+                default: return "Are you sure you want to exit? All unsaved progress will be lost.";
             }
         }
 
@@ -762,8 +824,8 @@ namespace FateContinent
             txtRect.offsetMin = Vector2.zero;
             txtRect.offsetMax = Vector2.zero;
 
-            // Добавляем красивую подсветку при наведении (UIButtonSelectionHover / UIButtonHoverEffect)
-            btnGov.AddComponent<UIButtonHoverEffect>();
+            // Добавляем красивый ховер эффект
+            btnGov.AddComponent<UIButtonPauseHover>();
 
             return button;
         }

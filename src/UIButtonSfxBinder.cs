@@ -71,11 +71,23 @@ public class UIButtonSfxBinder : MonoBehaviour
 
     private void ScanAndBindAllButtons()
     {
+        // Если в сцене присутствует GamePause_Manager, отключаем автоматический поиск и привязку кнопок для текущей сцены
+        if (FindFirstObjectByType<FateContinent.GamePause_Manager>() != null || FateContinent.GamePause_Manager.Instance != null)
+        {
+            return;
+        }
+
         // FindObjectsByType<Button>(FindObjectsInactive.Include, FindObjectsSortMode.None) находит как активные, так и неактивные кнопки во всей активной сцене!
         Button[] buttons = FindObjectsByType<Button>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         foreach (Button btn in buttons)
         {
             if (btn == null) continue;
+
+            // Если на кнопке вручную назначен UIButtonPauseHover, полностью пропускаем авто-привязку, чтобы избежать конфликтов звуков
+            if (btn.gameObject.GetComponent<UIButtonPauseHover>() != null)
+            {
+                continue;
+            }
 
             // Добавляем наш собственный триггер EventSystem, устойчивый к RemoveAllListeners()
             if (btn.gameObject.GetComponent<ButtonSfxTrigger>() == null)

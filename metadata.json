@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.7.8. Zenith Pause Autonomy - Adds localized ESC game pauses, manual save slots, auto-save triggers, and safe back-to-menu navigation prompts.",
+  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.8.0. Zenith Audio Autonomy & Standalone Routing - Routes button playbacks to stable scene hosts and excludes pause menus from background auto-scanning.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

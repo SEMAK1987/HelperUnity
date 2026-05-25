@@ -1,6 +1,6 @@
 {
   "project_name": "Unity & Blender AI Assistant",
-  "version": "18.7.8",
+  "version": "18.8.0",
   "interface_structure": {
     "tabs": [
       "studio",
@@ -12,10 +12,10 @@
   },
   "agents_count": 52,
   "project_assets": {
-    "scripts_count": 24,
+    "scripts_count": 25,
     "prefabs_count": 0,
     "videos_count": 0,
-    "total_files": 51,
+    "total_files": 52,
     "video_list": [],
     "script_list": [
       "MenuBackgroundCamera_Fate.cs",
@@ -39,10 +39,11 @@
       "src/Transtable_Dropdown.cs",
       "src/Transtable_Text.cs",
       "src/UIButtonHoverEffect.cs",
+      "src/UIButtonPauseHover.cs",
       "src/UIButtonSelectionHover.cs",
       "src/UIButtonSfxBinder.cs",
       "src/UnitBase.cs"
     ]
   },
-  "last_scan": "2026-05-24T11:35:22.409Z"
+  "last_scan": "2026-05-25T13:35:47.767Z"
 }
