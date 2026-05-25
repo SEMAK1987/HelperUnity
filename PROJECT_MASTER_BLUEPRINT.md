@@ -1,17 +1,17 @@
 # PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Total Knowledge Archive Edition)
 
-> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.8.0.
+> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.9.0.
 
 ## 1. Общая информация
-- **Версия Помощника:** 18.8.0
-- **Описание:** Гибридный ИИ-помощник нового поколения (v18.8.0 - Zenith Audio Autonomy & Standalone Routing) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка восстановления ошибочных привязок UI Инспектора, синхронизации UI, локальной маршрутизации на стабильные хосты во время паузы игры, глобального менеджера сохранений SaveGameSystem.cs и языковых ассетов (SDF), а также передовых гайдлайнов Suno, Udio и Pixabay Sound Effects с AudioMixer. Полная справочная база по озвучке элементов UI, сумок, навыков, монстров, а также по маршрутизации AudioMixer в Unity.
+- **Версия Помощника:** 18.9.0
+- **Описание:** Гибридный ИИ-помощник нового поколения (v18.9.0 - Zenith Dialogue Master System) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Интеграция DialogueSystem_Manager.cs с 9-языковым переводом, адаптивными компаньонскими портретами (Aelyssa) и классовым рендерингом (Warrior/Archer/Mage), а также эксклюзивные Midjourney/Stable Diffusion промпты для ассетов диалога без сходства с макетами. Полная поддержка сохранения SaveGameSystem.cs и маршрутизации AudioMixer.
 - **Путь проекта:** Не задан
 - **Локальное хранилище:** Не задано
 - **Версия Unity:** unknown
 - **Версия Blender:** unknown
 - **Версия GIMP:** unknown
 - **Версия Redot:** unknown
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_8_0_FATE_MASTER]
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_9_0_FATE_MASTER]
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -293,7 +293,8 @@ Freesound содержит миллионы звуков от инди-разр�
 - **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.
 - **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.
 
-## 13. История изменений (v18.8.0)
+## 13. История изменений (v18.9.0)
+- **v18.9.0:** Zenith Dialogue Master System - Lays out complete modular DialogueSystem_Manager.cs file supporting custom text, multilingual translation (triple fallbacks), companion guide placement on the left (Aelyssa), and reactive player-selected hero portrait rendering on the right (Warrior/Archer/Mage dependent on SaveGameSystem characterClass info). Configured 5 exhaustive, copy-friendly prompt assets inside CHARACTER_PROMPTS.md and added an interactive Dialogue Box Simulator directly in the "Quests & NPC" workspace tab.
 - **v18.8.0:** Zenith Audio Autonomy & Standalone Routing - Resolves disabled AudioSource exceptions during inside-game menu pause. Customizes UIButtonPauseHover to route playbacks to stable active hosts (e.g., GamePause_Manager or SettingsManager singletons). Excludes pause scenes from UIButtonSfxBinder automatic scan to prevent duplicate sound triggers and enable clean custom binders.
 - **v18.7.9:** Zenith Self-Healing UI - Automatic runtime healing of inspector misconfigurations. Intelligently scans both panels, resolves overlay text conflicts and ensures the Exit dialog does not overlap during normal pause states.
 - **v18.7.8:** Zenith Universal Input Safety - Solves runtime InvalidOperationException when checking old Input in projects with Active New Input System. Integrates reflection-based modern Input System readings for Escape/Space keys, combined with GamePause_Manager localized gameplay pauses and active panel state recycling.

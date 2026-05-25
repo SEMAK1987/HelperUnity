@@ -1,10 +1,10 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.8.0)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.9.0)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** 18.8.0
+- **Version:** 18.9.0
 - **Engine:** Unity 6 (6000.3.10f1)
-- **Updates:** Zenith Audio Autonomy & Standalone Routing - Safely routes pause button clicks to stable active hosts to avoid disabled AudioSource exceptions. Excludes pause scenes from automatic button SFX scan-binding to allow clean custom button triggers. (v18.8.0). Core RPG Saves & Sound Routing.
+- **Updates:** Zenith Dialogue Master System - Introduces DialogueSystem_Manager.cs to orchestrate custom dialog systems using a dual-avatar layout (Aelyssa on left, class-specific player hero on right) and multi-option pointer branching options. Syncs with Translator.cs and includes high-density Midjourney generator prompts in CHARACTER_PROMPTS.md.
 - **Design System:** Zenith Glassmorphism (8K Ultra-High Density)
 
 ## 📑 Core Documentation References
@@ -25,10 +25,10 @@
 - **Audio Rule (CRITICAL):** Используйте только `SettingsManager.cs` для управления звуком и музыкой (включая hover-эффекты и списки воспроизведения). Скрипты `AudioHandler` и `AudioManager` должны быть полностью удалены для чистоты проекта. Музыкальные клипы продлеваются через Suno/Udio и настраиваются на бесшовное зацикливание (`loop = true`). Звуковые файлы берем с Pixabay/Freesound по CC0-лицензии и подключаем напрямую к SettingsManager или через AudioMixer.
 
 ## 🚀 Протокол «Пошаговое Мастерство» (Step-by-Step Mastery)
-1. **Отслеживание прогресса:** Текущая версия v18.8.0 (Zenith Audio Autonomy & Standalone Routing - Safely routes playbacks to stable active hosts and excludes pause menus from background auto-scanning. v18.8.0).
+1. **Отслеживание прогресса:** Текущая версия v18.9.0 (Zenith Dialogue Master System - Dynamic elven companion dialogue sequences with choice-branching, 9-language translation and SaveGame class links. v18.9.0).
 2. **Чек-листы:** Инструкции по GLB-скачиванию, TMP-восстановлению, настройке триггеров сохранения, продлению треков в Suno / Udio (Extend, Get Whole Song), бесшовным музыкальным петлям, навигации по Pixabay, СС0 фильтрации, поисковым промптам, UIButtonSfxBinder автоматизации и маршрутизации звука через AudioMixer в Unity.
 3. **Обработка ошибок:** Исправлены проблемы CS1061, CS0155 (catch exceptions type, New Input System), дублирования разрешений, сброса шрифтов, некорректной локализации, некорректной фильтрации, некорректного применения аудио-эффектов, устаревших аудио-провайдеров и предупреждений "Exposed name does not exist" в микшере, а также добавлена работа звука без привязки к сцене в редакторе.
 4. **ОЧИСТКА:** Используйте только `SettingsManager.cs` для аудио. Удалите `AudioHandler` и `AudioManager` скрипты. Не использовать ElevenLabs.
 
 ---
-*Ядро AI пересинхронизировано (v18.8.0). Авто-апдейтер активен.*
+*Ядро AI пересинхронизировано (v18.9.0). Авто-апдейтер активен.*

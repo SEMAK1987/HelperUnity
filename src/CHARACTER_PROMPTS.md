@@ -40,6 +40,31 @@ Full-body action art of a Zenith Cosmic Mage from Fate Continent on a white back
 
 ---
 
+## 4. 🧝‍♀️ Помощник (Companion Character - Aelyssa)
+
+Наш верный гид и хранительница энергии Зенита. Она сопровождает героя на протяжении всего путешествия по Континенту Судьбы, появляясь в критические моменты и давая мудрые советы через диалоговые окна.
+
+### Портрет для диалогов (Вполоборота / Bust Portrait)
+**Prompt:**
+Bust portrait of Aelyssa, the legendary elven companion guide from Fate Continent, looking slightly towards the camera, white background. She has glowing white-silver hair flowing with pure Zenith particle currents, deep neon-purple eyes full of ancient wisdom, wearing a sleek slate-blue crystalline collar and glassmorphism shoulders wrapped in gold-etched glowing energy runes. Highly detailed digital painting, 8K, cinematic lighting, sharp details, Octane Render style, high contrast, iridescent skin --ar 1:1
+
+### Спокойная поза во весь рост (Для катсцен и 3D моделирования)
+**Prompt:**
+Full-body character concept art of Aelyssa from Fate Continent, standing elegantly on a white background. Levitating gently off the ground, surrounding by floating geometric glass cyan artifacts and orbiting light orbits. Long translucent star-weave robe, high-tech sandals, glowing energy lines on arms. High-density textures, unreal engine 5 style, hyper-detail, 8K render --ar 9:16
+
+---
+
+## 🖼️ Эксклюзивная Шапка и Рамка Диалогов (UI Dialog Box Assets)
+
+Промпты для создания футуристического игрового интерфейса (шапки, рамки и панели выбора), вдохновленного представленным макетом, но обладающего собственным оригинальным стилем.
+
+### Элемент интерфейса: Название панели и Рамка
+**Prompt:**
+A high-tech RPG video game UI dialog panel template asset, white background. Features a futuristic diagonal polygonal dialogue container shape, styled with glowing cyan-blue neon neon neon lines, rich glassmorphism dark indigo crystalline textures, and an exquisite glowing solid orange-amber decorative banner cap at the top left. Elegant sci-fi HUD frame vector design, game development asset, 8K, high contrast --ar 16:9
+
+---
+
 ### 💡 Советы для генерации:
-- **Ratio:** Все промпты настроены на `--ar 9:16` (вертикально), чтобы персонаж поместился во весь рост.
+- **Ratio:** Для вовесь рост используйте `--ar 9:16` (вертикально), для портретов диалога `--ar 1:1` (квадрат), для текстур интерфейса `--ar 16:9` (горизонтально).
 - **Negative Prompt:** (deformed, distorted, disfigured:1.3), background, landscape, ground, grass, rock, blurry, low resolution, multiple characters, extra fingers, bad anatomy.
+

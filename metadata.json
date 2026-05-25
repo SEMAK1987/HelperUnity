@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.8.0. Zenith Audio Autonomy & Standalone Routing - Routes button playbacks to stable scene hosts and excludes pause menus from background auto-scanning.",
+  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.9.0. Zenith Dialogue Master System - Implements custom dialogue systems, companion & class-defined portrait templates, and interactive multi-language branching dialogs.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
