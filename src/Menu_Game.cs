@@ -319,7 +319,7 @@ public class Menu_Game : MonoBehaviour
                 continue;
             }
 
-            if (slotIndex < 3)
+            if (slotIndex < 4)
             {
                 int currentSlot = slotIndex; 
 
@@ -327,14 +327,29 @@ public class Menu_Game : MonoBehaviour
                 if (txt != null)
                 {
                     bool hasSave = PlayerPrefs.HasKey("Save_Slot_" + currentSlot);
-                    if (hasSave)
+                    if (currentSlot == 3) // Стыковка с автосохранением
                     {
-                        string saveInfo = PlayerPrefs.GetString("Save_Slot_" + currentSlot + "_Info", "Saved Game");
-                        txt.text = Translator.GetText(24) + (currentSlot + 1) + " - " + saveInfo; 
+                        if (hasSave)
+                        {
+                            string saveInfo = PlayerPrefs.GetString("Save_Slot_" + currentSlot + "_Info", "Autosave");
+                            txt.text = GetAutosaveLabel() + " - " + saveInfo;
+                        }
+                        else
+                        {
+                            txt.text = GetAutosaveLabel() + " " + Translator.GetText(27);
+                        }
                     }
                     else
                     {
-                        txt.text = Translator.GetText(24) + (currentSlot + 1) + " " + Translator.GetText(27); 
+                        if (hasSave)
+                        {
+                            string saveInfo = PlayerPrefs.GetString("Save_Slot_" + currentSlot + "_Info", "Saved Game");
+                            txt.text = Translator.GetText(24) + (currentSlot + 1) + " - " + saveInfo; 
+                        }
+                        else
+                        {
+                            txt.text = Translator.GetText(24) + (currentSlot + 1) + " " + Translator.GetText(27); 
+                        }
                     }
                 }
 
@@ -343,6 +358,23 @@ public class Menu_Game : MonoBehaviour
 
                 slotIndex++;
             }
+        }
+    }
+
+    private string GetAutosaveLabel()
+    {
+        switch (Translator.LanguageID)
+        {
+            case 0: return "Автосохранение";
+            case 2: return "Auto-Speichern";
+            case 3: return "Sauvegarde Auto";
+            case 4: return "Guardado Automático";
+            case 5: return "Salvamento Automático";
+            case 6: return "オートセーブ";
+            case 7: return "자동 저장";
+            case 8: return "自动保存";
+            case 1:
+            default: return "Auto-Save";
         }
     }
 

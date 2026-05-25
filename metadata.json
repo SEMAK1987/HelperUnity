@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.7.7. Zenith Canvas Lifecycle Mastery - Resolves active UI panels duplicating or failing back-to-menu navigation states on reload through automatic reference recycling.",
+  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.7.8. Zenith Pause Autonomy - Adds localized ESC game pauses, manual save slots, auto-save triggers, and safe back-to-menu navigation prompts.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

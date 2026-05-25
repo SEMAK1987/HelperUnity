@@ -976,6 +976,7 @@ namespace FateContinent
             SaveGameSystem.CurrentData.gold = 150; // Стартовое золото игрока
             SaveGameSystem.CurrentData.currentHealth = heroData.HP;
             SaveGameSystem.CurrentData.maxHealth = heroData.HP;
+            SaveGameSystem.CurrentData.selectedDifficulty = selectedDifficultyIndex; // Записываем сложность в сохранение!
 
             // Сохраняем в Слот 0 (первичный слот новой игры)
             SaveGameSystem.Save(0);

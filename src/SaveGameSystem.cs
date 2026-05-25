@@ -21,6 +21,7 @@ public static class SaveGameSystem
         public string characterClass = "Воин";
         public int currentSceneIndex = 1;
         public string saveDateTime = "";
+        public int selectedDifficulty = 0; // Сохраненная сложность (0 - новичок, 4 - кошмар)
 
         [Header("Характеристики")]
         public int playerLevel = 1;
@@ -97,6 +98,9 @@ public static class SaveGameSystem
         }
 
         CurrentData = JsonUtility.FromJson<SaveData>(json);
+
+        // Синхронизируем уровень сложности в PlayerPrefs, чтобы геймплей его подхватил
+        PlayerPrefs.SetInt("Difficulty", CurrentData.selectedDifficulty);
 
         // 2. Загружаем сцену, на которой остановился игрок
         int targetScene = PlayerPrefs.GetInt("Save_Slot_" + slotIndex + "_Scene", 1);

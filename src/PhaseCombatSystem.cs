@@ -36,6 +36,74 @@ namespace FateContinent
             EventHub.InvokeCombatStart(aliveUnits);
         }
 
+        private enum InputSystemType { Unchecked, OldInput, NewInput }
+        private InputSystemType activeInputType = InputSystemType.Unchecked;
+
+        private bool IsSpacePressed()
+        {
+            if (activeInputType == InputSystemType.NewInput)
+            {
+                return CheckNewInputSystemSpace();
+            }
+            else if (activeInputType == InputSystemType.OldInput)
+            {
+                try
+                {
+                    return Input.GetKeyDown(KeyCode.Space);
+                }
+                catch (System.InvalidOperationException)
+                {
+                    activeInputType = InputSystemType.NewInput;
+                    return CheckNewInputSystemSpace();
+                }
+            }
+
+            // First time check
+            try
+            {
+                bool pressed = Input.GetKeyDown(KeyCode.Space);
+                activeInputType = InputSystemType.OldInput;
+                return pressed;
+            }
+            catch (System.InvalidOperationException)
+            {
+                activeInputType = InputSystemType.NewInput;
+                return CheckNewInputSystemSpace();
+            }
+        }
+
+        private bool CheckNewInputSystemSpace()
+        {
+            try
+            {
+                var inputSystemAssembly = System.Reflection.Assembly.Load("Unity.InputSystem");
+                if (inputSystemAssembly != null)
+                {
+                    var keyboardType = inputSystemAssembly.GetType("UnityEngine.InputSystem.Keyboard");
+                    if (keyboardType != null)
+                    {
+                        var currentProperty = keyboardType.GetProperty("current", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                        var keyboardInstance = currentProperty?.GetValue(null);
+                        if (keyboardInstance != null)
+                        {
+                            var spaceKeyProperty = keyboardInstance.GetType().GetProperty("spaceKey");
+                            var spaceKeyInstance = spaceKeyProperty?.GetValue(keyboardInstance);
+                            if (spaceKeyInstance != null)
+                            {
+                                var wasPressedVal = spaceKeyInstance.GetType().GetProperty("wasPressedThisFrame")?.GetValue(spaceKeyInstance);
+                                if (wasPressedVal != null)
+                                {
+                                    return (bool)wasPressedVal;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch {}
+            return false;
+        }
+
         void Update()
         {
             if (CurrentPhase != CombatPhase.Planning) return;
@@ -43,7 +111,7 @@ namespace FateContinent
             planningTimer += Time.deltaTime;
             EventHub.InvokePlanningTime(planningTime - planningTimer);
 
-            if (planningTimer >= planningTime || Input.GetKeyDown(KeyCode.Space))
+            if (planningTimer >= planningTime || IsSpacePressed())
             {
                 StartActionPhase();
             }
