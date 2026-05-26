@@ -181,6 +181,13 @@ namespace FateContinent
             // Обработка кнопки ESC с использованием безопасного метода IsEscapePressed
             if (IsEscapePressed())
             {
+                // Запрещаем ESC во время активного диалога
+                if (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.IsDialogueActive)
+                {
+                    Debug.Log("[FATE PAUSE] ESC заблокирован: идет диалог с Аэлиссой!");
+                    return;
+                }
+
                 // Проверяем ограничение сцен: "в других сценах в начальной и в сцене битвы что бы она была не активна только в этой сцене"
                 string activeScene = SceneManager.GetActiveScene().name.ToLower();
                 if (activeScene.Contains("menu") || 
@@ -188,9 +195,12 @@ namespace FateContinent
                     activeScene.Contains("battle") || 
                     activeScene.Contains("combat") || 
                     activeScene.Contains("fight") || 
+                    activeScene.Contains("wastes") || 
+                    activeScene.Contains("peak") || 
+                    activeScene.Contains("ruins") || 
                     activeScene == "loading")
                 {
-                    Debug.Log($"[FATE PAUSE] Сцена '{SceneManager.GetActiveScene().name}' запрещена для паузы.");
+                    Debug.Log($"[FATE PAUSE] Сцена '{SceneManager.GetActiveScene().name}' запрещена для паузы (битва или меню).");
                     return;
                 }
 

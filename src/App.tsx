@@ -78,7 +78,8 @@ import {
   Volume2,
   Globe,
   AlertCircle,
-  MessageSquare
+  MessageSquare,
+  Compass
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenAI } from "@google/genai";
@@ -1058,6 +1059,8 @@ export default function App() {
   const [simDialogueLang, setSimDialogueLang] = useState<'RU' | 'EN' | 'KR' | 'CH'>('RU');
   const [simDialogueStep, setSimDialogueStep] = useState<number>(0);
   const [dialogueActiveScene, setDialogueActiveScene] = useState<boolean>(false);
+  const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
+  const [midjourneyContTab, setMidjourneyContTab] = useState<'astralis' | 'vulcania' | 'nordgard' | 'zenith'>('astralis');
 
 
   const fetchPackagesInfo = async () => {
@@ -4927,76 +4930,253 @@ export default function App() {
                                       {simDialogueLang === 'RU' ? 'Перейти к выбору области континента ➔' : simDialogueLang === 'KR' ? '지역 선택 대화로 진입 ➔' : simDialogueLang === 'CH' ? '进入区域选择 ➔' : 'Select territory ➔'}
                                     </button>
                                   ) : simDialogueStep === 3 ? (
-                                    /* THE DYNAMIC CONTINENT CLEANSING LOCATIONS BUTTONS - EXACTLY WHAT USER WANTED */
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 w-full">
-                                      <button 
-                                        onClick={() => {
-                                          setSimDialogueStep(4);
-                                          showNotification("Вы выбрали место: Кровавые Пустоши!", "success");
-                                          try {
-                                            const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-                                            const osc = ctx.createOscillator(); osc.frequency.setValueAtTime(150, ctx.currentTime); osc.frequency.linearRampToValueAtTime(300, ctx.currentTime + 0.2);
-                                            const g = ctx.createGain(); g.gain.setValueAtTime(0.12, ctx.currentTime); osc.connect(g); g.connect(ctx.destination);
-                                            osc.start(); osc.stop(ctx.currentTime + 0.2);
-                                          } catch(e){}
-                                        }}
-                                        className="px-3 py-2 bg-red-600/10 hover:bg-red-600 border border-red-500/30 rounded-xl text-[10px] font-black text-red-200 hover:text-white transition-all flex items-center justify-center gap-2"
-                                      >
-                                        <span>🩸</span>
-                                        {simDialogueLang === 'RU' ? 'Кровавые Пустоши' : simDialogueLang === 'KR' ? '크림슨 황무지' : simDialogueLang === 'CH' ? '绯红荒野' : 'Crimson Wastes'}
-                                      </button>
-                                      
-                                      <button 
-                                        onClick={() => {
-                                          setSimDialogueStep(5);
-                                          showNotification("Вы выбрали место: Ледяной Пик!", "success");
-                                          try {
-                                            const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-                                            const osc = ctx.createOscillator(); osc.frequency.setValueAtTime(300, ctx.currentTime); osc.frequency.linearRampToValueAtTime(600, ctx.currentTime + 0.2);
-                                            const g = ctx.createGain(); g.gain.setValueAtTime(0.12, ctx.currentTime); osc.connect(g); g.connect(ctx.destination);
-                                            osc.start(); osc.stop(ctx.currentTime + 0.2);
-                                          } catch(e){}
-                                        }}
-                                        className="px-3 py-2 bg-cyan-600/10 hover:bg-cyan-600 border border-cyan-500/30 rounded-xl text-[10px] font-black text-cyan-200 hover:text-white transition-all flex items-center justify-center gap-2"
-                                      >
-                                        <span>❄️</span>
-                                        {simDialogueLang === 'RU' ? 'Ледяной Пик' : simDialogueLang === 'KR' ? '빙설의 봉우리' : simDialogueLang === 'CH' ? '冰封之巅' : 'Ice-Bound Peak'}
-                                      </button>
+                                    /* THE DYNAMIC CONTINENT CLEANSING LOCATIONS BUTTONS - EXACTLY WHAT USER WANTED WITH INTERACTIVE 2D MAP */
+                                    <div className="flex flex-col space-y-4 w-full font-sans">
+                                      <div className="text-[10px] text-indigo-150 font-bold uppercase tracking-wider text-center border-b border-indigo-500/10 pb-2 flex items-center justify-center gap-2">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-ping" />
+                                        <span>🗺️ {simDialogueLang === 'RU' ? 'Интерактивная карта континента: Наведите курсор на один из регионов зачистки' : simDialogueLang === 'KR' ? '인터랙티브 대륙 지도: 정화 지역에 커서를 올리세요' : simDialogueLang === 'CH' ? '互动大陆地图：请将鼠标悬停在要净化的区域上' : 'Interactive Continent Map: Hover over a territory to view details'}</span>
+                                      </div>
 
-                                      <button 
-                                        onClick={() => {
-                                          setSimDialogueStep(6);
-                                          showNotification("Вы выбрали место: Древние Руины!", "success");
-                                          try {
-                                            const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-                                            const osc = ctx.createOscillator(); osc.frequency.setValueAtTime(200, ctx.currentTime); osc.frequency.linearRampToValueAtTime(450, ctx.currentTime + 0.2);
-                                            const g = ctx.createGain(); g.gain.setValueAtTime(0.12, ctx.currentTime); osc.connect(g); g.connect(ctx.destination);
-                                            osc.start(); osc.stop(ctx.currentTime + 0.2);
-                                          } catch(e){}
-                                        }}
-                                        className="px-3 py-2 bg-amber-600/10 hover:bg-amber-600 border border-amber-500/30 rounded-xl text-[10px] font-black text-amber-200 hover:text-white transition-all flex items-center justify-center gap-2"
-                                      >
-                                        <span>🏛️</span>
-                                        {simDialogueLang === 'RU' ? 'Древние Руины' : simDialogueLang === 'KR' ? '고대 유적지' : simDialogueLang === 'CH' ? '远古遗迹' : 'Ancient Ruins'}
-                                      </button>
+                                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+                                        {/* LEFT: SVG ILLUSTRATED WATERPROOF CONTINENT MAP with 3 reactive zones */}
+                                        <div className="lg:col-span-6 relative bg-indigo-950/40 rounded-3xl p-4 border border-indigo-500/20 flex flex-col items-center justify-center min-h-[220px]">
+                                          <svg viewBox="0 0 400 300" className="w-full max-h-[190px] drop-shadow-[0_0_15px_rgba(99,102,241,0.15)]">
+                                            {/* Defs for gradients */}
+                                            <defs>
+                                              <radialGradient id="oceanGrad" cx="50%" cy="50%" r="50%">
+                                                <stop offset="0%" stopColor="#1e1b4b" stopOpacity="0.4" />
+                                                <stop offset="100%" stopColor="#030712" stopOpacity="0.9" />
+                                              </radialGradient>
+                                              <pattern id="gridPattern" width="20" height="20" patternUnits="userSpaceOnUse">
+                                                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#6366f1" strokeWidth="0.5" strokeOpacity="0.08" />
+                                              </pattern>
+                                            </defs>
+
+                                            {/* Background Ocean Grid */}
+                                            <rect width="400" height="300" rx="20" fill="url(#oceanGrad)" />
+                                            <rect width="400" height="300" rx="20" fill="url(#gridPattern)" />
+
+                                            {/* Shallow water silhouettes */}
+                                            <path d="M 50 150 Q 80 80 180 60 T 320 120 T 340 220 T 150 250 Z" fill="#4f46e5" fillOpacity="0.06" filter="blur(8px)" />
+
+                                            {/* Continent Mainland Contour Path (Fate Continent Base shape, elegant & stylized) */}
+                                            <path 
+                                              d="M 60 160 C 80 100 130 50 190 60 C 250 50 310 90 330 140 C 350 180 340 230 290 250 C 250 260 180 240 140 260 C 100 270 70 220 60 160 Z" 
+                                              fill="#111827" 
+                                              stroke="#4f46e5" 
+                                              strokeWidth="2" 
+                                              strokeOpacity="0.4" 
+                                            />
+
+                                            {/* REGION 1: Crimson Wastes (Left Bottom) */}
+                                            <path 
+                                              d="M 60 160 C 70 120 120 110 150 140 C 160 170 140 210 135 240 C 95 250 70 215 60 160 Z" 
+                                              fill={hoveredRegion === 'crimson' ? 'rgba(239, 68, 68, 0.35)' : 'rgba(239, 68, 68, 0.12)'}
+                                              stroke={hoveredRegion === 'crimson' ? '#ef4444' : '#b91c1c'}
+                                              strokeWidth={hoveredRegion === 'crimson' ? '3' : '1.5'}
+                                              className="transition-all duration-300 cursor-pointer"
+                                              onMouseEnter={() => setHoveredRegion('crimson')}
+                                              onMouseLeave={() => setHoveredRegion(null)}
+                                              onClick={() => {
+                                                setSimDialogueStep(4);
+                                                showNotification("Вы выбрали место: Кровавые Пустоши!", "success");
+                                              }}
+                                            />
+
+                                            {/* REGION 2: Ice-Bound Peak (Top North) */}
+                                            <path 
+                                              d="M 140 85 C 160 65 210 55 245 75 C 265 105 220 135 180 130 C 150 115 135 100 140 85 Z" 
+                                              fill={hoveredRegion === 'ice' ? 'rgba(6, 182, 212, 0.35)' : 'rgba(6, 182, 212, 0.12)'}
+                                              stroke={hoveredRegion === 'ice' ? '#06b6d4' : '#0891b2'}
+                                              strokeWidth={hoveredRegion === 'ice' ? '3' : '1.5'}
+                                              className="transition-all duration-300 cursor-pointer"
+                                              onMouseEnter={() => setHoveredRegion('ice')}
+                                              onMouseLeave={() => setHoveredRegion(null)}
+                                              onClick={() => {
+                                                setSimDialogueStep(5);
+                                                showNotification("Вы выбрали место: Ледяной Пик!", "success");
+                                              }}
+                                            />
+
+                                            {/* REGION 3: Ancient Ruins (Right & South East) */}
+                                            <path 
+                                              d="M 230 135 C 280 125 320 110 330 145 C 345 195 315 235 275 245 C 240 250 210 210 215 170 C 215 150 220 140 230 135 Z" 
+                                              fill={hoveredRegion === 'ruins' ? 'rgba(245, 158, 11, 0.35)' : 'rgba(245, 158, 11, 0.12)'}
+                                              stroke={hoveredRegion === 'ruins' ? '#f59e0b' : '#d97706'}
+                                              strokeWidth={hoveredRegion === 'ruins' ? '3' : '1.5'}
+                                              className="transition-all duration-300 cursor-pointer"
+                                              onMouseEnter={() => setHoveredRegion('ruins')}
+                                              onMouseLeave={() => setHoveredRegion(null)}
+                                              onClick={() => {
+                                                setSimDialogueStep(6);
+                                                showNotification("Вы выбрали место: Древние Руины!", "success");
+                                              }}
+                                            />
+
+                                            {/* Glow overlay nodes for capitals */}
+                                            <circle cx="106" cy="180" r="5" fill="#f87171" className="animate-pulse pointer-events-none" />
+                                            <circle cx="190" cy="94" r="5" fill="#22d3ee" className="animate-pulse pointer-events-none" />
+                                            <circle cx="280" cy="180" r="5" fill="#fbbf24" className="animate-pulse pointer-events-none" />
+
+                                            {/* Labels on Map */}
+                                            <text x="106" y="165" fill="#fca5a5" fontSize="8" fontWeight="bold" textAnchor="middle" className="pointer-events-none font-sans uppercase tracking-wider">🩸 Wastes</text>
+                                            <text x="190" y="82" fill="#a5f3fc" fontSize="8" fontWeight="bold" textAnchor="middle" className="pointer-events-none font-sans uppercase tracking-wider">❄️ Ice Peak</text>
+                                            <text x="280" y="165" fill="#fde047" fontSize="8" fontWeight="bold" textAnchor="middle" className="pointer-events-none font-sans uppercase tracking-wider">🏛️ Ruins</text>
+
+                                            {/* Map WindRose decoration */}
+                                            <g transform="translate(350, 60)" className="opacity-45">
+                                              <circle r="14" fill="none" stroke="#6366f1" strokeWidth="1" />
+                                              <line x1="0" y1="-18" x2="0" y2="18" stroke="#6366f1" strokeWidth="1" />
+                                              <line x1="-18" y1="0" x2="18" y2="0" stroke="#6366f1" strokeWidth="1" />
+                                              <polygon points="0,-18 -4,-4 0,0" fill="#818cf8" />
+                                              <polygon points="0,-18 4,-4 0,0" fill="#4f46e5" />
+                                              <text x="0" y="-21" fill="#818cf8" fontSize="6" fontWeight="bold" textAnchor="middle">N</text>
+                                            </g>
+                                          </svg>
+
+                                          <div className="absolute bottom-2 left-3 bg-slate-950/80 px-2 py-0.5 rounded-md border border-white/5 text-[8.5px] text-slate-400">
+                                            {simDialogueLang === 'RU' ? 'Клик на регион подтверждает выбор' : 'Click on a region to confirm selection'}
+                                          </div>
+                                        </div>
+
+                                        {/* RIGHT: DETAILED REGION STATS CARD */}
+                                        <div className="lg:col-span-6 flex flex-col justify-between min-h-[220px]">
+                                          {hoveredRegion === null ? (
+                                            /* Empty choice placeholder */
+                                            <div className="flex-1 flex flex-col items-center justify-center text-center p-6 rounded-3xl bg-white/5 border border-dashed border-white/10">
+                                              <Compass className="w-8 h-8 text-indigo-400/40 animate-bounce mb-2" />
+                                              <h5 className="text-[11px] font-bold text-slate-300">
+                                                {simDialogueLang === 'RU' ? 'Регион не выбран' : 'No Region Highlighted'}
+                                              </h5>
+                                              <p className="text-[10px] text-slate-400 max-w-xs mt-1 leading-relaxed">
+                                                {simDialogueLang === 'RU' ? 'Наведите мышь на багровую (Пустоши), бирюзовую (Пик) или золотую (Руины) область карты слева, чтобы дельно изучить бонусы почв и климата.' : 'Hover over the crimson, aqua, or golden territory on the map to inspect terrain buffs, weather drawbacks, and region specifications.'}
+                                              </p>
+                                            </div>
+                                          ) : hoveredRegion === 'crimson' ? (
+                                            /* Crimson Wastes details */
+                                            <div className="p-4 rounded-3xl bg-red-950/30 border border-red-500/30 flex-1 flex flex-col justify-between animate-fade-in font-sans">
+                                              <div>
+                                                <div className="flex items-center justify-between mb-1.5">
+                                                  <span className="text-[11px] font-black text-red-400 uppercase tracking-widest flex items-center gap-1.5">
+                                                    <span>🩸</span> {simDialogueLang === 'RU' ? 'Кровавые Пустоши' : 'Crimson Wastes'}
+                                                  </span>
+                                                  <span className="text-[8px] font-black bg-red-500/20 border border-red-500/30 text-red-300 px-2 py-0.5 rounded uppercase">Огненный шторм</span>
+                                                </div>
+                                                <p className="text-[10px] text-slate-300 leading-normal">
+                                                  {simDialogueLang === 'RU' ? 'Раскаленные бескрайние дюны под вечным багровым небом, терзаемые демоническими налетами и остаточными волнами Кристалла Зенита.' : 'Endless scalding sand dunes under a bleak scarlet crown, plagued by frequent demon invasions and Zenith crystal discharge torrents.'}
+                                                </p>
+                                              </div>
+
+                                              <div className="grid grid-cols-2 gap-2 my-2">
+                                                <div className="p-2 rounded-xl bg-emerald-950/25 border border-emerald-500/20">
+                                                  <span className="text-[8px] font-black text-emerald-400 uppercase tracking-wider block">✙ Плюсы земель</span>
+                                                  <span className="text-[9.5px] text-slate-300 font-bold">+25% к падению божественной руды</span>
+                                                </div>
+                                                <div className="p-2 rounded-xl bg-red-950/25 border border-red-500/20">
+                                                  <span className="text-[8px] font-black text-red-400 uppercase tracking-wider block">✙ Минусы климата</span>
+                                                  <span className="text-[9.5px] text-slate-300 font-bold">-15% к восстановлению здоровья</span>
+                                                </div>
+                                              </div>
+
+                                              <div className="p-2 border border-amber-500/20 rounded-xl bg-amber-500/5">
+                                                <span className="text-[8.5px] font-black text-amber-400 uppercase tracking-widest block">✦ Бонус Местности (Ярость Зенита)</span>
+                                                <p className="text-[9px] text-slate-300 font-medium leading-normal">Шанс критического удара увеличен на 15%, а атаки ближнего боя поджигают врагов.</p>
+                                              </div>
+                                            </div>
+                                          ) : hoveredRegion === 'ice' ? (
+                                            /* Ice-Bound Peak details */
+                                            <div className="p-4 rounded-3xl bg-cyan-950/30 border border-cyan-500/30 flex-1 flex flex-col justify-between animate-fade-in font-sans">
+                                              <div>
+                                                <div className="flex items-center justify-between mb-1.5">
+                                                  <span className="text-[11px] font-black text-cyan-400 uppercase tracking-widest flex items-center gap-1.5">
+                                                    <span>❄️</span> {simDialogueLang === 'RU' ? 'Ледяной Пик' : 'Ice-Bound Peak'}
+                                                  </span>
+                                                  <span className="text-[8px] font-black bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 px-2 py-0.5 rounded uppercase">Вечная стужа</span>
+                                                </div>
+                                                <p className="text-[10px] text-slate-300 leading-normal">
+                                                  {simDialogueLang === 'RU' ? 'Морозные ледяные пропасти на вершине мира, где скрытные ледяные мимики хранят сокровища павших королей.' : 'Frozen gorges and sky-high spires where ice-bound mimics protect the forgotten hordes of gold abandoned by zenith kings.'}
+                                                </p>
+                                              </div>
+
+                                              <div className="grid grid-cols-2 gap-2 my-2">
+                                                <div className="p-2 rounded-xl bg-emerald-950/25 border border-emerald-500/20">
+                                                  <span className="text-[8px] font-black text-emerald-400 uppercase tracking-wider block">✙ Плюсы земель</span>
+                                                  <span className="text-[9.5px] text-slate-300 font-bold">Двойной опыт за ледяных монстров</span>
+                                                </div>
+                                                <div className="p-2 rounded-xl bg-red-950/25 border border-red-500/20">
+                                                  <span className="text-[8px] font-black text-red-400 uppercase tracking-wider block">✙ Минусы климата</span>
+                                                  <span className="text-[9.5px] text-slate-300 font-bold">-10% к скорости бега и атаки</span>
+                                                </div>
+                                              </div>
+
+                                              <div className="p-2 border border-amber-500/20 rounded-xl bg-amber-500/5">
+                                                <span className="text-[8.5px] font-black text-amber-400 uppercase tracking-widest block">✦ Бонус Местности (Сердце Севера)</span>
+                                                <p className="text-[9px] text-slate-300 font-medium leading-normal">Дарует полный иммунитет к эффектам замерзания, окоченения и ледяного оглушения.</p>
+                                              </div>
+                                            </div>
+                                          ) : (
+                                            /* Ancient Ruins details */
+                                            <div className="p-4 rounded-3xl bg-amber-950/30 border border-amber-500/30 flex-1 flex flex-col justify-between animate-fade-in font-sans">
+                                              <div>
+                                                <div className="flex items-center justify-between mb-1.5">
+                                                  <span className="text-[11px] font-black text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
+                                                    <span>🏛️</span> {simDialogueLang === 'RU' ? 'Древние Руины' : 'Ancient Ruins'}
+                                                  </span>
+                                                  <span className="text-[8px] font-black bg-amber-500/20 border border-amber-500/30 text-amber-300 px-2 py-0.5 rounded uppercase">Скрытые ловушки</span>
+                                                </div>
+                                                <p className="text-[10px] text-slate-300 leading-normal">
+                                                  {simDialogueLang === 'RU' ? 'Забытые плиты покинутых дворцов небесных императоров Зенита, полные скрытых нажимных ловушек и спящих автоматонов.' : 'Lost floorplates from abandoned vertical palaces populated by complex stone traps and steel sentinels waiting to wake.'}
+                                                </p>
+                                              </div>
+
+                                              <div className="grid grid-cols-2 gap-2 my-2">
+                                                <div className="p-2 rounded-xl bg-emerald-950/25 border border-emerald-500/20">
+                                                  <span className="text-[8px] font-black text-emerald-400 uppercase tracking-wider block">✙ Плюсы земель</span>
+                                                  <span className="text-[9.5px] text-slate-300 font-bold">+35% к шансу легендарных артефактов</span>
+                                                </div>
+                                                <div className="p-2 rounded-xl bg-red-950/25 border border-red-500/20">
+                                                  <span className="text-[8px] font-black text-red-400 uppercase tracking-wider block">✙ Минусы климата</span>
+                                                  <span className="text-[9.5px] text-slate-300 font-bold">Стрелы ловушек наносят регулярный урон</span>
+                                                </div>
+                                              </div>
+
+                                              <div className="p-2 border border-amber-500/20 rounded-xl bg-amber-500/5">
+                                                <span className="text-[8.5px] font-black text-amber-400 uppercase tracking-widest block">✦ Бонус Местности (Мудрость Вечности)</span>
+                                                <p className="text-[9px] text-slate-300 font-medium leading-normal">
+                                                  {simDialogueLang === 'RU' ? '+20% к урону от заклинаний и ускорение времени перезарядки на 10%.' : '+20% skill spell pierce & 10% shorter skill cooldown rates.'}
+                                                </p>
+                                              </div>
+                                            </div>
+                                          )}
+                                        </div>
+
+                                      </div>
                                     </div>
                                   ) : (
-                                    /* FINALIZE PANEL WITH RESET OPTION */
-                                    <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 w-full">
-                                      <div className="flex-1 p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-[10.5px] text-green-400 font-bold flex items-center gap-2 font-sans">
-                                        <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                                        <span>Вы выбрали место зачистки континента! Диалог успешно протестирован и готов к запуску.</span>
+                                    /* Buttons for step 4, 5, 6 (Final / reset) */
+                                    <div className="flex flex-col space-y-4 w-full">
+                                      <div className="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 text-[10px] text-indigo-300 leading-normal font-sans">
+                                        {simDialogueLang === 'RU' 
+                                          ? '🏁 Симуляция диалоговой ветки завершена! Смена портретов, сюжетных развилок и переводы синхронизированы в соответствии с протоколами Fate Continent (v18.9.0).' 
+                                          : '🏁 Dialog simulation tree completed! Adaptive headshots, choice branchings, and localization keys are in perfect sync with Fate Continent protocols.'}
                                       </div>
-                                      
-                                      <button 
+                                      <button
                                         onClick={() => {
-                                          setDialogueActiveScene(false);
                                           setSimDialogueStep(0);
-                                          showNotification("Сброшено! Выберите класс заново", "info");
+                                          // Play reset audio effect on click
+                                          try {
+                                            const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                            const osc = ctx.createOscillator();
+                                            osc.frequency.setValueAtTime(300, ctx.currentTime);
+                                            osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.1);
+                                            const g = ctx.createGain(); g.gain.setValueAtTime(0.08, ctx.currentTime);
+                                            osc.connect(g); g.connect(ctx.destination);
+                                            osc.start(); osc.stop(ctx.currentTime + 0.1);
+                                          } catch(e){}
                                         }}
-                                        className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md shrink-0"
+                                        className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md self-start"
                                       >
-                                        Сменить Класс & Сбросить ↺
+                                        {simDialogueLang === 'RU' ? '← Начать диалог заново' : '← Reset dialogue tree'}
                                       </button>
                                     </div>
                                   )}
@@ -5004,43 +5184,42 @@ export default function App() {
                               </div>
                             </div>
 
-                            {/* RIGHT COLUMN: CHOSEN CLASS PORTRAIT INSIDE SMALL FRAME */}
+                            {/* RIGHT COLUMN: PLAYER HERO AVATAR IN DUAL LAYOUT */}
                             <div className="lg:col-span-1 flex flex-col items-center space-y-3 relative group">
-                              {/* Overlay Instruction Label Pointing to Hero Frame */}
-                              <div className="absolute -top-12 bg-amber-950/90 border border-amber-400 text-amber-400 px-3 py-1.5 rounded-xl text-[9.5px] font-bold text-center z-30 max-w-xs shadow-xl animate-bounce pointer-events-none">
-                                <span className="block font-black uppercase text-white mb-0.5">Портрет {simDialogueHero === 'warrior' ? 'Воина' : simDialogueHero === 'archer' ? 'Лучника' : 'Мага'}</span>
-                                Перетащите сюда спрайт класса
+                              <div className="absolute -top-12 bg-indigo-950/90 border border-indigo-400 text-yellow-400 px-3 py-1.5 rounded-xl text-[9.5px] font-bold text-center z-30 max-w-xs shadow-xl animate-bounce pointer-events-none font-sans">
+                                <span className="block font-black uppercase text-white mb-0.5">Класс Игрока</span>
+                                Выбранный герой: {simDialogueHero === 'warrior' ? 'Воин' : simDialogueHero === 'archer' ? 'Лучник' : 'Маг'}
                               </div>
 
-                              <div className="w-32 h-32 md:w-40 md:h-40 rounded-[2.5rem] bg-indigo-950/60 border-2 border-amber-500 shadow-[0_0_30px_rgba(245,158,11,0.3)] relative overflow-hidden transition-all duration-300 ring-4 ring-amber-500/10 hover:scale-105 animate-fade-in">
+                              <div className="w-32 h-32 md:w-40 md:h-40 rounded-[2.5rem] bg-indigo-950/60 border-2 border-amber-500 shadow-[0_0_30px_rgba(245,158,11,0.25)] relative overflow-hidden transition-all duration-300 ring-4 ring-amber-500/10 hover:scale-105">
                                 {simDialogueHero === 'warrior' ? (
-                                  /* Warrior SVG Headshot with Crown elements */
+                                  /* Warrior SVG Headshot style */
                                   <svg className="w-full h-full p-2" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <circle cx="50" cy="50" r="45" fill="#1e1b4b" />
                                     <path d="M25 50C25 30 35 20 50 20C65 20 75 30 75 50C75 60 72 75 70 85H30C28 75 25 60 25 50Z" fill="#64748b" />
-                                    {/* Crown accent */}
-                                    <path d="M35 20L42 28L50 15L58 28L65 20L57 32H43L35 20Z" fill="#fbbf24" stroke="#d97706" />
-                                    {/* Visor slit slate */}
+                                    <path d="M48 10L52 10L50 25L48 10Z" fill="#ef4444" />
+                                    <circle cx="50" cy="10" r="3" fill="#ef4444" />
                                     <path d="M32 42H68V48H32V42Z" fill="#0f172a" />
-                                    {/* Gold borders */}
-                                    <path d="M50 32V85" stroke="#f59e0b" strokeWidth="2.5" />
-                                    <circle cx="40" cy="45" r="2.5" fill="#38bdf8" />
-                                    <circle cx="60" cy="45" r="2.5" fill="#38bdf8" />
+                                    <path d="M50 22V85" stroke="#f59e0b" strokeWidth="2.5" />
+                                    <path d="M30 40H70" stroke="#f59e0b" strokeWidth="2" />
+                                    <circle cx="40" cy="45" r="2.5" fill="#f87171" />
+                                    <circle cx="60" cy="45" r="2.5" fill="#f87171" />
                                   </svg>
                                 ) : simDialogueHero === 'archer' ? (
-                                  /* Archer SVG Headshot in Hood */
+                                  /* Archer SVG Headshot style */
                                   <svg className="w-full h-full p-2" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <circle cx="50" cy="50" r="45" fill="#064e3b" />
-                                    {/* Hood/Cowl */}
                                     <path d="M25 55C25 32 35 15 50 15C65 15 75 32 75 55C75 70 70 85 70 90H30C30 85 25 70 25 55Z" fill="#0f172a" />
                                     <path d="M30 50L50 20L70 50L50 65L30 50Z" fill="#10b981" />
-                                    {/* Glowing green visior eye */}
                                     <path d="M38 46C42 48 46 48 50 46" stroke="#34d399" strokeWidth="3" />
+                                    <path d="M62 46C58 48 54 48 50 46" stroke="#34d399" strokeWidth="3" />
                                     <circle cx="44" cy="45" r="1.5" fill="#34d399" />
                                     <circle cx="56" cy="45" r="1.5" fill="#34d399" />
+                                    <path d="M15 25C20 18 30 18 35 25" stroke="#fbbf24" strokeWidth="2" />
                                   </svg>
                                 ) : (
-                                  /* Mage SVG Headshot star hat style */
+                                  
+/* Mage SVG Headshot star hat style */
                                   <svg className="w-full h-full p-2" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <circle cx="50" cy="50" r="45" fill="#311042" />
                                     {/* Archmage Hat */}

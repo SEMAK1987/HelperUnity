@@ -59,6 +59,11 @@ namespace FateContinent
         private int currentLineIndex = 0;
         private bool isDialogueActive = false;
 
+        public bool IsDialogueActive
+        {
+            get { return isDialogueActive; }
+        }
+
         private void Awake()
         {
             if (Instance == null)
