@@ -90,32 +90,114 @@ A high-tech RPG video game UI dialog panel template asset, white background. Fea
 
 ## 🗺️ 6. Высокодетализированные Midjourney-промпты для генерации карт (8K)
 
-Эти промпты оптимизированы для создания потрясающих, чистых географических карт континентов Фэнтези-мира без мешающего UI-мусора, водяных знаков, координатных сеток, надписей и указателей сторон света. Идеально подходят под нарезку на спрайты.
+> ⚠️ **Критическое Предотвращение «Эффекта Камня» (Zoom-Out Fix):**
+> Чтобы Midjourney не генерировал одинокий приближенный булыжник посреди пустоты, в каждый промпт заложен высотный панорамный ракурс (`wide shot satellite photography of the entire sprawling continent`, `high altitude aerial full shot`), а также запрет на изолированные макро-объекты. Теперь очертания континента и его береговая линия будут видны целиком.
 
-### Промпт 1: 🩸 Кровавые Пустоши (Scarlet Wastes / Crimson Lands)
-> **Prompt:** Isolated view of a fantasy volcanic region island map, fiery red and deep dark obsidian terrain, winding lava rivers glowing bright orange, smoking volcanic craters, crimson dust storms over rugged dunes, looking from top-down game camera angle, isolated on a solid navy-blue empty water background. Extremely detailed geografic textures, 8K, cinematic lighting, sharp fantasy cartography --no text, font, labels, letters, words, arrows, ui, compass, HUD icon, grid lines, banner --ar 16:9 --v 6.0
-
-### Промпт 2: ❄️ Ледяной Пик (Frostbound Peaks)
-> **Prompt:** Isolated view of an alpine winter frozen region island map, gargantuan snow-covered mountains, deep blue icy glaciers reflecting aurora light, winding frosty valleys, ancient towering glaciers, looking from top-down game camera angle, isolated on a solid dark-navy empty ocean background. Pristine white and sapphire-blue colors, hyper-detailed geography, 8K render --no text, font, labels, letters, words, arrows, ui, compass, HUD icon, grid lines, banner --ar 16:9 --v 6.0
-
-### Промпт 3: 🏛️ Древние Руины (Ancient Ruins / Mystic Megaliths)
-> **Prompt:** Isolated view of a mystical ancient stone-circle valley region island map, towering overgrown mossy megatons and dolmens, glowing sky-blue magical runic circles engraved on stones, dense emerald forests wrapping around broken marble temples, looking from top-down game camera angle, isolated on a solid dark-navy clear ocean water. Ancient mystic mood, highly detailed stone textures, unreal engine 5 style, 8K --no text, font, labels, letters, words, arrows, ui, compass, HUD icon, grid lines, banner --ar 16:9 --v 6.0
-
-### Промпт 4: 🌳 Зеленое Царство (Verdant Realm / Emerald Wildwoods)
-> **Prompt:** Isolated view of a lush fantasy forest region island map, giant world tree standing proud in the center with glowing yellow-green foliage, meandering pristine rivers, soft sunbeams filtering through leafy green plains, cozy elven glades, top-down isometric game view, isolated on clean navy-blue deep ocean background. Rich organic colors, extremely detailed trees and water, 8K resolution, fantasy cartography art style --no text, font, labels, letters, words, arrows, ui, compass, HUD icon, grid lines, banner --ar 16:9 --v 6.0
+### Промпт 1: 🩸 Кровавые Пустоши (Volcanic Badlands — 4 Территории + 3 Точки Высадки)
+*Карта разделена на 4 контрастных Вулканических региона (огненный лавовый, спящий черный обсидиан, серые пепловые холмы, кроваво-красные дюны) и имеет ровно 3 пустые каменные платформы-круга для выбора игрока.*
+> **Prompt:** Distant high-altitude satellite map of a sprawling fantasy volcanic island continent, wide shot showing the entire continent surrounded by vast navy-blue ocean, clear defined shoreline contours. The continent is geographically divided into 4 distinct colorful territories with natural organic borders: a fiery molten lava biome with glowing orange rivers, a dark black obsidian mountain region, a gray ash-dusted valley, and a crimson desert dune region. Spaced across the continent are exactly 3 empty flat circular landing platform nodes designed as ancient runic stone circles, clearly visible for player selection. 8K resolution, fantasy cartography art style, sharp textures, atmospheric lighting --no text, font, labels, letters, words, arrows, ui, compass, HUD icon, grid lines, banner, floating rock, single close-up stone, isolated boulder --ar 16:9 --v 6.0
 
 ---
 
-## 💡 7. Промпты для Генерации Светящихся Элементов и Масок (Glowing Level Nodes Overlay)
+### Промпт 2: ❄️ Ледяной Пик (Frostbound Peaks — 4 Территории + 3 Точки Высадки)
+*Карта разделена на 4 морозных региона (глубокие синие ледники, сверкающий белый снежный лес, ледяные торосы, замороженные фьорды) и имеет 3 плоских ледяных кольцевых точки для клика.*
+> **Prompt:** Distant panoramic aerial satellite map of an arctic fantasy winter continent island, wide shot capturing the entire landmass in frame surrounded by dark ocean waters. The continent is clearly divided into 4 visually distinct icy territories with natural borders like towering glaciers: a deep sapphire-blue glacier zone, a pristine snow-white pine forest, a teal-crystal peak biome, and dark frozen tundra fjords. Features exactly 3 empty flat ring-shaped frozen circular landing circles representing teleport nodes, waiting for user selection. Hyper-detailed map textures, Unreal Engine 5 look, 8K, brilliant crystalline bloom on cold colors --no text, font, labels, letters, words, arrows, ui, compass, HUD icon, grid lines, banner, floating rock, isolated stone --ar 16:9 --v 6.0
 
-Эти активы накладываются поверх сгенерированных карт в Unity для создания Zenith-эффекта живого мира при наведении курсора или выборе уровня сложности.
+---
 
-### Промпт 1: 🔥 Маски Кровавого Свечения (Crimson Nodes Mask)
-> **Prompt:** Isolated glowing abstract asset set of neon red magical circles, burning embers and hot magma runes, clean solid black background, perfect for a UI glowing overlay. Sharp high contrast, bloom effect, luminous volcanic veins, games development sprite sheet --no text, font, letters, words, arrows, landscape, map --ar 1:1 --v 6.0
+### Промпт 3: 🏛️ Древние Руины (Mystic Megaliths — 4 Территории + 3 Точки Высадки)
+*Континент разделен на 4 мистические зоны (изумрудные рощи, фиолетовые туманные пруды, серые мегалитические каньоны, заросшие золотистые луга) и имеет 3 светящихся круга приземления.*
+> **Prompt:** Ultra-wide high-altitude satellite view of a mysterious ancient ruin island map, full shot of the entire epic continent outlined nicely against clean dark-teal deep ocean water. The landmass is subdivided into 4 glowing magical territories with visual segmentations: an emerald forest valley of mossy trees, a misty lavender沼澤, a gray stony megalithic canyon, and golden-grass elven meadows. Prominently placed are exactly 3 flat empty circular runic engraving zones on the ground, designed as empty landing slots for player choices. Mythical glowing lines, high contrast game card art style, 8K --no text, font, labels, letters, words, arrows, ui, compass, HUD icon, grid lines, banner, isolated stone --ar 16:9 --v 6.0
 
-### Промпт 2: ❄️ Маски Ледяного Свечения (Frosty Runes Glowing Mask)
-> **Prompt:** Isolated glowing abstract asset set of pale-blue glowing ice crystals, frosty magical runes, shimmering teal snow flakes, clean solid black background, UI overlay light asset. High emission light, neon cyan accents, magical ice particles, game engine ready --no text, font, letters, words, arrows, landscape, map --ar 1:1 --v 6.0
+---
 
-### Промпт 3: 🌟 Маски Древнего Рунического Свечения (Mystic Runic Nodes Glow)
-> **Prompt:** Isolated glowing asset pack of celestial golden-amber magical circles, ancient runic glyphs glowing with solar cosmic light, clean solid black background, high-contrast VFX texture design. Beautiful emission glow, golden glassmorphism light source --no text, font, letters, words, arrows, landscape, map --ar 1:1 --v 6.0
+### Промпт 4: 👑 Политическая Карта (Factions Continent — Зенитная Империя)
+*Особый ключевой континент с конкретным делением территории по долям влияния фракций: 60% под властью Империи, 15% под контролем Разбойников, 15% Нейтральные земли и 10% зоны — ровно 3 пустые стартовые точки высадки.*
+> **Prompt:** Broad satellite tactical overview map of a fantasy faction continent, wide shot showing the entire circular continent in full view with well-defined coastlines. The continent visual terrain is divided politically by distinct colors: 60% of the land is Imperial territory painted in regal Royal Blue with golden medieval keeps and castles; 15% is Lawless Outlaw territory styled with rusty dark-iron spikes, ash wastelands and outlaw fortresses with jagged red banners; 15% is Neutral territory consisting of wild green forests and gray rocky peaks; and the remaining 10% features exactly 3 empty flat glowing circular landing nodes waiting for the player to dock. Extremely sharp game art, clear faction borders, brilliant fantasy cartography, 8K --no text, font, labels, letters, words, arrows, ui, compass, HUD icon, grid lines, banner, isolated rock, floating stone --ar 16:9 --v 6.0
+
+---
+
+## 💡 7. Промпты для Светящихся Элементов и Масок (Glowing Level Nodes Overlay)
+
+*Эти оверлеи генерируются на **абсолютно черном фоне (solid black background)**, чтобы вы могли легко импортировать их в Unity, установить режим смешивания или наложить маску в UI Canvas. Используются вместе с SimpleFloatAnimation.cs.*
+
+### Оверлей 1: 🔥 Маски Кровавого Свечения (Crimson Nodes & Paths Mask)
+*Светящиеся красные круги-выборы под Кровавые Пустоши.*
+> **Prompt:** Isolated glowing VFX game asset sheet of 3 radiant orange-red neon sci-fi circles, glowing fire embers, and fine volcanic energy cracks on a solid solid black background. High-contrast emissive light, perfect for UI glow map overlay, bloom, game engine asset --no text, font, labels, landscape, mountains --ar 1:1 --v 6.0
+
+### Оверлей 2: ❄️ Маски Морозного Сияния (Frosty Nodes & Paths Mask)
+*Светящиеся бирюзово-голубые круги под Ледяной Пик.*
+> **Prompt:** Isolated glowing VFX game asset pack of 3 arctic neon-teal cyan energy rings, glowing ice crystals, and delicate frost web patterns on a solid deep black background. Highly luminescent, clean sprite texture, fantasy magic circles, UI glow effect --no text, font, labels, landscape, mountains --ar 1:1 --v 6.0
+
+### Оверлей 3: 🌟 Маски Древне-Золотого Свечения (Mystic Sun-Gold Nodes Mask)
+*Яркие золотисто-солнечные и янтарные круги-выборы под Древние Руины.*
+> **Prompt:** Isolated glowing visual asset pack of 3 cosmic solar amber-golden runic circles, sacred geometry glowing sun glyphs on a solid pitch-black background. High emission brightness, elegant glassmorphism sparkles, golden particle dust glow for RPG game UI --no text, font, labels, landscape, mountains --ar 1:1 --v 6.0
+
+### Оверлей 4: 👑 Маски Имперских Фракций (Imperial & Outlaw Faction Node Glow)
+*Набор сине-золотых имперских знаков, ржаво-красных меток разбойников и янтарных точек выбора.*
+> **Prompt:** Isolated glowing game UI sprite sheet of 3 dark-blue neon shields, rusty outlaw crimson dagger markers, and 3 plain yellow glowing selection circles on a solid pure black background. Shimmering bloom, sharp vector edges, emissive magic lights for tactical faction selection, fantasy RPG UI, 8K --no text, font, letters, words, landscape, mountains --ar 1:1 --v 6.0
+
+---
+
+## 🎛️ РАЗДЕЛ 8: Пошаговая Инструкция создания ChoiceContainer (Контейнер Кнопок Выбора)
+
+Если в вашей иерархии в `DialoguePanel` отсутствуют кнопки вариантов выбора (Choice Container), выполните следующие простые шаги в редакторе Unity:
+
+1. **Создание пустого родительского компонента:**
+   - Кликните правой кнопкой мыши по `DialoguePanel` в Hierarchy ➔ выберите **Create Empty**.
+   - Назовите новый объект точно так: `ChoiceContainer`.
+
+2. **Настройка его размеров и положения (Rect Transform):**
+   - Выделите `ChoiceContainer`. В Inspector найдите его **Rect Transform**.
+   - Нажмите на квадрат выбора **Anchor Presets** в левом верхнем углу.
+   - Зажмите клавиши `Alt` и `Shift` на клавиатуре и кликните на нижний горизонтальный растянутый прямоугольник (**Bottom-Stretch**).
+   - Задайте следующие точные параметры:
+     - **PosX** = `0`
+     - **PosY** = `-55` (это сместит кнопки чуть ниже основной синей панели разговора, точно как на макетах, чтобы они не загораживали текст реплик)
+     - **Width** = `-80` (симметричный отступ слева и справа)
+     - **Height** = `45`
+
+3. **Добавление автоматической системы выравнивания (Horizontal Layout Group):**
+   - Нажмите кнопку **Add Component** внизу инспектора `ChoiceContainer`.
+   - Найдите и добавьте компонент **Horizontal Layout Group**.
+   - Настройте его параметры для идеальной верстки:
+     - **Padding:** Left = `10`, Right = `10`, Top = `0`, Bottom = `0`.
+     - **Spacing** = `25` (расстояние между вашими кнопками в пикселях).
+     - **Child Alignment** = `Middle Center` (центровать варианты точно по середине).
+     - **Control Child Size:** Поставьте обе галочки на `Width` и `Height`.
+     - **Use Child Scale:** Отключите обе галочки.
+     - **Child Force Expand:** **ОТКЛЮЧИТЕ** обе галочки `Width` и `Height` (иначе ваши кнопки растянутся до уродливых гигантских размеров. При выключенных галочках они сохранят красивую пропорциональную форму).
+
+4. **Как это работает программно:**
+   - В вашем скрипте `DialogueSystem_Manager.cs` есть поле ссылки `public RectTransform choiceContainer;`.
+   - Просто перетащите ваш созданный `ChoiceContainer` из Hierarchy в это поле инспектора `DialogueSystem_Manager`.
+   - Скрипт во время Шага 3 (выбор пути) сотрет старые кнопки и сам мгновенно создаст совершенно новые интерактивные кнопки на 9 языках. Вам больше не нужно создавать кнопки ручками в редакторе — они генерируются динамически!
+
+---
+
+## 🌌 РАЗДЕЛ 9: Пошаговая Инструкция наложения Светящихся Масок (Zenith Glow) в Unity
+
+Чтобы анимировать мигающие зоны на континентах при выборе или наведении курсора:
+
+1. **Подготовка Спрайтов:**
+   - Импортируйте сгенерированное изображение маски свечения (с абсолютно черным фоном) из Midjourney в папку `Assets/Textures/`.
+   - Выберите импортированный файл. В инспекторе переключите **Texture Type** на **Sprite (2D and UI)**.
+   - Измените **Alpha Source** на `From Gray Scale` (или настройте шейдер с прозрачностью, либо вырежьте черный цвет в Photoshop за 1 клик). Нажмите **Apply**.
+
+2. **Позиционирование на Карте:**
+   - Создайте дочерний `Image` внутри вашего объекта Карты континента в UI Canvas.
+   - Дайте ему имя, соответствующее зоне (например, `Glow_CrimsonWastes`).
+   - Перетяните настроенный спрайт маски свечения в поле **Source Image**.
+   - Переместите маску точно на нужный регион континента.
+
+3. **Оживление пульсации:**
+   - Навесьте на этот объект `Glow_CrimsonWastes` ваш скрипт `SimpleFloatAnimation.cs`.
+   - В инспекторе скрипта **настройте Zenith-параметры**:
+     - Снимите галочку с **Enable Floating** (чтобы маска не съезжала по координатам).
+     - Поставьте галочку на **Enable Alpha Pulsing** (активирует пульсацию светимости).
+     - Установите **Min Alpha** = `0.15`, **Max Alpha** = `1.0`.
+     - Установите **Pulse Speed** = `2.5` (скорость плавного Zenith-мерцания).
+     - Поставьте галочку на **Enable Scale Pulsing** (чтобы маска слегка дышала в размере), **Min Scale** = `0.98`, **Max Scale** = `1.02`, **Scale Speed** = `1.2`.
+   - По завершении настроек в коде запуска сцены, при наведении на кнопку или выборе персонажа, просто активируйте объект маски с помощью `gameObject.SetActive(true)` — и регион начнет плавно и невероятно красиво манить игрока своим зацикленным живым неоновым свечением!
+
 
