@@ -1057,6 +1057,7 @@ export default function App() {
   const [simDialogueHero, setSimDialogueHero] = useState<'warrior' | 'archer' | 'mage'>('warrior');
   const [simDialogueLang, setSimDialogueLang] = useState<'RU' | 'EN' | 'KR' | 'CH'>('RU');
   const [simDialogueStep, setSimDialogueStep] = useState<number>(0);
+  const [dialogueActiveScene, setDialogueActiveScene] = useState<boolean>(false);
 
 
   const fetchPackagesInfo = async () => {
@@ -4204,18 +4205,18 @@ export default function App() {
                                    <div key={i} className="flex justify-between items-center text-[10px] p-2 bg-white/5 rounded-xl border border-white/5">
                                       <span className="text-slate-500 font-black uppercase">{m.count}</span>
                                       <span className="text-purple-400 font-bold">{m.mult}</span>
-                                   </div>
-                                 ))}
-                               </div>
-                             </div>
-                           </div>
-                           <div className="p-6 bg-blue-600/5 rounded-3xl border border-blue-500/20 text-[10px] leading-relaxed text-slate-500 italic">
-                             "Важно: На уровне сложности 'Невероятный' множитель бонусов замков снижен до x0.6, а макс. кол-во замков одного типа ограничено семью до 1000 уровня."
-                           </div>
-                        </div>
-                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="p-6 bg-blue-600/5 rounded-3xl border border-blue-500/20 text-[10px] leading-relaxed text-slate-500 italic mt-6">
+                              "Важно: На уровне сложности 'Невероятный' множитель бонусов замков снижен до x0.6, а макс. кол-во замков одного типа ограничено семью до 1000 уровня."
+                            </div>
+                         </div>
+                       </div>
 
-                      <div className="space-y-8">
+                       <div className="space-y-8">
                         <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] px-4">Уровни Сложности</h3>
                         <div className="grid grid-cols-1 gap-4">
                           {[
@@ -4230,9 +4231,9 @@ export default function App() {
                              </div>
                           ))}
                         </div>
-                      </div>
-                    </div>
-                  </motion.div>
+                       </div>
+                     </div>
+                   </motion.div>
                 ) : designSubTab === 'Strategies' ? (
                   <motion.div 
                     initial={{ opacity: 0, y: 20 }}
@@ -4257,7 +4258,7 @@ export default function App() {
                                   <div className="space-y-2">
                                      <div className="text-[9px] text-slate-600 uppercase font-black">Приоритеты развития:</div>
                                      <div className="flex flex-wrap gap-2">
-                                        {strat.priorities.map((p: string, pi: number) => (
+                                        {strat.priorities.map((p, pi) => (
                                           <span key={pi} className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-[9px] text-slate-300 font-bold">{p}</span>
                                         ))}
                                      </div>
@@ -4316,322 +4317,153 @@ export default function App() {
                     animate={{ opacity: 1, y: 0 }}
                     className="space-y-12"
                   >
-                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                       <div className="space-y-6">
-                          <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] px-4 flex items-center gap-2">
-                             <MapIcon className="w-3 h-3" /> Континенты и Ландшафт
-                          </h3>
-                          <div className="grid grid-cols-1 gap-4">
-                             {Object.entries(gameDesign?.world_combat_locations?.continents || {}).map(([key, data]: any) => (
-                               <div key={key} className="p-8 rounded-[3rem] bg-black/40 border border-white/5 space-y-6 hover:bg-black/60 transition-all flex flex-col">
-                                  <div className="flex items-center justify-between">
-                                     <h4 className={`text-xl font-black uppercase italic tracking-tighter ${
-                                        key === 'plains_of_winds' ? 'text-green-400' :
-                                        key === 'mountain_range' ? 'text-slate-400' :
-                                        key === 'ancient_woods' ? 'text-emerald-500' : 'text-amber-400'
-                                     }`}>{data.name}</h4>
-                                     <div className="flex gap-2 text-slate-500 opacity-50">
-                                        {key === 'plains_of_winds' ? <Wind className="w-5 h-5" /> : 
-                                         key === 'mountain_range' ? <Mountain className="w-5 h-5" /> :
-                                         key === 'ancient_woods' ? <Flame className="w-5 h-5" /> : <Shield className="w-5 h-5" />}
-                                     </div>
-                                  </div>
-                                  
-                                  <div className="grid grid-cols-2 gap-4">
-                                     <div className="space-y-2">
-                                        <div className="text-[8px] text-slate-600 uppercase font-black tracking-widest">Состав Клеток:</div>
-                                        <div className="space-y-1">
-                                           {Object.entries(data.cells).map(([ctype, perc]: any) => (
-                                             <div key={ctype} className="flex justify-between items-center text-[10px] text-slate-400">
-                                                <span className="italic">{ctype}</span>
-                                                <span className="font-mono">{perc}%</span>
-                                             </div>
-                                           ))}
-                                        </div>
-                                     </div>
-                                     <div className="space-y-2">
-                                        <div className="text-[8px] text-slate-600 uppercase font-black tracking-widest">Эффекты:</div>
-                                        <div className="p-3 bg-white/5 rounded-xl space-y-1">
-                                           <div className="text-[9px] text-green-400 font-bold tracking-tighter">{data.effects.bonus}</div>
-                                           <div className="text-[9px] text-red-400 font-bold tracking-tighter">{data.effects.debuff}</div>
-                                        </div>
-                                     </div>
-                                  </div>
-
-                                  <div className="p-4 bg-white/5 rounded-2xl border border-white/5 mt-auto">
-                                     <div className="text-[8px] text-slate-500 uppercase font-black mb-1">Тактика:</div>
-                                     <p className="text-[11px] text-slate-300 italic leading-relaxed">{data.tactics}</p>
-                                  </div>
-                               </div>
-                             ))}
-                          </div>
-                       </div>
-
-                       <div className="space-y-8">
-                          <div className="space-y-6">
-                             <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] px-4 flex items-center gap-2">
-                                <Zap className="w-3 h-3 text-yellow-500" /> Динамические События
-                             </h3>
-                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="p-8 rounded-[2.5rem] bg-indigo-600/5 border border-indigo-500/20 space-y-6">
-                                   <div className="flex items-center gap-4">
-                                      <div className="p-3 bg-blue-500 rounded-xl">
-                                         <Droplets className="w-5 h-5 text-white" />
-                                      </div>
-                                      <div>
-                                         <div className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Weather: Rain</div>
-                                         <div className="text-[9px] text-slate-500 font-bold uppercase">Chance: {gameDesign?.dynamic_events?.weather?.rain?.chance * 100}%</div>
+                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                        <div className="space-y-6">
+                           <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] px-4 flex items-center gap-2">
+                              <MapIcon className="w-3 h-3" /> Континенты и Ландшафт
+                           </h3>
+                           <div className="grid grid-cols-1 gap-4">
+                              {Object.entries(gameDesign?.world_combat_locations?.continents || {}).map(([key, data]: any) => (
+                                <div key={key} className="p-8 rounded-[3rem] bg-black/40 border border-white/5 space-y-6 hover:bg-black/60 transition-all flex flex-col">
+                                   <div className="flex items-center justify-between">
+                                      <h4 className={`text-xl font-black uppercase italic tracking-tighter ${
+                                         key === 'plains_of_winds' ? 'text-green-400' :
+                                         key === 'mountain_range' ? 'text-slate-400' :
+                                         key === 'ancient_woods' ? 'text-emerald-500' : 'text-amber-400'
+                                      }`}>{data.name}</h4>
+                                      <div className="flex gap-2 text-slate-500 opacity-50">
+                                         {key === 'plains_of_winds' ? <Wind className="w-5 h-5" /> : 
+                                          key === 'mountain_range' ? <Mountain className="w-5 h-5" /> :
+                                          key === 'ancient_woods' ? <Flame className="w-5 h-5" /> : <Shield className="w-5 h-5" />}
                                       </div>
                                    </div>
-                                   <p className="text-[10px] text-slate-400 italic leading-relaxed">{gameDesign?.dynamic_events?.weather?.rain?.effects}</p>
-                                </div>
-
-                                <div className="p-8 rounded-[2.5rem] bg-slate-600/5 border border-slate-500/20 space-y-6">
-                                   <div className="flex items-center gap-4">
-                                      <div className="p-3 bg-slate-500 rounded-xl">
-                                         <CloudOff className="w-5 h-5 text-white" />
+                                   
+                                   <div className="grid grid-cols-2 gap-4">
+                                      <div className="space-y-2">
+                                         <div className="text-[8px] text-slate-600 uppercase font-black tracking-widest">Состав Клеток:</div>
+                                         <div className="space-y-1">
+                                            {Object.entries(data.cells).map(([ctype, perc]: any) => (
+                                              <div key={ctype} className="flex justify-between items-center text-[10px] text-slate-400">
+                                                 <span className="italic">{ctype}</span>
+                                                 <span className="font-mono">{perc}%</span>
+                                              </div>
+                                            ))}
+                                         </div>
                                       </div>
-                                      <div>
-                                         <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Weather: Fog</div>
-                                         <div className="text-[9px] text-slate-500 font-bold uppercase">Chance: {gameDesign?.dynamic_events?.weather?.fog?.chance * 100}%</div>
+                                      <div className="space-y-2">
+                                         <div className="text-[8px] text-slate-600 uppercase font-black tracking-widest">Эффекты:</div>
+                                         <div className="p-3 bg-white/5 rounded-xl space-y-1">
+                                            <div className="text-[9px] text-green-400 font-bold tracking-tighter">{data.effects.bonus}</div>
+                                            <div className="text-[9px] text-red-400 font-bold tracking-tighter">{data.effects.debuff}</div>
+                                         </div>
                                       </div>
                                    </div>
-                                   <p className="text-[10px] text-slate-400 italic leading-relaxed">{gameDesign?.dynamic_events?.weather?.fog?.effects}</p>
-                                </div>
-                             </div>
-                          </div>
 
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                             <div className="p-8 rounded-[2.5rem] bg-black/40 border border-white/10 space-y-6 shadow-2xl">
-                                <Sun className="w-5 h-5 text-orange-400" />
-                                <div className="space-y-2">
-                                   <h4 className="text-xs font-black text-white uppercase italic tracking-widest">Дневной Цикл</h4>
-                                   <p className="text-[10px] text-slate-500 italic leading-relaxed">{gameDesign?.dynamic_events?.time_cycle?.day?.effects}</p>
+                                   <div className="p-4 bg-white/5 rounded-2xl border border-white/5 mt-auto">
+                                      <div className="text-[8px] text-slate-500 uppercase font-black mb-1">Тактика:</div>
+                                      <p className="text-[11px] text-slate-300 italic leading-relaxed">{data.tactics}</p>
+                                   </div>
                                 </div>
-                             </div>
-                             <div className="p-8 rounded-[2.5rem] bg-black/40 border border-white/10 space-y-6 shadow-2xl">
-                                <Moon className="w-5 h-5 text-indigo-400" />
-                                <div className="space-y-2">
-                                   <h4 className="text-xs font-black text-white uppercase italic tracking-widest">Ночной Цикл</h4>
-                                   <p className="text-[10px] text-slate-500 italic leading-relaxed">{gameDesign?.dynamic_events?.time_cycle?.night?.effects}</p>
-                                </div>
-                             </div>
-                          </div>
+                              ))}
+                           </div>
+                        </div>
 
-                          <div className="p-10 rounded-[3rem] bg-red-600/5 border border-red-500/20 space-y-6">
-                             <h4 className="text-[10px] font-black text-red-500 uppercase tracking-[0.4em]">Случайные Угрозы</h4>
-                             <div className="grid grid-cols-1 gap-4">
-                                {Object.entries(gameDesign?.dynamic_events?.random_encounters || {}).map(([key, data]: any) => (
-                                  <div key={key} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 group hover:bg-white/10 transition-all cursor-default text-slate-100">
-                                     <div className="flex flex-col gap-1">
-                                        <span className="text-[11px] font-black text-white uppercase italic tracking-tighter">{key.replace('_', ' ')}</span>
-                                        {data.chance && <span className="text-[9px] text-slate-600 font-bold uppercase">Шанс: {data.chance * 100}%</span>}
-                                     </div>
-                                     <div className="text-right">
-                                        <div className="text-[9px] text-slate-400 italic max-w-[200px] leading-snug">
-                                           {data.effects || data.rewards}
-                                        </div>
-                                     </div>
-                                  </div>
-                                ))}
-                             </div>
-                          </div>
-                       </div>
-                    </div>
+                        <div className="space-y-8">
+                           <div className="space-y-6">
+                              <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] px-4 flex items-center gap-2">
+                                 <Zap className="w-3 h-3 text-yellow-500" /> Динамические События
+                              </h3>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                 <div className="p-8 rounded-[2.5rem] bg-indigo-600/5 border border-indigo-500/20 space-y-6">
+                                    <div className="flex items-center gap-4">
+                                       <div className="p-3 bg-blue-500 rounded-xl">
+                                          <Droplets className="w-5 h-5 text-white" />
+                                       </div>
+                                       <div>
+                                          <div className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Weather: Rain</div>
+                                          <div className="text-[9px] text-slate-500 font-bold uppercase">Chance: {gameDesign?.dynamic_events?.weather?.rain?.chance * 100}%</div>
+                                       </div>
+                                    </div>
+                                    <p className="text-[10px] text-slate-400 italic leading-relaxed">{gameDesign?.dynamic_events?.weather?.rain?.effects}</p>
+                                 </div>
 
-                    <div className="p-10 rounded-[4rem] bg-black/40 border border-white/10 space-y-8">
-                       <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">Боевые Объекты и Клетки</h4>
-                       <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
-                          {Object.entries(gameDesign?.world_combat_locations?.cell_types || {}).map(([key, data]: any) => (
-                            <div key={key} className="flex flex-col items-center gap-4 p-6 rounded-3xl bg-white/5 border border-white/5 group hover:border-white/20 transition-all">
-                               <div className={`p-4 rounded-2xl ${
-                                  key === 'passable' ? 'bg-green-600/10 text-green-400' :
-                                  key === 'hard' ? 'bg-orange-600/10 text-orange-400' :
-                                  key === 'impassable' ? 'bg-slate-600/10 text-slate-400' :
-                                  key === 'hidden' ? 'bg-blue-600/10 text-blue-400' : 'bg-red-600/10 text-red-400'
-                               }`}>
-                                  {key === 'passable' ? <Layout className="w-6 h-6" /> :
-                                   key === 'hard' ? <Activity className="w-6 h-6" /> :
-                                   key === 'impassable' ? <Box className="w-6 h-6" /> :
-                                   key === 'hidden' ? <Eye className="w-6 h-6" /> : <Skull className="w-6 h-6" />}
-                               </div>
-                               <div className="text-center space-y-1">
-                                  <div className="text-[11px] font-black text-white uppercase tracking-tighter">{data.name}</div>
-                                  <div className="text-[8px] text-slate-500 font-bold uppercase">{data.penalty || data.effect || data.bonus}</div>
+                                 <div className="p-8 rounded-[2.5rem] bg-slate-600/5 border border-slate-500/20 space-y-6">
+                                    <div className="flex items-center gap-4">
+                                       <div className="p-3 bg-slate-500 rounded-xl">
+                                          <CloudOff className="w-5 h-5 text-white" />
+                                       </div>
+                                       <div>
+                                          <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Weather: Fog</div>
+                                          <div className="text-[9px] text-slate-500 font-bold uppercase">Chance: {gameDesign?.dynamic_events?.weather?.fog?.chance * 100}%</div>
+                                       </div>
+                                    </div>
+                                    <p className="text-[10px] text-slate-400 italic leading-relaxed">{gameDesign?.dynamic_events?.weather?.fog?.effects}</p>
+                                 </div>
+                              </div>
+                           </div>
+
+                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              <div className="p-8 rounded-[2.5rem] bg-black/40 border border-white/10 space-y-6 shadow-2xl">
+                                 <Sun className="w-5 h-5 text-orange-400" />
+                                 <div className="space-y-2">
+                                    <h4 className="text-xs font-black text-white uppercase italic tracking-widest">Дневной Цикл</h4>
+                                    <p className="text-[10px] text-slate-500 italic leading-relaxed">{gameDesign?.dynamic_events?.time_cycle?.day?.effects}</p>
+                                 </div>
+                              </div>
+                              <div className="p-8 rounded-[2.5rem] bg-black/40 border border-white/10 space-y-6 shadow-2xl">
+                                 <Moon className="w-5 h-5 text-indigo-400" />
+                                 <div className="space-y-2">
+                                    <h4 className="text-xs font-black text-white uppercase italic tracking-widest">Ночной Цикл</h4>
+                                    <p className="text-[10px] text-slate-500 italic leading-relaxed">{gameDesign?.dynamic_events?.time_cycle?.night?.effects}</p>
+                                 </div>
+                              </div>
+                           </div>
+
+                           <div className="p-10 rounded-[3rem] bg-red-600/5 border border-red-500/20 space-y-6">
+                              <h4 className="text-[10px] font-black text-red-500 uppercase tracking-[0.4em]">Случайные Угрозы</h4>
+                              <div className="grid grid-cols-1 gap-4">
+                                 {Object.entries(gameDesign?.dynamic_events?.random_encounters || {}).map(([key, data]: any) => (
+                                   <div key={key} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 group hover:bg-white/10 transition-all cursor-default text-slate-100">
+                                      <div className="flex flex-col gap-1">
+                                         <span className="text-[11px] font-black text-white uppercase italic tracking-tighter">{key.replace('_', ' ')}</span>
+                                         {data.chance && <span className="text-[9px] text-slate-600 font-bold uppercase">Шанс: {data.chance * 100}%</span>}
+                                      </div>
+                                      <div className="text-right">
+                                         <div className="text-[9px] text-slate-400 italic max-w-[200px] leading-snug">
+                                            {data.effects || data.rewards}
+                                         </div>
+                                      </div>
+                                   </div>
+                                 ))}
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+
+                     <div className="p-10 rounded-[4rem] bg-black/40 border border-white/10 space-y-8">
+                        <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">Боевые Объекты и Клетки</h4>
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+                           {Object.entries(gameDesign?.world_combat_locations?.cell_types || {}).map(([key, data]: any) => (
+                             <div key={key} className="flex flex-col items-center gap-4 p-6 rounded-3xl bg-white/5 border border-white/5 group hover:border-white/20 transition-all">
+                                <div className={`p-4 rounded-2xl ${
+                                   key === 'passable' ? 'bg-green-600/10 text-green-400' :
+                                   key === 'hard' ? 'bg-orange-600/10 text-orange-400' :
+                                   key === 'impassable' ? 'bg-slate-600/10 text-slate-400' :
+                                   key === 'hidden' ? 'bg-blue-600/10 text-blue-400' : 'bg-red-600/10 text-red-400'
+                                }`}>
+                                   {key === 'passable' ? <Layout className="w-6 h-6" /> :
+                                    key === 'hard' ? <Activity className="w-6 h-6" /> :
+                                    key === 'impassable' ? <Box className="w-6 h-6" /> :
+                                    key === 'hidden' ? <Eye className="w-6 h-6" /> : <Skull className="w-6 h-6" />}
                                 </div>
-                             </div>
+                                <div className="text-center">
+                                    <span className="text-[10px] font-black text-white uppercase italic tracking-tighter block">{key}</span>
+                                    <span className="text-[9px] text-slate-500 font-bold uppercase block mt-1">{data.effects || 'Стандарт'}</span>
+                                 </div>
+                              </div>
                            ))}
                         </div>
                      </div>
-                  </motion.div>
-                ) : designSubTab === 'Potions & Alchemy' ? (
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="space-y-12"
-                  >
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                       <div className="lg:col-span-2 space-y-8">
-                          <div className="flex items-center justify-between px-4">
-                             <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] flex items-center gap-2">
-                                <FlaskConical className="w-3 h-3 text-emerald-400" /> Алхимия и Зелья
-                             </h3>
-                             <div className="flex items-center gap-2">
-                                <div className="px-2 py-1 bg-white/5 rounded border border-white/10 text-[8px] text-slate-500 font-black">LVL MULTIPLIER: {gameDesign?.potions_system?.scaling?.level_multiplier_formula}</div>
-                             </div>
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                             {/* Health Potions Row */}
-                             <div className="col-span-full grid grid-cols-1 md:grid-cols-3 gap-4">
-                                {Object.entries(gameDesign?.potions_system?.types?.health || {}).map(([size, data]: any) => (
-                                  <div key={size} className="p-6 rounded-[2.5rem] bg-gradient-to-br from-red-600/10 to-transparent border border-red-500/20 space-y-4 hover:bg-red-600/5 transition-all">
-                                     <div className="flex items-center justify-between">
-                                        <div className="p-2 bg-red-600 rounded-lg shadow-lg shadow-red-600/20">
-                                           <Droplets className="w-4 h-4 text-white" />
-                                        </div>
-                                        <span className="text-[8px] text-red-400 font-black uppercase tracking-widest">{data.name} HP</span>
-                                     </div>
-                                     <div className="space-y-1">
-                                        <h4 className="text-sm font-black text-white uppercase italic tracking-tighter">Зелье Здоровья</h4>
-                                        <div className="text-[10px] text-slate-500 font-mono italic">
-                                           {data.base > 0 && `${data.base} + `}{data.level_factor > 0 && `(Lvl * ${data.level_factor})`}{data.percentage > 0 && `${data.base > 0 || data.level_factor > 0 ? ' + ' : ''}(MaxHP * ${data.percentage * 100}%)`}
-                                        </div>
-                                     </div>
-                                  </div>
-                                ))}
-                             </div>
-
-                             {/* Mana Potions Row */}
-                             <div className="col-span-full grid grid-cols-1 md:grid-cols-3 gap-4">
-                                {Object.entries(gameDesign?.potions_system?.types?.mana || {}).map(([size, data]: any) => (
-                                  <div key={size} className="p-6 rounded-[2.5rem] bg-gradient-to-br from-blue-600/10 to-transparent border border-blue-500/20 space-y-4 hover:bg-blue-600/5 transition-all">
-                                     <div className="flex items-center justify-between">
-                                        <div className="p-2 bg-blue-600 rounded-lg shadow-lg shadow-blue-600/20">
-                                           <Zap className="w-4 h-4 text-white" />
-                                        </div>
-                                        <span className="text-[8px] text-blue-400 font-black uppercase tracking-widest">{data.name} MP</span>
-                                     </div>
-                                     <div className="space-y-1">
-                                        <h4 className="text-sm font-black text-white uppercase italic tracking-tighter">Зелье Маны</h4>
-                                        <div className="text-[10px] text-slate-500 font-mono italic">
-                                           {data.base > 0 && `${data.base} + `}{data.level_factor > 0 && `(Lvl * ${data.level_factor})`}{data.percentage > 0 && `${data.base > 0 || data.level_factor > 0 ? ' + ' : ''}(MaxMP * ${data.percentage * 100}%)`}
-                                        </div>
-                                     </div>
-                                  </div>
-                                ))}
-                             </div>
-                          </div>
-
-                          <div className="p-8 rounded-[3rem] bg-black/40 border border-white/5 space-y-6">
-                             <div className="flex items-center justify-between">
-                                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Профессиональные Бонусы</h4>
-                                <div className="text-[8px] text-blue-400 font-black uppercase">Passive Traits</div>
-                             </div>
-                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                {Object.entries(gameDesign?.potions_system?.class_bonuses || {}).map(([cls, data]: any) => (
-                                  <div key={cls} className="p-4 rounded-2xl bg-white/5 border border-white/5 flex flex-col gap-1 text-center">
-                                     <div className="text-[10px] font-black text-white uppercase italic">{cls === 'warrior' ? 'Воин' : cls === 'mage' ? 'Маг' : 'Стрелок'}</div>
-                                     <div className="text-[9px] text-emerald-400 font-bold">+{data.bonus * 100}% {data.stat} Potions</div>
-                                  </div>
-                                ))}
-                             </div>
-                          </div>
-                       </div>
-
-                       <div className="space-y-8">
-                          <div className="p-8 rounded-[3rem] bg-indigo-600/5 border border-indigo-500/20 space-y-6">
-                             <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Артефакты Алхимии</h4>
-                             <div className="space-y-3">
-                                {gameDesign?.potions_system?.equipment_bonuses?.items?.map((item: any, i: number) => (
-                                  <div key={i} className="flex items-center justify-between p-4 bg-black/40 rounded-2xl border border-white/5 group hover:border-indigo-500/30 transition-all">
-                                     <div className="flex flex-col gap-0.5">
-                                        <span className="text-[10px] font-black text-white uppercase italic tracking-tighter">{item.name}</span>
-                                        <span className="text-[9px] text-slate-500 leading-none">{item.effect}</span>
-                                     </div>
-                                     <Star className="w-3 h-3 text-indigo-400 opacity-20 group-hover:opacity-100 transition-opacity" />
-                                  </div>
-                                ))}
-                             </div>
-                             <div className="p-3 bg-red-600/5 rounded-xl border border-red-500/20 text-[9px] text-red-300 italic text-center leading-snug">
-                                "Максимальный суммарный бонус от экипировки: +{gameDesign?.potions_system?.equipment_bonuses?.max_capped_bonus * 100}%"
-                             </div>
-                          </div>
-
-                          <div className="p-8 rounded-[3rem] bg-black/40 border border-white/5 space-y-6">
-                             <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Эталонные Значения (scaling)</h4>
-                             <div className="space-y-4">
-                                {gameDesign?.potions_system?.scaling?.examples?.map((ex: any, i: number) => (
-                                  <div key={i} className="flex items-center justify-between text-[10px]">
-                                     <div className="flex items-center gap-3">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                        <span className="text-slate-500 font-black">Level {ex.level}</span>
-                                     </div>
-                                     <span className="text-emerald-400 font-mono font-bold">x{ex.multiplier.toFixed(1)} effect</span>
-                                  </div>
-                                ))}
-                             </div>
-                          </div>
-                       </div>
-                    </div>
-
-                    <div className="p-10 rounded-[4rem] bg-black/40 border border-white/10 space-y-8">
-                       <div className="flex items-center justify-between">
-                          <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">Реализация (C# MonoBehaviour)</h4>
-                          <div className="flex items-center gap-4 text-[9px] text-slate-600 font-black">
-                             <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-green-500" /> SCALABLE</div>
-                             <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-500" /> CLASS-AWARE</div>
-                          </div>
-                       </div>
-                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                          <div className="space-y-3">
-                             <div className="text-[9px] text-slate-500 uppercase font-black px-2 mb-1">Potion.cs</div>
-                             <div className="p-6 bg-slate-950 rounded-3xl border border-white/5 text-[10px] text-blue-300 font-mono leading-relaxed overflow-x-auto whitespace-pre">
-{`public float CalculateRestoreAmount(CharacterStats target) {
-    float levelMultiplier = 1f + Mathf.Log10(target.level);
-    float baseRestoreAmount = 0;
-
-    switch (potionType) {
-        case SmallHealth:
-            baseRestoreAmount = (base + level * factor); break;
-        case MediumHealth:
-            baseRestoreAmount = (target.maxHP * percentage); break;
-        case LargeHealth:
-            baseRestoreAmount = (base + level * factor) + (target.maxHP * percentage); break;
-        // MP logic identical...
-    }
-
-    float classBonus = GetClassBonus(target);
-    float equipBonus = target.GetEquipBonus();
-    
-    return baseRestoreAmount * levelMultiplier * classBonus * equipBonus;
-}`}
-                             </div>
-                          </div>
-                          <div className="space-y-4">
-                             <div className="text-[9px] text-slate-500 uppercase font-black px-2">Правила использования</div>
-                             <div className="grid grid-cols-1 gap-3">
-                                {[
-                                  { t: "Cooldown", v: gameDesign?.potions_system?.rules?.cooldown, i: <Clock className="w-3 h-3 text-orange-400" /> },
-                                  { t: "Visual", v: gameDesign?.potions_system?.rules?.visuals?.animation, i: <Eye className="w-3 h-3 text-blue-400" /> },
-                                  { t: "Particles", v: "Зелёные (HP) / Синие (MP)", i: <Sparkles className="w-3 h-3 text-emerald-400" /> },
-                                  { t: "UI Result", v: "Плавное заполнение + Floating Text", i: <Type className="w-3 h-3 text-purple-400" /> }
-                                ].map((rule, ri) => (
-                                  <div key={ri} className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/5">
-                                     <div className="p-2 bg-white/5 rounded-lg">{rule.i}</div>
-                                     <div className="space-y-0.5">
-                                        <div className="text-[9px] text-slate-500 font-black uppercase tracking-widest">{rule.t}</div>
-                                        <div className="text-[10px] text-white font-bold leading-tight">{rule.v}</div>
-                                     </div>
-                                  </div>
-                                ))}
-                             </div>
-                             <div className="p-6 bg-emerald-600/10 rounded-[2.5rem] border border-emerald-500/20 text-[10px] text-emerald-300 italic leading-relaxed">
-                                "Система автоматически масштабирует полезность зелий от 1 до 9999 уровня, предотвращая инфляцию статов и сохраняя актуальность расходных материалов на всех этапах игры."
-                             </div>
-                          </div>
-                       </div>
-                    </div>
                   </motion.div>
                 ) : designSubTab === 'Quests & NPC' ? (
                   <motion.div 
@@ -4645,215 +4477,558 @@ export default function App() {
                         <MessageSquare className="w-96 h-96 text-indigo-400" />
                       </div>
 
-                      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+                      <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-6 relative z-10 border-b border-indigo-500/10 pb-6">
                         <div>
                           <div className="flex items-center gap-3">
                             <span className="px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-[9px] font-black uppercase text-indigo-400 tracking-widest animate-pulse">
-                              ZENITH EXCLUSIVE UI (НЕ ПЛАГИАТ)
+                              ZENITH EXCLUSIVE DIALOG SYSTEM (v18.9.0)
                             </span>
-                            <span className="px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/30 text-[9px] font-bold text-amber-400">
-                              v18.9.0
+                            <span className="px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/30 text-[9px] font-bold text-amber-400">
+                              Unity 6 Ready
                             </span>
                           </div>
                           <h3 className="text-3xl font-black text-white uppercase italic tracking-tighter mt-2">
-                            Интерактивный Диалоговый Симулятор
+                            DialogueSystem_Manager • Симулятор Диалога
                           </h3>
                           <p className="text-xs text-slate-400 mt-1 max-w-2xl">
-                            Демонстрация эксклюзивной панели с помощником Аэлиссой слева и динамически выбираемым героем справа. Полная авто-синхронизация локализации и защита от искажений.
+                            Проектирование и визуализация нелинейных диалоговых цепочек с выбором класса героя и тактической области удаления скверны.
                           </p>
                         </div>
 
-                        {/* Controls bar */}
-                        <div className="flex flex-wrap items-center gap-3 bg-black/40 p-2.5 rounded-2xl border border-white/5 shadow-inner">
-                          {/* Lang Switcher */}
-                          <div className="flex items-center gap-1.5 border-r border-white/10 pr-3">
-                            {(['RU', 'EN', 'KR', 'CH'] as const).map((lang) => (
+                        {/* Controls (Language) */}
+                        <div className="flex flex-wrap items-center gap-4 relative z-20">
+                          <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Язык озвучки / текста:</span>
+                          <div className="bg-black/40 p-1 rounded-xl border border-white/5 flex gap-1">
+                            {['RU', 'EN', 'KR', 'CH'].map((lang) => (
                               <button
                                 key={lang}
                                 onClick={() => {
-                                  setSimDialogueLang(lang);
-                                  showNotification(`Язык симулятора изменен на: ${lang}`, "info");
+                                  setSimDialogueLang(lang as 'RU' | 'EN' | 'KR' | 'CH');
+                                  // Play synth click
+                                  try {
+                                    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                    const osc = ctx.createOscillator();
+                                    const gain = ctx.createGain();
+                                    osc.type = 'sine';
+                                    osc.frequency.setValueAtTime(600, ctx.currentTime);
+                                    osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.05);
+                                    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+                                    osc.connect(gain);
+                                    gain.connect(ctx.destination);
+                                    osc.start();
+                                    osc.stop(ctx.currentTime + 0.05);
+                                  } catch (e) {}
                                 }}
-                                className={`px-3 py-1.5 rounded-lg text-[9px] font-black transition-all ${
+                                className={`px-3 py-1.5 rounded-lg text-[10px] font-black tracking-wider transition-all ${
                                   simDialogueLang === lang 
-                                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' 
-                                  : 'text-slate-500 hover:text-white hover:bg-white/5'
+                                    ? 'bg-indigo-600 text-white shadow-md' 
+                                    : 'text-slate-400 hover:text-white hover:bg-white/5'
                                 }`}
                               >
                                 {lang}
                               </button>
                             ))}
                           </div>
-
-                          {/* Hero Selection */}
-                          <div className="flex items-center gap-1.5">
-                            {(['warrior', 'archer', 'mage'] as const).map((hero) => (
-                              <button
-                                key={hero}
-                                onClick={() => {
-                                  setSimDialogueHero(hero);
-                                  showNotification(`Герой изменен на: ${hero === 'warrior' ? 'Воин' : hero === 'archer' ? 'Стрелок' : 'Маг'}`, "success");
-                                }}
-                                className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all flex items-center gap-1 ${
-                                  simDialogueHero === hero 
-                                  ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30' 
-                                  : 'text-slate-500 hover:text-white hover:bg-white/5'
-                                }`}
-                              >
-                                <span className={`w-1.5 h-1.5 rounded-full ${hero === 'warrior' ? 'bg-red-500' : hero === 'archer' ? 'bg-green-500' : 'bg-cyan-400'}`} />
-                                {hero === 'warrior' ? 'Воин' : hero === 'archer' ? 'Стрелок' : 'Маг'}
-                              </button>
-                            ))}
-                          </div>
+                          
+                          {dialogueActiveScene && (
+                            <button
+                              onClick={() => {
+                                setDialogueActiveScene(false);
+                                setSimDialogueStep(0);
+                              }}
+                              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all"
+                            >
+                              ← Сменить Героя
+                            </button>
+                          )}
                         </div>
                       </div>
 
-                      {/* SIMULATED IN-GAME VIEWPORT */}
-                      <div className="p-6 md:p-12 rounded-[2.5rem] bg-slate-950/80 border border-white/5 relative overflow-hidden shadow-inner flex flex-col justify-end min-h-[360px] group/viewport">
-                        {/* Background scenery emulation */}
-                        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/30 via-slate-950 to-black pointer-events-none" />
-                        
-                        {/* Castle Gate outline background deco */}
-                        <div className="absolute inset-x-0 top-1/4 h-2/3 border-t border-b border-white/[0.02] flex justify-around pointer-events-none">
-                          <div className="w-1 border-r border-white/[0.01]" />
-                          <div className="w-1 border-r border-white/[0.01]" />
-                          <div className="w-1 border-r border-white/[0.01]" />
+                      {/* WORKSPACE PREVIEW - SWITCH BETWEEN SELECTION & ACTIVE DIALOGUE */}
+                      {!dialogueActiveScene ? (
+                        /* PHASE 1: SPLIT SCREEN CLASS SELECTION FOR DIALOGUE */
+                        <div className="space-y-6 relative z-10">
+                          <div className="text-center max-w-xl mx-auto space-y-2">
+                            <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest block">ШАГ 1: ВЫБЕРИТЕ ПЕРСОНАЖА ДЛЯ ВХОДА В СЦЕНУ ДИАЛОГА</span>
+                            <h4 className="text-xl font-black text-white uppercase italic tracking-tight">Кто поведет отряд на зачистку Континента?</h4>
+                            <p className="text-[11px] text-slate-400">Выберите героя, чтобы инициализировать 1:1 диалоговое окно с Аэлиссой, настроить спрайты в Unity и опробовать нелинейные развилки сюжета.</p>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
+                            {/* CARD: WARRIOR */}
+                            <div className="p-6 rounded-[2.5rem] bg-indigo-950/20 border border-indigo-500/20 hover:border-red-500/30 transition-all duration-300 flex flex-col justify-between space-y-6 relative group">
+                              <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-red-500/20 border border-red-500/30 text-[8px] font-bold text-red-400">FIERCE ATK</div>
+                              <div className="space-y-4">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-16 h-16 rounded-2xl bg-black/50 border border-red-500/30 flex items-center justify-center p-1 relative overflow-hidden">
+                                    <svg className="w-full h-full" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                      <circle cx="50" cy="50" r="45" fill="#1e1b4b" />
+                                      <path d="M25 50C25 30 35 20 50 20C65 20 75 30 75 50C75 60 72 75 70 85H30C28 75 25 60 25 50Z" fill="#64748b" />
+                                      <path d="M48 10L52 10L50 25L48 10Z" fill="#ef4444" />
+                                      <circle cx="50" cy="10" r="3" fill="#ef4444" />
+                                      <path d="M32 42H68V48H32V42Z" fill="#0f172a" />
+                                      <path d="M50 22V85" stroke="#f59e0b" strokeWidth="2.5" />
+                                      <path d="M30 40H70" stroke="#f59e0b" strokeWidth="2" />
+                                      <circle cx="40" cy="45" r="2.5" fill="#f87171" />
+                                      <circle cx="60" cy="45" r="2.5" fill="#f87171" />
+                                    </svg>
+                                  </div>
+                                  <div>
+                                    <span className="text-[9px] font-black uppercase text-slate-500 block tracking-widest">КЛАСС ВОИН</span>
+                                    <h5 className="text-lg font-black text-white uppercase italic tracking-tight">Коронный Воитель</h5>
+                                  </div>
+                                </div>
+
+                                <div className="space-y-2 text-[11px] text-slate-300">
+                                  <div className="font-mono bg-black/40 p-3 rounded-xl border border-white/5 space-y-1">
+                                    <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Промпт портрета 1:1 (Warrior Headshot)</div>
+                                    <p className="text-[9.5px] italic text-slate-400 select-all leading-tight">Bust headshot portrait of a brave heavy Warrior hero from Fate Continent, looking forward, white background. Wearing a magnificent golden and heavy matte slate-metal helmet with glowing blue energy slots and integrated Zenith crown accents. --ar 1:1</p>
+                                    <button
+                                      onClick={() => {
+                                        navigator.clipboard.writeText("Bust headshot portrait of a brave heavy Warrior hero from Fate Continent, looking forward, white background. Wearing a magnificent golden and heavy matte slate-metal helmet with glowing blue energy slots and integrated Zenith crown accents. --ar 1:1");
+                                        showNotification("Промпт портрета Воина скопирован!", "success");
+                                      }}
+                                      className="mt-2 w-full py-1 text-center bg-indigo-600 hover:bg-indigo-500 text-white rounded text-[9px] font-bold uppercase transition"
+                                    >
+                                      Копировать промпт 📋
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <button
+                                onClick={() => {
+                                  setSimDialogueHero('warrior');
+                                  setSimDialogueStep(0);
+                                  setDialogueActiveScene(true);
+                                  showNotification("Сцена диалога запущена за класс: Воин", "info");
+                                }}
+                                className="w-full py-3 bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg"
+                              >
+                                Выбрать и Начать Диалог ⚔️
+                              </button>
+                            </div>
+
+                            {/* CARD: ARCHER */}
+                            <div className="p-6 rounded-[2.5rem] bg-indigo-950/20 border border-indigo-500/20 hover:border-emerald-500/30 transition-all duration-300 flex flex-col justify-between space-y-6 relative group">
+                              <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-[8px] font-bold text-emerald-400">HIGH AGI</div>
+                              <div className="space-y-4">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-16 h-16 rounded-2xl bg-black/50 border border-emerald-500/30 flex items-center justify-center p-1 relative overflow-hidden">
+                                    <svg className="w-full h-full" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                      <circle cx="50" cy="50" r="45" fill="#064e3b" />
+                                      <path d="M25 55C25 32 35 15 50 15C65 15 75 32 75 55C75 70 70 85 70 90H30C30 85 25 70 25 55Z" fill="#0f172a" />
+                                      <path d="M30 50L50 20L70 50L50 65L30 50Z" fill="#10b981" />
+                                      <path d="M38 46C42 48 46 48 50 46" stroke="#34d399" strokeWidth="3" />
+                                      <path d="M62 46C58 48 54 48 50 46" stroke="#34d399" strokeWidth="3" />
+                                      <circle cx="44" cy="45" r="1.5" fill="#34d399" />
+                                      <circle cx="56" cy="45" r="1.5" fill="#34d399" />
+                                      <path d="M15 25C20 18 30 18 35 25" stroke="#fbbf24" strokeWidth="2" />
+                                    </svg>
+                                  </div>
+                                  <div>
+                                    <span className="text-[9px] font-black uppercase text-slate-500 block tracking-widest">КЛАСС СТРЕЛОК</span>
+                                    <h5 className="text-lg font-black text-white uppercase italic tracking-tight">Лучник в Капюшоне</h5>
+                                  </div>
+                                </div>
+
+                                <div className="space-y-2 text-[11px] text-slate-300">
+                                  <div className="font-mono bg-black/40 p-3 rounded-xl border border-white/5 space-y-1">
+                                    <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Промпт портрета 1:1 (Archer Headshot)</div>
+                                    <p className="text-[9.5px] italic text-slate-400 select-all leading-tight">Bust headshot portrait of an agile Master Archer hero from Fate Continent, looking slightly aside, white background. Wearing a sleek hood made of dark obsidian star-weave fabric with glowing green energy lining. --ar 1:1</p>
+                                    <button
+                                      onClick={() => {
+                                        navigator.clipboard.writeText("Bust headshot portrait of an agile Master Archer hero from Fate Continent, looking slightly aside, white background. Wearing a sleek hood made of dark obsidian star-weave fabric with glowing green energy lining. --ar 1:1");
+                                        showNotification("Промпт портрета Лучника скопирован!", "success");
+                                      }}
+                                      className="mt-2 w-full py-1 text-center bg-indigo-600 hover:bg-indigo-500 text-white rounded text-[9px] font-bold uppercase transition"
+                                    >
+                                      Копировать промпт 📋
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <button
+                                onClick={() => {
+                                  setSimDialogueHero('archer');
+                                  setSimDialogueStep(0);
+                                  setDialogueActiveScene(true);
+                                  showNotification("Сцена диалога запущена за класс: Лучник", "info");
+                                }}
+                                className="w-full py-3 bg-gradient-to-r from-emerald-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg"
+                              >
+                                Выбрать и Начать Диалог 🏹
+                              </button>
+                            </div>
+
+                            {/* CARD: MAGE */}
+                            <div className="p-6 rounded-[2.5rem] bg-indigo-950/20 border border-indigo-500/20 hover:border-purple-500/30 transition-all duration-300 flex flex-col justify-between space-y-6 relative group">
+                              <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-purple-500/20 border border-purple-500/30 text-[8px] font-bold text-purple-400 font-black">COSMIC MP</div>
+                              <div className="space-y-4">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-16 h-16 rounded-2xl bg-black/50 border border-purple-500/30 flex items-center justify-center p-1 relative overflow-hidden">
+                                    <svg className="w-full h-full" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                      <circle cx="50" cy="50" r="45" fill="#311042" />
+                                      <path d="M15 58L50 5L85 58H15Z" fill="#2e1065" />
+                                      <ellipse cx="50" cy="58" rx="35" ry="6" fill="#4c1d95" />
+                                      <path d="M30 45L50 15L70 45" stroke="#f472b6" strokeWidth="3.5" />
+                                      <circle cx="50" cy="18" r="4.5" fill="#a5f3fc" />
+                                      <path d="M40 70C42 65 48 65 50 60C52 65 58 65 60 70C58 75 52 75 50 80C48 75 42 75 40 70Z" fill="#f472b6" />
+                                    </svg>
+                                  </div>
+                                  <div>
+                                    <span className="text-[9px] font-black uppercase text-slate-500 block tracking-widest">КЛАСС МАГ</span>
+                                    <h5 className="text-lg font-black text-white uppercase italic tracking-tight">Звездный Архимаг</h5>
+                                  </div>
+                                </div>
+
+                                <div className="space-y-2 text-[11px] text-slate-300">
+                                  <div className="font-mono bg-black/40 p-3 rounded-xl border border-white/5 space-y-1">
+                                    <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Промпт портрета 1:1 (Mage Headshot)</div>
+                                    <p className="text-[9.5px] italic text-slate-400 select-all leading-tight">Bust headshot portrait of a powerful Cosmic Magician hero from Fate Continent, looking at the camera, white background. Wearing a floating stellar crystal crown in starry hat style. --ar 1:1</p>
+                                    <button
+                                      onClick={() => {
+                                        navigator.clipboard.writeText("Bust headshot portrait of a powerful Cosmic Magician hero from Fate Continent, looking at the camera, white background. Wearing a floating stellar crystal crown in starry hat style. --ar 1:1");
+                                        showNotification("Промпт портрета Мага скопирован!", "success");
+                                      }}
+                                      className="mt-2 w-full py-1 text-center bg-indigo-600 hover:bg-indigo-500 text-white rounded text-[9px] font-bold uppercase transition"
+                                    >
+                                      Копировать промпт 📋
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <button
+                                onClick={() => {
+                                  setSimDialogueHero('mage');
+                                  setSimDialogueStep(0);
+                                  setDialogueActiveScene(true);
+                                  showNotification("Сцена диалога запущена за класс: Маг", "info");
+                                }}
+                                className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg"
+                              >
+                                Выбрать и Начать Диалог 🔮
+                              </button>
+                            </div>
+                          </div>
                         </div>
+                      ) : (
+                        /* PHASE 2: IMMERSIVE ACTIVE DIALOGUE CANVAS LAYOUT (LEFT/RIGHT PORTRAITS + CENTRAL MAIN BALLOON) */
+                        <div className="space-y-8 relative z-10">
+                          {/* Dialogue Active Header bar */}
+                          <div className="flex items-center justify-between bg-black/40 px-6 py-3 rounded-2xl border border-white/5">
+                            <div className="flex items-center gap-2">
+                              <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-ping" />
+                              <span className="text-[10.5px] font-black text-indigo-400 uppercase tracking-widest font-mono">
+                                Сцена диалога: Аэлисса 🧝‍♀️ & {simDialogueHero === 'warrior' ? 'Воин ⚔️' : simDialogueHero === 'archer' ? 'Лучник 🏹' : 'Маг 🔮'}
+                              </span>
+                            </div>
+                            <span className="text-[10px] text-slate-500 font-bold uppercase font-sans">
+                              Текущий шаг сценария: #{simDialogueStep} • {
+                                simDialogueStep === 0 ? 'Приветствие' 
+                                : simDialogueStep === 1 ? 'Информация' 
+                                : simDialogueStep === 2 ? 'Энергетический запал' 
+                                : simDialogueStep === 3 ? 'Выбор очищения континента' 
+                                : 'Финал и зачистка'
+                              }
+                            </span>
+                          </div>
 
-                        {/* Dialogue Frame Container */}
-                        <div className="relative z-10 w-full max-w-4xl mx-auto flex flex-col items-center">
-                          {/* Avatars + Dialog box Grid */}
-                          <div className="w-full flex items-end justify-between gap-4 mb-4">
+                          {/* The Active RPG Screen Layout mockup with guides */}
+                          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-center pt-2 relative">
                             
-                            {/* Companion Portrait LHS */}
-                            <div className="flex flex-col items-center shrink-0">
-                              <div className="w-24 h-24 md:w-32 md:h-32 rounded-[2rem] bg-black/80 border-2 border-indigo-400/80 shadow-[0_0_25px_rgba(56,189,248,0.25)] relative overflow-hidden transition-all duration-500 transform hover:scale-105">
-                                {/* SVG Companion placeholder with high-detailed fantasy elements */}
+                            {/* LEFT COLUMN: COMPANION (AELYSSA) INSIDE SMALL FRAME */}
+                            <div className="lg:col-span-1 flex flex-col items-center space-y-3 relative group">
+                              {/* Overlay Instruction Label Pointing to Companion Frame */}
+                              <div className="absolute -top-12 bg-indigo-950/90 border border-indigo-400 text-cyan-400 px-3 py-1.5 rounded-xl text-[9.5px] font-bold text-center z-30 max-w-xs shadow-xl animate-bounce pointer-events-none">
+                                <span className="block font-black uppercase text-white mb-0.5">Портрет-компаньон</span>
+                                Перетащите сюда Aelyssa.png
+                              </div>
+
+                              <div className="w-32 h-32 md:w-40 md:h-40 rounded-[2.5rem] bg-indigo-950/60 border-2 border-indigo-500 shadow-[0_0_30px_rgba(99,102,241,0.3)] relative overflow-hidden transition-all duration-300 ring-4 ring-indigo-500/10 hover:scale-105">
+                                {/* Companion Graphic Placeholder drawing */}
                                 <svg className="w-full h-full p-2" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                  <circle cx="50" cy="50" r="45" fill="#0c111d" />
-                                  {/* Hair */}
-                                  <path d="M15 65C12 35 32 15 50 15C68 15 88 35 85 65C82 80 80 90 80 95H20C20 90 18 80 15 65Z" fill="#e2e8f0" />
-                                  {/* Pointy ears */}
-                                  <path d="M18 45L5 35L18 30V45Z" fill="#ffedd5" />
-                                  <path d="M82 45L95 35L82 30V45Z" fill="#ffedd5" />
-                                  {/* Face */}
-                                  <ellipse cx="50" cy="48" rx="20" ry="25" fill="#fed7aa" />
-                                  {/* Mystical glowing markings */}
-                                  <path d="M42 42C44 44 44 48 44 48" stroke="#a855f7" strokeWidth="2" strokeLinecap="round" />
-                                  <path d="M58 42C56 44 56 48 56 48" stroke="#a855f7" strokeWidth="2" strokeLinecap="round" />
-                                  {/* Purple Eyes */}
-                                  <circle cx="42" cy="44" r="4" fill="#6b21a8" />
-                                  <circle cx="58" cy="44" r="4" fill="#6b21a8" />
-                                  <circle cx="43" cy="43" r="1.5" fill="#ffffff" />
-                                  <circle cx="59" cy="43" r="1.5" fill="#ffffff" />
-                                  {/* Crown of Crystals */}
-                                  <path d="M35 22L50 5L65 22L50 15L35 22Z" fill="#00ffff" />
-                                  <circle cx="50" cy="18" r="4.5" fill="#a855f7" className="animate-pulse" />
+                                  <circle cx="50" cy="50" r="45" fill="#0f172a" />
+                                  <path d="M20 70C20 40 30 15 50 15C70 15 80 40 80 70C75 75 70 80 50 82C30 80 25 75 20 70Z" fill="#e2e8f0" />
+                                  <path d="M10 50C10 40 25 20 50 20C75 20 90 40 90 50C90 60 85 75 50 85C15 75 10 60 10 50Z" fill="#f1f5f9" />
+                                  <path d="M15 35C5 32 5 25 8 20C12 25 18 30 20 35H15Z" fill="#fbcfe8" />
+                                  <path d="M85 35C95 32 95 25 92 20C88 25 82 30 80 35H85Z" fill="#fbcfe8" />
+                                  <path d="M30 50C30 35 38 30 50 30C62 30 70 35 70 50C70 65 62 80 50 80C38 80 30 65 30 50Z" fill="#fbcfe8" />
+                                  <path d="M28 20C32 25 35 35 32 50C30 60 25 70 20 75" stroke="#f1f5f9" strokeWidth="2.5" />
+                                  <path d="M72 20C68 25 65 35 68 50C70 60 75 70 80 75" stroke="#f1f5f9" strokeWidth="2.5" />
+                                  <ellipse cx="40" cy="48" rx="3" ry="5" fill="#a855f7" />
+                                  <ellipse cx="60" cy="48" rx="3" ry="5" fill="#a855f7" />
+                                  <circle cx="41" cy="46" r="1" fill="#ffffff" />
+                                  <circle cx="61" cy="46" r="1" fill="#ffffff" />
+                                  <path d="M35 75C40 78 45 80 50 80C55 80 60 78 65 75" stroke="#818cf8" strokeWidth="3" />
                                 </svg>
+                                
+                                <div className="absolute inset-0 bg-indigo-500/10 group-hover:bg-indigo-500/0 transition-colors pointer-events-none" />
                               </div>
-                              <div className="mt-2.5 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 shadow-md">
-                                <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">
-                                  {simDialogueLang === 'RU' ? 'Аэлисса (Гид)' : 'Aelyssa (Guide)'}
+
+                              <div className="flex flex-col items-center">
+                                <span className="text-[10px] font-black text-indigo-400 bg-indigo-500/20 px-3 py-1 rounded-full border border-indigo-500/30 uppercase tracking-widest">
+                                  Аэлисса (Гид) 🧝‍♀️
                                 </span>
+                                <button
+                                  onClick={() => {
+                                    // Synthesize companion sound
+                                    try {
+                                      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                      const osc = ctx.createOscillator();
+                                      const gain = ctx.createGain();
+                                      osc.type = 'triangle';
+                                      osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+                                      osc.frequency.exponentialRampToValueAtTime(1174.66, ctx.currentTime + 0.3);
+                                      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                                      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+                                      osc.connect(gain);
+                                      gain.connect(ctx.destination);
+                                      osc.start();
+                                      osc.stop(ctx.currentTime + 0.35);
+                                    } catch(e){}
+                                    showNotification("🔊 Тест Voice Clip Аэлиссы воспроизведен! (Имитация companionVoiceClip)", "info");
+                                  }}
+                                  className="mt-2 text-[9px] text-slate-400 hover:text-white bg-black/40 hover:bg-slate-800 px-2 py-1 rounded-lg border border-white/5 transition flex items-center gap-1.5"
+                                >
+                                  🔊 Озвучка (Unity Clip)
+                                </button>
                               </div>
                             </div>
 
-                            {/* Dialogue Central Body (Double Polygon Cut Shape, NOT plagiarised) */}
-                            <div className="flex-1 min-h-[140px] md:min-h-[160px] bg-[#050914]/90 border-2 border-indigo-500/55 rounded-[2rem] shadow-2xl relative p-6 pt-10 flex flex-col justify-between overflow-hidden">
-                              {/* Background crystal dust noise */}
-                              <div className="absolute inset-0 opacity-[0.05] bg-[linear-gradient(45deg,_var(--tw-gradient-stops))] from-blue-500 to-transparent pointer-events-none" />
-                              
-                              {/* Glowing Cyan Diagonal Lines (Futuristic Edge Accents) */}
-                              <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-cyan-400 rounded-tl-xl pointer-events-none" />
-                              <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-cyan-400 rounded-br-xl pointer-events-none" />
+                            {/* CENTER 2 COLS: LARGE DIALOGUE CONTAINER FRAME */}
+                            <div className="lg:col-span-2 relative">
+                              {/* The Large Slanted RPG Frame Dialog Box inspired by user artwork */}
+                              <div className="rounded-[2.5rem] bg-gradient-to-br from-indigo-950 to-slate-900 border-2 border-cyan-400/80 shadow-[0_0_35px_rgba(34,211,238,0.25)] relative overflow-hidden backdrop-blur-2xl p-6 md:p-8 flex flex-col justify-between min-h-[220px]">
+                                
+                                {/* Top gold slanting title bar cover cap with gem star (as on screenshot 1 & 2) */}
+                                <div className="absolute top-0 left-0 bg-gradient-to-r from-amber-500 to-orange-600 border-b border-r border-amber-400/40 px-6 py-1.5 rounded-br-[1.5rem] flex items-center gap-2">
+                                  <span className="w-3 h-3 rounded bg-amber-200 animate-pulse flex items-center justify-center text-[8px] text-black font-black">✦</span>
+                                  <span className="text-[10px] font-black text-white uppercase tracking-widest">
+                                    {simDialogueStep === 0 ? 'АКТИВНАЯ РЕЧЬ' : simDialogueStep === 3 ? 'ВЫБОР ОЧИЩЕНИЯ' : 'СЛЕДУЮЩИЙ ШАГ'}
+                                  </span>
+                                </div>
 
-                              {/* Exclusive Dialogue Title Header Cap (Solid gold-orange slant style) */}
-                              <div className="absolute top-0 left-6 -translate-y-1/2 bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-1.5 rounded-full shadow-lg border border-amber-400/40">
-                                <span className="text-[11px] font-black text-white uppercase tracking-widest block font-sans">
-                                  {simDialogueLang === 'RU' 
-                                    ? (simDialogueStep === 0 ? 'ПРИВЕТСТВИЕ' : simDialogueStep === 1 ? 'РАССКАЗ О КРИСТАЛЛЕ' : simDialogueStep === 2 ? 'ЭНЕРГИЯ ВЫБОРА' : 'БЛАГОСЛОВЕНИЕ')
-                                    : (simDialogueStep === 0 ? 'GREETING' : simDialogueStep === 1 ? 'ABOUT THE CRYSTAL' : simDialogueStep === 2 ? 'ENERGY REBORN' : 'BLESSING')
-                                  }
-                                </span>
-                              </div>
+                                {/* Diagonal Polygonal Side Corners Visual accents */}
+                                <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-cyan-400/40 rounded-tr-xl pointer-events-none" />
+                                <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-cyan-400/40 rounded-bl-xl pointer-events-none" />
 
-                              {/* Dialogue Body Text */}
-                              <p className="text-[13px] md:text-sm text-slate-100 font-medium italic mt-2 leading-relaxed">
-                                {simDialogueLang === 'RU' 
-                                  ? (simDialogueStep === 0 ? 'Здравствуй, путник! Наш Континент Судьбы погружается во тьму древнего безвременья. Я буду сопровождать тебя в этом опасном походе.' : simDialogueStep === 1 ? 'Меня зовут Аэлисса, хранительница священного Кристалла Зенита. Моя магия защитит тебя от коварства Кровавых Пустошей.' : simDialogueStep === 2 ? 'Отважный боевой дух! Твое оружие уже заряжено энергией Зенита. Двинемся вперед через северные врата замка!' : 'Помни: каждый выбор здесь имеет значение. Да пребудет с тобой благословение Кристалла! Мы отправляемся.')
-                                  : simDialogueLang === 'EN'
-                                  ? (simDialogueStep === 0 ? 'Greetings, traveler! Our Fate Continent is sinking into the darkness of ancient timelessness. I will accompany you in this dangerous journey.' : simDialogueStep === 1 ? 'My name is Aelyssa, keeper of the sacred Zenith Crystal. My magic will protect you from the treachery of the Crimson Wastes.' : simDialogueStep === 2 ? 'Courageous battle spirit! Your weapon is infused with Zenith energy. Let us move forward through the northern castle gates!' : 'Remember: every choice here has consequences. May the blessing of the Crystal be with you! We set forth.')
-                                  : simDialogueLang === 'KR'
-                                  ? (simDialogueStep === 0 ? '반갑다, 여행자여! 우리의 운명 대륙이 고대 무한의 어둠 속으로 잠기고 있다. 내가 이 위험한 여정에 동행하겠다.' : simDialogueStep === 1 ? '내 이름은 앨리사, 신성한 제니스 크리스탈의 수호자다. 나의 마법이 크림슨 황무지의 배신으로부터 당신을 지켜줄 것이다.' : simDialogueStep === 2 ? '용감한 전향이여! 당신의 무기에 제니스 에너지가 주입되었다. 북쪽 성문을 통해 전진하자!' : '기억해라: 이곳에서의 모든 선택은 그 결과가 따른да. 크리스탈의 축복이 함께하기를! 우리는 떠난다.')
-                                  : (simDialogueStep === 0 ? '你好，旅人！我们的命运大陆正在沉入远古无尽的黑暗之中。我将陪伴你度过这段危险的旅程。' : simDialogueStep === 1 ? '我叫艾莉莎，神圣天顶水晶的守护者。我的魔法将保护你免受绯红荒野的背叛。' : simDialogueStep === 2 ? '英勇的斗志！你的武已经被注入了天顶能量。让我们从北门穿过城堡前进吧！' : '记住：这里的每一个选择都有其后果。愿水晶的祝福与你同在！我们出发了。')
-                                }
-                              </p>
+                                <div className="mt-4 space-y-4">
+                                  {/* Speaker Name label in bold */}
+                                  <div className="text-[11px] font-black text-amber-400 uppercase tracking-widest mt-1">
+                                    {simDialogueLang === 'RU' ? 'Аэлисса, Хранительница Кристалла' : 'Aelyssa, Keeper of Crystal'}
+                                  </div>
 
-                              {/* Interactive Choice list inside Dialogue Bubble */}
-                              <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-white/5 z-20">
-                                {simDialogueStep === 0 ? (
-                                  <>
+                                  {/* Dialogue message itself inside standard styling */}
+                                  <p className="text-[12.5px] md:text-sm text-slate-100 font-medium leading-relaxed italic">
+                                    {simDialogueLang === 'RU' ? (
+                                      simDialogueStep === 0 ? `Здравствуй, ${simDialogueHero === 'warrior' ? 'отважный Воин' : simDialogueHero === 'archer' ? 'меткий Стрелок' : 'мудрый Маг'}! Наш Континент Судьбы погружается во тьму древнего безвременья. Я буду сопровождать тебя в этом опасном походе.`
+                                      : simDialogueStep === 1 ? 'Я — хранительница священного Кристалла Зенита. Моя магия защитит твое боевое снаряжение от смертоносной скверны.'
+                                      : simDialogueStep === 2 ? `Твоя воля непоколебима! Оружие класса ${simDialogueHero === 'warrior' ? 'Воин' : simDialogueHero === 'archer' ? 'Стрелок' : 'Маг'} напитано божественным сиянием. Мы готовы совершить поход.`
+                                      : simDialogueStep === 3 ? 'Путник, настал решающий миг! Выберите территорию на Континенте Судьбы, которую наш воинский отряд должен зачистить от легионов скверны в первую очередь:'
+                                      : simDialogueStep === 4 ? 'Вы выбрали 🩸 Кровавые Пустоши! Здесь сильны орды демонов-налетчиков и адские песчаные бури Зенита. Да благословит Кристалл наши мечи! В поход!'
+                                      : simDialogueStep === 5 ? 'Вы выбрали ❄️ Ледяной Пик! Вечная мерзлота испытывает плоть на прочность, а Ледяные Мимики охраняют заброшенные залежи руды. Готовьте щиты!'
+                                      : 'Вы выбрали 🏛️ Древние Руины! Забытые гробницы таят прах великих императоров Зенита, но берегитесь оживших статуй и капканов. Шагнем во тьму!'
+                                    ) : simDialogueLang === 'EN' ? (
+                                      simDialogueStep === 0 ? `Greetings, ${simDialogueHero}! Our Fate Continent is sinking into the darkness of ancient timelessness. I will accompany you in this dangerous journey.`
+                                      : simDialogueStep === 1 ? 'I am the keeper of the sacred Zenith Crystal. My magic will shield your equipment from the lethal corruption.'
+                                      : simDialogueStep === 2 ? `Your battle spirit is absolute! Your ${simDialogueHero} focus has been loaded with holy solar flames. We stand prepared.`
+                                      : simDialogueStep === 3 ? 'Traveler, the crucial moment is here! Choose a specific sector on the Fate Continent for our tactical squad to cleanse first:'
+                                      : simDialogueStep === 4 ? 'You chosen Crimson Wastes! Demon hordes and brutal firestorms rage across this territory. May the Crystal bless us. March!'
+                                      : simDialogueStep === 5 ? 'You chosen Ice-Bound Peak! Extreme cold attacks the mind, and ancient Ice Mimics patrol the rich ore caves. Prepare your gear!'
+                                      : 'You chosen Ancient Ruins! Legendary tombs hold relics of the celestial emperors, but ancient traps remain active. Into the shadow!'
+                                    ) : simDialogueLang === 'KR' ? (
+                                      simDialogueStep === 0 ? `반갑다, ${simDialogueHero === 'warrior' ? '용감한 전사' : simDialogueHero === 'archer' ? '신궁' : '현명한 마법사'}여! 우리의 운명 대륙이 어둠 속으로 잠기고 있다. 내가 함께하겠다.`
+                                      : simDialogueStep === 1 ? '나는 신성한 제니스 크리스탈의 수хо자다. 나의 마법이 크림슨의 오염으로부터 당신을 защитит 할것이다.'
+                                      : simDialogueStep === 2 ? '전투 정신이 훌륭하다! 당신의 장비에 제니스 에너지가 가득 찼다. 출발 준비가 끝났다.'
+                                      : simDialogueStep === 3 ? '결정적인 순간이다! 우리 군대가 먼저 전술적으로 소탕할 정화 지역을 선택하십시오:'
+                                      : simDialogueStep === 4 ? '크림슨 황무지를 선택하셨습니다! 악마 군단과 거친 제니스 마력 폭풍이 몰아치는 전쟁터입니다. 돌격!'
+                                      : simDialogueStep === 5 ? '빙설의 봉우리를 선택하셨습니다! 혹독한 영구 동토에 미믹들이 고대 광산을 경비합니다. 준비를 마칩시다!'
+                                      : '고대 유적지를 선택하셨습니다! 지하 묘지에 고대의 강력한 제니스 결정이 잠들어 있지만, 고대의 함정이 가득합니다.'
+                                    ) : (
+                                      simDialogueStep === 0 ? `你好, 尊敬的${simDialogueHero === 'warrior' ? '战士' : simDialogueHero === 'archer' ? '射手' : '法师'}! 我们的命运大陆正在沉入无尽黑暗。我将陪伴你征战。`
+                                      : simDialogueStep === 1 ? '我是神圣天顶水晶的守护者。我的魔法将保护你的装备和灵魂不被污染。'
+                                      : simDialogueStep === 2 ? '斗志极其高昂！你的天顶武器已经充能完毕，随时能够出征斩杀恶魔。'
+                                      : simDialogueStep === 3 ? '旅人，决胜时刻已到！请在命运大陆中选择一个特定区域，进行首轮净化除魔行动：'
+                                      : simDialogueStep === 4 ? '你选择了绯红荒野！这里盘踞着强盗匪帮和狂暴的天顶狂风。愿水晶祝福我们，即刻出发！'
+                                      : simDialogueStep === 5 ? '你选择了冰封之巅！永恒极寒在考验你的意志，冰巨人守卫着尘封的宝藏。准备御寒吧！'
+                                      : '你选择了远古遗迹！失落的墓穴里埋藏着帝国元老的法术，但致命机关依然在运转。小心前进！'
+                                    )}
+                                  </p>
+                                </div>
+
+                                {/* BRANCHING BUTTON CONTROLS INSIDE DIALOGUE BOX */}
+                                <div className="border-t border-white/5 pt-4 mt-6 z-20 flex flex-wrap gap-2.5">
+                                  {simDialogueStep === 0 ? (
+                                    <>
+                                      <button 
+                                        onClick={() => {
+                                          setSimDialogueStep(1);
+                                          showNotification("Разветвление: Вопрос о спутнице", "info");
+                                          try {
+                                            const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                            const osc = ctx.createOscillator();
+                                            osc.frequency.setValueAtTime(440, ctx.currentTime);
+                                            osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.1);
+                                            const g = ctx.createGain();
+                                            g.gain.setValueAtTime(0.1, ctx.currentTime);
+                                            g.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+                                            osc.connect(g); g.connect(ctx.destination);
+                                            osc.start(); osc.stop(ctx.currentTime + 0.1);
+                                          } catch(e){}
+                                        }}
+                                        className="px-4 py-2 bg-indigo-500/10 hover:bg-indigo-600 border border-indigo-500/20 rounded-xl text-[10px] font-bold text-indigo-300 hover:text-white transition-all text-left flex items-center gap-2 group/btn"
+                                      >
+                                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 group-hover/btn:scale-125 transition-transform" />
+                                        {simDialogueLang === 'RU' ? 'Кто ты такая?' : simDialogueLang === 'KR' ? '당신은 누구십니까?' : simDialogueLang === 'CH' ? '你是谁？' : 'Who are you?'}
+                                      </button>
+                                      <button 
+                                        onClick={() => {
+                                          setSimDialogueStep(2);
+                                          showNotification("Разветвление: Готовность к бою", "info");
+                                          try {
+                                            const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                            const osc = ctx.createOscillator();
+                                            osc.frequency.setValueAtTime(500, ctx.currentTime);
+                                            osc.frequency.exponentialRampToValueAtTime(900, ctx.currentTime + 0.1);
+                                            const g = ctx.createGain();
+                                            g.gain.setValueAtTime(0.1, ctx.currentTime);
+                                            g.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+                                            osc.connect(g); g.connect(ctx.destination);
+                                            osc.start(); osc.stop(ctx.currentTime + 0.1);
+                                          } catch(e){}
+                                        }}
+                                        className="px-4 py-2 bg-indigo-500/10 hover:bg-purple-600 border border-indigo-500/20 rounded-xl text-[10px] font-bold text-indigo-300 hover:text-white transition-all text-left flex items-center gap-2 group/btn"
+                                      >
+                                        <span className="w-1.5 h-1.5 rounded-full bg-purple-400 group-hover/btn:scale-125 transition-transform" />
+                                        {simDialogueLang === 'RU' ? 'Я готов к битве!' : simDialogueLang === 'KR' ? '전투 준비 완료!' : simDialogueLang === 'CH' ? '我准备好战斗了！' : 'I am ready for battle!'}
+                                      </button>
+                                    </>
+                                  ) : simDialogueStep === 1 || simDialogueStep === 2 ? (
                                     <button 
-                                      onClick={() => { setSimDialogueStep(1); showNotification("Вы выбрали разузнать о спутнице", "info"); }}
-                                      className="px-4 py-2 bg-indigo-500/10 hover:bg-indigo-600 border border-indigo-500/20 rounded-xl text-[11px] font-bold text-indigo-300 hover:text-white transition-all text-left flex items-center gap-2 group/btn"
+                                      onClick={() => {
+                                        setSimDialogueStep(3);
+                                        // Play chime
+                                        try {
+                                          const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                          const osc = ctx.createOscillator();
+                                          osc.frequency.setValueAtTime(700, ctx.currentTime);
+                                          osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.15);
+                                          const g = ctx.createGain(); g.gain.setValueAtTime(0.08, ctx.currentTime);
+                                          osc.connect(g); g.connect(ctx.destination);
+                                          osc.start(); osc.stop(ctx.currentTime + 0.15);
+                                        } catch(e){}
+                                      }}
+                                      className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 border border-indigo-400/40 rounded-xl text-[10px] font-black uppercase tracking-widest text-white transition-all flex items-center gap-2"
                                     >
-                                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 group-hover/btn:scale-125 transition-transform" />
-                                      {simDialogueLang === 'RU' ? 'Кто ты такая?' : simDialogueLang === 'KR' ? '당신은 누구십니까?' : simDialogueLang === 'CH' ? '你是谁？' : 'Who are you?'}
+                                      {simDialogueLang === 'RU' ? 'Перейти к выбору области континента ➔' : simDialogueLang === 'KR' ? '지역 선택 대화로 진입 ➔' : simDialogueLang === 'CH' ? '进入区域选择 ➔' : 'Select territory ➔'}
                                     </button>
-                                    <button 
-                                      onClick={() => { setSimDialogueStep(2); showNotification("Вы бросаетесь в битву", "info"); }}
-                                      className="px-4 py-2 bg-indigo-500/10 hover:bg-purple-600 border border-indigo-500/20 rounded-xl text-[11px] font-bold text-indigo-300 hover:text-white transition-all text-left flex items-center gap-2 group/btn"
-                                    >
-                                      <span className="w-1.5 h-1.5 rounded-full bg-purple-400 group-hover/btn:scale-125 transition-transform" />
-                                      {simDialogueLang === 'RU' ? 'Я готов к битве!' : simDialogueLang === 'KR' ? '전투 준비 완료!' : simDialogueLang === 'CH' ? '我准备好战斗了！' : 'I am ready for battle!'}
-                                    </button>
-                                  </>
-                                ) : simDialogueStep === 1 ? (
-                                  <button 
-                                    onClick={() => setSimDialogueStep(3)}
-                                    className="px-4 py-2 bg-indigo-500/10 hover:bg-slate-800 border border-indigo-500/20 rounded-xl text-[11px] font-bold text-indigo-300 hover:text-white transition-all flex items-center gap-2"
-                                  >
-                                    {simDialogueLang === 'RU' ? 'Продолжить поход...' : simDialogueLang === 'KR' ? '여정 계속하기...' : simDialogueLang === 'CH' ? '继续旅程...' : 'Continue quest...'}
-                                  </button>
-                                ) : simDialogueStep === 2 ? (
-                                  <button 
-                                    onClick={() => setSimDialogueStep(3)}
-                                    className="px-4 py-2 bg-indigo-500/10 hover:bg-slate-800 border border-indigo-500/20 rounded-xl text-[11px] font-bold text-indigo-300 hover:text-white transition-all flex items-center gap-2"
-                                  >
-                                    {simDialogueLang === 'RU' ? 'Начать приключение!' : simDialogueLang === 'KR' ? '모험 시작하기!' : simDialogueLang === 'CH' ? '开始冒险！' : 'Start adventure!'}
-                                  </button>
-                                ) : (
-                                  <button 
-                                    onClick={() => setSimDialogueStep(0)}
-                                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-[11px] font-black text-white uppercase tracking-widest transition-all"
-                                  >
-                                    {simDialogueLang === 'RU' ? 'Повторить диалог ↺' : simDialogueLang === 'KR' ? '대화 반복 ↺' : simDialogueLang === 'CH' ? '重复对话 ↺' : 'Restart Dialogue ↺'}
-                                  </button>
-                                )}
+                                  ) : simDialogueStep === 3 ? (
+                                    /* THE DYNAMIC CONTINENT CLEANSING LOCATIONS BUTTONS - EXACTLY WHAT USER WANTED */
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 w-full">
+                                      <button 
+                                        onClick={() => {
+                                          setSimDialogueStep(4);
+                                          showNotification("Вы выбрали место: Кровавые Пустоши!", "success");
+                                          try {
+                                            const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                            const osc = ctx.createOscillator(); osc.frequency.setValueAtTime(150, ctx.currentTime); osc.frequency.linearRampToValueAtTime(300, ctx.currentTime + 0.2);
+                                            const g = ctx.createGain(); g.gain.setValueAtTime(0.12, ctx.currentTime); osc.connect(g); g.connect(ctx.destination);
+                                            osc.start(); osc.stop(ctx.currentTime + 0.2);
+                                          } catch(e){}
+                                        }}
+                                        className="px-3 py-2 bg-red-600/10 hover:bg-red-600 border border-red-500/30 rounded-xl text-[10px] font-black text-red-200 hover:text-white transition-all flex items-center justify-center gap-2"
+                                      >
+                                        <span>🩸</span>
+                                        {simDialogueLang === 'RU' ? 'Кровавые Пустоши' : simDialogueLang === 'KR' ? '크림슨 황무지' : simDialogueLang === 'CH' ? '绯红荒野' : 'Crimson Wastes'}
+                                      </button>
+                                      
+                                      <button 
+                                        onClick={() => {
+                                          setSimDialogueStep(5);
+                                          showNotification("Вы выбрали место: Ледяной Пик!", "success");
+                                          try {
+                                            const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                            const osc = ctx.createOscillator(); osc.frequency.setValueAtTime(300, ctx.currentTime); osc.frequency.linearRampToValueAtTime(600, ctx.currentTime + 0.2);
+                                            const g = ctx.createGain(); g.gain.setValueAtTime(0.12, ctx.currentTime); osc.connect(g); g.connect(ctx.destination);
+                                            osc.start(); osc.stop(ctx.currentTime + 0.2);
+                                          } catch(e){}
+                                        }}
+                                        className="px-3 py-2 bg-cyan-600/10 hover:bg-cyan-600 border border-cyan-500/30 rounded-xl text-[10px] font-black text-cyan-200 hover:text-white transition-all flex items-center justify-center gap-2"
+                                      >
+                                        <span>❄️</span>
+                                        {simDialogueLang === 'RU' ? 'Ледяной Пик' : simDialogueLang === 'KR' ? '빙설의 봉우리' : simDialogueLang === 'CH' ? '冰封之巅' : 'Ice-Bound Peak'}
+                                      </button>
+
+                                      <button 
+                                        onClick={() => {
+                                          setSimDialogueStep(6);
+                                          showNotification("Вы выбрали место: Древние Руины!", "success");
+                                          try {
+                                            const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                            const osc = ctx.createOscillator(); osc.frequency.setValueAtTime(200, ctx.currentTime); osc.frequency.linearRampToValueAtTime(450, ctx.currentTime + 0.2);
+                                            const g = ctx.createGain(); g.gain.setValueAtTime(0.12, ctx.currentTime); osc.connect(g); g.connect(ctx.destination);
+                                            osc.start(); osc.stop(ctx.currentTime + 0.2);
+                                          } catch(e){}
+                                        }}
+                                        className="px-3 py-2 bg-amber-600/10 hover:bg-amber-600 border border-amber-500/30 rounded-xl text-[10px] font-black text-amber-200 hover:text-white transition-all flex items-center justify-center gap-2"
+                                      >
+                                        <span>🏛️</span>
+                                        {simDialogueLang === 'RU' ? 'Древние Руины' : simDialogueLang === 'KR' ? '고대 유적지' : simDialogueLang === 'CH' ? '远古遗迹' : 'Ancient Ruins'}
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    /* FINALIZE PANEL WITH RESET OPTION */
+                                    <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 w-full">
+                                      <div className="flex-1 p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-[10.5px] text-green-400 font-bold flex items-center gap-2 font-sans">
+                                        <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                                        <span>Вы выбрали место зачистки континента! Диалог успешно протестирован и готов к запуску.</span>
+                                      </div>
+                                      
+                                      <button 
+                                        onClick={() => {
+                                          setDialogueActiveScene(false);
+                                          setSimDialogueStep(0);
+                                          showNotification("Сброшено! Выберите класс заново", "info");
+                                        }}
+                                        className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md shrink-0"
+                                      >
+                                        Сменить Класс & Сбросить ↺
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
                             </div>
 
-                            {/* Chosen Hero Portrait RHS (Updates based on selection!) */}
-                            <div className="flex flex-col items-center shrink-0">
-                              <div className="w-24 h-24 md:w-32 md:h-32 rounded-[2rem] bg-black/80 border-2 border-amber-400/80 shadow-[0_0_25px_rgba(245,158,11,0.25)] relative overflow-hidden transition-all duration-500 transform hover:scale-105">
+                            {/* RIGHT COLUMN: CHOSEN CLASS PORTRAIT INSIDE SMALL FRAME */}
+                            <div className="lg:col-span-1 flex flex-col items-center space-y-3 relative group">
+                              {/* Overlay Instruction Label Pointing to Hero Frame */}
+                              <div className="absolute -top-12 bg-amber-950/90 border border-amber-400 text-amber-400 px-3 py-1.5 rounded-xl text-[9.5px] font-bold text-center z-30 max-w-xs shadow-xl animate-bounce pointer-events-none">
+                                <span className="block font-black uppercase text-white mb-0.5">Портрет {simDialogueHero === 'warrior' ? 'Воина' : simDialogueHero === 'archer' ? 'Лучника' : 'Мага'}</span>
+                                Перетащите сюда спрайт класса
+                              </div>
+
+                              <div className="w-32 h-32 md:w-40 md:h-40 rounded-[2.5rem] bg-indigo-950/60 border-2 border-amber-500 shadow-[0_0_30px_rgba(245,158,11,0.3)] relative overflow-hidden transition-all duration-300 ring-4 ring-amber-500/10 hover:scale-105 animate-fade-in">
                                 {simDialogueHero === 'warrior' ? (
-                                  /* Warrior SVG */
+                                  /* Warrior SVG Headshot with Crown elements */
                                   <svg className="w-full h-full p-2" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <circle cx="50" cy="50" r="45" fill="#1e1b4b" />
-                                    {/* Knight Helmet */}
                                     <path d="M25 50C25 30 35 20 50 20C65 20 75 30 75 50C75 60 72 75 70 85H30C28 75 25 60 25 50Z" fill="#64748b" />
-                                    <path d="M48 10L52 10L50 25L48 10Z" fill="#ef4444" />
-                                    <circle cx="50" cy="10" r="3" fill="#ef4444" />
+                                    {/* Crown accent */}
+                                    <path d="M35 20L42 28L50 15L58 28L65 20L57 32H43L35 20Z" fill="#fbbf24" stroke="#d97706" />
                                     {/* Visor slit slate */}
                                     <path d="M32 42H68V48H32V42Z" fill="#0f172a" />
                                     {/* Gold borders */}
-                                    <path d="M50 22V85" stroke="#f59e0b" strokeWidth="2.5" />
-                                    <path d="M30 40H70" stroke="#f59e0b" strokeWidth="2" />
-                                    <circle cx="40" cy="45" r="2.5" fill="#f87171" className="animate-pulse" />
-                                    <circle cx="60" cy="45" r="2.5" fill="#f87171" className="animate-pulse" />
+                                    <path d="M50 32V85" stroke="#f59e0b" strokeWidth="2.5" />
+                                    <circle cx="40" cy="45" r="2.5" fill="#38bdf8" />
+                                    <circle cx="60" cy="45" r="2.5" fill="#38bdf8" />
                                   </svg>
                                 ) : simDialogueHero === 'archer' ? (
-                                  /* Archer SVG */
+                                  /* Archer SVG Headshot in Hood */
                                   <svg className="w-full h-full p-2" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <circle cx="50" cy="50" r="45" fill="#064e3b" />
                                     {/* Hood/Cowl */}
@@ -4861,33 +5036,122 @@ export default function App() {
                                     <path d="M30 50L50 20L70 50L50 65L30 50Z" fill="#10b981" />
                                     {/* Glowing green visior eye */}
                                     <path d="M38 46C42 48 46 48 50 46" stroke="#34d399" strokeWidth="3" />
-                                    <path d="M62 46C58 48 54 48 50 46" stroke="#34d399" strokeWidth="3" />
                                     <circle cx="44" cy="45" r="1.5" fill="#34d399" />
                                     <circle cx="56" cy="45" r="1.5" fill="#34d399" />
-                                    {/* Bow outline back */}
-                                    <path d="M15 25C20 18 30 18 35 25" stroke="#fbbf24" strokeWidth="2" />
                                   </svg>
                                 ) : (
-                                  /* Mage SVG */
+                                  /* Mage SVG Headshot star hat style */
                                   <svg className="w-full h-full p-2" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <circle cx="50" cy="50" r="45" fill="#311042" />
                                     {/* Archmage Hat */}
                                     <path d="M15 58L50 5L85 58H15Z" fill="#2e1065" />
                                     <ellipse cx="50" cy="58" rx="35" ry="6" fill="#4c1d95" />
                                     <path d="M30 45L50 15L70 45" stroke="#f472b6" strokeWidth="3.5" />
-                                    {/* Glowing cosmic star */}
-                                    <circle cx="50" cy="18" r="4.5" fill="#a5f3fc" className="animate-pulse" />
+                                    {/* Glowing cosmic star of archmage hat */}
+                                    <circle cx="50" cy="18" r="4.5" fill="#a5f3fc" />
                                     <path d="M40 70C42 65 48 65 50 60C52 65 58 65 60 70C58 75 52 75 50 80C48 75 42 75 40 70Z" fill="#f472b6" />
                                   </svg>
                                 )}
+                                <div className="absolute inset-0 bg-yellow-500/10 group-hover:bg-yellow-500/0 transition-colors pointer-events-none" />
                               </div>
-                              <div className="mt-2.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/30 shadow-md">
-                                <span className="text-[10px] font-black text-amber-400 uppercase tracking-widest">
-                                  {simDialogueHero === 'warrior' ? 'ВОИН (КЛАСС)' : simDialogueHero === 'archer' ? 'СТРЕЛОК (КЛАСС)' : 'МАГ (КЛАСС)'}
+
+                              <div className="text-center font-sans">
+                                <span className="text-[10px] font-black text-amber-400 bg-amber-500/20 px-3 py-1 rounded-full border border-amber-500/30 uppercase tracking-widest block font-sans">
+                                  {simDialogueHero === 'warrior' ? 'Воин (Класс)' : simDialogueHero === 'archer' ? 'Стрелок (Класс)' : 'Маг (Класс)'}
                                 </span>
                               </div>
                             </div>
 
+                          </div>
+                        </div>
+                      )}
+
+                      {/* UNITY DETAILED DRAG AND DROP MANUAL CONFIGURATION PANEL */}
+                      <div className="p-8 rounded-[2.5rem] bg-black/60 border border-white/5 space-y-6 relative z-10 font-sans">
+                        <div className="flex items-center gap-3 border-b border-indigo-500/10 pb-4">
+                          <div className="p-2 rounded-xl bg-orange-500/20 border border-orange-500/30">
+                            <Zap className="w-5 h-5 text-orange-400" />
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-black text-white uppercase tracking-wider">
+                              Инструкция по настройке DialogueManager в Unity
+                            </h4>
+                            <p className="text-[10px] text-slate-400">
+                              Пошаговое привязывание ассетов диалогов в окне инспектора Unity 6 (6000.3.10f1)
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="p-4 rounded-2xl bg-indigo-500/5 border border-indigo-500/10 text-[10.5px] text-indigo-400 flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <Info className="w-4 h-4 shrink-0" />
+                            <span>Класс сохранения <code className="bg-indigo-950/40 px-2 py-0.5 rounded text-white text-[10px]">SaveGameSystem.cs</code> автоматически хранит выбранный класс перед запуском диалога, и передает её в менеджер для отображения правой стороны.</span>
+                          </div>
+                        </div>
+
+                        {/* Interactive Unity Guide Text */}
+                        <div className="space-y-4 text-[11px] text-slate-300 leading-relaxed font-sans">
+                          <p className="font-bold text-amber-400">
+                            Выделите объект <code className="bg-slate-800 text-white px-1.5 py-0.5 rounded font-mono border border-white/10">DialogueManager</code> в иерархии вашей сцены в Unity Editor. В появившемся окне Inspector прикрепите активы в соответствующие слоты:
+                          </p>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                            <div className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-2">
+                              <div className="flex items-center gap-2">
+                                <span className="w-2.5 h-2.5 rounded bg-indigo-500 shrink-0" />
+                                <strong className="text-slate-200">1. Портрет-компаньон:</strong>
+                              </div>
+                              <p className="text-[10.5px] text-slate-400 pl-4.5">
+                                Перетащите спрайт Аэлиссы (<code className="bg-slate-800 text-slate-300 px-1 font-mono">Aelyssa.png</code> / <code className="bg-slate-800 text-slate-300 px-1 font-mono">companionPortrait</code>) в поле <code className="text-indigo-300 font-mono">Companion Portrait</code>.
+                              </p>
+                            </div>
+
+                            <div className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-2">
+                              <div className="flex items-center gap-2">
+                                <span className="w-2.5 h-2.5 rounded bg-red-500 shrink-0" />
+                                <strong className="text-slate-200">2. Портрет воина:</strong>
+                              </div>
+                              <p className="text-[10.5px] text-slate-400 pl-4.5">
+                                Перетащите спрайт воина (с коронным золотым шлемом) в поле <code className="text-red-300 font-mono">Warrior Portrait</code>.
+                              </p>
+                            </div>
+
+                            <div className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-2">
+                              <div className="flex items-center gap-2">
+                                <span className="w-2.5 h-2.5 rounded bg-emerald-500 shrink-0" />
+                                <strong className="text-slate-200">3. Портрет лучника:</strong>
+                              </div>
+                              <p className="text-[10.5px] text-slate-400 pl-4.5">
+                                Перетащите спрайт стрелка (в капюшоне из темной ткани) в поле <code className="text-emerald-300 font-mono">Archer Portrait</code>.
+                              </p>
+                            </div>
+
+                            <div className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-2">
+                              <div className="flex items-center gap-2">
+                                <span className="w-2.5 h-2.5 rounded bg-purple-500 shrink-0" />
+                                <strong className="text-slate-200">4. Портрет мага:</strong>
+                              </div>
+                              <p className="text-[10.5px] text-slate-400 pl-4.5">
+                                Перетащите спрайт мага (в звездной мантии/короне) в поле <code className="text-purple-300 font-mono">Mage Portrait</code>.
+                              </p>
+                            </div>
+
+                            <div className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-2 md:col-span-2">
+                              <div className="flex items-center gap-2">
+                                <span className="w-2.5 h-2.5 rounded bg-yellow-500 shrink-0" />
+                                <strong className="text-slate-200">5. Голосовой клип компаньона:</strong>
+                              </div>
+                              <p className="text-[10.5px] text-slate-400 pl-4.5">
+                                Привяжите короткий фоновый звуковой эффект реплики из вашей библиотеки Pixabay (например, кристаллический звон или эльфийский фонемный возглас) к переменной <code className="text-yellow-300 font-mono">companionVoiceClip</code>. В игре при каждой реплике Аэлиссы будет проигрываться этот клип через <code className="bg-slate-800 text-slate-300 px-1 font-mono">SettingsManager</code>.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="p-4 rounded-2xl bg-indigo-500/5 border border-indigo-500/10 text-[10.5px] text-indigo-400 flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <Info className="w-4 h-4 shrink-0" />
+                            <span>Класс сохранения <code className="bg-indigo-950/40 px-2 py-0.5 rounded text-white text-[10px]">SaveGameSystem.cs</code> автоматически хранит выбранный класс перед запуском диалога, и передает её в менеджер для отображения правой стороны.</span>
                           </div>
                         </div>
                       </div>

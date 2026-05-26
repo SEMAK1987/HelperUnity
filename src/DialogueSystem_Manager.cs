@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement; // ОБЯЗАТЕЛЬНО ДОБАВИТЬ ДЛЯ ПЕРЕХОДА МЕЖДУ СЦЕНАМИ И КАРТАМИ ЗАЧИСТКИ
 
 namespace FateContinent
 {
@@ -172,6 +173,24 @@ namespace FateContinent
             {
                 dialogPanel.SetActive(false);
             }
+            
+            // Проверяем, на каком шаге мы закончили диалог (это определяет выбранную локацию!)
+            if (currentLineIndex == 4)
+            {
+                Debug.Log("[GATEWAY] Загрузка уровня: Кровавые Пустоши!");
+                SceneManager.LoadScene("Scene_CrimsonWastes"); // Имя сцены вашей локации
+            }
+            else if (currentLineIndex == 5)
+            {
+                Debug.Log("[GATEWAY] Загрузка уровня: Ледяной Пик!");
+                SceneManager.LoadScene("Scene_IceBoundPeak"); // Имя сцены вашей локации
+            }
+            else if (currentLineIndex == 6)
+            {
+                Debug.Log("[GATEWAY] Загрузка уровня: Древние Руины!");
+                SceneManager.LoadScene("Scene_AncientRuins"); // Имя сцены вашей локации
+            }
+            
             Debug.Log("[DIALOGUE SYSTEM] Диалог завершен.");
         }
 
@@ -475,7 +494,7 @@ namespace FateContinent
                 textRU = "Меня зовут Аэлисса, хранительница священного Кристалла Зенита. Моя магия защитит тебя от коварства Кровавых Пустошей.",
                 textEN = "My name is Aelyssa, keeper of the sacred Zenith Crystal. My magic will protect you from the treachery of the Crimson Wastes.",
                 textCH = "我叫艾莉莎，神圣天顶水晶的守护者。我的魔法将保护你免受绯红荒野的背叛。",
-                textKR = "내 이름은 앨리사, 신성한 제니스 크리스탈의 수호자다. 나의 마법이 크림슨 황무지의 배신으로부터 당신을 지켜줄 것이다.",
+                textKR = "내 이름은 앨리사, 신성한 제니스 크ريس탈의 수호자다. 나의 마법이 크림슨 황무지의 배신으로부터 당신을 지켜줄 것이다.",
                 choicesRU = new string[] { "Продолжить поход" },
                 choicesEN = new string[] { "Continue quest" },
                 choicesCH = new string[] { "继续旅程" },
@@ -488,27 +507,77 @@ namespace FateContinent
                 textRU = "Отлично! Твое оружие заряжено энергией Зенита. Двинемся вперед через северные врата замка!",
                 textEN = "Excellent! Your weapon is infused with Zenith energy. Let us move forward through the northern castle gates!",
                 textCH = "太棒了！你的武被注入了天顶能量。让我们从北门穿过城堡前进吧！",
-                textKR = "훌륭하다! 당신의 무기에 제니스 에너지가 주입되었다. 북쪽 성문을 통해 전진하자!",
+                textKR = "훌륭하다! 당신의 무기에 제니스 에нер지가 주입되었다. 북쪽 성문을 통해 전진하자!",
                 choicesRU = new string[] { "Начать приключение" },
                 choicesEN = new string[] { "Start adventure" },
                 choicesCH = new string[] { "开始冒险" },
                 choicesKR = new string[] { "모험 시작하기" },
-                nextLineIndexes = new int[] { 3 } // Циклический выход на завершение
+                nextLineIndexes = new int[] { 3 }
             };
 
+            // l4 (Index 3) - Предлагает выбрать локацию для зачистки
             DialogLine l4 = new DialogLine
             {
-                textRU = "Помни: каждый выбор здесь имеет значение. Да пребудет с тобой благословение Кристалла!",
-                textEN = "Remember: every choice here has consequences. May the blessing of the Crystal be with you!",
-                textCH = "记住：这里的每一个选择都有其后果。愿水晶的祝福与你同在！",
-                textKR = "기억해라: 이곳에서의 모든 선택은 그 결과가 따른다. 크리스탈의 축복이 함께하기를!",
+                textRU = "Помни: каждый выбор здесь имеет значение. Наш отряд готов к бою. Теперь выбери область на Континенте Судьбы для первой боевой зачистки:",
+                textEN = "Remember: every choice here has consequences. Our squad is ready. Now select a territory on the Fate Continent for the initial tactical sweep:",
+                textCH = "记住：这里的每一个选择都有其后果。我们的队伍已准备就绪。现在请选择命运大陆上的一个区域进行首次战术肃清：",
+                textKR = "기억해라: 이곳에서의 모든 선택은 그 결과가 따른다. 우리 부대는 전투 준비가 끝났다. 이제 운명의 대륙에서 첫 전술적 소탕을 전개할 지역을 선택해라:",
+                choicesRU = new string[] { "🩸 Кровавые Пустоши", "❄️ Ледяной Пик", "🏛️ Древние Руины" },
+                choicesEN = new string[] { "🩸 Crimson Wastes", "❄️ Ice-Bound Peak", "🏛️ Ancient Ruins" },
+                choicesCH = new string[] { "🩸 绯红荒野", "❄️ 冰封之巅", "🏛️ 远古遗迹" },
+                choicesKR = new string[] { "🩸 크림슨 황무지", "❄️ 빙설의 봉우리", "🏛️ 고대 유적지" },
+                nextLineIndexes = new int[] { 4, 5, 6 }
+            };
+
+            // l5 (Index 4) - Результат Кровавые Пустоши
+            DialogLine l5 = new DialogLine
+            {
+                textRU = "Вы выбрали Кровавые Пустоши! Здесь сильны орды бандитов и адские ветры Зенита. Да пребудет с тобой благословение Кристалла! Мы отправляемся в бой.",
+                textEN = "You have selected the Crimson Wastes! Bandit hordes and infernal Zenith winds plague this land. May the blessing of the Crystal guide us! Charging into battle.",
+                textCH = "你选择了绯红荒野！这里充斥着强盗匪帮 and 狂暴的天顶狂风。愿水晶祝福我们！即刻出发，开辟战场。",
+                textKR = "크림슨 황무지를 선택했다! 도적 떼와 거친 제니스 마력 폭풍이 몰아치는 대지다. 크리스탈의 축복이 당신을 인도하기를! 전장으로 진격한다.",
+                choicesRU = new string[] { "Завершить диалог" },
+                choicesEN = new string[] { "End dialogue" },
+                choicesCH = new string[] { "结束对话" },
+                choicesKR = new string[] { "대화 종료" },
                 nextLineIndexes = null // Конец диалога
+            };
+
+            // l6 (Index 5) - Результат Ледяной Пик
+            DialogLine l6 = new DialogLine
+            {
+                textRU = "Вы выбрали Ледяной Пик! Вечная мерзлота проверяет волю на прочность, а Ледяные Големы стерегут древние сокровища. Да пребудет с тобой благословение Кристалла!",
+                textEN = "You have selected the Ice-Bound Peak! The absolute permafrost tests our resolve, while giant Ice Golems stand guard over absolute wonders. May the Crystal protect us!",
+                textCH = "你选择了冰封之巅！永恒的极寒将考验你的意志，而寒冰巨魔正守护着古老奇迹。愿水晶庇佑我们！",
+                textKR = "빙설의 봉우리를 선택했다! 혹독한 영구 동토가 의지를 시험하며, 거대한 얼음 골렘들이 고대의 신비를 경비하고 있다. 크리스탈의 보살핌이 있기를!",
+                choicesRU = new string[] { "Завершить диалог" },
+                choicesEN = new string[] { "End dialogue" },
+                choicesCH = new string[] { "结束对话" },
+                choicesKR = new string[] { "대화 종료" },
+                nextLineIndexes = null
+            };
+
+            // l7 (Index 6) - Результат Древние Руины
+            DialogLine l7 = new DialogLine
+            {
+                textRU = "Вы выбрали Древние Руины! Забытые катакомбы хранят остатки древних кристаллов Зенита, но берегись ловушек и древних теней. Да пребудет с тобой благословение Кристалла!",
+                textEN = "You have selected the Ancient Ruins! Forgotten catacombs hold absolute remnants of ancient Zenith energy crystals, but beware deadly traps and immortal shadows. Crystal bless you!",
+                textCH = "你选择了远古遗迹！被遗忘的墓穴藏有远古天顶能量水晶的余烬，但务必小心致命的陷阱与不死的幽影。愿水晶赐福于你！",
+                textKR = "고대 유적지를 선택했다! 잊혀진 지하 묘지에 고대 제니스 마력 결정의 잔재가 숨겨져 있지만, 치명적인 함정과 불멸의 그림자를 경계해라. 크리스탈의 축복을!",
+                choicesRU = new string[] { "Завершить диалог" },
+                choicesEN = new string[] { "End dialogue" },
+                choicesCH = new string[] { "结束对话" },
+                choicesKR = new string[] { "대화 종료" },
+                nextLineIndexes = null
             };
 
             dialogueSteps.Add(l1);
             dialogueSteps.Add(l2);
             dialogueSteps.Add(l3);
             dialogueSteps.Add(l4);
+            dialogueSteps.Add(l5);
+            dialogueSteps.Add(l6);
+            dialogueSteps.Add(l7);
         }
     }
 

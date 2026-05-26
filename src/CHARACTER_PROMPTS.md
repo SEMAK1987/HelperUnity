@@ -54,6 +54,24 @@ Full-body character concept art of Aelyssa from Fate Continent, standing elegant
 
 ---
 
+## 5. 🎭 Портреты Героев для Диалогов 1:1 (Player Hero Dialogue Portraits)
+
+Промпты для создания высокодетализированных квадратных портретов (Bust/Headshot) классов игроков во время разговорных реплик. Они автоматически сменяются на правой стороне диалоговой панели в зависимости от класса.
+
+### ⚔️ Портрет Воина (Warrior Dialogue Portrait - 1:1)
+**Prompt:**
+Bust headshot portrait of a brave heavy Warrior hero from Fate Continent, looking forward, white background. Wearing a magnificent golden and heavy matte slate-metal helmet with glowing blue energy slots and integrated Zenith crown accents. Sharp masculine jawline, determined expression, steel plate shoulders with glowing circuits. 8K resolution, realistic cinematic lighting, unreal engine 5 render, sharp focus --ar 1:1
+
+### 🏹 Портрет Стрелка (Archer Dialogue Portrait - 1:1)
+**Prompt:**
+Bust headshot portrait of an agile Master Archer hero from Fate Continent, looking slightly aside, white background. Wearing a sleek hood made of dark obsidian star-weave fabric with glowing green energy lining and translucent sapphire glass ornaments over the forehead. Focused sharp gaze, athletic features, cybernetic quiver strap. Cinematic volumetric light, high-density clothing texture, ultra-realistic digital art, 8K --ar 1:1
+
+### 🔮 Портрет Мага (Mage Dialogue Portrait - 1:1)
+**Prompt:**
+Bust headshot portrait of a powerful Cosmic Magician hero from Fate Continent, looking at the camera, white background. Wearing a floating stellar crystal crown studded with tiny glowing stars and nebula-violet patterns. Shimmering iridescent skin with soft neon-runes, glowing eyes filled with astronomical galaxian energy, flowing cosmic collar of deep indigo. Epic cinematic mood, masterpiece digital painting, high-density details, 8K --ar 1:1
+
+---
+
 ## 🖼️ Эксклюзивная Шапка и Рамка Диалогов (UI Dialog Box Assets)
 
 Промпты для создания футуристического игрового интерфейса (шапки, рамки и панели выбора), вдохновленного представленным макетом, но обладающего собственным оригинальным стилем.

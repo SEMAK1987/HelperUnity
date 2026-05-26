@@ -5,16 +5,27 @@
     "UnityRaceData.cs",
     "UnitySystems.cs",
     "UnityWorldSync.cs",
+    "src/BalanceConfig.cs",
+    "src/CharacterSelectionController.cs",
+    "src/DialogueSystem_Manager.cs",
+    "src/EventHub.cs",
+    "src/GamePause_Manager.cs",
     "src/LanguageSelector.cs",
     "src/LoadingScreenManager.cs",
     "src/MainMenuController.cs",
     "src/Menu_Game.cs",
+    "src/PhaseCombatSystem.cs",
+    "src/SaveGameSystem.cs",
     "src/SettingsManager.cs",
     "src/SimpleFloatAnimation.cs",
     "src/Translator.cs",
     "src/Transtable_Dropdown.cs",
     "src/Transtable_Text.cs",
-    "src/UIButtonHoverEffect.cs"
+    "src/UIButtonHoverEffect.cs",
+    "src/UIButtonPauseHover.cs",
+    "src/UIButtonSelectionHover.cs",
+    "src/UIButtonSfxBinder.cs",
+    "src/UnitBase.cs"
   ],
   "prefabs": [],
   "scenes": [],
@@ -23,12 +34,12 @@
   "pdfs": [],
   "videos": [],
   "others": [],
-  "total_files": 42,
+  "total_files": 57,
   "analysis": {
     "audit_issues": [],
     "todos": [],
     "asset_stats": {
-      "total_size": 660238,
+      "total_size": 986004,
       "large_files": []
     },
     "dependencies": {
@@ -53,6 +64,40 @@
         "UnityEngine",
         "System.IO"
       ],
+      "BalanceConfig": [
+        "UnityEngine",
+        "System",
+        "System.Collections.Generic"
+      ],
+      "CharacterSelectionController": [
+        "UnityEngine",
+        "UnityEngine.UI",
+        "UnityEngine.SceneManagement",
+        "System.Collections",
+        "System.Collections.Generic",
+        "System.Linq",
+        "TMPro"
+      ],
+      "DialogueSystem_Manager": [
+        "System.Collections",
+        "System.Collections.Generic",
+        "UnityEngine",
+        "UnityEngine.UI",
+        "TMPro"
+      ],
+      "EventHub": [
+        "UnityEngine",
+        "System",
+        "System.Collections.Generic"
+      ],
+      "GamePause_Manager": [
+        "UnityEngine",
+        "UnityEngine.UI",
+        "UnityEngine.SceneManagement",
+        "System.Collections",
+        "System.Collections.Generic",
+        "TMPro"
+      ],
       "LanguageSelector": [
         "UnityEngine",
         "TMPro",
@@ -75,10 +120,21 @@
         "UnityEngine.UI",
         "TMPro"
       ],
+      "PhaseCombatSystem": [
+        "UnityEngine",
+        "System.Collections.Generic",
+        "System.Linq"
+      ],
+      "SaveGameSystem": [
+        "System",
+        "UnityEngine",
+        "UnityEngine.SceneManagement"
+      ],
       "SettingsManager": [
         "UnityEngine",
         "UnityEngine.UI",
         "UnityEngine.Audio",
+        "UnityEngine.SceneManagement",
         "TMPro",
         "System.Collections.Generic"
       ],
@@ -105,8 +161,26 @@
         "UnityEngine",
         "UnityEngine.EventSystems",
         "UnityEngine.UI"
+      ],
+      "UIButtonPauseHover": [
+        "UnityEngine",
+        "UnityEngine.EventSystems",
+        "UnityEngine.UI"
+      ],
+      "UIButtonSelectionHover": [
+        "UnityEngine",
+        "UnityEngine.EventSystems",
+        "UnityEngine.UI"
+      ],
+      "UIButtonSfxBinder": [
+        "UnityEngine",
+        "UnityEngine.UI",
+        "UnityEngine.EventSystems"
+      ],
+      "UnitBase": [
+        "UnityEngine"
       ]
     }
   },
-  "last_updated": "2026-05-20T06:09:47.358Z"
+  "last_updated": "2026-05-26T07:21:47.595Z"
 }
