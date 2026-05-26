@@ -86,3 +86,36 @@ A high-tech RPG video game UI dialog panel template asset, white background. Fea
 - **Ratio:** Для вовесь рост используйте `--ar 9:16` (вертикально), для портретов диалога `--ar 1:1` (квадрат), для текстур интерфейса `--ar 16:9` (горизонтально).
 - **Negative Prompt:** (deformed, distorted, disfigured:1.3), background, landscape, ground, grass, rock, blurry, low resolution, multiple characters, extra fingers, bad anatomy.
 
+---
+
+## 🗺️ 6. Высокодетализированные Midjourney-промпты для генерации карт (8K)
+
+Эти промпты оптимизированы для создания потрясающих, чистых географических карт континентов Фэнтези-мира без мешающего UI-мусора, водяных знаков, координатных сеток, надписей и указателей сторон света. Идеально подходят под нарезку на спрайты.
+
+### Промпт 1: 🩸 Кровавые Пустоши (Scarlet Wastes / Crimson Lands)
+> **Prompt:** Isolated view of a fantasy volcanic region island map, fiery red and deep dark obsidian terrain, winding lava rivers glowing bright orange, smoking volcanic craters, crimson dust storms over rugged dunes, looking from top-down game camera angle, isolated on a solid navy-blue empty water background. Extremely detailed geografic textures, 8K, cinematic lighting, sharp fantasy cartography --no text, font, labels, letters, words, arrows, ui, compass, HUD icon, grid lines, banner --ar 16:9 --v 6.0
+
+### Промпт 2: ❄️ Ледяной Пик (Frostbound Peaks)
+> **Prompt:** Isolated view of an alpine winter frozen region island map, gargantuan snow-covered mountains, deep blue icy glaciers reflecting aurora light, winding frosty valleys, ancient towering glaciers, looking from top-down game camera angle, isolated on a solid dark-navy empty ocean background. Pristine white and sapphire-blue colors, hyper-detailed geography, 8K render --no text, font, labels, letters, words, arrows, ui, compass, HUD icon, grid lines, banner --ar 16:9 --v 6.0
+
+### Промпт 3: 🏛️ Древние Руины (Ancient Ruins / Mystic Megaliths)
+> **Prompt:** Isolated view of a mystical ancient stone-circle valley region island map, towering overgrown mossy megatons and dolmens, glowing sky-blue magical runic circles engraved on stones, dense emerald forests wrapping around broken marble temples, looking from top-down game camera angle, isolated on a solid dark-navy clear ocean water. Ancient mystic mood, highly detailed stone textures, unreal engine 5 style, 8K --no text, font, labels, letters, words, arrows, ui, compass, HUD icon, grid lines, banner --ar 16:9 --v 6.0
+
+### Промпт 4: 🌳 Зеленое Царство (Verdant Realm / Emerald Wildwoods)
+> **Prompt:** Isolated view of a lush fantasy forest region island map, giant world tree standing proud in the center with glowing yellow-green foliage, meandering pristine rivers, soft sunbeams filtering through leafy green plains, cozy elven glades, top-down isometric game view, isolated on clean navy-blue deep ocean background. Rich organic colors, extremely detailed trees and water, 8K resolution, fantasy cartography art style --no text, font, labels, letters, words, arrows, ui, compass, HUD icon, grid lines, banner --ar 16:9 --v 6.0
+
+---
+
+## 💡 7. Промпты для Генерации Светящихся Элементов и Масок (Glowing Level Nodes Overlay)
+
+Эти активы накладываются поверх сгенерированных карт в Unity для создания Zenith-эффекта живого мира при наведении курсора или выборе уровня сложности.
+
+### Промпт 1: 🔥 Маски Кровавого Свечения (Crimson Nodes Mask)
+> **Prompt:** Isolated glowing abstract asset set of neon red magical circles, burning embers and hot magma runes, clean solid black background, perfect for a UI glowing overlay. Sharp high contrast, bloom effect, luminous volcanic veins, games development sprite sheet --no text, font, letters, words, arrows, landscape, map --ar 1:1 --v 6.0
+
+### Промпт 2: ❄️ Маски Ледяного Свечения (Frosty Runes Glowing Mask)
+> **Prompt:** Isolated glowing abstract asset set of pale-blue glowing ice crystals, frosty magical runes, shimmering teal snow flakes, clean solid black background, UI overlay light asset. High emission light, neon cyan accents, magical ice particles, game engine ready --no text, font, letters, words, arrows, landscape, map --ar 1:1 --v 6.0
+
+### Промпт 3: 🌟 Маски Древнего Рунического Свечения (Mystic Runic Nodes Glow)
+> **Prompt:** Isolated glowing asset pack of celestial golden-amber magical circles, ancient runic glyphs glowing with solar cosmic light, clean solid black background, high-contrast VFX texture design. Beautiful emission glow, golden glassmorphism light source --no text, font, letters, words, arrows, landscape, map --ar 1:1 --v 6.0
+
