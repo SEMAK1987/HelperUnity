@@ -809,9 +809,287 @@ export default function App() {
   const [vkProgress, setVkProgress] = useState(0);
   const [vkStatus, setVkStatus] = useState('');
   const [showStudioGuide, setShowStudioGuide] = useState(false);
+
+  // Custom Map Marker Splitter State
+  const [showMarkerSplitter, setShowMarkerSplitter] = useState(false);
+  const [markerImage, setMarkerImage] = useState<string | null>(null);
+  const [markerTolerance, setMarkerTolerance] = useState<number>(35);
+  const [markerSmoothing, setMarkerSmoothing] = useState<boolean>(true);
+  const [markerHasAlpha, setMarkerHasAlpha] = useState<boolean>(true);
+  const [markerPadding, setMarkerPadding] = useState<number>(5); // custom crop padding
+  const [markerCenters, setMarkerCenters] = useState<[number, number, number]>([18.00, 50.00, 81.50]); // default optimized centers for Midjourney 16:9 layout
   
   const chatEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Map Marker Splitter Refs and Hooks
+  const canvasRefLeft = useRef<HTMLCanvasElement>(null);
+  const canvasRefCenter = useRef<HTMLCanvasElement>(null);
+  const canvasRefRight = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    if (!markerImage) return;
+
+    let active = true;
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      if (!active) return;
+      const H = img.naturalHeight;
+      const W = img.naturalWidth;
+      
+      const refs = [canvasRefLeft, canvasRefCenter, canvasRefRight];
+      
+      markerCenters.forEach((centerPercent, index) => {
+        const canvas = refs[index].current;
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        
+        // Output perfect square resolution match
+        const size = Math.min(H, W / 3);
+        canvas.width = size;
+        canvas.height = size;
+        
+        ctx.clearRect(0, 0, size, size);
+        
+        // Center calculation
+        const cx = (centerPercent / 100) * W;
+        
+        // Boundaries crop box
+        let sx = cx - size / 2;
+        let sy = (H - size) / 2; // Center vertically as well
+        if (sy < 0) sy = 0;
+        
+        // Clamping to original image boundaries
+        if (sx < 0) sx = 0;
+        if (sx + size > W) sx = W - size;
+        
+        // Padding/crop shrink percentage zoom
+        const padPx = (markerPadding / 100) * size;
+        const sWidth = size - padPx * 2;
+        const sHeight = size - padPx * 2;
+        const sourceSx = sx + padPx;
+        const sourceSy = sy + padPx;
+        
+        // Draw to output square canvas
+        ctx.drawImage(img, sourceSx, sourceSy, sWidth, sHeight, 0, 0, size, size);
+        
+        // Transparency Chroma-Key filter
+        if (markerHasAlpha) {
+          try {
+            const imgData = ctx.getImageData(0, 0, size, size);
+            const data = imgData.data;
+            const len = data.length;
+            const tolerance = markerTolerance;
+            
+            for (let i = 0; i < len; i += 4) {
+              const r = data[i];
+              const g = data[i+1];
+              const b = data[i+2];
+              
+              // Max RGB channel distance from pitch-black
+              const br = Math.max(r, g, b);
+              
+              if (br < tolerance) {
+                if (markerSmoothing) {
+                  const ratio = br / tolerance; // 0 to 1
+                  data[i+3] = Math.round(ratio * data[i+3]);
+                } else {
+                  data[i+3] = 0;
+                }
+              } else if (br < tolerance * 1.5 && markerSmoothing) {
+                const ratio = (br - tolerance) / (tolerance * 0.5); // 0 to 1
+                const factor = 0.5 + 0.5 * ratio;
+                data[i+3] = Math.round(data[i+3] * factor);
+              }
+            }
+            ctx.putImageData(imgData, 0, 0);
+          } catch (err) {
+            console.error("Canvas pixel manipulation failed: ", err);
+          }
+        }
+      });
+    };
+    img.src = markerImage;
+    return () => {
+      active = false;
+    };
+  }, [markerImage, markerCenters, markerTolerance, markerSmoothing, markerHasAlpha, markerPadding]);
+
+  useEffect(() => {
+    const handlePaste = (e: ClipboardEvent) => {
+      if (!showMarkerSplitter) return;
+      const items = e.clipboardData?.items;
+      if (items) {
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].type.indexOf('image') !== -1) {
+            const blob = items[i].getAsFile();
+            if (blob) {
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                setMarkerImage(reader.result as string);
+                showNotification('Изображение успешно вставлено из буфера обмена!', 'success');
+              };
+              reader.readAsDataURL(blob);
+            }
+          }
+        }
+      }
+    };
+    
+    window.addEventListener('paste', handlePaste);
+    return () => window.removeEventListener('paste', handlePaste);
+  }, [showMarkerSplitter]);
+
+  // Generate dynamic offline demo image containing 3 fantasy rings
+  const generateDemoMarkerImage = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1200;
+    canvas.height = 675; // 16:9 aspect ratio
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    // Solid dark-fantasy background
+    ctx.fillStyle = '#06060c';
+    ctx.fillRect(0, 0, 1200, 675);
+    
+    // Add realistic subtle grid lines to simulate raw Midjourney output
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < 1200; x += 50) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, 675);
+      ctx.stroke();
+    }
+    for (let y = 0; y < 675; y += 50) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(1200, y);
+      ctx.stroke();
+    }
+    
+    // Design three glowing placeholder circles
+    const designs = [
+      {
+        glow: 'rgba(59, 130, 246, 0.35)',
+        border: '#3b82f6',
+        accent: '#60a5fa',
+        text: 'IMPERIAL',
+        sub: 'COMPASS'
+      },
+      {
+        glow: 'rgba(249, 115, 22, 0.35)',
+        border: '#f97316',
+        accent: '#ef4444',
+        text: 'OUTLAW',
+        sub: 'FIRE RING'
+      },
+      {
+        glow: 'rgba(16, 185, 129, 0.35)',
+        border: '#10b981',
+        accent: '#34d399',
+        text: 'NEUTRAL',
+        sub: 'DRUID STONE'
+      }
+    ];
+    
+    // Optimized centers to align with default markerCenters state: [18.0%, 50.0%, 81.5%]
+    const pixelCenters = [
+      18.00 / 100 * 1200,
+      50.00 / 100 * 1200,
+      81.50 / 100 * 1200
+    ];
+    
+    const cy = 675 / 2;
+    const r = 100; // circle radius
+    
+    designs.forEach((des, idx) => {
+      const cx = pixelCenters[idx];
+      
+      // Radiant Bloom Glow
+      const grad = ctx.createRadialGradient(cx, cy, r - 40, cx, cy, r + 60);
+      grad.addColorStop(0, des.glow);
+      grad.addColorStop(0.5, 'rgba(0, 0, 0, 0)');
+      grad.addColorStop(0.8, 'rgba(0, 0, 0, 0.8)');
+      grad.addColorStop(1, 'rgba(0, 0, 0, 1)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r + 60, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Heavy outer game HUD circle
+      ctx.strokeStyle = des.border;
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.stroke();
+      
+      // Secondary interior ring
+      ctx.strokeStyle = des.accent;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r - 20, 0, Math.PI * 2);
+      ctx.stroke();
+      
+      // Compass rays or spikes
+      ctx.strokeStyle = '#22d3ee';
+      ctx.lineWidth = 3;
+      for (let degree = 0; degree < 360; degree += 45) {
+        const radAngle = (degree * Math.PI) / 180;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(radAngle) * (r - 10), cy + Math.sin(radAngle) * (r - 10));
+        ctx.lineTo(cx + Math.cos(radAngle) * (r + 10), cy + Math.sin(radAngle) * (r + 10));
+        ctx.stroke();
+      }
+      
+      // Concentric central cores
+      ctx.fillStyle = des.accent;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 15, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Title text inside
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 12px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(des.text, cx, cy - 40);
+      
+      // Subtitle
+      ctx.fillStyle = des.accent;
+      ctx.font = '9px "Inter", sans-serif';
+      ctx.fillText(des.sub, cx, cy + 40);
+    });
+    
+    setMarkerImage(canvas.toDataURL('image/png'));
+    showNotification('Загружен интерактивный тестовый пример!', 'info');
+  };
+
+  // Download logic helper
+  const downloadMarker = (index: number) => {
+    const refs = [canvasRefLeft, canvasRefCenter, canvasRefRight];
+    const canvas = refs[index].current;
+    if (!canvas) return;
+    
+    const names = [
+      "Fate_Imperial_Compass_Marker.png",
+      "Fate_Outlaw_Fire_Marker.png",
+      "Fate_Neutral_Druid_Marker.png"
+    ];
+    
+    try {
+      const link = document.createElement('a');
+      link.download = names[index];
+      link.href = canvas.toDataURL('image/png', 1.0); // Full quality lossless PNG
+      link.click();
+      showNotification(`Успешно сохранено: ${names[index]} (без потери качества!)`, 'success');
+    } catch (err) {
+      showNotification('Ошибка при сохранении изображения. Попробуйте загрузить локальный файл.', 'error');
+    }
+  };
 
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [updateInfo, setUpdateInfo] = useState<any>(null);
@@ -2606,6 +2884,12 @@ export default function App() {
                 className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 text-blue-400 hover:bg-blue-600/10 border border-blue-500/20`}
               >
                 <ImageIcon className="w-3.5 h-3.5" /> Обложки ВК
+              </button>
+              <button 
+                onClick={() => setShowMarkerSplitter(true)}
+                className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 text-amber-400 hover:bg-amber-600/10 border border-amber-500/20 hover:scale-105 active:scale-95 duration-300`}
+              >
+                <Compass className="w-3.5 h-3.5 text-amber-400" /> Сплиттер Маркеров
               </button>
               <button 
                 onClick={() => setActiveTab('game_design')}
@@ -7294,6 +7578,350 @@ export default function App() {
                       />
                     ))}
                   </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Map Marker Splitter Modal */}
+      <AnimatePresence>
+        {showMarkerSplitter && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[110] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="bg-[#0c0c0e] border border-amber-500/20 rounded-[2.5rem] w-full max-w-6xl h-[90vh] overflow-hidden flex flex-col shadow-2xl shadow-amber-950/10"
+            >
+              {/* Header */}
+              <div className="p-8 border-b border-white/5 flex items-center justify-between bg-gradient-to-r from-amber-600/10 to-blue-600/10">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-amber-600/20 rounded-2xl text-amber-400 shadow-xl shadow-amber-500/10">
+                    <Compass className="w-8 h-8 animate-spin-slow" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic flex items-center gap-2">
+                      Сплиттер Маркеров Карт <span className="text-amber-400 text-xs px-2.5 py-1 bg-amber-500/10 rounded-full border border-amber-500/20 not-italic tracking-normal">v18.9.0</span>
+                    </h3>
+                    <p className="text-xs text-slate-500 uppercase tracking-[0.2em] font-bold">Нарезание триады маркеров на PNG 8K без потери качества</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setShowMarkerSplitter(false)}
+                  className="p-3 hover:bg-white/10 rounded-2xl text-slate-400 transition-all hover:rotate-90"
+                >
+                  <X className="w-8 h-8" />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-hidden flex flex-col lg:flex-row">
+                {/* Left Controls */}
+                <div className="w-full lg:w-[380px] p-8 border-b lg:border-b-0 lg:border-r border-white/5 space-y-8 overflow-y-auto scrollbar-thin scrollbar-thumb-white/5 bg-black/20">
+                  
+                  {/* Step 1: Upload Source Sprite Sheet */}
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">1. Источник (Триптих)</h4>
+                      <button 
+                        onClick={generateDemoMarkerImage}
+                        className="text-[9px] font-black text-amber-400 hover:text-amber-300 uppercase tracking-widest bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-lg transition-transform hover:scale-105"
+                      >
+                        Тестовый шаблон
+                      </button>
+                    </div>
+                    
+                    <div 
+                      className="border border-dashed border-white/10 hover:border-amber-500/40 rounded-3xl p-6 text-center transition-all bg-black/40 relative cursor-pointer group flex flex-col items-center justify-center gap-2 aspect-[16/7]"
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        const file = e.dataTransfer.files[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onloadend = () => setMarkerImage(reader.result as string);
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    >
+                      {markerImage ? (
+                        <div className="relative w-full h-full rounded-2xl overflow-hidden group">
+                          <img src={markerImage} className="w-full h-full object-cover rounded-xl" alt="Marker Source" />
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center flex-col gap-1.5 backdrop-blur-sm">
+                            <Upload className="w-6 h-6 text-amber-400 mb-1" />
+                            <span className="text-[9px] font-bold text-white uppercase tracking-widest">Заменить изображение</span>
+                            <span className="text-[8px] text-slate-400 font-mono">Можно вставить через Ctrl + V</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-slate-500 group-hover:text-amber-400 group-hover:bg-amber-500/10 transition-colors">
+                            <Upload className="w-5 h-5" />
+                          </div>
+                          <p className="text-[10px] font-bold text-white uppercase tracking-widest">Перетащите сюда или вставьте</p>
+                          <p className="text-[8px] text-slate-500 uppercase">Поддержка буфера обмена Ctrl+V</p>
+                        </>
+                      )}
+                      <input 
+                        type="file" 
+                        className="absolute inset-0 opacity-0 cursor-pointer" 
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => setMarkerImage(reader.result as string);
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Step 2: Keying options */}
+                  <div className="space-y-5">
+                    <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">2. Фильтр прозрачности (Альфа)</h4>
+                    
+                    <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-[10px] text-white font-bold uppercase tracking-wider">Очистка Тёмного фона</span>
+                        <span className="text-[8px] text-slate-500 uppercase font-mono">Chroma-key black bg</span>
+                      </div>
+                      <input 
+                        type="checkbox" 
+                        checked={markerHasAlpha} 
+                        onChange={(e) => setMarkerHasAlpha(e.target.checked)}
+                        className="w-4 h-4 rounded border-slate-700 bg-slate-800 text-amber-500 focus:ring-amber-500 focus:ring-offset-slate-900 cursor-pointer"
+                      />
+                    </div>
+
+                    {markerHasAlpha && (
+                      <div className="space-y-4 p-4 bg-white/5 rounded-2xl border border-white/5">
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center text-[10px] uppercase font-bold tracking-wider">
+                            <span className="text-slate-400">Чувствительность чёрного</span>
+                            <span className="text-amber-400 font-mono font-black">{markerTolerance}</span>
+                          </div>
+                          <input 
+                            type="range" 
+                            min="5" 
+                            max="110" 
+                            value={markerTolerance} 
+                            onChange={(e) => setMarkerTolerance(parseInt(e.target.value))}
+                            className="w-full accent-amber-500 bg-black/40 h-1.5 rounded-lg cursor-pointer"
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                          <span className="text-[9px] text-slate-400 font-bold uppercase">Смягчение краев (Anti-aliasing)</span>
+                          <input 
+                            type="checkbox" 
+                            checked={markerSmoothing} 
+                            onChange={(e) => setMarkerSmoothing(e.target.checked)}
+                            className="w-4 h-4 rounded border-slate-700 bg-slate-800 text-amber-500 focus:ring-amber-500 cursor-pointer"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Step 3: Geometry & Cropping Offset Adjustments */}
+                  <div className="space-y-5">
+                    <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">3. Обрезка и Смещение по Осям</h4>
+                    
+                    <div className="space-y-4 p-4 bg-white/5 rounded-2xl border border-white/5">
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center text-[10px] uppercase font-bold tracking-wider">
+                          <span className="text-slate-400">Внутренний отступ (Padding / Zoom)</span>
+                          <span className="text-amber-400 font-mono font-black">{markerPadding}%</span>
+                        </div>
+                        <input 
+                          type="range" 
+                          min="-30" 
+                          max="40" 
+                          value={markerPadding} 
+                          onChange={(e) => setMarkerPadding(parseInt(e.target.value))}
+                          className="w-full accent-amber-500 bg-black/40 h-1.5 rounded-lg cursor-pointer"
+                        />
+                        <p className="text-[8px] text-slate-500 italic mt-0.5 uppercase">Отрицательный отступ увеличивает границы обрезки.</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4 p-4 bg-white/5 rounded-2xl border border-white/5">
+                      <div className="text-[10px] font-bold uppercase text-slate-400 tracking-wider mb-2">Калибровка Центров (%)</div>
+                      
+                      {[
+                        { label: 'Имперский Компас (Слева)', index: 0, min: 10, max: 30 },
+                        { label: 'Разбойники (Центр)', index: 1, min: 40, max: 60 },
+                        { label: 'Нейтралы (Справа)', index: 2, min: 70, max: 92 }
+                      ].map((item, i) => (
+                        <div key={i} className="space-y-1.5">
+                          <div className="flex justify-between items-center text-[9px] uppercase font-bold text-slate-500">
+                            <span>{item.label}</span>
+                            <span className="text-amber-400 font-mono font-black">{markerCenters[item.index].toFixed(2)}%</span>
+                          </div>
+                          <input 
+                            type="range" 
+                            min={item.min} 
+                            max={item.max} 
+                            step="0.1"
+                            value={markerCenters[item.index]} 
+                            onChange={(e) => {
+                              const val = parseFloat(e.target.value);
+                              const copy = [...markerCenters] as [number, number, number];
+                              copy[item.index] = val;
+                              setMarkerCenters(copy);
+                            }}
+                            className="w-full accent-amber-500 bg-black/40 h-1.5 rounded-lg cursor-pointer"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Right Panel: Live Previews */}
+                <div className="flex-1 p-10 bg-[#070709] overflow-y-auto flex flex-col justify-between scrollbar-thin scrollbar-thumb-white/5">
+                  
+                  {!markerImage ? (
+                    <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6 opacity-30 group py-16">
+                      <div className="p-10 bg-white/5 rounded-full border border-white/10 group-hover:scale-105 duration-1000">
+                        <Compass className="w-16 h-16 text-amber-500" />
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-sm uppercase font-black tracking-[0.4em] italic text-white">Splitter Canvas Offline</p>
+                        <p className="text-xs text-slate-500 uppercase tracking-widest leading-relaxed">Загрузите или вставьте исходное изображение трезубца для маскирования</p>
+                      </div>
+                      <button 
+                        onClick={generateDemoMarkerImage}
+                        className="px-6 py-3 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-xl shadow-amber-600/20"
+                      >
+                        Запустить тестовый интерактив
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-10 flex-1">
+                      {/* Original Map Visualization with Cut Markers */}
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center text-[10px] uppercase font-black text-slate-500 tracking-widest">
+                          <span>Визуализация раскладки (Калибровочные оси обрезки)</span>
+                          <span className="bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 text-amber-400 font-mono text-[9px]">16:9 Aspect Frame</span>
+                        </div>
+                        <div className="relative border border-white/10 rounded-2xl overflow-hidden shadow-2xl bg-black/80 aspect-video max-h-[220px] mx-auto">
+                          <img src={markerImage} className="w-full h-full object-cover opacity-60 filter blur-[1px]" alt="Split layout background" />
+                          
+                          {/* Centers indicator overlays */}
+                          {markerCenters.map((center, idx) => (
+                            <div 
+                              key={idx}
+                              style={{ left: `${center}%` }}
+                              className="absolute top-0 bottom-0 w-[2px] bg-amber-500/60 shadow-[0_0_15px_#f59e0b] flex flex-col justify-between items-center transition-all duration-150 transform -translate-x-1/2"
+                            >
+                              <div className="bg-amber-500 text-black text-[8px] font-black uppercase px-2 py-0.5 rounded-full mt-2 tracking-widest shadow-lg">
+                                Срез {idx+1}
+                              </div>
+                              <div className="h-10 w-10 border-2 border-dashed border-amber-500 rounded-full bg-amber-500/10 animate-ping absolute top-1/2 -translate-y-1/2 pointer-events-none" />
+                              <div className="h-12 w-12 border-2 border-amber-400/80 rounded-full bg-black/40 absolute top-1/2 -translate-y-1/2 flex items-center justify-center font-bold text-[9px] text-amber-400 shadow-md">
+                                {center.toFixed(1)}%
+                              </div>
+                              <div className="bg-amber-500 text-black text-[7px] font-black uppercase px-1.5 py-0.5 rounded mb-2 font-mono">
+                                x-coord
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Three Output Canvases */}
+                      <div className="space-y-4">
+                        <div className="text-[10px] uppercase font-black text-slate-500 tracking-widest">
+                          Результат нарезки высокого качества (PNG с прозрачностью)
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          
+                          {/* Box 1: Imperial */}
+                          <div className="bg-black/60 border border-white/10 hover:border-blue-500/40 rounded-3xl p-5 flex flex-col items-center gap-4 transition-all group">
+                            <div className="text-[10px] font-black uppercase text-blue-400 tracking-[0.2em] flex items-center gap-1.5">
+                              <span className="h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_8px_#3b82f6] animate-pulse" />
+                              1. Синяя Империя (Лев.)
+                            </div>
+                            
+                            {/* Grid alpha background for checkouts */}
+                            <div className="aspect-square w-full max-w-[160px] bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:12px_12px] bg-black/80 rounded-2xl border border-white/5 flex items-center justify-center overflow-hidden p-2 relative shadow-inner">
+                              <canvas ref={canvasRefLeft} className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(59,130,246,0.3)] transition-transform duration-500 group-hover:scale-105" />
+                            </div>
+
+                            <button 
+                              onClick={() => downloadMarker(0)}
+                              className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl transition-all shadow-xl shadow-blue-500/20 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98]"
+                            >
+                              <Download className="w-4 h-4" />
+                              Скачать PNG
+                            </button>
+                          </div>
+
+                          {/* Box 2: Outlaw */}
+                          <div className="bg-black/60 border border-white/10 hover:border-orange-500/40 rounded-3xl p-5 flex flex-col items-center gap-4 transition-all group">
+                            <div className="text-[10px] font-black uppercase text-orange-400 tracking-[0.2em] flex items-center gap-1.5">
+                              <span className="h-2 w-2 rounded-full bg-orange-500 shadow-[0_0_8px_#f97316] animate-pulse" />
+                              2. Разбойники (Центр)
+                            </div>
+                            
+                            {/* Grid alpha background */}
+                            <div className="aspect-square w-full max-w-[160px] bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:12px_12px] bg-black/80 rounded-2xl border border-white/5 flex items-center justify-center overflow-hidden p-2 relative shadow-inner">
+                              <canvas ref={canvasRefCenter} className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(249,115,22,0.3)] transition-transform duration-500 group-hover:scale-105" />
+                            </div>
+
+                            <button 
+                              onClick={() => downloadMarker(1)}
+                              className="w-full py-3.5 bg-orange-600 hover:bg-orange-500 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl transition-all shadow-xl shadow-orange-500/20 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98]"
+                            >
+                              <Download className="w-4 h-4" />
+                              Скачать PNG
+                            </button>
+                          </div>
+
+                          {/* Box 3: Neutral */}
+                          <div className="bg-black/60 border border-white/10 hover:border-green-500/40 rounded-3xl p-5 flex flex-col items-center gap-4 transition-all group">
+                            <div className="text-[10px] font-black uppercase text-green-400 tracking-[0.2em] flex items-center gap-1.5">
+                              <span className="h-2 w-2 rounded-full bg-green-500 shadow-[0_0_8px_#10b981] animate-pulse" />
+                              3. Нейтралы (Прав.)
+                            </div>
+                            
+                            {/* Grid alpha background */}
+                            <div className="aspect-square w-full max-w-[160px] bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:12px_12px] bg-black/80 rounded-2xl border border-white/5 flex items-center justify-center overflow-hidden p-2 relative shadow-inner">
+                              <canvas ref={canvasRefRight} className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] transition-transform duration-500 group-hover:scale-105" />
+                            </div>
+
+                            <button 
+                              onClick={() => downloadMarker(2)}
+                              className="w-full py-3.5 bg-green-600 hover:bg-green-500 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl transition-all shadow-xl shadow-green-500/20 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98]"
+                            >
+                              <Download className="w-4 h-4" />
+                              Скачать PNG
+                            </button>
+                          </div>
+
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Bottom Tip bar */}
+                  <div className="p-6 bg-amber-500/5 border border-amber-500/10 rounded-2xl flex items-center gap-4 text-xs text-amber-400/90 leading-relaxed mt-6">
+                    <Info className="w-5 h-5 flex-shrink-0" />
+                    <p className="text-[10px] uppercase font-bold tracking-wider">
+                      <b>Полезный лайфхак:</b> Если ваши кольца на исходном изображении смещены в сторону, вы можете отрегулировать ползунки в третьей секции слева, чтобы выставить центр обрезки идеально под каждый маркер!
+                    </p>
+                  </div>
+
                 </div>
               </div>
             </motion.div>
