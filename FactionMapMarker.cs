@@ -11,7 +11,7 @@ using UnityEngine.EventSystems;
 namespace FateContinent
 {
     [RequireComponent(typeof(SpriteRenderer))]
-    [RequireComponent(typeof(Collider2D))] // Необходим для кликов в 2D/2.5D мировом пространстве
+    // [RequireComponent(typeof(Collider2D))] - УБРАНО для предотвращения ошибки "Can't add script" в редакторе Unity! Скрипт теперь добавляется безупречно.
     public class FactionMapMarker : MonoBehaviour
     {
         [Header("Настройки фракции")]
@@ -58,6 +58,15 @@ namespace FateContinent
             spriteRenderer = GetComponent<SpriteRenderer>();
             baseScale = transform.localScale;
             targetScale = baseScale;
+
+            // Динамическая проверка колайдера
+            Collider2D col = GetComponent<Collider2D>();
+            if (col == null)
+            {
+                // Авто-добавление CircleCollider2D делает настройку невероятно удобной и беспроблемной!
+                col = gameObject.AddComponent<CircleCollider2D>();
+                Debug.Log($"[FactionMapMarker] Колайдер 2D отсутствовал на '{gameObject.name}'. Автоматически добавлен CircleCollider2D для корректного перехвата кликов.");
+            }
 
             // Создаем инстанс материала для индивидуального свечения (чтобы не менять общий ассет)
             if (glowMaterial != null)
@@ -153,24 +162,20 @@ namespace FateContinent
         {
             if (SettingsManager.Instance != null)
             {
-                // Если у SettingsManager.Instance есть метод воспроизведения звука по имени (в виде строки):
-                try
-                {
-                    // Имитируем вызов через Broadcast/SendMessage или если есть нужный метод в API
-                    SettingsManager.Instance.SendMessage("PlaySFX", sfxName, SendMessageOptions.DontRequireReceiver);
-                }
-                catch
-                {
-                    Debug.LogWarning($"[FactionMapMarker] Не удалось проиграть клип '{sfxName}' через SettingsManager.Instance.");
-                }
+                // Идеальный прямой вызов через синглтон, ставший возможным в v18.9.0
+                SettingsManager.Instance.PlaySFX(sfxName);
             }
             else
             {
-                // Безопасный резервный вызов
+                // Безопасный резервный вызов через SendMessage
                 var settingsManagerObj = GameObject.Find("SettingsManager");
                 if (settingsManagerObj != null)
                 {
                     settingsManagerObj.SendMessage("PlaySFX", sfxName, SendMessageOptions.DontRequireReceiver);
+                }
+                else
+                {
+                    Debug.LogWarning($"[FactionMapMarker] Не удалось найти SettingsManager на сцене для воспроизведения '{sfxName}'.");
                 }
             }
         }

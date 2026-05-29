@@ -817,15 +817,37 @@ export default function App() {
   const [markerSmoothing, setMarkerSmoothing] = useState<boolean>(true);
   const [markerHasAlpha, setMarkerHasAlpha] = useState<boolean>(true);
   const [markerPadding, setMarkerPadding] = useState<number>(5); // custom crop padding
-  const [markerCenters, setMarkerCenters] = useState<[number, number, number]>([18.00, 50.00, 81.50]); // default optimized centers for Midjourney 16:9 layout
+  const [markerPartCount, setMarkerPartCount] = useState<number>(3);
+  const [markerCenters, setMarkerCenters] = useState<number[]>([18.00, 50.00, 81.50]); // default optimized centers for Midjourney 16:9 layout
+  const [markerYCenters, setMarkerYCenters] = useState<number[]>([50.00, 50.00, 50.00]);
+  const [markerCropSize, setMarkerCropSize] = useState<number>(30); // Crop size as % of image width
+  const [showUnityGuide, setShowUnityGuide] = useState<boolean>(true);
   
   const chatEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Map Marker Splitter Refs and Hooks
-  const canvasRefLeft = useRef<HTMLCanvasElement>(null);
-  const canvasRefCenter = useRef<HTMLCanvasElement>(null);
-  const canvasRefRight = useRef<HTMLCanvasElement>(null);
+  // Map Marker Splitter Refs using dynamic map
+  const canvasRefs = useRef<{[key: number]: HTMLCanvasElement | null}>({});
+
+  useEffect(() => {
+    if (markerPartCount === 3) {
+      setMarkerCenters([18.00, 50.00, 81.50]);
+      setMarkerYCenters([50.00, 50.00, 50.00]);
+    } else if (markerPartCount === 6) {
+      // 2x3 Grid default layout for raw Midjourney grids (3 on top row, 3 on bottom row)
+      setMarkerCenters([18.00, 50.00, 81.50, 18.00, 50.00, 81.50]);
+      setMarkerYCenters([28.00, 28.00, 28.00, 72.00, 72.00, 72.00]);
+    } else {
+      const defaults: number[] = [];
+      const yDefaults: number[] = [];
+      for (let i = 0; i < markerPartCount; i++) {
+        defaults.push(parseFloat(((i + 0.5) * (100 / markerPartCount)).toFixed(2)));
+        yDefaults.push(50.00);
+      }
+      setMarkerCenters(defaults);
+      setMarkerYCenters(yDefaults);
+    }
+  }, [markerPartCount]);
 
   useEffect(() => {
     if (!markerImage) return;
@@ -838,33 +860,40 @@ export default function App() {
       const H = img.naturalHeight;
       const W = img.naturalWidth;
       
-      const refs = [canvasRefLeft, canvasRefCenter, canvasRefRight];
-      
       markerCenters.forEach((centerPercent, index) => {
-        const canvas = refs[index].current;
+        const canvas = canvasRefs.current[index];
         if (!canvas) return;
         
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
         
-        // Output perfect square resolution match
-        const size = Math.min(H, W / 3);
+        // Output perfect square resolution match based on markerCropSize (percentage of image width)
+        const cropPercent = markerCropSize || 30;
+        let size = (cropPercent / 100) * W;
+        
+        // Ensure size does not exceed W or H
+        if (size > W) size = W;
+        if (size > H) size = H;
+        
         canvas.width = size;
         canvas.height = size;
         
         ctx.clearRect(0, 0, size, size);
         
-        // Center calculation
+        // Center calculation on X and Y
         const cx = (centerPercent / 100) * W;
+        const cyPercent = markerYCenters[index] !== undefined ? markerYCenters[index] : 50.00;
+        const cy = (cyPercent / 100) * H;
         
         // Boundaries crop box
         let sx = cx - size / 2;
-        let sy = (H - size) / 2; // Center vertically as well
-        if (sy < 0) sy = 0;
+        let sy = cy - size / 2;
         
         // Clamping to original image boundaries
         if (sx < 0) sx = 0;
         if (sx + size > W) sx = W - size;
+        if (sy < 0) sy = 0;
+        if (sy + size > H) sy = H - size;
         
         // Padding/crop shrink percentage zoom
         const padPx = (markerPadding / 100) * size;
@@ -885,25 +914,25 @@ export default function App() {
             const tolerance = markerTolerance;
             
             for (let i = 0; i < len; i += 4) {
-              const r = data[i];
-              const g = data[i+1];
-              const b = data[i+2];
-              
-              // Max RGB channel distance from pitch-black
-              const br = Math.max(r, g, b);
-              
-              if (br < tolerance) {
-                if (markerSmoothing) {
-                  const ratio = br / tolerance; // 0 to 1
-                  data[i+3] = Math.round(ratio * data[i+3]);
-                } else {
-                  data[i+3] = 0;
-                }
-              } else if (br < tolerance * 1.5 && markerSmoothing) {
-                const ratio = (br - tolerance) / (tolerance * 0.5); // 0 to 1
-                const factor = 0.5 + 0.5 * ratio;
-                data[i+3] = Math.round(data[i+3] * factor);
-              }
+               const r = data[i];
+               const g = data[i+1];
+               const b = data[i+2];
+               
+               // Max RGB channel distance from pitch-black
+               const br = Math.max(r, g, b);
+               
+               if (br < tolerance) {
+                 if (markerSmoothing) {
+                   const ratio = br / tolerance; // 0 to 1
+                   data[i+3] = Math.round(ratio * data[i+3]);
+                 } else {
+                   data[i+3] = 0;
+                 }
+               } else if (br < tolerance * 1.5 && markerSmoothing) {
+                 const ratio = (br - tolerance) / (tolerance * 0.5); // 0 to 1
+                 const factor = 0.5 + 0.5 * ratio;
+                 data[i+3] = Math.round(data[i+3] * factor);
+               }
             }
             ctx.putImageData(imgData, 0, 0);
           } catch (err) {
@@ -916,7 +945,7 @@ export default function App() {
     return () => {
       active = false;
     };
-  }, [markerImage, markerCenters, markerTolerance, markerSmoothing, markerHasAlpha, markerPadding]);
+  }, [markerImage, markerCenters, markerYCenters, markerCropSize, markerTolerance, markerSmoothing, markerHasAlpha, markerPadding, markerPartCount]);
 
   useEffect(() => {
     const handlePaste = (e: ClipboardEvent) => {
@@ -1070,8 +1099,7 @@ export default function App() {
 
   // Download logic helper
   const downloadMarker = (index: number) => {
-    const refs = [canvasRefLeft, canvasRefCenter, canvasRefRight];
-    const canvas = refs[index].current;
+    const canvas = canvasRefs.current[index];
     if (!canvas) return;
     
     const names = [
@@ -1079,13 +1107,14 @@ export default function App() {
       "Fate_Outlaw_Fire_Marker.png",
       "Fate_Neutral_Druid_Marker.png"
     ];
+    const fileName = names[index] || `Fate_Marker_${index + 1}.png`;
     
     try {
       const link = document.createElement('a');
-      link.download = names[index];
+      link.download = fileName;
       link.href = canvas.toDataURL('image/png', 1.0); // Full quality lossless PNG
       link.click();
-      showNotification(`Успешно сохранено: ${names[index]} (без потери качества!)`, 'success');
+      showNotification(`Успешно сохранено: ${fileName} (без потери качества!)`, 'success');
     } catch (err) {
       showNotification('Ошибка при сохранении изображения. Попробуйте загрузить локальный файл.', 'error');
     }
@@ -7504,7 +7533,7 @@ export default function App() {
                           </>
                         ) : (
                           <>
-                            <Sparkles className="w-5 h-5" />
+                            <Sparkles className="w-5 h-5 animate-bounce" />
                             Генерировать 10 вариантов
                           </>
                         )}
@@ -7536,13 +7565,13 @@ export default function App() {
                 </div>
 
                 {/* Right Results Grid */}
-                <div className="flex-1 p-10 bg-[#0a0a0c] overflow-y-auto scrollbar-thin scrollbar-thumb-white/5">
+                <div className="flex-1 p-10 bg-[#0a0a0c] overflow-y-auto scrollbar-thin scrollbar-thumb-white/5 animate-fade-in">
                   {vkResults.length === 0 && !isGeneratingVK && (
-                    <div className="h-full flex flex-col items-center justify-center text-center space-y-6 opacity-20 group">
+                    <div className="h-full flex flex-col items-center justify-center text-center space-y-6 opacity-20 group py-16">
                       <div className="p-10 bg-white/5 rounded-full border border-white/10 group-hover:scale-110 transition-transform duration-1000">
-                        <ImageIcon className="w-20 h-20" />
+                        <ImageIcon className="w-20 h-20 text-slate-400" />
                       </div>
-                      <p className="text-sm uppercase font-black tracking-[0.4em] italic">Manifestation Hub Empty</p>
+                      <p className="text-sm uppercase font-black tracking-[0.4em] italic text-slate-400">Manifestation Hub Empty</p>
                     </div>
                   )}
 
@@ -7735,6 +7764,55 @@ export default function App() {
                   <div className="space-y-5">
                     <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">3. Обрезка и Смещение по Осям</h4>
                     
+                    {/* Dynamic Part Count Selector */}
+                    <div className="space-y-4 p-4 bg-white/5 rounded-2xl border border-white/5">
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center text-[10px] uppercase font-bold tracking-wider">
+                          <span className="text-slate-400">Количество частей (Срезов)</span>
+                          <span className="text-amber-400 font-mono font-black">{markerPartCount}</span>
+                        </div>
+                        <input 
+                          type="range" 
+                          min="1" 
+                          max="10" 
+                          step="1"
+                          value={markerPartCount} 
+                          onChange={(e) => setMarkerPartCount(parseInt(e.target.value))}
+                          className="w-full accent-amber-500 bg-black/40 h-1.5 rounded-lg cursor-pointer"
+                        />
+                        <div className="flex gap-1 flex-wrap mt-1">
+                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                            <button
+                              key={num}
+                              onClick={() => setMarkerPartCount(num)}
+                              className={`text-[9px] px-2 py-1 rounded transition-colors uppercase font-mono font-bold ${markerPartCount === num ? 'bg-amber-500 text-black' : 'bg-white/5 text-slate-400 hover:bg-white/10'}`}
+                            >
+                              {num}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Width / Crop Size slider */}
+                    <div className="space-y-4 p-4 bg-white/5 rounded-2xl border border-white/5">
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center text-[10px] uppercase font-bold tracking-wider">
+                          <span className="text-slate-400">Ширина кадрирования (Диаметр)</span>
+                          <span className="text-amber-400 font-mono font-black">{markerCropSize}%</span>
+                        </div>
+                        <input 
+                          type="range" 
+                          min="10" 
+                          max="95" 
+                          value={markerCropSize} 
+                          onChange={(e) => setMarkerCropSize(parseInt(e.target.value))}
+                          className="w-full accent-amber-500 bg-black/40 h-1.5 rounded-lg cursor-pointer"
+                        />
+                        <p className="text-[8px] text-slate-500 italic mt-0.5 uppercase">Размер области обрезки (в процентах от ширины кадра).</p>
+                      </div>
+                    </div>
+
                     <div className="space-y-4 p-4 bg-white/5 rounded-2xl border border-white/5">
                       <div className="space-y-2">
                         <div className="flex justify-between items-center text-[10px] uppercase font-bold tracking-wider">
@@ -7753,35 +7831,81 @@ export default function App() {
                       </div>
                     </div>
 
-                    <div className="space-y-4 p-4 bg-white/5 rounded-2xl border border-white/5">
-                      <div className="text-[10px] font-bold uppercase text-slate-400 tracking-wider mb-2">Калибровка Центров (%)</div>
-                      
-                      {[
-                        { label: 'Имперский Компас (Слева)', index: 0, min: 10, max: 30 },
-                        { label: 'Разбойники (Центр)', index: 1, min: 40, max: 60 },
-                        { label: 'Нейтралы (Справа)', index: 2, min: 70, max: 92 }
-                      ].map((item, i) => (
-                        <div key={i} className="space-y-1.5">
-                          <div className="flex justify-between items-center text-[9px] uppercase font-bold text-slate-500">
-                            <span>{item.label}</span>
-                            <span className="text-amber-400 font-mono font-black">{markerCenters[item.index].toFixed(2)}%</span>
-                          </div>
-                          <input 
-                            type="range" 
-                            min={item.min} 
-                            max={item.max} 
-                            step="0.1"
-                            value={markerCenters[item.index]} 
-                            onChange={(e) => {
-                              const val = parseFloat(e.target.value);
-                              const copy = [...markerCenters] as [number, number, number];
-                              copy[item.index] = val;
-                              setMarkerCenters(copy);
-                            }}
-                            className="w-full accent-amber-500 bg-black/40 h-1.5 rounded-lg cursor-pointer"
-                          />
+                    <div className="space-y-4 p-4 bg-white/5 rounded-2xl border border-white/5 max-h-[380px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
+                      <div className="text-[10px] font-bold uppercase text-slate-400 tracking-wider mb-2 sticky top-0 bg-[#0e0e11] py-1 z-10 flex justify-between items-center">
+                        <span>Центры Осей (%)</span>
+                        <div className="flex gap-1.5">
+                          <button
+                            onClick={() => setMarkerPartCount(6)}
+                            className="bg-amber-500/10 text-amber-400 hover:bg-amber-500 hover:text-black hover:scale-105 border border-amber-500/20 text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded transition-all"
+                          >
+                            Сетка 2х3 (6 шт)
+                          </button>
+                          <button
+                            onClick={() => setMarkerPartCount(3)}
+                            className="bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white hover:scale-105 border border-blue-500/20 text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded transition-all"
+                          >
+                            Ряд (3 шт)
+                          </button>
                         </div>
-                      ))}
+                      </div>
+                      
+                      {markerCenters.map((center, idx) => {
+                        const label = idx === 0 ? 'Срез 1 (Левый Вверх)' : idx === markerPartCount - 1 ? `Срез ${markerPartCount} (Правый Низ)` : `Срез ${idx + 1}`;
+                        const yCenter = markerYCenters[idx] !== undefined ? markerYCenters[idx] : 50.00;
+                        return (
+                          <div key={idx} className="space-y-2 pb-3 mb-2 border-b border-white/5 last:border-0 last:pb-0 last:mb-0">
+                            <div className="flex justify-between items-center text-[9px] uppercase font-bold text-amber-400/90">
+                              <span>{label}</span>
+                              <span className="font-mono text-[8px] opacity-60">X: {center.toFixed(1)}% | Y: {yCenter.toFixed(1)}%</span>
+                            </div>
+                            
+                            {/* X alignment */}
+                            <div className="space-y-1">
+                              <div className="flex justify-between text-[8px] text-slate-500 font-mono">
+                                <span>Горизонталь (X)</span>
+                                <span>{center.toFixed(1)}%</span>
+                              </div>
+                              <input 
+                                type="range" 
+                                min="0" 
+                                max="100" 
+                                step="0.1"
+                                value={center || 0} 
+                                onChange={(e) => {
+                                  const val = parseFloat(e.target.value);
+                                  const copy = [...markerCenters];
+                                  copy[idx] = val;
+                                  setMarkerCenters(copy);
+                                }}
+                                className="w-full accent-amber-500 bg-black/40 h-1 rounded-lg cursor-pointer"
+                              />
+                            </div>
+
+                            {/* Y alignment */}
+                            <div className="space-y-1">
+                              <div className="flex justify-between text-[8px] text-slate-500 font-mono">
+                                <span>Вертикаль (Y)</span>
+                                <span>{yCenter.toFixed(1)}%</span>
+                              </div>
+                              <input 
+                                type="range" 
+                                min="0" 
+                                max="100" 
+                                step="0.1"
+                                value={yCenter} 
+                                onChange={(e) => {
+                                  const val = parseFloat(e.target.value);
+                                  const copy = [...markerYCenters];
+                                  copy[idx] = val;
+                                  setMarkerYCenters(copy);
+                                }}
+                                className="w-full accent-blue-500 bg-black/40 h-1 rounded-lg cursor-pointer"
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -7818,97 +7942,74 @@ export default function App() {
                           <img src={markerImage} className="w-full h-full object-cover opacity-60 filter blur-[1px]" alt="Split layout background" />
                           
                           {/* Centers indicator overlays */}
-                          {markerCenters.map((center, idx) => (
-                            <div 
-                              key={idx}
-                              style={{ left: `${center}%` }}
-                              className="absolute top-0 bottom-0 w-[2px] bg-amber-500/60 shadow-[0_0_15px_#f59e0b] flex flex-col justify-between items-center transition-all duration-150 transform -translate-x-1/2"
-                            >
-                              <div className="bg-amber-500 text-black text-[8px] font-black uppercase px-2 py-0.5 rounded-full mt-2 tracking-widest shadow-lg">
-                                Срез {idx+1}
+                          {markerCenters.map((center, idx) => {
+                            const yCenter = markerYCenters[idx] !== undefined ? markerYCenters[idx] : 50.00;
+                            const sizePercent = markerCropSize || 30; // percentage of image width
+                            return (
+                              <div 
+                                key={idx}
+                                style={{ 
+                                  left: `${center}%`, 
+                                  top: `${yCenter}%`,
+                                  width: `${sizePercent}%`,
+                                  aspectRatio: '1 / 1', // square crop shape!
+                                }}
+                                className="absolute border-2 border-dashed border-amber-500 bg-amber-500/10 shadow-[0_0_15px_rgba(245,158,11,0.3)] flex flex-col justify-center items-center transition-all duration-150 transform -translate-x-1/2 -translate-y-1/2 rounded-xl"
+                              >
+                                <div className="absolute top-1 left-2 bg-amber-500 text-black text-[8px] font-mono leading-none px-1 py-0.5 rounded font-black uppercase shadow">
+                                  Срез #{idx + 1}
+                                </div>
+                                <div className="absolute bottom-1 right-2 bg-black/80 text-amber-400 text-[7px] font-mono leading-none px-1 py-0.5 rounded">
+                                  {center.toFixed(0)}%, {yCenter.toFixed(0)}%
+                                </div>
+                                <div className="h-6 w-6 border border-dashed border-amber-400 rounded-full animate-ping absolute pointer-events-none opacity-40" />
+                                <div className="h-2 w-2 rounded-full bg-amber-400 shadow-[0_0_8px_#f59e0b]" />
                               </div>
-                              <div className="h-10 w-10 border-2 border-dashed border-amber-500 rounded-full bg-amber-500/10 animate-ping absolute top-1/2 -translate-y-1/2 pointer-events-none" />
-                              <div className="h-12 w-12 border-2 border-amber-400/80 rounded-full bg-black/40 absolute top-1/2 -translate-y-1/2 flex items-center justify-center font-bold text-[9px] text-amber-400 shadow-md">
-                                {center.toFixed(1)}%
-                              </div>
-                              <div className="bg-amber-500 text-black text-[7px] font-black uppercase px-1.5 py-0.5 rounded mb-2 font-mono">
-                                x-coord
-                              </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       </div>
 
-                      {/* Three Output Canvases */}
+                      {/* Dynamic Output Canvases */}
                       <div className="space-y-4">
                         <div className="text-[10px] uppercase font-black text-slate-500 tracking-widest">
                           Результат нарезки высокого качества (PNG с прозрачностью)
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                          
-                          {/* Box 1: Imperial */}
-                          <div className="bg-black/60 border border-white/10 hover:border-blue-500/40 rounded-3xl p-5 flex flex-col items-center gap-4 transition-all group">
-                            <div className="text-[10px] font-black uppercase text-blue-400 tracking-[0.2em] flex items-center gap-1.5">
-                              <span className="h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_8px_#3b82f6] animate-pulse" />
-                              1. Синяя Империя (Лев.)
-                            </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {markerCenters.map((_, idx) => {
+                            const hue = (idx * (360 / Math.max(1, markerPartCount))) % 360;
+                            const ringGlowColor = `hsla(${hue}, 80%, 50%, 0.3)`;
+                            const dotColor = `hsl(${hue}, 100%, 50%)`;
                             
-                            {/* Grid alpha background for checkouts */}
-                            <div className="aspect-square w-full max-w-[160px] bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:12px_12px] bg-black/80 rounded-2xl border border-white/5 flex items-center justify-center overflow-hidden p-2 relative shadow-inner">
-                              <canvas ref={canvasRefLeft} className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(59,130,246,0.3)] transition-transform duration-500 group-hover:scale-105" />
-                            </div>
+                            return (
+                              <div key={idx} className="bg-black/60 border border-white/5 hover:border-amber-500/30 rounded-3xl p-5 flex flex-col items-center gap-4 transition-all group">
+                                <div className="text-[10px] font-black uppercase text-slate-300 tracking-[0.2em] flex items-center gap-1.5">
+                                  <span 
+                                    className="h-2 w-2 rounded-full animate-pulse" 
+                                    style={{ backgroundColor: dotColor, boxShadow: `0 0 8px ${dotColor}` }}
+                                  />
+                                  Срез {idx + 1}
+                                </div>
+                                
+                                {/* Grid alpha background */}
+                                <div className="aspect-square w-full max-w-[160px] bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:12px_12px] bg-black/80 rounded-2xl border border-white/5 flex items-center justify-center overflow-hidden p-2 relative shadow-inner">
+                                  <canvas 
+                                    ref={el => { canvasRefs.current[idx] = el; }} 
+                                    className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" 
+                                    style={{ filter: `drop-shadow(0 0 8px ${ringGlowColor})` }}
+                                  />
+                                </div>
 
-                            <button 
-                              onClick={() => downloadMarker(0)}
-                              className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl transition-all shadow-xl shadow-blue-500/20 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98]"
-                            >
-                              <Download className="w-4 h-4" />
-                              Скачать PNG
-                            </button>
-                          </div>
-
-                          {/* Box 2: Outlaw */}
-                          <div className="bg-black/60 border border-white/10 hover:border-orange-500/40 rounded-3xl p-5 flex flex-col items-center gap-4 transition-all group">
-                            <div className="text-[10px] font-black uppercase text-orange-400 tracking-[0.2em] flex items-center gap-1.5">
-                              <span className="h-2 w-2 rounded-full bg-orange-500 shadow-[0_0_8px_#f97316] animate-pulse" />
-                              2. Разбойники (Центр)
-                            </div>
-                            
-                            {/* Grid alpha background */}
-                            <div className="aspect-square w-full max-w-[160px] bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:12px_12px] bg-black/80 rounded-2xl border border-white/5 flex items-center justify-center overflow-hidden p-2 relative shadow-inner">
-                              <canvas ref={canvasRefCenter} className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(249,115,22,0.3)] transition-transform duration-500 group-hover:scale-105" />
-                            </div>
-
-                            <button 
-                              onClick={() => downloadMarker(1)}
-                              className="w-full py-3.5 bg-orange-600 hover:bg-orange-500 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl transition-all shadow-xl shadow-orange-500/20 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98]"
-                            >
-                              <Download className="w-4 h-4" />
-                              Скачать PNG
-                            </button>
-                          </div>
-
-                          {/* Box 3: Neutral */}
-                          <div className="bg-black/60 border border-white/10 hover:border-green-500/40 rounded-3xl p-5 flex flex-col items-center gap-4 transition-all group">
-                            <div className="text-[10px] font-black uppercase text-green-400 tracking-[0.2em] flex items-center gap-1.5">
-                              <span className="h-2 w-2 rounded-full bg-green-500 shadow-[0_0_8px_#10b981] animate-pulse" />
-                              3. Нейтралы (Прав.)
-                            </div>
-                            
-                            {/* Grid alpha background */}
-                            <div className="aspect-square w-full max-w-[160px] bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:12px_12px] bg-black/80 rounded-2xl border border-white/5 flex items-center justify-center overflow-hidden p-2 relative shadow-inner">
-                              <canvas ref={canvasRefRight} className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] transition-transform duration-500 group-hover:scale-105" />
-                            </div>
-
-                            <button 
-                              onClick={() => downloadMarker(2)}
-                              className="w-full py-3.5 bg-green-600 hover:bg-green-500 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl transition-all shadow-xl shadow-green-500/20 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98]"
-                            >
-                              <Download className="w-4 h-4" />
-                              Скачать PNG
-                            </button>
-                          </div>
-
+                                <button 
+                                  onClick={() => downloadMarker(idx)}
+                                  className="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl transition-all shadow-xl hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+                                >
+                                  <Download className="w-4 h-4 text-amber-500" />
+                                  Скачать PNG
+                                </button>
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
                     </div>
@@ -7920,6 +8021,77 @@ export default function App() {
                     <p className="text-[10px] uppercase font-bold tracking-wider">
                       <b>Полезный лайфхак:</b> Если ваши кольца на исходном изображении смещены в сторону, вы можете отрегулировать ползунки в третьей секции слева, чтобы выставить центр обрезки идеально под каждый маркер!
                     </p>
+                  </div>
+
+                  {/* Expandable Unity 6 Import Guide */}
+                  <div className="mt-6 border border-white/5 bg-white/5 rounded-3xl p-6 space-y-4">
+                    <div className="flex justify-between items-center cursor-pointer select-none" onClick={() => setShowUnityGuide(!showUnityGuide)}>
+                      <div className="flex items-center gap-3">
+                        <BookOpen className="w-5 h-5 text-amber-500 animate-pulse" />
+                        <h4 className="text-[11px] font-black uppercase tracking-wider text-slate-300">🗺️ Руководство по интеграции и пошаговому импорту в Unity 6</h4>
+                      </div>
+                      <span className="text-amber-500 text-[10px] font-bold font-mono bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded uppercase">
+                        {showUnityGuide ? 'Свернуть' : 'Развернуть'}
+                      </span>
+                    </div>
+
+                    {showUnityGuide && (
+                      <div className="space-y-4 text-[11px] leading-relaxed text-slate-400 border-t border-white/5 pt-4">
+                        <div className="space-y-1.5 p-3.5 bg-black/40 rounded-2xl border border-white/5">
+                          <h5 className="font-extrabold text-white uppercase tracking-wider text-[10px]">🛠️ ШАГ 1. Организация каталога проекта (Assets)</h5>
+                          <p className="text-[10px] text-slate-300">В окне <b>Project</b> внутри Unity 6 создайте чистую структуру папок:</p>
+                          <ul className="list-disc list-inside space-y-1 text-slate-300 text-[9.5px] font-mono pl-1">
+                            <li><span className="text-amber-400">Assets/Environment/Maps/</span> — текстуры карт континентов (Midjourney).</li>
+                            <li><span className="text-amber-400">Assets/Environment/Markers/</span> — нарезанные кольца из этого сплиттера.</li>
+                            <li><span className="text-amber-400">Assets/Scripts/Map/</span> — скрипт <span className="text-blue-400">FactionMapMarker.cs</span>.</li>
+                          </ul>
+                        </div>
+
+                        <div className="space-y-1.5 p-3.5 bg-black/40 rounded-2xl border border-white/5">
+                          <h5 className="font-extrabold text-white uppercase tracking-wider text-[10px]">🛡️ ШАГ 2. Настройка импорта Текстур (8K Альфа)</h5>
+                          <p className="text-[10px] text-slate-300">В окне Inspector примените параметры для вырезанных маркеров:</p>
+                          <ul className="list-disc list-inside space-y-1 text-slate-300 text-[9.5px] pl-1">
+                            <li>Texture Type: <span className="text-amber-400 font-semibold">Sprite (2D and UI)</span></li>
+                            <li>Sprite Mode: <span className="text-amber-400 font-semibold">Single</span></li>
+                            <li>Alpha Source: <span className="text-amber-400 font-semibold">Input Texture Alpha</span></li>
+                            <li>Alpha Is Transparency: <span className="text-emerald-400 font-extrabold">🟩 Включено (Обязательно)</span></li>
+                            <li>Generate Physics Shapes: <span className="text-rose-400 font-semibold">🟥 Выключено</span></li>
+                            <li>Filter Mode: <span className="text-amber-400 font-semibold">Bilinear / Trilinear</span></li>
+                            <li>Aniso Level: <span className="text-amber-400 font-semibold">4</span></li>
+                            <li>Max Size: <span className="text-amber-400 font-semibold">2048 или 4096</span></li>
+                            <li>Compression: <span className="text-amber-400 font-semibold">High Quality</span></li>
+                          </ul>
+                        </div>
+
+                        <div className="space-y-1.5 p-3.5 bg-black/40 rounded-2xl border border-white/5">
+                          <h5 className="font-extrabold text-white uppercase tracking-wider text-[10px]">🌟 ШАГ 3. Настройка Bloom-Эффекта и Материала (HDR)</h5>
+                          <p className="text-[10px] text-slate-300">Создайте спрайт <span className="text-amber-400 font-semibold">Faction_Marker_Aelyssa</span>. Настройте свечение через URP:</p>
+                          <p className="text-[9.5px] text-slate-400 leading-normal pl-1 border-l-2 border-amber-500/40">
+                            Создайте новый материал <b>M_Neon_Glow</b> (Shader: <span className="text-amber-300 font-mono">Universal Render Pipeline/2D/Sprite-Lit-Default</span>).
+                            Включите опцию <b>Emission</b> (Свечение). Установите цвет свечения с HDR-интенсивностью <span className="text-amber-400 font-semibold">+1.5 ... +2.0</span>.
+                            В настройках URP Global Volume активируйте <b>Bloom</b> (Threshold: 0.9, Intensity: 2.5 - 3.0).
+                          </p>
+                        </div>
+
+                        <div className="space-y-1.5 p-3.5 bg-black/40 rounded-2xl border border-white/5">
+                          <h5 className="font-extrabold text-white uppercase tracking-wider text-[10px]">💬 ШАГ 4. Интеграция Диалогов (Aelyssa & Классы)</h5>
+                          <p className="text-[10px] text-slate-300">Скрипт <span className="text-blue-400 font-mono text-[9px]">DialogueSystem_Manager.cs</span> адаптирован под двух-аватарную сетку:</p>
+                          <p className="text-[9.5px] text-slate-400 leading-normal pl-1 border-l-2 border-purple-500/40">
+                            Левый портрет: <b>Аэлисса</b>. Правый портрет: динамически подменяется на спрайт выбранного класса героя на старте.
+                            В <b>Translator.cs</b> задействованы 3 fallbacks. Выбор веток диалогов и фракционной репутации автоматически шлет сейв-триггер в <span className="text-blue-400 font-semibold">SaveGameSystem.cs</span>.
+                          </p>
+                        </div>
+
+                        <div className="space-y-1.5 p-3.5 bg-black/40 rounded-2xl border border-white/5">
+                          <h5 className="font-extrabold text-white uppercase tracking-wider text-[10px]">🔊 ШАГ 5. Архитектурная Очистка Аудио (Zenith Mixer)</h5>
+                          <p className="text-[10px] text-slate-300">Для чистоты и оптимизации проекта:</p>
+                          <p className="text-[9.5px] text-slate-400 leading-normal pl-1 border-l-2 border-blue-500/40">
+                            Полностью <b>удалите устаревшие скрипты</b> <code>AudioHandler</code> и <code>AudioManager</code>. Настройка hover-кликов и лупов (Suno/Udio)
+                            производится исключительно через центральный синглтон <code>SettingsManager.cs</code> в связке с <code>UIButtonSfxBinder</code> для маршрутизации напрямую через AudioMixer.
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                 </div>

@@ -274,6 +274,39 @@ public class SettingsManager : MonoBehaviour
         sfxSource.PlayOneShot(clip);
     }
 
+    // Воспроизведение звука по строковому названию клипа (например, из Resources/Audio/)
+    // Решает ошибку CS1061 в FactionMapMarker и других C#-скриптах проекта!
+    public void PlaySFX(string sfxName)
+    {
+        if (sfxSource == null || string.IsNullOrEmpty(sfxName)) return;
+
+        // Поиск в локальном массиве hoverSounds по имени ассета
+        foreach (AudioClip clip in hoverSounds)
+        {
+            if (clip != null && clip.name == sfxName)
+            {
+                sfxSource.PlayOneShot(clip);
+                return;
+            }
+        }
+
+        // Пытаемся динамически загрузить из папки Resources (как Audio/name или просто по имени)
+        AudioClip loadedClip = Resources.Load<AudioClip>("Audio/" + sfxName);
+        if (loadedClip == null)
+        {
+            loadedClip = Resources.Load<AudioClip>(sfxName);
+        }
+
+        if (loadedClip != null)
+        {
+            sfxSource.PlayOneShot(loadedClip);
+        }
+        else
+        {
+            Debug.LogWarning($"[FATE SETTINGS] Аудиоклип '{sfxName}' не найден в массиве hoverSounds или Resources.");
+        }
+    }
+
     // Переключение Музыки в зависимости от состояния игры.
     // playlistIndex: 0 = Меню, 1 = Выбор Персонажей, 2 = Карта/Ходьба, 3 = Бой
     // trackIndex: номер трека в конкретном плейлисте (0-9)
