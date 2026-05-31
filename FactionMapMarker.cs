@@ -68,6 +68,12 @@ namespace FateContinent
                 Debug.Log($"[FactionMapMarker] Колайдер 2D отсутствовал на '{gameObject.name}'. Автоматически добавлен CircleCollider2D для корректного перехвата кликов.");
             }
 
+            // Авто-калибровка неоновых цветов, если они оставлены по умолчанию (прозрачные, черные или не настроены)
+            if (normalGlowColor.a < 0.05f || normalGlowColor == Color.black || normalGlowColor == Color.clear)
+            {
+                AutoCalibrateColors();
+            }
+
             // Создаем инстанс материала для индивидуального свечения (чтобы не менять общий ассет)
             if (glowMaterial != null)
             {
@@ -79,6 +85,48 @@ namespace FateContinent
             {
                 // Fallback: дублируем стандартный спрайтовый материал
                 instancedMaterial = spriteRenderer.material;
+            }
+        }
+
+        private void AutoCalibrateColors()
+        {
+            string nameLower = factionName.ToLower();
+            
+            // 1. Этельгард (Эльфы) — Сапфирово-бирюзовый неон (Диалоги 3/4 или ключевые слова)
+            if (nameLower.Contains("аэлисс") || nameLower.Contains("этельгард") || nameLower.Contains("эльф") || nameLower.Contains("порт") || nameLower.Contains("ethel") || associatedDialogueIndex == 3 || associatedDialogueIndex == 4)
+            {
+                // Hex: #0A6CB2 (Интенсивность +0.5 -> умножение на 1.41)
+                // Hover Hex: #00F0FF (Интенсивность +2.0 -> умножение на 4.0)
+                normalGlowColor = new Color(10f / 255f, 108f / 255f, 178f / 255f, 1.0f) * 1.41f;
+                hoverGlowColor = new Color(0f / 255f, 240f / 255f, 255f / 255f, 1.0f) * 4.0f;
+                Debug.Log($"[FactionMapMarker] Авто-калибровка цветов для '{factionName}': Сапфирово-бирюзовый неон (Этельгард)");
+            }
+            // 2. Арделланд (Люди) — Золотисто-солнечный неон (Диалоги 5/6 или ключевые слова)
+            else if (nameLower.Contains("льв") || nameLower.Contains("цитадел") || nameLower.Contains("ардел") || nameLower.Contains("человек") || nameLower.Contains("ardel") || nameLower.Contains("lion") || associatedDialogueIndex == 5 || associatedDialogueIndex == 6)
+            {
+                // Hex: #B2830A (Интенсивность +0.5)
+                // Hover Hex: #FFD000 (Интенсивность +2.0)
+                normalGlowColor = new Color(178f / 255f, 131f / 255f, 10f / 255f, 1.0f) * 1.41f;
+                hoverGlowColor = new Color(255f / 255f, 208f / 255f, 0f / 255f, 1.0f) * 4.0f;
+                Debug.Log($"[FactionMapMarker] Авто-калибровка цветов для '{factionName}': Золотисто-солнечный неон (Арделланд)");
+            }
+            // 3. Вердантия (Друиды) — Чародейский изумрудный неон (Диалоги 7/8 или ключевые слова)
+            else if (nameLower.Contains("друид") || nameLower.Contains("вердант") || nameLower.Contains("святилищ") || nameLower.Contains("лес") || nameLower.Contains("verd") || nameLower.Contains("druid") || associatedDialogueIndex == 7 || associatedDialogueIndex == 8)
+            {
+                // Hex: #0AB23D (Интенсивность +0.5)
+                // Hover Hex: #00FF55 (Интенсивность +2.0)
+                normalGlowColor = new Color(10f / 255f, 178f / 255f, 61f / 255f, 1.0f) * 1.41f;
+                hoverGlowColor = new Color(0f / 255f, 255f / 255f, 85f / 255f, 1.0f) * 4.0f;
+                Debug.Log($"[FactionMapMarker] Авто-калибровка цветов для '{factionName}': Чародейский изумрудный неон (Вердантия)");
+            }
+            // 4. Ксандрия (Разлом/Арена) — Электрический фиолетовый неон
+            else
+            {
+                // Hex: #6F0AB2 (Интенсивность +0.5)
+                // Hover Hex: #CC00FF (Интенсивность +2.0)
+                normalGlowColor = new Color(111f / 255f, 10f / 255f, 178f / 255f, 1.0f) * 1.41f;
+                hoverGlowColor = new Color(204f / 255f, 0f / 255f, 255f / 255f, 1.0f) * 4.0f;
+                Debug.Log($"[FactionMapMarker] Авто-калибровка цветов для '{factionName}': Электрический фиолетовый неон (Ксандрия)");
             }
         }
 

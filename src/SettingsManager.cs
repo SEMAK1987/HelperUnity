@@ -274,6 +274,12 @@ public class SettingsManager : MonoBehaviour
         sfxSource.PlayOneShot(clip);
     }
 
+    // Совместимый псевдоним для старых скриптов кнопок и диалогов
+    public void PlaySound(AudioClip clip)
+    {
+        PlaySoundEffect(clip);
+    }
+
     // Воспроизведение звука по строковому названию клипа (например, из Resources/Audio/)
     // Решает ошибку CS1061 в FactionMapMarker и других C#-скриптах проекта!
     public void PlaySFX(string sfxName)

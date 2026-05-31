@@ -50,6 +50,7 @@ namespace FateContinent
         public bool exitByName = true;
 
         private bool isPaused = false;
+        private bool wasDialogueActiveBeforePause = false;
         private int lastLanguageID = -1;
         private Canvas createdCanvas; // Временный Canvas для рантайм-меню
 
@@ -184,7 +185,7 @@ namespace FateContinent
                 // Запрещаем ESC во время активного диалога
                 if (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.IsDialogueActive)
                 {
-                    Debug.Log("[FATE PAUSE] ESC заблокирован: идет диалог с Аэлиссой!");
+                    Debug.Log("[FATE PAUSE] ESC заблокирован: идет диалог!");
                     return;
                 }
 
@@ -231,6 +232,18 @@ namespace FateContinent
             isPaused = true;
             Time.timeScale = 0f; // Полная заморозка времени физики и апдейтов
 
+            // Проверяем, активен ли диалог Помощника, и временно гасим его панель
+            if (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.IsDialogueActive)
+            {
+                wasDialogueActiveBeforePause = true;
+                DialogueSystem_Manager.Instance.SetDialoguePanelActive(false);
+                Debug.Log("[FATE PAUSE] Обнаружен активный диалог. Панель временно скрыта на время паузы.");
+            }
+            else
+            {
+                wasDialogueActiveBeforePause = false;
+            }
+
             if (pauseMenuPanel != null) pauseMenuPanel.SetActive(true);
             
             // Включаем нормальное меню паузы (скрываем подтверждение выхода и показываем кнопки сохранений)
@@ -247,6 +260,14 @@ namespace FateContinent
             if (pauseMenuPanel != null) pauseMenuPanel.SetActive(false);
             if (confirmExitPanel != null) confirmExitPanel.SetActive(false);
             if (confirmPromptText != null) confirmPromptText.gameObject.SetActive(false);
+
+            // Восстанавливаем диалоговую панель, если она была скрыта перед паузой
+            if (wasDialogueActiveBeforePause && DialogueSystem_Manager.Instance != null)
+            {
+                DialogueSystem_Manager.Instance.SetDialoguePanelActive(true);
+                Debug.Log("[FATE PAUSE] Восстановлено отображение диалога с Аэлиссой.");
+            }
+            wasDialogueActiveBeforePause = false;
 
             Debug.Log("[FATE PAUSE] Возобновление нормального хода времени.");
         }
@@ -678,7 +699,7 @@ namespace FateContinent
 
             var canvas = canvasGov.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = 999; // Поверх всего
+            canvas.sortingOrder = 1500; // Поверх всего (выше диалогов, которые на 999)
 
             canvasGov.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             canvasGov.AddComponent<GraphicRaycaster>();

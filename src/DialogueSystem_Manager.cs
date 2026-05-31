@@ -55,6 +55,7 @@ namespace FateContinent
         private TextMeshProUGUI dialogueBodyText;
         private List<Button> choiceButtons = new List<Button>();
         private GameObject choiceContainer;
+        private Button nextDialogueButton;
 
         private int currentLineIndex = 0;
         private bool isDialogueActive = false;
@@ -63,6 +64,9 @@ namespace FateContinent
         {
             get { return isDialogueActive; }
         }
+
+        private enum InputSystemType { Unchecked, OldInput, NewInput }
+        private InputSystemType activeInputType = InputSystemType.Unchecked;
 
         private void Awake()
         {
@@ -79,6 +83,28 @@ namespace FateContinent
             }
         }
 
+        private void OnEnable()
+        {
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+
+        private void OnDisable()
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
+
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            // Автоматическое переподключение и избавление от лишних окон во всех сценах геймплея
+            InitializeDialogueUI();
+            
+            // Скрываемый на старте диалог во избежание визуальных багов
+            if (dialogPanel != null)
+            {
+                dialogPanel.SetActive(false);
+            }
+        }
+
         private void Start()
         {
             // При старте скрываем диалоговое окно
@@ -86,6 +112,301 @@ namespace FateContinent
             {
                 dialogPanel.SetActive(false);
             }
+        }
+
+        private void Update()
+        {
+            if (!isDialogueActive) return;
+
+            // Если есть активные варианты выбора, клавиатура / случайные клики не продвигают диалог автоматически
+            DialogLine currentLine = dialogueSteps[currentLineIndex];
+            int lang = Translator.LanguageID;
+            string[] currentChoices = null;
+            switch (lang)
+            {
+                case 0: currentChoices = currentLine.choicesRU; break;
+                case 8: currentChoices = currentLine.choicesCH; break;
+                case 7: currentChoices = currentLine.choicesKR; break;
+                default: currentChoices = currentLine.choicesEN; break;
+            }
+
+            bool hasChoices = currentChoices != null && currentChoices.Length > 0;
+
+            if (!hasChoices)
+            {
+                // Позволяет пропускать диалог кликом мыши или кнопками пробел/ввод!
+                if (IsMouseButtonDownZero() || IsSpaceOrReturnPressed())
+                {
+                    AdvanceDialogue();
+                }
+            }
+            else
+            {
+                // Позволяет делать выбор цифрами 1, 2, 3 на клавиатуре для невероятного удобства!
+                if (IsAlphaPressed(1))
+                {
+                    if (currentChoices.Length >= 1) SelectChoice(0);
+                }
+                else if (IsAlphaPressed(2))
+                {
+                    if (currentChoices.Length >= 2) SelectChoice(1);
+                }
+                else if (IsAlphaPressed(3))
+                {
+                    if (currentChoices.Length >= 3) SelectChoice(2);
+                }
+            }
+        }
+
+        private bool IsSpaceOrReturnPressed()
+        {
+            if (activeInputType == InputSystemType.NewInput)
+            {
+                return CheckNewInputSpaceOrReturn();
+            }
+            else if (activeInputType == InputSystemType.OldInput)
+            {
+                try
+                {
+                    return Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return);
+                }
+                catch (System.InvalidOperationException)
+                {
+                    activeInputType = InputSystemType.NewInput;
+                    return CheckNewInputSpaceOrReturn();
+                }
+            }
+
+            try
+            {
+                bool pressed = Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return);
+                activeInputType = InputSystemType.OldInput;
+                return pressed;
+            }
+            catch (System.InvalidOperationException)
+            {
+                activeInputType = InputSystemType.NewInput;
+                return CheckNewInputSpaceOrReturn();
+            }
+        }
+
+        private bool IsMouseButtonDownZero()
+        {
+            if (activeInputType == InputSystemType.NewInput)
+            {
+                return CheckNewInputMousePressed();
+            }
+            else if (activeInputType == InputSystemType.OldInput)
+            {
+                try
+                {
+                    return Input.GetMouseButtonDown(0);
+                }
+                catch (System.InvalidOperationException)
+                {
+                    activeInputType = InputSystemType.NewInput;
+                    return CheckNewInputMousePressed();
+                }
+            }
+
+            try
+            {
+                bool pressed = Input.GetMouseButtonDown(0);
+                activeInputType = InputSystemType.OldInput;
+                return pressed;
+            }
+            catch (System.InvalidOperationException)
+            {
+                activeInputType = InputSystemType.NewInput;
+                return CheckNewInputMousePressed();
+            }
+        }
+
+        private bool IsAlphaPressed(int alphaNum)
+        {
+            if (activeInputType == InputSystemType.NewInput)
+            {
+                return CheckNewInputAlpha(alphaNum);
+            }
+            else if (activeInputType == InputSystemType.OldInput)
+            {
+                try
+                {
+                    if (alphaNum == 1) return Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1);
+                    if (alphaNum == 2) return Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2);
+                    if (alphaNum == 3) return Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3);
+                    return false;
+                }
+                catch (System.InvalidOperationException)
+                {
+                    activeInputType = InputSystemType.NewInput;
+                    return CheckNewInputAlpha(alphaNum);
+                }
+            }
+
+            try
+            {
+                bool pressed = false;
+                if (alphaNum == 1) pressed = Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1);
+                if (alphaNum == 2) pressed = Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2);
+                if (alphaNum == 3) pressed = Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3);
+                activeInputType = InputSystemType.OldInput;
+                return pressed;
+            }
+            catch (System.InvalidOperationException)
+            {
+                activeInputType = InputSystemType.NewInput;
+                return CheckNewInputAlpha(alphaNum);
+            }
+        }
+
+        private bool CheckNewInputSpaceOrReturn()
+        {
+            try
+            {
+                var inputSystemAssembly = System.Reflection.Assembly.Load("Unity.InputSystem");
+                if (inputSystemAssembly != null)
+                {
+                    var keyboardType = inputSystemAssembly.GetType("UnityEngine.InputSystem.Keyboard");
+                    if (keyboardType != null)
+                    {
+                        var currentProperty = keyboardType.GetProperty("current", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                        var keyboardInstance = currentProperty?.GetValue(null);
+                        if (keyboardInstance != null)
+                        {
+                            var spaceKeyProperty = keyboardInstance.GetType().GetProperty("spaceKey");
+                            var spaceKeyInstance = spaceKeyProperty?.GetValue(keyboardInstance);
+                            if (spaceKeyInstance != null)
+                            {
+                                var wasPressedProperty = spaceKeyInstance.GetType().GetProperty("wasPressedThisFrame");
+                                if (wasPressedProperty != null && (bool)wasPressedProperty.GetValue(spaceKeyInstance))
+                                {
+                                    return true;
+                                }
+                            }
+
+                            var enterKeyProperty = keyboardInstance.GetType().GetProperty("enterKey");
+                            var enterKeyInstance = enterKeyProperty?.GetValue(keyboardInstance);
+                            if (enterKeyInstance != null)
+                            {
+                                var wasPressedProperty = enterKeyInstance.GetType().GetProperty("wasPressedThisFrame");
+                                if (wasPressedProperty != null && (bool)wasPressedProperty.GetValue(enterKeyInstance))
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // Игнорируем ошибки рефлексии
+            }
+            return false;
+        }
+
+        private bool CheckNewInputMousePressed()
+        {
+            try
+            {
+                var inputSystemAssembly = System.Reflection.Assembly.Load("Unity.InputSystem");
+                if (inputSystemAssembly != null)
+                {
+                    var mouseType = inputSystemAssembly.GetType("UnityEngine.InputSystem.Mouse");
+                    if (mouseType != null)
+                    {
+                        var currentProperty = mouseType.GetProperty("current", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                        var mouseInstance = currentProperty?.GetValue(null);
+                        if (mouseInstance != null)
+                        {
+                            var leftButtonProperty = mouseInstance.GetType().GetProperty("leftButton");
+                            var leftButtonInstance = leftButtonProperty?.GetValue(mouseInstance);
+                            if (leftButtonInstance != null)
+                            {
+                                var wasPressedProperty = leftButtonInstance.GetType().GetProperty("wasPressedThisFrame");
+                                if (wasPressedProperty != null && (bool)wasPressedProperty.GetValue(leftButtonInstance))
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+
+                    var pointerType = inputSystemAssembly.GetType("UnityEngine.InputSystem.Pointer");
+                    if (pointerType != null)
+                    {
+                        var currentProperty = pointerType.GetProperty("current", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                        var pointerInstance = currentProperty?.GetValue(null);
+                        if (pointerInstance != null)
+                        {
+                            var pressProperty = pointerInstance.GetType().GetProperty("press");
+                            var pressInstance = pressProperty?.GetValue(pointerInstance);
+                            if (pressInstance != null)
+                            {
+                                var wasPressedProperty = pressInstance.GetType().GetProperty("wasPressedThisFrame");
+                                if (wasPressedProperty != null && (bool)wasPressedProperty.GetValue(pressInstance))
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // Игнорируем ошибки рефлексии
+            }
+            return false;
+        }
+
+        private bool CheckNewInputAlpha(int number)
+        {
+            try
+            {
+                var inputSystemAssembly = System.Reflection.Assembly.Load("Unity.InputSystem");
+                if (inputSystemAssembly != null)
+                {
+                    var keyboardType = inputSystemAssembly.GetType("UnityEngine.InputSystem.Keyboard");
+                    if (keyboardType != null)
+                    {
+                        var currentProperty = keyboardType.GetProperty("current", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                        var keyboardInstance = currentProperty?.GetValue(null);
+                        if (keyboardInstance != null)
+                        {
+                            string keyName = "digit" + number + "Key";
+                            var keyProperty = keyboardInstance.GetType().GetProperty(keyName);
+                            var keyInstance = keyProperty?.GetValue(keyboardInstance);
+                            if (keyInstance != null)
+                            {
+                                var wasPressedProperty = keyInstance.GetType().GetProperty("wasPressedThisFrame");
+                                if (wasPressedProperty != null && (bool)wasPressedProperty.GetValue(keyInstance))
+                                {
+                                    return true;
+                                }
+                            }
+
+                            string numpadName = "numpad" + number + "Key";
+                            var numpadProperty = keyboardInstance.GetType().GetProperty(numpadName);
+                            var numpadInstance = numpadProperty?.GetValue(keyboardInstance);
+                            if (numpadInstance != null)
+                            {
+                                var wasPressedProperty = numpadInstance.GetType().GetProperty("wasPressedThisFrame");
+                                if (wasPressedProperty != null && (bool)wasPressedProperty.GetValue(numpadInstance))
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // Игнорируем ошибки рефлексии
+            }
+            return false;
         }
 
         /// <summary>
@@ -171,6 +492,14 @@ namespace FateContinent
             }
         }
 
+        public void SetDialoguePanelActive(bool active)
+        {
+            if (dialogPanel != null)
+            {
+                dialogPanel.SetActive(active);
+            }
+        }
+
         public void EndDialogue()
         {
             isDialogueActive = false;
@@ -179,6 +508,13 @@ namespace FateContinent
                 dialogPanel.SetActive(false);
             }
             
+            // После окончания любого диалога автоматически открываем и показываем карту мира
+            if (FateMapManager.Instance != null)
+            {
+                FateMapManager.Instance.SetMapVisible(true);
+                Debug.Log("[DIALOGUE SYSTEM] Раскрываем интерактивную карту мира для выбора фракций.");
+            }
+
             // Проверяем, на каком шаге мы закончили диалог (это определяет выбранную локацию!)
             if (currentLineIndex == 4)
             {
@@ -212,13 +548,16 @@ namespace FateContinent
             // Определяем язык перевода
             int lang = Translator.LanguageID; // 0=RU, 1=EN, 7=KR, 8=CH (или по умолчанию EN)
             
-            // Настройка текста имени имя
+            // Настройка текста имени
             string speakerName = currentLine.characterName;
             if (string.IsNullOrEmpty(speakerName))
             {
                 speakerName = (lang == 0) ? companionNameRU : companionNameEN;
             }
-            speakerNameText.text = speakerName;
+            if (speakerNameText != null)
+            {
+                speakerNameText.text = speakerName;
+            }
 
             // Настройка текста реплики со специфичными переводами
             string mainText = "";
@@ -229,13 +568,30 @@ namespace FateContinent
                 case 7: mainText = !string.IsNullOrEmpty(currentLine.textKR) ? currentLine.textKR : currentLine.textEN; break;
                 default: mainText = currentLine.textEN; break;
             }
-            dialogueBodyText.text = mainText;
+            if (dialogueBodyText != null)
+            {
+                dialogueBodyText.text = mainText;
+            }
 
             // Накатываем шрифты в зависимости от языка
             ApplyDialogueFonts();
 
             // Динамический выбор портрета игрока на правой стороне
             UpdatePlayerPortrait();
+
+            // Привязка и обновление портрета компаньона (Аэлиссы) на левой стороне
+            if (companionPortraitImage != null)
+            {
+                if (companionPortrait != null)
+                {
+                    companionPortraitImage.sprite = companionPortrait;
+                    companionPortraitImage.color = Color.white;
+                }
+                else if (companionPortraitImage.sprite != null)
+                {
+                    companionPortraitImage.color = Color.white;
+                }
+            }
 
             // Обработка вариантов ответов (кнопок выбора)
             string[] currentChoices = null;
@@ -247,16 +603,36 @@ namespace FateContinent
                 default: currentChoices = currentLine.choicesEN; break;
             }
 
-            // Очищаем предыдущие кнопки
-            foreach (var btn in choiceButtons)
+            // Полностью очищаем все дочерние элементы контейнера, гарантируя отсутствие наложенных и застрявших кнопок!
+            if (choiceContainer != null)
             {
-                Destroy(btn.gameObject);
+                // Обязательно открепляем перед Destroy, чтобы элементы моментально исчезали из разметки HorizontalLayoutGroup!
+                List<Transform> children = new List<Transform>();
+                foreach (Transform child in choiceContainer.transform)
+                {
+                    children.Add(child);
+                }
+                foreach (Transform child in children)
+                {
+                    child.SetParent(null);
+                    Destroy(child.gameObject);
+                }
             }
             choiceButtons.Clear();
 
+            if (nextDialogueButton == null)
+            {
+                SetupNextDialogueButton();
+            }
+
             if (currentChoices != null && currentChoices.Length > 0)
             {
-                choiceContainer.SetActive(true);
+                if (choiceContainer != null)
+                {
+                    choiceContainer.SetActive(true);
+                }
+                if (nextDialogueButton != null) nextDialogueButton.gameObject.SetActive(false);
+
                 for (int i = 0; i < currentChoices.Length; i++)
                 {
                     int index = i;
@@ -266,10 +642,20 @@ namespace FateContinent
             }
             else
             {
-                choiceContainer.SetActive(false);
-                // Создаем невидимую кнопку на весь корпус панели для возможности клика "Далее" мышкой
-                Button nextBtn = CreateChoiceButton((lang == 0) ? "Далее..." : "Continue...", () => AdvanceDialogue());
-                choiceButtons.Add(nextBtn);
+                if (choiceContainer != null)
+                {
+                    choiceContainer.SetActive(false);
+                }
+                if (nextDialogueButton != null)
+                {
+                    nextDialogueButton.gameObject.SetActive(true);
+                    // Обновляем текст кнопки под язык локализации!
+                    TextMeshProUGUI txtTmp = nextDialogueButton.GetComponentInChildren<TextMeshProUGUI>();
+                    if (txtTmp != null)
+                    {
+                        txtTmp.text = (lang == 0) ? "Далее ▶" : "Next ▶";
+                    }
+                }
             }
         }
 
@@ -277,19 +663,21 @@ namespace FateContinent
         {
             if (playerPortraitImage == null) return;
 
-            // Считываем текущий класс из SaveGameSystem
-            string savedClass = SaveGameSystem.CurrentData != null ? SaveGameSystem.CurrentData.characterClass : "";
+            // Считываем текущий класс из SaveGameSystem в нижнем регистре для избежания проблем с регистром
+            string savedClass = (SaveGameSystem.CurrentData != null && SaveGameSystem.CurrentData.characterClass != null) 
+                ? SaveGameSystem.CurrentData.characterClass.ToLower() 
+                : "";
             
             Sprite chosenSprite = null;
-            if (savedClass.Contains("warrior"))
+            if (savedClass.Contains("warrior") || savedClass.Contains("воин"))
             {
                 chosenSprite = warriorPortrait;
             }
-            else if (savedClass.Contains("archer"))
+            else if (savedClass.Contains("archer") || savedClass.Contains("лучник") || savedClass.Contains("стрелок") || savedClass.Contains("strelok"))
             {
                 chosenSprite = archerPortrait;
             }
-            else if (savedClass.Contains("mage"))
+            else if (savedClass.Contains("mage") || savedClass.Contains("маг"))
             {
                 chosenSprite = magePortrait;
             }
@@ -301,8 +689,16 @@ namespace FateContinent
             }
             else
             {
-                // Если портрет отсутствует, делаем его силуэтным/затемненным полупрозрачным
-                playerPortraitImage.color = new Color(1f, 1f, 1f, 0.25f);
+                // Если сохранённый класс отсутствует или не совпадает, но в инспекторе/на сцене вручную задан спрайт (например, Снайпер/Strelok) —
+                // сохраняем полную видимость (Alpha = 255), иначе делаем силуэтным/полупрозрачным
+                if (playerPortraitImage.sprite != null)
+                {
+                    playerPortraitImage.color = Color.white;
+                }
+                else
+                {
+                    playerPortraitImage.color = new Color(1f, 1f, 1f, 0.25f);
+                }
             }
         }
 
@@ -320,9 +716,208 @@ namespace FateContinent
             if (dialogueBodyText != null) dialogueBodyText.font = activeFont;
         }
 
+        private Transform FindChildRecursive(Transform parent, string name)
+        {
+            if (parent.name.Equals(name, System.StringComparison.OrdinalIgnoreCase))
+            {
+                return parent;
+            }
+            foreach (Transform child in parent)
+            {
+                Transform found = FindChildRecursive(child, name);
+                if (found != null) return found;
+            }
+            return null;
+        }
+
         private void InitializeDialogueUI()
         {
-            // Создаем Canvas для диалогов
+            // Очищаем старые ссылки, если сцена сменилась
+            dialogCanvas = null;
+            dialogPanel = null;
+            speakerNameText = null;
+            dialogueBodyText = null;
+            choiceContainer = null;
+            companionPortraitImage = null;
+            playerPortraitImage = null;
+            nextDialogueButton = null;
+
+            // Умный поиск: если дизайнер уже перенес или настроил FATE_DIALOGUE_CANVAS в сцене, не плодим дубликаты!
+            GameObject rootCanvas = GameObject.Find("FATE_DIALOGUE_CANVAS");
+            if (rootCanvas == null)
+            {
+                Canvas[] existingCanvases = FindObjectsByType<Canvas>(FindObjectsSortMode.None);
+                foreach (var c in existingCanvases)
+                {
+                    if (c.name.ToUpper().Contains("DIALOGUE") || c.name.ToUpper().Contains("CANVAS"))
+                    {
+                        if (FindChildRecursive(c.transform, "DialoguePanel") != null)
+                        {
+                            rootCanvas = c.gameObject;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (rootCanvas != null)
+            {
+                dialogCanvas = rootCanvas.GetComponent<Canvas>();
+
+                // Хак самоисцеления: принудительно скрываем посторонние меню, чтобы избежать наложения в разных сценах
+                Transform pauseP = FindChildRecursive(rootCanvas.transform, "PausePanel");
+                if (pauseP != null) pauseP.gameObject.SetActive(false);
+
+                Transform confirmP = FindChildRecursive(rootCanvas.transform, "ConfirmPanel");
+                if (confirmP != null) confirmP.gameObject.SetActive(false);
+
+                Transform confirmP2 = FindChildRecursive(rootCanvas.transform, "ConfirmPanel (1)");
+                if (confirmP2 != null) confirmP2.gameObject.SetActive(false);
+
+                Transform panelT = FindChildRecursive(rootCanvas.transform, "DialoguePanel");
+                if (panelT != null)
+                {
+                    dialogPanel = panelT.gameObject;
+                    
+                    // Поиск вспомогательных контейнеров и портретов рекурсивно! (Исключает проблемы вложенности)
+                    Transform compPortraitT = FindChildRecursive(panelT, "Img_CompanionPortrait");
+                    if (compPortraitT != null) companionPortraitImage = compPortraitT.GetComponent<Image>();
+
+                    Transform playerPortraitT = FindChildRecursive(panelT, "Img_PlayerPortrait");
+                    if (playerPortraitT != null) playerPortraitImage = playerPortraitT.GetComponent<Image>();
+
+                    Transform containerT = FindChildRecursive(panelT, "ChoiceContainer");
+                    if (containerT != null) choiceContainer = containerT.gameObject;
+                    
+                    // Умный поиск текстовых полей, защищенный от ложного перехвата из портретов и кнопок!
+                    List<TextMeshProUGUI> candidateSpeakers = new List<TextMeshProUGUI>();
+                    List<TextMeshProUGUI> candidateBodies = new List<TextMeshProUGUI>();
+
+                    TextMeshProUGUI[] tmps = panelT.GetComponentsInChildren<TextMeshProUGUI>(true);
+                    foreach (var tmp in tmps)
+                    {
+                        // Проверяем, не принадлежит ли текст портрету персонажа, кнопкам выбора или сторонним панелям
+                        Transform parentIter = tmp.transform;
+                        bool isExcluded = false;
+                        while (parentIter != null && parentIter != panelT)
+                        {
+                            string pName = parentIter.name.ToLower();
+                            if (pName.Contains("portrait") || pName.Contains("choice") || pName.Contains("btn") || pName.Contains("button"))
+                            {
+                                isExcluded = true;
+                                break;
+                            }
+                            parentIter = parentIter.parent;
+                        }
+                        if (isExcluded) continue;
+
+                        string goName = tmp.gameObject.name.ToLower();
+                        
+                        // Высокий приоритет: строгое совпадение имен
+                        if (goName == "txt_speakername" || goName == "speakername" || goName == "speaker_name" || goName == "txt_speaker" || goName == "text_speakername")
+                        {
+                            speakerNameText = tmp;
+                        }
+                        else if (goName == "txt_dialoguebody" || goName == "dialoguebody" || goName == "dialogue_body" || goName == "txt_dialogue" || goName == "dialoguebodytext" || goName == "text_dialoguebody")
+                        {
+                            dialogueBodyText = tmp;
+                        }
+                        
+                        // Низкий приоритет: сбор кандидатов по вхождению ключевых слов
+                        if (goName.Contains("speaker") || goName.Contains("cap") || goName.Contains("header"))
+                        {
+                            candidateSpeakers.Add(tmp);
+                        }
+                        else if (goName.Contains("body") || goName.Contains("dialog") || goName.Contains("text"))
+                        {
+                            candidateBodies.Add(tmp);
+                        }
+                    }
+
+                    // Назначение резервных кандидатов, только если точные совпадения не обнаружены
+                    if (speakerNameText == null && candidateSpeakers.Count > 0)
+                    {
+                        speakerNameText = candidateSpeakers[0];
+                    }
+                    if (dialogueBodyText == null && candidateBodies.Count > 0)
+                    {
+                        dialogueBodyText = candidateBodies[0];
+                    }
+
+                    // Если вообще ничего не нашли, делаем координатную сортировку по высоте
+                    if (speakerNameText == null || dialogueBodyText == null || speakerNameText == dialogueBodyText)
+                    {
+                        if (tmps.Length >= 2)
+                        {
+                            List<TextMeshProUGUI> sortedList = new List<TextMeshProUGUI>(tmps);
+                            sortedList.RemoveAll(t => {
+                                Transform pi = t.transform;
+                                while (pi != null && pi != panelT)
+                                {
+                                    string pName = pi.name.ToLower();
+                                    if (pName.Contains("portrait") || pName.Contains("choice") || pName.Contains("btn") || pName.Contains("button"))
+                                        return true;
+                                    pi = pi.parent;
+                                }
+                                return false;
+                            });
+                            
+                            if (sortedList.Count >= 2)
+                            {
+                                sortedList.Sort((a, b) => b.transform.position.y.CompareTo(a.transform.position.y));
+                                if (speakerNameText == null) speakerNameText = sortedList[0];
+                                if (dialogueBodyText == null) dialogueBodyText = sortedList[1];
+                            }
+                        }
+                    }
+
+                    // Сохраняем и укрепляем разметку СЦЕНЫ, но БЕЗ разрушения исходных координат RectTransform, если они были настроены в Редакторе!
+                    // Калибруем только базовые свойства автопереноса слов
+                    if (dialogueBodyText != null)
+                    {
+                        dialogueBodyText.textWrappingMode = TextWrappingModes.Normal;
+                    }
+                    if (speakerNameText != null)
+                    {
+                        speakerNameText.textWrappingMode = TextWrappingModes.NoWrap;
+                    }
+
+                    // Восстанавливаем разметку контейнера выбора кнопок (мягкое позиционирование для предотвращения отрезания)
+                    if (choiceContainer != null)
+                    {
+                        HorizontalLayoutGroup existingHLayout = choiceContainer.GetComponent<HorizontalLayoutGroup>();
+                        if (existingHLayout == null)
+                        {
+                            existingHLayout = choiceContainer.AddComponent<HorizontalLayoutGroup>();
+                        }
+                        existingHLayout.spacing = 20f;
+                        existingHLayout.childAlignment = TextAnchor.MiddleCenter;
+                        existingHLayout.childControlHeight = true;
+                        existingHLayout.childControlWidth = true;
+                        existingHLayout.childForceExpandHeight = false;
+                        existingHLayout.childForceExpandWidth = true;
+
+                        RectTransform existingChoiceRect = choiceContainer.GetComponent<RectTransform>();
+                        if (existingChoiceRect != null)
+                        {
+                            // Осторожно калибруем только высоту/позицию Y для гарантированной видимости, не сбивая ширину
+                            existingChoiceRect.anchorMin = new Vector2(0f, 0f);
+                            existingChoiceRect.anchorMax = new Vector2(1f, 0f);
+                            existingChoiceRect.anchoredPosition = new Vector2(0f, 30f); // Кнопки приподняты во избежание срезания экрана
+                            existingChoiceRect.sizeDelta = new Vector2(-80f, 50f);
+                        }
+                    }
+
+                    if (speakerNameText != null && dialogueBodyText != null)
+                    {
+                        Debug.Log("[DIALOGUE SYSTEM] Инициализация: Обнаружены, верифицированы и привязаны существующие UI-компоненты диалога.");
+                        SetupNextDialogueButton();
+                        return;
+                    }
+                }
+            }
+
+            // Создаем Canvas для диалогов с нуля, если в сцене его нет
             GameObject canvasGov = new GameObject("FATE_DIALOGUE_CANVAS");
             dialogCanvas = canvasGov.AddComponent<Canvas>();
             dialogCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -330,7 +925,6 @@ namespace FateContinent
             
             canvasGov.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             canvasGov.AddComponent<GraphicRaycaster>();
-            DontDestroyOnLoad(canvasGov);
 
             // Создаем основную панель диалога (Специализированная шапка-контейнер "Exclusive High density Polygon Shape")
             dialogPanel = new GameObject("DialoguePanel");
@@ -365,8 +959,10 @@ namespace FateContinent
             GameObject speakerGov = new GameObject("Txt_SpeakerName");
             speakerGov.transform.SetParent(headerGov.transform, false);
             RectTransform speakerRect = speakerGov.AddComponent<RectTransform>();
-            speakerRect.fillShareWithParent(); // Занимает всю шапку
+            speakerRect.anchorMin = Vector2.zero;
+            speakerRect.anchorMax = Vector2.one;
             speakerRect.offsetMin = new Vector2(15f, 0f);
+            speakerRect.offsetMax = Vector2.zero;
 
             speakerNameText = speakerGov.AddComponent<TextMeshProUGUI>();
             speakerNameText.text = "Aelyssa";
@@ -374,6 +970,7 @@ namespace FateContinent
             speakerNameText.fontWeight = FontWeight.Black;
             speakerNameText.color = Color.white;
             speakerNameText.alignment = TextAlignmentOptions.Left;
+            speakerNameText.textWrappingMode = TextWrappingModes.NoWrap;
 
             // Текст самой речи
             GameObject textGov = new GameObject("Txt_DialogueBody");
@@ -382,13 +979,14 @@ namespace FateContinent
             textRect.anchorMin = new Vector2(0f, 0f);
             textRect.anchorMax = new Vector2(1f, 1f);
             textRect.offsetMin = new Vector2(180f, 40f); // Оставляем место под левый портрет
-            textRect.offsetMax = new Vector2(-180f, -40f); // Оставляем место под правый портрет
+            textRect.offsetMax = new Vector2(-180f, -65f); // Гарантированный зазор сверху (65 пикселей под шапку для предотвращения залезания)
 
             dialogueBodyText = textGov.AddComponent<TextMeshProUGUI>();
             dialogueBodyText.text = "Loading conversation...";
             dialogueBodyText.fontSize = 15f;
             dialogueBodyText.color = new Color(0.9f, 0.95f, 1f, 1f);
             dialogueBodyText.alignment = TextAlignmentOptions.TopLeft;
+            dialogueBodyText.textWrappingMode = TextWrappingModes.Normal;
 
             // Левый Портрет: Помощница (Аэлисса) в гексагональном или круглом контейнере
             GameObject compPortraitGov = new GameObject("Img_CompanionPortrait");
@@ -428,7 +1026,7 @@ namespace FateContinent
             RectTransform choiceRect = choiceContainer.AddComponent<RectTransform>();
             choiceRect.anchorMin = new Vector2(0f, 0f);
             choiceRect.anchorMax = new Vector2(1f, 0f);
-            choiceRect.anchoredPosition = new Vector2(0f, -60f); // Кнопки сдвинуты чуть ниже тела диалога
+            choiceRect.anchoredPosition = new Vector2(0f, 30f); // Кнопки приподняты внутрь окна диалога во избежание обрезания на кромке экрана
             choiceRect.sizeDelta = new Vector2(-80f, 50f);
 
             HorizontalLayoutGroup hLayout = choiceContainer.AddComponent<HorizontalLayoutGroup>();
@@ -436,6 +1034,70 @@ namespace FateContinent
             hLayout.childAlignment = TextAnchor.MiddleCenter;
             hLayout.childControlHeight = true;
             hLayout.childControlWidth = true;
+            hLayout.childForceExpandHeight = false;
+            hLayout.childForceExpandWidth = true;
+
+            SetupNextDialogueButton();
+        }
+
+        private void SetupNextDialogueButton()
+        {
+            if (dialogPanel == null) return;
+
+            Transform nextT = FindChildRecursive(dialogPanel.transform, "Btn_NextDialogue");
+            if (nextT != null)
+            {
+                nextDialogueButton = nextT.GetComponent<Button>();
+                if (nextDialogueButton != null)
+                {
+                    nextDialogueButton.onClick.RemoveAllListeners();
+                    nextDialogueButton.onClick.AddListener(() => AdvanceDialogue());
+                }
+            }
+            else
+            {
+                // Создаем красивую интерактивную кнопку "Далее" в правом нижнем углу диалоговой панели
+                GameObject nextBtnGov = new GameObject("Btn_NextDialogue");
+                nextBtnGov.transform.SetParent(dialogPanel.transform, false);
+                RectTransform nextBtnRect = nextBtnGov.AddComponent<RectTransform>();
+                nextBtnRect.anchorMin = new Vector2(1f, 0f);
+                nextBtnRect.anchorMax = new Vector2(1f, 0f);
+                nextBtnRect.anchoredPosition = new Vector2(-60f, 25f);
+                nextBtnRect.sizeDelta = new Vector2(140f, 38f);
+
+                Image nextBtnImg = nextBtnGov.AddComponent<Image>();
+                // Сапфирово-сине-голубой цвет кнопки
+                nextBtnImg.color = new Color(0.04f, 0.42f, 0.70f, 0.95f); 
+                
+                Outline nextBtnOutline = nextBtnGov.AddComponent<Outline>();
+                nextBtnOutline.effectColor = new Color(0f, 0.94f, 1f, 0.5f); // Циановое свечение
+
+                nextDialogueButton = nextBtnGov.AddComponent<Button>();
+                nextDialogueButton.onClick.AddListener(() => AdvanceDialogue());
+
+                GameObject nextTextGov = new GameObject("Txt_NextDialogue");
+                nextTextGov.transform.SetParent(nextBtnGov.transform, false);
+                RectTransform nextTextRect = nextTextGov.AddComponent<RectTransform>();
+                nextTextRect.anchorMin = Vector2.zero;
+                nextTextRect.anchorMax = Vector2.one;
+                nextTextRect.offsetMin = Vector2.zero;
+                nextTextRect.offsetMax = Vector2.zero;
+
+                TextMeshProUGUI nextTmp = nextTextGov.AddComponent<TextMeshProUGUI>();
+                nextTmp.text = "Далее ▶";
+                nextTmp.fontSize = 13f;
+                nextTmp.fontWeight = FontWeight.Bold;
+                nextTmp.color = Color.white;
+                nextTmp.alignment = TextAlignmentOptions.Center;
+
+                // Накатываем активный шрифт
+                if (Translator.Instance != null && Translator.Instance.defaultFont != null)
+                {
+                    nextTmp.font = Translator.Instance.defaultFont;
+                }
+
+                nextBtnGov.AddComponent<UIButtonPauseHover>();
+            }
         }
 
         private Button CreateChoiceButton(string choiceText, UnityEngine.Events.UnityAction onClickAction)
@@ -443,6 +1105,12 @@ namespace FateContinent
             GameObject btnGov = new GameObject("Btn_DialogueChoice");
             btnGov.transform.SetParent(choiceContainer.transform, false);
             
+            // Настройка жестких макетов, чтобы текст вариантов никогда не сжимался по вертикали или буква к букве
+            LayoutElement layout = btnGov.AddComponent<LayoutElement>();
+            layout.minWidth = 180f;
+            layout.preferredWidth = 260f;
+            layout.minHeight = 42f;
+
             Image btnImg = btnGov.AddComponent<Image>();
             btnImg.color = new Color(0.08f, 0.09f, 0.15f, 0.95f);
             
@@ -456,13 +1124,17 @@ namespace FateContinent
             GameObject textGov = new GameObject("Txt_BtnChoice");
             textGov.transform.SetParent(btnGov.transform, false);
             RectTransform textRect = textGov.AddComponent<RectTransform>();
-            textRect.fillShareWithParent();
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.offsetMin = Vector2.zero;
+            textRect.offsetMax = Vector2.zero;
 
             TextMeshProUGUI tmp = textGov.AddComponent<TextMeshProUGUI>();
             tmp.text = choiceText;
             tmp.fontSize = 13f;
             tmp.color = Color.white;
             tmp.alignment = TextAlignmentOptions.Center;
+            tmp.textWrappingMode = TextWrappingModes.Normal;
 
             // Накатываем активный шрифт
             if (Translator.Instance != null)
@@ -527,10 +1199,10 @@ namespace FateContinent
                 textEN = "Remember: every choice here has consequences. Our squad is ready. Now select a territory on the Fate Continent for the initial tactical sweep:",
                 textCH = "记住：这里的每一个选择都有其后果。我们的队伍已准备就绪。现在请选择命运大陆上的一个区域进行首次战术肃清：",
                 textKR = "기억해라: 이곳에서의 모든 선택은 그 결과가 따른다. 우리 부대는 전투 준비가 끝났다. 이제 운명의 대륙에서 첫 전술적 소탕을 전개할 지역을 선택해라:",
-                choicesRU = new string[] { "🩸 Кровавые Пустоши", "❄️ Ледяной Пик", "🏛️ Древние Руины" },
-                choicesEN = new string[] { "🩸 Crimson Wastes", "❄️ Ice-Bound Peak", "🏛️ Ancient Ruins" },
-                choicesCH = new string[] { "🩸 绯红荒野", "❄️ 冰封之巅", "🏛️ 远古遗迹" },
-                choicesKR = new string[] { "🩸 크림슨 황무지", "❄️ 빙설의 봉우리", "🏛️ 고대 유적지" },
+                choicesRU = new string[] { "Кровавые Пустоши", "Ледяной Пик", "Древние Руины" },
+                choicesEN = new string[] { "Crimson Wastes", "Ice-Bound Peak", "Ancient Ruins" },
+                choicesCH = new string[] { "绯红荒野", "冰封之巅", "远古遗迹" },
+                choicesKR = new string[] { "크림슨 황무지", "빙설의 봉우리", "고대 유적지" },
                 nextLineIndexes = new int[] { 4, 5, 6 }
             };
 
@@ -583,17 +1255,6 @@ namespace FateContinent
             dialogueSteps.Add(l5);
             dialogueSteps.Add(l6);
             dialogueSteps.Add(l7);
-        }
-    }
-
-    public static class DialogueRectExtensions
-    {
-        public static void fillShareWithParent(this RectTransform t)
-        {
-            t.anchorMin = Vector2.zero;
-            t.anchorMax = Vector2.one;
-            t.offsetMin = Vector2.zero;
-            t.offsetMax = Vector2.zero;
         }
     }
 }

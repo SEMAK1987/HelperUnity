@@ -1,5 +1,5 @@
 {
-  "version": "18.8.0",
+  "version": "18.10.0",
   "name": "Fate Continent",
-  "description": "Unity & Blender AI Assistant v18.8.0 (Zenith Audio Autonomy & Standalone Routing - Automatic fallback to stable active scene hosts for pause menu buttons, and automatic scan-bypass for active pause menus to eliminate redundant triggering)"
+  "description": "Unity & Blender AI Assistant v18.10.0 (Zenith Map Master System - Custom interactive map markers with auto-calibrating HDR neon colors, Bloom-glowing ring feedback, click-sound bindings, and multi-option dial branching)"
 }

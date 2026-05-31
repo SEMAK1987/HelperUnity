@@ -1,10 +1,10 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.9.0)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.10.1)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** 18.9.0
+- **Version:** 18.10.1
 - **Engine:** Unity 6 (6000.3.10f1)
-- **Updates:** Zenith Dialogue Master System - Introduces DialogueSystem_Manager.cs to orchestrate custom dialog systems using a dual-avatar layout (Aelyssa on left, class-specific player hero on right) and multi-option pointer branching options. Syncs with Translator.cs and includes high-density Midjourney generator prompts in CHARACTER_PROMPTS.md.
+- **Updates:** Zenith Map Master System + Dialogue UI Uplift - Hotfixes case-insensitive player portrait matching and maintains explicit opacity. Lifts Dialogue Choice Container buttons into visible bounds (Y: 30f) inside DialoguePanel. Triggers DialogueSystem_Manager initialization instant-on at the start of Intro sequence fade to avoid empty-screen delays.
 - **Design System:** Zenith Glassmorphism (8K Ultra-High Density)
 
 ## 📑 Core Documentation References
@@ -25,10 +25,10 @@
 - **Audio Rule (CRITICAL):** Используйте только `SettingsManager.cs` для управления звуком и музыкой (включая hover-эффекты и списки воспроизведения). Скрипты `AudioHandler` и `AudioManager` должны быть полностью удалены для чистоты проекта. Музыкальные клипы продлеваются через Suno/Udio и настраиваются на бесшовное зацикливание (`loop = true`). Звуковые файлы берем с Pixabay/Freesound по CC0-лицензии и подключаем напрямую к SettingsManager или через AudioMixer.
 
 ## 🚀 Протокол «Пошаговое Мастерство» (Step-by-Step Mastery)
-1. **Отслеживание прогресса:** Текущая версия v18.9.0 (Zenith Dialogue Master System - Dynamic elven companion dialogue sequences with choice-branching, 9-language translation and SaveGame class links. v18.9.0).
+1. **Отслеживание прогресса:** Текущая версия v18.10.1 (Dialogue UI Uplift - case-insensitive player portrait matching, explicit opacity fallbacks, dialogue choice container buttons uplift to Y=30f, zero-delay intro transitions. v18.10.1).
 2. **Чек-листы:** Инструкции по GLB-скачиванию, TMP-восстановлению, настройке триггеров сохранения, продлению треков в Suno / Udio (Extend, Get Whole Song), бесшовным музыкальным петлям, навигации по Pixabay, СС0 фильтрации, поисковым промптам, UIButtonSfxBinder автоматизации и маршрутизации звука через AudioMixer в Unity.
 3. **Обработка ошибок:** Исправлены проблемы CS1061, CS0155 (catch exceptions type, New Input System), дублирования разрешений, сброса шрифтов, некорректной локализации, некорректной фильтрации, некорректного применения аудио-эффектов, устаревших аудио-провайдеров и предупреждений "Exposed name does not exist" в микшере, а также добавлена работа звука без привязки к сцене в редакторе.
 4. **ОЧИСТКА:** Используйте только `SettingsManager.cs` для аудио. Удалите `AudioHandler` и `AudioManager` скрипты. Не использовать ElevenLabs.
 
 ---
-*Ядро AI пересинхронизировано (v18.9.0). Авто-апдейтер активен.*
+*Ядро AI пересинхронизировано (v18.10.1). Авто-апдейтер активен.*

@@ -456,7 +456,7 @@ function generateId() {
 
 async function checkProjectIntegrity() {
   const kb = await fs.readJson(kbPath).catch(() => ({}));
-  const currentVersion = kb.version || "18.8.0";
+  const currentVersion = kb.version || "18.10.0";
   
   const files = [
     { name: "knowledge_base.json", default: { project_name: "Unity Assistant", version: currentVersion, project_path: process.cwd(), system_instruction: "You are a helpful assistant." } },
@@ -506,17 +506,17 @@ async function generateMasterBlueprint() {
     const blueprint = await fs.readJson(blueprintJsonPath);
     
     let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"} (Total Knowledge Archive Edition)\n\n`;
-    md += `> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.8.0.\n\n`;
+    md += `> **ВНИМАНИЕ:** Этот документ является \"источников истины\" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.10.0.\n\n`;
     md += `## 1. Общая информация\n`;
-    md += `- **Версия Помощника:** ${blueprint.version || "18.8.0"}\n`;
-    md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (v18.8.0 - Zenith Audio Autonomy & Standalone Routing) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка восстановления ошибочных привязок UI Инспектора, синхронизации UI, локальной маршрутизации на стабильные хосты во время паузы игры, глобального менеджера сохранений SaveGameSystem.cs и языковых ассетов (SDF), а также передовых гайдлайнов Suno, Udio и Pixabay Sound Effects с AudioMixer. Полная справочная база по озвучке элементов UI, сумок, навыков, монстров, а также по маршрутизации AudioMixer в Unity."}\n`;
+    md += `- **Версия Помощника:** ${blueprint.version || "18.10.0"}\n`;
+    md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (v18.10.0 - Zenith Map Master System - Custom interactive map markers with auto-calibrating HDR neon colors, Bloom-glowing ring feedback, click-sound bindings, and multi-option dial branching) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка восстановления ошибочных привязок UI Инспектора, синхронизации UI, локальной маршрутизации на стабильные хосты во время паузы игры, глобального менеджера сохранений SaveGameSystem.cs и языковых ассетов (SDF), а также передовых гайдлайнов Suno, Udio и Pixabay Sound Effects с AudioMixer. Полная справочная база по озвучке элементов UI, сумок, навыков, монстров, а также по маршрутизации AudioMixer в Unity."}\n`;
     md += `- **Путь проекта:** ${kb.project_path || "Не задан"}\n`;
     md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
     md += `- **Версия Unity:** ${currentUnityStatus.version}\n`;
     md += `- **Версия Blender:** ${currentBlenderStatus.version}\n`;
     md += `- **Версия GIMP:** ${currentGimpStatus.version}\n`;
     md += `- **Версия Redot:** ${currentRedotStatus.version}\n`;
-    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_8_0_FATE_MASTER]\n\n`;
+    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_10_0_FATE_MASTER]\n\n`;
     
     md += `## 2. Структура интерфейса\n`;
     md += `### Вкладки\n`;
@@ -559,13 +559,13 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.8.0 - Zenith Audio Autonomy & Standalone Routing)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.10.0 - Zenith Map Master System)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
     md += `- **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.\n`;
     md += `- **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.\n`;
     md += `- **No-Internet Mode (Quantum Archive):** 10,000+ видео-уроков. Мгновенный доступ при любых внешних условиях.\n\n`;
 
-    md += `### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.8.0 Sync)\n`;
+    md += `### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.10.0 Sync)\n`;
     md += `- **Unity 6 Physics & Optimization:** [Video #2](https://www.youtube.com/watch?v=9vuyis_Y-LY)\n`;
     md += `- **Blender Advanced Rigging:** [Video #3](https://www.youtube.com/watch?v=UKZp67dY1_w)\n`;
     md += `- **Shader Graph Mastery:** [Video #4](https://www.youtube.com/watch?v=-hvxjyzcSkI)\n`;
@@ -786,7 +786,9 @@ async function generateMasterBlueprint() {
     md += `- **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.\n`;
     md += `- **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.\n\n`;
 
-    md += `## 13. История изменений (v18.8.0)\n`;
+    md += `## 13. История изменений (v18.10.0)\n`;
+    md += `- **v18.10.0:** Zenith Map Master System • Interactive Continents & Auto-HDR Neon Calibration - Custom interactive map markers with auto-calibrating HDR neon colors, Bloom-glowing ring feedback, click-sound bindings, and multi-option dial branching. Implements automated neon HDR auto-calibration in FactionMapMarker.cs (Sapphire-cyan #0A6CB2, Lion Golden-yellow #B2830A, Druid Green #0AB23D, Xandria Amethyst #6F0AB2) on empty/reset values (A < 0.05, black, clear) to eliminate reverting inspector parameters.\n`;
+    md += `- **v18.9.0:** Zenith Dialogue Master System - Introduces DialogueSystem_Manager.cs to orchestrate custom dialog systems using a dual-avatar layout (Aelyssa on left, class-specific player hero on right) and multi-option pointer branching options. Syncs with Translator.cs and includes high-density Midjourney generator prompts in CHARACTER_PROMPTS.md.\n`;
     md += `- **v18.8.0:** Zenith Audio Autonomy & Standalone Routing - Resolves disabled AudioSource exceptions during inside-game menu pause. Customizes UIButtonPauseHover to route playbacks to stable active hosts (e.g., GamePause_Manager or SettingsManager singletons). Excludes pause scenes from UIButtonSfxBinder automatic scan to prevent duplicate sound triggers and enable clean custom binders.\n`;
     md += `- **v18.7.9:** Zenith Self-Healing UI - Automatic runtime healing of inspector misconfigurations. Intelligently scans both panels, resolves overlay text conflicts and ensures the Exit dialog does not overlap during normal pause states.\n`;
     md += `- **v18.7.8:** Zenith Universal Input Safety - Solves runtime InvalidOperationException when checking old Input in projects with Active New Input System. Integrates reflection-based modern Input System readings for Escape/Space keys, combined with GamePause_Manager localized gameplay pauses and active panel state recycling.\n`;
