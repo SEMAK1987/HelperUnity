@@ -176,6 +176,45 @@ namespace FateContinent
             return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100f);
         }
 
+        // Создает красивый процедурный фон со звездами и кибер-сеткой для тактической карты,
+        // если в инспекторе не настроена фоновая картинка!
+        private Sprite CreateProceduralMapBackground()
+        {
+            int width = 512;
+            int height = 512;
+            Texture2D tex = new Texture2D(width, height, TextureFormat.RGBA32, false);
+            
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    float dy = (float)y / height;
+                    float dx = (float)x / width;
+                    
+                    float distCenter = Mathf.Sqrt((dx - 0.5f)*(dx - 0.5f) + (dy - 0.5f)*(dy - 0.5f));
+                    Color baseCol = Color.Lerp(new Color(0.04f, 0.05f, 0.12f, 1f), new Color(0.01f, 0.02f, 0.05f, 1f), distCenter * 1.4f);
+                    
+                    // Добавляем красивую сеточку тактической карты
+                    if (x % 32 == 0 || y % 32 == 0)
+                    {
+                        baseCol += new Color(0.12f, 0.45f, 0.85f, 0.07f);
+                    }
+                    
+                    // Добавляем случайные мелкие звездочки на фон
+                    float pseudoNoise = Mathf.Sin(x * 12.9898f + y * 78.233f) * 43758.5453f;
+                    pseudoNoise = pseudoNoise - Mathf.Floor(pseudoNoise);
+                    if (pseudoNoise > 0.997f)
+                    {
+                        baseCol += new Color(1f, 1f, 1f, 0.6f);
+                    }
+                    
+                    tex.SetPixel(x, y, baseCol);
+                }
+            }
+            tex.Apply();
+            return Sprite.Create(tex, new Rect(0, 0, width, height), new Vector2(0.5f, 0.5f), 100f);
+        }
+
         // Автозаполнение резервной карты при отсутствии данных в Инспекторе
         private void SetupFallbackMap()
         {
@@ -242,7 +281,8 @@ namespace FateContinent
             }
             else
             {
-                Debug.LogWarning($"[Fate Map] У карты '{activeMap.mapName}' отсутствует фоновый спрайт!");
+                Debug.LogWarning($"[Fate Map] У карты '{activeMap.mapName}' отсутствует фоновый спрайт! Генерируем красивую процедурную кибер-карту Cosmos-Zenith...");
+                mapBgRenderer.sprite = CreateProceduralMapBackground();
             }
 
             // 2. Очищаем старые созданные кольца-маркеры на сцене

@@ -1,10 +1,10 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.10.1)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.11.0)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** 18.10.1
+- **Version:** 18.11.0
 - **Engine:** Unity 6 (6000.3.10f1)
-- **Updates:** Zenith Map Master System + Dialogue UI Uplift - Hotfixes case-insensitive player portrait matching and maintains explicit opacity. Lifts Dialogue Choice Container buttons into visible bounds (Y: 30f) inside DialoguePanel. Triggers DialogueSystem_Manager initialization instant-on at the start of Intro sequence fade to avoid empty-screen delays.
+- **Updates:** Zenith Map & Dialogue Blueprint Synchronization - Integrates verified Inspector configurations for World Map glowing landmarks (FateMapManager) and adaptive dialog workspaces (DialogueSystem_Manager) with auto-coords anchoring, custom voices, and dynamic player class portrait triggers.
 - **Design System:** Zenith Glassmorphism (8K Ultra-High Density)
 
 ## 📑 Core Documentation References
@@ -25,10 +25,24 @@
 - **Audio Rule (CRITICAL):** Используйте только `SettingsManager.cs` для управления звуком и музыкой (включая hover-эффекты и списки воспроизведения). Скрипты `AudioHandler` и `AudioManager` должны быть полностью удалены для чистоты проекта. Музыкальные клипы продлеваются через Suno/Udio и настраиваются на бесшовное зацикливание (`loop = true`). Звуковые файлы берем с Pixabay/Freesound по CC0-лицензии и подключаем напрямую к SettingsManager или через AudioMixer.
 
 ## 🚀 Протокол «Пошаговое Мастерство» (Step-by-Step Mastery)
-1. **Отслеживание прогресса:** Текущая версия v18.10.1 (Dialogue UI Uplift - case-insensitive player portrait matching, explicit opacity fallbacks, dialogue choice container buttons uplift to Y=30f, zero-delay intro transitions. v18.10.1).
-2. **Чек-листы:** Инструкции по GLB-скачиванию, TMP-восстановлению, настройке триггеров сохранения, продлению треков в Suno / Udio (Extend, Get Whole Song), бесшовным музыкальным петлям, навигации по Pixabay, СС0 фильтрации, поисковым промптам, UIButtonSfxBinder автоматизации и маршрутизации звука через AudioMixer в Unity.
-3. **Обработка ошибок:** Исправлены проблемы CS1061, CS0155 (catch exceptions type, New Input System), дублирования разрешений, сброса шрифтов, некорректной локализации, некорректной фильтрации, некорректного применения аудио-эффектов, устаревших аудио-провайдеров и предупреждений "Exposed name does not exist" в микшере, а также добавлена работа звука без привязки к сцене в редакторе.
-4. **ОЧИСТКА:** Используйте только `SettingsManager.cs` для аудио. Удалите `AudioHandler` и `AudioManager` скрипты. Не использовать ElevenLabs.
+1. **Отслеживание прогресса:** Текущая версия v18.11.0 (Zenith Map & Dialogue Blueprint Sync - Automatic alignment coords, glowing rings HDR presets, and custom voice/avatar matching. v18.11.0).
+2. **Инструкции Настройки Компонентов (Verified Inspector Settings):**
+   - **FateMapManager (FATE_WORLD_MAP):**
+     - *Maps List:* [+] Слот для глобальной карты (Map Name = "Континент Судьбы", Map Background = фоновый спрайт карты).
+     - *Rings (Кольца-Маркеры):* [+] Интерактивные точки миров (Кровавые Пустоши, Ледяной Пик, Ржавые Окраины / Древние Руины).
+       - *Setup:* Ring Name, Ring Description, Ring Sprite (круглая неоновая текстура), Local Position (X,Y), Associated Dialogue Index (например, 3), Click/Hover Sfx (UI_Click_Metallic / UI_Hover_Soft), Normal/Hover Glow Color (выбирать HDR неоновые оттенки).
+       - *Default Glow Material:* `M_Neon_Glow`.
+       - *Show Map On Start:* False (карта скрыта до окончания интро диалогов).
+   - **DialogueSystem_Manager (DialogueManager):**
+     - *Companion Names:* Аэлисса (RU) и Aelyssa (EN).
+     - *Portraits (Sprites):* Companion Portrait (левая сторона: `Pomoshnica`), Warrior/Archer/Mage Portraits (правая сторона: `Voin`, `Strelok`, `Mag` - устанавливаются динамически на основе выбранного класса из сохранений SaveGameSystem).
+     - *Companion Voice:* `magic chime` (звуковой клип тихой эльфийской речи на фоне реплики).
+     - *Enforce Coordinates:* True (принудительное выравнивание координат плашек).
+       - *Positions & Offsets:* Настройка сдвигов имен, полей текста и кнопок диалога (Choice Container Y=30f для удержания кнопок в границах видимости).
+       - *Dialogue Steps:* Оставьте список пустым, чтобы система загрузила заложенный сценарий завязки игры на 4 языках.
+3. **Чек-листы:** Инструкции по GLB-скачиванию, TMP-восстановлению, настройке триггеров сохранения, продлению треков в Suno / Udio (Extend, Get Whole Song), бесшовным музыкальным петлям, навигации по Pixabay, СС0 фильтрации, поисковым промптам, UIButtonSfxBinder автоматизации и маршрутизации звука через AudioMixer в Unity.
+4. **Обработка ошибок:** Исправлены проблемы CS1061, CS0155 (catch exceptions type, New Input System), дублирования разрешений, сброса шрифтов, некорректной локализации, некорректной фильтрации, некорректного применения аудио-эффектов, устаревших аудио-провайдеров и предупреждений "Exposed name does not exist" в микшере, а также добавлена работа звука без привязки к сцене в редакторе.
+5. **ОЧИСТКА:** Используйте только `SettingsManager.cs` для аудио. Удалите `AudioHandler` и `AudioManager` скрипты. Не использовать ElevenLabs.
 
 ---
-*Ядро AI пересинхронизировано (v18.10.1). Авто-апдейтер активен.*
+*Ядро AI пересинхронизировано (v18.11.0). Авто-апдейтер активен.*

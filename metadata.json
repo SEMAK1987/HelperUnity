@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.10.0. Zenith Map & Dialogue Master System - Dynamic elven companion dialogue sequences, choice-branching, 9-language translation, and Map Manager with Auto-HDR neon calibration.",
+  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.0. Zenith Map & Dialogue Blueprint Sync - Interactive neon-glow markers, custom voice/class portraits, auto-coordinate enforcement, and multi-option branching.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

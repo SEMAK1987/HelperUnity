@@ -1,6 +1,6 @@
 {
   "project": "Fate Continent",
-  "version": "18.10.0",
+  "version": "18.11.0",
   "modules": [
     {
       "name": "Localization & Fonts",
@@ -29,7 +29,8 @@
         "Zenith Self-Healing UI v18.7.9: Automatically heals and reassigns misconfigured TextMeshProUGUI references (e.g., Pause Title vs Confirm Exit Prompts) at scene load. Intelligently scans panel object sub-trees (PausePanel vs ConfirmPanel), deactivates extra stray warning texts inside active gameplay panels, and binds correct localized components.",
         "Zenith Audio Autonomy & Standalone Routing v18.8.0: Resolves disabled AudioSource exceptions during inside-game menu pause. Isolated UIButtonPauseHover audio execution by targeting stable active Scene hosts (such as GamePause_Manager or SettingsManager singletons) instead of button components themselves. Excludes pause scenes from UIButtonSfxBinder automatic scan to completely bypass auto-scanning/auto-binding, allowing clean custom bindings and preventing duplicate sound triggers.",
         "Zenith Dialogue Master System v18.9.0: Lays out complete modular DialogueSystem_Manager.cs. Handles runtime Canvas-overlay dialogue overlays, companion character portrait alignment on the left (Aelyssa), selected player-class portrait rendering on the right (Warrior/Archer/Mage dependent on SaveGameSystem characterClass info), and responsive branching/multi-option choices navigated via pointer clicks. Stores robust high-density prompt templates in CHARACTER_PROMPTS.md.",
-        "Zenith Map Master System v18.10.0: Introduces automated neon HDR auto-calibration in FactionMapMarker.cs. Intelligently checks for unconfigured or resetting inspector color values (A < 0.05, black, clear) and injects perfect bloom-glowing HDR colors (Sapphire-cyan #0A6CB2 with intensity +0.5 multiplier 1.41f, Lion Golden-yellow #B2830A, Druid Green #0AB23D, Xandria Amethyst #6F0AB2 with +2.0 intensity hover flash of 4.0f multiplier) matching name keywords and dial indices. Integrates seamless navigation coordinates and UI hover/click metal sound triggering."
+        "Zenith Map Master System v18.10.0: Introduces automated neon HDR auto-calibration in FactionMapMarker.cs. Intelligently checks for unconfigured or resetting inspector color values (A < 0.05, black, clear) and injects perfect bloom-glowing HDR colors (Sapphire-cyan #0A6CB2 with intensity +0.5 multiplier 1.41f, Lion Golden-yellow #B2830A, Druid Green #0AB23D, Xandria Amethyst #6F0AB2 with +2.0 intensity hover flash of 4.0f multiplier) matching name keywords and dial indices. Integrates seamless navigation coordinates and UI hover/click metal sound triggering.",
+        "Zenith Map & Dialogue Blueprint Sync v18.11.0: Integrates precise Inspector guidelines into the project core database. Synchronizes FateMapManager (glowing landmarks, customized hover/click soundscapes, and auto-HDR neon calibration mapped to bloom material M_Neon_Glow) and DialogueSystem_Manager (dual-avatar dialogue views sync, custom companion vocals magic chime, automatic anchoring, and offset limits to protect visual layout)."
       ]
     },
     {

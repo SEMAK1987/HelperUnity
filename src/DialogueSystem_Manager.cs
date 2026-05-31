@@ -28,6 +28,54 @@ namespace FateContinent
         [Header("Настройки Звуков Речи Помощника")]
         public AudioClip companionVoiceClip; // Короткие фоновые фразы помощника при репликах
 
+        [Header("📐 Ручная Настройка Координат Текста (Inspector Tweaks)")]
+        [Tooltip("Включить принудительное применение этих координат в игре. Позволяет двигать текст и кнопки прямо из инспектора в режиме игры!")]
+        public bool enforceCoordinates = true;
+
+        [Header("Левый текст имени (Companion Left Name)")]
+        public Vector2 companionNameAnchorMin = new Vector2(0f, 0f);
+        public Vector2 companionNameAnchorMax = new Vector2(0f, 0f);
+        public Vector2 companionNamePosition = new Vector2(173f, 40f);
+        public Vector2 companionNameSizeDelta = new Vector2(250f, 40f);
+        public TextAlignmentOptions companionNameAlignment = TextAlignmentOptions.Left;
+
+        [Header("Правый текст имени (Hero/Player Right Name)")]
+        public Vector2 heroNameAnchorMin = new Vector2(1f, 0f);
+        public Vector2 heroNameAnchorMax = new Vector2(1f, 0f);
+        public Vector2 heroNamePosition = new Vector2(-173f, 40f);
+        public Vector2 heroNameSizeDelta = new Vector2(250f, 40f);
+        public TextAlignmentOptions heroNameAlignment = TextAlignmentOptions.Right;
+
+        [Header("Текст реплики диалога (Dialogue Body Text)")]
+        public Vector2 bodyTextAnchorMin = new Vector2(0f, 0f);
+        public Vector2 bodyTextAnchorMax = new Vector2(1f, 1f);
+        [Tooltip("Отступ снизу и отступ слева в формате (Left, Bottom)")]
+        public Vector2 bodyTextOffsetMin = new Vector2(250f, 65f); // 250px слева, чтобы не накладываться на левого героя, 65px снизу
+        [Tooltip("Отступ сверху и отступ справа в формате (-Right, -Top)")]
+        public Vector2 bodyTextOffsetMax = new Vector2(-250f, -65f); // 250px справа, чтобы не накладываться на правого героя, 65px сверху под шапку!
+        public TextAlignmentOptions bodyTextAlignment = TextAlignmentOptions.TopLeft;
+
+        [Header("Панель кнопок выбора (Choice Container Panel)")]
+        public Vector2 choiceContainerPosition = new Vector2(0f, 40f); // Приподнимайте по Y, чтобы не срезались кнопки!
+        public Vector2 choiceContainerSizeDelta = new Vector2(-150f, 60f); // Ширина и высота панели кнопок
+
+        [Header("Кнопки выбора (Choice Buttons Style)")]
+        public float choiceButtonFontSize = 13f;
+        public float choiceButtonMinWidth = 180f;
+        public float choiceButtonPreferredWidth = 260f;
+        public float choiceButtonMinHeight = 42f;
+
+        [Header("🔄 Переход на сцены уровней")]
+        [Tooltip("Загружать ли сцены уровней при выборе во вводном диалоге? Если выключено, игрок просто останется на интерактивной карте мира.")]
+        public bool loadScenesOnEnd = false;
+        
+        [Tooltip("Имя сцены для Кровавых Пустошей")]
+        public string sceneCrimsonWastes = "Scene_CrimsonWastes";
+        [Tooltip("Имя сцены для Ледяного Пика")]
+        public string sceneIceBoundPeak = "Scene_IceBoundPeak";
+        [Tooltip("Имя сцены для Древних Руин")]
+        public string sceneAncientRuins = "Scene_AncientRuins";
+
         [System.Serializable]
         public class DialogLine
         {
@@ -52,10 +100,14 @@ namespace FateContinent
         private Image companionPortraitImage;
         private Image playerPortraitImage;
         private TextMeshProUGUI speakerNameText;
+        private TextMeshProUGUI leftSpeakerNameText;
+        private TextMeshProUGUI rightSpeakerNameText;
         private TextMeshProUGUI dialogueBodyText;
         private List<Button> choiceButtons = new List<Button>();
         private GameObject choiceContainer;
         private Button nextDialogueButton;
+        private Sprite originalCompanionSprite;
+        private Sprite originalPlayerSprite;
 
         private int currentLineIndex = 0;
         private bool isDialogueActive = false;
@@ -114,9 +166,68 @@ namespace FateContinent
             }
         }
 
+        public void ApplyRectTransformTweaks()
+        {
+            if (!enforceCoordinates) return;
+
+            if (leftSpeakerNameText != null)
+            {
+                RectTransform rt = leftSpeakerNameText.GetComponent<RectTransform>();
+                if (rt != null)
+                {
+                    rt.anchorMin = companionNameAnchorMin;
+                    rt.anchorMax = companionNameAnchorMax;
+                    rt.anchoredPosition = companionNamePosition;
+                    rt.sizeDelta = companionNameSizeDelta;
+                }
+                leftSpeakerNameText.alignment = companionNameAlignment;
+            }
+
+            if (rightSpeakerNameText != null)
+            {
+                RectTransform rt = rightSpeakerNameText.GetComponent<RectTransform>();
+                if (rt != null)
+                {
+                    rt.anchorMin = heroNameAnchorMin;
+                    rt.anchorMax = heroNameAnchorMax;
+                    rt.anchoredPosition = heroNamePosition;
+                    rt.sizeDelta = heroNameSizeDelta;
+                }
+                rightSpeakerNameText.alignment = heroNameAlignment;
+            }
+
+            if (dialogueBodyText != null)
+            {
+                RectTransform rt = dialogueBodyText.GetComponent<RectTransform>();
+                if (rt != null)
+                {
+                    rt.anchorMin = bodyTextAnchorMin;
+                    rt.anchorMax = bodyTextAnchorMax;
+                    rt.offsetMin = bodyTextOffsetMin;
+                    rt.offsetMax = bodyTextOffsetMax;
+                }
+                dialogueBodyText.alignment = bodyTextAlignment;
+            }
+
+            if (choiceContainer != null)
+            {
+                RectTransform rt = choiceContainer.GetComponent<RectTransform>();
+                if (rt != null)
+                {
+                    rt.anchorMin = new Vector2(0f, 0f);
+                    rt.anchorMax = new Vector2(1f, 0f);
+                    rt.anchoredPosition = choiceContainerPosition;
+                    rt.sizeDelta = choiceContainerSizeDelta;
+                }
+            }
+        }
+
         private void Update()
         {
             if (!isDialogueActive) return;
+
+            // Применяем настройки ручного позиционирования каждый кадр в Update для мгновенного тюнинга в Редакторе Unity!
+            ApplyRectTransformTweaks();
 
             // Если есть активные варианты выбора, клавиатура / случайные клики не продвигают диалог автоматически
             DialogLine currentLine = dialogueSteps[currentLineIndex];
@@ -470,11 +581,39 @@ namespace FateContinent
             }
         }
 
+        private bool IsSceneInBuildSettings(string sceneName)
+        {
+            if (string.IsNullOrEmpty(sceneName)) return false;
+            for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
+            {
+                string path = UnityEngine.SceneManagement.SceneUtility.GetScenePathByBuildIndex(i);
+                string name = System.IO.Path.GetFileNameWithoutExtension(path);
+                if (name.Equals(sceneName, System.StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public void SelectChoice(int choiceIndex)
         {
             if (!isDialogueActive) return;
 
             DialogLine currentLine = dialogueSteps[currentLineIndex];
+
+            // Интерактивная синхронизация: если мы делаем выбор в шаге 3 (выбор места высадки на тактическую карту)
+            if (currentLineIndex == 3)
+            {
+                if (FateMapManager.Instance != null)
+                {
+                    // Переключаем карту и делаем её видимой для игрока прямо сейчас!
+                    FateMapManager.Instance.SwitchToMap(choiceIndex);
+                    FateMapManager.Instance.SetMapVisible(true);
+                    Debug.Log($"[DIALOGUE SYSTEM] Игрок выбрал зону {choiceIndex}. Динамически переключаем активную тактическую карту на индекс: {choiceIndex}");
+                }
+            }
+
             if (currentLine.nextLineIndexes != null && choiceIndex < currentLine.nextLineIndexes.Length)
             {
                 // Проигрываем приятный звук клика по диалоговому варианту
@@ -500,6 +639,32 @@ namespace FateContinent
             }
         }
 
+        private void TryLoadScene(string sceneName)
+        {
+            if (!loadScenesOnEnd || string.IsNullOrEmpty(sceneName))
+            {
+                Debug.Log($"[GATEWAY] Загрузка сцен отключена или имя пустое ({sceneName}). Остаемся на интерактивной карте континентов.");
+                return;
+            }
+
+            // Интеллектуальное самоисцеление от пустого/зависшего экрана: если сцена отсутствует в Build Settings,
+            // мы не пытаемся загрузить её, предотвращая вечную пустышку и позволяя играть на интерактивной карте!
+            if (!IsSceneInBuildSettings(sceneName))
+            {
+                Debug.LogWarning($"[GATEWAY] Сцена '{sceneName}' отсутствует в Build Settings. Переход отменен, чтобы избежать пустого экрана. Игрок остается в 'GameScene' на тактической карте.");
+                return;
+            }
+
+            try
+            {
+                SceneManager.LoadScene(sceneName);
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"[GATEWAY] Ошибка загрузки сцены '{sceneName}'. Убедитесь, что вы создали данную сцену и добавили её в Build Settings: {ex.Message}");
+            }
+        }
+
         public void EndDialogue()
         {
             isDialogueActive = false;
@@ -518,21 +683,93 @@ namespace FateContinent
             // Проверяем, на каком шаге мы закончили диалог (это определяет выбранную локацию!)
             if (currentLineIndex == 4)
             {
-                Debug.Log("[GATEWAY] Загрузка уровня: Кровавые Пустоши!");
-                SceneManager.LoadScene("Scene_CrimsonWastes"); // Имя сцены вашей локации
+                Debug.Log("[GATEWAY] Попытка загрузки уровня: Кровавые Пустоши!");
+                TryLoadScene(sceneCrimsonWastes);
             }
             else if (currentLineIndex == 5)
             {
-                Debug.Log("[GATEWAY] Загрузка уровня: Ледяной Пик!");
-                SceneManager.LoadScene("Scene_IceBoundPeak"); // Имя сцены вашей локации
+                Debug.Log("[GATEWAY] Попытка загрузки уровня: Ледяной Пик!");
+                TryLoadScene(sceneIceBoundPeak);
             }
             else if (currentLineIndex == 6)
             {
-                Debug.Log("[GATEWAY] Загрузка уровня: Древние Руины!");
-                SceneManager.LoadScene("Scene_AncientRuins"); // Имя сцены вашей локации
+                Debug.Log("[GATEWAY] Попытка загрузки уровня: Древние Руины!");
+                TryLoadScene(sceneAncientRuins);
             }
             
             Debug.Log("[DIALOGUE SYSTEM] Диалог завершен.");
+        }
+
+        private string GetLocalizedClassName(string rawClass, int lang)
+        {
+            if (string.IsNullOrEmpty(rawClass)) return (lang == 0) ? "Герой" : "Hero";
+            string cls = rawClass.ToLower();
+            if (cls.Contains("warrior") || cls.Contains("воин"))
+                return (lang == 0) ? "Воин" : "Warrior";
+            if (cls.Contains("archer") || cls.Contains("лучник") || cls.Contains("стрелок") || cls.Contains("strelok") || cls.Contains("снайпер"))
+                return (lang == 0) ? "Снайпер" : "Archer";
+            if (cls.Contains("mage") || cls.Contains("маг"))
+                return (lang == 0) ? "Маг" : "Mage";
+            return rawClass;
+        }
+
+        private TextMeshProUGUI CreatePortraitNameLabel(Image portraitImage, string defaultText, bool isLeft)
+        {
+            if (portraitImage == null) return null;
+
+            // Ищем, не создавали ли мы уже этот текст ранее
+            string goName = isLeft ? "Txt_CompanionName_Dynamic" : "Txt_PlayerName_Dynamic";
+            Transform existingText = portraitImage.transform.Find(goName);
+            if (existingText != null)
+            {
+                return existingText.GetComponent<TextMeshProUGUI>();
+            }
+
+            // Создаем игровой объект подписи под портретом
+            GameObject txtGov = new GameObject(goName);
+            txtGov.transform.SetParent(portraitImage.transform, false);
+
+            RectTransform rect = txtGov.AddComponent<RectTransform>();
+            // Позиционируем снизу под портретом (на 25 пикселей ниже нижней кромки)
+            rect.anchorMin = new Vector2(0.5f, 0f);
+            rect.anchorMax = new Vector2(0.5f, 0f);
+            rect.anchoredPosition = new Vector2(0f, -25f);
+            rect.sizeDelta = new Vector2(160f, 30f);
+
+            // Создаем красивую подложку для надписи имени
+            GameObject badgeBg = new GameObject("BadgeBg");
+            badgeBg.transform.SetParent(txtGov.transform, false);
+            RectTransform bgRect = badgeBg.AddComponent<RectTransform>();
+            bgRect.anchorMin = Vector2.zero;
+            bgRect.anchorMax = Vector2.one;
+            bgRect.offsetMin = new Vector2(-10f, 0f); // Слегка шире текста
+            bgRect.offsetMax = new Vector2(10f, 0f);
+
+            Image bgImg = badgeBg.AddComponent<Image>();
+            bgImg.color = new Color(0.04f, 0.05f, 0.12f, 0.95f); // Космический глубокий индиго
+
+            Outline outline = badgeBg.AddComponent<Outline>();
+            outline.effectColor = isLeft ? new Color(0.12f, 0.64f, 0.94f, 0.6f) : new Color(0.95f, 0.61f, 0.07f, 0.6f);
+            outline.effectDistance = new Vector2(1f, 1f);
+
+            TextMeshProUGUI tmp = txtGov.AddComponent<TextMeshProUGUI>();
+            tmp.text = defaultText;
+            tmp.fontSize = 13f;
+            tmp.fontWeight = FontWeight.Bold;
+            tmp.color = Color.white;
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.textWrappingMode = TextWrappingModes.NoWrap;
+
+            // Применяем шрифт
+            if (Translator.Instance != null && Translator.Instance.defaultFont != null)
+            {
+                tmp.font = Translator.Instance.defaultFont;
+            }
+
+            // Перемещаем подложку на задний план, чтобы текст был поверх нее
+            badgeBg.transform.SetAsFirstSibling();
+
+            return tmp;
         }
 
         private void UpdateDialogueView()
@@ -547,16 +784,73 @@ namespace FateContinent
 
             // Определяем язык перевода
             int lang = Translator.LanguageID; // 0=RU, 1=EN, 7=KR, 8=CH (или по умолчанию EN)
-            
-            // Настройка текста имени
-            string speakerName = currentLine.characterName;
-            if (string.IsNullOrEmpty(speakerName))
+
+            // Конфигурируем базовые имена
+            string companionName = (lang == 0) ? companionNameRU : companionNameEN;
+            string rawClass = (SaveGameSystem.CurrentData != null) ? SaveGameSystem.CurrentData.characterClass : "";
+            string localizedClass = GetLocalizedClassName(rawClass, lang);
+
+            // Имя выбранного героя приоритетно берем из SaveGameSystem.saveName,
+            // так как там лежит уже полная красивая локализованная строка вида "Воин (Премиум)" или "Стрелок (Премиум)"!
+            string playerDisplayName = (SaveGameSystem.CurrentData != null && !string.IsNullOrEmpty(SaveGameSystem.CurrentData.saveName) && SaveGameSystem.CurrentData.saveName != "Игрок")
+                ? SaveGameSystem.CurrentData.saveName
+                : localizedClass;
+
+            // Самоисцеление: динамически создаем надписи имен под портретами в стиле Zenith Glassmorphism, если в канвасе они отсутствуют!
+            if (leftSpeakerNameText == null && companionPortraitImage != null)
             {
-                speakerName = (lang == 0) ? companionNameRU : companionNameEN;
+                leftSpeakerNameText = CreatePortraitNameLabel(companionPortraitImage, companionName, true);
             }
+            if (rightSpeakerNameText == null && playerPortraitImage != null)
+            {
+                rightSpeakerNameText = CreatePortraitNameLabel(playerPortraitImage, playerDisplayName, false);
+            }
+
+            // Текстовые подписи под левым и правым портеретами
+            if (leftSpeakerNameText != null)
+            {
+                leftSpeakerNameText.text = companionName;
+            }
+            if (rightSpeakerNameText != null)
+            {
+                rightSpeakerNameText.text = playerDisplayName;
+            }
+
+            // Вычисляем, кто говорит на текущем шаге
+            string rawSpeaker = currentLine.characterName;
+            bool speaking = false;
+
+            if (!string.IsNullOrEmpty(rawSpeaker))
+            {
+                string rawLower = rawSpeaker.ToLower();
+                if (rawLower.Contains("игрок") || rawLower.Contains("player") || rawLower.Contains("воин") || rawLower.Contains("warrior") || rawLower.Contains("лучник") || rawLower.Contains("archer") || rawLower.Contains("маг") || rawLower.Contains("mage") || rawLower.Contains("стрелок") || rawLower.Contains("снайпер") || rawLower.Contains("hero"))
+                {
+                    speaking = true;
+                }
+            }
+
+            // Настройка главного текста имени активного говорящего
+            string activeSpeakerName = companionName;
+            if (speaking)
+            {
+                activeSpeakerName = playerDisplayName;
+            }
+            else if (!string.IsNullOrEmpty(rawSpeaker))
+            {
+                string rawSpeakerLower = rawSpeaker.ToLower();
+                if (rawSpeakerLower.Contains("aelis") || rawSpeakerLower.Contains("аэлис"))
+                {
+                    activeSpeakerName = companionName;
+                }
+                else
+                {
+                    activeSpeakerName = rawSpeaker;
+                }
+            }
+
             if (speakerNameText != null)
             {
-                speakerNameText.text = speakerName;
+                speakerNameText.text = activeSpeakerName;
             }
 
             // Настройка текста реплики со специфичными переводами
@@ -579,17 +873,46 @@ namespace FateContinent
             // Динамический выбор портрета игрока на правой стороне
             UpdatePlayerPortrait();
 
-            // Привязка и обновление портрета компаньона (Аэлиссы) на левой стороне
+            // Привязка и обновление портрета компаньона (Аэлиссы) на левой стороне с кэш-защитой
             if (companionPortraitImage != null)
             {
                 if (companionPortrait != null)
                 {
                     companionPortraitImage.sprite = companionPortrait;
-                    companionPortraitImage.color = Color.white;
                 }
-                else if (companionPortraitImage.sprite != null)
+                else if (originalCompanionSprite != null)
                 {
-                    companionPortraitImage.color = Color.white;
+                    companionPortraitImage.sprite = originalCompanionSprite;
+                }
+            }
+
+            // Применяем визуальный акцент (подсвечиваем говорящего и слегка затемняем слушателя)
+            if (speaking)
+            {
+                // Говорит игрок
+                if (playerPortraitImage != null) playerPortraitImage.color = Color.white;
+                if (companionPortraitImage != null) companionPortraitImage.color = new Color(1f, 1f, 1f, 0.4f);
+
+                if (rightSpeakerNameText != null) rightSpeakerNameText.color = new Color(0.95f, 0.61f, 0.07f, 1f); // Золотой
+                if (leftSpeakerNameText != null) leftSpeakerNameText.color = new Color(0.7f, 0.8f, 0.9f, 0.4f); // Приглушенный
+            }
+            else
+            {
+                // Говорит компаньон (Аэлисса)
+                if (companionPortraitImage != null) companionPortraitImage.color = Color.white;
+                if (playerPortraitImage != null) playerPortraitImage.color = new Color(1f, 1f, 1f, 0.4f);
+
+                if (leftSpeakerNameText != null) leftSpeakerNameText.color = new Color(0.95f, 0.61f, 0.07f, 1f); // Золотой
+                if (rightSpeakerNameText != null) rightSpeakerNameText.color = new Color(0.7f, 0.8f, 0.9f, 0.4f); // Приглушенный
+            }
+
+            // ИЗЮМИНКА СЦЕНЫ: принудительно раскрываем интерактивную карту мира, когда диалог доходит до выбора места высадки (Index 3)!
+            if (currentLineIndex == 3)
+            {
+                if (FateMapManager.Instance != null)
+                {
+                    FateMapManager.Instance.SetMapVisible(true);
+                    Debug.Log("[DIALOGUE SYSTEM] Карта мира плавно открыта на фоне для выбора места высадки.");
                 }
             }
 
@@ -603,10 +926,9 @@ namespace FateContinent
                 default: currentChoices = currentLine.choicesEN; break;
             }
 
-            // Полностью очищаем все дочерние элементы контейнера, гарантируя отсутствие наложенных и застрявших кнопок!
-            if (choiceContainer != null)
+            // Полностью очищаем все дочерние элементы контейнера, если это не сам DialoguePanel во избежание багов
+            if (choiceContainer != null && choiceContainer != dialogPanel)
             {
-                // Обязательно открепляем перед Destroy, чтобы элементы моментально исчезали из разметки HorizontalLayoutGroup!
                 List<Transform> children = new List<Transform>();
                 foreach (Transform child in choiceContainer.transform)
                 {
@@ -669,15 +991,15 @@ namespace FateContinent
                 : "";
             
             Sprite chosenSprite = null;
-            if (savedClass.Contains("warrior") || savedClass.Contains("воин"))
+            if (savedClass.Contains("warrior") || savedClass.Contains("воин") || savedClass.Contains("voin"))
             {
                 chosenSprite = warriorPortrait;
             }
-            else if (savedClass.Contains("archer") || savedClass.Contains("лучник") || savedClass.Contains("стрелок") || savedClass.Contains("strelok"))
+            else if (savedClass.Contains("archer") || savedClass.Contains("лучник") || savedClass.Contains("стрелок") || savedClass.Contains("strelok") || savedClass.Contains("снайпер"))
             {
                 chosenSprite = archerPortrait;
             }
-            else if (savedClass.Contains("mage") || savedClass.Contains("маг"))
+            else if (savedClass.Contains("mage") || savedClass.Contains("маг") || savedClass.Contains("mag"))
             {
                 chosenSprite = magePortrait;
             }
@@ -742,8 +1064,28 @@ namespace FateContinent
             playerPortraitImage = null;
             nextDialogueButton = null;
 
-            // Умный поиск: если дизайнер уже перенес или настроил FATE_DIALOGUE_CANVAS в сцене, не плодим дубликаты!
+            // Умный поиск: ищем FATE_DIALOGUE_CANVAS в сцене, включая неактивные корневые объекты
             GameObject rootCanvas = GameObject.Find("FATE_DIALOGUE_CANVAS");
+            if (rootCanvas == null)
+            {
+                Scene activeScene = SceneManager.GetActiveScene();
+                if (activeScene.isLoaded)
+                {
+                    GameObject[] rootGOs = activeScene.GetRootGameObjects();
+                    foreach (var go in rootGOs)
+                    {
+                        if (go.name == "FATE_DIALOGUE_CANVAS" || go.name.ToUpper().Contains("DIALOGUE") || go.GetComponent<Canvas>() != null)
+                        {
+                            if (FindChildRecursive(go.transform, "DialoguePanel") != null || go.name == "FATE_DIALOGUE_CANVAS")
+                            {
+                                rootCanvas = go;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
             if (rootCanvas == null)
             {
                 Canvas[] existingCanvases = FindObjectsByType<Canvas>(FindObjectsSortMode.None);
@@ -779,30 +1121,79 @@ namespace FateContinent
                 {
                     dialogPanel = panelT.gameObject;
                     
-                    // Поиск вспомогательных контейнеров и портретов рекурсивно! (Исключает проблемы вложенности)
-                    Transform compPortraitT = FindChildRecursive(panelT, "Img_CompanionPortrait");
-                    if (compPortraitT != null) companionPortraitImage = compPortraitT.GetComponent<Image>();
+                    // Поиск вспомогательных контейнеров и портретов рекурсивно и по ключевым словам!
+                    Image[] allImages = panelT.GetComponentsInChildren<Image>(true);
+                    foreach (var img in allImages)
+                    {
+                        string imgName = img.gameObject.name.ToLower();
+                        if (imgName.Contains("companion") || imgName.Contains("aelis") || imgName.Contains("left") || imgName.Contains("helper"))
+                        {
+                            companionPortraitImage = img;
+                        }
+                        else if (imgName.Contains("player") || imgName.Contains("hero") || imgName.Contains("right") || imgName.Contains("class") || imgName.Contains("avatar"))
+                        {
+                            playerPortraitImage = img;
+                        }
+                    }
 
-                    Transform playerPortraitT = FindChildRecursive(panelT, "Img_PlayerPortrait");
-                    if (playerPortraitT != null) playerPortraitImage = playerPortraitT.GetComponent<Image>();
+                    // Если не найдено по содержимому имени, делаем классический точечный поиск по иерархии
+                    if (companionPortraitImage == null)
+                    {
+                        Transform compT = FindChildRecursive(panelT, "Img_CompanionPortrait");
+                        if (compT != null) companionPortraitImage = compT.GetComponent<Image>();
+                    }
+                    if (playerPortraitImage == null)
+                    {
+                        Transform playerT = FindChildRecursive(panelT, "Img_PlayerPortrait");
+                        if (playerT != null) playerPortraitImage = playerT.GetComponent<Image>();
+                    }
 
-                    Transform containerT = FindChildRecursive(panelT, "ChoiceContainer");
+                    // Кэшируем оригинальные спрайты из сцены для предотвращения затирания при перерисовке
+                    if (companionPortraitImage != null && companionPortraitImage.sprite != null)
+                    {
+                        originalCompanionSprite = companionPortraitImage.sprite;
+                    }
+                    if (playerPortraitImage != null && playerPortraitImage.sprite != null)
+                    {
+                        originalPlayerSprite = playerPortraitImage.sprite;
+                    }
+
+                    // Ищем выборный контейнер по ключевым словам или иерархии
+                    Transform containerT = null;
+                    foreach (Transform child in panelT)
+                    {
+                        string childName = child.name.ToLower();
+                        if (childName.Contains("choice") || childName.Contains("button") || childName.Contains("container"))
+                        {
+                            containerT = child;
+                            break;
+                        }
+                    }
+                    if (containerT == null)
+                    {
+                        containerT = FindChildRecursive(panelT, "ChoiceContainer");
+                        if (containerT == null) containerT = FindChildRecursive(panelT, "Choice_Container");
+                        if (containerT == null) containerT = FindChildRecursive(panelT, "Choices");
+                    }
                     if (containerT != null) choiceContainer = containerT.gameObject;
                     
-                    // Умный поиск текстовых полей, защищенный от ложного перехвата из портретов и кнопок!
-                    List<TextMeshProUGUI> candidateSpeakers = new List<TextMeshProUGUI>();
-                    List<TextMeshProUGUI> candidateBodies = new List<TextMeshProUGUI>();
+                    // Умная классификация текстовых полей
+                    leftSpeakerNameText = null;
+                    rightSpeakerNameText = null;
+                    dialogueBodyText = null;
 
                     TextMeshProUGUI[] tmps = panelT.GetComponentsInChildren<TextMeshProUGUI>(true);
+                    List<TextMeshProUGUI> nameTexts = new List<TextMeshProUGUI>();
+
                     foreach (var tmp in tmps)
                     {
-                        // Проверяем, не принадлежит ли текст портрету персонажа, кнопкам выбора или сторонним панелям
+                        // Проверяем, не принадлежит ли текст кнопкам выбора или портрету
                         Transform parentIter = tmp.transform;
                         bool isExcluded = false;
                         while (parentIter != null && parentIter != panelT)
                         {
                             string pName = parentIter.name.ToLower();
-                            if (pName.Contains("portrait") || pName.Contains("choice") || pName.Contains("btn") || pName.Contains("button"))
+                            if (pName.Contains("choice") || pName.Contains("btn") || pName.Contains("button"))
                             {
                                 isExcluded = true;
                                 break;
@@ -812,75 +1203,94 @@ namespace FateContinent
                         if (isExcluded) continue;
 
                         string goName = tmp.gameObject.name.ToLower();
-                        
-                        // Высокий приоритет: строгое совпадение имен
-                        if (goName == "txt_speakername" || goName == "speakername" || goName == "speaker_name" || goName == "txt_speaker" || goName == "text_speakername")
-                        {
-                            speakerNameText = tmp;
-                        }
-                        else if (goName == "txt_dialoguebody" || goName == "dialoguebody" || goName == "dialogue_body" || goName == "txt_dialogue" || goName == "dialoguebodytext" || goName == "text_dialoguebody")
-                        {
-                            dialogueBodyText = tmp;
-                        }
-                        
-                        // Низкий приоритет: сбор кандидатов по вхождению ключевых слов
-                        if (goName.Contains("speaker") || goName.Contains("cap") || goName.Contains("header"))
-                        {
-                            candidateSpeakers.Add(tmp);
-                        }
-                        else if (goName.Contains("body") || goName.Contains("dialog") || goName.Contains("text"))
-                        {
-                            candidateBodies.Add(tmp);
-                        }
-                    }
 
-                    // Назначение резервных кандидатов, только если точные совпадения не обнаружены
-                    if (speakerNameText == null && candidateSpeakers.Count > 0)
-                    {
-                        speakerNameText = candidateSpeakers[0];
-                    }
-                    if (dialogueBodyText == null && candidateBodies.Count > 0)
-                    {
-                        dialogueBodyText = candidateBodies[0];
-                    }
-
-                    // Если вообще ничего не нашли, делаем координатную сортировку по высоте
-                    if (speakerNameText == null || dialogueBodyText == null || speakerNameText == dialogueBodyText)
-                    {
-                        if (tmps.Length >= 2)
+                        // Ищем тело диалога по имени или ключевым словам
+                        if (goName == "txt_dialoguebody" || goName == "dialoguebody" || goName == "dialogue_body" || goName == "txt_dialogue" || goName == "dialoguebodytext" || goName == "text_dialoguebody" || goName.Contains("body") || goName.Contains("content"))
                         {
-                            List<TextMeshProUGUI> sortedList = new List<TextMeshProUGUI>(tmps);
-                            sortedList.RemoveAll(t => {
-                                Transform pi = t.transform;
-                                while (pi != null && pi != panelT)
-                                {
-                                    string pName = pi.name.ToLower();
-                                    if (pName.Contains("portrait") || pName.Contains("choice") || pName.Contains("btn") || pName.Contains("button"))
-                                        return true;
-                                    pi = pi.parent;
-                                }
-                                return false;
-                            });
-                            
-                            if (sortedList.Count >= 2)
+                            if (!goName.Contains("speaker") && !goName.Contains("name"))
                             {
-                                sortedList.Sort((a, b) => b.transform.position.y.CompareTo(a.transform.position.y));
-                                if (speakerNameText == null) speakerNameText = sortedList[0];
-                                if (dialogueBodyText == null) dialogueBodyText = sortedList[1];
+                                dialogueBodyText = tmp;
+                                continue;
+                            }
+                        }
+
+                        // Собираем кандидаты для имен героев
+                        if (goName.Contains("speaker") || goName.Contains("name") || goName.Contains("cap") || goName.Contains("header") || goName.Contains("title") || goName.Contains("left") || goName.Contains("right"))
+                        {
+                            nameTexts.Add(tmp);
+                        }
+                    }
+
+                    // Если body text не сформирован, берём оставшийся текст, который не попал в nameTexts
+                    if (dialogueBodyText == null)
+                    {
+                        foreach (var tmp in tmps)
+                        {
+                            Transform parentIter = tmp.transform;
+                            bool isExcluded = false;
+                            while (parentIter != null && parentIter != panelT)
+                            {
+                                if (parentIter.name.ToLower().Contains("choice") || parentIter.name.ToLower().Contains("btn"))
+                                {
+                                    isExcluded = true;
+                                    break;
+                                }
+                                parentIter = parentIter.parent;
+                            }
+                            if (isExcluded) continue;
+
+                            if (!nameTexts.Contains(tmp))
+                            {
+                                dialogueBodyText = tmp;
+                                break;
                             }
                         }
                     }
 
-                    // Сохраняем и укрепляем разметку СЦЕНЫ, но БЕЗ разрушения исходных координат RectTransform, если они были настроены в Редакторе!
-                    // Калибруем только базовые свойства автопереноса слов
+                    // Сортируем nameTexts по экранным координатам по оси X для точного разделения Left vs Right
+                    if (nameTexts.Count >= 2)
+                    {
+                        nameTexts.Sort((a, b) =>
+                        {
+                            float ax = 0f;
+                            float bx = 0f;
+                            RectTransform ar = a.GetComponent<RectTransform>();
+                            RectTransform br = b.GetComponent<RectTransform>();
+                            if (ar != null) ax = ar.anchoredPosition.x;
+                            if (br != null) bx = br.anchoredPosition.x;
+                            return ax.CompareTo(bx);
+                        });
+                        leftSpeakerNameText = nameTexts[0];
+                        rightSpeakerNameText = nameTexts[nameTexts.Count - 1];
+                    }
+                    else if (nameTexts.Count == 1)
+                    {
+                        float ax = 0f;
+                        RectTransform ar = nameTexts[0].GetComponent<RectTransform>();
+                        if (ar != null) ax = ar.anchoredPosition.x;
+                        if (ax < 0f) leftSpeakerNameText = nameTexts[0];
+                        else rightSpeakerNameText = nameTexts[0];
+                    }
+
+                    // Обратная совместимость во всем коде
+                    speakerNameText = leftSpeakerNameText != null ? leftSpeakerNameText : rightSpeakerNameText;
+
+                    // Укрепляем разметку СЦЕНЫ
                     if (dialogueBodyText != null)
                     {
                         dialogueBodyText.textWrappingMode = TextWrappingModes.Normal;
                     }
-                    if (speakerNameText != null)
+                    if (leftSpeakerNameText != null)
                     {
-                        speakerNameText.textWrappingMode = TextWrappingModes.NoWrap;
+                        leftSpeakerNameText.textWrappingMode = TextWrappingModes.NoWrap;
                     }
+                    if (rightSpeakerNameText != null)
+                    {
+                        rightSpeakerNameText.textWrappingMode = TextWrappingModes.NoWrap;
+                    }
+
+                    // Всегда принудительно накладываем координаты и настройки из инспектора во время инициализации!
+                    ApplyRectTransformTweaks();
 
                     // Восстанавливаем разметку контейнера выбора кнопок (мягкое позиционирование для предотвращения отрезания)
                     if (choiceContainer != null)
@@ -896,16 +1306,6 @@ namespace FateContinent
                         existingHLayout.childControlWidth = true;
                         existingHLayout.childForceExpandHeight = false;
                         existingHLayout.childForceExpandWidth = true;
-
-                        RectTransform existingChoiceRect = choiceContainer.GetComponent<RectTransform>();
-                        if (existingChoiceRect != null)
-                        {
-                            // Осторожно калибруем только высоту/позицию Y для гарантированной видимости, не сбивая ширину
-                            existingChoiceRect.anchorMin = new Vector2(0f, 0f);
-                            existingChoiceRect.anchorMax = new Vector2(1f, 0f);
-                            existingChoiceRect.anchoredPosition = new Vector2(0f, 30f); // Кнопки приподняты во избежание срезания экрана
-                            existingChoiceRect.sizeDelta = new Vector2(-80f, 50f);
-                        }
                     }
 
                     if (speakerNameText != null && dialogueBodyText != null)
@@ -1107,9 +1507,9 @@ namespace FateContinent
             
             // Настройка жестких макетов, чтобы текст вариантов никогда не сжимался по вертикали или буква к букве
             LayoutElement layout = btnGov.AddComponent<LayoutElement>();
-            layout.minWidth = 180f;
-            layout.preferredWidth = 260f;
-            layout.minHeight = 42f;
+            layout.minWidth = choiceButtonMinWidth;
+            layout.preferredWidth = choiceButtonPreferredWidth;
+            layout.minHeight = choiceButtonMinHeight;
 
             Image btnImg = btnGov.AddComponent<Image>();
             btnImg.color = new Color(0.08f, 0.09f, 0.15f, 0.95f);
@@ -1131,7 +1531,7 @@ namespace FateContinent
 
             TextMeshProUGUI tmp = textGov.AddComponent<TextMeshProUGUI>();
             tmp.text = choiceText;
-            tmp.fontSize = 13f;
+            tmp.fontSize = choiceButtonFontSize;
             tmp.color = Color.white;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.textWrappingMode = TextWrappingModes.Normal;
