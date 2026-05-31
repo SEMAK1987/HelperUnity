@@ -343,6 +343,33 @@ namespace FateContinent
             SetMapVisible(isMapVisible);
         }
 
+        // Подсвечивает выбранное кольцо-маркер на карте по его индексу и приглушает остальные
+        public void HighlightRing(int ringIndex)
+        {
+            if (activeRings == null || activeRings.Count == 0)
+            {
+                Debug.LogWarning("[Fate Map] Список колец пуст, нечего подсвечивать.");
+                return;
+            }
+
+            for (int i = 0; i < activeRings.Count; i++)
+            {
+                if (activeRings[i] == null) continue;
+                FactionMapMarker marker = activeRings[i].GetComponent<FactionMapMarker>();
+                if (marker == null) continue;
+
+                if (i == ringIndex)
+                {
+                    marker.SetHighlightActive(true);
+                    Debug.Log($"[Fate Map] Активирована подсветка для маркера '{marker.factionName}' (Индекс: {i})");
+                }
+                else
+                {
+                    marker.SetHighlightActive(false);
+                }
+            }
+        }
+
         private void ClearActiveRings()
         {
             foreach (GameObject ring in activeRings)

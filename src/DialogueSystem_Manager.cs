@@ -110,6 +110,7 @@ namespace FateContinent
         private Sprite originalPlayerSprite;
 
         private int currentLineIndex = 0;
+        private int selectedZoneIndex = 0; // Текущая выбранная интерактивная область высадки
         private bool isDialogueActive = false;
 
         public bool IsDialogueActive
@@ -175,12 +176,25 @@ namespace FateContinent
                 RectTransform rt = leftSpeakerNameText.GetComponent<RectTransform>();
                 if (rt != null)
                 {
-                    rt.anchorMin = companionNameAnchorMin;
-                    rt.anchorMax = companionNameAnchorMax;
-                    rt.anchoredPosition = companionNamePosition;
-                    rt.sizeDelta = companionNameSizeDelta;
+                    if (leftSpeakerNameText.gameObject.name != "Txt_CompanionName_Dynamic")
+                    {
+                        rt.anchorMin = companionNameAnchorMin;
+                        rt.anchorMax = companionNameAnchorMax;
+                        rt.anchoredPosition = companionNamePosition;
+                        rt.sizeDelta = companionNameSizeDelta;
+                        leftSpeakerNameText.alignment = companionNameAlignment;
+                    }
+                    else
+                    {
+                        // Для динамической плашки позиция строго внизу по центру портрета
+                        rt.anchorMin = new Vector2(0.5f, 0f);
+                        rt.anchorMax = new Vector2(0.5f, 0f);
+                        rt.pivot = new Vector2(0.5f, 1f);
+                        rt.anchoredPosition = new Vector2(0f, -10f);
+                        rt.sizeDelta = new Vector2(250f, 40f);
+                        leftSpeakerNameText.alignment = TextAlignmentOptions.Center;
+                    }
                 }
-                leftSpeakerNameText.alignment = companionNameAlignment;
             }
 
             if (rightSpeakerNameText != null)
@@ -188,12 +202,25 @@ namespace FateContinent
                 RectTransform rt = rightSpeakerNameText.GetComponent<RectTransform>();
                 if (rt != null)
                 {
-                    rt.anchorMin = heroNameAnchorMin;
-                    rt.anchorMax = heroNameAnchorMax;
-                    rt.anchoredPosition = heroNamePosition;
-                    rt.sizeDelta = heroNameSizeDelta;
+                    if (rightSpeakerNameText.gameObject.name != "Txt_PlayerName_Dynamic")
+                    {
+                        rt.anchorMin = heroNameAnchorMin;
+                        rt.anchorMax = heroNameAnchorMax;
+                        rt.anchoredPosition = heroNamePosition;
+                        rt.sizeDelta = heroNameSizeDelta;
+                        rightSpeakerNameText.alignment = heroNameAlignment;
+                    }
+                    else
+                    {
+                        // Для динамической плашки героя позиция строго внизу по центру портрета
+                        rt.anchorMin = new Vector2(0.5f, 0f);
+                        rt.anchorMax = new Vector2(0.5f, 0f);
+                        rt.pivot = new Vector2(0.5f, 1f);
+                        rt.anchoredPosition = new Vector2(0f, -10f);
+                        rt.sizeDelta = new Vector2(250f, 40f);
+                        rightSpeakerNameText.alignment = TextAlignmentOptions.Center;
+                    }
                 }
-                rightSpeakerNameText.alignment = heroNameAlignment;
             }
 
             if (dialogueBodyText != null)
@@ -559,6 +586,14 @@ namespace FateContinent
 
             DialogLine currentLine = dialogueSteps[currentLineIndex];
 
+            // Если мы находимся на шаге 3 (выбор места высадки) и нажимаем "Далее/Высадка" (кнопка подтверждения)
+            if (currentLineIndex == 3)
+            {
+                // Подтверждаем текущую выбранную зону высадки принудительно!
+                SelectChoice(selectedZoneIndex, true);
+                return;
+            }
+
             // Если есть варианты выбора, игрок должен кликнуть по кнопке выбора, обычный клик не продвигает диалог
             bool hasChoices = (Translator.LanguageID == 0 ? currentLine.choicesRU : currentLine.choicesEN) != null && 
                               (Translator.LanguageID == 0 ? currentLine.choicesRU.Length : currentLine.choicesEN.Length) > 0;
@@ -598,6 +633,11 @@ namespace FateContinent
 
         public void SelectChoice(int choiceIndex)
         {
+            SelectChoice(choiceIndex, false);
+        }
+
+        public void SelectChoice(int choiceIndex, bool forceConfirm)
+        {
             if (!isDialogueActive) return;
 
             DialogLine currentLine = dialogueSteps[currentLineIndex];
@@ -605,12 +645,36 @@ namespace FateContinent
             // Интерактивная синхронизация: если мы делаем выбор в шаге 3 (выбор места высадки на тактическую карту)
             if (currentLineIndex == 3)
             {
+                if (!forceConfirm && selectedZoneIndex != choiceIndex)
+                {
+                    // Игрок переключил выбор зоны кликом по кнопке, подсвечиваем ее на карте но не переходим на следующий слайд!
+                    selectedZoneIndex = choiceIndex;
+                    
+                    if (FateMapManager.Instance != null)
+                    {
+                        FateMapManager.Instance.SetMapVisible(true);
+                        FateMapManager.Instance.HighlightRing(choiceIndex);
+                        Debug.Log($"[DIALOGUE SYSTEM] Игрок сфокусировался на зоне {choiceIndex}. Подсвечиваем маркер на карте.");
+                    }
+
+                    // Обновляем визуальные состояния кнопок выбора и текст описания зоны
+                    UpdateChoiceSelectionVisuals(choiceIndex);
+                    UpdateInteractiveZoneText(choiceIndex);
+
+                    // Воспроизводим звук ховера/переключения меню
+                    if (SettingsManager.Instance != null && UIButtonSfxBinder.Instance != null && UIButtonSfxBinder.Instance.clickSound != null)
+                    {
+                        SettingsManager.Instance.PlaySoundEffect(UIButtonSfxBinder.Instance.clickSound);
+                    }
+                    return;
+                }
+                
+                // Если мы кликнули повторно по уже выбранному региону или подтверждаем через "Высадка ➔"
                 if (FateMapManager.Instance != null)
                 {
-                    // Переключаем карту и делаем её видимой для игрока прямо сейчас!
-                    FateMapManager.Instance.SwitchToMap(choiceIndex);
+                    // Гарантируем сброс в обычное состояние перед закрытием
+                    FateMapManager.Instance.SwitchToMap(0);
                     FateMapManager.Instance.SetMapVisible(true);
-                    Debug.Log($"[DIALOGUE SYSTEM] Игрок выбрал зону {choiceIndex}. Динамически переключаем активную тактическую карту на индекс: {choiceIndex}");
                 }
             }
 
@@ -628,6 +692,92 @@ namespace FateContinent
             else
             {
                 EndDialogue();
+            }
+        }
+
+        // Обновляет визуальное выделение интерактивных кнопок выбора (делает выбранную золотой/неоновой, а остальные приглушенными)
+        private void UpdateChoiceSelectionVisuals(int selectedIndex)
+        {
+            if (choiceButtons == null || choiceButtons.Count == 0) return;
+
+            for (int i = 0; i < choiceButtons.Count; i++)
+            {
+                Button btn = choiceButtons[i];
+                if (btn == null) continue;
+
+                // Завершающая кнопка подтверждения (индекс 3 на шаге 3) имеет свой собственный статический стиль изумрудного Zenith Glass
+                if (currentLineIndex == 3 && i == 3) continue;
+
+                Image btnImg = btn.GetComponent<Image>();
+                Outline outline = btn.GetComponent<Outline>();
+                TextMeshProUGUI tmp = btn.GetComponentInChildren<TextMeshProUGUI>();
+
+                if (i == selectedIndex)
+                {
+                    // Подсвечиваем выбранную кнопку: тепло-золотой фон
+                    if (btnImg != null) btnImg.color = new Color(0.95f, 0.61f, 0.07f, 0.95f);
+                    if (outline != null)
+                    {
+                        outline.effectColor = new Color(1f, 0.85f, 0.1f, 0.95f); // Золотой неон
+                        outline.effectDistance = new Vector2(3f, 3f);
+                    }
+                    if (tmp != null)
+                    {
+                        tmp.fontWeight = FontWeight.Black;
+                        tmp.color = Color.white;
+                    }
+                }
+                else
+                {
+                    // Приглушенные невыбранные варианты
+                    if (btnImg != null) btnImg.color = new Color(0.08f, 0.09f, 0.15f, 0.95f);
+                    if (outline != null)
+                    {
+                        outline.effectColor = new Color(0.12f, 0.64f, 0.94f, 0.45f); // Обычный циановый неон
+                        outline.effectDistance = new Vector2(1f, 1f);
+                    }
+                    if (tmp != null)
+                    {
+                        tmp.fontWeight = FontWeight.Regular;
+                        tmp.color = new Color(0.7f, 0.8f, 0.9f, 0.85f);
+                    }
+                }
+            }
+        }
+
+        // Динамическое обновление текста диалога с подробным тактическим описанием миров
+        private void UpdateInteractiveZoneText(int zoneIndex)
+        {
+            int lang = Translator.LanguageID;
+            string desc = "";
+            if (lang == 0) // RU
+            {
+                if (zoneIndex == 0) desc = "<b>[Кровавые Пустоши]:</b> Выжженные песчаные дюны и бури под вечным багровым небом. Регенерация снижена. <i>(Нажмите кнопку завершения для подтверждения)</i>";
+                else if (zoneIndex == 1) desc = "<b>[Ледяной Пик]:</b> Царство вечной мерзлоты. Обитают ледяные гиганты. Скорость отряда снижена на льду. <i>(Нажмите кнопку завершения для подтверждения)</i>";
+                else desc = "<b>[Древние Руины]:</b> Величественные руины династии. Энергетические осколки и каменные стражи. <i>(Нажмите кнопку завершения для подтверждения)</i>";
+            }
+            else if (lang == 8) // CH
+            {
+                if (zoneIndex == 0) desc = "<b>[绯红荒野]:</b> 烈日下的沙丘与强盗。战士生命回复减慢。<i>(请点击确认按钮以完成选择)</i>";
+                else if (zoneIndex == 1) desc = "<b>[冰封之巅]:</b> 极寒冻土与巨人，生存难度极高。移动速度降低。<i>(请点击确认按钮以完成选择)</i>";
+                else desc = "<b>[远古遗迹]:</b> 遗留的能量水晶，充斥着机关巨像。<i>(请点击确认按钮以完成选择)</i>";
+            }
+            else if (lang == 7) // KR
+            {
+                if (zoneIndex == 0) desc = "<b>[크림슨 황무지]:</b> 뜨거운 모래 사막과 마력 폭풍. 체력 재생 감소. <i>(확인 버튼을 누르면 선택이 완료됩니다)</i>";
+                else if (zoneIndex == 1) desc = "<b>[빙설의 봉우리]:</b> 영구 동토와 혹한. 부대 이동 속도 감소. <i>(확인 버튼을 누르면 선택이 완료됩니다)</i>";
+                else desc = "<b>[고대 유적지]:</b> 고대 문명의 파편과 힘의 결정. 경비 석상이 작동 중. <i>(확인 버튼을 누르면 선택이 완료됩니다)</i>";
+            }
+            else // EN / fallback
+            {
+                if (zoneIndex == 0) desc = "<b>[Crimson Wastes]:</b> Scorched ruins and firestorms. Reduced health regeneration. <i>(Press the confirmation button to proceed)</i>";
+                else if (zoneIndex == 1) desc = "<b>[Ice-Bound Peak]:</b> Ultimate permafrost and frost behemoths. Reduced move speed on ice. <i>(Press the confirmation button to proceed)</i>";
+                else desc = "<b>[Ancient Ruins]:</b> Ancient ruins with pure energy crystals but guarded by stone traps. <i>(Press the confirmation button to proceed)</i>";
+            }
+
+            if (dialogueBodyText != null)
+            {
+                dialogueBodyText.text = desc;
             }
         }
 
@@ -707,10 +857,43 @@ namespace FateContinent
             if (cls.Contains("warrior") || cls.Contains("воин"))
                 return (lang == 0) ? "Воин" : "Warrior";
             if (cls.Contains("archer") || cls.Contains("лучник") || cls.Contains("стрелок") || cls.Contains("strelok") || cls.Contains("снайпер"))
-                return (lang == 0) ? "Снайпер" : "Archer";
+                return (lang == 0) ? "Лучник" : "Archer";
             if (cls.Contains("mage") || cls.Contains("маг"))
                 return (lang == 0) ? "Маг" : "Mage";
             return rawClass;
+        }
+
+        private void ClearUnwantedBackgrounds(GameObject targetObj)
+        {
+            if (targetObj == null) return;
+
+            // 1. Убираем компонент Image непосредственно с самого объекта (если вдруг висит)
+            Image img = targetObj.GetComponent<Image>();
+            if (img != null)
+            {
+                DestroyImmediate(img);
+            }
+
+            // 2. Убираем компонент Outline
+            Outline outline = targetObj.GetComponent<Outline>();
+            if (outline != null)
+            {
+                DestroyImmediate(outline);
+            }
+
+            // 3. Ищем и уничтожаем дочерние объекты-подложки (BadgeBg, BG, Background и т.д.)
+            for (int i = targetObj.transform.childCount - 1; i >= 0; i--)
+            {
+                Transform child = targetObj.transform.GetChild(i);
+                if (child != null)
+                {
+                    string childName = child.name.ToLower();
+                    if (childName.Contains("bg") || childName.Contains("badge") || childName.Contains("back") || childName.Contains("image") || childName.Contains("panel") || childName.Contains("banner"))
+                    {
+                        DestroyImmediate(child.gameObject);
+                    }
+                }
+            }
         }
 
         private TextMeshProUGUI CreatePortraitNameLabel(Image portraitImage, string defaultText, bool isLeft)
@@ -720,54 +903,75 @@ namespace FateContinent
             // Ищем, не создавали ли мы уже этот текст ранее
             string goName = isLeft ? "Txt_CompanionName_Dynamic" : "Txt_PlayerName_Dynamic";
             Transform existingText = portraitImage.transform.Find(goName);
+            
+            GameObject txtGov;
+            RectTransform rect;
+            TextMeshProUGUI tmp;
+
             if (existingText != null)
             {
-                return existingText.GetComponent<TextMeshProUGUI>();
+                txtGov = existingText.gameObject;
+                rect = txtGov.GetComponent<RectTransform>();
+                tmp = txtGov.GetComponent<TextMeshProUGUI>();
+            }
+            else
+            {
+                // Создаем игровой объект подписи под портретом с нуля
+                txtGov = new GameObject(goName);
+                txtGov.transform.SetParent(portraitImage.transform, false);
+
+                rect = txtGov.AddComponent<RectTransform>();
+                tmp = txtGov.AddComponent<TextMeshProUGUI>();
             }
 
-            // Создаем игровой объект подписи под портретом
-            GameObject txtGov = new GameObject(goName);
-            txtGov.transform.SetParent(portraitImage.transform, false);
+            // Очищаем любые мешающие плашки и прямоугольники
+            ClearUnwantedBackgrounds(txtGov);
 
-            RectTransform rect = txtGov.AddComponent<RectTransform>();
-            // Позиционируем снизу под портретом (на 25 пикселей ниже нижней кромки)
+            // --- БЛОК АВТОКОРРЕКЦИИ И САМОИСЦЕЛЕНИЯ КОРДИНАТ И СВОЙСТВ (ЭФФЕКТ ZENITH) ---
+            // Сбрасываем локальный масштаб в 1, чтобы избежать сжатия текста
+            txtGov.transform.localScale = Vector3.one;
+
+            // Позиционируем плашку имени внизу под портретом по центру (Pivot у верхней кромки: 0.5, 1)
             rect.anchorMin = new Vector2(0.5f, 0f);
             rect.anchorMax = new Vector2(0.5f, 0f);
-            rect.anchoredPosition = new Vector2(0f, -25f);
-            rect.sizeDelta = new Vector2(160f, 30f);
+            rect.pivot = new Vector2(0.5f, 1f);
+            rect.anchoredPosition = new Vector2(0f, -10f); // Ровно на 10 пикселей ниже нижней границы портрета
+            rect.sizeDelta = new Vector2(250f, 40f);
 
-            // Создаем красивую подложку для надписи имени
-            GameObject badgeBg = new GameObject("BadgeBg");
-            badgeBg.transform.SetParent(txtGov.transform, false);
-            RectTransform bgRect = badgeBg.AddComponent<RectTransform>();
-            bgRect.anchorMin = Vector2.zero;
-            bgRect.anchorMax = Vector2.one;
-            bgRect.offsetMin = new Vector2(-10f, 0f); // Слегка шире текста
-            bgRect.offsetMax = new Vector2(10f, 0f);
-
-            Image bgImg = badgeBg.AddComponent<Image>();
-            bgImg.color = new Color(0.04f, 0.05f, 0.12f, 0.95f); // Космический глубокий индиго
-
-            Outline outline = badgeBg.AddComponent<Outline>();
-            outline.effectColor = isLeft ? new Color(0.12f, 0.64f, 0.94f, 0.6f) : new Color(0.95f, 0.61f, 0.07f, 0.6f);
-            outline.effectDistance = new Vector2(1f, 1f);
-
-            TextMeshProUGUI tmp = txtGov.AddComponent<TextMeshProUGUI>();
-            tmp.text = defaultText;
-            tmp.fontSize = 13f;
-            tmp.fontWeight = FontWeight.Bold;
-            tmp.color = Color.white;
-            tmp.alignment = TextAlignmentOptions.Center;
-            tmp.textWrappingMode = TextWrappingModes.NoWrap;
-
-            // Применяем шрифт
-            if (Translator.Instance != null && Translator.Instance.defaultFont != null)
+            // Настройки текста в стиле Аэлиссы (сочный крупный шрифт, золотой/оранжевый цвет)
+            if (tmp != null)
             {
-                tmp.font = Translator.Instance.defaultFont;
-            }
+                tmp.text = defaultText;
 
-            // Перемещаем подложку на задний план, чтобы текст был поверх нее
-            badgeBg.transform.SetAsFirstSibling();
+                // Чтобы правая надпись героя выглядела так же, как у Аэлиссы
+                if (!isLeft && leftSpeakerNameText != null)
+                {
+                    tmp.font = leftSpeakerNameText.font;
+                    float targetSize = leftSpeakerNameText.fontSize;
+                    if (targetSize < 18f) targetSize = 18f; // Гарантируем крупный красивый шрифт!
+                    tmp.fontSize = targetSize;
+                    tmp.fontWeight = FontWeight.Bold; // Очень жирный
+                    tmp.fontStyle = leftSpeakerNameText.fontStyle;
+                    tmp.characterSpacing = leftSpeakerNameText.characterSpacing; // Синхронизируем широкий интервал букв
+                    tmp.lineSpacing = leftSpeakerNameText.lineSpacing;
+                    tmp.wordSpacing = leftSpeakerNameText.wordSpacing;
+                    tmp.color = leftSpeakerNameText.color;
+                }
+                else
+                {
+                    tmp.fontSize = 18f; // Наш сочный крупный шрифт 18px!
+                    tmp.fontWeight = FontWeight.Bold; // Сверхжирный
+                    tmp.color = new Color(0.95f, 0.61f, 0.07f, 1f); // Насыщенный золотисто-оранжевый в стиле Аэлиссы
+
+                    if (Translator.Instance != null && Translator.Instance.defaultFont != null)
+                    {
+                        tmp.font = Translator.Instance.defaultFont;
+                    }
+                }
+
+                tmp.alignment = TextAlignmentOptions.Center;
+                tmp.textWrappingMode = TextWrappingModes.NoWrap;
+            }
 
             return tmp;
         }
@@ -796,23 +1000,73 @@ namespace FateContinent
                 ? SaveGameSystem.CurrentData.saveName
                 : localizedClass;
 
-            // Самоисцеление: динамически создаем надписи имен под портретами в стиле Zenith Glassmorphism, если в канвасе они отсутствуют!
-            if (leftSpeakerNameText == null && companionPortraitImage != null)
+            // Очищаем имя от суффикса премиум-класса для лаконичности и делаем имена чистыми (Воин, Лучник, Маг)
+            if (!string.IsNullOrEmpty(playerDisplayName))
             {
-                leftSpeakerNameText = CreatePortraitNameLabel(companionPortraitImage, companionName, true);
+                playerDisplayName = playerDisplayName
+                    .Replace(" (Премиум)", "")
+                    .Replace("(Премиум)", "")
+                    .Replace(" (Premium)", "")
+                    .Replace("(Premium)", "")
+                    .Replace(" (프리미엄)", "")
+                    .Replace("(프리미엄)", "")
+                    .Replace(" (豪华)", "")
+                    .Replace("(豪华)", "")
+                    .Replace(" (プレミアム)", "")
+                    .Replace("(プレミアム)", "")
+                    .Replace("Снайпер", "Лучник")
+                    .Replace("Стрелок", "Лучник")
+                    .Trim();
             }
-            if (rightSpeakerNameText == null && playerPortraitImage != null)
+
+            // Наличие и чистота надписей имен в стиле Zenith
+            if (leftSpeakerNameText != null && leftSpeakerNameText.gameObject.name != "Txt_CompanionName_Dynamic")
             {
-                rightSpeakerNameText = CreatePortraitNameLabel(playerPortraitImage, playerDisplayName, false);
+                // Нативный текстовой элемент уже есть в префабе! Нам НЕ нужна динамическая копия.
+                // Навсегда удаляем Txt_CompanionName_Dynamic из иерархии под портретом Аэлиссы, чтобы убрать наложения текстов.
+                if (companionPortraitImage != null)
+                {
+                    Transform t = companionPortraitImage.transform.Find("Txt_CompanionName_Dynamic");
+                    if (t != null) DestroyImmediate(t.gameObject);
+                }
+            }
+            else
+            {
+                // Если нативной подписи нет, используем автоматическую динамическую подпись под портретом
+                if (companionPortraitImage != null)
+                {
+                    leftSpeakerNameText = CreatePortraitNameLabel(companionPortraitImage, companionName, true);
+                }
+            }
+
+            if (rightSpeakerNameText != null && rightSpeakerNameText.gameObject.name != "Txt_PlayerName_Dynamic")
+            {
+                // Нативный текстовой элемент уже есть в префабе! Нам НЕ нужна динамическая копия.
+                // Навсегда удаляем Txt_PlayerName_Dynamic из иерархии под портретом героя, чтобы убрать лишний текст.
+                if (playerPortraitImage != null)
+                {
+                    Transform t = playerPortraitImage.transform.Find("Txt_PlayerName_Dynamic");
+                    if (t != null) DestroyImmediate(t.gameObject);
+                }
+            }
+            else
+            {
+                // Если нативной подписи нет, автоматически создаем крупный жирный золотой текст под портретом выбранного героя
+                if (playerPortraitImage != null)
+                {
+                    rightSpeakerNameText = CreatePortraitNameLabel(playerPortraitImage, playerDisplayName, false);
+                }
             }
 
             // Текстовые подписи под левым и правым портеретами
             if (leftSpeakerNameText != null)
             {
+                ClearUnwantedBackgrounds(leftSpeakerNameText.gameObject);
                 leftSpeakerNameText.text = companionName;
             }
             if (rightSpeakerNameText != null)
             {
+                ClearUnwantedBackgrounds(rightSpeakerNameText.gameObject);
                 rightSpeakerNameText.text = playerDisplayName;
             }
 
@@ -886,24 +1140,24 @@ namespace FateContinent
                 }
             }
 
-            // Применяем визуальный акцент (подсвечиваем говорящего и слегка затемняем слушателя)
+            // Применяем визуальный акцент (подсвечиваем говорящего и слегка приглушаем слушателя, оставляя полную читабельность и контраст)
             if (speaking)
             {
                 // Говорит игрок
                 if (playerPortraitImage != null) playerPortraitImage.color = Color.white;
-                if (companionPortraitImage != null) companionPortraitImage.color = new Color(1f, 1f, 1f, 0.4f);
+                if (companionPortraitImage != null) companionPortraitImage.color = new Color(1f, 1f, 1f, 0.85f); // 85% видимости, сохраняем сочность и контраст!
 
                 if (rightSpeakerNameText != null) rightSpeakerNameText.color = new Color(0.95f, 0.61f, 0.07f, 1f); // Золотой
-                if (leftSpeakerNameText != null) leftSpeakerNameText.color = new Color(0.7f, 0.8f, 0.9f, 0.4f); // Приглушенный
+                if (leftSpeakerNameText != null) leftSpeakerNameText.color = new Color(0.7f, 0.8f, 0.9f, 0.6f); // Почти белый/приглушенный
             }
             else
             {
                 // Говорит компаньон (Аэлисса)
                 if (companionPortraitImage != null) companionPortraitImage.color = Color.white;
-                if (playerPortraitImage != null) playerPortraitImage.color = new Color(1f, 1f, 1f, 0.4f);
+                if (playerPortraitImage != null) playerPortraitImage.color = new Color(1f, 1f, 1f, 0.85f); // 85% видимости, наш любимый Снайпер больше не пропадает!
 
                 if (leftSpeakerNameText != null) leftSpeakerNameText.color = new Color(0.95f, 0.61f, 0.07f, 1f); // Золотой
-                if (rightSpeakerNameText != null) rightSpeakerNameText.color = new Color(0.7f, 0.8f, 0.9f, 0.4f); // Приглушенный
+                if (rightSpeakerNameText != null) rightSpeakerNameText.color = new Color(0.7f, 0.8f, 0.9f, 0.6f); // Почти белый/приглушенный
             }
 
             // ИЗЮМИНКА СЦЕНЫ: принудительно раскрываем интерактивную карту мира, когда диалог доходит до выбора места высадки (Index 3)!
@@ -912,7 +1166,9 @@ namespace FateContinent
                 if (FateMapManager.Instance != null)
                 {
                     FateMapManager.Instance.SetMapVisible(true);
-                    Debug.Log("[DIALOGUE SYSTEM] Карта мира плавно открыта на фоне для выбора места высадки.");
+                    // Задержка на 1 кадр или мгновенная подсветка
+                    FateMapManager.Instance.HighlightRing(selectedZoneIndex);
+                    Debug.Log($"[DIALOGUE SYSTEM] Карта мира плавно открыта на фоне для выбора места высадки. Текущий выбранный индекс: {selectedZoneIndex}");
                 }
             }
 
@@ -953,13 +1209,58 @@ namespace FateContinent
                 {
                     choiceContainer.SetActive(true);
                 }
-                if (nextDialogueButton != null) nextDialogueButton.gameObject.SetActive(false);
-
-                for (int i = 0; i < currentChoices.Length; i++)
+                
+                // На шаге выбора локации (Index 3) мы полностью скрываем отдельную кнопку в правом углу,
+                // заменяя ее на встроенный красивый вариант подтверждения среди кнопок выбора!
+                if (nextDialogueButton != null)
                 {
-                    int index = i;
-                    Button btn = CreateChoiceButton(currentChoices[i], () => SelectChoice(index));
-                    choiceButtons.Add(btn);
+                    nextDialogueButton.gameObject.SetActive(false);
+                }
+
+                if (currentLineIndex == 3)
+                {
+                    // Создаем 3 основные кнопки выбора регионов
+                    for (int i = 0; i < currentChoices.Length; i++)
+                    {
+                        int index = i;
+                        Button btn = CreateChoiceButton(currentChoices[i], () => SelectChoice(index));
+                        choiceButtons.Add(btn);
+                    }
+
+                    // Добавляем 4-ю встроенную кнопку для ручного подтверждения / завершения диалога!
+                    string confirmText = (lang == 0) ? "Завершить диалог" : (lang == 8) ? "结束对话" : (lang == 7) ? "대화 종료" : "End Dialogue";
+                    Button confirmBtn = CreateChoiceButton(confirmText, () => SelectChoice(selectedZoneIndex, true));
+                    choiceButtons.Add(confirmBtn);
+
+                    // Стилизуем кнопку "Завершить диалог" в изумрудных оттенках стиля Zenith Glass
+                    Image btnImg = confirmBtn.GetComponent<Image>();
+                    Outline outline = confirmBtn.GetComponent<Outline>();
+                    if (btnImg != null)
+                    {
+                        btnImg.color = new Color(0.12f, 0.45f, 0.22f, 0.95f); // Изумрудно-зеленый оттенок
+                    }
+                    if (outline != null)
+                    {
+                        outline.effectColor = new Color(0.15f, 0.85f, 0.35f, 0.95f); // Зеленый неон
+                        outline.effectDistance = new Vector2(2f, 2f);
+                    }
+                }
+                else
+                {
+                    // Для остальных шагов диалога создаем стандартные кнопки выбора
+                    for (int i = 0; i < currentChoices.Length; i++)
+                    {
+                        int index = i;
+                        Button btn = CreateChoiceButton(currentChoices[i], () => SelectChoice(index));
+                        choiceButtons.Add(btn);
+                    }
+                }
+
+                // Сразу форсируем подсветку активной кнопки и текста при первом рендере шага 3
+                if (currentLineIndex == 3)
+                {
+                    UpdateChoiceSelectionVisuals(selectedZoneIndex);
+                    UpdateInteractiveZoneText(selectedZoneIndex);
                 }
             }
             else
@@ -971,11 +1272,11 @@ namespace FateContinent
                 if (nextDialogueButton != null)
                 {
                     nextDialogueButton.gameObject.SetActive(true);
-                    // Обновляем текст кнопки под язык локализации!
+                    // Обновляем текст кнопки без использования unicode стрелок
                     TextMeshProUGUI txtTmp = nextDialogueButton.GetComponentInChildren<TextMeshProUGUI>();
                     if (txtTmp != null)
                     {
-                        txtTmp.text = (lang == 0) ? "Далее ▶" : "Next ▶";
+                        txtTmp.text = (lang == 0) ? "Далее" : "Next";
                     }
                 }
             }
@@ -1034,6 +1335,8 @@ namespace FateContinent
             if (lang == 8 && Translator.Instance.chineseFont != null) activeFont = Translator.Instance.chineseFont;
             else if (lang == 7 && Translator.Instance.koreanFont != null) activeFont = Translator.Instance.koreanFont;
 
+            if (leftSpeakerNameText != null) leftSpeakerNameText.font = activeFont;
+            if (rightSpeakerNameText != null) rightSpeakerNameText.font = activeFont;
             if (speakerNameText != null) speakerNameText.font = activeFont;
             if (dialogueBodyText != null) dialogueBodyText.font = activeFont;
         }

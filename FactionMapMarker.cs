@@ -130,8 +130,43 @@ namespace FateContinent
             }
         }
 
+        private bool isHighlightedChoice = false;
+
+        public void SetHighlightActive(bool active)
+        {
+            isHighlightedChoice = active;
+            isHovered = false;
+            
+            // Если включен инстанцированный материал, обновляем его цвета мгновенно
+            if (active)
+            {
+                targetScale = baseScale * (hoverScaleMultiplier * 1.15f);
+                SetGlowColor(hoverGlowColor);
+            }
+            else
+            {
+                targetScale = baseScale;
+                SetGlowColor(normalGlowColor * 0.4f); // Приглушаем неактивные точки для фокуса
+            }
+        }
+
         void Update()
         {
+            if (isHighlightedChoice)
+            {
+                // Для выбранной точки - усиленная красивая пульсация
+                pulseTimer += Time.deltaTime * (pulseSpeed * 1.5f);
+                float pulse = Mathf.Sin(pulseTimer) * (pulseRange * 1.2f);
+                transform.localScale = baseScale * (hoverScaleMultiplier * 1.12f + pulse);
+                
+                if (instancedMaterial != null)
+                {
+                    Color pulsedColor = hoverGlowColor * (1.1f + pulse * 0.3f);
+                    SetGlowColor(pulsedColor);
+                }
+                return;
+            }
+
             // Плавная интерполяция размера (Ховер эффект)
             transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime * scaleSpeed);
 
@@ -154,6 +189,7 @@ namespace FateContinent
         void OnMouseEnter()
         {
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return; // Проверка на перекрытие интерфейсом
+            if (isHighlightedChoice) return;
 
             isHovered = true;
             targetScale = baseScale * hoverScaleMultiplier;
@@ -165,6 +201,7 @@ namespace FateContinent
 
         void OnMouseExit()
         {
+            if (isHighlightedChoice) return;
             isHovered = false;
             targetScale = baseScale;
             SetGlowColor(normalGlowColor);
