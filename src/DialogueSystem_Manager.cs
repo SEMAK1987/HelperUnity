@@ -26,7 +26,7 @@ namespace FateContinent
         public Sprite magePortrait;         // Портрет мага для правой стороны
 
         [Header("Настройки Звуков Речи Помощника")]
-        public AudioClip companionVoiceClip; // Короткие фоновые фразы помощника при репликах
+        public AudioClip companionVoiceClip; // Короткие фракции помощника при репликах
 
         [Header("📐 Ручная Настройка Координат Текста (Inspector Tweaks)")]
         [Tooltip("Включить принудительное применение этих координат в игре. Позволяет двигать текст и кнопки прямо из инспектора в режиме игры!")]
@@ -766,7 +766,7 @@ namespace FateContinent
             {
                 if (zoneIndex == 0) desc = "<b>[크림슨 황무지]:</b> 뜨거운 모래 사막과 마력 폭풍. 체력 재생 감소. <i>(확인 버튼을 누르면 선택이 완료됩니다)</i>";
                 else if (zoneIndex == 1) desc = "<b>[빙설의 봉우리]:</b> 영구 동토와 혹한. 부대 이동 속도 감소. <i>(확인 버튼을 누르면 선택이 완료됩니다)</i>";
-                else desc = "<b>[고대 유적지]:</b> 고대 문명의 파편과 힘의 결정. 경비 석상이 작동 중. <i>(확인 버튼을 누르면 선택이 완료됩니다)</i>";
+                else desc = "<b>[고대 유적지]:</b> 고대 문명의 파편 and 힘의 결정. 경비 석상이 작동 중. <i>(확인 버튼을 누르면 선택이 완료됩니다)</i>";
             }
             else // EN / fallback
             {
@@ -948,7 +948,7 @@ namespace FateContinent
                 {
                     tmp.font = leftSpeakerNameText.font;
                     float targetSize = leftSpeakerNameText.fontSize;
-                    if (targetSize < 18f) targetSize = 18f; // Гарантируем крупный красивый шрифт!
+                    if (targetSize < 18f) targetSize = 18f; // ...
                     tmp.fontSize = targetSize;
                     tmp.fontWeight = FontWeight.Bold; // Очень жирный
                     tmp.fontStyle = leftSpeakerNameText.fontStyle;
@@ -1140,35 +1140,30 @@ namespace FateContinent
                 }
             }
 
-            // Применяем визуальный акцент (подсвечиваем говорящего и слегка приглушаем слушателя, оставляя полную читабельность и контраст)
+            // Применяем визуальный акцент
             if (speaking)
             {
-                // Говорит игрок
                 if (playerPortraitImage != null) playerPortraitImage.color = Color.white;
-                if (companionPortraitImage != null) companionPortraitImage.color = new Color(1f, 1f, 1f, 0.85f); // 85% видимости, сохраняем сочность и контраст!
+                if (companionPortraitImage != null) companionPortraitImage.color = new Color(1f, 1f, 1f, 0.85f);
 
-                if (rightSpeakerNameText != null) rightSpeakerNameText.color = new Color(0.95f, 0.61f, 0.07f, 1f); // Золотой
-                if (leftSpeakerNameText != null) leftSpeakerNameText.color = new Color(0.7f, 0.8f, 0.9f, 0.6f); // Почти белый/приглушенный
+                if (rightSpeakerNameText != null) rightSpeakerNameText.color = new Color(0.95f, 0.61f, 0.07f, 1f);
+                if (leftSpeakerNameText != null) leftSpeakerNameText.color = new Color(0.7f, 0.8f, 0.9f, 0.6f);
             }
             else
             {
-                // Говорит компаньон (Аэлисса)
                 if (companionPortraitImage != null) companionPortraitImage.color = Color.white;
-                if (playerPortraitImage != null) playerPortraitImage.color = new Color(1f, 1f, 1f, 0.85f); // 85% видимости, наш любимый Снайпер больше не пропадает!
+                if (playerPortraitImage != null) playerPortraitImage.color = new Color(1f, 1f, 1f, 0.85f);
 
-                if (leftSpeakerNameText != null) leftSpeakerNameText.color = new Color(0.95f, 0.61f, 0.07f, 1f); // Золотой
-                if (rightSpeakerNameText != null) rightSpeakerNameText.color = new Color(0.7f, 0.8f, 0.9f, 0.6f); // Почти белый/приглушенный
+                if (leftSpeakerNameText != null) leftSpeakerNameText.color = new Color(0.95f, 0.61f, 0.07f, 1f);
+                if (rightSpeakerNameText != null) rightSpeakerNameText.color = new Color(0.7f, 0.8f, 0.9f, 0.6f);
             }
 
-            // ИЗЮМИНКА СЦЕНЫ: принудительно раскрываем интерактивную карту мира, когда диалог доходит до выбора места высадки (Index 3)!
             if (currentLineIndex == 3)
             {
                 if (FateMapManager.Instance != null)
                 {
                     FateMapManager.Instance.SetMapVisible(true);
-                    // Задержка на 1 кадр или мгновенная подсветка
                     FateMapManager.Instance.HighlightRing(selectedZoneIndex);
-                    Debug.Log($"[DIALOGUE SYSTEM] Карта мира плавно открыта на фоне для выбора места высадки. Текущий выбранный индекс: {selectedZoneIndex}");
                 }
             }
 
@@ -1182,7 +1177,6 @@ namespace FateContinent
                 default: currentChoices = currentLine.choicesEN; break;
             }
 
-            // Полностью очищаем все дочерние элементы контейнера, если это не сам DialoguePanel во избежание багов
             if (choiceContainer != null && choiceContainer != dialogPanel)
             {
                 List<Transform> children = new List<Transform>();
@@ -1210,8 +1204,6 @@ namespace FateContinent
                     choiceContainer.SetActive(true);
                 }
                 
-                // На шаге выбора локации (Index 3) мы полностью скрываем отдельную кнопку в правом углу,
-                // заменяя ее на встроенный красивый вариант подтверждения среди кнопок выбора!
                 if (nextDialogueButton != null)
                 {
                     nextDialogueButton.gameObject.SetActive(false);
@@ -1219,7 +1211,6 @@ namespace FateContinent
 
                 if (currentLineIndex == 3)
                 {
-                    // Создаем 3 основные кнопки выбора регионов
                     for (int i = 0; i < currentChoices.Length; i++)
                     {
                         int index = i;
@@ -1227,27 +1218,24 @@ namespace FateContinent
                         choiceButtons.Add(btn);
                     }
 
-                    // Добавляем 4-ю встроенную кнопку для ручного подтверждения / завершения диалога!
                     string confirmText = (lang == 0) ? "Завершить диалог" : (lang == 8) ? "结束对话" : (lang == 7) ? "대화 종료" : "End Dialogue";
                     Button confirmBtn = CreateChoiceButton(confirmText, () => SelectChoice(selectedZoneIndex, true));
                     choiceButtons.Add(confirmBtn);
 
-                    // Стилизуем кнопку "Завершить диалог" в изумрудных оттенках стиля Zenith Glass
                     Image btnImg = confirmBtn.GetComponent<Image>();
                     Outline outline = confirmBtn.GetComponent<Outline>();
                     if (btnImg != null)
                     {
-                        btnImg.color = new Color(0.12f, 0.45f, 0.22f, 0.95f); // Изумрудно-зеленый оттенок
+                        btnImg.color = new Color(0.12f, 0.45f, 0.22f, 0.95f);
                     }
                     if (outline != null)
                     {
-                        outline.effectColor = new Color(0.15f, 0.85f, 0.35f, 0.95f); // Зеленый неон
+                        outline.effectColor = new Color(0.15f, 0.85f, 0.35f, 0.95f);
                         outline.effectDistance = new Vector2(2f, 2f);
                     }
                 }
                 else
                 {
-                    // Для остальных шагов диалога создаем стандартные кнопки выбора
                     for (int i = 0; i < currentChoices.Length; i++)
                     {
                         int index = i;
@@ -1256,7 +1244,6 @@ namespace FateContinent
                     }
                 }
 
-                // Сразу форсируем подсветку активной кнопки и текста при первом рендере шага 3
                 if (currentLineIndex == 3)
                 {
                     UpdateChoiceSelectionVisuals(selectedZoneIndex);
@@ -1272,7 +1259,6 @@ namespace FateContinent
                 if (nextDialogueButton != null)
                 {
                     nextDialogueButton.gameObject.SetActive(true);
-                    // Обновляем текст кнопки без использования unicode стрелок
                     TextMeshProUGUI txtTmp = nextDialogueButton.GetComponentInChildren<TextMeshProUGUI>();
                     if (txtTmp != null)
                     {
@@ -1286,7 +1272,6 @@ namespace FateContinent
         {
             if (playerPortraitImage == null) return;
 
-            // Считываем текущий класс из SaveGameSystem в нижнем регистре для избежания проблем с регистром
             string savedClass = (SaveGameSystem.CurrentData != null && SaveGameSystem.CurrentData.characterClass != null) 
                 ? SaveGameSystem.CurrentData.characterClass.ToLower() 
                 : "";
@@ -1312,8 +1297,6 @@ namespace FateContinent
             }
             else
             {
-                // Если сохранённый класс отсутствует или не совпадает, но в инспекторе/на сцене вручную задан спрайт (например, Снайпер/Strelok) —
-                // сохраняем полную видимость (Alpha = 255), иначе делаем силуэтным/полупрозрачным
                 if (playerPortraitImage.sprite != null)
                 {
                     playerPortraitImage.color = Color.white;
@@ -1357,7 +1340,6 @@ namespace FateContinent
 
         private void InitializeDialogueUI()
         {
-            // Очищаем старые ссылки, если сцена сменилась
             dialogCanvas = null;
             dialogPanel = null;
             speakerNameText = null;
@@ -1367,7 +1349,6 @@ namespace FateContinent
             playerPortraitImage = null;
             nextDialogueButton = null;
 
-            // Умный поиск: ищем FATE_DIALOGUE_CANVAS в сцене, включая неактивные корневые объекты
             GameObject rootCanvas = GameObject.Find("FATE_DIALOGUE_CANVAS");
             if (rootCanvas == null)
             {
@@ -1409,7 +1390,6 @@ namespace FateContinent
             {
                 dialogCanvas = rootCanvas.GetComponent<Canvas>();
 
-                // Хак самоисцеления: принудительно скрываем посторонние меню, чтобы избежать наложения в разных сценах
                 Transform pauseP = FindChildRecursive(rootCanvas.transform, "PausePanel");
                 if (pauseP != null) pauseP.gameObject.SetActive(false);
 
@@ -1424,7 +1404,6 @@ namespace FateContinent
                 {
                     dialogPanel = panelT.gameObject;
                     
-                    // Поиск вспомогательных контейнеров и портретов рекурсивно и по ключевым словам!
                     Image[] allImages = panelT.GetComponentsInChildren<Image>(true);
                     foreach (var img in allImages)
                     {
@@ -1439,7 +1418,6 @@ namespace FateContinent
                         }
                     }
 
-                    // Если не найдено по содержимому имени, делаем классический точечный поиск по иерархии
                     if (companionPortraitImage == null)
                     {
                         Transform compT = FindChildRecursive(panelT, "Img_CompanionPortrait");
@@ -1451,7 +1429,6 @@ namespace FateContinent
                         if (playerT != null) playerPortraitImage = playerT.GetComponent<Image>();
                     }
 
-                    // Кэшируем оригинальные спрайты из сцены для предотвращения затирания при перерисовке
                     if (companionPortraitImage != null && companionPortraitImage.sprite != null)
                     {
                         originalCompanionSprite = companionPortraitImage.sprite;
@@ -1461,7 +1438,6 @@ namespace FateContinent
                         originalPlayerSprite = playerPortraitImage.sprite;
                     }
 
-                    // Ищем выборный контейнер по ключевым словам или иерархии
                     Transform containerT = null;
                     foreach (Transform child in panelT)
                     {
@@ -1480,7 +1456,6 @@ namespace FateContinent
                     }
                     if (containerT != null) choiceContainer = containerT.gameObject;
                     
-                    // Умная классификация текстовых полей
                     leftSpeakerNameText = null;
                     rightSpeakerNameText = null;
                     dialogueBodyText = null;
@@ -1490,7 +1465,6 @@ namespace FateContinent
 
                     foreach (var tmp in tmps)
                     {
-                        // Проверяем, не принадлежит ли текст кнопкам выбора или портрету
                         Transform parentIter = tmp.transform;
                         bool isExcluded = false;
                         while (parentIter != null && parentIter != panelT)
@@ -1507,7 +1481,6 @@ namespace FateContinent
 
                         string goName = tmp.gameObject.name.ToLower();
 
-                        // Ищем тело диалога по имени или ключевым словам
                         if (goName == "txt_dialoguebody" || goName == "dialoguebody" || goName == "dialogue_body" || goName == "txt_dialogue" || goName == "dialoguebodytext" || goName == "text_dialoguebody" || goName.Contains("body") || goName.Contains("content"))
                         {
                             if (!goName.Contains("speaker") && !goName.Contains("name"))
@@ -1517,14 +1490,12 @@ namespace FateContinent
                             }
                         }
 
-                        // Собираем кандидаты для имен героев
                         if (goName.Contains("speaker") || goName.Contains("name") || goName.Contains("cap") || goName.Contains("header") || goName.Contains("title") || goName.Contains("left") || goName.Contains("right"))
                         {
                             nameTexts.Add(tmp);
                         }
                     }
 
-                    // Если body text не сформирован, берём оставшийся текст, который не попал в nameTexts
                     if (dialogueBodyText == null)
                     {
                         foreach (var tmp in tmps)
@@ -1550,7 +1521,6 @@ namespace FateContinent
                         }
                     }
 
-                    // Сортируем nameTexts по экранным координатам по оси X для точного разделения Left vs Right
                     if (nameTexts.Count >= 2)
                     {
                         nameTexts.Sort((a, b) =>
@@ -1575,10 +1545,8 @@ namespace FateContinent
                         else rightSpeakerNameText = nameTexts[0];
                     }
 
-                    // Обратная совместимость во всем коде
                     speakerNameText = leftSpeakerNameText != null ? leftSpeakerNameText : rightSpeakerNameText;
 
-                    // Укрепляем разметку СЦЕНЫ
                     if (dialogueBodyText != null)
                     {
                         dialogueBodyText.textWrappingMode = TextWrappingModes.Normal;
@@ -1592,10 +1560,8 @@ namespace FateContinent
                         rightSpeakerNameText.textWrappingMode = TextWrappingModes.NoWrap;
                     }
 
-                    // Всегда принудительно накладываем координаты и настройки из инспектора во время инициализации!
                     ApplyRectTransformTweaks();
 
-                    // Восстанавливаем разметку контейнера выбора кнопок (мягкое позиционирование для предотвращения отрезания)
                     if (choiceContainer != null)
                     {
                         HorizontalLayoutGroup existingHLayout = choiceContainer.GetComponent<HorizontalLayoutGroup>();
@@ -1613,23 +1579,20 @@ namespace FateContinent
 
                     if (speakerNameText != null && dialogueBodyText != null)
                     {
-                        Debug.Log("[DIALOGUE SYSTEM] Инициализация: Обнаружены, верифицированы и привязаны существующие UI-компоненты диалога.");
                         SetupNextDialogueButton();
                         return;
                     }
                 }
             }
 
-            // Создаем Canvas для диалогов с нуля, если в сцене его нет
             GameObject canvasGov = new GameObject("FATE_DIALOGUE_CANVAS");
             dialogCanvas = canvasGov.AddComponent<Canvas>();
             dialogCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            dialogCanvas.sortingOrder = 999; // Поверх геймплея и под меню паузы
+            dialogCanvas.sortingOrder = 999;
             
             canvasGov.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             canvasGov.AddComponent<GraphicRaycaster>();
 
-            // Создаем основную панель диалога (Специализированная шапка-контейнер "Exclusive High density Polygon Shape")
             dialogPanel = new GameObject("DialoguePanel");
             dialogPanel.transform.SetParent(canvasGov.transform, false);
             RectTransform panelRect = dialogPanel.AddComponent<RectTransform>();
@@ -1638,15 +1601,13 @@ namespace FateContinent
             panelRect.anchoredPosition = new Vector2(0f, 120f);
             panelRect.sizeDelta = new Vector2(950f, 220f);
 
-            // Фоновая подложка из матового стекла (Zenith Glassmorphism)
             Image bgImg = dialogPanel.AddComponent<Image>();
-            bgImg.color = new Color(0.04f, 0.05f, 0.09f, 0.85f); // Космический глубокий индиго
+            bgImg.color = new Color(0.04f, 0.05f, 0.09f, 0.85f);
             
             Outline outline = dialogPanel.AddComponent<Outline>();
-            outline.effectColor = new Color(0.12f, 0.64f, 0.94f, 0.6f); // Светящийся циановый ободок (как на фото)
+            outline.effectColor = new Color(0.12f, 0.64f, 0.94f, 0.6f);
             outline.effectDistance = new Vector2(2f, 2f);
 
-            // Добавляем красивую декоративную шапку (Top Panel Label "Cap" с уникальными скосами)
             GameObject headerGov = new GameObject("DialogueCap_Header");
             headerGov.transform.SetParent(dialogPanel.transform, false);
             RectTransform headerRect = headerGov.AddComponent<RectTransform>();
@@ -1656,9 +1617,8 @@ namespace FateContinent
             headerRect.sizeDelta = new Vector2(-40f, 35f);
 
             Image headerImg = headerGov.AddComponent<Image>();
-            headerImg.color = new Color(0.95f, 0.61f, 0.07f, 0.75f); // Оранжево-золотой акцент (из скриншота)
+            headerImg.color = new Color(0.95f, 0.61f, 0.07f, 0.75f);
 
-            // Текст спикера
             GameObject speakerGov = new GameObject("Txt_SpeakerName");
             speakerGov.transform.SetParent(headerGov.transform, false);
             RectTransform speakerRect = speakerGov.AddComponent<RectTransform>();
@@ -1675,14 +1635,13 @@ namespace FateContinent
             speakerNameText.alignment = TextAlignmentOptions.Left;
             speakerNameText.textWrappingMode = TextWrappingModes.NoWrap;
 
-            // Текст самой речи
             GameObject textGov = new GameObject("Txt_DialogueBody");
             textGov.transform.SetParent(dialogPanel.transform, false);
             RectTransform textRect = textGov.AddComponent<RectTransform>();
             textRect.anchorMin = new Vector2(0f, 0f);
             textRect.anchorMax = new Vector2(1f, 1f);
-            textRect.offsetMin = new Vector2(180f, 40f); // Оставляем место под левый портрет
-            textRect.offsetMax = new Vector2(-180f, -65f); // Гарантированный зазор сверху (65 пикселей под шапку для предотвращения залезания)
+            textRect.offsetMin = new Vector2(180f, 40f);
+            textRect.offsetMax = new Vector2(-180f, -65f);
 
             dialogueBodyText = textGov.AddComponent<TextMeshProUGUI>();
             dialogueBodyText.text = "Loading conversation...";
@@ -1691,45 +1650,42 @@ namespace FateContinent
             dialogueBodyText.alignment = TextAlignmentOptions.TopLeft;
             dialogueBodyText.textWrappingMode = TextWrappingModes.Normal;
 
-            // Левый Портрет: Помощница (Аэлисса) в гексагональном или круглом контейнере
             GameObject compPortraitGov = new GameObject("Img_CompanionPortrait");
             compPortraitGov.transform.SetParent(dialogPanel.transform, false);
             RectTransform compPortraitRect = compPortraitGov.AddComponent<RectTransform>();
             compPortraitRect.anchorMin = new Vector2(0f, 0.5f);
             compPortraitRect.anchorMax = new Vector2(0f, 0.5f);
-            compPortraitRect.anchoredPosition = new Vector2(-60f, 10f);
+            compPortraitRect.anchoredPosition = new Vector3(-60f, 10f);
             compPortraitRect.sizeDelta = new Vector2(160f, 160f);
 
             companionPortraitImage = compPortraitGov.AddComponent<Image>();
             companionPortraitImage.color = new Color(1f, 1f, 1f, 0.9f);
             
             Outline compOutline = compPortraitGov.AddComponent<Outline>();
-            compOutline.effectColor = new Color(0.12f, 0.64f, 0.94f, 0.9f); // Циан
+            compOutline.effectColor = new Color(0.12f, 0.64f, 0.94f, 0.9f);
             compOutline.effectDistance = new Vector2(3f, 3f);
 
-            // Правый Портрет: Выбранный Герой
             GameObject playerPortraitGov = new GameObject("Img_PlayerPortrait");
             playerPortraitGov.transform.SetParent(dialogPanel.transform, false);
             RectTransform playerPortraitRect = playerPortraitGov.AddComponent<RectTransform>();
             playerPortraitRect.anchorMin = new Vector2(1f, 0.5f);
             playerPortraitRect.anchorMax = new Vector2(1f, 0.5f);
-            playerPortraitRect.anchoredPosition = new Vector2(60f, 10f);
+            playerPortraitRect.anchoredPosition = new Vector3(60f, 10f);
             playerPortraitRect.sizeDelta = new Vector2(160f, 160f);
 
             playerPortraitImage = playerPortraitGov.AddComponent<Image>();
             playerPortraitImage.color = new Color(1f, 1f, 1f, 0.9f);
 
             Outline playerOutline = playerPortraitGov.AddComponent<Outline>();
-            playerOutline.effectColor = new Color(0.95f, 0.61f, 0.07f, 0.9f); // Оранжевый
+            playerOutline.effectColor = new Color(0.95f, 0.61f, 0.07f, 0.9f);
             playerOutline.effectDistance = new Vector2(3f, 3f);
 
-            // Контейнер Кнопок Выбора
             choiceContainer = new GameObject("ChoiceContainer");
             choiceContainer.transform.SetParent(dialogPanel.transform, false);
             RectTransform choiceRect = choiceContainer.AddComponent<RectTransform>();
             choiceRect.anchorMin = new Vector2(0f, 0f);
             choiceRect.anchorMax = new Vector2(1f, 0f);
-            choiceRect.anchoredPosition = new Vector2(0f, 30f); // Кнопки приподняты внутрь окна диалога во избежание обрезания на кромке экрана
+            choiceRect.anchoredPosition = new Vector2(0f, 30f);
             choiceRect.sizeDelta = new Vector2(-80f, 50f);
 
             HorizontalLayoutGroup hLayout = choiceContainer.AddComponent<HorizontalLayoutGroup>();
@@ -1759,7 +1715,6 @@ namespace FateContinent
             }
             else
             {
-                // Создаем красивую интерактивную кнопку "Далее" в правом нижнем углу диалоговой панели
                 GameObject nextBtnGov = new GameObject("Btn_NextDialogue");
                 nextBtnGov.transform.SetParent(dialogPanel.transform, false);
                 RectTransform nextBtnRect = nextBtnGov.AddComponent<RectTransform>();
@@ -1769,11 +1724,10 @@ namespace FateContinent
                 nextBtnRect.sizeDelta = new Vector2(140f, 38f);
 
                 Image nextBtnImg = nextBtnGov.AddComponent<Image>();
-                // Сапфирово-сине-голубой цвет кнопки
                 nextBtnImg.color = new Color(0.04f, 0.42f, 0.70f, 0.95f); 
                 
                 Outline nextBtnOutline = nextBtnGov.AddComponent<Outline>();
-                nextBtnOutline.effectColor = new Color(0f, 0.94f, 1f, 0.5f); // Циановое свечение
+                nextBtnOutline.effectColor = new Color(0f, 0.94f, 1f, 0.5f);
 
                 nextDialogueButton = nextBtnGov.AddComponent<Button>();
                 nextDialogueButton.onClick.AddListener(() => AdvanceDialogue());
@@ -1787,13 +1741,12 @@ namespace FateContinent
                 nextTextRect.offsetMax = Vector2.zero;
 
                 TextMeshProUGUI nextTmp = nextTextGov.AddComponent<TextMeshProUGUI>();
-                nextTmp.text = "Далее ▶";
+                nextTmp.text = "Далее";
                 nextTmp.fontSize = 13f;
                 nextTmp.fontWeight = FontWeight.Bold;
                 nextTmp.color = Color.white;
                 nextTmp.alignment = TextAlignmentOptions.Center;
 
-                // Накатываем активный шрифт
                 if (Translator.Instance != null && Translator.Instance.defaultFont != null)
                 {
                     nextTmp.font = Translator.Instance.defaultFont;
@@ -1808,7 +1761,6 @@ namespace FateContinent
             GameObject btnGov = new GameObject("Btn_DialogueChoice");
             btnGov.transform.SetParent(choiceContainer.transform, false);
             
-            // Настройка жестких макетов, чтобы текст вариантов никогда не сжимался по вертикали или буква к букве
             LayoutElement layout = btnGov.AddComponent<LayoutElement>();
             layout.minWidth = choiceButtonMinWidth;
             layout.preferredWidth = choiceButtonPreferredWidth;
@@ -1823,7 +1775,6 @@ namespace FateContinent
             Button button = btnGov.AddComponent<Button>();
             button.onClick.AddListener(onClickAction);
 
-            // Текст внутри кнопки
             GameObject textGov = new GameObject("Txt_BtnChoice");
             textGov.transform.SetParent(btnGov.transform, false);
             RectTransform textRect = textGov.AddComponent<RectTransform>();
@@ -1839,13 +1790,11 @@ namespace FateContinent
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.textWrappingMode = TextWrappingModes.Normal;
 
-            // Накатываем активный шрифт
             if (Translator.Instance != null)
             {
                 tmp.font = Translator.Instance.defaultFont;
             }
 
-            // Добавляем hover-компонент, чтобы проигрывать звуки при наведении
             btnGov.AddComponent<UIButtonPauseHover>();
 
             return button;
@@ -1855,7 +1804,6 @@ namespace FateContinent
         {
             dialogueSteps.Clear();
 
-            // Создаем тестовую стартовую цепочку (Аэлисса помогает искателю приключений)
             DialogLine l1 = new DialogLine
             {
                 textRU = "Здравствуй, путник! Наш Континент Судьбы погружается во тьму древнего безвременья. Я буду сопровождать тебя в этом опасном походе.",
@@ -1874,7 +1822,7 @@ namespace FateContinent
                 textRU = "Меня зовут Аэлисса, хранительница священного Кристалла Зенита. Моя магия защитит тебя от коварства Кровавых Пустошей.",
                 textEN = "My name is Aelyssa, keeper of the sacred Zenith Crystal. My magic will protect you from the treachery of the Crimson Wastes.",
                 textCH = "我叫艾莉莎，神圣天顶水晶的守护者。我的魔法将保护你免受绯红荒野的背叛。",
-                textKR = "내 이름은 앨리사, 신성한 제니스 크ريس탈의 수호자다. 나의 마법이 크림슨 황무지의 배신으로부터 당신을 지켜줄 것이다.",
+                textKR = "내 이름은 앨리사, 신성한 제니스 크리스탈의 수호자다. 나의 마법이 크림슨 황무지의 배신으로부터 당신을 지켜줄 것이다.",
                 choicesRU = new string[] { "Продолжить поход" },
                 choicesEN = new string[] { "Continue quest" },
                 choicesCH = new string[] { "继续旅程" },
@@ -1895,7 +1843,6 @@ namespace FateContinent
                 nextLineIndexes = new int[] { 3 }
             };
 
-            // l4 (Index 3) - Предлагает выбрать локацию для зачистки
             DialogLine l4 = new DialogLine
             {
                 textRU = "Помни: каждый выбор здесь имеет значение. Наш отряд готов к бою. Теперь выбери область на Континенте Судьбы для первой боевой зачистки:",
@@ -1909,7 +1856,6 @@ namespace FateContinent
                 nextLineIndexes = new int[] { 4, 5, 6 }
             };
 
-            // l5 (Index 4) - Результат Кровавые Пустоши
             DialogLine l5 = new DialogLine
             {
                 textRU = "Вы выбрали Кровавые Пустоши! Здесь сильны орды бандитов и адские ветры Зенита. Да пребудет с тобой благословение Кристалла! Мы отправляемся в бой.",
@@ -1920,10 +1866,9 @@ namespace FateContinent
                 choicesEN = new string[] { "End dialogue" },
                 choicesCH = new string[] { "结束对话" },
                 choicesKR = new string[] { "대화 종료" },
-                nextLineIndexes = null // Конец диалога
+                nextLineIndexes = null
             };
 
-            // l6 (Index 5) - Результат Ледяной Пик
             DialogLine l6 = new DialogLine
             {
                 textRU = "Вы выбрали Ледяной Пик! Вечная мерзлота проверяет волю на прочность, а Ледяные Големы стерегут древние сокровища. Да пребудет с тобой благословение Кристалла!",
@@ -1937,7 +1882,6 @@ namespace FateContinent
                 nextLineIndexes = null
             };
 
-            // l7 (Index 6) - Результат Древние Руины
             DialogLine l7 = new DialogLine
             {
                 textRU = "Вы выбрали Древние Руины! Забытые катакомбы хранят остатки древних кристаллов Зенита, но берегись ловушек и древних теней. Да пребудет с тобой благословение Кристалла!",

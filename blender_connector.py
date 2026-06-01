@@ -101,7 +101,7 @@ class AI_ASSISTANT_PT_Panel(bpy.types.Panel):
         props = context.scene.ai_assistant_props
         
         col = layout.column(align=True)
-        col.label(text="v18.8.0 - Zenith Audio Autonomy & Standalone Routing (Stable Sync Active)")
+        col.label(text="v18.11.0 - Zenith Map & Dialogue Sync (Sync Active)")
         col.prop(props, "server_url")
         col.prop(props, "mode")
         

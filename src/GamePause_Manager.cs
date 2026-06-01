@@ -609,7 +609,7 @@ namespace FateContinent
                 case 0: return "Вы уверены, что хотите выйти? Весь несохраненный прогресс будет утерян.";
                 case 2: return "Bist du sicher, dass du beenden willst? Ungespeicherter Fortschritt geht verloren.";
                 case 3: return "Êtes-vous sûr de vouloir quitter ? Progression non sauvegarde de l'échec.";
-                case 4: return "¿Estás seguro de que quieres salir? El progreso no guardado se perderá.";
+                case 4: return "¿Estás seguro de HTML? El progreso no guardado se perderá.";
                 case 5: return "Tem certeza de que deseja sair? O progresso não salvo será perdido.";
                 case 6: return "本当に終了しますか？保存されていない進行状況は失われます。";
                 case 7: return "정말 종료하시겠습니까? 저장되지 않은 진행 상황은 사라집니다.";
@@ -675,7 +675,7 @@ namespace FateContinent
             switch (Translator.LanguageID)
             {
                 case 0: return "Автосохранение успешно создано!";
-                case 2: return "Auto-Speicherung erfolgreich erstellt!";
+                case 2: return "Auto-Speicherung успешно создана!";
                 case 3: return "Sauvegarde automatique créée avec succès!";
                 case 4: return "¡Guardado automático creado con éxito!";
                 case 5: return "Salvamento automático criado com sucesso!";
