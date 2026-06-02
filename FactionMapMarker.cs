@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 /*
- * [FATE CONTINENT - ZENITH DIALOGUE & MAP SYSTEM v18.9.0]
+ * [FATE CONTINENT - ZENITH DIALOGUE & MAP SYSTEM v18.11.0]
  * Автономный C# компонент для интерактивных маркеров континентов и фракций.
  * Обеспечивает плавное свечение (Bloom/Emission), интерактивный ховер, затухание
  * и интеграцию со звуком через SettingsManager.
