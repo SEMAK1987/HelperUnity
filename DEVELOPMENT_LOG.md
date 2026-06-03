@@ -1,5 +1,8 @@
 # DEVELOPMENT LOG
 
+## [2026-06-03]
+- **v18.11.1**: Ultimate Independent Map & Ring Scaling and Positioning Sync. Separated ring scaling completely from parent Map scale compensation inside both `FateMapManager.cs` and `FactionMapMarker.cs`. Recalculates `baseScale` and `targetScale` dynamically every frame at runtime to facilitate real-time inspector updates.
+
 ## [2026-06-02]
 - **v18.11.0**: Zenith Map & Dialogue Blueprint Sync. Integrates precise Inspector guidelines into the project core database. Synchronizes FateMapManager (glowing landmarks, customized hover/click soundscapes, and auto-HDR neon calibration mapped to bloom material M_Neon_Glow) and DialogueSystem_Manager (dual local companion voices, case-insensitive class portraits, and anchored coords alignments).
 - **v18.10.0**: Zenith Map Master System. Interactive Continents & Auto-HDR Neon Calibration. Custom interactive map markers with auto-calibrating HDR neon colors, Bloom-glowing ring feedback, click-sound bindings, and multi-option dial branching.

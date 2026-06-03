@@ -1,6 +1,6 @@
 {
   "project_name": "Unity & Blender AI Assistant",
-  "version": "18.11.0",
+  "version": "18.11.3",
   "interface_structure": {
     "tabs": [
       "studio",
@@ -49,5 +49,5 @@
       "src/UnitBase.cs"
     ]
   },
-  "last_scan": "2026-05-31T10:58:21.608Z"
+  "last_scan": "2026-06-03T17:57:47.484Z"
 }

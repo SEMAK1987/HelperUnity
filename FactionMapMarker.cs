@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 /*
- * [FATE CONTINENT - ZENITH DIALOGUE & MAP SYSTEM v18.11.0]
+ * [FATE CONTINENT - ZENITH DIALOGUE & MAP SYSTEM v18.11.1]
  * Автономный C# компонент для интерактивных маркеров континентов и фракций.
  * Обеспечивает плавное свечение (Bloom/Emission), интерактивный ховер, затухание
  * и интеграцию со звуком через SettingsManager.
@@ -44,6 +44,10 @@ namespace FateContinent
         [Tooltip("Будет воспроизведен звук клика при активации")]
         public string clickSfxName = "UI_Click_Metallic";
         public string hoverSfxName = "UI_Hover_Soft";
+
+        [Header("Компенсация масштабирования")]
+        [Tooltip("Переопределение локального масштаба из FateMapManager")]
+        public Vector3 localScaleOverride = Vector3.one;
 
         // Внутренние переменные
         private SpriteRenderer spriteRenderer;
@@ -140,18 +144,51 @@ namespace FateContinent
             // Если включен инстанцированный материал, обновляем его цвета мгновенно
             if (active)
             {
-                targetScale = baseScale * (hoverScaleMultiplier * 1.15f);
                 SetGlowColor(hoverGlowColor);
             }
             else
             {
-                targetScale = baseScale;
                 SetGlowColor(normalGlowColor * 0.4f); // Приглушаем неактивные точки для фокуса
             }
         }
 
         void Update()
         {
+            // --- ZENITH QUANTUM INDEPENDENT SCALE CALCULATION ---
+            float masterRingScale = 1.0f;
+            float parentMapScale = 1.0f;
+
+            if (FateMapManager.Instance != null)
+            {
+                masterRingScale = FateMapManager.Instance.ringScale;
+                parentMapScale = FateMapManager.Instance.mapScale;
+            }
+
+            // Абсолютная независимость: делим желаемый ringScale на масштаб карты (parentMapScale).
+            // Это гарантирует, что при увеличении карты кольцо остается точно заданного размера!
+            float compensatedComp = masterRingScale / (parentMapScale > 0.001f ? parentMapScale : 1.0f);
+            baseScale = new Vector3(compensatedComp, compensatedComp, 1.0f);
+
+            // Если задано внешнее переопределение размера (например, из FateMapManager), используем его
+            if (localScaleOverride != Vector3.one && localScaleOverride != Vector3.zero)
+            {
+                baseScale = localScaleOverride;
+            }
+
+            // Рассчитываем целевой масштаб на основе интерактивных состояний в реальном времени
+            if (isHighlightedChoice)
+            {
+                targetScale = baseScale * (hoverScaleMultiplier * 1.15f);
+            }
+            else if (isHovered)
+            {
+                targetScale = baseScale * hoverScaleMultiplier;
+            }
+            else
+            {
+                targetScale = baseScale;
+            }
+
             if (isHighlightedChoice)
             {
                 // Для выбранной точки - усиленная красивая пульсация
@@ -192,7 +229,6 @@ namespace FateContinent
             if (isHighlightedChoice) return;
 
             isHovered = true;
-            targetScale = baseScale * hoverScaleMultiplier;
             SetGlowColor(hoverGlowColor);
 
             // Воспроизведение звука наведения через SettingsManager (если он есть) или локальный клип
@@ -203,7 +239,6 @@ namespace FateContinent
         {
             if (isHighlightedChoice) return;
             isHovered = false;
-            targetScale = baseScale;
             SetGlowColor(normalGlowColor);
         }
 
@@ -211,7 +246,8 @@ namespace FateContinent
         {
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
 
-            targetScale = baseScale * (hoverScaleMultiplier * 0.9f); // Небольшое сжатие при клике
+            // Мягко сжимаем размер при нажатии
+            transform.localScale = baseScale * (hoverScaleMultiplier * 0.9f);
             PlaySfx(clickSfxName);
 
             // Событие выбора фракции на карте
@@ -220,10 +256,7 @@ namespace FateContinent
 
         void OnMouseUp()
         {
-            if (isHovered)
-                targetScale = baseScale * hoverScaleMultiplier;
-            else
-                targetScale = baseScale;
+            // Состояние сжатия сбрасывается автоматически в следующем кадре Update()
         }
 
         private void SetGlowColor(Color color)
@@ -271,8 +304,8 @@ namespace FateContinent
             
             if (triggerDialogueOnClassClick && DialogueSystem_Manager.Instance != null)
             {
-                // Мгновенный запуск диалога на нужном слайде!
-                DialogueSystem_Manager.Instance.StartDialogue(associatedDialogueIndex);
+                // Мгновенный запуск диалога на нужном слайде с передачей имени и подписи!
+                DialogueSystem_Manager.Instance.OnMapMarkerClicked(associatedDialogueIndex, factionName, factionDescription);
             }
             else
             {

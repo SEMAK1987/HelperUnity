@@ -1903,5 +1903,53 @@ namespace FateContinent
             dialogueSteps.Add(l6);
             dialogueSteps.Add(l7);
         }
+
+        /// <summary>
+        /// Совместимый псевдоним запуска диалога с маркера карты
+        /// </summary>
+        public void OnMapMarkerClicked(int dialogueIndex)
+        {
+            StartDialogue(dialogueIndex);
+        }
+
+        /// <summary>
+        /// Совместимый псевдоним запуска диалога с маркера карты по умолчанию
+        /// </summary>
+        public void OnMapMarkerClicked()
+        {
+            StartDialogue();
+        }
+
+        /// <summary>
+        /// Совместимый псевдоним запуска диалога с 3 аргументами (для предотвращения ошибки CS1501)
+        /// </summary>
+        public void OnMapMarkerClicked(int dialogueIndex, string name, string description)
+        {
+            StartDialogue(dialogueIndex);
+        }
+
+        /// <summary>
+        /// Совместимый псевдоним запуска диалога с 3 аргументами (для предотвращения ошибки CS1501 - альтернативный порядок)
+        /// </summary>
+        public void OnMapMarkerClicked(string name, string description, int dialogueIndex)
+        {
+            StartDialogue(dialogueIndex);
+        }
+
+        /// <summary>
+        /// Абсолютно универсальный псевдоним с 3 аргументами для любых типов данных (int, string, float, object)
+        /// </summary>
+        public void OnMapMarkerClicked(object first, object second, object third)
+        {
+            int index = 0;
+            if (first is int i1) index = i1;
+            else if (second is int i2) index = i2;
+            else if (third is int i3) index = i3;
+            else if (first != null && int.TryParse(first.ToString(), out int p1)) index = p1;
+            else if (second != null && int.TryParse(second.ToString(), out int p2)) index = p2;
+            else if (third != null && int.TryParse(third.ToString(), out int p3)) index = p3;
+            
+            StartDialogue(index);
+        }
     }
 }

@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.0. Zenith Map & Dialogue Blueprint Sync - Interactive neon-glow markers, custom voice/class portraits, auto-coordinate enforcement, and multi-option branching.",
+  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.3. Zenith Compiler Integration - Resolves FateMapManager localScaleOverride CS1061 errors on FactionMapMarker.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

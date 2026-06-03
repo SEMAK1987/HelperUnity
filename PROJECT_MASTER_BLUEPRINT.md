@@ -1,17 +1,17 @@
 # PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Total Knowledge Archive Edition)
 
-> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.11.0.
+> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.11.3.
 
 ## 1. Общая информация
-- **Версия Помощника:** 18.11.0
-- **Описание:** Гибридный ИИ-помощник нового поколения (v18.11.0 - Zenith Map & Dialogue Blueprint Sync - Interactive neon-glow markers, custom voice/class portraits, auto-coordinate enforcement, and multi-option branching) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка восстановления ошибочных привязок UI Инспектора, синхронизации UI, локальной маршрутизации на стабильные хосты во время паузы игры, глобального менеджера сохранений SaveGameSystem.cs и языковых ассетов (SDF), а также передовых гайдлайнов Suno, Udio и Pixabay Sound Effects с AudioMixer. Полная справочная база по озвучке элементов UI, сумок, навыков, монстров, а также по маршрутизации AudioMixer в Unity.
+- **Версия Помощника:** 18.11.3
+- **Описание:** Гибридный ИИ-помощник нового поколения (v18.11.3 - Zenith Compiler Integration & FactionMapMarker localScaleOverride Sync) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка восстановления ошибочных привязок UI Инспектора, синхронизации UI, локальной маршрутизации на стабильные хосты во время паузы игры, глобального менеджера сохранений SaveGameSystem.cs и языковых ассетов (SDF), а также передовых гайдлайнов Suno, Udio и Pixabay Sound Effects с AudioMixer. Полная справочная база по озвучке элементов UI, сумок, навыков, монстров, а также по маршрутизации AudioMixer в Unity.
 - **Путь проекта:** Не задан
 - **Локальное хранилище:** Не задано
 - **Версия Unity:** unknown
 - **Версия Blender:** unknown
 - **Версия GIMP:** unknown
 - **Версия Redot:** unknown
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_11_0_FATE_MASTER]
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_11_3_FATE_MASTER]
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -42,17 +42,17 @@
 
 ### Системные инструкции
 ```text
-undefined
+You are Zenith Quantum Divine Assistant, guiding the Fate Continent world development and Unity/Blender workflows.
 ```
 
 
-## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.11.0 - Zenith Map & Dialogue Blueprint Sync)
+## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.11.3 - Zenith Compiler Integration)
 ### Режимы работы и Архитектурные уровни
 - **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.
 - **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.
 - **No-Internet Mode (Quantum Archive):** 10,000+ видео-уроков. Мгновенный доступ при любых внешних условиях.
 
-### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.11.0 Sync)
+### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.11.3 Sync)
 - **Unity 6 Physics & Optimization:** [Video #2](https://www.youtube.com/watch?v=9vuyis_Y-LY)
 - **Blender Advanced Rigging:** [Video #3](https://www.youtube.com/watch?v=UKZp67dY1_w)
 - **Shader Graph Mastery:** [Video #4](https://www.youtube.com/watch?v=-hvxjyzcSkI)
@@ -293,7 +293,10 @@ Freesound содержит миллионы звуков от инди-разр�
 - **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.
 - **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.
 
-## 13. История изменений (v18.11.0)
+## 13. История изменений (v18.11.3)
+- **v18.11.3:** Zenith Compiler Integration & FactionMapMarker localScaleOverride Sync • Resolves C# error CS1061 in FateMapManager.cs when trying to access the localScaleOverride property on FactionMapMarker. Added the localScaleOverride field to FactionMapMarker.cs and updated its Update() method to smoothly incorporate any external size offsets dynamically.
+- **v18.11.2:** Zenith Compiler Compatibility & Multi-Signature Overloads • Fixes compilation errors CS1061 and CS1501 in Unity. Introduced 3-argument overloads for `OnMapMarkerClicked(associatedDialogueIndex, factionName, factionDescription)` (including fully dynamic type parsing via generic objects) in `DialogueSystem_Manager.cs`, and added compatible `PlaySfx(string)` and `PlaySfx(AudioClip)` aliases in `SettingsManager.cs` to ensure absolute C# compilation out-of-the-box.
+- **v18.11.1:** Ultimate Independent Map & Ring Scaling and Positioning Sync • Separated ring scaling completely from parent Map scale compensation inside both `FateMapManager.cs` and `FactionMapMarker.cs`. Recalculates `baseScale` and `targetScale` dynamically every frame at runtime to facilitate real-time inspector updates.
 - **v18.11.0:** Zenith Map & Dialogue Blueprint Sync • Components Setup Sync - Synchronizes the blueprint with exact component guidelines for FateMapManager (glowing neon rings, HDR colors, default glow material M_Neon_Glow) and DialogueSystem_Manager (dual local companion voices, case-insensitive class portraits, and anchored coords alignments).
 - **v18.10.1:** Dialogue UI Uplift - Matches character avatar files on case-insensitive class, forces alpha opacity fallback, zero-delay intro sequences, and lifts dialogue option buttons to Y=30f in container.
 - **v18.10.0:** Zenith Map Master System • Interactive Continents & Auto-HDR Neon Calibration - Custom interactive map markers with auto-calibrating HDR neon colors, Bloom-glowing ring feedback, click-sound bindings, and multi-option dial branching. Implements automated neon HDR auto-calibration in FactionMapMarker.cs (Sapphire-cyan #0A6CB2, Lion Golden-yellow #B2830A, Druid Green #0AB23D, Xandria Amethyst #6F0AB2) on empty/reset values (A < 0.05, black, clear) to eliminate reverting inspector parameters.
