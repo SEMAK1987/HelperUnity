@@ -14,5 +14,9 @@
   {
     "issue": "Missing Script",
     "solution": "Компонент ссылается на удаленный или перемещенный скрипт. Используйте 'Unity Cleanup' для удаления битых ссылок."
+  },
+  {
+    "issue": "CS1061 / CS1501 scale override errors in FateMapManager or FactionMapMarker",
+    "solution": "Убедитесь, что в FactionMapMarker.cs объявлено поле public Vector3 localScaleOverride = Vector3.one; и оно учитывается при компенсации масштаба, а в DialogueSystem_Manager.cs добавлены совместимые overloads для OnMapMarkerClicked."
   }
 ]
