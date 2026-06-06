@@ -61,6 +61,10 @@ namespace FateContinent
         void Awake()
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.color = Color.white; // Держим идеально белый цвет оригинальной картинки!
+            }
             baseScale = transform.localScale;
             targetScale = baseScale;
 
@@ -73,11 +77,9 @@ namespace FateContinent
                 Debug.Log($"[FactionMapMarker] Колайдер 2D отсутствовал на '{gameObject.name}'. Автоматически добавлен CircleCollider2D для корректного перехвата кликов.");
             }
 
-            // Авто-калибровка неоновых цветов, если они оставлены по умолчанию (прозрачные, черные или не настроены)
-            if (normalGlowColor.a < 0.05f || normalGlowColor == Color.black || normalGlowColor == Color.clear)
-            {
-                AutoCalibrateColors();
-            }
+            // Убрали принудительную перекалибровку неоновых цветов, если пользователь установил белый цвет на максимум!
+            normalGlowColor = Color.white;
+            hoverGlowColor = Color.white;
 
             // Создаем инстанс материала для индивидуального свечения (чтобы не менять общий ассет)
             if (glowMaterial != null)
@@ -85,6 +87,19 @@ namespace FateContinent
                 if (Application.isPlaying)
                 {
                     instancedMaterial = Instantiate(glowMaterial);
+                    
+                    // Гарантированно отключаем ZWrite на инстанцируемом материале во избежание черного/белого круга
+                    // позади спрайта на точках с фоном карты!
+                    if (instancedMaterial.HasProperty("_ZWrite"))
+                    {
+                        instancedMaterial.SetFloat("_ZWrite", 0.0f);
+                    }
+                    if (instancedMaterial.HasProperty("_ZWriteControl"))
+                    {
+                        instancedMaterial.SetFloat("_ZWriteControl", 0.0f);
+                    }
+                    instancedMaterial.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+
                     spriteRenderer.material = instancedMaterial;
                     SetGlowColor(normalGlowColor);
                 }
@@ -110,44 +125,7 @@ namespace FateContinent
 
         private void AutoCalibrateColors()
         {
-            string nameLower = factionName.ToLower();
-            
-            // 1. Этельгард (Эльфы) — Сапфирово-бирюзовый неон (Диалоги 3/4 или ключевые слова)
-            if (nameLower.Contains("аэлисс") || nameLower.Contains("этельгард") || nameLower.Contains("эльф") || nameLower.Contains("порт") || nameLower.Contains("ethel") || associatedDialogueIndex == 3 || associatedDialogueIndex == 4)
-            {
-                // Hex: #0A6CB2 (Интенсивность +0.5 -> умножение на 1.41)
-                // Hover Hex: #00F0FF (Интенсивность +2.0 -> умножение на 4.0)
-                normalGlowColor = new Color(10f / 255f, 108f / 255f, 178f / 255f, 1.0f) * 1.41f;
-                hoverGlowColor = new Color(0f / 255f, 240f / 255f, 255f / 255f, 1.0f) * 4.0f;
-                Debug.Log($"[FactionMapMarker] Авто-калибровка цветов для '{factionName}': Сапфирово-бирюзовый неон (Этельгард)");
-            }
-            // 2. Арделланд (Люди) — Золотисто-солнечный неон (Диалоги 5/6 или ключевые слова)
-            else if (nameLower.Contains("льв") || nameLower.Contains("цитадел") || nameLower.Contains("ардел") || nameLower.Contains("человек") || nameLower.Contains("ardel") || nameLower.Contains("lion") || associatedDialogueIndex == 5 || associatedDialogueIndex == 6)
-            {
-                // Hex: #B2830A (Интенсивность +0.5)
-                // Hover Hex: #FFD000 (Интенсивность +2.0)
-                normalGlowColor = new Color(178f / 255f, 131f / 255f, 10f / 255f, 1.0f) * 1.41f;
-                hoverGlowColor = new Color(255f / 255f, 208f / 255f, 0f / 255f, 1.0f) * 4.0f;
-                Debug.Log($"[FactionMapMarker] Авто-калибровка цветов для '{factionName}': Золотисто-солнечный неон (Арделланд)");
-            }
-            // 3. Вердантия (Друиды) — Чародейский изумрудный неон (Диалоги 7/8 или ключевые слова)
-            else if (nameLower.Contains("друид") || nameLower.Contains("вердант") || nameLower.Contains("святилищ") || nameLower.Contains("лес") || nameLower.Contains("verd") || nameLower.Contains("druid") || associatedDialogueIndex == 7 || associatedDialogueIndex == 8)
-            {
-                // Hex: #0AB23D (Интенсивность +0.5)
-                // Hover Hex: #00FF55 (Интенсивность +2.0)
-                normalGlowColor = new Color(10f / 255f, 178f / 255f, 61f / 255f, 1.0f) * 1.41f;
-                hoverGlowColor = new Color(0f / 255f, 255f / 255f, 85f / 255f, 1.0f) * 4.0f;
-                Debug.Log($"[FactionMapMarker] Авто-калибровка цветов для '{factionName}': Чародейский изумрудный неон (Вердантия)");
-            }
-            // 4. Ксандрия (Разлом/Арена) — Электрический фиолетовый неон
-            else
-            {
-                // Hex: #6F0AB2 (Интенсивность +0.5)
-                // Hover Hex: #CC00FF (Интенсивность +2.0)
-                normalGlowColor = new Color(111f / 255f, 10f / 255f, 178f / 255f, 1.0f) * 1.41f;
-                hoverGlowColor = new Color(204f / 255f, 0f / 255f, 255f / 255f, 1.0f) * 4.0f;
-                Debug.Log($"[FactionMapMarker] Авто-калибровка цветов для '{factionName}': Электрический фиолетовый неон (Ксандрия)");
-            }
+            // Метод оставлен пустым, так как мы хотим сохранить оригинальные цвета картинок без принудительного неонового тинтирования!
         }
 
         private bool isHighlightedChoice = false;
@@ -164,7 +142,8 @@ namespace FateContinent
             }
             else
             {
-                SetGlowColor(normalGlowColor * 0.4f); // Приглушаем неактивные точки для фокуса
+                // Никогда не затемняем и не приглушаем неактивные точки! Альфа канал всегда на максимум!
+                SetGlowColor(normalGlowColor);
             }
         }
 
@@ -277,18 +256,26 @@ namespace FateContinent
 
         private void SetGlowColor(Color color)
         {
+            Color colorWithMaxAlpha = color;
+            colorWithMaxAlpha.a = 1.0f; // Всегда держим альфа-канал на абсолютном максимуме!
+
             if (instancedMaterial != null)
             {
                 // Поддержка стандартного цвета шейдера Sprites-Default и HDR Emission свойств
                 if (instancedMaterial.HasProperty("_Color"))
-                    instancedMaterial.SetColor("_Color", color);
+                    instancedMaterial.SetColor("_Color", colorWithMaxAlpha);
                 
                 if (instancedMaterial.HasProperty("_EmissionColor"))
-                    instancedMaterial.SetColor("_EmissionColor", color);
+                    instancedMaterial.SetColor("_EmissionColor", colorWithMaxAlpha);
 
                 // Для URP / Sprite-Glow шейдеров
                 if (instancedMaterial.HasProperty("_GlowColor"))
-                    instancedMaterial.SetColor("_GlowColor", color);
+                    instancedMaterial.SetColor("_GlowColor", colorWithMaxAlpha);
+            }
+
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.color = Color.white; // Постоянно держим исходный белый цвет без тинта
             }
         }
 

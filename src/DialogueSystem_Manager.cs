@@ -75,8 +75,6 @@ namespace FateContinent
         public string sceneIceBoundPeak = "Scene_IceBoundPeak";
         [Tooltip("Имя сцены для Древних Руин")]
         public string sceneAncientRuins = "Scene_AncientRuins";
-        [Tooltip("Имя сцены для Святилища Зенита")]
-        public string sceneZenithSanctuary = "Scene_ZenithSanctuary";
 
         [System.Serializable]
         public class DialogLine
@@ -118,6 +116,11 @@ namespace FateContinent
         public bool IsDialogueActive
         {
             get { return isDialogueActive; }
+        }
+
+        public int SelectedZoneIndex
+        {
+            get { return selectedZoneIndex; }
         }
 
         private enum InputSystemType { Unchecked, OldInput, NewInput }
@@ -245,8 +248,17 @@ namespace FateContinent
                 {
                     rt.anchorMin = new Vector2(0f, 0f);
                     rt.anchorMax = new Vector2(1f, 0f);
-                    rt.anchoredPosition = choiceContainerPosition;
-                    rt.sizeDelta = choiceContainerSizeDelta;
+                    
+                    if (currentLineIndex == 3)
+                    {
+                        rt.anchoredPosition = new Vector2(0f, 62f);
+                        rt.sizeDelta = new Vector2(choiceContainerSizeDelta.x, 42f);
+                    }
+                    else
+                    {
+                        rt.anchoredPosition = choiceContainerPosition;
+                        rt.sizeDelta = choiceContainerSizeDelta;
+                    }
                 }
             }
         }
@@ -550,6 +562,74 @@ namespace FateContinent
         }
 
         /// <summary>
+        /// Событие вызова при клике на маркер карты. v18.11.2 (3-argument overload)
+        /// </summary>
+        public void OnMapMarkerClicked(int associatedDialogueIndex, string factionName, string factionDescription)
+        {
+            OnMapMarkerClicked((object)associatedDialogueIndex, (object)factionName, (object)factionDescription);
+        }
+
+        /// <summary>
+        /// Общий динамический оверлод для поддержки различных типов. v18.11.2 (3-argument overload)
+        /// </summary>
+        public void OnMapMarkerClicked(object associatedDialogueIndex, object factionName, object factionDescription)
+        {
+            // Пытаемся безопасно распарсить dialogueIndex
+            int dialogueIndex = 3; // fallback default
+            if (associatedDialogueIndex != null)
+            {
+                if (associatedDialogueIndex is int)
+                    dialogueIndex = (int)associatedDialogueIndex;
+                else if (associatedDialogueIndex is float)
+                    dialogueIndex = Mathf.RoundToInt((float)associatedDialogueIndex);
+                else if (associatedDialogueIndex is double)
+                    dialogueIndex = Mathf.RoundToInt((float)(double)associatedDialogueIndex);
+                else
+                    int.TryParse(associatedDialogueIndex.ToString(), out dialogueIndex);
+            }
+
+            string fName = factionName != null ? factionName.ToString() : "";
+            string fDesc = factionDescription != null ? factionDescription.ToString() : "";
+
+            Debug.Log($"[DialogueSystem_Manager] Разбор клика по маркеру: Index={dialogueIndex}, Name={fName}, Desc={fDesc}");
+
+            // Открываем диалоговое окно на нужном шаге
+            StartDialogue(dialogueIndex);
+
+            // Если шаг равен 3 (выбор локации), автоматически устанавливаем selectedZoneIndex!
+            if (dialogueIndex == 3)
+            {
+                // Поиск подходящей зоны по названию фракции/маркера
+                string fLower = fName.ToLower();
+                int targetZone = 0; // По умолчанию Кровавые Пустоши
+
+                if (fLower.Contains("пик") || fLower.Contains("ice") || fLower.Contains("ледян"))
+                {
+                    targetZone = 1;
+                }
+                else if (fLower.Contains("руин") || fLower.Contains("ancient") || fLower.Contains("развалин") || fLower.Contains("окраин"))
+                {
+                    targetZone = 2;
+                }
+                else if (fLower.Contains("святилищ") || fLower.Contains("zenith") || fLower.Contains("грозов") || fLower.Contains("storm"))
+                {
+                    targetZone = 3;
+                }
+
+                selectedZoneIndex = targetZone;
+
+                // Обновляем визуальные состояния и карту
+                if (FateMapManager.Instance != null)
+                {
+                    FateMapManager.Instance.HighlightRing(targetZone);
+                }
+
+                UpdateChoiceSelectionVisuals(targetZone);
+                UpdateInteractiveZoneText(targetZone);
+            }
+        }
+
+        /// <summary>
         /// Запустить диалог по индексу реплики
         /// </summary>
         public void StartDialogue(int startIndex = 0)
@@ -647,7 +727,7 @@ namespace FateContinent
             // Интерактивная синхронизация: если мы делаем выбор в шаге 3 (выбор места высадки на тактическую карту)
             if (currentLineIndex == 3)
             {
-                if (!forceConfirm && selectedZoneIndex != choiceIndex)
+                if (!forceConfirm)
                 {
                     // Игрок переключил выбор зоны кликом по кнопке, подсвечиваем ее на карте но не переходим на следующий слайд!
                     selectedZoneIndex = choiceIndex;
@@ -678,6 +758,17 @@ namespace FateContinent
                     FateMapManager.Instance.SwitchToMap(0);
                     FateMapManager.Instance.SetMapVisible(true);
                 }
+
+                // СОХРАНЯЕМ ВЫБРАННЫЙ ТАКТИЧЕСКИЙ ДЕСАНТ!
+                string factionName = "Багровые Пустоши";
+                if (selectedZoneIndex == 1) factionName = "Ледяной Пик";
+                else if (selectedZoneIndex == 2) factionName = "Древние Руины";
+                else if (selectedZoneIndex == 3) factionName = "Святилище Зенита";
+
+                PlayerPrefs.SetInt("LandedZoneIndex", selectedZoneIndex);
+                PlayerPrefs.SetString("LandedZoneName", factionName);
+                PlayerPrefs.Save();
+                Debug.Log($"[DIALOGUE SYSTEM] Сохранено в PlayerPrefs: LandedZoneIndex={selectedZoneIndex}, LandedZoneName={factionName}");
             }
 
             if (currentLine.nextLineIndexes != null && choiceIndex < currentLine.nextLineIndexes.Length)
@@ -707,8 +798,8 @@ namespace FateContinent
                 Button btn = choiceButtons[i];
                 if (btn == null) continue;
 
-                // Завершающая кнопка подтверждения (последний индекс на шаге 3) имеет свой собственный статический стиль изумрудного Zenith Glass
-                if (currentLineIndex == 3 && i == 4) continue;
+                // Завершающая кнопка подтверждения (последний элемент на шаге 3) имеет свой собственный статический стиль изумрудного Zenith Glass
+                if (currentLineIndex == 3 && i == choiceButtons.Count - 1) continue;
 
                 Image btnImg = btn.GetComponent<Image>();
                 Outline outline = btn.GetComponent<Outline>();
@@ -757,28 +848,28 @@ namespace FateContinent
                 if (zoneIndex == 0) desc = "<b>[Кровавые Пустоши]:</b> Выжженные песчаные дюны и бури под вечным багровым небом. Регенерация снижена. <i>(Нажмите кнопку завершения для подтверждения)</i>";
                 else if (zoneIndex == 1) desc = "<b>[Ледяной Пик]:</b> Царство вечной мерзлоты. Обитают ледяные гиганты. Скорость отряда снижена на льду. <i>(Нажмите кнопку завершения для подтверждения)</i>";
                 else if (zoneIndex == 2) desc = "<b>[Древние Руины]:</b> Величественные руины династии. Энергетические осколки и каменные стражи. <i>(Нажмите кнопку завершения для подтверждения)</i>";
-                else desc = "<b>[Святилище Зенита]:</b> Величественный лесной оазис, скрывающий истоки Кристалла под защитой лесных духов. <i>(Нажмите кнопку завершения для подтверждения)</i>";
+                else desc = "<b>[Грозовые Кряжи]:</b> Облачный архипелаг, парящий над бездной. Здесь бушуют постоянные молнии, а воздух раздирают стихийные бури. <i>(Нажмите кнопку завершения для подтверждения)</i>";
             }
             else if (lang == 8) // CH
             {
                 if (zoneIndex == 0) desc = "<b>[绯红荒野]:</b> 烈日下的沙丘与强盗。战士生命回复减慢。<i>(请点击确认按钮以完成选择)</i>";
                 else if (zoneIndex == 1) desc = "<b>[冰封之巅]:</b> 极寒冻土与巨人，生存难度极高。移动速度降低。<i>(请点击确认按钮以完成选择)</i>";
                 else if (zoneIndex == 2) desc = "<b>[远古遗迹]:</b> 遗留的能量水晶，充斥着机关巨像。<i>(请点击确认按钮以完成选择)</i>";
-                else desc = "<b>[天顶圣所]:</b> 雄伟的森林绿洲，在古老守护灵庇护下隐藏着水晶之源。<i>(请点击确认按钮以完成选择)</i>";
+                else desc = "<b>[雷暴山脊]:</b> 悬浮在深渊之上的云中群岛。雷电肆虐，元素风暴撕裂空气。<i>(请点击确认按钮以完成选择)</i>";
             }
             else if (lang == 7) // KR
             {
                 if (zoneIndex == 0) desc = "<b>[크림슨 황무지]:</b> 뜨거운 모래 사막과 마력 폭풍. 체력 재생 감소. <i>(확인 버튼을 누르면 선택이 완료됩니다)</i>";
                 else if (zoneIndex == 1) desc = "<b>[빙설의 봉우리]:</b> 영구 동토와 혹한. 부대 이동 속도 감소. <i>(확인 버튼을 누르면 선택이 완료됩니다)</i>";
                 else if (zoneIndex == 2) desc = "<b>[고대 유적지]:</b> 고대 문명의 파편 and 힘의 결정. 경비 석상이 작동 중. <i>(확인 버튼을 누르면 선택이 완료됩니다)</i>";
-                else desc = "<b>[제니스 성소]:</b> 고대 정령들의 수호 아래 크리스탈의 수수께끼가 숨겨진 웅장한 숲의 오아시스. <i>(확인 버튼을 누르면 선택이 완료됩니다)</i>";
+                else desc = "<b>[폭풍 산맥]:</b> 심연 위에 떠 있는 구름 군도. 끊임없는 번개와 원소의 폭풍. <i>(확인 버튼을 누르면 선택이 완료됩니다)</i>";
             }
             else // EN / fallback
             {
                 if (zoneIndex == 0) desc = "<b>[Crimson Wastes]:</b> Scorched ruins and firestorms. Reduced health regeneration. <i>(Press the confirmation button to proceed)</i>";
                 else if (zoneIndex == 1) desc = "<b>[Ice-Bound Peak]:</b> Ultimate permafrost and frost behemoths. Reduced move speed on ice. <i>(Press the confirmation button to proceed)</i>";
                 else if (zoneIndex == 2) desc = "<b>[Ancient Ruins]:</b> Ancient ruins with pure energy crystals but guarded by stone traps. <i>(Press the confirmation button to proceed)</i>";
-                else desc = "<b>[Zenith Sanctuary]:</b> A majestic forest oasis hiding the origin of the Crystal, guarded by ancient spirits. <i>(Press the confirmation button to proceed)</i>";
+                else desc = "<b>[Storm Ridges]:</b> Cloud archipelago floating over the abyss. Constant lightning storms and elemental tempests. <i>(Press the confirmation button to proceed)</i>";
             }
 
             if (dialogueBodyText != null)
@@ -829,11 +920,11 @@ namespace FateContinent
                 dialogPanel.SetActive(false);
             }
             
-            // После окончания любого диалога автоматически открываем и показываем карту мира
+            // После завершения диалога скрываем интерактивную тактическую карту и маркеры, чтобы они не засоряли экран!
             if (FateMapManager.Instance != null)
             {
-                FateMapManager.Instance.SetMapVisible(true);
-                Debug.Log("[DIALOGUE SYSTEM] Раскрываем интерактивную карту мира для выбора фракций.");
+                FateMapManager.Instance.SetMapVisible(false);
+                Debug.Log("[DIALOGUE SYSTEM] Сворачиваем интерактивную тактическую карту континентов.");
             }
 
             // Проверяем, на каком шаге мы закончили диалог (это определяет выбранную локацию!)
@@ -851,11 +942,6 @@ namespace FateContinent
             {
                 Debug.Log("[GATEWAY] Попытка загрузки уровня: Древние Руины!");
                 TryLoadScene(sceneAncientRuins);
-            }
-            else if (currentLineIndex == 7)
-            {
-                Debug.Log("[GATEWAY] Попытка загрузки уровня: Святилище Зенита!");
-                TryLoadScene(sceneZenithSanctuary);
             }
             
             Debug.Log("[DIALOGUE SYSTEM] Диалог завершен.");
@@ -1201,6 +1287,17 @@ namespace FateContinent
                     Destroy(child.gameObject);
                 }
             }
+
+            if (dialogPanel != null)
+            {
+                Transform existingConfirm = FindChildRecursive(dialogPanel.transform, "Btn_ConfirmDialogueChoice");
+                if (existingConfirm != null)
+                {
+                    if (Application.isPlaying) Destroy(existingConfirm.gameObject);
+                    else DestroyImmediate(existingConfirm.gameObject);
+                }
+            }
+
             choiceButtons.Clear();
 
             if (nextDialogueButton == null)
@@ -1230,20 +1327,8 @@ namespace FateContinent
                     }
 
                     string confirmText = (lang == 0) ? "Завершить диалог" : (lang == 8) ? "结束对话" : (lang == 7) ? "대화 종료" : "End Dialogue";
-                    Button confirmBtn = CreateChoiceButton(confirmText, () => SelectChoice(selectedZoneIndex, true));
+                    Button confirmBtn = CreateConfirmButton(confirmText, () => SelectChoice(selectedZoneIndex, true));
                     choiceButtons.Add(confirmBtn);
-
-                    Image btnImg = confirmBtn.GetComponent<Image>();
-                    Outline outline = confirmBtn.GetComponent<Outline>();
-                    if (btnImg != null)
-                    {
-                        btnImg.color = new Color(0.12f, 0.45f, 0.22f, 0.95f);
-                    }
-                    if (outline != null)
-                    {
-                        outline.effectColor = new Color(0.15f, 0.85f, 0.35f, 0.95f);
-                        outline.effectDistance = new Vector2(2f, 2f);
-                    }
                 }
                 else
                 {
@@ -1699,13 +1784,13 @@ namespace FateContinent
             choiceRect.anchoredPosition = new Vector2(0f, 30f);
             choiceRect.sizeDelta = new Vector2(-80f, 50f);
 
-            HorizontalLayoutGroup hLayout = choiceContainer.AddComponent<HorizontalLayoutGroup>();
-            hLayout.spacing = 20f;
-            hLayout.childAlignment = TextAnchor.MiddleCenter;
-            hLayout.childControlHeight = true;
-            hLayout.childControlWidth = true;
-            hLayout.childForceExpandHeight = false;
-            hLayout.childForceExpandWidth = true;
+            HorizontalLayoutGroup newHLayout = choiceContainer.AddComponent<HorizontalLayoutGroup>();
+            newHLayout.spacing = 20f;
+            newHLayout.childAlignment = TextAnchor.MiddleCenter;
+            newHLayout.childControlHeight = true;
+            newHLayout.childControlWidth = true;
+            newHLayout.childForceExpandHeight = false;
+            newHLayout.childForceExpandWidth = true;
 
             SetupNextDialogueButton();
         }
@@ -1811,6 +1896,59 @@ namespace FateContinent
             return button;
         }
 
+        private Button CreateConfirmButton(string choiceText, UnityEngine.Events.UnityAction onClickAction)
+        {
+            GameObject btnGov = new GameObject("Btn_ConfirmDialogueChoice");
+            btnGov.transform.SetParent(dialogPanel.transform, false);
+
+            RectTransform rect = btnGov.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.5f, 0f);
+            rect.anchorMax = new Vector2(0.5f, 0f);
+            rect.pivot = new Vector2(0.5f, 0f);
+            rect.anchoredPosition = new Vector2(0f, -35f); // Lowered well below the DialogPanel to prevent screen/button overlap
+            rect.sizeDelta = new Vector2(230f, 38f);      // Centered, professional sizing
+
+            Image btnImg = btnGov.AddComponent<Image>();
+            btnImg.color = new Color(0.12f, 0.45f, 0.22f, 0.95f);
+            
+            Outline btnOutline = btnGov.AddComponent<Outline>();
+            btnOutline.effectColor = new Color(0.15f, 0.85f, 0.35f, 0.95f);
+            btnOutline.effectDistance = new Vector2(1.5f, 1.5f);
+
+            Button button = btnGov.AddComponent<Button>();
+            button.onClick.AddListener(onClickAction);
+
+            GameObject textGov = new GameObject("Txt_BtnConfirmChoice");
+            textGov.transform.SetParent(btnGov.transform, false);
+            RectTransform textRect = textGov.AddComponent<RectTransform>();
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.offsetMin = Vector2.zero;
+            textRect.offsetMax = Vector2.zero;
+
+            TextMeshProUGUI tmp = textGov.AddComponent<TextMeshProUGUI>();
+            tmp.text = choiceText;
+            tmp.fontSize = choiceButtonFontSize - 1f; // Slightly more compact font to look premium
+            tmp.fontWeight = FontWeight.Bold;
+            tmp.color = Color.white;
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.textWrappingMode = TextWrappingModes.NoWrap;
+
+            if (Translator.Instance != null)
+            {
+                TMP_FontAsset activeFont = Translator.Instance.defaultFont;
+                int lang = Translator.LanguageID;
+                if (lang == 8 && Translator.Instance.chineseFont != null) activeFont = Translator.Instance.chineseFont;
+                else if (lang == 7 && Translator.Instance.koreanFont != null) activeFont = Translator.Instance.koreanFont;
+                
+                if (activeFont != null) tmp.font = activeFont;
+            }
+
+            btnGov.AddComponent<UIButtonPauseHover>();
+
+            return button;
+        }
+
         private void SetupFallbackDialogues()
         {
             dialogueSteps.Clear();
@@ -1859,11 +1997,11 @@ namespace FateContinent
                 textRU = "Помни: каждый выбор здесь имеет значение. Наш отряд готов к бою. Теперь выбери область на Континенте Судьбы для первой боевой зачистки:",
                 textEN = "Remember: every choice here has consequences. Our squad is ready. Now select a territory on the Fate Continent for the initial tactical sweep:",
                 textCH = "记住：这里的每一个选择都有其后果。我们的队伍已准备就绪。现在请选择命运大陆上的一个区域进行首次战术肃清：",
-                textKR = "기억해라: 이곳에서의 모든 선택은 그 결과가 따른다. 우리 부대는 전투 준비가 끝났다. 이제 운명의 대륙에서 첫 전술적 소탕을 전개할 지역을 선택해라:",
-                choicesRU = new string[] { "Кровавые Пустоши", "Ледяной Пик", "Древние Руины", "Святилище Зенита" },
-                choicesEN = new string[] { "Crimson Wastes", "Ice-Bound Peak", "Ancient Ruins", "Zenith Sanctuary" },
-                choicesCH = new string[] { "绯红荒野", "冰封之巅", "远古遗迹", "天顶圣所" },
-                choicesKR = new string[] { "크림슨 황무지", "빙설의 봉우리", "고대 유적지", "제니스 성소" },
+                textKR = "기억해라: 이곳에서의 모든 선택은 그 결과가 따른다. 우리 부대는 전투 준비가 끝났다. 이제 운명의 대륙에서 첫 전술적 소탕을 전개할 지역을 선택해ра:",
+                choicesRU = new string[] { "Кровавые Пустоши", "Ледяной Пик", "Древние Руины", "Грозовые Кряжи" },
+                choicesEN = new string[] { "Crimson Wastes", "Ice-Bound Peak", "Ancient Ruins", "Storm Ridges" },
+                choicesCH = new string[] { "绯红荒野", "冰封之巅", "远古遗迹", "雷暴山脊" },
+                choicesKR = new string[] { "크림슨 황무지", "빙설의 봉우리", "고대 유적지", "폭풍 산맥" },
                 nextLineIndexes = new int[] { 4, 5, 6, 7 }
             };
 
@@ -1872,7 +2010,7 @@ namespace FateContinent
                 textRU = "Вы выбрали Кровавые Пустоши! Здесь сильны орды бандитов и адские ветры Зенита. Да пребудет с тобой благословение Кристалла! Мы отправляемся в бой.",
                 textEN = "You have selected the Crimson Wastes! Bandit hordes and infernal Zenith winds plague this land. May the blessing of the Crystal guide us! Charging into battle.",
                 textCH = "你选择了绯红荒野！这里充斥着强盗匪帮 and 狂暴的天顶狂风。愿水晶祝福我们！即刻出发，开辟战场。",
-                textKR = "크림슨 황무지를 선택했다! 도적 떼와 거친 제니스 마력 폭풍이 몰아치는 대지다. 크리스탈의 축복이 당신을 인도하기를! 전장으로 진격한다.",
+                textKR = "크림슨 황무지를 선택했다! 도적 떼와 거친 제니스 마력 폭풍이 몰а치는 대지다. 크리스탈의 축복이 당신을 인도하기를! 전장으로 진격한다.",
                 choicesRU = new string[] { "Завершить диалог" },
                 choicesEN = new string[] { "End dialogue" },
                 choicesCH = new string[] { "结束对话" },
@@ -1908,10 +2046,10 @@ namespace FateContinent
 
             DialogLine l8 = new DialogLine
             {
-                textRU = "Вы выбрали Святилище Зенита! Здесь покоятся древние реликвии Кристалла под защитой лесных духов. Да пребудет с тобой благословение Кристалла! Мы отправляемся в путь.",
-                textEN = "You have selected the Zenith Sanctuary! Ancient remnants of the Crystal lie here under the protection of forest spirits. May the blessing of the Crystal guide us! We are on our way.",
-                textCH = "你选择了天顶圣所！古老的水晶遗迹在森林守护灵的庇佑下安息。愿水晶祝福我们！我们即刻启程。",
-                textKR = "제니스 성소를 선택하셨습니다! 고대 크리스탈 정수가 숲의 정령들의 보호 아래 잠들어 있습니다. 크리스탈의 축복이 우리와 함께하기를! 여정을 시작합니다.",
+                textRU = "Вы выбрали Грозовые Кряжи! Облачный архипелаг, парящий над бездной. Здесь бушуют постоянные молнии, а воздух раздирают стихийные бури. Да пребудет с нами Кристалл!",
+                textEN = "You have selected the Storm Ridges! A cloud archipelago floating over the abyss. Constant lightning storms rage here, and elemental tempests tear the air. May the Crystal protect us!",
+                textCH = "你选择了雷暴山脊！悬浮在深渊之上の云中群岛。这里肆虐着连绵不断的雷暴，元素风暴撕裂着空气。愿水晶庇护我们！",
+                textKR = "폭풍 산맥을 선택했다! 심연 위에 떠 있는 구름 군도입니다. 이곳에는 끊임없는 번개 폭풍이 치고 원소의 폭풍이 공기를 찢고 있습니다. 크리스탈의 보살핌이 있기를!",
                 choicesRU = new string[] { "Завершить диалог" },
                 choicesEN = new string[] { "End dialogue" },
                 choicesCH = new string[] { "结束对话" },
@@ -1927,54 +2065,6 @@ namespace FateContinent
             dialogueSteps.Add(l6);
             dialogueSteps.Add(l7);
             dialogueSteps.Add(l8);
-        }
-
-        /// <summary>
-        /// Совместимый псевдоним запуска диалога с маркера карты
-        /// </summary>
-        public void OnMapMarkerClicked(int dialogueIndex)
-        {
-            StartDialogue(dialogueIndex);
-        }
-
-        /// <summary>
-        /// Совместимый псевдоним запуска диалога с маркера карты по умолчанию
-        /// </summary>
-        public void OnMapMarkerClicked()
-        {
-            StartDialogue();
-        }
-
-        /// <summary>
-        /// Совместимый псевдоним запуска диалога с 3 аргументами (для предотвращения ошибки CS1501)
-        /// </summary>
-        public void OnMapMarkerClicked(int dialogueIndex, string name, string description)
-        {
-            StartDialogue(dialogueIndex);
-        }
-
-        /// <summary>
-        /// Совместимый псевдоним запуска диалога с 3 аргументами (для предотвращения ошибки CS1501 - альтернативный порядок)
-        /// </summary>
-        public void OnMapMarkerClicked(string name, string description, int dialogueIndex)
-        {
-            StartDialogue(dialogueIndex);
-        }
-
-        /// <summary>
-        /// Абсолютно универсальный псевдоним с 3 аргументами для любых типов данных (int, string, float, object)
-        /// </summary>
-        public void OnMapMarkerClicked(object first, object second, object third)
-        {
-            int index = 0;
-            if (first is int i1) index = i1;
-            else if (second is int i2) index = i2;
-            else if (third is int i3) index = i3;
-            else if (first != null && int.TryParse(first.ToString(), out int p1)) index = p1;
-            else if (second != null && int.TryParse(second.ToString(), out int p2)) index = p2;
-            else if (third != null && int.TryParse(third.ToString(), out int p3)) index = p3;
-            
-            StartDialogue(index);
         }
     }
 }

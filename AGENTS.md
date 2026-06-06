@@ -1,10 +1,12 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.11.4)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.11.6)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** 18.11.4
+- **Version:** 18.11.6
 - **Engine:** Unity 6 (6000.3.10f1)
 - **Updates:** Zenith Coordinates & Selection Sync - Resolves dual-coordinate feedback loop positioning by restricting scene-to-inspector sync specifically to active Scene dragging via `Selection.activeGameObject == ringObj`. Fixes missing 4th choice highlight (Zenith Sanctuary / Святилище Зенита) under Step 3 choice selectors in `DialogueSystem_Manager` by correctly omitting the 5th confirm button (index 4) instead of the 4th choice button (index 3).
+- **v18.11.5 Update:** Single Ring Visibility & Pure Coordinates Preservation - Dynamically disables other rings at runtime, displaying ONLY the single chosen landing point ring. Preserves user-entered Inspector coordinates at runtime by establishing your exact manually fine-tuned layout coordinates as hardcoded default variable parameters in C# and removing the runtime scene-sync overwrite block, completely resolving coordinate resets or values "jumping" to zero on play start.
+- **v18.11.6 Update:** Synchronized Map & Marker Dismissal - Automatically caches Faction_Marker_Aelyssa and player class markers on startup to properly control their visibility in sync with the tactical world map. Directs DialogueSystem_Manager to dismiss map visibility when ending dialogue (clicking "Завершить диалог"), completely cleaning up map background sprites, active landing point rings, and the companion companion/faction markers from the viewport upon conversation exit.
 - **Design System:** Zenith Glassmorphism (8K Ultra-High Density)
 
 ## 📑 Core Documentation References
@@ -25,7 +27,7 @@
 - **Audio Rule (CRITICAL):** Используйте только `SettingsManager.cs` для управления звуком и музыкой (включая hover-эффекты и списки воспроизведения). Скрипты `AudioHandler` и `AudioManager` должны быть полностью удалены для чистоты проекта. Музыкальные клипы продлеваются через Suno/Udio и настраиваются на бесшовное зацикливание (`loop = true`). Звуковые файлы берем с Pixabay/Freesound по CC0-лицензии и подключаем напрямую к SettingsManager или через AudioMixer.
 
 ## 🚀 Протокол «Пошаговое Мастерство» (Step-by-Step Mastery)
-1. **Отслеживание прогресса:** Текущая версия v18.11.4 (Zenith Map & Dialogue Selection Synchronization Sync. v18.11.4).
+1. **Отслеживание прогресса:** Текущая версия v18.11.6 (Zenith Map & Dialogue Selection Synchronization Sync. v18.11.6).
 2. **Инструкции Настройки Компонентов (Verified Inspector Settings):**
    - **FateMapManager (FATE_WORLD_MAP):**
      - *Maps List:* [+] Слот для глобальной карты (Map Name = "Континент Судьбы", Map Background = фоновый спрайт карты).
@@ -45,4 +47,4 @@
 5. **ОЧИСТКА:** Используйте только `SettingsManager.cs` для аудио. Удалите `AudioHandler` и `AudioManager` скрипты. Не использовать ElevenLabs.
 
 ---
-*Ядро AI пересинхронизировано (v18.11.4). Авто-апдейтер активен.*
+*Ядро AI пересинхронизировано (v18.11.6). Авто-апдейтер активен.*

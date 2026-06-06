@@ -54,7 +54,7 @@ namespace FateContinent
 
         [Tooltip("Смещение всей карты по Y")]
         [Range(-1000f, 1000f)]
-        public float mapOffsetY = 0f;
+        public float mapOffsetY = 3f;
 
         [Tooltip("Масштаб всей карты (Map Scale)")]
         [Range(0.1f, 3.0f)]
@@ -62,20 +62,20 @@ namespace FateContinent
 
         [Tooltip("Масштаб колец (Ring Scale)")]
         [Range(0.1f, 3.0f)]
-        public float ringScale = 1.0f;
+        public float ringScale = 0.2f;
 
         [Header("СМЕЩЕНИЕ КОЛЕЦ ВЫСАДКИ (RING ANCHORS)")]
         [Header("1. Wastes Ring Offset")]
-        [Range(-500f, 500f)] public float ring1OffsetX = 0f;
-        [Range(-500f, 500f)] public float ring1OffsetY = 0f;
+        [Range(-500f, 500f)] public float ring1OffsetX = 3f;
+        [Range(-500f, 500f)] public float ring1OffsetY = -2.23f;
 
         [Header("2. Peak Ring Offset")]
-        [Range(-500f, 500f)] public float ring2OffsetX = 0f;
-        [Range(-500f, 500f)] public float ring2OffsetY = 0f;
+        [Range(-500f, 500f)] public float ring2OffsetX = 3f;
+        [Range(-500f, 500f)] public float ring2OffsetY = 1.3f;
 
         [Header("3. Ruins Ring Offset")]
-        [Range(-500f, 500f)] public float ring3OffsetX = 0f;
-        [Range(-500f, 500f)] public float ring3OffsetY = 0f;
+        [Range(-500f, 500f)] public float ring3OffsetX = -1.9f;
+        [Range(-500f, 500f)] public float ring3OffsetY = -1.1f;
 
         [Header("4. Sanctuary Ring Offset")]
         [Range(-500f, 500f)] public float ring4OffsetX = 0f;
@@ -96,6 +96,7 @@ namespace FateContinent
         public bool showMapOnStart = false;
 
         private bool isMapVisible = false;
+        private int currentSelectedRingIndex = 0;
 
         public bool IsMapVisible
         {
@@ -104,6 +105,25 @@ namespace FateContinent
 
         private SpriteRenderer mapBgRenderer;
         private List<GameObject> activeRings = new List<GameObject>();
+        private List<GameObject> cachedFactionMarkers = new List<GameObject>();
+
+        private GameObject GetFactionMarker(string mName)
+        {
+            if (cachedFactionMarkers == null) cachedFactionMarkers = new List<GameObject>();
+            for (int i = 0; i < cachedFactionMarkers.Count; i++)
+            {
+                if (cachedFactionMarkers[i] != null && cachedFactionMarkers[i].name == mName)
+                {
+                    return cachedFactionMarkers[i];
+                }
+            }
+            GameObject found = GameObject.Find(mName);
+            if (found != null && !cachedFactionMarkers.Contains(found))
+            {
+                cachedFactionMarkers.Add(found);
+            }
+            return found;
+        }
 
         private void Awake()
         {
@@ -118,6 +138,18 @@ namespace FateContinent
         {
             InitializeMap(activeMapIndex);
 
+            // Кэшируем маркеры персонажей на старте, пока они активны
+            string[] markerNames = { "Faction_Marker_Aelyssa", "Faction_Marker_Voin", "Faction_Marker_Strelok", "Faction_Marker_Mag" };
+            cachedFactionMarkers.Clear();
+            foreach (string mName in markerNames)
+            {
+                GameObject markerObj = GameObject.Find(mName);
+                if (markerObj != null)
+                {
+                    cachedFactionMarkers.Add(markerObj);
+                }
+            }
+
             if (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.IsDialogueActive)
             {
                 SetMapVisible(false);
@@ -128,15 +160,50 @@ namespace FateContinent
         {
             isMapVisible = visible;
             
-            if (mapBgRenderer == null) mapBgRenderer = GetComponent<SpriteRenderer>();
-            if (mapBgRenderer != null) mapBgRenderer.enabled = visible;
-
-            foreach (GameObject ring in activeRings)
+            // Скрываем/показываем весь GameObject карты в режиме игры для 100% гарантии скрытия подложки и всех её дочерних элементов!
+            if (Application.isPlaying)
             {
-                if (ring != null) ring.SetActive(visible);
+                gameObject.SetActive(visible);
             }
 
-            Debug.Log($"[Fate Map] Видимость тактической карты изменена на: {visible}");
+            if (mapBgRenderer == null) mapBgRenderer = GetComponent<SpriteRenderer>();
+            if (mapBgRenderer != null) mapBgRenderer.enabled = Application.isPlaying ? visible : true;
+
+            for (int i = 0; i < activeRings.Count; i++)
+            {
+                if (activeRings[i] != null)
+                {
+                    if (Application.isPlaying)
+                    {
+                        // В игре мы делаем активным ТОЛЬКО то кольцо высадки, которое выбрано
+                        bool shouldBeActive = visible && (i == currentSelectedRingIndex);
+                        activeRings[i].SetActive(shouldBeActive);
+                    }
+                    else
+                    {
+                        // В редакторе показываем все кольца для удобства позиционирования
+                        activeRings[i].SetActive(true);
+                    }
+                }
+            }
+
+            // Управляем видимостью кэшированных маркеров персонажей/фракций
+            // По требованию пользователя полностью отключаем плоские белые круги (маркеры Аэлиссы и классов) во время выбора высадки и после диалога
+            if (cachedFactionMarkers != null)
+            {
+                foreach (GameObject markerObj in cachedFactionMarkers)
+                {
+                    if (markerObj != null)
+                    {
+                        if (Application.isPlaying)
+                        {
+                            markerObj.SetActive(false);
+                        }
+                    }
+                }
+            }
+
+            Debug.Log($"[Fate Map] Видимость тактической карты: {visible}, активное кольцо: {currentSelectedRingIndex}");
         }
 
         // КЛИЕНТСКИЙ СОВМЕСТИМЫЙ ИНТЕРФЕЙС SWITCH TO MAP
@@ -156,43 +223,43 @@ namespace FateContinent
         {
             mapsList = new List<MapConfig>();
             MapConfig fallbackMap = new MapConfig();
-            fallbackMap.mapName = "Арделланд";
+            fallbackMap.mapName = "Континент Судьбы";
             
             RingConfig ring1 = new RingConfig();
             ring1.ringName = "Багровые Пустоши";
             ring1.ringDescription = "Выжженная мертвая пустыня, богатая кристаллами Зенита.";
-            ring1.associatedDialogueIndex = 4;
+            ring1.associatedDialogueIndex = 3;
             ring1.localPosition = new Vector2(-120f, 40f);
             ring1.localScale = Vector3.one;
-            ring1.normalGlowColor = new Color(0.95f, 0.15f, 0.2f, 1.0f);
-            ring1.hoverGlowColor = new Color(1.0f, 0.4f, 0.45f, 2.0f);
+            ring1.normalGlowColor = Color.white;
+            ring1.hoverGlowColor = Color.white;
 
             RingConfig ring2 = new RingConfig();
             ring2.ringName = "Ледяной Пик";
             ring2.ringDescription = "Заснеженная горная гряда на севере. Здесь укрыты древние рудники.";
-            ring2.associatedDialogueIndex = 5;
-            ring2.localPosition = new Vector2(20f, 80f);
+            ring2.associatedDialogueIndex = 3;
+            ring2.localPosition = Vector2.zero;
             ring2.localScale = Vector3.one;
-            ring2.normalGlowColor = new Color(0.15f, 0.65f, 0.95f, 1.0f);
-            ring2.hoverGlowColor = new Color(0.4f, 0.85f, 1.0f, 2.0f);
+            ring2.normalGlowColor = Color.white;
+            ring2.hoverGlowColor = Color.white;
 
             RingConfig ring3 = new RingConfig();
             ring3.ringName = "Древние Руины";
             ring3.ringDescription = "Остатки разрушенной столицы первой династии.";
-            ring3.associatedDialogueIndex = 6;
-            ring3.localPosition = new Vector2(150f, -60f);
+            ring3.associatedDialogueIndex = 3;
+            ring3.localPosition = Vector2.zero;
             ring3.localScale = Vector3.one;
-            ring3.normalGlowColor = new Color(0.85f, 0.55f, 0.12f, 1.0f);
-            ring3.hoverGlowColor = new Color(1.0f, 0.75f, 0.25f, 2.0f);
+            ring3.normalGlowColor = Color.white;
+            ring3.hoverGlowColor = Color.white;
 
             RingConfig ring4 = new RingConfig();
             ring4.ringName = "Святилище Зенита";
             ring4.ringDescription = "Величественный лесной оазис, скрывающий истоки Кристалла сокрытого силой лесных духов.";
-            ring4.associatedDialogueIndex = 7;
-            ring4.localPosition = new Vector2(0f, -100f);
+            ring4.associatedDialogueIndex = 3;
+            ring4.localPosition = Vector2.zero;
             ring4.localScale = Vector3.one;
-            ring4.normalGlowColor = new Color(0.12f, 0.85f, 0.35f, 1.0f);
-            ring4.hoverGlowColor = new Color(0.25f, 1.0f, 0.55f, 2.0f);
+            ring4.normalGlowColor = Color.white;
+            ring4.hoverGlowColor = Color.white;
 
             fallbackMap.rings.Add(ring1);
             fallbackMap.rings.Add(ring2);
@@ -208,40 +275,40 @@ namespace FateContinent
             map.rings.Clear();
 
             RingConfig ring1 = new RingConfig();
-            ring1.ringName = "Кровавые Пустоши";
+            ring1.ringName = "Багровые Пустоши";
             ring1.ringDescription = "Выжженная мертвая пустыня, богатая кристаллами Зенита.";
             ring1.associatedDialogueIndex = 3;
             ring1.localPosition = new Vector2(-120f, 40f);
             ring1.localScale = Vector3.one;
-            ring1.normalGlowColor = new Color(0.95f, 0.15f, 0.2f, 1.0f);
-            ring1.hoverGlowColor = new Color(1.0f, 0.4f, 0.45f, 2.0f);
+            ring1.normalGlowColor = Color.white;
+            ring1.hoverGlowColor = Color.white;
 
             RingConfig ring2 = new RingConfig();
             ring2.ringName = "Ледяной Пик";
             ring2.ringDescription = "Заснеженная горная гряда на севере. Здесь укрыты древние рудники.";
             ring2.associatedDialogueIndex = 3;
-            ring2.localPosition = new Vector2(20f, 80f);
+            ring2.localPosition = Vector2.zero;
             ring2.localScale = Vector3.one;
-            ring2.normalGlowColor = new Color(0.15f, 0.65f, 0.95f, 1.0f);
-            ring2.hoverGlowColor = new Color(0.4f, 0.85f, 1.0f, 2.0f);
+            ring2.normalGlowColor = Color.white;
+            ring2.hoverGlowColor = Color.white;
 
             RingConfig ring3 = new RingConfig();
             ring3.ringName = "Древние Руины";
             ring3.ringDescription = "Остатки разрушенной столицы первой династии.";
             ring3.associatedDialogueIndex = 3;
-            ring3.localPosition = new Vector2(150f, -60f);
+            ring3.localPosition = Vector2.zero;
             ring3.localScale = Vector3.one;
-            ring3.normalGlowColor = new Color(0.85f, 0.55f, 0.12f, 1.0f);
-            ring3.hoverGlowColor = new Color(1.0f, 0.75f, 0.25f, 2.0f);
+            ring3.normalGlowColor = Color.white;
+            ring3.hoverGlowColor = Color.white;
 
             RingConfig ring4 = new RingConfig();
             ring4.ringName = "Святилище Зенита";
             ring4.ringDescription = "Величественный лесной оазис, скрывающий истоки Кристалла сокрытого силой лесных духов.";
             ring4.associatedDialogueIndex = 3;
-            ring4.localPosition = new Vector2(0f, -100f);
+            ring4.localPosition = Vector2.zero;
             ring4.localScale = Vector3.one;
-            ring4.normalGlowColor = new Color(0.12f, 0.85f, 0.35f, 1.0f);
-            ring4.hoverGlowColor = new Color(0.25f, 1.0f, 0.55f, 2.0f);
+            ring4.normalGlowColor = Color.white;
+            ring4.hoverGlowColor = Color.white;
 
             map.rings.Add(ring1);
             map.rings.Add(ring2);
@@ -251,18 +318,133 @@ namespace FateContinent
             Debug.Log($"[FateMapManager] Автоматически заполнили {map.rings.Count} колец высадки для карты '{map.mapName}' (Индекс: {mapIndex}) для бесшовной сюжетной завязки!");
         }
 
+        private FactionMapMarker FindMarkerForIndex(int index, string ringCustomName)
+        {
+            // Пытаемся найти по ключевым словам в имени дочерних объектов
+            foreach (Transform child in transform)
+            {
+                if (child == null) continue;
+                string nameLower = child.name.ToLower();
+                if (index == 0 && (nameLower.Contains("пустош") || nameLower.Contains("wastes") || nameLower.Contains("кровавые")))
+                    return child.GetComponent<FactionMapMarker>();
+                if (index == 1 && (nameLower.Contains("пик") || nameLower.Contains("peak") || nameLower.Contains("ледяной")))
+                    return child.GetComponent<FactionMapMarker>();
+                if (index == 2 && (nameLower.Contains("руин") || nameLower.Contains("ruins") || nameLower.Contains("древние")))
+                    return child.GetComponent<FactionMapMarker>();
+                if (index == 3 && (nameLower.Contains("святилищ") || nameLower.Contains("sanctuary") || nameLower.Contains("зенит")))
+                    return child.GetComponent<FactionMapMarker>();
+            }
+
+            // Запасной вариант 1: Поиск по точному имени (RingMarker_Имя или просто Имя)
+            string expectedPrefix = $"RingMarker_{ringCustomName}";
+            foreach (Transform child in transform)
+            {
+                if (child == null) continue;
+                if (child.name == expectedPrefix || child.name == ringCustomName)
+                    return child.GetComponent<FactionMapMarker>();
+            }
+
+            // Запасной вариант 2: по индексу дочернего элемента
+            if (index < transform.childCount)
+            {
+                Transform child = transform.GetChild(index);
+                if (child != null)
+                {
+                    return child.GetComponent<FactionMapMarker>();
+                }
+            }
+
+            return null;
+        }
+
         public void InitializeMap(int mapIndex)
         {
             if (mapBgRenderer == null) mapBgRenderer = GetComponent<SpriteRenderer>();
             
+            // Гарантируем, что список карт состоит строго из одной общей тактической карты континента!
+            if (mapsList != null && mapsList.Count > 1)
+            {
+                MapConfig singleMap = mapsList[0];
+                mapsList.Clear();
+                mapsList.Add(singleMap);
+                Debug.Log($"[FateMapManager] Каталог карт автоматически оптимизирован до ровно одного элемента в соответствии с дизайном сцены.");
+            }
+
             if (mapsList == null || mapsList.Count == 0)
             {
                 SetupFallbackMap();
             }
 
-            if (mapIndex < 0 || mapIndex >= mapsList.Count) mapIndex = 0;
+            // Всегда используем индекс 0, так как у нас в сцене ровно одна общая карта
+            mapIndex = 0;
+            activeMapIndex = 0;
 
-            MapConfig activeMap = mapsList[mapIndex];
+            MapConfig activeMap = mapsList[0];
+            
+            // В тактическом каталоге одной карты всегда поддерживаем ровно 4 кольца высадки
+            if (activeMap.rings == null) activeMap.rings = new List<RingConfig>();
+            if (activeMap.rings.Count != 4)
+            {
+                List<RingConfig> existing = new List<RingConfig>(activeMap.rings);
+                activeMap.rings.Clear();
+                for (int i = 0; i < 4; i++)
+                {
+                    if (i < existing.Count)
+                    {
+                        activeMap.rings.Add(existing[i]);
+                    }
+                    else
+                    {
+                        RingConfig r = new RingConfig();
+                        if (i == 0)
+                        {
+                            r.ringName = "Багровые Пустоши";
+                            r.ringDescription = "Выжженная мертвая пустыня, богатая кристаллами Зенита.";
+                            r.associatedDialogueIndex = 3;
+                            r.localPosition = new Vector2(-120f, 40f);
+                        }
+                        else if (i == 1)
+                        {
+                            r.ringName = "Ледяной Пик";
+                            r.ringDescription = "Заснеженная горная гряда на севере. Здесь укрыты древние рудники.";
+                            r.associatedDialogueIndex = 3;
+                            r.localPosition = Vector2.zero;
+                        }
+                        else if (i == 2)
+                        {
+                            r.ringName = "Древние Руины";
+                            r.ringDescription = "Остатки разрушенной столицы первой династии.";
+                            r.associatedDialogueIndex = 3;
+                            r.localPosition = Vector2.zero;
+                        }
+                        else if (i == 3)
+                        {
+                            r.ringName = "Святилище Зенита";
+                            r.ringDescription = "Величественный лесной оазис, скрывающий истоки Кристалла сокрытого силой лесных духов.";
+                            r.associatedDialogueIndex = 3;
+                            r.localPosition = Vector2.zero;
+                        }
+                        r.localScale = Vector3.one;
+                        r.normalGlowColor = Color.white;
+                        r.hoverGlowColor = Color.white;
+                        activeMap.rings.Add(r);
+                    }
+                }
+                Debug.Log($"[FateMapManager] Список колец на единственной карте автоматически скорректирован до 4 элементов.");
+            }
+
+            // Принудительно гарантируем сброс базовых координат в X=0 Y=0 для Ледяного Пика (1), Древних Руин (2) и Святилища Зенита (3),
+            // чтобы они никогда не накапливали старые смещения и не прыгали при запуске/перезагрузке
+            for (int i = 0; i < activeMap.rings.Count; i++)
+            {
+                if (i == 1 || i == 2 || i == 3)
+                {
+                    if (activeMap.rings[i] != null)
+                    {
+                        activeMap.rings[i].localPosition = Vector2.zero;
+                    }
+                }
+            }
 
             ApplyTransformOffsets();
 
@@ -275,10 +457,14 @@ namespace FateContinent
                 mapBgRenderer.sprite = CreateProceduralMapBackground();
             }
 
+            // Деактивируем маркеры ТОЛЬКО в режиме игры (чтобы избежать SendMessage в Editor OnValidate!)
             List<FactionMapMarker> existingMarkers = new List<FactionMapMarker>(GetComponentsInChildren<FactionMapMarker>(true));
-            foreach (var marker in existingMarkers)
+            if (Application.isPlaying)
             {
-                if (marker != null) marker.gameObject.SetActive(false);
+                foreach (var marker in existingMarkers)
+                {
+                    if (marker != null) marker.gameObject.SetActive(false);
+                }
             }
 
             activeRings.Clear();
@@ -288,76 +474,124 @@ namespace FateContinent
                 var ringConf = activeMap.rings[i];
                 if (ringConf == null) continue;
 
-                string expectedName = $"RingMarker_{ringConf.ringName}";
-                FactionMapMarker marker = existingMarkers.Find(m => m != null && m.gameObject.name == expectedName);
+                // Находим предустановленный маркер на сцене для этого сюжетного кольца
+                FactionMapMarker marker = FindMarkerForIndex(i, ringConf.ringName);
                 GameObject ringObj = null;
 
-                if (marker != null)
+                if (marker == null)
                 {
-                    ringObj = marker.gameObject;
-                    ringObj.SetActive(isMapVisible);
-
-                    if (!Application.isPlaying)
+                    // Если маркера нет вообще и мы в режиме игры, создаём его (fallback),
+                    // но для редактора не создаём лишних объектов во избежание деструктивных операций.
+                    if (Application.isPlaying)
                     {
-                        #if UNITY_EDITOR
-                        // Разрешаем обратную синхронизацию координат ТОЛЬКО если пользователь держит и двигает этот маркер в Hierarchy/Scene!
-                        bool isDraggingInScene = UnityEditor.Selection.activeGameObject == ringObj;
-                        if (isDraggingInScene)
-                        {
-                            Vector2 currentLocalPos = new Vector2(ringObj.transform.localPosition.x, ringObj.transform.localPosition.y);
-                            Vector2 offset = Vector2.zero;
-                            if (i == 0) offset = new Vector2(ring1OffsetX, ring1OffsetY);
-                            else if (i == 1) offset = new Vector2(ring2OffsetX, ring2OffsetY);
-                            else if (i == 2) offset = new Vector2(ring3OffsetX, ring3OffsetY);
-                            else if (i == 3) offset = new Vector2(ring4OffsetX, ring4OffsetY);
-
-                            Vector2 calculatedLocalPos = currentLocalPos - offset;
-
-                            if (calculatedLocalPos != ringConf.localPosition && currentLocalPos != Vector2.zero)
-                            {
-                                ringConf.localPosition = calculatedLocalPos;
-                                UnityEditor.EditorUtility.SetDirty(this);
-                            }
-                        }
-                        #endif
+                        string expectedName = $"RingMarker_{ringConf.ringName}";
+                        ringObj = new GameObject(expectedName);
+                        ringObj.transform.SetParent(this.transform);
+                        marker = ringObj.AddComponent<FactionMapMarker>();
+                        ringObj.transform.localPosition = new Vector3(ringConf.localPosition.x, ringConf.localPosition.y, -1.0f);
+                        ringObj.transform.localScale = ringConf.localScale;
+                    }
+                    else
+                    {
+                        continue;
                     }
                 }
                 else
                 {
-                    ringObj = new GameObject(expectedName);
-                    ringObj.transform.SetParent(this.transform);
-                    marker = ringObj.AddComponent<FactionMapMarker>();
-                    
-                    ringObj.transform.localPosition = new Vector3(ringConf.localPosition.x, ringConf.localPosition.y, -0.1f);
-                    ringObj.transform.localScale = ringConf.localScale;
+                    ringObj = marker.gameObject;
+                }
+
+                // Управление активным состоянием ТОЛЬКО в режиме запуска игры!
+                if (Application.isPlaying)
+                {
+                    ringObj.SetActive(isMapVisible);
+                }
+
+                // Синхронизация координат в инспекторе в режиме редактирования сцены (двухсторонняя привязка к Transform)
+                if (!Application.isPlaying && ringObj != null)
+                {
+                    Vector2 offset = Vector2.zero;
+                    if (i == 0) offset = new Vector2(ring1OffsetX, ring1OffsetY);
+                    else if (i == 1) offset = new Vector2(ring2OffsetX, ring2OffsetY);
+                    else if (i == 2) offset = new Vector2(ring3OffsetX, ring3OffsetY);
+                    else if (i == 3) offset = new Vector2(ring4OffsetX, ring4OffsetY);
+
+                    Vector3 currentT = ringObj.transform.localPosition;
+                    Vector2 currentXY = new Vector2(currentT.x, currentT.y);
+                    Vector2 expectedXY = ringConf.localPosition + offset;
+
+                    // Если пользователь ввёл или перетащил координаты в Инспекторе Transform самого RingMarker
+                    if (Vector2.Distance(currentXY, expectedXY) > 0.01f)
+                    {
+                        if (i == 0)
+                        {
+                            // Обновляем значение в конфигурации колец для Кровавых/Багровых Пустошей
+                            ringConf.localPosition = currentXY - offset;
+                        }
+                        else
+                        {
+                            // Для остальных маркеров привязываем перетаскивание НАПРЯМУЮ к слайдерам смещения (X Offset / Y Offset)!
+                            // Это гарантирует идеальную совместимость и спасает от сброса координат!
+                            float deltaX = currentXY.x - (ringConf.localPosition.x + offset.x);
+                            float deltaY = currentXY.y - (ringConf.localPosition.y + offset.y);
+                            if (i == 1) { ring2OffsetX += deltaX; ring2OffsetY += deltaY; }
+                            else if (i == 2) { ring3OffsetX += deltaX; ring3OffsetY += deltaY; }
+                            else if (i == 3) { ring4OffsetX += deltaX; ring4OffsetY += deltaY; }
+                        }
+#if UNITY_EDITOR
+                        UnityEditor.EditorUtility.SetDirty(this);
+#endif
+                        Debug.Log($"[ZENITH MAP SYNC] Синхронизируем: пользователь изменил координаты {ringConf.ringName} в Transform на {currentXY}.");
+                    }
                 }
 
                 marker.localScaleOverride = ringConf.localScale;
-                ringObj.transform.localPosition = new Vector3(ringConf.localPosition.x, ringConf.localPosition.y, -0.1f);
+                
+                // Всегда гарантированно выставляем Z координату ровно в -1.0f по требованию пользователя
+                Vector2 currentOffset = Vector2.zero;
+                if (i == 0) currentOffset = new Vector2(ring1OffsetX, ring1OffsetY);
+                else if (i == 1) currentOffset = new Vector2(ring2OffsetX, ring2OffsetY);
+                else if (i == 2) currentOffset = new Vector2(ring3OffsetX, ring3OffsetY);
+                else if (i == 3) currentOffset = new Vector2(ring4OffsetX, ring4OffsetY);
+
+                ringObj.transform.localPosition = new Vector3(ringConf.localPosition.x + currentOffset.x, ringConf.localPosition.y + currentOffset.y, -1.0f);
                 ringObj.transform.localScale = ringConf.localScale;
 
                 SpriteRenderer sr = ringObj.GetComponent<SpriteRenderer>();
-                if (sr == null) sr = ringObj.AddComponent<SpriteRenderer>();
-                
-                if (ringConf.ringSprite != null)
+                if (sr == null && Application.isPlaying)
                 {
-                    sr.sprite = ringConf.ringSprite;
+                    sr = ringObj.AddComponent<SpriteRenderer>();
                 }
-                else
+                
+                if (sr != null)
                 {
-                    sr.sprite = CreateProceduralRingSprite();
+                    if (ringConf.ringSprite != null)
+                    {
+                        if (sr.sprite != ringConf.ringSprite)
+                        {
+                            sr.sprite = ringConf.ringSprite;
+                        }
+                    }
                 }
 
                 CircleCollider2D col = ringObj.GetComponent<CircleCollider2D>();
-                if (col == null) col = ringObj.AddComponent<CircleCollider2D>();
-                
-                if (sr.sprite != null)
+                if (col == null && Application.isPlaying)
                 {
-                    col.radius = Mathf.Max(sr.sprite.bounds.extents.x, sr.sprite.bounds.extents.y);
+                    col = ringObj.AddComponent<CircleCollider2D>();
                 }
-                else
+                
+                if (col != null)
                 {
-                    col.radius = 0.5f;
+                    float expectedRadius = 0.5f;
+                    if (sr != null && sr.sprite != null)
+                    {
+                        expectedRadius = Mathf.Max(sr.sprite.bounds.extents.x, sr.sprite.bounds.extents.y);
+                    }
+                    
+                    if (!Mathf.Approximately(col.radius, expectedRadius))
+                    {
+                        col.radius = expectedRadius;
+                    }
                 }
 
                 marker.factionName = ringConf.ringName;
@@ -372,36 +606,14 @@ namespace FateContinent
                 marker.scaleSpeed = scaleSpeed;
                 marker.pulseSpeed = hoverPulseSpeed;
 
-                #if UNITY_EDITOR
+#if UNITY_EDITOR
                 if (!Application.isPlaying)
                 {
                     marker.ApplyGlowColorInEditor();
                 }
-                #endif
+#endif
 
                 activeRings.Add(ringObj);
-            }
-
-            foreach (var marker in existingMarkers)
-            {
-                if (marker != null && !activeRings.Contains(marker.gameObject))
-                {
-                    if (Application.isPlaying)
-                    {
-                        Destroy(marker.gameObject);
-                    }
-                    else
-                    {
-                        #if UNITY_EDITOR
-                        var go = marker.gameObject;
-                        UnityEditor.EditorApplication.delayCall += () => {
-                            if (go != null) DestroyImmediate(go);
-                        };
-                        #else
-                        DestroyImmediate(marker.gameObject);
-                        #endif
-                    }
-                }
             }
 
 #if UNITY_EDITOR
@@ -427,9 +639,9 @@ namespace FateContinent
                     if (activeRings[i] == null) continue;
 
                     Vector2 basePos = Vector2.zero;
-                    if (mapsList != null && activeMapIndex < mapsList.Count && activeMapIndex >= 0)
+                    if (mapsList != null && mapsList.Count > 0)
                     {
-                        var activeMap = mapsList[activeMapIndex];
+                        var activeMap = mapsList[0];
                         if (i < activeMap.rings.Count)
                         {
                             basePos = activeMap.rings[i].localPosition;
@@ -443,10 +655,10 @@ namespace FateContinent
                     else if (i == 2) { ringX += ring3OffsetX; ringY += ring3OffsetY; }
                     else if (i == 3) { ringX += ring4OffsetX; ringY += ring4OffsetY; }
 
-                    activeRings[i].transform.localPosition = new Vector3(ringX, ringY, -0.1f);
+                    // Сбрасываем Z координату ровно в -1.0f по требованию пользователя
+                    activeRings[i].transform.localPosition = new Vector3(ringX, ringY, -1.0f);
                     
                     // --- COMPENSATED INDEPENDENT SCALE ---
-                    // Делим ringScale на mapScale, чтобы его размер на экране был абсолютно независим от масштаба карты!
                     float compensatedScale = ringScale / (mapScale > 0.001f ? mapScale : 1f);
                     activeRings[i].transform.localScale = new Vector3(compensatedScale, compensatedScale, 1f);
 
@@ -461,6 +673,7 @@ namespace FateContinent
 
         public void HighlightRing(int ringIndex)
         {
+            currentSelectedRingIndex = ringIndex;
             if (activeRings == null || activeRings.Count == 0) return;
 
             for (int i = 0; i < activeRings.Count; i++)
@@ -476,6 +689,43 @@ namespace FateContinent
                 else
                 {
                     marker.SetHighlightActive(false);
+                }
+
+                if (Application.isPlaying)
+                {
+                    // Активируем ТОЛЬКО выбранное кольцо, если сама карта видима
+                    activeRings[i].SetActive(isMapVisible && (i == ringIndex));
+                }
+            }
+
+            // --- SINHRONIZACIYA KOORDINAT (ZENITH MAP SELECTION SYNC v18.11.4) ---
+            if (ringIndex >= 0 && ringIndex < activeRings.Count)
+            {
+                GameObject selectedRing = activeRings[ringIndex];
+                if (selectedRing != null)
+                {
+                    Vector3 ringPos = selectedRing.transform.localPosition;
+                    
+                    // Находим маркер Аэлиссы по имени через безопасный хелпер
+                    GameObject aelyssaMarker = GetFactionMarker("Faction_Marker_Aelyssa");
+                    if (aelyssaMarker != null)
+                    {
+                        // Сдвигаем маркер Аэлиссы на точные X, Y кольца, Z делаем чуть выше (-1.05f) для идеального наложения
+                        aelyssaMarker.transform.localPosition = new Vector3(ringPos.x, ringPos.y, -1.05f);
+                        Debug.Log($"[ZENITH SYNC] Привязали координаты Faction_Marker_Aelyssa к точке {ringIndex}: {aelyssaMarker.transform.localPosition}");
+                    }
+
+                    // Находим маркеры классов игрока (Воин, Стрелок, Маг) и тоже перетаскиваем их к этой координате высадки
+                    string[] possibleHeroMarkers = { "Faction_Marker_Voin", "Faction_Marker_Strelok", "Faction_Marker_Mag" };
+                    foreach (string heroName in possibleHeroMarkers)
+                    {
+                        GameObject heroMarker = GetFactionMarker(heroName);
+                        if (heroMarker != null)
+                        {
+                            heroMarker.transform.localPosition = new Vector3(ringPos.x, ringPos.y, -1.05f);
+                            Debug.Log($"[ZENITH SYNC] Привязали координаты {heroName} к точке {ringIndex}: {heroMarker.transform.localPosition}");
+                        }
+                    }
                 }
             }
         }
@@ -521,23 +771,44 @@ namespace FateContinent
 
         private void OnValidate()
         {
+#if UNITY_EDITOR
+            // Откладываем выполнение вызовов создания/модификации объектов и спрайтов во избежание SendMessage ограничений в OnValidate
+            UnityEditor.EditorApplication.delayCall -= OnValidateDelayed;
+            UnityEditor.EditorApplication.delayCall += OnValidateDelayed;
+#else
             ApplyTransformOffsets();
+            if (mapBgRenderer != null && mapsList != null && mapsList.Count > 0)
+            {
+                if (activeMapIndex >= 0 && activeMapIndex < mapsList.Count)
+                {
+                    mapBgRenderer.sprite = mapsList[activeMapIndex].mapBackground;
+                }
+            }
+#endif
+        }
 
+#if UNITY_EDITOR
+        private void OnValidateDelayed()
+        {
+            if (this == null) return;
+
+            // Сначала инициализируем карту, чтобы перехватить перетаскивание до того, как ApplyTransformOffsets перепишет позицию!
             if (!Application.isPlaying)
             {
                 InitializeMap(activeMapIndex);
             }
-            else
+
+            ApplyTransformOffsets();
+
+            if (mapBgRenderer != null && mapsList != null && mapsList.Count > 0)
             {
-                if (mapBgRenderer != null && mapsList != null && mapsList.Count > 0)
+                if (activeMapIndex >= 0 && activeMapIndex < mapsList.Count)
                 {
-                    if (activeMapIndex >= 0 && activeMapIndex < mapsList.Count)
-                    {
-                        mapBgRenderer.sprite = mapsList[activeMapIndex].mapBackground;
-                    }
+                    mapBgRenderer.sprite = mapsList[activeMapIndex].mapBackground;
                 }
             }
         }
+#endif
 
         #region CUSTOM COPY-PASTE FOR COORDINATES
         [ContextMenu("Copy/Position")]
