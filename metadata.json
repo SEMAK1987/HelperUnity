@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.4. Zenith Coordinates & Selection Sync - Resolves dual-coordinate feedback loop positioning and missing Zenith Sanctuary highlight on step 3.",
+  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.7. Selective Dialogue Map Dismissal & Hidden Faction Markers - Dismisses map background, rings, and hides flat class/Aelyssa markers from the tactical layout.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

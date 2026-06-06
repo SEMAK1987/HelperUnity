@@ -1263,6 +1263,13 @@ namespace FateContinent
                     FateMapManager.Instance.HighlightRing(selectedZoneIndex);
                 }
             }
+            else
+            {
+                if (FateMapManager.Instance != null)
+                {
+                    FateMapManager.Instance.SetMapVisible(false);
+                }
+            }
 
             // Обработка вариантов ответов (кнопок выбора)
             string[] currentChoices = null;

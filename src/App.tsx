@@ -199,7 +199,7 @@ function GameHelpView() {
              <BookOpen className="w-8 h-8 text-blue-500" />
              Помощь По Игре (Unity 6)
           </h2>
-          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v18.11.4</p>
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v18.11.7</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -746,7 +746,7 @@ export default function App() {
 
   const [kb, setKb] = useState<KBData | null>(null);
   const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info' | 'migration' | 'game_design' | 'game_help'>('chat');
-  const [appVersion, setAppVersion] = useState('18.11.4');
+  const [appVersion, setAppVersion] = useState('18.11.7');
 
   useEffect(() => {
     // Автоматическая синхронизация версии с сервером
@@ -4797,7 +4797,7 @@ export default function App() {
                         <div>
                           <div className="flex items-center gap-3">
                             <span className="px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-[9px] font-black uppercase text-indigo-400 tracking-widest animate-pulse">
-                              ZENITH EXCLUSIVE DIALOG SYSTEM (v18.11.4)
+                              ZENITH EXCLUSIVE DIALOG SYSTEM (v18.11.7)
                             </span>
                             <span className="px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/30 text-[9px] font-bold text-amber-400">
                               Unity 6 Ready
@@ -7686,7 +7686,7 @@ export default function App() {
                   </div>
                   <div>
                     <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic flex items-center gap-2">
-                      Сплиттер Маркеров Карт <span className="text-amber-400 text-xs px-2.5 py-1 bg-amber-500/10 rounded-full border border-amber-500/20 not-italic tracking-normal">v18.11.4</span>
+                      Сплиттер Маркеров Карт <span className="text-amber-400 text-xs px-2.5 py-1 bg-amber-500/10 rounded-full border border-amber-500/20 not-italic tracking-normal">v18.11.7</span>
                     </h3>
                     <p className="text-xs text-slate-500 uppercase tracking-[0.2em] font-bold">Нарезание триады маркеров на PNG 8K без потери качества</p>
                   </div>

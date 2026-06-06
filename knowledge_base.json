@@ -3,7 +3,7 @@
   "project_name": "Fate Continent",
   "project_path": "",
   "system_instruction": "You are Zenith Quantum Divine Assistant, guiding the Fate Continent world development and Unity/Blender workflows.",
-  "version": "18.11.4",
+  "version": "18.11.7",
   "modules": [
     {
       "name": "Localization & Fonts",
@@ -37,7 +37,8 @@
         "Zenith Independent Scale & Positioning Sync v18.11.1: Separates ring/marker scaling entirely from parent map scale compensation inside both FateMapManager.cs and FactionMapMarker.cs. Recalculates baseScale and targetScale dynamically every frame at runtime to facilitate real-time, non-stale inspector slider updates (Map Scale vs Ring Scale).",
         "Zenith Compiler Compatibility & Multi-Signature Overloads v18.11.2: Resolves compilation errors CS1061 and CS1501 inside Unity by introducing resilient multi-signature overloads. Added custom OnMapMarkerClicked(arg1, arg2, arg3) with automatic dynamic item extraction to DialogueSystem_Manager, along with PlaySfx(string sfxName) and PlaySfx(AudioClip) overloads inside SettingsManager to bridge diverse asset trigger variants without manual editing.",
         "Zenith Compiler Integration & FactionMapMarker localScaleOverride Sync v18.11.3: Resolves Unity error CS1061 where FateMapManager tried to access non-existent localScaleOverride field inside FactionMapMarker. Incorporated the localScaleOverride field in FactionMapMarker.cs and utilized it in real-time scale calculations.",
-        "Zenith Coordinates & Selection Sync v18.11.4: Resolves dual-coordinate feedback loop positioning by restricting scene-to-inspector sync specifically to active Scene dragging via Selection.activeGameObject == ringObj. Fixes missing 4th choice highlight (Zenith Sanctuary / Святилище Зенита) under Step 3 choice selectors in DialogueSystem_Manager by correctly omitting the 5th confirm button (index 4) instead of the 4th choice button (index 3)."
+        "Zenith Coordinates & Selection Sync v18.11.4: Resolves dual-coordinate feedback loop positioning by restricting scene-to-inspector sync specifically to active Scene dragging via Selection.activeGameObject == ringObj. Fixes missing 4th choice highlight (Zenith Sanctuary / Святилище Зенита) under Step 3 choice selectors in DialogueSystem_Manager by correctly omitting the 5th confirm button (index 4) instead of the 4th choice button (index 3).",
+        "Zenith Single Ring Coordinates & Faction Marker Sync v18.11.7 (v18.11.5 - v18.11.7): Restricts active ring visibility to single highlighted landing spot, preserving manual inspector values. Keeps map & companion coordinates fully in sync on dialogue start and end, dismissing overlay map textures, rings, and companion markers on dialogue completion 'Завершить диалог' or non-interactive steps. Completely removes flat circular redundant faction references from the layout views."
       ]
     },
     {
