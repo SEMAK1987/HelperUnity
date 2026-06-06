@@ -199,7 +199,7 @@ function GameHelpView() {
              <BookOpen className="w-8 h-8 text-blue-500" />
              Помощь По Игре (Unity 6)
           </h2>
-          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v18.11.3</p>
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v18.11.4</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -746,7 +746,7 @@ export default function App() {
 
   const [kb, setKb] = useState<KBData | null>(null);
   const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info' | 'migration' | 'game_design' | 'game_help'>('chat');
-  const [appVersion, setAppVersion] = useState('18.11.3');
+  const [appVersion, setAppVersion] = useState('18.11.4');
 
   useEffect(() => {
     // Автоматическая синхронизация версии с сервером
@@ -4797,7 +4797,7 @@ export default function App() {
                         <div>
                           <div className="flex items-center gap-3">
                             <span className="px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-[9px] font-black uppercase text-indigo-400 tracking-widest animate-pulse">
-                              ZENITH EXCLUSIVE DIALOG SYSTEM (v18.11.3)
+                              ZENITH EXCLUSIVE DIALOG SYSTEM (v18.11.4)
                             </span>
                             <span className="px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/30 text-[9px] font-bold text-amber-400">
                               Unity 6 Ready
@@ -5147,7 +5147,7 @@ export default function App() {
                                       : simDialogueStep === 3 ? 'Путник, настал решающий миг! Выберите территорию на Континенте Судьбы, которую наш воинский отряд должен зачистить от легионов скверны в первую очередь:'
                                       : simDialogueStep === 4 ? 'Вы выбрали 🩸 Кровавые Пустоши! Здесь сильны орды демонов-налетчиков и адские песчаные бури Зенита. Да благословит Кристалл наши мечи! В поход!'
                                       : simDialogueStep === 5 ? 'Вы выбрали ❄️ Ледяной Пик! Вечная мерзлота испытывает плоть на прочность, а Ледяные Мимики охраняют заброшенные залежи руды. Готовьте щиты!'
-                                      : 'Вы выбрали 🏛️ Древние Руины! Забытые гробницы таят прах великих императоров Зенита, но берегитесь оживших статуй и капканов. Шагнем во тьму!'
+                                      : simDialogueStep === 6 ? 'Вы выбрали 🏛️ Древние Руины! Забытые гробницы таят прах великих императоров Зенита, но берегитесь оживших статуй и капканов. Шагнем во тьму!' : 'Вы выбрали 🌿 Святилище Зенита! Величественный лесной оазис скрывает истоки священного Кристалла под защитой душ предков. Да пребудет с нами благословение Кристалла!'
                                     ) : simDialogueLang === 'EN' ? (
                                       simDialogueStep === 0 ? `Greetings, ${simDialogueHero}! Our Fate Continent is sinking into the darkness of ancient timelessness. I will accompany you in this dangerous journey.`
                                       : simDialogueStep === 1 ? 'I am the keeper of the sacred Zenith Crystal. My magic will shield your equipment from the lethal corruption.'
@@ -5155,7 +5155,7 @@ export default function App() {
                                       : simDialogueStep === 3 ? 'Traveler, the crucial moment is here! Choose a specific sector on the Fate Continent for our tactical squad to cleanse first:'
                                       : simDialogueStep === 4 ? 'You chosen Crimson Wastes! Demon hordes and brutal firestorms rage across this territory. May the Crystal bless us. March!'
                                       : simDialogueStep === 5 ? 'You chosen Ice-Bound Peak! Extreme cold attacks the mind, and ancient Ice Mimics patrol the rich ore caves. Prepare your gear!'
-                                      : 'You chosen Ancient Ruins! Legendary tombs hold relics of the celestial emperors, but ancient traps remain active. Into the shadow!'
+                                      : simDialogueStep === 6 ? 'You chosen Ancient Ruins! Legendary tombs hold relics of the celestial emperors, but ancient traps remain active. Into the shadow!' : 'You chosen Zenith Sanctuary! A majestic forest oasis hiding the origin of the Crystal, guarded by ancient spirits. Let us set off!'
                                     ) : simDialogueLang === 'KR' ? (
                                       simDialogueStep === 0 ? `반갑다, ${simDialogueHero === 'warrior' ? '용감한 전사' : simDialogueHero === 'archer' ? '신궁' : '현명한 마법사'}여! 우리의 운명 대륙이 어둠 속으로 잠기고 있다. 내가 함께하겠다.`
                                       : simDialogueStep === 1 ? '나는 신성한 제니스 크리스탈의 수хо자다. 나의 마법이 크림슨의 오염으로부터 당신을 защитит 할것이다.'
@@ -5163,7 +5163,7 @@ export default function App() {
                                       : simDialogueStep === 3 ? '결정적인 순간이다! 우리 군대가 먼저 전술적으로 소탕할 정화 지역을 선택하십시오:'
                                       : simDialogueStep === 4 ? '크림슨 황무지를 선택하셨습니다! 악마 군단과 거친 제니스 마력 폭풍이 몰아치는 전쟁터입니다. 돌격!'
                                       : simDialogueStep === 5 ? '빙설의 봉우리를 선택하셨습니다! 혹독한 영구 동토에 미믹들이 고대 광산을 경비합니다. 준비를 마칩시다!'
-                                      : '고대 유적지를 선택하셨습니다! 지하 묘지에 고대의 강력한 제니스 결정이 잠들어 있지만, 고대의 함정이 가득합니다.'
+                                      : simDialogueStep === 6 ? '고대 유적지를 선택하셨습니다! 지하 묘지에 고대의 강력한 제니스 결정이 잠들어 있지만, 고대의 함정이 가득합니다.' : '제니스 성소를 선택하셨습니다! 고대 크리스탈 정수가 숲의 정령들의 보호 아래 잠들어 있습니다. 크리스탈의 축복과 함께 성스러운 사명 속으로!'
                                     ) : (
                                       simDialogueStep === 0 ? `你好, 尊敬的${simDialogueHero === 'warrior' ? '战士' : simDialogueHero === 'archer' ? '射手' : '法师'}! 我们的命运大陆正在沉入无尽黑暗。我将陪伴你征战。`
                                       : simDialogueStep === 1 ? '我是神圣天顶水晶的守护者。我的魔法将保护你的装备和灵魂不被污染。'
@@ -5171,7 +5171,7 @@ export default function App() {
                                       : simDialogueStep === 3 ? '旅人，决胜时刻已到！请在命运大陆中选择一个特定区域，进行首轮净化除魔行动：'
                                       : simDialogueStep === 4 ? '你选择了绯红荒野！这里盘踞着强盗匪帮和狂暴的天顶狂风。愿水晶祝福我们，即刻出发！'
                                       : simDialogueStep === 5 ? '你选择了冰封之巅！永恒极寒在考验你的意志，冰巨人守卫着尘封的宝藏。准备御寒吧！'
-                                      : '你选择了远古遗迹！失落的墓穴里埋藏着帝国元老的法术，但致命机关依然在运转。小心前进！'
+                                      : simDialogueStep === 6 ? '你选择了远古遗迹！失落的墓穴里埋藏着帝国元老的法术，但致命机关依然在运转。小心前进！' : '你选择了天顶圣所！古老的水晶遗迹在森林守护灵的庇佑下安息。愿水晶祝福我们，开启神圣出征！'
                                     )}
                                   </p>
                                 </div>
@@ -5326,15 +5326,32 @@ export default function App() {
                                               }}
                                             />
 
+                                             {/* REGION 4: Zenith Sanctuary (Center / Bottom Central) */}
+                                             <path 
+                                               d="M 135 240 C 160 190 200 160 215 170 C 210 210 240 250 190 250 C 165 250 145 245 135 240 Z" 
+                                               fill={hoveredRegion === 'sanctuary' ? 'rgba(16, 185, 129, 0.35)' : 'rgba(16, 185, 129, 0.12)'}
+                                               stroke={hoveredRegion === 'sanctuary' ? '#10b981' : '#047857'}
+                                               strokeWidth={hoveredRegion === 'sanctuary' ? '3' : '1.5'}
+                                               className="transition-all duration-300 cursor-pointer"
+                                               onMouseEnter={() => setHoveredRegion('sanctuary')}
+                                               onMouseLeave={() => setHoveredRegion(null)}
+                                               onClick={() => {
+                                                 setSimDialogueStep(7);
+                                                 showNotification("Вы выбрали место: Святилище Зенита!", "success");
+                                               }}
+                                             />
+
                                             {/* Glow overlay nodes for capitals */}
                                             <circle cx="106" cy="180" r="5" fill="#f87171" className="animate-pulse pointer-events-none" />
                                             <circle cx="190" cy="94" r="5" fill="#22d3ee" className="animate-pulse pointer-events-none" />
                                             <circle cx="280" cy="180" r="5" fill="#fbbf24" className="animate-pulse pointer-events-none" />
+                                             <circle cx="180" cy="210" r="5" fill="#34d399" className="animate-pulse pointer-events-none" />
 
                                             {/* Labels on Map */}
                                             <text x="106" y="165" fill="#fca5a5" fontSize="8" fontWeight="bold" textAnchor="middle" className="pointer-events-none font-sans uppercase tracking-wider">🩸 Wastes</text>
                                             <text x="190" y="82" fill="#a5f3fc" fontSize="8" fontWeight="bold" textAnchor="middle" className="pointer-events-none font-sans uppercase tracking-wider">❄️ Ice Peak</text>
                                             <text x="280" y="165" fill="#fde047" fontSize="8" fontWeight="bold" textAnchor="middle" className="pointer-events-none font-sans uppercase tracking-wider">🏛️ Ruins</text>
+                                             <text x="180" y="228" fill="#6ee7b7" fontSize="8" fontWeight="bold" textAnchor="middle" className="pointer-events-none font-sans uppercase tracking-wider">🌿 Sanctuary</text>
 
                                             {/* Map WindRose decoration */}
                                             <g transform="translate(350, 60)" className="opacity-45">
@@ -5362,7 +5379,7 @@ export default function App() {
                                                 {simDialogueLang === 'RU' ? 'Регион не выбран' : 'No Region Highlighted'}
                                               </h5>
                                               <p className="text-[10px] text-slate-400 max-w-xs mt-1 leading-relaxed">
-                                                {simDialogueLang === 'RU' ? 'Наведите мышь на багровую (Пустоши), бирюзовую (Пик) или золотую (Руины) область карты слева, чтобы дельно изучить бонусы почв и климата.' : 'Hover over the crimson, aqua, or golden territory on the map to inspect terrain buffs, weather drawbacks, and region specifications.'}
+                                                {simDialogueLang === 'RU' ? 'Наведите мышь на багровую (Пустоши), бирюзовую (Пик), золотую (Руины) или зеленую (Святилище) область карты слева, чтобы детально изучить бонусы почв и климата.' : 'Hover over the crimson, aqua, golden, or green territory on the map to inspect terrain buffs, specs, and specifications.'}
                                               </p>
                                             </div>
                                           ) : hoveredRegion === 'crimson' ? (
@@ -5427,7 +5444,7 @@ export default function App() {
                                                 <p className="text-[9px] text-slate-300 font-medium leading-normal">Дарует полный иммунитет к эффектам замерзания, окоченения и ледяного оглушения.</p>
                                               </div>
                                             </div>
-                                          ) : (
+                                          ) : hoveredRegion === 'ruins' ? (
                                             /* Ancient Ruins details */
                                             <div className="p-4 rounded-3xl bg-amber-950/30 border border-amber-500/30 flex-1 flex flex-col justify-between animate-fade-in font-sans">
                                               <div>
@@ -5459,9 +5476,41 @@ export default function App() {
                                                   {simDialogueLang === 'RU' ? '+20% к урону от заклинаний и ускорение времени перезарядки на 10%.' : '+20% skill spell pierce & 10% shorter skill cooldown rates.'}
                                                 </p>
                                               </div>
-                                            </div>
-                                          )}
-                                        </div>
+                                             </div>
+                                           ) : (
+                                             /* Zenith Sanctuary details */
+                                             <div className="p-4 rounded-3xl bg-emerald-950/30 border border-emerald-500/30 flex-1 flex flex-col justify-between animate-fade-in font-sans">
+                                               <div>
+                                                 <div className="flex items-center justify-between mb-1.5">
+                                                   <span className="text-[11px] font-black text-emerald-400 uppercase tracking-widest flex items-center gap-1.5">
+                                                     <span>🌿</span> {simDialogueLang === 'RU' ? 'Святилище Зенита' : 'Zenith Sanctuary'}
+                                                   </span>
+                                                   <span className="text-[8px] font-black bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 px-2 py-0.5 rounded uppercase">Защита Духов</span>
+                                                 </div>
+                                                 <p className="text-[10px] text-slate-300 leading-normal">
+                                                    {simDialogueLang === 'RU' ? 'Величественный лесной оазис, скрывающий истоки Кристалла сокрытого мощной силой вечных лесных духов.' : 'A majestic forest oasis hiding the origin of the Crystal, heavily guarded by ancient and immortal forest spirits.'}
+                                                 </p>
+                                               </div>
+
+                                               <div className="grid grid-cols-2 gap-2 my-2">
+                                                 <div className="p-2 rounded-xl bg-emerald-950/25 border border-emerald-500/20">
+                                                   <span className="text-[8px] font-black text-emerald-400 uppercase tracking-wider block">✙ Плюсы земель</span>
+                                                   <span className="text-[9.5px] text-slate-300 font-bold">+15% к регенерации маны всего отряда</span>
+                                                 </div>
+                                                 <div className="p-2 rounded-xl bg-red-950/25 border border-red-500/20">
+                                                   <span className="text-[8px] font-black text-red-400 uppercase tracking-wider block">✙ Минусы климата</span>
+                                                   <span className="text-[9.5px] text-slate-300 font-bold">Ослабление эффективности зелий лечения</span>
+                                                 </div>
+                                               </div>
+
+                                               <div className="p-2 border border-emerald-500/20 rounded-xl bg-emerald-500/5">
+                                                 <span className="text-[8.5px] font-black text-emerald-400 uppercase tracking-widest block">✦ Бонус Местности (Живая Земля)</span>
+                                                 <p className="text-[9px] text-slate-300 font-medium leading-normal">
+                                                    {simDialogueLang === 'RU' ? 'Время восстановления активных умений поддержки сокращено на 25%.' : 'Support utility cooldown rates are accelerated by 25%.'}
+                                                 </p>
+                                               </div>
+                                             </div>
+                                           )}</div>
 
                                       </div>
                                     </div>
@@ -7637,7 +7686,7 @@ export default function App() {
                   </div>
                   <div>
                     <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic flex items-center gap-2">
-                      Сплиттер Маркеров Карт <span className="text-amber-400 text-xs px-2.5 py-1 bg-amber-500/10 rounded-full border border-amber-500/20 not-italic tracking-normal">v18.11.3</span>
+                      Сплиттер Маркеров Карт <span className="text-amber-400 text-xs px-2.5 py-1 bg-amber-500/10 rounded-full border border-amber-500/20 not-italic tracking-normal">v18.11.4</span>
                     </h3>
                     <p className="text-xs text-slate-500 uppercase tracking-[0.2em] font-bold">Нарезание триады маркеров на PNG 8K без потери качества</p>
                   </div>

@@ -10,6 +10,7 @@ using UnityEngine.EventSystems;
 
 namespace FateContinent
 {
+    [ExecuteAlways]
     [RequireComponent(typeof(SpriteRenderer))]
     // [RequireComponent(typeof(Collider2D))] - УБРАНО для предотвращения ошибки "Can't add script" в редакторе Unity! Скрипт теперь добавляется безупречно.
     public class FactionMapMarker : MonoBehaviour
@@ -81,14 +82,29 @@ namespace FateContinent
             // Создаем инстанс материала для индивидуального свечения (чтобы не менять общий ассет)
             if (glowMaterial != null)
             {
-                instancedMaterial = Instantiate(glowMaterial);
-                spriteRenderer.material = instancedMaterial;
-                SetGlowColor(normalGlowColor);
+                if (Application.isPlaying)
+                {
+                    instancedMaterial = Instantiate(glowMaterial);
+                    spriteRenderer.material = instancedMaterial;
+                    SetGlowColor(normalGlowColor);
+                }
+                else
+                {
+                    spriteRenderer.sharedMaterial = glowMaterial;
+                    instancedMaterial = null; // Не используем инстанс и не мутируем в редакторе
+                }
             }
             else
             {
                 // Fallback: дублируем стандартный спрайтовый материал
-                instancedMaterial = spriteRenderer.material;
+                if (Application.isPlaying)
+                {
+                    instancedMaterial = spriteRenderer.material;
+                }
+                else
+                {
+                    instancedMaterial = null; // Не используем инстанс в редакторе
+                }
             }
         }
 
@@ -196,7 +212,7 @@ namespace FateContinent
                 float pulse = Mathf.Sin(pulseTimer) * (pulseRange * 1.2f);
                 transform.localScale = baseScale * (hoverScaleMultiplier * 1.12f + pulse);
                 
-                if (instancedMaterial != null)
+                if (instancedMaterial != null && Application.isPlaying)
                 {
                     Color pulsedColor = hoverGlowColor * (1.1f + pulse * 0.3f);
                     SetGlowColor(pulsedColor);
@@ -215,7 +231,7 @@ namespace FateContinent
                 transform.localScale = baseScale * (1.0f + pulse);
                 
                 // Если включен HDR материал, пульсируем его интенсивность свечения
-                if (instancedMaterial != null)
+                if (instancedMaterial != null && Application.isPlaying)
                 {
                     Color pulsedColor = normalGlowColor * (1.0f + pulse * 0.5f);
                     SetGlowColor(pulsedColor);
@@ -310,6 +326,17 @@ namespace FateContinent
             else
             {
                 Debug.LogWarning("[FactionMapMarker] DialogueSystem_Manager.Instance не инициализирован в этой сцене!");
+            }
+        }
+
+        public void ApplyGlowColorInEditor()
+        {
+            if (Application.isPlaying) return;
+            
+            spriteRenderer = GetComponent<SpriteRenderer>();
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.color = normalGlowColor;
             }
         }
     }

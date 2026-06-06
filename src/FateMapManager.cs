@@ -77,6 +77,10 @@ namespace FateContinent
         [Range(-500f, 500f)] public float ring3OffsetX = 0f;
         [Range(-500f, 500f)] public float ring3OffsetY = 0f;
 
+        [Header("4. Sanctuary Ring Offset")]
+        [Range(-500f, 500f)] public float ring4OffsetX = 0f;
+        [Range(-500f, 500f)] public float ring4OffsetY = 0f;
+
         [Header("Общие настройки маркеров")]
         [Tooltip("Общий материал свечения с поддержкой Bloom (например, M_Neon_Glow)")]
         public Material defaultGlowMaterial;
@@ -181,11 +185,70 @@ namespace FateContinent
             ring3.normalGlowColor = new Color(0.85f, 0.55f, 0.12f, 1.0f);
             ring3.hoverGlowColor = new Color(1.0f, 0.75f, 0.25f, 2.0f);
 
+            RingConfig ring4 = new RingConfig();
+            ring4.ringName = "Святилище Зенита";
+            ring4.ringDescription = "Величественный лесной оазис, скрывающий истоки Кристалла сокрытого силой лесных духов.";
+            ring4.associatedDialogueIndex = 7;
+            ring4.localPosition = new Vector2(0f, -100f);
+            ring4.localScale = Vector3.one;
+            ring4.normalGlowColor = new Color(0.12f, 0.85f, 0.35f, 1.0f);
+            ring4.hoverGlowColor = new Color(0.25f, 1.0f, 0.55f, 2.0f);
+
             fallbackMap.rings.Add(ring1);
             fallbackMap.rings.Add(ring2);
             fallbackMap.rings.Add(ring3);
+            fallbackMap.rings.Add(ring4);
 
             mapsList.Add(fallbackMap);
+        }
+
+        private void PopulateDefaultRingsForMap(MapConfig map, int mapIndex)
+        {
+            if (map.rings == null) map.rings = new List<RingConfig>();
+            map.rings.Clear();
+
+            RingConfig ring1 = new RingConfig();
+            ring1.ringName = "Кровавые Пустоши";
+            ring1.ringDescription = "Выжженная мертвая пустыня, богатая кристаллами Зенита.";
+            ring1.associatedDialogueIndex = 3;
+            ring1.localPosition = new Vector2(-120f, 40f);
+            ring1.localScale = Vector3.one;
+            ring1.normalGlowColor = new Color(0.95f, 0.15f, 0.2f, 1.0f);
+            ring1.hoverGlowColor = new Color(1.0f, 0.4f, 0.45f, 2.0f);
+
+            RingConfig ring2 = new RingConfig();
+            ring2.ringName = "Ледяной Пик";
+            ring2.ringDescription = "Заснеженная горная гряда на севере. Здесь укрыты древние рудники.";
+            ring2.associatedDialogueIndex = 3;
+            ring2.localPosition = new Vector2(20f, 80f);
+            ring2.localScale = Vector3.one;
+            ring2.normalGlowColor = new Color(0.15f, 0.65f, 0.95f, 1.0f);
+            ring2.hoverGlowColor = new Color(0.4f, 0.85f, 1.0f, 2.0f);
+
+            RingConfig ring3 = new RingConfig();
+            ring3.ringName = "Древние Руины";
+            ring3.ringDescription = "Остатки разрушенной столицы первой династии.";
+            ring3.associatedDialogueIndex = 3;
+            ring3.localPosition = new Vector2(150f, -60f);
+            ring3.localScale = Vector3.one;
+            ring3.normalGlowColor = new Color(0.85f, 0.55f, 0.12f, 1.0f);
+            ring3.hoverGlowColor = new Color(1.0f, 0.75f, 0.25f, 2.0f);
+
+            RingConfig ring4 = new RingConfig();
+            ring4.ringName = "Святилище Зенита";
+            ring4.ringDescription = "Величественный лесной оазис, скрывающий истоки Кристалла сокрытого силой лесных духов.";
+            ring4.associatedDialogueIndex = 3;
+            ring4.localPosition = new Vector2(0f, -100f);
+            ring4.localScale = Vector3.one;
+            ring4.normalGlowColor = new Color(0.12f, 0.85f, 0.35f, 1.0f);
+            ring4.hoverGlowColor = new Color(0.25f, 1.0f, 0.55f, 2.0f);
+
+            map.rings.Add(ring1);
+            map.rings.Add(ring2);
+            map.rings.Add(ring3);
+            map.rings.Add(ring4);
+
+            Debug.Log($"[FateMapManager] Автоматически заполнили {map.rings.Count} колец высадки для карты '{map.mapName}' (Индекс: {mapIndex}) для бесшовной сюжетной завязки!");
         }
 
         public void InitializeMap(int mapIndex)
@@ -236,16 +299,27 @@ namespace FateContinent
 
                     if (!Application.isPlaying)
                     {
-                        Vector2 currentLocalPos = new Vector2(ringObj.transform.localPosition.x, ringObj.transform.localPosition.y);
-                        if (currentLocalPos != ringConf.localPosition && currentLocalPos != Vector2.zero)
+                        #if UNITY_EDITOR
+                        // Разрешаем обратную синхронизацию координат ТОЛЬКО если пользователь держит и двигает этот маркер в Hierarchy/Scene!
+                        bool isDraggingInScene = UnityEditor.Selection.activeGameObject == ringObj;
+                        if (isDraggingInScene)
                         {
-                            ringConf.localPosition = currentLocalPos;
-                        }
+                            Vector2 currentLocalPos = new Vector2(ringObj.transform.localPosition.x, ringObj.transform.localPosition.y);
+                            Vector2 offset = Vector2.zero;
+                            if (i == 0) offset = new Vector2(ring1OffsetX, ring1OffsetY);
+                            else if (i == 1) offset = new Vector2(ring2OffsetX, ring2OffsetY);
+                            else if (i == 2) offset = new Vector2(ring3OffsetX, ring3OffsetY);
+                            else if (i == 3) offset = new Vector2(ring4OffsetX, ring4OffsetY);
 
-                        if (ringObj.transform.localScale != ringConf.localScale && ringObj.transform.localScale != Vector3.one)
-                        {
-                            ringConf.localScale = ringObj.transform.localScale;
+                            Vector2 calculatedLocalPos = currentLocalPos - offset;
+
+                            if (calculatedLocalPos != ringConf.localPosition && currentLocalPos != Vector2.zero)
+                            {
+                                ringConf.localPosition = calculatedLocalPos;
+                                UnityEditor.EditorUtility.SetDirty(this);
+                            }
                         }
+                        #endif
                     }
                 }
                 else
@@ -298,6 +372,13 @@ namespace FateContinent
                 marker.scaleSpeed = scaleSpeed;
                 marker.pulseSpeed = hoverPulseSpeed;
 
+                #if UNITY_EDITOR
+                if (!Application.isPlaying)
+                {
+                    marker.ApplyGlowColorInEditor();
+                }
+                #endif
+
                 activeRings.Add(ringObj);
             }
 
@@ -306,9 +387,20 @@ namespace FateContinent
                 if (marker != null && !activeRings.Contains(marker.gameObject))
                 {
                     if (Application.isPlaying)
+                    {
                         Destroy(marker.gameObject);
+                    }
                     else
+                    {
+                        #if UNITY_EDITOR
+                        var go = marker.gameObject;
+                        UnityEditor.EditorApplication.delayCall += () => {
+                            if (go != null) DestroyImmediate(go);
+                        };
+                        #else
                         DestroyImmediate(marker.gameObject);
+                        #endif
+                    }
                 }
             }
 
@@ -349,6 +441,7 @@ namespace FateContinent
                     if (i == 0) { ringX += ring1OffsetX; ringY += ring1OffsetY; }
                     else if (i == 1) { ringX += ring2OffsetX; ringY += ring2OffsetY; }
                     else if (i == 2) { ringX += ring3OffsetX; ringY += ring3OffsetY; }
+                    else if (i == 3) { ringX += ring4OffsetX; ringY += ring4OffsetY; }
 
                     activeRings[i].transform.localPosition = new Vector3(ringX, ringY, -0.1f);
                     
@@ -445,5 +538,371 @@ namespace FateContinent
                 }
             }
         }
+
+        #region CUSTOM COPY-PASTE FOR COORDINATES
+        [ContextMenu("Copy/Position")]
+        public void CopyPosition()
+        {
+            string json = string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                "{{\"type\":\"FateMapCoords\",\"mapOffsetX\":{0:F4},\"mapOffsetY\":{1:F4}}}",
+                mapOffsetX, mapOffsetY);
+            GUIUtility.systemCopyBuffer = json;
+            Debug.Log("[FATE COORDINATES] Position (Map Offset) copied to clipboard!");
+        }
+
+        [ContextMenu("Copy/Rotation")]
+        public void CopyRotation()
+        {
+            // Наша карта плоская, но добавим заглушку под стандартный Трансформ для полной копии функционала из скриншота
+            string json = "{\"type\":\"FateMapCoords\",\"rotation\":0.0}";
+            GUIUtility.systemCopyBuffer = json;
+            Debug.Log("[FATE COORDINATES] Default flat rotation (0.0) copied to clipboard!");
+        }
+
+        [ContextMenu("Copy/Scale")]
+        public void CopyScale()
+        {
+            string json = string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                "{{\"type\":\"FateMapCoords\",\"mapScale\":{0:F4},\"ringScale\":{1:F4}}}",
+                mapScale, ringScale);
+            GUIUtility.systemCopyBuffer = json;
+            Debug.Log("[FATE COORDINATES] Scales (Map & Rings) copied to clipboard!");
+        }
+
+        [ContextMenu("Copy/Offsets (Rings)")]
+        public void CopyOffsets()
+        {
+            string json = string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                "{{\"type\":\"FateMapCoords\",\"ring1OffsetX\":{0:F4},\"ring1OffsetY\":{1:F4},\"ring2OffsetX\":{2:F4},\"ring2OffsetY\":{3:F4},\"ring3OffsetX\":{4:F4},\"ring3OffsetY\":{5:F4},\"ring4OffsetX\":{6:F4},\"ring4OffsetY\":{7:F4}}}",
+                ring1OffsetX, ring1OffsetY, ring2OffsetX, ring2OffsetY, ring3OffsetX, ring3OffsetY, ring4OffsetX, ring4OffsetY);
+            GUIUtility.systemCopyBuffer = json;
+            Debug.Log("[FATE COORDINATES] All 4 Ring Anchors offsets copied to clipboard!");
+        }
+
+         [ContextMenu("Copy/Component Values")]
+        public void CopyComponentValues()
+        {
+            string json = string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                "{{\"type\":\"FateMapCoords\",\"mapOffsetX\":{0:F4},\"mapOffsetY\":{1:F4},\"mapScale\":{2:F4},\"ringScale\":{3:F4},\"ring1OffsetX\":{4:F4},\"ring1OffsetY\":{5:F4},\"ring2OffsetX\":{6:F4},\"ring2OffsetY\":{7:F4},\"ring3OffsetX\":{8:F4},\"ring3OffsetY\":{9:F4},\"ring4OffsetX\":{10:F4},\"ring4OffsetY\":{11:F4}}}",
+                mapOffsetX, mapOffsetY, mapScale, ringScale,
+                ring1OffsetX, ring1OffsetY, ring2OffsetX, ring2OffsetY, ring3OffsetX, ring3OffsetY, ring4OffsetX, ring4OffsetY);
+            GUIUtility.systemCopyBuffer = json;
+            Debug.Log("[FATE COORDINATES] Entire Coordinators and Anchors Component data copied to clipboard!");
+        }
+
+        [ContextMenu("Paste/Position")]
+        public void PastePosition()
+        {
+            string buffer = GUIUtility.systemCopyBuffer;
+            if (string.IsNullOrEmpty(buffer)) return;
+
+            bool success = false;
+            if (buffer.Contains("type") && buffer.Contains("FateMapCoords"))
+            {
+                success |= TryGetFloat(buffer, "mapOffsetX", ref mapOffsetX);
+                success |= TryGetFloat(buffer, "mapOffsetY", ref mapOffsetY);
+            }
+            else
+            {
+                Vector3 vec;
+                if (TryParseVectorAnywhere(buffer, out vec))
+                {
+                    mapOffsetX = vec.x;
+                    mapOffsetY = vec.y;
+                    success = true;
+                }
+            }
+
+            if (success)
+            {
+                ApplyTransformOffsets();
+                InitializeMap(activeMapIndex);
+                Debug.Log($"[FATE COORDINATES] Position pasted successfully! Offset: ({mapOffsetX}, {mapOffsetY})");
+#if UNITY_EDITOR
+                UnityEditor.EditorUtility.SetDirty(this);
+#endif
+            }
+            else
+            {
+                Debug.LogWarning("[FATE COORDINATES] Paste Position failed. Clipboard contents invalid.");
+            }
+        }
+
+        [ContextMenu("Paste/Rotation")]
+        public void PasteRotation()
+        {
+            Debug.Log("[FATE COORDINATES] Rotation is locked on 2D flat Zenith Map.");
+        }
+
+        [ContextMenu("Paste/Scale")]
+        public void PasteScale()
+        {
+            string buffer = GUIUtility.systemCopyBuffer;
+            if (string.IsNullOrEmpty(buffer)) return;
+
+            bool success = false;
+            if (buffer.Contains("type") && buffer.Contains("FateMapCoords"))
+            {
+                success |= TryGetFloat(buffer, "mapScale", ref mapScale);
+                success |= TryGetFloat(buffer, "ringScale", ref ringScale);
+            }
+            else
+            {
+                Vector3 vec;
+                if (TryParseVectorAnywhere(buffer, out vec))
+                {
+                    mapScale = vec.x;
+                    if (vec.y > 0.01f) ringScale = vec.y;
+                    success = true;
+                }
+            }
+
+            if (success)
+            {
+                ApplyTransformOffsets();
+                InitializeMap(activeMapIndex);
+                Debug.Log($"[FATE COORDINATES] Scales pasted successfully! Map Scale: {mapScale}, Ring Scale: {ringScale}");
+#if UNITY_EDITOR
+                UnityEditor.EditorUtility.SetDirty(this);
+#endif
+            }
+            else
+            {
+                Debug.LogWarning("[FATE COORDINATES] Paste Scale failed. Clipboard contents invalid.");
+            }
+        }
+
+        [ContextMenu("Paste/Offsets (Rings)")]
+        public void PasteOffsets()
+        {
+            string buffer = GUIUtility.systemCopyBuffer;
+            if (string.IsNullOrEmpty(buffer)) return;
+
+            bool success = false;
+            if (buffer.Contains("type") && buffer.Contains("FateMapCoords"))
+            {
+                success |= TryGetFloat(buffer, "ring1OffsetX", ref ring1OffsetX);
+                success |= TryGetFloat(buffer, "ring1OffsetY", ref ring1OffsetY);
+                success |= TryGetFloat(buffer, "ring2OffsetX", ref ring2OffsetX);
+                success |= TryGetFloat(buffer, "ring2OffsetY", ref ring2OffsetY);
+                success |= TryGetFloat(buffer, "ring3OffsetX", ref ring3OffsetX);
+                success |= TryGetFloat(buffer, "ring3OffsetY", ref ring3OffsetY);
+                success |= TryGetFloat(buffer, "ring4OffsetX", ref ring4OffsetX);
+                success |= TryGetFloat(buffer, "ring4OffsetY", ref ring4OffsetY);
+            }
+
+            if (success)
+            {
+                ApplyTransformOffsets();
+                InitializeMap(activeMapIndex);
+                Debug.Log("[FATE COORDINATES] All Ring Offsets pasted successfully from clipboard!");
+#if UNITY_EDITOR
+                UnityEditor.EditorUtility.SetDirty(this);
+#endif
+            }
+            else
+            {
+                Debug.LogWarning("[FATE COORDINATES] Paste Offsets failed. Make sure clipboard contains valid ring anchor offsets.");
+            }
+        }
+
+        [ContextMenu("Paste/Component Values")]
+        public void PasteComponentValues()
+        {
+            string buffer = GUIUtility.systemCopyBuffer;
+            if (string.IsNullOrEmpty(buffer)) return;
+
+            bool success = false;
+            if (buffer.Contains("type") && buffer.Contains("FateMapCoords"))
+            {
+                success |= TryGetFloat(buffer, "mapOffsetX", ref mapOffsetX);
+                success |= TryGetFloat(buffer, "mapOffsetY", ref mapOffsetY);
+                success |= TryGetFloat(buffer, "mapScale", ref mapScale);
+                success |= TryGetFloat(buffer, "ringScale", ref ringScale);
+                success |= TryGetFloat(buffer, "ring1OffsetX", ref ring1OffsetX);
+                success |= TryGetFloat(buffer, "ring1OffsetY", ref ring1OffsetY);
+                success |= TryGetFloat(buffer, "ring2OffsetX", ref ring2OffsetX);
+                success |= TryGetFloat(buffer, "ring2OffsetY", ref ring2OffsetY);
+                success |= TryGetFloat(buffer, "ring3OffsetX", ref ring3OffsetX);
+                success |= TryGetFloat(buffer, "ring3OffsetY", ref ring3OffsetY);
+                success |= TryGetFloat(buffer, "ring4OffsetX", ref ring4OffsetX);
+                success |= TryGetFloat(buffer, "ring4OffsetY", ref ring4OffsetY);
+            }
+
+            if (success)
+            {
+                ApplyTransformOffsets();
+                InitializeMap(activeMapIndex);
+                Debug.Log("[FATE COORDINATES] All custom coordinator component values pasted successfully!");
+#if UNITY_EDITOR
+                UnityEditor.EditorUtility.SetDirty(this);
+#endif
+            }
+            else
+            {
+                Debug.LogWarning("[FATE COORDINATES] Paste Component Values failed. Clipboard values are not custom FateMapCoords JSON format.");
+            }
+        }
+
+        private bool TryGetFloat(string json, string key, ref float targetField)
+        {
+            // Пытаемся найти ключ "key": с кавычками в разных форматах экранирования
+            string searchKey1 = "\"" + key + "\":";
+            string searchKey2 = "\\\"" + key + "\\\":";
+            
+            int index = json.IndexOf(searchKey1);
+            int keyLength = searchKey1.Length;
+            
+            if (index == -1)
+            {
+                index = json.IndexOf(searchKey2);
+                keyLength = searchKey2.Length;
+            }
+            
+            if (index == -1) return false;
+
+            int valStart = index + keyLength;
+            int commaIdx = json.IndexOf(",", valStart);
+            int braceIdx = json.IndexOf("}", valStart);
+            int endIdx = -1;
+            if (commaIdx != -1 && braceIdx != -1) endIdx = Mathf.Min(commaIdx, braceIdx);
+            else if (commaIdx != -1) endIdx = commaIdx;
+            else if (braceIdx != -1) endIdx = braceIdx;
+
+            if (endIdx == -1) return false;
+
+            string rawVal = json.Substring(valStart, endIdx - valStart).Trim();
+            rawVal = rawVal.Replace("\"", "").Replace("\\", "").Trim();
+            float parsedVal;
+            if (float.TryParse(rawVal, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out parsedVal))
+            {
+                targetField = parsedVal;
+                return true;
+            }
+            return false;
+        }
+
+        private bool TryParseVectorAnywhere(string text, out Vector3 result)
+        {
+            result = Vector3.zero;
+            string clean = text.Trim();
+            
+            if (clean.StartsWith("Vector3")) clean = clean.Substring(7).Trim();
+            if (clean.StartsWith("Vector2")) clean = clean.Substring(7).Trim();
+            if (clean.StartsWith("(") && clean.EndsWith(")")) clean = clean.Substring(1, clean.Length - 2).Trim();
+
+            string[] parts = clean.Split(',');
+            if (parts.Length >= 2)
+            {
+                float x = 0, y = 0, z = 0;
+                bool successX = float.TryParse(parts[0].Trim(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out x);
+                bool successY = float.TryParse(parts[1].Trim(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out y);
+                if (parts.Length >= 3)
+                {
+                    float.TryParse(parts[2].Trim(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out z);
+                }
+                
+                if (successX && successY)
+                {
+                    result = new Vector3(x, y, z);
+                    return true;
+                }
+            }
+            return false;
+        }
+        #endregion
     }
 }
+
+#if UNITY_EDITOR
+namespace FateContinent
+{
+    using UnityEditor;
+
+    [CustomEditor(typeof(FateMapManager))]
+    public class FateMapManagerEditor : Editor
+    {
+        public override void OnInspectorGUI()
+        {
+            FateMapManager manager = (FateMapManager)target;
+
+            // Золотая панель быстрой вставки и копирования (Zenith Style)
+            EditorGUILayout.Space(12);
+            EditorGUILayout.BeginVertical("box");
+            
+            GUIStyle headerStyle = new GUIStyle(EditorStyles.boldLabel);
+            headerStyle.normal.textColor = new Color(1.0f, 0.72f, 0.1f); // Насыщенный золотой цвет Zenith
+            headerStyle.alignment = TextAnchor.MiddleCenter;
+            headerStyle.fontSize = 11;
+            
+            EditorGUILayout.LabelField("⚡ БЫСТРОЕ КОПИРОВАНИЕ И ВСТАВКА (CLIPBOARD)", headerStyle);
+            EditorGUILayout.Space(6);
+
+            // Кнопки копирования в два удобных ряда
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("📋 Копировать Позицию", GUILayout.Height(28)))
+            {
+                manager.CopyPosition();
+            }
+            if (GUILayout.Button("📋 Копировать Масштабы", GUILayout.Height(28)))
+            {
+                manager.CopyScale();
+            }
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("📋 Копировать Смещения Колец", GUILayout.Height(28)))
+            {
+                manager.CopyOffsets();
+            }
+            if (GUILayout.Button("📋 Копировать ВСЕ настройки", GUILayout.Height(28)))
+            {
+                manager.CopyComponentValues();
+            }
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.Space(6);
+
+            Color originalBg = GUI.backgroundColor;
+            
+            // Кнопки вставки с интуитивной цветовой индикацией
+            EditorGUILayout.BeginHorizontal();
+            GUI.backgroundColor = new Color(0.35f, 0.95f, 0.45f); // Сочный зеленый для вставки
+            if (GUILayout.Button("📥 Вставить Позицию", GUILayout.Height(28)))
+            {
+                manager.PastePosition();
+            }
+            if (GUILayout.Button("📥 Вставить Масштабы", GUILayout.Height(28)))
+            {
+                manager.PasteScale();
+            }
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            GUI.backgroundColor = new Color(0.4f, 0.85f, 1.0f); // Неоновый голубой для колец
+            if (GUILayout.Button("📥 Вставить Смещения Колец", GUILayout.Height(28)))
+            {
+                manager.PasteOffsets();
+            }
+            GUI.backgroundColor = new Color(1.0f, 0.65f, 0.2f); // Насыщенный оранжевый для полной вставки
+            if (GUILayout.Button("📥 Вставить ВСЕ параметры", GUILayout.Height(28)))
+            {
+                manager.PasteComponentValues();
+            }
+            EditorGUILayout.EndHorizontal();
+
+            GUI.backgroundColor = originalBg;
+
+            EditorGUILayout.Space(6);
+            EditorGUILayout.HelpBox("💡 Совет: Вы можете скопировать обычный Transform (Position/Scale) любого объекта в Unity и нажать здесь 'Вставить Позицию' или 'Вставить Масштабы' — скрипт автоматически расшифрует координаты!", MessageType.Info);
+            
+            EditorGUILayout.EndVertical();
+            EditorGUILayout.Space(12);
+
+            // Отрисовка стандартного инспектора после наших кастомных кнопок копирования-вставки
+            DrawDefaultInspector();
+        }
+    }
+}
+#endif
+

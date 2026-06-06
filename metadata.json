@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.3. Zenith Compiler Integration - Resolves FateMapManager localScaleOverride CS1061 errors on FactionMapMarker.",
+  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.4. Zenith Coordinates & Selection Sync - Resolves dual-coordinate feedback loop positioning and missing Zenith Sanctuary highlight on step 3.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

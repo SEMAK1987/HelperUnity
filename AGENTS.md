@@ -1,10 +1,10 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.11.3)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.11.4)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** 18.11.3
+- **Version:** 18.11.4
 - **Engine:** Unity 6 (6000.3.10f1)
-- **Updates:** Zenith Map & Dialogue Blueprint Synchronization - Integrates verified Inspector configurations for World Map glowing landmarks (FateMapManager) and adaptive dialog workspaces (DialogueSystem_Manager) with auto-coords anchoring, custom voices, and dynamic player class portrait triggers. Resolved compiler CS1061 and CS1501.
+- **Updates:** Zenith Coordinates & Selection Sync - Resolves dual-coordinate feedback loop positioning by restricting scene-to-inspector sync specifically to active Scene dragging via `Selection.activeGameObject == ringObj`. Fixes missing 4th choice highlight (Zenith Sanctuary / Святилище Зенита) under Step 3 choice selectors in `DialogueSystem_Manager` by correctly omitting the 5th confirm button (index 4) instead of the 4th choice button (index 3).
 - **Design System:** Zenith Glassmorphism (8K Ultra-High Density)
 
 ## 📑 Core Documentation References
@@ -25,7 +25,7 @@
 - **Audio Rule (CRITICAL):** Используйте только `SettingsManager.cs` для управления звуком и музыкой (включая hover-эффекты и списки воспроизведения). Скрипты `AudioHandler` и `AudioManager` должны быть полностью удалены для чистоты проекта. Музыкальные клипы продлеваются через Suno/Udio и настраиваются на бесшовное зацикливание (`loop = true`). Звуковые файлы берем с Pixabay/Freesound по CC0-лицензии и подключаем напрямую к SettingsManager или через AudioMixer.
 
 ## 🚀 Протокол «Пошаговое Мастерство» (Step-by-Step Mastery)
-1. **Отслеживание прогресса:** Текущая версия v18.11.3 (Zenith Compiler Integration & FactionMapMarker localScaleOverride Sync. v18.11.3).
+1. **Отслеживание прогресса:** Текущая версия v18.11.4 (Zenith Map & Dialogue Selection Synchronization Sync. v18.11.4).
 2. **Инструкции Настройки Компонентов (Verified Inspector Settings):**
    - **FateMapManager (FATE_WORLD_MAP):**
      - *Maps List:* [+] Слот для глобальной карты (Map Name = "Континент Судьбы", Map Background = фоновый спрайт карты).
@@ -45,4 +45,4 @@
 5. **ОЧИСТКА:** Используйте только `SettingsManager.cs` для аудио. Удалите `AudioHandler` и `AudioManager` скрипты. Не использовать ElevenLabs.
 
 ---
-*Ядро AI пересинхронизировано (v18.11.3). Авто-апдейтер активен.*
+*Ядро AI пересинхронизировано (v18.11.4). Авто-апдейтер активен.*

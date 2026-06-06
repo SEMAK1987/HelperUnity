@@ -1,6 +1,6 @@
 # PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Total Knowledge Archive Edition)
 
-> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.11.3.
+> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.11.4.
 
 ## 1. Общая информация
 - **Версия Помощника:** 18.11.3
@@ -293,8 +293,9 @@ Freesound содержит миллионы звуков от инди-разр�
 - **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.
 - **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.
 
-## 13. История изменений (v18.11.3)
-- **v18.11.3:** Zenith Compiler Integration & FactionMapMarker localScaleOverride Sync • Resolves C# error CS1061 in FateMapManager.cs when trying to access the localScaleOverride property on FactionMapMarker. Added the localScaleOverride field to FactionMapMarker.cs and updated its Update() method to smoothly incorporate any external size offsets dynamically.
+## 13. История изменений (v18.11.4)
+- **v18.11.4:** Zenith Coordinates & Selection Sync • Resolves dual-coordinate feedback loop positioning by restricting scene-to-inspector sync specifically to active Scene dragging via Selection.activeGameObject == ringObj. Fixes missing 4th choice highlight (Zenith Sanctuary / Святилище Зенита) under Step 3 choice selectors in DialogueSystem_Manager by correctly omitting the 5th confirm button (index 4) instead of the 4th choice button (index 3).
+- **v18.11.3:** Zenith Compiler Integration & FactionMapMarker localScaleOverride Sync • Resolves C# error CS1061 in FateMapManager.cs when trying to access localScaleOverride property on FactionMapMarker. Added the localScaleOverride field to FactionMapMarker.cs and updated its Update() method to smoothly incorporate any external size offsets dynamically.
 - **v18.11.2:** Zenith Compiler Compatibility & Multi-Signature Overloads • Fixes compilation errors CS1061 and CS1501 in Unity. Introduced 3-argument overloads for `OnMapMarkerClicked(associatedDialogueIndex, factionName, factionDescription)` (including fully dynamic type parsing via generic objects) in `DialogueSystem_Manager.cs`, and added compatible `PlaySfx(string)` and `PlaySfx(AudioClip)` aliases in `SettingsManager.cs` to ensure absolute C# compilation out-of-the-box.
 - **v18.11.1:** Ultimate Independent Map & Ring Scaling and Positioning Sync • Separated ring scaling completely from parent Map scale compensation inside both `FateMapManager.cs` and `FactionMapMarker.cs`. Recalculates `baseScale` and `targetScale` dynamically every frame at runtime to facilitate real-time inspector updates.
 - **v18.11.0:** Zenith Map & Dialogue Blueprint Sync • Components Setup Sync - Synchronizes the blueprint with exact component guidelines for FateMapManager (glowing neon rings, HDR colors, default glow material M_Neon_Glow) and DialogueSystem_Manager (dual local companion voices, case-insensitive class portraits, and anchored coords alignments).

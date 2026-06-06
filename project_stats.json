@@ -1,5 +1,6 @@
 {
   "scripts": [
+    "FactionMapMarker.cs",
     "MenuBackgroundCamera_Fate.cs",
     "UnityConnector.cs",
     "UnityRaceData.cs",
@@ -9,6 +10,8 @@
     "src/CharacterSelectionController.cs",
     "src/DialogueSystem_Manager.cs",
     "src/EventHub.cs",
+    "src/FateGameplayIntro_Manager.cs",
+    "src/FateMapManager.cs",
     "src/GamePause_Manager.cs",
     "src/LanguageSelector.cs",
     "src/LoadingScreenManager.cs",
@@ -34,15 +37,19 @@
   "pdfs": [],
   "videos": [],
   "others": [],
-  "total_files": 57,
+  "total_files": 60,
   "analysis": {
     "audit_issues": [],
     "todos": [],
     "asset_stats": {
-      "total_size": 986004,
+      "total_size": 1225792,
       "large_files": []
     },
     "dependencies": {
+      "FactionMapMarker": [
+        "UnityEngine",
+        "UnityEngine.EventSystems"
+      ],
       "MenuBackgroundCamera_Fate": [
         "UnityEngine"
       ],
@@ -83,12 +90,23 @@
         "System.Collections.Generic",
         "UnityEngine",
         "UnityEngine.UI",
-        "TMPro"
+        "TMPro",
+        "UnityEngine.SceneManagement"
       ],
       "EventHub": [
         "UnityEngine",
         "System",
         "System.Collections.Generic"
+      ],
+      "FateGameplayIntro_Manager": [
+        "UnityEngine",
+        "UnityEngine.UI",
+        "System.Collections",
+        "TMPro"
+      ],
+      "FateMapManager": [
+        "System.Collections.Generic",
+        "UnityEngine"
       ],
       "GamePause_Manager": [
         "UnityEngine",
@@ -139,7 +157,8 @@
         "System.Collections.Generic"
       ],
       "SimpleFloatAnimation": [
-        "UnityEngine"
+        "UnityEngine",
+        "UnityEngine.UI"
       ],
       "Translator": [
         "System.Collections",
@@ -182,5 +201,5 @@
       ]
     }
   },
-  "last_updated": "2026-05-26T07:21:47.595Z"
+  "last_updated": "2026-06-04T14:05:12.089Z"
 }

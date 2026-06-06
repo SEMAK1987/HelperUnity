@@ -2,6 +2,316 @@
   {
     "event": "change",
     "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T14:05:10.074Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-06-04T14:05:10.070Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T14:05:07.625Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/tmp_edit_map_svg.cjs",
+    "timestamp": "2026-06-04T14:05:07.621Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T14:04:49.876Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/tmp_edit_map_svg.cjs",
+    "timestamp": "2026-06-04T14:04:49.873Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T14:04:48.825Z"
+  },
+  {
+    "event": "add",
+    "path": "/app/applet/tmp_edit_map_svg.cjs",
+    "timestamp": "2026-06-04T14:04:48.822Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T14:04:35.356Z"
+  },
+  {
+    "event": "unlink",
+    "path": "/app/applet/tmp_edit_dialogue.cjs",
+    "timestamp": "2026-06-04T14:04:35.354Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T14:04:27.237Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-06-04T14:04:27.233Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T14:04:24.902Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/tmp_edit_dialogue.cjs",
+    "timestamp": "2026-06-04T14:04:24.900Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T14:04:23.226Z"
+  },
+  {
+    "event": "add",
+    "path": "/app/applet/tmp_edit_dialogue.cjs",
+    "timestamp": "2026-06-04T14:04:23.222Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T14:03:28.991Z"
+  },
+  {
+    "event": "unlink",
+    "path": "/app/applet/tmp_replace_app.cjs",
+    "timestamp": "2026-06-04T14:03:28.988Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T14:03:19.979Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-06-04T14:03:19.976Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T14:03:17.746Z"
+  },
+  {
+    "event": "unlink",
+    "path": "/app/applet/tmp_replace_app.js",
+    "timestamp": "2026-06-04T14:03:17.743Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T14:03:17.650Z"
+  },
+  {
+    "event": "add",
+    "path": "/app/applet/tmp_replace_app.cjs",
+    "timestamp": "2026-06-04T14:03:17.646Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T14:03:05.271Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/tmp_replace_app.js",
+    "timestamp": "2026-06-04T14:03:05.268Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T14:03:04.026Z"
+  },
+  {
+    "event": "add",
+    "path": "/app/applet/tmp_replace_app.js",
+    "timestamp": "2026-06-04T14:03:04.022Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T14:02:33.677Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-06-04T14:02:33.673Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T14:02:15.284Z"
+  },
+  {
+    "event": "unlink",
+    "path": "/app/applet/tmp_replace_app.js",
+    "timestamp": "2026-06-04T14:02:15.280Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T14:01:23.796Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/tmp_replace_app.js",
+    "timestamp": "2026-06-04T14:01:23.793Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T14:01:20.931Z"
+  },
+  {
+    "event": "add",
+    "path": "/app/applet/tmp_replace_app.js",
+    "timestamp": "2026-06-04T14:01:20.928Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T14:00:14.715Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-06-04T14:00:14.712Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T13:58:56.324Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/FateMapManager.cs",
+    "timestamp": "2026-06-04T13:58:56.321Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T13:58:48.330Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/FateMapManager.cs",
+    "timestamp": "2026-06-04T13:58:48.326Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T13:58:37.582Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/FateMapManager.cs",
+    "timestamp": "2026-06-04T13:58:37.579Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T13:58:17.745Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/DialogueSystem_Manager.cs",
+    "timestamp": "2026-06-04T13:58:17.741Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T13:58:07.291Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/DialogueSystem_Manager.cs",
+    "timestamp": "2026-06-04T13:58:07.287Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T13:57:34.890Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/DialogueSystem_Manager.cs",
+    "timestamp": "2026-06-04T13:57:34.886Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T13:57:23.780Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/DialogueSystem_Manager.cs",
+    "timestamp": "2026-06-04T13:57:23.775Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T13:56:32.995Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/DialogueSystem_Manager.cs",
+    "timestamp": "2026-06-04T13:56:32.992Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T13:24:58.974Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/package-lock.json",
+    "timestamp": "2026-06-04T13:24:58.970Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T13:24:35.069Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/troubleshooting_db.json",
+    "timestamp": "2026-06-04T13:24:35.065Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T12:56:45.721Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T12:56:45.503Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-04T12:56:45.492Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/DEVELOPMENT_LOG.md",
+    "timestamp": "2026-06-04T12:56:45.279Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
     "timestamp": "2026-05-26T12:57:49.509Z"
   },
   {
@@ -188,315 +498,5 @@
     "event": "change",
     "path": "/app/applet/src/App.tsx",
     "timestamp": "2026-05-26T07:39:36.507Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:38:35.676Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/App.tsx",
-    "timestamp": "2026-05-26T07:38:35.664Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:37:09.864Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/App.tsx",
-    "timestamp": "2026-05-26T07:37:09.858Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:34:59.341Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/package-lock.json",
-    "timestamp": "2026-05-26T07:34:59.337Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:34:57.378Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/App.tsx",
-    "timestamp": "2026-05-26T07:34:57.373Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:32:34.081Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/App.tsx",
-    "timestamp": "2026-05-26T07:32:34.076Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:24:09.396Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/package-lock.json",
-    "timestamp": "2026-05-26T07:24:09.391Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:23:55.521Z"
-  },
-  {
-    "event": "unlink",
-    "path": "/app/applet/find_mismatch.cjs",
-    "timestamp": "2026-05-26T07:23:55.516Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:23:25.212Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/find_mismatch.cjs",
-    "timestamp": "2026-05-26T07:23:25.199Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:22:54.316Z"
-  },
-  {
-    "event": "unlink",
-    "path": "/app/applet/delete_lines.cjs",
-    "timestamp": "2026-05-26T07:22:54.312Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:22:48.052Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/App.tsx",
-    "timestamp": "2026-05-26T07:22:48.048Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:22:45.243Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/delete_lines.cjs",
-    "timestamp": "2026-05-26T07:22:45.236Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:22:44.123Z"
-  },
-  {
-    "event": "add",
-    "path": "/app/applet/delete_lines.cjs",
-    "timestamp": "2026-05-26T07:22:44.118Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:21:45.575Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/find_mismatch.cjs",
-    "timestamp": "2026-05-26T07:21:45.571Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:21:24.185Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/find_mismatch.cjs",
-    "timestamp": "2026-05-26T07:21:24.180Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:21:01.170Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/find_mismatch.cjs",
-    "timestamp": "2026-05-26T07:21:01.166Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:20:58.973Z"
-  },
-  {
-    "event": "add",
-    "path": "/app/applet/find_mismatch.cjs",
-    "timestamp": "2026-05-26T07:20:58.970Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:19:06.916Z"
-  },
-  {
-    "event": "unlink",
-    "path": "/app/applet/repair.cjs",
-    "timestamp": "2026-05-26T07:19:06.909Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:18:59.807Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/App.tsx",
-    "timestamp": "2026-05-26T07:18:59.799Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:18:56.093Z"
-  },
-  {
-    "event": "unlink",
-    "path": "/app/applet/repair.js",
-    "timestamp": "2026-05-26T07:18:56.089Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:18:55.997Z"
-  },
-  {
-    "event": "add",
-    "path": "/app/applet/repair.cjs",
-    "timestamp": "2026-05-26T07:18:55.993Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:18:41.075Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/repair.js",
-    "timestamp": "2026-05-26T07:18:41.071Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:18:39.751Z"
-  },
-  {
-    "event": "add",
-    "path": "/app/applet/repair.js",
-    "timestamp": "2026-05-26T07:18:39.746Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:16:41.810Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/App.tsx",
-    "timestamp": "2026-05-26T07:16:41.805Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:14:52.055Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/App.tsx",
-    "timestamp": "2026-05-26T07:14:52.045Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:10:06.113Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/DEVELOPMENT_LOG.md",
-    "timestamp": "2026-05-26T07:10:06.093Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-25T19:42:49.656Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/App.tsx",
-    "timestamp": "2026-05-25T19:42:49.652Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-25T19:42:46.827Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/fix_dangling.js",
-    "timestamp": "2026-05-25T19:42:46.823Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-25T19:42:45.809Z"
-  },
-  {
-    "event": "add",
-    "path": "/app/applet/fix_dangling.js",
-    "timestamp": "2026-05-25T19:42:45.805Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-25T19:41:54.591Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/App.tsx",
-    "timestamp": "2026-05-25T19:41:54.586Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-25T19:41:00.945Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/App.tsx",
-    "timestamp": "2026-05-25T19:41:00.939Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-25T19:40:58.349Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/fix_quests.js",
-    "timestamp": "2026-05-25T19:40:58.345Z"
   }
 ]

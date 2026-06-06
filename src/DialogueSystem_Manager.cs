@@ -75,6 +75,8 @@ namespace FateContinent
         public string sceneIceBoundPeak = "Scene_IceBoundPeak";
         [Tooltip("Имя сцены для Древних Руин")]
         public string sceneAncientRuins = "Scene_AncientRuins";
+        [Tooltip("Имя сцены для Святилища Зенита")]
+        public string sceneZenithSanctuary = "Scene_ZenithSanctuary";
 
         [System.Serializable]
         public class DialogLine
@@ -705,8 +707,8 @@ namespace FateContinent
                 Button btn = choiceButtons[i];
                 if (btn == null) continue;
 
-                // Завершающая кнопка подтверждения (индекс 3 на шаге 3) имеет свой собственный статический стиль изумрудного Zenith Glass
-                if (currentLineIndex == 3 && i == 3) continue;
+                // Завершающая кнопка подтверждения (последний индекс на шаге 3) имеет свой собственный статический стиль изумрудного Zenith Glass
+                if (currentLineIndex == 3 && i == 4) continue;
 
                 Image btnImg = btn.GetComponent<Image>();
                 Outline outline = btn.GetComponent<Outline>();
@@ -754,25 +756,29 @@ namespace FateContinent
             {
                 if (zoneIndex == 0) desc = "<b>[Кровавые Пустоши]:</b> Выжженные песчаные дюны и бури под вечным багровым небом. Регенерация снижена. <i>(Нажмите кнопку завершения для подтверждения)</i>";
                 else if (zoneIndex == 1) desc = "<b>[Ледяной Пик]:</b> Царство вечной мерзлоты. Обитают ледяные гиганты. Скорость отряда снижена на льду. <i>(Нажмите кнопку завершения для подтверждения)</i>";
-                else desc = "<b>[Древние Руины]:</b> Величественные руины династии. Энергетические осколки и каменные стражи. <i>(Нажмите кнопку завершения для подтверждения)</i>";
+                else if (zoneIndex == 2) desc = "<b>[Древние Руины]:</b> Величественные руины династии. Энергетические осколки и каменные стражи. <i>(Нажмите кнопку завершения для подтверждения)</i>";
+                else desc = "<b>[Святилище Зенита]:</b> Величественный лесной оазис, скрывающий истоки Кристалла под защитой лесных духов. <i>(Нажмите кнопку завершения для подтверждения)</i>";
             }
             else if (lang == 8) // CH
             {
                 if (zoneIndex == 0) desc = "<b>[绯红荒野]:</b> 烈日下的沙丘与强盗。战士生命回复减慢。<i>(请点击确认按钮以完成选择)</i>";
                 else if (zoneIndex == 1) desc = "<b>[冰封之巅]:</b> 极寒冻土与巨人，生存难度极高。移动速度降低。<i>(请点击确认按钮以完成选择)</i>";
-                else desc = "<b>[远古遗迹]:</b> 遗留的能量水晶，充斥着机关巨像。<i>(请点击确认按钮以完成选择)</i>";
+                else if (zoneIndex == 2) desc = "<b>[远古遗迹]:</b> 遗留的能量水晶，充斥着机关巨像。<i>(请点击确认按钮以完成选择)</i>";
+                else desc = "<b>[天顶圣所]:</b> 雄伟的森林绿洲，在古老守护灵庇护下隐藏着水晶之源。<i>(请点击确认按钮以完成选择)</i>";
             }
             else if (lang == 7) // KR
             {
                 if (zoneIndex == 0) desc = "<b>[크림슨 황무지]:</b> 뜨거운 모래 사막과 마력 폭풍. 체력 재생 감소. <i>(확인 버튼을 누르면 선택이 완료됩니다)</i>";
                 else if (zoneIndex == 1) desc = "<b>[빙설의 봉우리]:</b> 영구 동토와 혹한. 부대 이동 속도 감소. <i>(확인 버튼을 누르면 선택이 완료됩니다)</i>";
-                else desc = "<b>[고대 유적지]:</b> 고대 문명의 파편 and 힘의 결정. 경비 석상이 작동 중. <i>(확인 버튼을 누르면 선택이 완료됩니다)</i>";
+                else if (zoneIndex == 2) desc = "<b>[고대 유적지]:</b> 고대 문명의 파편 and 힘의 결정. 경비 석상이 작동 중. <i>(확인 버튼을 누르면 선택이 완료됩니다)</i>";
+                else desc = "<b>[제니스 성소]:</b> 고대 정령들의 수호 아래 크리스탈의 수수께끼가 숨겨진 웅장한 숲의 오아시스. <i>(확인 버튼을 누르면 선택이 완료됩니다)</i>";
             }
             else // EN / fallback
             {
                 if (zoneIndex == 0) desc = "<b>[Crimson Wastes]:</b> Scorched ruins and firestorms. Reduced health regeneration. <i>(Press the confirmation button to proceed)</i>";
                 else if (zoneIndex == 1) desc = "<b>[Ice-Bound Peak]:</b> Ultimate permafrost and frost behemoths. Reduced move speed on ice. <i>(Press the confirmation button to proceed)</i>";
-                else desc = "<b>[Ancient Ruins]:</b> Ancient ruins with pure energy crystals but guarded by stone traps. <i>(Press the confirmation button to proceed)</i>";
+                else if (zoneIndex == 2) desc = "<b>[Ancient Ruins]:</b> Ancient ruins with pure energy crystals but guarded by stone traps. <i>(Press the confirmation button to proceed)</i>";
+                else desc = "<b>[Zenith Sanctuary]:</b> A majestic forest oasis hiding the origin of the Crystal, guarded by ancient spirits. <i>(Press the confirmation button to proceed)</i>";
             }
 
             if (dialogueBodyText != null)
@@ -845,6 +851,11 @@ namespace FateContinent
             {
                 Debug.Log("[GATEWAY] Попытка загрузки уровня: Древние Руины!");
                 TryLoadScene(sceneAncientRuins);
+            }
+            else if (currentLineIndex == 7)
+            {
+                Debug.Log("[GATEWAY] Попытка загрузки уровня: Святилище Зенита!");
+                TryLoadScene(sceneZenithSanctuary);
             }
             
             Debug.Log("[DIALOGUE SYSTEM] Диалог завершен.");
@@ -1849,11 +1860,11 @@ namespace FateContinent
                 textEN = "Remember: every choice here has consequences. Our squad is ready. Now select a territory on the Fate Continent for the initial tactical sweep:",
                 textCH = "记住：这里的每一个选择都有其后果。我们的队伍已准备就绪。现在请选择命运大陆上的一个区域进行首次战术肃清：",
                 textKR = "기억해라: 이곳에서의 모든 선택은 그 결과가 따른다. 우리 부대는 전투 준비가 끝났다. 이제 운명의 대륙에서 첫 전술적 소탕을 전개할 지역을 선택해라:",
-                choicesRU = new string[] { "Кровавые Пустоши", "Ледяной Пик", "Древние Руины" },
-                choicesEN = new string[] { "Crimson Wastes", "Ice-Bound Peak", "Ancient Ruins" },
-                choicesCH = new string[] { "绯红荒野", "冰封之巅", "远古遗迹" },
-                choicesKR = new string[] { "크림슨 황무지", "빙설의 봉우리", "고대 유적지" },
-                nextLineIndexes = new int[] { 4, 5, 6 }
+                choicesRU = new string[] { "Кровавые Пустоши", "Ледяной Пик", "Древние Руины", "Святилище Зенита" },
+                choicesEN = new string[] { "Crimson Wastes", "Ice-Bound Peak", "Ancient Ruins", "Zenith Sanctuary" },
+                choicesCH = new string[] { "绯红荒野", "冰封之巅", "远古遗迹", "天顶圣所" },
+                choicesKR = new string[] { "크림슨 황무지", "빙설의 봉우리", "고대 유적지", "제니스 성소" },
+                nextLineIndexes = new int[] { 4, 5, 6, 7 }
             };
 
             DialogLine l5 = new DialogLine
@@ -1895,6 +1906,19 @@ namespace FateContinent
                 nextLineIndexes = null
             };
 
+            DialogLine l8 = new DialogLine
+            {
+                textRU = "Вы выбрали Святилище Зенита! Здесь покоятся древние реликвии Кристалла под защитой лесных духов. Да пребудет с тобой благословение Кристалла! Мы отправляемся в путь.",
+                textEN = "You have selected the Zenith Sanctuary! Ancient remnants of the Crystal lie here under the protection of forest spirits. May the blessing of the Crystal guide us! We are on our way.",
+                textCH = "你选择了天顶圣所！古老的水晶遗迹在森林守护灵的庇佑下安息。愿水晶祝福我们！我们即刻启程。",
+                textKR = "제니스 성소를 선택하셨습니다! 고대 크리스탈 정수가 숲의 정령들의 보호 아래 잠들어 있습니다. 크리스탈의 축복이 우리와 함께하기를! 여정을 시작합니다.",
+                choicesRU = new string[] { "Завершить диалог" },
+                choicesEN = new string[] { "End dialogue" },
+                choicesCH = new string[] { "结束对话" },
+                choicesKR = new string[] { "대화 종료" },
+                nextLineIndexes = null
+            };
+
             dialogueSteps.Add(l1);
             dialogueSteps.Add(l2);
             dialogueSteps.Add(l3);
@@ -1902,6 +1926,7 @@ namespace FateContinent
             dialogueSteps.Add(l5);
             dialogueSteps.Add(l6);
             dialogueSteps.Add(l7);
+            dialogueSteps.Add(l8);
         }
 
         /// <summary>
