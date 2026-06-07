@@ -38,6 +38,9 @@ namespace FateContinent
         [Tooltip("Объект игрока, который будет десантирован")]
         public Transform playerTransform;
 
+        [Tooltip("3D Модель Континента (будет автоматически скрыта во время диалога и включена при десантировании)")]
+        public GameObject continentObject;
+
         [Tooltip("Главная камера для плавной фокусировки")]
         public Transform mainCameraTransform;
 
@@ -55,15 +58,66 @@ namespace FateContinent
             else
             {
                 Destroy(gameObject);
+                return;
+            }
+
+            // Автоматическое нахождение 3D-карты в Hierarchy на старте
+            if (continentObject == null)
+            {
+                continentObject = GameObject.Find("Континент");
+                if (continentObject != null)
+                {
+                    Debug.Log("<color=#00FFCC>[LANDING SYS]</color> Скрипт автоматически нашел 3D-модель Континента.");
+                }
+            }
+
+            // Автоматическое нахождение синей сферы игрока в Hierarchy на старте
+            if (playerTransform == null)
+            {
+                GameObject pObj = GameObject.Find("Player_Placeholder");
+                if (pObj != null)
+                {
+                    playerTransform = pObj.transform;
+                    Debug.Log("<color=#00FFCC>[LANDING SYS]</color> Скрипт автоматически нашел Player_Placeholder.");
+                }
+            }
+        }
+
+        private void Start()
+        {
+            // СВЕРХВАЖНО: Изначально полностью выключаем 3D-карту и героя, чтобы они не лезли на задний план вступительных диалогов Аэлиссы!
+            if (continentObject != null)
+            {
+                continentObject.SetActive(false);
+                Debug.Log("[LANDING SYS] Изначально деактивировали 3D Континент, чтобы очистить задний план диалога.");
+            }
+
+            if (playerTransform != null)
+            {
+                playerTransform.gameObject.SetActive(false);
+                Debug.Log("[LANDING SYS] Изначально деактивировали Player_Placeholder.");
             }
         }
 
         /// <summary>
         /// Вызывается автоматически, когда игрок выбирает точку высадки и завершает диалог!
         /// </summary>
-        /// <param name="zoneIndex">Индекс выбранной зоны (0: Кровавые Пустоши, 1: Ледяной Пик, 2: Древние Руины)</param>
+        /// <param name="zoneIndex">Индекс выбранной зоны (0: Кровавые Пустоши, 1: Ледяной Пик, 2: Древние Руины, 3: Грозовые Кряжи)</param>
         public void DispatchLanding(int zoneIndex)
         {
+            // Включаем 3D-карту и героя обратно при начале перемещения камеры
+            if (continentObject != null)
+            {
+                continentObject.SetActive(true);
+                Debug.Log("<color=#00FFCC>[LANDING SYS]</color> Активируем 3D-модель Континента!");
+            }
+
+            if (playerTransform != null)
+            {
+                playerTransform.gameObject.SetActive(true);
+                Debug.Log("<color=#00FFCC>[LANDING SYS]</color> Активируем Player_Placeholder!");
+            }
+
             if (landingPoints == null || landingPoints.Length == 0)
             {
                 Debug.LogWarning("[LANDING SYS] Точки высадки не настроены в LandingPositionManager!");
