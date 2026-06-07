@@ -1,11 +1,11 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.11.7)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.11.8)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** 18.11.7
+- **Version:** 18.11.8
 - **Engine:** Unity 6 (6000.3.10f1)
-- **Updates:** Selective Dialogue Map Dismissal & Hidden Faction Markers - Dismisses map background, landing rings, and companion/hero markers upon clicking 'End Dialogue' or ending conversation. Hides non-glowing faction reference circles (`Faction_Marker_Aelyssa` / class markers) inside the tactical view to keep the landing layout extremely pristine.
-- **v18.11.6 Update:** Synchronized Map & Marker Dismissal - Automatically caches Faction_Marker_Aelyssa and player class markers on startup to properly control their visibility in sync with the tactical world map. Directs DialogueSystem_Manager to dismiss map visibility when ending dialogue (clicking "Завершить диалог"), completely cleaning up map background sprites, active landing point rings, and the companion companion/faction markers from the viewport upon conversation exit.
+- **Updates:** 4-Zone Landing Position Auto-Sync & Anchor Persistence - Binds four distinct landing points and automatically synchronizes physical spawn anchors (`Wastes_SpawnPoint`, `Peak_SpawnPoint`, `Ruins_SpawnPoint`, `Crags_SpawnPoint`), securely caching player selection across sessions with persistent PlayerPrefs. Fully masks 3D environments during dialog panels to secure scene purity.
+- **v18.11.7 Update:** Selective Dialogue Map Dismissal & Hidden Faction Markers - Dismisses map background, landing rings, and companion/hero markers upon clicking 'End Dialogue' or ending conversation. Hides non-glowing faction reference circles (`Faction_Marker_Aelyssa` / class markers) inside the tactical view to keep the landing layout extremely pristine.
 - **Design System:** Zenith Glassmorphism (8K Ultra-High Density)
 
 ## 📑 Core Documentation References
@@ -26,7 +26,7 @@
 - **Audio Rule (CRITICAL):** Используйте только `SettingsManager.cs` для управления звуком и музыкой (включая hover-эффекты и списки воспроизведения). Скрипты `AudioHandler` и `AudioManager` должны быть полностью удалены для чистоты проекта. Музыкальные клипы продлеваются через Suno/Udio и настраиваются на бесшовное зацикливание (`loop = true`). Звуковые файлы берем с Pixabay/Freesound по CC0-лицензии и подключаем напрямую к SettingsManager или через AudioMixer.
 
 ## 🚀 Протокол «Пошаговое Мастерство» (Step-by-Step Mastery)
-1. **Отслеживание прогресса:** Текущая версия v18.11.7 (Zenith Map Dismissal & Faction Marker Cache Sync, v18.11.7).
+1. **Отслеживание прогресса:** Текущая версия v18.11.8 (4-Zone Landing Auto-Sync & Anchor Persistence, v18.11.8).
 2. **Инструкции Настройки Компонентов (Verified Inspector Settings):**
    - **FateMapManager (FATE_WORLD_MAP):**
      - *Maps List:* [+] Слот для глобальной карты (Map Name = "Континент Судьбы", Map Background = фоновый спрайт карты).
@@ -46,4 +46,4 @@
 5. **ОЧИСТКА:** Используйте только `SettingsManager.cs` для аудио. Удалите `AudioHandler` и `AudioManager` скрипты. Не использовать ElevenLabs.
 
 ---
-*Ядро AI пересинхронизировано (v18.11.7). Авто-апдейтер активен.*
+*Ядро AI пересинхронизировано (v18.11.8). Авто-апдейтер активен.*

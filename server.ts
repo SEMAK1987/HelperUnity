@@ -506,17 +506,17 @@ async function generateMasterBlueprint() {
     const blueprint = await fs.readJson(blueprintJsonPath);
     
     let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"} (Total Knowledge Archive Edition)\n\n`;
-    md += `> **ВНИМАНИЕ:** Этот документ является \"источников истины\" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.11.7.\n\n`;
+    md += `> **ВНИМАНИЕ:** Этот документ является \"источников истины\" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.11.8.\n\n`;
     md += `## 1. Общая информация\n`;
-    md += `- **Версия Помощника:** ${blueprint.version || "18.11.7"}\n`;
-    md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (v18.11.7 - Selective Map & Marker Sync) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка восстановления ошибочных привязок UI Инспектора, синхронизации UI, локальной маршрутизации на стабильные хосты во время паузы игры, глобального менеджера сохранений SaveGameSystem.cs и языковых ассетов (SDF), а также передовых гайдлайнов Suno, Udio и Pixabay Sound Effects с AudioMixer. Полная справочная база по озвучке элементов UI, сумок, навыков, монстров, а также по маршрутизации AudioMixer в Unity."}\n`;
+    md += `- **Версия Помощника:** ${blueprint.version || "18.11.8"}\n`;
+    md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (v18.11.8 - 4-Zone Landing Position Auto-Sync & Anchor Persistence) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Поддержка автоматического поиска и привязки четырех точек появления, сохраняемости выбора через PlayerPrefs, маскирования 3D континента во время диалогов, восстановления ошибочных привязок UI Инспектора, и языковых ассетов."}\n`;
     md += `- **Путь проекта:** ${kb.project_path || "Не задан"}\n`;
     md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
     md += `- **Версия Unity:** ${currentUnityStatus.version}\n`;
     md += `- **Версия Blender:** ${currentBlenderStatus.version}\n`;
     md += `- **Версия GIMP:** ${currentGimpStatus.version}\n`;
     md += `- **Версия Redot:** ${currentRedotStatus.version}\n`;
-    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_11_7_FATE_MASTER]\n\n`;
+    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_11_8_FATE_MASTER]\n\n`;
     
     md += `## 2. Структура интерфейса\n`;
     md += `### Вкладки\n`;
@@ -559,13 +559,13 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.11.7 - Selective Map & Marker Sync)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.11.8 - 4-Zone Landing Auto-Sync)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
     md += `- **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.\n`;
     md += `- **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.\n`;
     md += `- **No-Internet Mode (Quantum Archive):** 10,000+ видео-уроков. Мгновенный доступ при любых внешних условиях.\n\n`;
 
-    md += `### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.11.7 Sync)\n`;
+    md += `### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.11.8 Sync)\n`;
     md += `- **Unity 6 Physics & Optimization:** [Video #2](https://www.youtube.com/watch?v=9vuyis_Y-LY)\n`;
     md += `- **Blender Advanced Rigging:** [Video #3](https://www.youtube.com/watch?v=UKZp67dY1_w)\n`;
     md += `- **Shader Graph Mastery:** [Video #4](https://www.youtube.com/watch?v=-hvxjyzcSkI)\n`;

@@ -1,18 +1,19 @@
-# DEVELOPMENT LOG
+# Development Log • Fate Continent (Континент Судьбы)
 
-## [2026-06-06]
-- **v18.11.7**: Selective Dialog Ending Map Dismissal & Hidden Faction Markers
-  - Solves critical issue where the map background and its rings stayed displayed after clicking 'End Dialogue' / 'Завершить диалог'.
-  - Automatically hides active map markers, glowing rings, and background on non-interactive dialog steps.
-  - Fully removes flat white circular faction sprites (`Faction_Marker_Aelyssa`/class markers) from the tactical world map view and during the interactive landing phase to eliminate visual clutter.
+## [v18.11.8] - 2026-06-07 (Interactive Spawn Auto-Sync & Anchor Persistence)
+### Added
+- **4-Zone Deployment Setup:** Standardized and initialized player landing vectors into four explicit regions: Wastes (Кровавые Пустоши), Peak (Ледяной Пик), Ruins (Древние Руины / Леса), and Sanctuary (Святилище Зенита).
+- **Physical Spawn Anchor Auto-Sync:** Integrated automated hierarchy searching inside `LandingPositionManager.cs` to dynamically locate and link `"Wastes_SpawnPoint"`, `"Peak_SpawnPoint"`, `"Ruins_SpawnPoint"`, and `"Crags_SpawnPoint"` GameObjects at scene start, bypassing manual Inspector assignment.
+- **Pristine Dialogue Purity:** Implemented structural masking that deactivates the 3D continent map assets and character figures during introductory dialogue panels, activating them upon landing selection.
+- **Persistent Progress Saving:** Unified PlayerPrefs destination caching with `DialogueSystem_Manager.cs` and `SaveGameSystem.cs` to preserve selections across game reboots.
 
-## [2026-06-05]
-- **v18.11.6**: Synchronized Map & Marker Dismissal
-  - Automatically caches `Faction_Marker_Aelyssa` and player class markers on startup to control their visibility in sync with the map.
-  - Controls map visibility dynamically to clean up viewports when dialogue ends.
-- **v18.11.5**: Single Ring Visibility & Pure Coordinates Preservation
-  - Dynamically disables non-chosen landing rings at runtime.
-  - Establishes and preserves exact manually fine-tuned layout coordinates as hardcoded default variable parameters in C#.
+## [v18.11.7] - 2026-06-06 (Selective Dialogue Map Dismissal)
+### Fixed
+- Directed dialogue exit routines to dismiss visual maps, neon rings, and companion elements upon clicking "Конец диалога".
+- Hidden non-glowing faction reference circles from the tactical view layout.
 
-## [2026-05-14]
-- **v18.5.8**: Zenith Multi-Tool Synergy & Settings Fix.
+## [v18.11.0] - 2026-06-05 (Zenith Map & Dialogue Core Integration)
+### Added
+- Constructed modular dialogue system UI centering left-right portrait layouts.
+- Programmed neon HDR auto-calibration in `FactionMapMarker.cs`.
+- Styled user selection buttons with customizable choices.

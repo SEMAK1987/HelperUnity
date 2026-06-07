@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.7. Selective Dialogue Map Dismissal & Hidden Faction Markers - Dismisses map background, rings, and hides flat class/Aelyssa markers from the tactical layout.",
+  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.8. 4-Zone Landing Auto-Sync & Physical Anchor Persistence - Automatically handles 4 physical spawn anchors synchronization, keeping character spawning and positioning pristine.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
