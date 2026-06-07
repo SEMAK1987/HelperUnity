@@ -47,7 +47,7 @@ namespace FateContinent
         [Header("✨ Настройки плавного перемещения камеры")]
         public bool smoothCameraMove = true;
         public float cameraMoveSpeed = 3.0f;
-        public Vector3 cameraOffset = new Vector3(0, 15f, -10f); // Ракурс сверху на точку
+        public Vector3 cameraOffset = new Vector3(0, 2.5f, -2.0f); // Ракурс сверху на точку
 
         private void OnValidate()
         {
@@ -144,6 +144,13 @@ namespace FateContinent
 
             // Гарантируем корректное заполнение при старте
             InitializeDefaultPoints();
+
+            // Автоматически понижаем ракурс камеры, если значение имеет устаревший высокий дефолт (15f), чтобы решить проблему "слишком высоко"
+            if (cameraOffset == new Vector3(0, 15f, -10f))
+            {
+                cameraOffset = new Vector3(0, 2.5f, -2.0f);
+                Debug.Log("<color=#00FFCC>[LANDING SYS]</color> Скорректировали высоту камеры с 15.0f до идеальных 2.5f для масштаба континента.");
+            }
 
             // Автоматическое нахождение 3D-карты в Hierarchy на старте
             if (continentObject == null)

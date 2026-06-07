@@ -1,4 +1,7 @@
 using UnityEngine;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 namespace FateContinent
 {
@@ -35,13 +38,13 @@ namespace FateContinent
 
         [Header("🔍 Настройки масштабирования (Zoom)")]
         [Tooltip("Текущий уровень приближения")]
-        public float currentZoom = 0.5f; // От 0.0 (максимально близко) до 1.0 (максимально высоко)
+        public float currentZoom = 0.3f; // От 0.0 (максимально близко) до 1.0 (максимально высоко)
         [Tooltip("Минимальная высота камеры (максимальный зум)")]
-        public float minHeight = 5.0f;
+        public float minHeight = 0.6f;   // Настроено под уровень красивого приближения карты
         [Tooltip("Максимальная высота камеры (минимальный зум)")]
-        public float maxHeight = 40.0f;
+        public float maxHeight = 8.0f;  // Настроено, чтобы карта не отдалялась слишком далеко
         [Tooltip("Чувствительность колесика мыши")]
-        public float zoomSensitivity = 5.0f;
+        public float zoomSensitivity = 3.0f;
         [Tooltip("Плавность приближения")]
         public float zoomSmoothing = 8.0f;
 
@@ -116,8 +119,23 @@ namespace FateContinent
 
         private void HandleKeyboardMovement()
         {
-            float horizontal = Input.GetAxisRaw("Horizontal"); // A, D, Left, Right
-            float vertical = Input.GetAxisRaw("Vertical");     // W, S, Up, Down
+            float horizontal = 0f;
+            float vertical = 0f;
+
+#if ENABLE_INPUT_SYSTEM
+            var kb = Keyboard.current;
+            if (kb != null)
+            {
+                if (kb.aKey.isPressed || kb.leftArrowKey.isPressed) horizontal = -1f;
+                else if (kb.dKey.isPressed || kb.rightArrowKey.isPressed) horizontal = 1f;
+
+                if (kb.wKey.isPressed || kb.upArrowKey.isPressed) vertical = 1f;
+                else if (kb.sKey.isPressed || kb.downArrowKey.isPressed) vertical = -1f;
+            }
+#else
+            horizontal = Input.GetAxisRaw("Horizontal"); // A, D, Left, Right
+            vertical = Input.GetAxisRaw("Vertical");     // W, S, Up, Down
+#endif
 
             Vector3 inputDirection = new Vector3(horizontal, 0f, vertical).normalized;
 
@@ -125,7 +143,14 @@ namespace FateContinent
             {
                 // Рассчитываем скорость с учетом Shift
                 float speed = baseMoveSpeed;
-                if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+                
+#if ENABLE_INPUT_SYSTEM
+                bool shiftPressed = kb != null && (kb.leftShiftKey.isPressed || kb.rightShiftKey.isPressed);
+#else
+                bool shiftPressed = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+#endif
+
+                if (shiftPressed)
                 {
                     speed *= shiftSpeedMultiplier;
                 }
@@ -151,15 +176,31 @@ namespace FateContinent
 
         private void HandleMouseDrag()
         {
-            // Зажатие правой (1) или средней (2) клавиши мыши для перетаскивания карты
+#if ENABLE_INPUT_SYSTEM
+            var mouse = Mouse.current;
+            if (mouse == null) return;
+
+            bool rightPressed = mouse.rightButton.isPressed;
+            bool middlePressed = mouse.middleButton.isPressed;
+            Vector3 currentMousePos = mouse.position.ReadValue();
+
+            if (mouse.rightButton.wasPressedThisFrame || mouse.middleButton.wasPressedThisFrame)
+            {
+                lastDragMousePosition = currentMousePos;
+            }
+#else
+            bool rightPressed = Input.GetMouseButton(1);
+            bool middlePressed = Input.GetMouseButton(2);
+            Vector3 currentMousePos = Input.mousePosition;
+
             if (Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2))
             {
-                lastDragMousePosition = Input.mousePosition;
+                lastDragMousePosition = currentMousePos;
             }
+#endif
 
-            if (Input.GetMouseButton(1) || Input.GetMouseButton(2))
+            if (rightPressed || middlePressed)
             {
-                Vector3 currentMousePos = Input.mousePosition;
                 Vector3 delta = currentMousePos - lastDragMousePosition;
 
                 if (delta.magnitude > 0.1f)
@@ -190,8 +231,17 @@ namespace FateContinent
 
         private void HandleZoom()
         {
-            float scroll = Input.GetAxis("Mouse ScrollWheel");
-            if (Mathf.Abs(scroll) > 0.01f)
+            float scroll = 0f;
+#if ENABLE_INPUT_SYSTEM
+            var mouse = Mouse.current;
+            if (mouse != null)
+            {
+                scroll = mouse.scroll.ReadValue().y * 0.005f; // Корректируем коэффициент прокрутки под новый Input System
+            }
+#else
+            scroll = Input.GetAxis("Mouse ScrollWheel");
+#endif
+            if (Mathf.Abs(scroll) > 0.001f)
             {
                 targetZoom -= scroll * zoomSensitivity;
                 targetZoom = Mathf.Clamp01(targetZoom);

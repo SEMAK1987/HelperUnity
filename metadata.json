@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.8. 4-Zone Landing Auto-Sync & Physical Anchor Persistence - Automatically handles 4 physical spawn anchors synchronization, keeping character spawning and positioning pristine.",
+  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.9. Input System Auto-Switch & Camera Calibration - Solves New Input System 999+ Exception errors and calibrates strategic camera offset zoom values to fit the map perfectly.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
