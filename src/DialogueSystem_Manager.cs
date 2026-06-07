@@ -927,6 +927,16 @@ namespace FateContinent
                 Debug.Log("[DIALOGUE SYSTEM] Сворачиваем интерактивную тактическую карту континентов.");
             }
 
+            // Вызываем ручное 3D позиционирование на физической карте
+            if (LandingPositionManager.Instance != null)
+            {
+                LandingPositionManager.Instance.DispatchLanding(selectedZoneIndex);
+            }
+            else
+            {
+                Debug.Log("[DIALOGUE SYSTEM] LandingPositionManager не найден. Пропускаем физическое 3D десантирование.");
+            }
+
             // Проверяем, на каком шаге мы закончили диалог (это определяет выбранную локацию!)
             if (currentLineIndex == 4)
             {
