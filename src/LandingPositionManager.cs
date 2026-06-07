@@ -32,7 +32,7 @@ namespace FateContinent
 
         [Header("📍 Настройка Физических Точек Высадки в 3D Мире")]
         [Tooltip("Список ручных точек высадки на 3D карте Континента")]
-        public LandingPoint[] landingPoints;
+        public LandingPoint[] landingPoints = new LandingPoint[4];
 
         [Header("🎥 Ссылки на объекты сцены")]
         [Tooltip("Объект игрока, который будет десантирован")]
@@ -49,6 +49,87 @@ namespace FateContinent
         public float cameraMoveSpeed = 3.0f;
         public Vector3 cameraOffset = new Vector3(0, 15f, -10f); // Ракурс сверху на точку
 
+        private void OnValidate()
+        {
+            InitializeDefaultPoints();
+        }
+
+        private void InitializeDefaultPoints()
+        {
+            // Автоматическое расширение и инициализация массива до 4 элементов (под 4 кнопки диалога)
+            if (landingPoints == null || landingPoints.Length != 4)
+            {
+                landingPoints = new LandingPoint[4];
+            }
+
+            for (int i = 0; i < 4; i++)
+            {
+                if (landingPoints[i] == null)
+                {
+                    landingPoints[i] = new LandingPoint();
+                }
+            }
+
+            // Настройка имен по умолчанию
+            landingPoints[0].zoneID = "Wastes";
+            landingPoints[0].zoneName = "Кровавые Пустоши";
+
+            landingPoints[1].zoneID = "Peak";
+            landingPoints[1].zoneName = "Ледяной Пик";
+
+            landingPoints[2].zoneID = "Ruins";
+            landingPoints[2].zoneName = "Древние Руины";
+
+            landingPoints[3].zoneID = "Crags";
+            landingPoints[3].zoneName = "Грозовые Кряжи";
+
+            // Автоматический поиск пустышек, чтобы ничего не сбрасывалось и не требовалось перетаскивать вручную
+            AutoFindSpawnAnchors();
+        }
+
+        private void AutoFindSpawnAnchors()
+        {
+            if (landingPoints == null) return;
+
+            string[] defaultAnchorNames = new string[] { 
+                "Wastes_SpawnPoint", 
+                "Peak_SpawnPoint", 
+                "Ruins_SpawnPoint", 
+                "Crags_SpawnPoint" 
+            };
+
+            for (int i = 0; i < landingPoints.Length; i++)
+            {
+                if (landingPoints[i] == null) continue;
+
+                if (landingPoints[i].spawnAnchor == null)
+                {
+                    string targetName = defaultAnchorNames[i];
+                    GameObject foundObj = GameObject.Find(targetName);
+                    
+                    // Если не нашли напрямую, ищем по всей иерархии (включая неактивные или вложенные объекты)
+                    if (foundObj == null)
+                    {
+                        var transforms = Resources.FindObjectsOfTypeAll<Transform>();
+                        foreach (var t in transforms)
+                        {
+                            if (t.name == targetName && t.gameObject.scene.isLoaded)
+                            {
+                                foundObj = t.gameObject;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (foundObj != null)
+                    {
+                        landingPoints[i].spawnAnchor = foundObj.transform;
+                        Debug.Log($"<color=#00FFCC>[LANDING SYS]</color> Успешно авто-связали точку: <b>{landingPoints[i].zoneName}</b> с объектом <b>{targetName}</b> в сцене!");
+                    }
+                }
+            }
+        }
+
         private void Awake()
         {
             if (Instance == null)
@@ -61,10 +142,26 @@ namespace FateContinent
                 return;
             }
 
+            // Гарантируем корректное заполнение при старте
+            InitializeDefaultPoints();
+
             // Автоматическое нахождение 3D-карты в Hierarchy на старте
             if (continentObject == null)
             {
                 continentObject = GameObject.Find("Континент");
+                if (continentObject == null)
+                {
+                    // Ищем по части имени
+                    foreach (var go in Resources.FindObjectsOfTypeAll<GameObject>())
+                    {
+                        if (go.name.Contains("Континент") && go.scene.isLoaded)
+                        {
+                            continentObject = go;
+                            break;
+                        }
+                    }
+                }
+
                 if (continentObject != null)
                 {
                     Debug.Log("<color=#00FFCC>[LANDING SYS]</color> Скрипт автоматически нашел 3D-модель Континента.");
@@ -75,6 +172,18 @@ namespace FateContinent
             if (playerTransform == null)
             {
                 GameObject pObj = GameObject.Find("Player_Placeholder");
+                if (pObj == null)
+                {
+                    foreach (var go in Resources.FindObjectsOfTypeAll<GameObject>())
+                    {
+                        if (go.name.Contains("Player_Placeholder") && go.scene.isLoaded)
+                        {
+                            pObj = go;
+                            break;
+                        }
+                    }
+                }
+
                 if (pObj != null)
                 {
                     playerTransform = pObj.transform;
