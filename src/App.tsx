@@ -5250,11 +5250,11 @@ export default function App() {
                                         <span>🗺️ {simDialogueLang === 'RU' ? 'Интерактивная карта континента: Наведите курсор на один из регионов зачистки' : simDialogueLang === 'KR' ? '인터랙티브 대륙 지도: 정화 지역에 커서를 올리세요' : simDialogueLang === 'CH' ? '互动大陆地图：请将鼠标悬停在要净化的区域上' : 'Interactive Continent Map: Hover over a territory to view details'}</span>
                                       </div>
 
-                                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+                                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
                                         {/* LEFT: SVG ILLUSTRATED WATERPROOF CONTINENT MAP with 3 reactive zones */}
-                                        <div className="lg:col-span-6 relative bg-indigo-950/40 rounded-3xl p-4 border border-indigo-500/20 flex flex-col items-center justify-center min-h-[220px]">
-                                          <svg viewBox="0 0 400 300" className="w-full max-h-[190px] drop-shadow-[0_0_15px_rgba(99,102,241,0.15)]">
-                                            {/* Defs for gradients */}
+                                        <div className="lg:col-span-7 relative bg-indigo-950/40 rounded-3xl p-6 border border-indigo-500/20 flex flex-col items-center justify-center min-h-[380px] transition-all">
+                                          <svg viewBox="0 0 400 300" className="w-full max-h-[340px] drop-shadow-[0_0_20px_rgba(99,102,241,0.25)] transition-all">
+                                            {/* Defs for gradients & glowing filters */}
                                             <defs>
                                               <radialGradient id="oceanGrad" cx="50%" cy="50%" r="50%">
                                                 <stop offset="0%" stopColor="#1e1b4b" stopOpacity="0.4" />
@@ -5263,6 +5263,17 @@ export default function App() {
                                               <pattern id="gridPattern" width="20" height="20" patternUnits="userSpaceOnUse">
                                                 <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#6366f1" strokeWidth="0.5" strokeOpacity="0.08" />
                                               </pattern>
+                                              {/* Premium high-intensity glow filter for full configuration highlighting */}
+                                              <filter id="neonGlow" x="-30%" y="-30%" width="160%" height="160%">
+                                                <feGaussianBlur stdDeviation="6" result="blur" />
+                                                <feComponentTransfer in="blur" result="brightBlur">
+                                                  <feFuncA type="linear" slope="2.2" />
+                                                </feComponentTransfer>
+                                                <feMerge>
+                                                  <feMergeNode in="brightBlur" />
+                                                  <feMergeNode in="SourceGraphic" />
+                                                </feMerge>
+                                              </filter>
                                             </defs>
 
                                             {/* Background Ocean Grid */}
@@ -5282,9 +5293,20 @@ export default function App() {
                                             />
 
                                             {/* REGION 1: Crimson Wastes (Left Bottom) */}
+                                            {hoveredRegion === 'crimson' && (
+                                              <path 
+                                                d="M 60 160 C 70 120 120 110 150 140 C 160 170 140 210 135 240 C 95 250 70 215 60 160 Z" 
+                                                fill="none"
+                                                stroke="#ef4444"
+                                                strokeWidth="7"
+                                                strokeOpacity="0.45"
+                                                filter="url(#neonGlow)"
+                                                className="pointer-events-none"
+                                              />
+                                            )}
                                             <path 
                                               d="M 60 160 C 70 120 120 110 150 140 C 160 170 140 210 135 240 C 95 250 70 215 60 160 Z" 
-                                              fill={hoveredRegion === 'crimson' ? 'rgba(239, 68, 68, 0.35)' : 'rgba(239, 68, 68, 0.12)'}
+                                              fill={hoveredRegion === 'crimson' ? 'rgba(239, 68, 68, 0.42)' : 'rgba(239, 68, 68, 0.12)'}
                                               stroke={hoveredRegion === 'crimson' ? '#ef4444' : '#b91c1c'}
                                               strokeWidth={hoveredRegion === 'crimson' ? '3' : '1.5'}
                                               className="transition-all duration-300 cursor-pointer"
@@ -5295,11 +5317,31 @@ export default function App() {
                                                 showNotification("Вы выбрали место: Кровавые Пустоши!", "success");
                                               }}
                                             />
+                                            {/* Tactical scan & full coordinates config overlay on hover */}
+                                            {hoveredRegion === 'crimson' && (
+                                              <g className="animate-pulse pointer-events-none">
+                                                <rect x="42" y="105" width="125" height="152" fill="none" stroke="#ef4444" strokeWidth="0.75" strokeDasharray="3 3" strokeOpacity="0.4" />
+                                                <path d="M 42 120 L 42 105 L 57 105 M 152 105 L 167 105 L 167 120 M 42 242 L 42 257 L 57 257 M 152 257 L 167 257 L 167 242" fill="none" stroke="#ef4444" strokeWidth="1.5" strokeOpacity="0.8" />
+                                                <text x="46" y="117" fill="#ef4444" fontSize="5.5" fontWeight="900" className="font-sans tracking-widest uppercase opacity-90">🛰️ ALIGN_CFG: CRIMSON_WASTES (88.4%)</text>
+                                                <text x="46" y="252" fill="#ef4444" fontSize="5" fontWeight="bold" className="font-sans tracking-wider opacity-60">BOUNDS: LAT 44.1°N | LON 12.8°W</text>
+                                              </g>
+                                            )}
 
                                             {/* REGION 2: Ice-Bound Peak (Top North) */}
+                                            {hoveredRegion === 'ice' && (
+                                              <path 
+                                                d="M 140 85 C 160 65 210 55 245 75 C 265 105 220 135 180 130 C 150 115 135 100 140 85 Z" 
+                                                fill="none"
+                                                stroke="#06b6d4"
+                                                strokeWidth="7"
+                                                strokeOpacity="0.45"
+                                                filter="url(#neonGlow)"
+                                                className="pointer-events-none"
+                                              />
+                                            )}
                                             <path 
                                               d="M 140 85 C 160 65 210 55 245 75 C 265 105 220 135 180 130 C 150 115 135 100 140 85 Z" 
-                                              fill={hoveredRegion === 'ice' ? 'rgba(6, 182, 212, 0.35)' : 'rgba(6, 182, 212, 0.12)'}
+                                              fill={hoveredRegion === 'ice' ? 'rgba(6, 182, 212, 0.42)' : 'rgba(6, 182, 212, 0.12)'}
                                               stroke={hoveredRegion === 'ice' ? '#06b6d4' : '#0891b2'}
                                               strokeWidth={hoveredRegion === 'ice' ? '3' : '1.5'}
                                               className="transition-all duration-300 cursor-pointer"
@@ -5310,11 +5352,31 @@ export default function App() {
                                                 showNotification("Вы выбрали место: Ледяной Пик!", "success");
                                               }}
                                             />
+                                            {/* Tactical scan & full coordinates config overlay on hover */}
+                                            {hoveredRegion === 'ice' && (
+                                              <g className="animate-pulse pointer-events-none">
+                                                <rect x="128" y="47" width="131" height="95" fill="none" stroke="#06b6d4" strokeWidth="0.75" strokeDasharray="3 3" strokeOpacity="0.4" />
+                                                <path d="M 128 62 L 128 47 L 143 47 M 244 47 L 259 47 L 259 62 M 128 127 L 128 142 L 143 142 M 244 142 L 259 142 L 259 127" fill="none" stroke="#06b6d4" strokeWidth="1.5" strokeOpacity="0.8" />
+                                                <text x="132" y="59" fill="#06b6d4" fontSize="5.5" fontWeight="900" className="font-sans tracking-widest uppercase opacity-90">🛰️ ALIGN_CFG: ICE_PEAK (94.1%)</text>
+                                                <text x="132" y="137" fill="#06b6d4" fontSize="5" fontWeight="bold" className="font-sans tracking-wider opacity-60">BOUNDS: LAT 78.3°N | LON 04.1°E</text>
+                                              </g>
+                                            )}
 
                                             {/* REGION 3: Ancient Ruins (Right & South East) */}
+                                            {hoveredRegion === 'ruins' && (
+                                              <path 
+                                                d="M 230 135 C 280 125 320 110 330 145 C 345 195 315 235 275 245 C 240 250 210 210 215 170 C 215 150 220 140 230 135 Z" 
+                                                fill="none"
+                                                stroke="#f59e0b"
+                                                strokeWidth="7"
+                                                strokeOpacity="0.45"
+                                                filter="url(#neonGlow)"
+                                                className="pointer-events-none"
+                                              />
+                                            )}
                                             <path 
                                               d="M 230 135 C 280 125 320 110 330 145 C 345 195 315 235 275 245 C 240 250 210 210 215 170 C 215 150 220 140 230 135 Z" 
-                                              fill={hoveredRegion === 'ruins' ? 'rgba(245, 158, 11, 0.35)' : 'rgba(245, 158, 11, 0.12)'}
+                                              fill={hoveredRegion === 'ruins' ? 'rgba(245, 158, 11, 0.42)' : 'rgba(245, 158, 11, 0.12)'}
                                               stroke={hoveredRegion === 'ruins' ? '#f59e0b' : '#d97706'}
                                               strokeWidth={hoveredRegion === 'ruins' ? '3' : '1.5'}
                                               className="transition-all duration-300 cursor-pointer"
@@ -5325,11 +5387,31 @@ export default function App() {
                                                 showNotification("Вы выбрали место: Древние Руины!", "success");
                                               }}
                                             />
+                                            {/* Tactical scan & full coordinates config overlay on hover */}
+                                            {hoveredRegion === 'ruins' && (
+                                              <g className="animate-pulse pointer-events-none">
+                                                <rect x="202" y="112" width="140" height="145" fill="none" stroke="#f59e0b" strokeWidth="0.75" strokeDasharray="3 3" strokeOpacity="0.4" />
+                                                <path d="M 202 127 L 202 112 L 217 112 M 327 112 L 342 112 L 342 127 M 202 242 L 202 257 L 217 257 M 327 257 L 342 257 L 342 242" fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeOpacity="0.8" />
+                                                <text x="206" y="124" fill="#f59e0b" fontSize="5.5" fontWeight="900" className="font-sans tracking-widest uppercase opacity-90">🛰️ ALIGN_CFG: ANCIENT_RUINS (92.5%)</text>
+                                                <text x="206" y="252" fill="#f59e0b" fontSize="5" fontWeight="bold" className="font-sans tracking-wider opacity-60">BOUNDS: LAT 12.9°S | LON 38.6°E</text>
+                                              </g>
+                                            )}
 
                                              {/* REGION 4: Zenith Sanctuary (Center / Bottom Central) */}
+                                             {hoveredRegion === 'sanctuary' && (
+                                               <path 
+                                                 d="M 135 240 C 160 190 200 160 215 170 C 210 210 240 250 190 250 C 165 250 145 245 135 240 Z" 
+                                                 fill="none"
+                                                 stroke="#10b981"
+                                                 strokeWidth="7"
+                                                 strokeOpacity="0.45"
+                                                 filter="url(#neonGlow)"
+                                                 className="pointer-events-none"
+                                               />
+                                             )}
                                              <path 
                                                d="M 135 240 C 160 190 200 160 215 170 C 210 210 240 250 190 250 C 165 250 145 245 135 240 Z" 
-                                               fill={hoveredRegion === 'sanctuary' ? 'rgba(16, 185, 129, 0.35)' : 'rgba(16, 185, 129, 0.12)'}
+                                               fill={hoveredRegion === 'sanctuary' ? 'rgba(16, 185, 129, 0.42)' : 'rgba(16, 185, 129, 0.12)'}
                                                stroke={hoveredRegion === 'sanctuary' ? '#10b981' : '#047857'}
                                                strokeWidth={hoveredRegion === 'sanctuary' ? '3' : '1.5'}
                                                className="transition-all duration-300 cursor-pointer"
@@ -5340,18 +5422,27 @@ export default function App() {
                                                  showNotification("Вы выбрали место: Святилище Зенита!", "success");
                                                }}
                                              />
+                                             {/* Tactical scan & full coordinates config overlay on hover */}
+                                             {hoveredRegion === 'sanctuary' && (
+                                               <g className="animate-pulse pointer-events-none">
+                                                 <rect x="127" y="157" width="120" height="103" fill="none" stroke="#10b981" strokeWidth="0.75" strokeDasharray="3 3" strokeOpacity="0.4" />
+                                                 <path d="M 127 172 L 127 157 L 142 157 M 232 157 L 247 157 L 247 172 M 127 245 L 127 260 L 142 260 M 232 260 L 247 260 L 247 245" fill="none" stroke="#10b981" strokeWidth="1.5" strokeOpacity="0.8" />
+                                                 <text x="131" y="169" fill="#10b981" fontSize="5.5" fontWeight="900" className="font-sans tracking-widest uppercase opacity-90">🛰️ ALIGN_CFG: ZENITH_SANCTUARY (99.1%)</text>
+                                                 <text x="131" y="255" fill="#10b981" fontSize="5" fontWeight="bold" className="font-sans tracking-wider opacity-60">BOUNDS: LAT 08.5°S | LON 14.2°W</text>
+                                               </g>
+                                             )}
 
                                             {/* Glow overlay nodes for capitals */}
                                             <circle cx="106" cy="180" r="5" fill="#f87171" className="animate-pulse pointer-events-none" />
                                             <circle cx="190" cy="94" r="5" fill="#22d3ee" className="animate-pulse pointer-events-none" />
                                             <circle cx="280" cy="180" r="5" fill="#fbbf24" className="animate-pulse pointer-events-none" />
-                                             <circle cx="180" cy="210" r="5" fill="#34d399" className="animate-pulse pointer-events-none" />
+                                            <circle cx="180" cy="210" r="5" fill="#34d399" className="animate-pulse pointer-events-none" />
 
                                             {/* Labels on Map */}
                                             <text x="106" y="165" fill="#fca5a5" fontSize="8" fontWeight="bold" textAnchor="middle" className="pointer-events-none font-sans uppercase tracking-wider">🩸 Wastes</text>
                                             <text x="190" y="82" fill="#a5f3fc" fontSize="8" fontWeight="bold" textAnchor="middle" className="pointer-events-none font-sans uppercase tracking-wider">❄️ Ice Peak</text>
                                             <text x="280" y="165" fill="#fde047" fontSize="8" fontWeight="bold" textAnchor="middle" className="pointer-events-none font-sans uppercase tracking-wider">🏛️ Ruins</text>
-                                             <text x="180" y="228" fill="#6ee7b7" fontSize="8" fontWeight="bold" textAnchor="middle" className="pointer-events-none font-sans uppercase tracking-wider">🌿 Sanctuary</text>
+                                            <text x="180" y="228" fill="#6ee7b7" fontSize="8" fontWeight="bold" textAnchor="middle" className="pointer-events-none font-sans uppercase tracking-wider">🌿 Sanctuary</text>
 
                                             {/* Map WindRose decoration */}
                                             <g transform="translate(350, 60)" className="opacity-45">
@@ -5370,7 +5461,7 @@ export default function App() {
                                         </div>
 
                                         {/* RIGHT: DETAILED REGION STATS CARD */}
-                                        <div className="lg:col-span-6 flex flex-col justify-between min-h-[220px]">
+                                        <div className="lg:col-span-5 flex flex-col justify-between min-h-[380px]">
                                           {hoveredRegion === null ? (
                                             /* Empty choice placeholder */
                                             <div className="flex-1 flex flex-col items-center justify-center text-center p-6 rounded-3xl bg-white/5 border border-dashed border-white/10">

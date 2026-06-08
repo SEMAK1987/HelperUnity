@@ -646,6 +646,19 @@ namespace FateContinent
             {
                 InitializeDialogueUI();
             }
+            else
+            {
+                // Гарантируем, что корневой холст активен
+                if (dialogCanvas != null)
+                {
+                    dialogCanvas.gameObject.SetActive(true);
+                }
+                else
+                {
+                    GameObject rootCanvas = GameObject.Find("FATE_DIALOGUE_CANVAS");
+                    if (rootCanvas != null) rootCanvas.SetActive(true);
+                }
+            }
 
             dialogPanel.SetActive(true);
             UpdateDialogueView();
@@ -927,14 +940,33 @@ namespace FateContinent
                 Debug.Log("[DIALOGUE SYSTEM] Сворачиваем интерактивную тактическую карту континентов.");
             }
 
-            // Вызываем ручное 3D позиционирование на физической карте
-            if (LandingPositionManager.Instance != null)
+            // Вызываем ручное 3D позиционирование на физической карте с умным самовосстановлением (включая неактивные объекты)
+            LandingPositionManager lpm = LandingPositionManager.Instance;
+            if (lpm == null)
             {
-                LandingPositionManager.Instance.DispatchLanding(selectedZoneIndex);
+                var allLpms = Resources.FindObjectsOfTypeAll<LandingPositionManager>();
+                if (allLpms != null && allLpms.Length > 0)
+                {
+                    foreach (var l in allLpms)
+                    {
+                        if (l != null && l.gameObject.scene.isLoaded)
+                        {
+                            lpm = l;
+                            lpm.gameObject.SetActive(true);
+                            Debug.Log("<color=#00FFCC>[DIALOGUE SYSTEM]</color> Обнаружили и успешно активировали неактивный LandingPositionManager в иерархии сцены!");
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (lpm != null)
+            {
+                lpm.DispatchLanding(selectedZoneIndex);
             }
             else
             {
-                Debug.Log("[DIALOGUE SYSTEM] LandingPositionManager не найден. Пропускаем физическое 3D десантирование.");
+                Debug.LogWarning("[DIALOGUE SYSTEM] LandingPositionManager не найден ни в активной, ни в неактивной иерархии. Пропускаем физическое 3D десантирование.");
             }
 
             // Проверяем, на каком шаге мы закончили диалог (это определяет выбранную локацию!)
@@ -1501,6 +1533,7 @@ namespace FateContinent
 
             if (rootCanvas != null)
             {
+                rootCanvas.SetActive(true); // Гарантируем, что холст активен и не отключен в инспекторе!
                 dialogCanvas = rootCanvas.GetComponent<Canvas>();
 
                 Transform pauseP = FindChildRecursive(rootCanvas.transform, "PausePanel");

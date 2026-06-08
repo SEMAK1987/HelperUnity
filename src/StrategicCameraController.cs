@@ -79,6 +79,22 @@ namespace FateContinent
 
         private void Start()
         {
+            // Принудительно отключаем свободное перемещение камеры во время стартовых диалогов Аэлиссы,
+            // чтобы пользователь не улетел в пустоту, пока идет вступительный разговор и выбор зон.
+            isControlEnabled = false;
+
+            // Автоматическое исправление завышенных высот камеры из-за старой сериализации в инспекторе
+            if (minHeight >= 3.0f)
+            {
+                minHeight = 0.6f;
+                Debug.Log($"<color=#00FFCC>[CAMERA CALIBRATION]</color> Скорректировали минимальную высоту камеры с {minHeight}f до идеальных 0.6f.");
+            }
+            if (maxHeight >= 20.0f)
+            {
+                maxHeight = 8.0f;
+                Debug.Log($"<color=#00FFCC>[CAMERA CALIBRATION]</color> Скорректировали максимальную высоту камеры с {maxHeight}f до идеальных 8.0f.");
+            }
+
             // Считываем стартовые координаты
             targetPosition = transform.position;
             // Рассчитываем начальный зум на основе текущей высоты камеры
@@ -106,8 +122,10 @@ namespace FateContinent
             targetPosition.x = Mathf.Clamp(targetPosition.x, xBounds.x, xBounds.y);
             targetPosition.z = Mathf.Clamp(targetPosition.z, zBounds.x, zBounds.y);
             
-            // Задаем средний зум по умолчанию при фокусировке
+            // Задаем средний зум по умолчанию при фокусировке и мгновенно сбрасываем текущий интерполированный зум,
+            // чтобы избежать моментального взлета и улета камеры вверх!
             targetZoom = 0.4f; 
+            currentZoom = 0.4f;
             
             // Если игрок еще не управлял камерой, переносим физически сразу, чтобы не было "дергания"
             if (!isControlEnabled)

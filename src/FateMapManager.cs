@@ -136,6 +136,13 @@ namespace FateContinent
 
         private void Start()
         {
+            // Автоматически увеличиваем базовый масштаб карты, если он был слишком маленьким по умолчанию
+            if (mapScale <= 1.05f)
+            {
+                mapScale = 1.6f;
+                Debug.Log("<color=#00FFCC>[FATE CONTINENT CALIBRATION]</color> Автоматически увеличили масштаб тактической карты до 1.6f для величественного полноэкранного обзора.");
+            }
+
             InitializeMap(activeMapIndex);
 
             // Кэшируем маркеры персонажей на старте, пока они активны
