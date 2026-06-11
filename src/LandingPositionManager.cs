@@ -71,17 +71,17 @@ namespace FateContinent
             }
 
             // Настройка имен по умолчанию
-            landingPoints[0].zoneID = "Wastes";
-            landingPoints[0].zoneName = "Кровавые Пустоши";
+            landingPoints[0].zoneID = "Oasis";
+            landingPoints[0].zoneName = "Оазис";
 
-            landingPoints[1].zoneID = "Peak";
-            landingPoints[1].zoneName = "Ледяной Пик";
+            landingPoints[1].zoneID = "Outpost";
+            landingPoints[1].zoneName = "Аванпост";
 
-            landingPoints[2].zoneID = "Ruins";
-            landingPoints[2].zoneName = "Древние Руины";
+            landingPoints[2].zoneID = "Shore";
+            landingPoints[2].zoneName = "Побережье";
 
-            landingPoints[3].zoneID = "Crags";
-            landingPoints[3].zoneName = "Грозовые Кряжи";
+            landingPoints[3].zoneID = "Citadel";
+            landingPoints[3].zoneName = "Цитадель";
 
             // Автоматический поиск пустышек, чтобы ничего не сбрасывалось и не требовалось перетаскивать вручную
             AutoFindSpawnAnchors();
@@ -92,10 +92,10 @@ namespace FateContinent
             if (landingPoints == null) return;
 
             string[] defaultAnchorNames = new string[] { 
-                "Wastes_SpawnPoint", 
-                "Peak_SpawnPoint", 
-                "Ruins_SpawnPoint", 
-                "Crags_SpawnPoint" 
+                "Oasis_SpawnPoint", 
+                "Outpost_SpawnPoint", 
+                "Shore_SpawnPoint", 
+                "Citadel_SpawnPoint" 
             };
 
             for (int i = 0; i < landingPoints.Length; i++)

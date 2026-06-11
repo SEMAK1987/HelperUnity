@@ -1916,7 +1916,7 @@ namespace FateContinent
             btnImg.color = new Color(0.08f, 0.09f, 0.15f, 0.95f);
             
             Outline btnOutline = btnGov.AddComponent<Outline>();
-            btnOutline.effectColor = new Color(0.12f, 0.64f, 0.94f, 0.4f);
+            btnOutline.effectColor = new Color(0.12f, 0.64f, 0.94f, 0.40f);
 
             Button button = btnGov.AddComponent<Button>();
             button.onClick.AddListener(onClickAction);
@@ -1938,7 +1938,12 @@ namespace FateContinent
 
             if (Translator.Instance != null)
             {
-                tmp.font = Translator.Instance.defaultFont;
+                TMP_FontAsset activeFont = Translator.Instance.defaultFont;
+                int lang = Translator.LanguageID;
+                if (lang == 8 && Translator.Instance.chineseFont != null) activeFont = Translator.Instance.chineseFont;
+                else if (lang == 7 && Translator.Instance.koreanFont != null) activeFont = Translator.Instance.koreanFont;
+                
+                if (activeFont != null) tmp.font = activeFont;
             }
 
             btnGov.AddComponent<UIButtonPauseHover>();
@@ -1955,8 +1960,8 @@ namespace FateContinent
             rect.anchorMin = new Vector2(0.5f, 0f);
             rect.anchorMax = new Vector2(0.5f, 0f);
             rect.pivot = new Vector2(0.5f, 0f);
-            rect.anchoredPosition = new Vector2(0f, -35f); // Lowered well below the DialogPanel to prevent screen/button overlap
-            rect.sizeDelta = new Vector2(230f, 38f);      // Centered, professional sizing
+            rect.anchoredPosition = new Vector2(0f, -35f);
+            rect.sizeDelta = new Vector2(230f, 38f);
 
             Image btnImg = btnGov.AddComponent<Image>();
             btnImg.color = new Color(0.12f, 0.45f, 0.22f, 0.95f);
@@ -1978,7 +1983,7 @@ namespace FateContinent
 
             TextMeshProUGUI tmp = textGov.AddComponent<TextMeshProUGUI>();
             tmp.text = choiceText;
-            tmp.fontSize = choiceButtonFontSize - 1f; // Slightly more compact font to look premium
+            tmp.fontSize = choiceButtonFontSize - 1f;
             tmp.fontWeight = FontWeight.Bold;
             tmp.color = Color.white;
             tmp.alignment = TextAlignmentOptions.Center;
@@ -1991,7 +1996,7 @@ namespace FateContinent
                 if (lang == 8 && Translator.Instance.chineseFont != null) activeFont = Translator.Instance.chineseFont;
                 else if (lang == 7 && Translator.Instance.koreanFont != null) activeFont = Translator.Instance.koreanFont;
                 
-                if (activeFont != null) tmp.font = activeFont;
+                if (activeFont != null) tmp.font = activeFont; 
             }
 
             btnGov.AddComponent<UIButtonPauseHover>();
@@ -1999,7 +2004,8 @@ namespace FateContinent
             return button;
         }
 
-        private void SetupFallbackDialogues()
+        
+private void SetupFallbackDialogues()
         {
             dialogueSteps.Clear();
 

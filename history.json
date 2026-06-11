@@ -2,6 +2,106 @@
   {
     "event": "change",
     "path": "/app/applet/history.json",
+    "timestamp": "2026-06-11T16:59:33.604Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/DialogueSystem_Manager.cs",
+    "timestamp": "2026-06-11T16:59:33.597Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-11T16:58:44.060Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/DialogueSystem_Manager.cs",
+    "timestamp": "2026-06-11T16:58:44.047Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-11T16:57:36.896Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/DialogueSystem_Manager.cs",
+    "timestamp": "2026-06-11T16:57:36.892Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-11T16:53:46.963Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/package-lock.json",
+    "timestamp": "2026-06-11T16:53:46.899Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-11T16:53:45.157Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/DialogueSystem_Manager.cs",
+    "timestamp": "2026-06-11T16:53:45.154Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-11T16:53:06.783Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/DialogueSystem_Manager.cs",
+    "timestamp": "2026-06-11T16:53:06.776Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-11T16:52:24.360Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/LandingPositionManager.cs",
+    "timestamp": "2026-06-11T16:52:24.356Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-11T16:12:20.691Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/package-lock.json",
+    "timestamp": "2026-06-11T16:12:20.688Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-11T16:11:47.271Z"
+  },
+  {
+    "event": "unlink",
+    "path": "/app/applet/src/fix_warning.ts",
+    "timestamp": "2026-06-11T16:11:47.268Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-06-11T16:11:43.861Z"
+  },
+  {
+    "event": "unlink",
+    "path": "/app/applet/src/replace_map.ts",
+    "timestamp": "2026-06-11T16:11:43.857Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
     "timestamp": "2026-06-11T16:11:36.402Z"
   },
   {
@@ -398,105 +498,5 @@
     "event": "change",
     "path": "/app/applet/history.json",
     "timestamp": "2026-05-26T12:57:49.509Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/App.tsx",
-    "timestamp": "2026-05-26T12:57:49.500Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T12:57:42.018Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/repair.ts",
-    "timestamp": "2026-05-26T12:57:42.012Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T12:57:40.650Z"
-  },
-  {
-    "event": "add",
-    "path": "/app/applet/repair.ts",
-    "timestamp": "2026-05-26T12:57:40.643Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T12:43:15.445Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/package-lock.json",
-    "timestamp": "2026-05-26T12:43:15.437Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T12:43:13.470Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/App.tsx",
-    "timestamp": "2026-05-26T12:43:13.466Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T12:37:32.445Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/App.tsx",
-    "timestamp": "2026-05-26T12:37:32.441Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T12:36:11.937Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/App.tsx",
-    "timestamp": "2026-05-26T12:36:11.933Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T12:35:25.418Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/GamePause_Manager.cs",
-    "timestamp": "2026-05-26T12:35:25.415Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T12:35:12.172Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/DialogueSystem_Manager.cs",
-    "timestamp": "2026-05-26T12:35:12.167Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T11:49:59.183Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/DEVELOPMENT_LOG.md",
-    "timestamp": "2026-05-26T11:49:59.172Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-05-26T07:44:21.654Z"
   }
 ]
