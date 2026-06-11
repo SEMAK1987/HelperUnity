@@ -13,6 +13,7 @@
     "src/FateGameplayIntro_Manager.cs",
     "src/FateMapManager.cs",
     "src/GamePause_Manager.cs",
+    "src/LandingPositionManager.cs",
     "src/LanguageSelector.cs",
     "src/LoadingScreenManager.cs",
     "src/MainMenuController.cs",
@@ -21,6 +22,7 @@
     "src/SaveGameSystem.cs",
     "src/SettingsManager.cs",
     "src/SimpleFloatAnimation.cs",
+    "src/StrategicCameraController.cs",
     "src/Translator.cs",
     "src/Transtable_Dropdown.cs",
     "src/Transtable_Text.cs",
@@ -37,12 +39,12 @@
   "pdfs": [],
   "videos": [],
   "others": [],
-  "total_files": 60,
+  "total_files": 64,
   "analysis": {
     "audit_issues": [],
     "todos": [],
     "asset_stats": {
-      "total_size": 1225792,
+      "total_size": 1384917,
       "large_files": []
     },
     "dependencies": {
@@ -106,7 +108,8 @@
       ],
       "FateMapManager": [
         "System.Collections.Generic",
-        "UnityEngine"
+        "UnityEngine",
+        "UnityEditor"
       ],
       "GamePause_Manager": [
         "UnityEngine",
@@ -115,6 +118,10 @@
         "System.Collections",
         "System.Collections.Generic",
         "TMPro"
+      ],
+      "LandingPositionManager": [
+        "UnityEngine",
+        "System.Collections"
       ],
       "LanguageSelector": [
         "UnityEngine",
@@ -160,6 +167,10 @@
         "UnityEngine",
         "UnityEngine.UI"
       ],
+      "StrategicCameraController": [
+        "UnityEngine",
+        "UnityEngine.InputSystem"
+      ],
       "Translator": [
         "System.Collections",
         "System.Collections.Generic",
@@ -201,5 +212,5 @@
       ]
     }
   },
-  "last_updated": "2026-06-04T14:05:12.089Z"
+  "last_updated": "2026-06-11T16:11:38.417Z"
 }

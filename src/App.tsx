@@ -5242,370 +5242,522 @@ export default function App() {
                                     >
                                       {simDialogueLang === 'RU' ? 'Перейти к выбору области континента ➔' : simDialogueLang === 'KR' ? '지역 선택 대화로 진입 ➔' : simDialogueLang === 'CH' ? '进入区域选择 ➔' : 'Select territory ➔'}
                                     </button>
-                                  ) : simDialogueStep === 3 ? (
-                                    /* THE DYNAMIC CONTINENT CLEANSING LOCATIONS BUTTONS - EXACTLY WHAT USER WANTED WITH INTERACTIVE 2D MAP */
-                                    <div className="flex flex-col space-y-4 w-full font-sans">
-                                      <div className="text-[10px] text-indigo-150 font-bold uppercase tracking-wider text-center border-b border-indigo-500/10 pb-2 flex items-center justify-center gap-2">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-ping" />
-                                        <span>🗺️ {simDialogueLang === 'RU' ? 'Интерактивная карта континента: Наведите курсор на один из регионов зачистки' : simDialogueLang === 'KR' ? '인터랙티브 대륙 지도: 정화 지역에 커서를 올리세요' : simDialogueLang === 'CH' ? '互动大陆地图：请将鼠标悬停在要净化的区域上' : 'Interactive Continent Map: Hover over a territory to view details'}</span>
-                                      </div>
+                                  ) : simDialogueStep === 3 ? (() => {
+                                    /* THE 12-CELL TACTICAL GRID FOR THE NEW_KONTINENT - v18.11.9 */
+                                    const TACTICAL_TILES = [
+                                      // ROW 0
+                                      {
+                                        index: 0, row: 0, col: 0, type: 'neutral', color: '#95a5a6', emoji: '🪙',
+                                        name: {
+                                          RU: 'Северная Поляна (Нейтралы)',
+                                          EN: 'North Plateau (Neutrals)',
+                                          CH: '北高原 (中立)',
+                                          KR: '북부 고원 (중립)'
+                                        },
+                                        desc: {
+                                          RU: 'Мирная нейтральная стоянка вольных торговцев и алхимиков. Высадка недоступна.',
+                                          EN: 'Peaceful neutral territory of free traders and alchemists. Deployment is locked.',
+                                          CH: '自由贸易者的和平中立领土。部署已锁定。',
+                                          KR: '자유 무역상들의 평화로운 중립 영토입니다. 배치 불가.'
+                                        },
+                                        techUid: 'TILE_NEUTRAL_NORTH', bounds: 'LAT 54.3°N | LON 10.2°W',
+                                        buffs: { RU: 'Нейтральные торговцы', EN: 'Neutral merchants & crafting' },
+                                        nerfs: { RU: 'Высадка заблокирована', EN: 'Spawn locked' },
+                                        feature: { RU: 'Безопасная гавань без боевых действий', EN: 'Safe zoning without ongoing conflicts' }
+                                      },
+                                      {
+                                        index: 1, row: 0, col: 1, type: 'bandit', color: '#e74c3c', emoji: '💀',
+                                        name: {
+                                          RU: 'Аванпост Мародеров (Разбойники)',
+                                          EN: 'Marauders Outpost (Bandits)',
+                                          CH: '掠夺者前哨 (强盗)',
+                                          KR: '약탈자 전초기지 (도적)'
+                                        },
+                                        desc: {
+                                          RU: 'Укрепленный лагерь бандитских группировок. Высадка заблокирована.',
+                                          EN: 'Fortified bandit camp holding local trade routes. Spawn is locked.',
+                                          CH: '扼守当地贸易路线的要塞化强盗营地。部署已锁定。',
+                                          KR: '지역 교역로를 장악한 요새화된 도적 캠프입니다. 배치 불가.'
+                                        },
+                                        techUid: 'TILE_BANDIT_CAMP_ALPHA', bounds: 'LAT 58.1°N | LON 04.5°E',
+                                        buffs: { RU: 'Повышенный шанс выпадения золота', EN: 'Increased gold drop-rate multiplier' },
+                                        nerfs: { RU: 'Высадка заблокирована', EN: 'Spawn locked' },
+                                        feature: { RU: 'Опасный лагерь с вышками и сильными лучниками', EN: 'Aggressive bandit fort with heavy marksmen' }
+                                      },
+                                      {
+                                        index: 2, row: 0, col: 2, type: 'neutral', color: '#95a5a6', emoji: '🪙',
+                                        name: {
+                                          RU: 'Каменные Глыбы (Нейтралы)',
+                                          EN: 'Stone Crags (Neutrals)',
+                                          CH: '石峰 (中立)',
+                                          KR: '돌 바위 (중립)'
+                                        },
+                                        desc: {
+                                          RU: 'Заброшенные карьеры древних каменщиков. Высадка недоступна.',
+                                          EN: 'Abandoned stone quarries of ancient masons. Spawn is locked.',
+                                          CH: '古代记录者的废弃石矿场。部署已锁定。',
+                                          KR: '고대 기록가들의 버려진 채석장입니다. 배치 불가.'
+                                        },
+                                        techUid: 'TILE_NEUTRAL_EAST', bounds: 'LAT 52.8°N | LON 25.4°E',
+                                        buffs: { RU: 'Залежи качественного строительного камня', EN: 'Rich stone quarry deposits' },
+                                        nerfs: { RU: 'Высадка заблокирована', EN: 'Spawn locked' },
+                                        feature: { RU: 'Старые шахты под патронажем гномов', EN: 'Old excavating structures run by dwarfs' }
+                                      },
+                                      // ROW 1
+                                      {
+                                        index: 3, row: 1, col: 0, type: 'hero', color: '#3498db', emoji: '🛡️', heroSlot: 0,
+                                        name: {
+                                          RU: 'Северный Шпиль — Точка А (Высадка Героя)',
+                                          EN: 'Northern Spire - Sector Alpha',
+                                          CH: '北天顶之塔 - 阿尔法区',
+                                          KR: '북부 첨탑 - 알파 구역'
+                                        },
+                                        desc: {
+                                          RU: 'Древний шпиль на севере континента. Точка полностью подготовлена к высадке вашего героя.',
+                                          EN: 'Ancient beacon spire in the far north. Secured and certified for instant vanguard drop.',
+                                          CH: '远北的古代烽火塔。已安全并认证，可立即进行前锋投放。',
+                                          KR: '극북의 고대 봉화 첨탑. 즉각적인 선봉대 하강을 위해 확보 및 안심 보증.'
+                                        },
+                                        techUid: 'TILE_HERO_SPAWN_ALPHA', bounds: 'LAT 44.1°N | LON 12.8°W',
+                                        buffs: { RU: '+25% к падению божественной руды', EN: '+25% Divine Ore drop-rate' },
+                                        nerfs: { RU: '-15% к восстановлению здоровья', EN: '-15% Health Regeneration rate' },
+                                        feature: { RU: 'Ярость Зенита: Крит увеличен на 15%, удары поджигают врагов', EN: 'Zenith Fury: Crit chance +15%, melee hits ignite targets' }
+                                      },
+                                      {
+                                        index: 4, row: 1, col: 1, type: 'hero', color: '#3498db', emoji: '🛡️', heroSlot: 1,
+                                        name: {
+                                          RU: 'Центральные Врата — Точка Б (Высадка Героя)',
+                                          EN: 'Central Gates - Sector Delta',
+                                          CH: '中央城门 - 德尔塔区',
+                                          KR: '중앙 성문 - 델타 구역'
+                                        },
+                                        desc: {
+                                          RU: 'Главные створчатые врата. Оптимальный сектор для начала штурма и боевой зачистки.',
+                                          EN: 'Immense golden gates leading directly into the heart of the continent. Excellent start point.',
+                                          CH: '直通大陆腹地的巨大黄金城门。极佳的出征切入点。',
+                                          KR: '대륙의 심장부로 바로 연결되는 거대한 신성 성문. 뛰어난 집결지입니다.'
+                                        },
+                                        techUid: 'TILE_HERO_SPAWN_DELTA', bounds: 'LAT 78.3°N | LON 04.1°E',
+                                        buffs: { RU: 'Двойной опыт за ледяных монстров', EN: 'Double Exp from icy elements' },
+                                        nerfs: { RU: '-10% к скорости бега и атаки', EN: '-10% Attack & Move speed penalty' },
+                                        feature: { RU: 'Сердце Севера: Полный иммунитет к эффектам замерзания и окоченения', EN: 'North Heart: Complete immunity to freeze & slow status effects' }
+                                      },
+                                      {
+                                        index: 5, row: 1, col: 2, type: 'hero', color: '#3498db', emoji: '🛡️', heroSlot: 2,
+                                        name: {
+                                          RU: 'Восточная Гавань — Точка В (Высадка Героя)',
+                                          EN: 'Eastern Harbor - Sector Gamma',
+                                          CH: '东部港口 - 伽马区',
+                                          KR: '동부 항구 - 감마 구역'
+                                        },
+                                        desc: {
+                                          RU: 'Бывший причал кораблей. Полная поддержка авангарда защитным покровом Кристалла.',
+                                          EN: 'An abandoned naval harbor of ancient high elves. Extremely safe beachhead.',
+                                          CH: '古高精灵废弃的军港。极其安全的登陆滩头。',
+                                          KR: '지배층 고대 엘ф들의 버려진 해군 항구. 매우 안전한 교두보입니다.'
+                                        },
+                                        techUid: 'TILE_HERO_SPAWN_GAMMA', bounds: 'LAT 12.9°S | LON 38.6°E',
+                                        buffs: { RU: '+35% к шансу легендарного снаряжения', EN: '+35% Legendary Gear find multiplier' },
+                                        nerfs: { RU: 'Стрелы древних ловушек наносят регулярный урон', EN: 'Periodic trap arrow bleeding damage' },
+                                        feature: { RU: 'Мудрость Вечности: +20% к интеллекту, -10% отката активных навыков', EN: 'Eternal Wisdom: +20% spell magic pierce & 10% shorter cooldowns' }
+                                      },
+                                      // ROW 2
+                                      {
+                                        index: 6, row: 2, col: 0, type: 'forest', color: '#2ecc71', emoji: '🌿',
+                                        name: {
+                                          RU: 'Изумрудная Чаща (Лесные Жители)',
+                                          EN: 'Emerald Thicket (Forest Dwellers)',
+                                          CH: '翡翠丛林 (林地种族)',
+                                          KR: '에메랄드 숲 (숲 거주민)'
+                                        },
+                                        desc: {
+                                          RU: 'Густой заповедный бор друидов и эльфийских ловчих. Высадка заблокирована.',
+                                          EN: 'Millennia-old woods heavily guarded by sentinel druids. Spawn is locked.',
+                                          CH: '受德鲁伊卫士严密守护的千年森林。部署已锁定。',
+                                          KR: '수호 드루이드들이 철저히 경비하는 태고의 숲입니다. 배치 불가.'
+                                        },
+                                        techUid: 'TILE_FOREST_EMERALD', bounds: 'LAT 22.4°N | LON 18.2°W',
+                                        buffs: { RU: 'Ускорение регенерации маны на 20%', EN: 'Accelerated mana restoration by 20%' },
+                                        nerfs: { RU: 'Высадка заблокирована', EN: 'Spawn locked' },
+                                        feature: { RU: 'Покровительство духов леса оберегает эльфов', EN: 'Sacred protection of nature forces' }
+                                      },
+                                      {
+                                        index: 7, row: 2, col: 1, type: 'forest', color: '#2ecc71', emoji: '🌿',
+                                        name: {
+                                          RU: 'Священная Поляна (Лесные Жители)',
+                                          EN: 'Sacred Glade (Forest Dwellers)',
+                                          CH: '圣光幽谷 (林地种族)',
+                                          KR: '성스러운 공тер (숲 거주민)'
+                                        },
+                                        desc: {
+                                          RU: 'Тайное убежище лесных жителей Средиземья, укрытое лечебной аурой. Высадка разблокирована.',
+                                          EN: 'Mystical clearing filled with pure life energy. Spawn is locked.',
+                                          CH: '充满纯净生命能量的神秘林间空地。部署已锁定。',
+                                          KR: '순수한 생명력으로 채워진 신비한 빈터입니다. 배치 불가.'
+                                        },
+                                        techUid: 'TILE_FOREST_SACRED', bounds: 'LAT 15.5°N | LON 02.1°W',
+                                        buffs: { RU: '+15% к эффективности лечения отряда', EN: 'Amplified target healing' },
+                                        nerfs: { RU: 'Высадка заблокирована', EN: 'Spawn locked' },
+                                        feature: { RU: 'Быстрое рассеивание ядов и проклятий в воздухе', EN: 'Instant purification of deadly debuffs' }
+                                      },
+                                      {
+                                        index: 8, row: 2, col: 2, type: 'bandit', color: '#e74c3c', emoji: '💀',
+                                        name: {
+                                          RU: 'Теневой Лагерь (Разбойники)',
+                                          EN: 'Shadow Camp (Bandits)',
+                                          CH: '暗影营寨 (强盗)',
+                                          KR: '그림자 요새 (도적)'
+                                        },
+                                        desc: {
+                                          RU: 'Логово наемников-отступников Теневого Синдиката. Высадка заблокирована.',
+                                          EN: 'Hidden mercenary training den of the shadow syndicate. Spawn is locked.',
+                                          CH: '暗影辛迪加的秘密雇佣兵训练营。部署已锁定。',
+                                          KR: '그림자 신디케이트 용병들의 비밀 기지입니다. 배치 불가.'
+                                        },
+                                        techUid: 'TILE_BANDIT_CAMP_BETA', bounds: 'LAT 05.2°N | LON 34.8°E',
+                                        buffs: { RU: 'Хранилища украденных кристаллов', EN: 'Premium crystal chests & stolen jewels' },
+                                        nerfs: { RU: 'Высадка заблокирована', EN: 'Spawn locked' },
+                                        feature: { RU: 'Тяжелые капканы по всему периметру лагеря', EN: 'Deadly traps scattered along the perimeter' }
+                                      },
+                                      // ROW 3
+                                      {
+                                        index: 9, row: 3, col: 0, type: 'hero', color: '#3498db', emoji: '🛡️', heroSlot: 3,
+                                        name: {
+                                          RU: 'Южный Оазис — Точка Г (Высадка Героя)',
+                                          EN: 'Southern Oasis - Sector Beta',
+                                          CH: '南部绿洲 - 贝塔区',
+                                          KR: '남부 오아시스 - 베타 구역'
+                                        },
+                                        desc: {
+                                          RU: 'Святилище Зенита на южной окраине, скрывающее неиссякаемый Кристальный источник.',
+                                          EN: 'A majestic forest oasis and ruins of a sanctuary, hiding the true origins of the Zenith Crystal.',
+                                          CH: '宏伟的森林绿洲与神殿废墟，隐藏着天顶水晶의 起源。',
+                                          KR: '고양된 사원의 구름 오아시스. 고대 영령들이 지키고 있는 크리스탈 제니스 정수.'
+                                        },
+                                        techUid: 'TILE_HERO_SPAWN_BETA', bounds: 'LAT 08.5°S | LON 14.2°W',
+                                        buffs: { RU: '+15% к восстановлению маны всего отряда', EN: '+15% Mana regeneration for full squad' },
+                                        nerfs: { RU: 'Эликсиры исцеления слабее на 20%', EN: 'Healing Potions efficacy debuffed by 20%' },
+                                        feature: { RU: 'Живая Земля: Время восстановления вспомогательных умений сокращено на 25%', EN: 'Living Soil: Support items and skills cooldown speed +25%' }
+                                      },
+                                      {
+                                        index: 10, row: 3, col: 1, type: 'forest', color: '#2ecc71', emoji: '🌿',
+                                        name: {
+                                          RU: 'Лесное Убежище (Лесные Жители)',
+                                          EN: 'Forest Retreat (Forest Dwellers)',
+                                          CH: '森林隐所 (林地种族)',
+                                          KR: '숲의 휴양지 (숲 거주민)'
+                                        },
+                                        desc: {
+                                          RU: 'Укрытие лесного ополчения в кронах древних исполинских деревьев. Высадка недоступна.',
+                                          EN: 'Concealed base camp built into ancient pine trees canopy. Spawn is locked.',
+                                          CH: '建在老松树冠上的隐蔽大本营。部署已锁定。',
+                                          KR: '거대 고대 소나무 숲속에 은폐된 베이스캠프입니다. 배치 불가.'
+                                        },
+                                        techUid: 'TILE_FOREST_RETREAT', bounds: 'LAT 12.0°S | LON 10.5°E',
+                                        buffs: { RU: 'Маскировка от налетов с небес', EN: 'Air scouting stealth camouflage' },
+                                        nerfs: { RU: 'Высадка заблокирована', EN: 'Spawn locked' },
+                                        feature: { RU: 'Эльфийские следопыты патрулируют ветви', EN: 'Hidden woodland scouts watching from trunks' }
+                                      },
+                                      {
+                                        index: 11, row: 3, col: 2, type: 'forest', color: '#2ecc71', emoji: '🌿',
+                                        name: {
+                                          RU: 'Шепчущие Деревья (Лесные Жители)',
+                                          EN: 'Whispering Woods (Forest Dwellers)',
+                                          CH: '低语树林 (林地种族)',
+                                          KR: '속삭이는 나무숲 (숲 거주민)'
+                                        },
+                                        desc: {
+                                          RU: 'Древний бор, окутанный вечным речным туманом древности. Высадка недоступна.',
+                                          EN: 'Mystical pathway heading into the fog dense riverbanks. Spawn is locked.',
+                                          CH: '通往浓雾缭绕的河岸的神秘通道。部署已锁定。',
+                                          KR: '강 안개가 드리워진 신성한 강안길입니다. 배치 불가.'
+                                        },
+                                        techUid: 'TILE_FOREST_WHISPERS', bounds: 'LAT 18.4°S | LON 20.8°E',
+                                        buffs: { RU: 'Защита от разведки противника', EN: 'Full detection range immunity' },
+                                        nerfs: { RU: 'Высадка заблокирована', EN: 'Spawn locked' },
+                                        feature: { RU: 'Магические колючки замедляют незваных гостей на 40%', EN: 'Ancient thorns slow intruders down by 40%' }
+                                      }
+                                    ];
 
-                                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
-                                        {/* LEFT: SVG ILLUSTRATED WATERPROOF CONTINENT MAP with 3 reactive zones */}
-                                        <div className="lg:col-span-7 relative bg-indigo-950/40 rounded-3xl p-6 border border-indigo-500/20 flex flex-col items-center justify-center min-h-[380px] transition-all">
-                                          <svg viewBox="0 0 400 300" className="w-full max-h-[340px] drop-shadow-[0_0_20px_rgba(99,102,241,0.25)] transition-all">
-                                            {/* Defs for gradients & glowing filters */}
-                                            <defs>
-                                              <radialGradient id="oceanGrad" cx="50%" cy="50%" r="50%">
-                                                <stop offset="0%" stopColor="#1e1b4b" stopOpacity="0.4" />
-                                                <stop offset="100%" stopColor="#030712" stopOpacity="0.9" />
-                                              </radialGradient>
-                                              <pattern id="gridPattern" width="20" height="20" patternUnits="userSpaceOnUse">
-                                                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#6366f1" strokeWidth="0.5" strokeOpacity="0.08" />
-                                              </pattern>
-                                              {/* Premium high-intensity glow filter for full configuration highlighting */}
-                                              <filter id="neonGlow" x="-30%" y="-30%" width="160%" height="160%">
-                                                <feGaussianBlur stdDeviation="6" result="blur" />
-                                                <feComponentTransfer in="blur" result="brightBlur">
-                                                  <feFuncA type="linear" slope="2.2" />
-                                                </feComponentTransfer>
-                                                <feMerge>
-                                                  <feMergeNode in="brightBlur" />
-                                                  <feMergeNode in="SourceGraphic" />
-                                                </feMerge>
-                                              </filter>
-                                            </defs>
+                                    // Parse hovered tile index
+                                    let hoveredTileIndex: number | null = null;
+                                    if (hoveredRegion && hoveredRegion.startsWith('tile_')) {
+                                      hoveredTileIndex = parseInt(hoveredRegion.replace('tile_', ''), 10);
+                                    }
+                                    const activeTile = TACTICAL_TILES.find(t => t.index === hoveredTileIndex);
 
-                                            {/* Background Ocean Grid */}
-                                            <rect width="400" height="300" rx="20" fill="url(#oceanGrad)" />
-                                            <rect width="400" height="300" rx="20" fill="url(#gridPattern)" />
-
-                                            {/* Shallow water silhouettes */}
-                                            <path d="M 50 150 Q 80 80 180 60 T 320 120 T 340 220 T 150 250 Z" fill="#4f46e5" fillOpacity="0.06" filter="blur(8px)" />
-
-                                            {/* Continent Mainland Contour Path (Fate Continent Base shape, elegant & stylized) */}
-                                            <path 
-                                              d="M 60 160 C 80 100 130 50 190 60 C 250 50 310 90 330 140 C 350 180 340 230 290 250 C 250 260 180 240 140 260 C 100 270 70 220 60 160 Z" 
-                                              fill="#111827" 
-                                              stroke="#4f46e5" 
-                                              strokeWidth="2" 
-                                              strokeOpacity="0.4" 
-                                            />
-
-                                            {/* REGION 1: Crimson Wastes (Left Bottom) */}
-                                            {hoveredRegion === 'crimson' && (
-                                              <path 
-                                                d="M 60 160 C 70 120 120 110 150 140 C 160 170 140 210 135 240 C 95 250 70 215 60 160 Z" 
-                                                fill="none"
-                                                stroke="#ef4444"
-                                                strokeWidth="7"
-                                                strokeOpacity="0.45"
-                                                filter="url(#neonGlow)"
-                                                className="pointer-events-none"
-                                              />
-                                            )}
-                                            <path 
-                                              d="M 60 160 C 70 120 120 110 150 140 C 160 170 140 210 135 240 C 95 250 70 215 60 160 Z" 
-                                              fill={hoveredRegion === 'crimson' ? 'rgba(239, 68, 68, 0.42)' : 'rgba(239, 68, 68, 0.12)'}
-                                              stroke={hoveredRegion === 'crimson' ? '#ef4444' : '#b91c1c'}
-                                              strokeWidth={hoveredRegion === 'crimson' ? '3' : '1.5'}
-                                              className="transition-all duration-300 cursor-pointer"
-                                              onMouseEnter={() => setHoveredRegion('crimson')}
-                                              onMouseLeave={() => setHoveredRegion(null)}
-                                              onClick={() => {
-                                                setSimDialogueStep(4);
-                                                showNotification("Вы выбрали место: Кровавые Пустоши!", "success");
-                                              }}
-                                            />
-                                            {/* Tactical scan & full coordinates config overlay on hover */}
-                                            {hoveredRegion === 'crimson' && (
-                                              <g className="animate-pulse pointer-events-none">
-                                                <rect x="42" y="105" width="125" height="152" fill="none" stroke="#ef4444" strokeWidth="0.75" strokeDasharray="3 3" strokeOpacity="0.4" />
-                                                <path d="M 42 120 L 42 105 L 57 105 M 152 105 L 167 105 L 167 120 M 42 242 L 42 257 L 57 257 M 152 257 L 167 257 L 167 242" fill="none" stroke="#ef4444" strokeWidth="1.5" strokeOpacity="0.8" />
-                                                <text x="46" y="117" fill="#ef4444" fontSize="5.5" fontWeight="900" className="font-sans tracking-widest uppercase opacity-90">🛰️ ALIGN_CFG: CRIMSON_WASTES (88.4%)</text>
-                                                <text x="46" y="252" fill="#ef4444" fontSize="5" fontWeight="bold" className="font-sans tracking-wider opacity-60">BOUNDS: LAT 44.1°N | LON 12.8°W</text>
-                                              </g>
-                                            )}
-
-                                            {/* REGION 2: Ice-Bound Peak (Top North) */}
-                                            {hoveredRegion === 'ice' && (
-                                              <path 
-                                                d="M 140 85 C 160 65 210 55 245 75 C 265 105 220 135 180 130 C 150 115 135 100 140 85 Z" 
-                                                fill="none"
-                                                stroke="#06b6d4"
-                                                strokeWidth="7"
-                                                strokeOpacity="0.45"
-                                                filter="url(#neonGlow)"
-                                                className="pointer-events-none"
-                                              />
-                                            )}
-                                            <path 
-                                              d="M 140 85 C 160 65 210 55 245 75 C 265 105 220 135 180 130 C 150 115 135 100 140 85 Z" 
-                                              fill={hoveredRegion === 'ice' ? 'rgba(6, 182, 212, 0.42)' : 'rgba(6, 182, 212, 0.12)'}
-                                              stroke={hoveredRegion === 'ice' ? '#06b6d4' : '#0891b2'}
-                                              strokeWidth={hoveredRegion === 'ice' ? '3' : '1.5'}
-                                              className="transition-all duration-300 cursor-pointer"
-                                              onMouseEnter={() => setHoveredRegion('ice')}
-                                              onMouseLeave={() => setHoveredRegion(null)}
-                                              onClick={() => {
-                                                setSimDialogueStep(5);
-                                                showNotification("Вы выбрали место: Ледяной Пик!", "success");
-                                              }}
-                                            />
-                                            {/* Tactical scan & full coordinates config overlay on hover */}
-                                            {hoveredRegion === 'ice' && (
-                                              <g className="animate-pulse pointer-events-none">
-                                                <rect x="128" y="47" width="131" height="95" fill="none" stroke="#06b6d4" strokeWidth="0.75" strokeDasharray="3 3" strokeOpacity="0.4" />
-                                                <path d="M 128 62 L 128 47 L 143 47 M 244 47 L 259 47 L 259 62 M 128 127 L 128 142 L 143 142 M 244 142 L 259 142 L 259 127" fill="none" stroke="#06b6d4" strokeWidth="1.5" strokeOpacity="0.8" />
-                                                <text x="132" y="59" fill="#06b6d4" fontSize="5.5" fontWeight="900" className="font-sans tracking-widest uppercase opacity-90">🛰️ ALIGN_CFG: ICE_PEAK (94.1%)</text>
-                                                <text x="132" y="137" fill="#06b6d4" fontSize="5" fontWeight="bold" className="font-sans tracking-wider opacity-60">BOUNDS: LAT 78.3°N | LON 04.1°E</text>
-                                              </g>
-                                            )}
-
-                                            {/* REGION 3: Ancient Ruins (Right & South East) */}
-                                            {hoveredRegion === 'ruins' && (
-                                              <path 
-                                                d="M 230 135 C 280 125 320 110 330 145 C 345 195 315 235 275 245 C 240 250 210 210 215 170 C 215 150 220 140 230 135 Z" 
-                                                fill="none"
-                                                stroke="#f59e0b"
-                                                strokeWidth="7"
-                                                strokeOpacity="0.45"
-                                                filter="url(#neonGlow)"
-                                                className="pointer-events-none"
-                                              />
-                                            )}
-                                            <path 
-                                              d="M 230 135 C 280 125 320 110 330 145 C 345 195 315 235 275 245 C 240 250 210 210 215 170 C 215 150 220 140 230 135 Z" 
-                                              fill={hoveredRegion === 'ruins' ? 'rgba(245, 158, 11, 0.42)' : 'rgba(245, 158, 11, 0.12)'}
-                                              stroke={hoveredRegion === 'ruins' ? '#f59e0b' : '#d97706'}
-                                              strokeWidth={hoveredRegion === 'ruins' ? '3' : '1.5'}
-                                              className="transition-all duration-300 cursor-pointer"
-                                              onMouseEnter={() => setHoveredRegion('ruins')}
-                                              onMouseLeave={() => setHoveredRegion(null)}
-                                              onClick={() => {
-                                                setSimDialogueStep(6);
-                                                showNotification("Вы выбрали место: Древние Руины!", "success");
-                                              }}
-                                            />
-                                            {/* Tactical scan & full coordinates config overlay on hover */}
-                                            {hoveredRegion === 'ruins' && (
-                                              <g className="animate-pulse pointer-events-none">
-                                                <rect x="202" y="112" width="140" height="145" fill="none" stroke="#f59e0b" strokeWidth="0.75" strokeDasharray="3 3" strokeOpacity="0.4" />
-                                                <path d="M 202 127 L 202 112 L 217 112 M 327 112 L 342 112 L 342 127 M 202 242 L 202 257 L 217 257 M 327 257 L 342 257 L 342 242" fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeOpacity="0.8" />
-                                                <text x="206" y="124" fill="#f59e0b" fontSize="5.5" fontWeight="900" className="font-sans tracking-widest uppercase opacity-90">🛰️ ALIGN_CFG: ANCIENT_RUINS (92.5%)</text>
-                                                <text x="206" y="252" fill="#f59e0b" fontSize="5" fontWeight="bold" className="font-sans tracking-wider opacity-60">BOUNDS: LAT 12.9°S | LON 38.6°E</text>
-                                              </g>
-                                            )}
-
-                                             {/* REGION 4: Zenith Sanctuary (Center / Bottom Central) */}
-                                             {hoveredRegion === 'sanctuary' && (
-                                               <path 
-                                                 d="M 135 240 C 160 190 200 160 215 170 C 210 210 240 250 190 250 C 165 250 145 245 135 240 Z" 
-                                                 fill="none"
-                                                 stroke="#10b981"
-                                                 strokeWidth="7"
-                                                 strokeOpacity="0.45"
-                                                 filter="url(#neonGlow)"
-                                                 className="pointer-events-none"
-                                               />
-                                             )}
-                                             <path 
-                                               d="M 135 240 C 160 190 200 160 215 170 C 210 210 240 250 190 250 C 165 250 145 245 135 240 Z" 
-                                               fill={hoveredRegion === 'sanctuary' ? 'rgba(16, 185, 129, 0.42)' : 'rgba(16, 185, 129, 0.12)'}
-                                               stroke={hoveredRegion === 'sanctuary' ? '#10b981' : '#047857'}
-                                               strokeWidth={hoveredRegion === 'sanctuary' ? '3' : '1.5'}
-                                               className="transition-all duration-300 cursor-pointer"
-                                               onMouseEnter={() => setHoveredRegion('sanctuary')}
-                                               onMouseLeave={() => setHoveredRegion(null)}
-                                               onClick={() => {
-                                                 setSimDialogueStep(7);
-                                                 showNotification("Вы выбрали место: Святилище Зенита!", "success");
-                                               }}
-                                             />
-                                             {/* Tactical scan & full coordinates config overlay on hover */}
-                                             {hoveredRegion === 'sanctuary' && (
-                                               <g className="animate-pulse pointer-events-none">
-                                                 <rect x="127" y="157" width="120" height="103" fill="none" stroke="#10b981" strokeWidth="0.75" strokeDasharray="3 3" strokeOpacity="0.4" />
-                                                 <path d="M 127 172 L 127 157 L 142 157 M 232 157 L 247 157 L 247 172 M 127 245 L 127 260 L 142 260 M 232 260 L 247 260 L 247 245" fill="none" stroke="#10b981" strokeWidth="1.5" strokeOpacity="0.8" />
-                                                 <text x="131" y="169" fill="#10b981" fontSize="5.5" fontWeight="900" className="font-sans tracking-widest uppercase opacity-90">🛰️ ALIGN_CFG: ZENITH_SANCTUARY (99.1%)</text>
-                                                 <text x="131" y="255" fill="#10b981" fontSize="5" fontWeight="bold" className="font-sans tracking-wider opacity-60">BOUNDS: LAT 08.5°S | LON 14.2°W</text>
-                                               </g>
-                                             )}
-
-                                            {/* Glow overlay nodes for capitals */}
-                                            <circle cx="106" cy="180" r="5" fill="#f87171" className="animate-pulse pointer-events-none" />
-                                            <circle cx="190" cy="94" r="5" fill="#22d3ee" className="animate-pulse pointer-events-none" />
-                                            <circle cx="280" cy="180" r="5" fill="#fbbf24" className="animate-pulse pointer-events-none" />
-                                            <circle cx="180" cy="210" r="5" fill="#34d399" className="animate-pulse pointer-events-none" />
-
-                                            {/* Labels on Map */}
-                                            <text x="106" y="165" fill="#fca5a5" fontSize="8" fontWeight="bold" textAnchor="middle" className="pointer-events-none font-sans uppercase tracking-wider">🩸 Wastes</text>
-                                            <text x="190" y="82" fill="#a5f3fc" fontSize="8" fontWeight="bold" textAnchor="middle" className="pointer-events-none font-sans uppercase tracking-wider">❄️ Ice Peak</text>
-                                            <text x="280" y="165" fill="#fde047" fontSize="8" fontWeight="bold" textAnchor="middle" className="pointer-events-none font-sans uppercase tracking-wider">🏛️ Ruins</text>
-                                            <text x="180" y="228" fill="#6ee7b7" fontSize="8" fontWeight="bold" textAnchor="middle" className="pointer-events-none font-sans uppercase tracking-wider">🌿 Sanctuary</text>
-
-                                            {/* Map WindRose decoration */}
-                                            <g transform="translate(350, 60)" className="opacity-45">
-                                              <circle r="14" fill="none" stroke="#6366f1" strokeWidth="1" />
-                                              <line x1="0" y1="-18" x2="0" y2="18" stroke="#6366f1" strokeWidth="1" />
-                                              <line x1="-18" y1="0" x2="18" y2="0" stroke="#6366f1" strokeWidth="1" />
-                                              <polygon points="0,-18 -4,-4 0,0" fill="#818cf8" />
-                                              <polygon points="0,-18 4,-4 0,0" fill="#4f46e5" />
-                                              <text x="0" y="-21" fill="#818cf8" fontSize="6" fontWeight="bold" textAnchor="middle">N</text>
-                                            </g>
-                                          </svg>
-
-                                          <div className="absolute bottom-2 left-3 bg-slate-950/80 px-2 py-0.5 rounded-md border border-white/5 text-[8.5px] text-slate-400">
-                                            {simDialogueLang === 'RU' ? 'Клик на регион подтверждает выбор' : 'Click on a region to confirm selection'}
-                                          </div>
+                                    return (
+                                      <div className="flex flex-col space-y-4 w-full font-sans animate-fade-in" id="tactical_grid_step3">
+                                        <div className="text-[10px] text-indigo-150 font-bold uppercase tracking-wider text-center border-b border-indigo-500/10 pb-2 flex items-center justify-center gap-2">
+                                          <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-ping" />
+                                          <span>🗺️ {simDialogueLang === 'RU' ? 'Тактическая сетка Континента Судьбы: Наведите на тайл или кликните синюю зону высадки героя' : simDialogueLang === 'KR' ? '운명의 영토 전술 격자: 커서를 대거나 청색 부대를 배치하십시오' : simDialogueLang === 'CH' ? '命运大平原战术网格：悬停 or 点击蓝色英雄出征区域' : 'Tactical Sector Grid: Hover over any tile, or click a BLUE hero deployment zone'}</span>
                                         </div>
 
-                                        {/* RIGHT: DETAILED REGION STATS CARD */}
-                                        <div className="lg:col-span-5 flex flex-col justify-between min-h-[380px]">
-                                          {hoveredRegion === null ? (
-                                            /* Empty choice placeholder */
-                                            <div className="flex-1 flex flex-col items-center justify-center text-center p-6 rounded-3xl bg-white/5 border border-dashed border-white/10">
-                                              <Compass className="w-8 h-8 text-indigo-400/40 animate-bounce mb-2" />
-                                              <h5 className="text-[11px] font-bold text-slate-300">
-                                                {simDialogueLang === 'RU' ? 'Регион не выбран' : 'No Region Highlighted'}
-                                              </h5>
-                                              <p className="text-[10px] text-slate-400 max-w-xs mt-1 leading-relaxed">
-                                                {simDialogueLang === 'RU' ? 'Наведите мышь на багровую (Пустоши), бирюзовую (Пик), золотую (Руины) или зеленую (Святилище) область карты слева, чтобы детально изучить бонусы почв и климата.' : 'Hover over the crimson, aqua, golden, or green territory on the map to inspect terrain buffs, specs, and specifications.'}
-                                              </p>
+                                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+                                          {/* LEFT: 3x4 GRID (Representing the New_Kontinent 12-cell mesh colors from Blender) */}
+                                          <div className="lg:col-span-12 xl:col-span-7 relative bg-indigo-950/40 rounded-3xl p-6 border border-indigo-500/20 flex flex-col items-center justify-center min-h-[380px] transition-all">
+                                            <svg viewBox="0 0 400 300" className="w-full max-h-[340px] drop-shadow-[0_0_20px_rgba(99,102,241,0.25)] transition-all">
+                                              {/* Defs for gradients & glowing filters */}
+                                              <defs>
+                                                <radialGradient id="oceanGrad" cx="50%" cy="50%" r="50%">
+                                                  <stop offset="0%" stopColor="#111c38" stopOpacity="0.4" />
+                                                  <stop offset="100%" stopColor="#030712" stopOpacity="0.95" />
+                                                </radialGradient>
+                                                <pattern id="gridPattern" width="20" height="20" patternUnits="userSpaceOnUse">
+                                                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#6366f1" strokeWidth="0.5" strokeOpacity="0.08" />
+                                                </pattern>
+                                                {/* Premium neon glow */}
+                                                <filter id="neonGlowNew" x="-20%" y="-20%" width="140%" height="140%">
+                                                  <feGaussianBlur stdDeviation="5" result="blur" />
+                                                  <feComponentTransfer in="blur" result="brightBlur">
+                                                    <feFuncA type="linear" slope="1.8" />
+                                                  </feComponentTransfer>
+                                                  <feMerge>
+                                                    <feMergeNode in="brightBlur" />
+                                                    <feMergeNode in="SourceGraphic" />
+                                                  </feMerge>
+                                                </filter>
+                                              </defs>
+
+                                              {/* Ocean Background Grid */}
+                                              <rect width="400" height="300" rx="20" fill="url(#oceanGrad)" />
+                                              <rect width="400" height="300" rx="20" fill="url(#gridPattern)" />
+
+                                              {/* Decorative map island underlay silhouette */}
+                                              <path d="M 40 130 Q 70 50 180 40 T 350 100 T 360 210 T 130 260 Z" fill="#4f46e5" fillOpacity="0.04" filter="blur(16px)" />
+
+                                              {/* Render the 12 dynamic interactive tiles in 3x4 grid */}
+                                              {TACTICAL_TILES.map((tile) => {
+                                                const x_rect = 20 + tile.col * 120 + 4;
+                                                const y_rect = 20 + tile.row * 65 + 4;
+                                                const width_rect = 112;
+                                                const height_rect = 57;
+                                                const isHovered = hoveredTileIndex === tile.index;
+
+                                                // Color assignments based on user's exact HEX rules
+                                                const colorMain = tile.color; // #3498db (Blue), #e74c3c (Red), #2ecc71 (Green), #95a5a6 (Gray)
+                                                let fillOpacity = isHovered ? '0.45' : '0.15';
+                                                let strokeColor = isHovered ? colorMain : colorMain + 'bb';
+                                                let strokeWidth = isHovered ? 3.5 : 1.5;
+
+                                                return (
+                                                  <g key={tile.index} className="transition-all">
+                                                    {/* Glow behind the active tile */}
+                                                    {isHovered && (
+                                                      <rect 
+                                                        x={x_rect} 
+                                                        y={y_rect} 
+                                                        width={width_rect} 
+                                                        height={height_rect} 
+                                                        rx="10" 
+                                                        ry="10" 
+                                                        fill={colorMain}
+                                                        fillOpacity="0.25"
+                                                        filter="url(#neonGlowNew)"
+                                                        className="pointer-events-none"
+                                                      />
+                                                    )}
+
+                                                    {/* The Main Round Rect Tile */}
+                                                    <rect 
+                                                      x={x_rect} 
+                                                      y={y_rect} 
+                                                      width={width_rect} 
+                                                      height={height_rect} 
+                                                      rx="10" 
+                                                      ry="10" 
+                                                      fill={isHovered ? `rgba(${tile.type === 'hero' ? '52,152,219' : tile.type === 'bandit' ? '231,76,60' : tile.type === 'forest' ? '46,204,113' : '149,165,166'}, 0.42)` : `rgba(${tile.type === 'hero' ? '52,152,219' : tile.type === 'bandit' ? '231,76,60' : tile.type === 'forest' ? '46,204,113' : '149,165,166'}, 0.15)`}
+                                                      stroke={strokeColor}
+                                                      strokeWidth={strokeWidth}
+                                                      className={`transition-all duration-300 ${tile.type === 'hero' ? 'cursor-pointer' : 'cursor-default'}`}
+                                                      onMouseEnter={() => setHoveredRegion('tile_' + tile.index)}
+                                                      onMouseLeave={() => setHoveredRegion(null)}
+                                                      onClick={() => {
+                                                        if (tile.type === 'hero') {
+                                                          const nextStep = tile.heroSlot === 0 ? 4 : tile.heroSlot === 1 ? 5 : tile.heroSlot === 2 ? 6 : 7;
+                                                          setSimDialogueStep(nextStep);
+                                                          showNotification(`${simDialogueLang === 'RU' ? 'Координаты высадки приняты: ' : 'Vanguard landing approved: '} ${tile.name[simDialogueLang]}!`, "success");
+                                                        } else {
+                                                          showNotification(
+                                                            simDialogueLang === 'RU' 
+                                                              ? `Сектор заблокирован! Высадка возможна только в синие Сигнальные Шпили Альянса.` 
+                                                              : `Deployment locked! Heroes can only teleport to glowing Blue Allied Signal Spires.`, 
+                                                            "error"
+                                                          );
+                                                        }
+                                                      }}
+                                                    />
+
+                                                    {/* Central Emoji */}
+                                                    <text
+                                                      x={x_rect + width_rect / 2}
+                                                      y={y_rect + 25}
+                                                      fontSize="12"
+                                                      textAnchor="middle"
+                                                      className="pointer-events-none select-none filter drop-shadow"
+                                                    >
+                                                      {tile.emoji}
+                                                    </text>
+
+                                                    {/* Mini short caption inside tile */}
+                                                    <text
+                                                      x={x_rect + width_rect / 2}
+                                                      y={y_rect + 43}
+                                                      fontSize="7.5"
+                                                      fontWeight="bold"
+                                                      fill={isHovered ? '#ffffff' : colorMain}
+                                                      textAnchor="middle"
+                                                      className="pointer-events-none select-none font-sans uppercase tracking-widest"
+                                                    >
+                                                      {tile.type === 'hero' ? `SPAWN [${tile.heroSlot === 0 ? 'A' : tile.heroSlot === 1 ? 'B' : tile.heroSlot === 2 ? 'C' : 'D'}]` : tile.type.toUpperCase()}
+                                                    </text>
+
+                                                    {/* Scan Coordinate Bounds HUD for hovered tile */}
+                                                    {isHovered && (
+                                                      <g className="pointer-events-none opacity-90">
+                                                        <rect x={x_rect - 3} y={y_rect - 3} width={width_rect + 6} height={height_rect + 6} fill="none" stroke={colorMain} strokeWidth="0.75" strokeDasharray="3 3" />
+                                                        <path d={`M ${x_rect - 3} ${y_rect + 5} L ${x_rect - 3} ${y_rect - 3} L ${x_rect + 5} ${y_rect - 3}`} fill="none" stroke={colorMain} strokeWidth="1.5" />
+                                                        <path d={`M ${x_rect + width_rect - 5} ${y_rect - 3} L ${x_rect + width_rect + 3} ${y_rect - 3} L ${x_rect + width_rect + 3} ${y_rect + 5}`} fill="none" stroke={colorMain} strokeWidth="1.5" />
+                                                        <path d={`M ${x_rect - 3} ${y_rect + height_rect - 5} L ${x_rect - 3} ${y_rect + height_rect + 3} L ${x_rect + 5} ${y_rect + height_rect + 3}`} fill="none" stroke={colorMain} strokeWidth="1.5" />
+                                                        <path d={`M ${x_rect + width_rect - 5} ${y_rect + height_rect + 3} L ${x_rect + width_rect + 3} dots `} fill="none" stroke={colorMain} strokeWidth="1.5" />
+                                                      </g>
+                                                    )}
+                                                  </g>
+                                                );
+                                              })}
+
+                                              {/* Elegant tactical windrose overlay inside top right space */}
+                                              <g transform="translate(355, 55)" className="opacity-30">
+                                                <circle r="12" fill="none" stroke="#6366f1" strokeWidth="0.75" />
+                                                <line x1="0" y1="-16" x2="0" y2="16" stroke="#6366f1" strokeWidth="0.75" />
+                                                <line x1="-16" y1="0" x2="16" y2="0" stroke="#6366f1" strokeWidth="0.75" />
+                                                <polygon points="0,-16 -3,-3 0,0" fill="#a5f3fc" />
+                                                <polygon points="0,-16 3,-3 0,0" fill="#4f46e5" />
+                                                <text x="0" y="-19" fill="#a5f3fc" fontSize="6.5" fontWeight="black" textAnchor="middle">N</text>
+                                              </g>
+                                            </svg>
+
+                                            <div className="absolute bottom-2 left-3 bg-slate-950/85 px-2.5 py-1 rounded-lg border border-white/5 text-[9px] font-medium text-slate-400 font-sans flex items-center gap-1.5 backdrop-blur-sm">
+                                              <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                                              <span>{simDialogueLang === 'RU' ? 'Клик на СИНЮЮ зону производит десант верных войск!' : 'Click on any BLUE tile to deploy your landing force!'}</span>
                                             </div>
-                                          ) : hoveredRegion === 'crimson' ? (
-                                            /* Crimson Wastes details */
-                                            <div className="p-4 rounded-3xl bg-red-950/30 border border-red-500/30 flex-1 flex flex-col justify-between animate-fade-in font-sans">
-                                              <div>
-                                                <div className="flex items-center justify-between mb-1.5">
-                                                  <span className="text-[11px] font-black text-red-400 uppercase tracking-widest flex items-center gap-1.5">
-                                                    <span>🩸</span> {simDialogueLang === 'RU' ? 'Кровавые Пустоши' : 'Crimson Wastes'}
+                                          </div>
+
+                                          {/* RIGHT: DYNAMIC HUD SPEC PANEL FITTED TO HIGHLIGHTED TILE */}
+                                          <div className="lg:col-span-12 xl:col-span-5 flex flex-col justify-between min-h-[380px]">
+                                            {!activeTile ? (
+                                              /* Tactical Empty Selection HUD - v18.11.9 */
+                                              <div className="flex-1 flex flex-col items-center justify-center text-center p-6 rounded-3xl bg-white/5 border border-dashed border-indigo-400/20 backdrop-blur-sm">
+                                                <Compass className="w-9 h-9 text-indigo-400/30 animate-pulse mb-3" />
+                                                <h5 className="text-xs font-black text-slate-300 uppercase tracking-widest">
+                                                  {simDialogueLang === 'RU' ? 'Сектор не выбран' : 'HUD UNCONNECTED'}
+                                                </h5>
+                                                <p className="text-[10px] text-slate-400 max-w-xs mt-2 leading-relaxed font-sans">
+                                                  {simDialogueLang === 'RU' 
+                                                    ? 'Наведите курсор мыши на любой квадрат карты, чтобы считать сенсорами подробные постройки, климатический рельеф, баффы почвы и ограничения десантирования.' 
+                                                    : 'Hover your targeting pointer over any 3D grid cell of the New Continent to query planetary architecture, sector climate, or landing constraints.'}
+                                                </p>
+                                                <div className="mt-4 flex flex-col gap-1.5 w-full max-w-[200px]">
+                                                  <div className="flex items-center gap-2 text-[8px] justify-between text-slate-500 font-mono uppercase bg-black/20 p-1 rounded">
+                                                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-[#3498db]" />Герой (4)</span>
+                                                    <span className="text-[#3498db] font-bold">ОТКРЫТО</span>
+                                                  </div>
+                                                  <div className="flex items-center gap-2 text-[8px] justify-between text-slate-500 font-mono uppercase bg-black/20 p-1 rounded">
+                                                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-[#2ecc71]" />Лесные (4)</span>
+                                                    <span className="text-[#2ecc71] font-bold">БЛОК</span>
+                                                  </div>
+                                                  <div className="flex items-center gap-2 text-[8px] justify-between text-slate-500 font-mono uppercase bg-black/20 p-1 rounded">
+                                                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-[#e74c3c]" />Бандиты (2)</span>
+                                                    <span className="text-[#e74c3c] font-bold">БЛОК</span>
+                                                  </div>
+                                                  <div className="flex items-center gap-2 text-[8px] justify-between text-slate-500 font-mono uppercase bg-black/20 p-1 rounded">
+                                                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-[#95a5a6]" />Нейтрал (2)</span>
+                                                    <span className="text-[#95a5a6] font-bold">БЛОК</span>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            ) : (
+                                              /* ACTIVE SELECTED/HOVERED HUD SECTOR DETAILS */
+                                              <div 
+                                                className="p-5 rounded-3xl border flex-1 flex flex-col justify-between animate-fade-in font-sans"
+                                                style={{
+                                                  backgroundColor: `rgba(${activeTile.type === 'hero' ? '7, 30, 64, 0.61' : activeTile.type === 'bandit' ? '44, 12, 12, 0.61' : activeTile.type === 'forest' ? '10, 41, 20, 0.61' : '26, 29, 36, 0.61'},` + (activeTile.type === 'hero' ? ' 0.63)' : '0.45)'),
+                                                  borderColor: activeTile.color + '66'
+                                                }}
+                                              >
+                                                <div>
+                                                  <div className="flex items-center justify-between mb-2">
+                                                    <span className="text-xs font-black uppercase tracking-widest flex items-center gap-2" style={{ color: activeTile.color }}>
+                                                      <span>{activeTile.emoji}</span> {activeTile.name[simDialogueLang]}
+                                                    </span>
+                                                    <span 
+                                                      className="text-[8px] font-black px-2 py-0.5 rounded border uppercase"
+                                                      style={{ 
+                                                        color: '#ffffff',
+                                                        backgroundColor: activeTile.color + '55',
+                                                        borderColor: activeTile.color
+                                                      }}
+                                                    >
+                                                      {activeTile.type === 'hero' ? (simDialogueLang === 'RU' ? 'ВЫСАДКА' : 'LANDING') : (simDialogueLang === 'RU' ? 'ЗАБЛОКИРОВАН' : 'RESTRICTED')}
+                                                    </span>
+                                                  </div>
+
+                                                  <p className="text-[10px] text-slate-200 leading-relaxed font-sans">
+                                                    {activeTile.desc[simDialogueLang]}
+                                                  </p>
+
+                                                  <div className="my-1.5 flex items-center justify-between bg-black/30 p-1.5 rounded-lg border border-white/5 font-mono text-[8px] text-slate-400">
+                                                    <span>🛰️ COORDS: {activeTile.bounds}</span>
+                                                    <span>UID: {activeTile.techUid}</span>
+                                                  </div>
+                                                </div>
+
+                                                <div className="grid grid-cols-2 gap-2 my-2">
+                                                  <div className="p-2 rounded-xl bg-emerald-950/30 border border-emerald-500/20">
+                                                    <span className="text-[7.5px] font-black text-emerald-400 uppercase tracking-wider block">✙ ПЛЮСЫ ЗЕМЕЛЬ</span>
+                                                    <span className="text-[9px] text-slate-200 font-bold leading-tight">{activeTile.buffs[simDialogueLang] || activeTile.buffs['RU']}</span>
+                                                  </div>
+                                                  <div className="p-2 rounded-xl bg-red-950/30 border border-red-500/20">
+                                                    <span className="text-[7.5px] font-black text-red-400 uppercase tracking-wider block">⚔️ УГРОЗЫ И СТАТУС</span>
+                                                    <span className="text-[9px] text-slate-200 font-bold leading-tight">{activeTile.nerfs[simDialogueLang] || activeTile.nerfs['RU']}</span>
+                                                  </div>
+                                                </div>
+
+                                                <div className="p-2.5 border rounded-xl bg-white/5" style={{ borderColor: activeTile.color + '33' }}>
+                                                  <span className="text-[8px] font-black uppercase tracking-widest block" style={{ color: activeTile.color }}>
+                                                    ✦ {simDialogueLang === 'RU' ? 'ЭФФЕКТ ТАКТИЧЕСКОГО СЕКТОРА' : 'TACTICAL SECTOR MODIFIER'}
                                                   </span>
-                                                  <span className="text-[8px] font-black bg-red-500/20 border border-red-500/30 text-red-300 px-2 py-0.5 rounded uppercase">Огненный шторм</span>
+                                                  <p className="text-[9px] text-slate-300 font-medium leading-normal mt-0.5">
+                                                    {activeTile.feature[simDialogueLang] || activeTile.feature['RU']}
+                                                  </p>
                                                 </div>
-                                                <p className="text-[10px] text-slate-300 leading-normal">
-                                                  {simDialogueLang === 'RU' ? 'Раскаленные бескрайние дюны под вечным багровым небом, терзаемые демоническими налетами и остаточными волнами Кристалла Зенита.' : 'Endless scalding sand dunes under a bleak scarlet crown, plagued by frequent demon invasions and Zenith crystal discharge torrents.'}
-                                                </p>
-                                              </div>
 
-                                              <div className="grid grid-cols-2 gap-2 my-2">
-                                                <div className="p-2 rounded-xl bg-emerald-950/25 border border-emerald-500/20">
-                                                  <span className="text-[8px] font-black text-emerald-400 uppercase tracking-wider block">✙ Плюсы земель</span>
-                                                  <span className="text-[9.5px] text-slate-300 font-bold">+25% к падению божественной руды</span>
-                                                </div>
-                                                <div className="p-2 rounded-xl bg-red-950/25 border border-red-500/20">
-                                                  <span className="text-[8px] font-black text-red-400 uppercase tracking-wider block">✙ Минусы климата</span>
-                                                  <span className="text-[9.5px] text-slate-300 font-bold">-15% к восстановлению здоровья</span>
-                                                </div>
+                                                {activeTile.type === 'hero' ? (
+                                                  <button
+                                                    onClick={() => {
+                                                      const nextStep = activeTile.heroSlot === 0 ? 4 : activeTile.heroSlot === 1 ? 5 : activeTile.heroSlot === 2 ? 6 : 7;
+                                                      setSimDialogueStep(nextStep);
+                                                      showNotification(`${simDialogueLang === 'RU' ? 'Наведение завершено: ' : 'Lock-on completed: '} ${activeTile.name[simDialogueLang]}!`, "success");
+                                                    }}
+                                                    className="w-full mt-2.5 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider text-white transition-all text-center flex items-center justify-center gap-1.5 shadow hover:scale-[1.02] active:scale-[0.98]"
+                                                    style={{
+                                                      backgroundColor: activeTile.color
+                                                    }}
+                                                  >
+                                                    🚀 {simDialogueLang === 'RU' ? 'ДЕБЮТИРОВАТЬ ГЕРОЯ СЮДА' : 'LOCK & DEPLOY TO THIS SECTOR'}
+                                                  </button>
+                                                ) : (
+                                                  <div className="w-full mt-2.5 py-1.5 rounded-lg text-[8.5px] font-black text-center text-red-200 uppercase bg-red-950/20 border border-red-500/10">
+                                                    🚫 {simDialogueLang === 'RU' ? 'Высадка запрещена этой фракцией' : 'SPAWN INTERCEPTED BY SECTOR FORCE'}
+                                                  </div>
+                                                )}
                                               </div>
-
-                                              <div className="p-2 border border-amber-500/20 rounded-xl bg-amber-500/5">
-                                                <span className="text-[8.5px] font-black text-amber-400 uppercase tracking-widest block">✦ Бонус Местности (Ярость Зенита)</span>
-                                                <p className="text-[9px] text-slate-300 font-medium leading-normal">Шанс критического удара увеличен на 15%, а атаки ближнего боя поджигают врагов.</p>
-                                              </div>
-                                            </div>
-                                          ) : hoveredRegion === 'ice' ? (
-                                            /* Ice-Bound Peak details */
-                                            <div className="p-4 rounded-3xl bg-cyan-950/30 border border-cyan-500/30 flex-1 flex flex-col justify-between animate-fade-in font-sans">
-                                              <div>
-                                                <div className="flex items-center justify-between mb-1.5">
-                                                  <span className="text-[11px] font-black text-cyan-400 uppercase tracking-widest flex items-center gap-1.5">
-                                                    <span>❄️</span> {simDialogueLang === 'RU' ? 'Ледяной Пик' : 'Ice-Bound Peak'}
-                                                  </span>
-                                                  <span className="text-[8px] font-black bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 px-2 py-0.5 rounded uppercase">Вечная стужа</span>
-                                                </div>
-                                                <p className="text-[10px] text-slate-300 leading-normal">
-                                                  {simDialogueLang === 'RU' ? 'Морозные ледяные пропасти на вершине мира, где скрытные ледяные мимики хранят сокровища павших королей.' : 'Frozen gorges and sky-high spires where ice-bound mimics protect the forgotten hordes of gold abandoned by zenith kings.'}
-                                                </p>
-                                              </div>
-
-                                              <div className="grid grid-cols-2 gap-2 my-2">
-                                                <div className="p-2 rounded-xl bg-emerald-950/25 border border-emerald-500/20">
-                                                  <span className="text-[8px] font-black text-emerald-400 uppercase tracking-wider block">✙ Плюсы земель</span>
-                                                  <span className="text-[9.5px] text-slate-300 font-bold">Двойной опыт за ледяных монстров</span>
-                                                </div>
-                                                <div className="p-2 rounded-xl bg-red-950/25 border border-red-500/20">
-                                                  <span className="text-[8px] font-black text-red-400 uppercase tracking-wider block">✙ Минусы климата</span>
-                                                  <span className="text-[9.5px] text-slate-300 font-bold">-10% к скорости бега и атаки</span>
-                                                </div>
-                                              </div>
-
-                                              <div className="p-2 border border-amber-500/20 rounded-xl bg-amber-500/5">
-                                                <span className="text-[8.5px] font-black text-amber-400 uppercase tracking-widest block">✦ Бонус Местности (Сердце Севера)</span>
-                                                <p className="text-[9px] text-slate-300 font-medium leading-normal">Дарует полный иммунитет к эффектам замерзания, окоченения и ледяного оглушения.</p>
-                                              </div>
-                                            </div>
-                                          ) : hoveredRegion === 'ruins' ? (
-                                            /* Ancient Ruins details */
-                                            <div className="p-4 rounded-3xl bg-amber-950/30 border border-amber-500/30 flex-1 flex flex-col justify-between animate-fade-in font-sans">
-                                              <div>
-                                                <div className="flex items-center justify-between mb-1.5">
-                                                  <span className="text-[11px] font-black text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
-                                                    <span>🏛️</span> {simDialogueLang === 'RU' ? 'Древние Руины' : 'Ancient Ruins'}
-                                                  </span>
-                                                  <span className="text-[8px] font-black bg-amber-500/20 border border-amber-500/30 text-amber-300 px-2 py-0.5 rounded uppercase">Скрытые ловушки</span>
-                                                </div>
-                                                <p className="text-[10px] text-slate-300 leading-normal">
-                                                  {simDialogueLang === 'RU' ? 'Забытые плиты покинутых дворцов небесных императоров Зенита, полные скрытых нажимных ловушек и спящих автоматонов.' : 'Lost floorplates from abandoned vertical palaces populated by complex stone traps and steel sentinels waiting to wake.'}
-                                                </p>
-                                              </div>
-
-                                              <div className="grid grid-cols-2 gap-2 my-2">
-                                                <div className="p-2 rounded-xl bg-emerald-950/25 border border-emerald-500/20">
-                                                  <span className="text-[8px] font-black text-emerald-400 uppercase tracking-wider block">✙ Плюсы земель</span>
-                                                  <span className="text-[9.5px] text-slate-300 font-bold">+35% к шансу легендарных артефактов</span>
-                                                </div>
-                                                <div className="p-2 rounded-xl bg-red-950/25 border border-red-500/20">
-                                                  <span className="text-[8px] font-black text-red-400 uppercase tracking-wider block">✙ Минусы климата</span>
-                                                  <span className="text-[9.5px] text-slate-300 font-bold">Стрелы ловушек наносят регулярный урон</span>
-                                                </div>
-                                              </div>
-
-                                              <div className="p-2 border border-amber-500/20 rounded-xl bg-amber-500/5">
-                                                <span className="text-[8.5px] font-black text-amber-400 uppercase tracking-widest block">✦ Бонус Местности (Мудрость Вечности)</span>
-                                                <p className="text-[9px] text-slate-300 font-medium leading-normal">
-                                                  {simDialogueLang === 'RU' ? '+20% к урону от заклинаний и ускорение времени перезарядки на 10%.' : '+20% skill spell pierce & 10% shorter skill cooldown rates.'}
-                                                </p>
-                                              </div>
-                                             </div>
-                                           ) : (
-                                             /* Zenith Sanctuary details */
-                                             <div className="p-4 rounded-3xl bg-emerald-950/30 border border-emerald-500/30 flex-1 flex flex-col justify-between animate-fade-in font-sans">
-                                               <div>
-                                                 <div className="flex items-center justify-between mb-1.5">
-                                                   <span className="text-[11px] font-black text-emerald-400 uppercase tracking-widest flex items-center gap-1.5">
-                                                     <span>🌿</span> {simDialogueLang === 'RU' ? 'Святилище Зенита' : 'Zenith Sanctuary'}
-                                                   </span>
-                                                   <span className="text-[8px] font-black bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 px-2 py-0.5 rounded uppercase">Защита Духов</span>
-                                                 </div>
-                                                 <p className="text-[10px] text-slate-300 leading-normal">
-                                                    {simDialogueLang === 'RU' ? 'Величественный лесной оазис, скрывающий истоки Кристалла сокрытого мощной силой вечных лесных духов.' : 'A majestic forest oasis hiding the origin of the Crystal, heavily guarded by ancient and immortal forest spirits.'}
-                                                 </p>
-                                               </div>
-
-                                               <div className="grid grid-cols-2 gap-2 my-2">
-                                                 <div className="p-2 rounded-xl bg-emerald-950/25 border border-emerald-500/20">
-                                                   <span className="text-[8px] font-black text-emerald-400 uppercase tracking-wider block">✙ Плюсы земель</span>
-                                                   <span className="text-[9.5px] text-slate-300 font-bold">+15% к регенерации маны всего отряда</span>
-                                                 </div>
-                                                 <div className="p-2 rounded-xl bg-red-950/25 border border-red-500/20">
-                                                   <span className="text-[8px] font-black text-red-400 uppercase tracking-wider block">✙ Минусы климата</span>
-                                                   <span className="text-[9.5px] text-slate-300 font-bold">Ослабление эффективности зелий лечения</span>
-                                                 </div>
-                                               </div>
-
-                                               <div className="p-2 border border-emerald-500/20 rounded-xl bg-emerald-500/5">
-                                                 <span className="text-[8.5px] font-black text-emerald-400 uppercase tracking-widest block">✦ Бонус Местности (Живая Земля)</span>
-                                                 <p className="text-[9px] text-slate-300 font-medium leading-normal">
-                                                    {simDialogueLang === 'RU' ? 'Время восстановления активных умений поддержки сокращено на 25%.' : 'Support utility cooldown rates are accelerated by 25%.'}
-                                                 </p>
-                                               </div>
-                                             </div>
-                                           )}</div>
-
+                                            )}
+                                          </div>
+                                        </div>
                                       </div>
-                                    </div>
-                                  ) : (
+                                    );
+                                  })() :  (
                                     /* Buttons for step 4, 5, 6 (Final / reset) */
                                     <div className="flex flex-col space-y-4 w-full">
                                       <div className="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 text-[10px] text-indigo-300 leading-normal font-sans">
