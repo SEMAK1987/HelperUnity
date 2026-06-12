@@ -145,6 +145,9 @@ namespace FateContinent
             // Гарантируем корректное заполнение при старте
             InitializeDefaultPoints();
 
+            // Создаем красивую плоскость океана под континентом для фонового ландшафта, если она отсутствует
+            SetupOceanPlane();
+
             // Автоматически понижаем ракурс камеры, если значение имеет устаревший или завышенный дефолт в инспекторе (например, y > 5.0f)
             if (cameraOffset.y > 5.0f)
             {
@@ -201,7 +204,7 @@ namespace FateContinent
 
         private void Start()
         {
-            // СВЕРХВАЖНО: Изначально полностью выключаем 3D-карту и героя, чтобы они не лезли на задний план вступительных диалогов Аэлиссы!
+            // СВЕРХВАЖНО: Изначально полностью выключаем 3D-карту, океан и героя, чтобы они не лезли на задний план вступительных диалогов Аэлиссы!
             if (continentObject != null)
             {
                 continentObject.SetActive(false);
@@ -212,6 +215,14 @@ namespace FateContinent
             {
                 playerTransform.gameObject.SetActive(false);
                 Debug.Log("[LANDING SYS] Изначально деактивировали Player_Placeholder.");
+            }
+
+            // Изначально скрываем океан, чтобы не мешал во время разговора
+            GameObject oceanObj = GameObject.Find("Fate_Ocean_Plane");
+            if (oceanObj != null)
+            {
+                oceanObj.SetActive(false);
+                Debug.Log("[LANDING SYS] Изначально деактивировали океан Fate_Ocean_Plane.");
             }
         }
 
@@ -232,6 +243,22 @@ namespace FateContinent
             {
                 playerTransform.gameObject.SetActive(true);
                 Debug.Log("<color=#00FFCC>[LANDING SYS]</color> Активируем Player_Placeholder!");
+            }
+
+            // Активируем океан обратно при старте полета
+            GameObject oceanObj = null;
+            foreach (var go in Resources.FindObjectsOfTypeAll<GameObject>())
+            {
+                if (go.name == "Fate_Ocean_Plane" && go.scene.isLoaded)
+                {
+                    oceanObj = go;
+                    break;
+                }
+            }
+            if (oceanObj != null)
+            {
+                oceanObj.SetActive(true);
+                Debug.Log("<color=#00FFCC>[LANDING SYS]</color> Активируем океан Fate_Ocean_Plane!");
             }
 
             if (landingPoints == null || landingPoints.Length == 0)
@@ -283,7 +310,7 @@ namespace FateContinent
                     {
                         mainCameraTransform.position = targetCameraPos;
                         mainCameraTransform.LookAt(point.spawnAnchor.position);
-                        EnableStrategicCamera(point.spawnAnchor.position);
+                        CompleteLandingAndStartDialogue(point.spawnAnchor.position);
                     }
                 }
             }
@@ -291,6 +318,29 @@ namespace FateContinent
             {
                 Debug.LogError($"[LANDING SYS] Критическая ошибка: Spawn Anchor для точки '{point.zoneName}' равен Null! Укажите пустышку Transform в инспекторе.");
             }
+        }
+
+        private void CompleteLandingAndStartDialogue(Vector3 lookAtPoint)
+        {
+            if (StrategicCameraController.Instance != null)
+            {
+                StrategicCameraController.Instance.FocusOnPoint(lookAtPoint, cameraOffset);
+                StrategicCameraController.Instance.isControlEnabled = false;
+            }
+            if (GamePause_Manager.Instance != null)
+            {
+                GamePause_Manager.Instance.isPauseBlockedManually = true;
+            }
+            if (FateMapManager.Instance != null)
+            {
+                FateMapManager.Instance.SetMapVisible(true);
+            }
+
+            if (DialogueSystem_Manager.Instance != null)
+            {
+                DialogueSystem_Manager.Instance.StartDialogue(8);
+            }
+            Debug.Log("[LANDING SYS] Десантирование завершено. Пауза заблокирована. Запускаем Инструктаж о замках (шаг 8).");
         }
 
         private void EnableStrategicCamera(Vector3 anchorPosition)
@@ -328,7 +378,81 @@ namespace FateContinent
             Debug.Log("[LANDING SYS] Камера успешно наведена на новую зону высадки.");
 
             // Активируем свободное перемещение камеры игроком после приземления
-            EnableStrategicCamera(lookAtPoint);
+            CompleteLandingAndStartDialogue(lookAtPoint);
+        }
+
+        /// <summary>
+        /// Создает красивую плоскость океана под континентом для фонового ландшафта, если она отсутствует.
+        /// </summary>
+        public void SetupOceanPlane()
+        {
+            GameObject oceanObj = GameObject.Find("Fate_Ocean_Plane");
+            if (oceanObj == null)
+            {
+                oceanObj = GameObject.CreatePrimitive(PrimitiveType.Plane);
+                oceanObj.name = "Fate_Ocean_Plane";
+                
+                // Располагаем под континентом (чуть ниже Y = -0.5f, чтобы не было Z-файта с ландшафтом)
+                oceanObj.transform.position = new Vector3(0f, -0.6f, 0f);
+                
+                // Делаем плоскость достаточно огромной для стратегического обзора
+                oceanObj.transform.localScale = new Vector3(80f, 1f, 80f); 
+
+                // Настраиваем MeshRenderer для тайлинга текстуры
+                MeshRenderer mr = oceanObj.GetComponent<MeshRenderer>();
+                if (mr != null)
+                {
+                    Material oceanMat = null;
+                    
+                    // Попытка найти уже настроенный в ассетах материал M_Ocean_Background, чтобы избежать сброса текстур
+                    Material[] availableMats = Resources.FindObjectsOfTypeAll<Material>();
+                    foreach (var m in availableMats)
+                    {
+                        if (m != null && m.name == "M_Ocean_Background")
+                        {
+                            oceanMat = m;
+                            break;
+                        }
+                    }
+
+                    // Если материала нет, создаем его динамически с поддержкой Universal Render Pipeline
+                    if (oceanMat == null)
+                    {
+                        Shader urpShader = Shader.Find("Universal Render Pipeline/Lit");
+                        if (urpShader == null) urpShader = Shader.Find("URP/Lit");
+                        if (urpShader == null) urpShader = Shader.Find("Standard");
+                        
+                        oceanMat = new Material(urpShader);
+                        oceanMat.name = "M_Ocean_Background";
+                        
+                        // Цветовой оттенок темного космического океана
+                        oceanMat.color = new Color(0.02f, 0.05f, 0.12f, 1.0f);
+                        
+                        // Шероховатость и отражения
+                        if (oceanMat.HasProperty("_Glossiness")) oceanMat.SetFloat("_Glossiness", 0.7f);
+                        if (oceanMat.HasProperty("_Smoothness")) oceanMat.SetFloat("_Smoothness", 0.7f);
+                        if (oceanMat.HasProperty("_Metallic")) oceanMat.SetFloat("_Metallic", 0.1f);
+                    }
+
+                    // Принудительно задаем 40x40 тайлинг, чтобы 8K текстура воды не растягивалась мылом
+                    if (oceanMat.HasProperty("_BaseMap"))
+                    {
+                        oceanMat.SetTextureScale("_BaseMap", new Vector2(40f, 40f));
+                    }
+                    else if (oceanMat.HasProperty("_MainTex"))
+                    {
+                        oceanMat.SetTextureScale("_MainTex", new Vector2(40f, 40f));
+                    }
+
+                    mr.material = oceanMat;
+                }
+
+                // Отключаем тени, чтобы плоскость выглядела чисто
+                mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                mr.receiveShadows = true;
+
+                Debug.Log("<color=#00FFCC>[OCEAN GENERATOR]</color> Специфицировали красивую плоскость Fate_Ocean_Plane под континентом (Y = -0.6f, масштаб 80x80).");
+            }
         }
     }
 }

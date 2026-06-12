@@ -58,7 +58,7 @@ namespace FateContinent
 
         [Tooltip("Масштаб всей карты (Map Scale)")]
         [Range(0.1f, 3.0f)]
-        public float mapScale = 1.0f;
+        public float mapScale = 1.2f;
 
         [Tooltip("Масштаб колец (Ring Scale)")]
         [Range(0.1f, 3.0f)]
@@ -136,8 +136,15 @@ namespace FateContinent
 
         private void Start()
         {
+            // Автоматически инициализируем систему замков FateCastleManager
+            if (GameObject.Find("FateCastleManager") == null)
+            {
+                GameObject castleGov = new GameObject("FateCastleManager");
+                castleGov.AddComponent<FateCastleManager>();
+            }
+
             // Автоматически увеличиваем базовый масштаб карты, если он был слишком маленьким по умолчанию
-            if (mapScale <= 1.05f)
+            if (mapScale <= 0.1f)
             {
                 mapScale = 1.6f;
                 Debug.Log("<color=#00FFCC>[FATE CONTINENT CALIBRATION]</color> Автоматически увеличили масштаб тактической карты до 1.6f для величественного полноэкранного обзора.");
@@ -798,6 +805,26 @@ namespace FateContinent
         private void OnValidateDelayed()
         {
             if (this == null) return;
+
+            // Двусторонняя синхронизация с Трансформом:
+            if (!Application.isPlaying)
+            {
+                if (Mathf.Abs(transform.localScale.x - mapScale) > 0.001f && transform.localScale.x > 0.05f)
+                {
+                    mapScale = transform.localScale.x;
+                    UnityEditor.EditorUtility.SetDirty(this);
+                }
+                if (Mathf.Abs(transform.localPosition.x - mapOffsetX) > 0.001f)
+                {
+                    mapOffsetX = transform.localPosition.x;
+                    UnityEditor.EditorUtility.SetDirty(this);
+                }
+                if (Mathf.Abs(transform.localPosition.y - mapOffsetY) > 0.001f)
+                {
+                    mapOffsetY = transform.localPosition.y;
+                    UnityEditor.EditorUtility.SetDirty(this);
+                }
+            }
 
             // Сначала инициализируем карту, чтобы перехватить перетаскивание до того, как ApplyTransformOffsets перепишет позицию!
             if (!Application.isPlaying)

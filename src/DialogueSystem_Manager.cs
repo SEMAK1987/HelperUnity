@@ -699,6 +699,14 @@ namespace FateContinent
             }
 
             // Переход на следующую реплику
+            if (currentLineIndex == 11)
+            {
+                if (FateCastleManager.Instance != null)
+                {
+                    FateCastleManager.Instance.SpawnAllCastles();
+                }
+            }
+
             if (currentLine.nextLineIndexes != null && currentLine.nextLineIndexes.Length > 0)
             {
                 currentLineIndex = currentLine.nextLineIndexes[0];
@@ -927,6 +935,40 @@ namespace FateContinent
 
         public void EndDialogue()
         {
+            if (currentLineIndex == 12)
+            {
+                isDialogueActive = false;
+                if (dialogPanel != null)
+                {
+                    dialogPanel.SetActive(false);
+                }
+                
+                if (FateMapManager.Instance != null)
+                {
+                    FateMapManager.Instance.SetMapVisible(true);
+                }
+                if (StrategicCameraController.Instance != null)
+                {
+                    StrategicCameraController.Instance.isControlEnabled = true;
+                    // Сфокусируем камеру на выбранном замке
+                    int playerZone = selectedZoneIndex;
+                    if (LandingPositionManager.Instance != null && playerZone < LandingPositionManager.Instance.landingPoints.Length)
+                    {
+                        var anchor = LandingPositionManager.Instance.landingPoints[playerZone].spawnAnchor;
+                        if (anchor != null)
+                        {
+                            StrategicCameraController.Instance.FocusOnPoint(anchor.position, LandingPositionManager.Instance.cameraOffset);
+                        }
+                    }
+                }
+                if (GamePause_Manager.Instance != null)
+                {
+                    GamePause_Manager.Instance.isPauseBlockedManually = false;
+                }
+                Debug.Log("[DIALOGUE SYSTEM] Пост-высадочный инструктаж о замках окончен. Все системы разблокированы для свободной игры!");
+                return;
+            }
+
             isDialogueActive = false;
             if (dialogPanel != null)
             {
@@ -2121,6 +2163,77 @@ private void SetupFallbackDialogues()
             dialogueSteps.Add(l6);
             dialogueSteps.Add(l7);
             dialogueSteps.Add(l8);
+
+            DialogLine l9 = new DialogLine
+            {
+                textRU = "Мы успешно приземлились на выбранную точку! Это место станет нашей базой. Мы начинаем наш боевой поход со своей точки высадки и будем захватывать территории на Континенте Судьбы!",
+                textEN = "We have successfully landed at our chosen point! This place will become our base. We begin our campaign from our landing site and will capture territories on the Fate Continent!",
+                textCH = "我们成功降落在了选择的地点！这个地方将成为我们的基地。我们从登陆地点开始征程，将占领命运大陆上的领土！",
+                textKR = "우리는 선택한 장소에 성공적으로 착륙했다! 이곳은 우리의 기지가 될 것이다. 우리는 착륙 지점에서 캠페인을 시작하여 운명 대륙의 영토를 모두 정복할 것이다!",
+                choicesRU = new string[] { "Продолжить" },
+                choicesEN = new string[] { "Continue" },
+                choicesCH = new string[] { "继续" },
+                choicesKR = new string[] { "계속" },
+                nextLineIndexes = new int[] { 9 }
+            };
+
+            DialogLine l10 = new DialogLine
+            {
+                textRU = "Помни, здесь повсюду вражеские кланы, которых нам предстоит победить для полного освобождения нашего великого континента.",
+                textEN = "Remember, enemy clans are everywhere, whom we must defeat for the complete liberation of our great continent.",
+                textCH = "记住，敌人氏族无处不在，为了彻底解放我们伟大的大陆，我们必须击败他们。",
+                textKR = "기억해라, 대륙의 완전한 해방을 위해 반드시 격퇴해야 할 적 부족들이 도처에 널려 있다.",
+                choicesRU = new string[] { "Продолжить" },
+                choicesEN = new string[] { "Continue" },
+                choicesCH = new string[] { "继续" },
+                choicesKR = new string[] { "계속" },
+                nextLineIndexes = new int[] { 10 }
+            };
+
+            DialogLine l11 = new DialogLine
+            {
+                textRU = "Со временем враги будут становиться всё сильнее. Чтобы выстоять и сокрушить их, нам необходимо усердно развивать наши опорные замки.",
+                textEN = "Over time, enemies will become stronger. To withstand and crush them, we need to diligently develop our stronghold castles.",
+                textCH = "随着时间的推移，敌人会变得越来越强大。为了抵御并粉碎他们，我们需要努力发展我们的据点城堡。",
+                textKR = "시간이 지날수록 귀중한 적들은 점점 강해질 것이다. 그들을 버텨내고 분쇄하려면 우리 지점의 거점 성들을 견고히 발전시켜야 한다.",
+                choicesRU = new string[] { "Продолжить" },
+                choicesEN = new string[] { "Continue" },
+                choicesCH = new string[] { "继续" },
+                choicesKR = new string[] { "계속" },
+                nextLineIndexes = new int[] { 11 }
+            };
+
+            DialogLine l12 = new DialogLine
+            {
+                textRU = "Каждый замок имеет пятиуровневую систему улучшения. В зависимости от его уровня мы получим большие привилегии: пассивную добычу золота, покупку воинов, приобретение лечебных зелий и снаряжения, а также место для тренировки воинов и нашего героя.",
+                textEN = "Each castle operates on a 5-level upgrade system. Depending on its level, we gain significant privileges: passive gold income, buying troops, purchasing health potions and equipment, and a training ground for soldiers and our hero.",
+                textCH = "每个城堡都采用 5 级升级系统。根据其级别，我们将获得显着的特权：被动金币收益、招募士兵、在店面里购买恢复药水和装备，以及供士兵和我们英雄训练的场所。",
+                textKR = "각 성은 5단계 업그레이드 시스템으로 운영된다. 성의 레벨에 따라 골드 자동 획득, 군사 모집, 치료용 물약 및 풍부한 장ви 구매, 그리고 군사들과 영웅을 훈련시킬 연병장 등 거대한 혜택을 제공받게 된다.",
+                choicesRU = new string[] { "Показать наши замки!" },
+                choicesEN = new string[] { "Show our Castles!" },
+                choicesCH = new string[] { "展示我们的城堡！" },
+                choicesKR = new string[] { "우리의 성 보여주기!" },
+                nextLineIndexes = new int[] { 12 }
+            };
+
+            DialogLine l13 = new DialogLine
+            {
+                textRU = "Взгляни на карту! Вот наш главный замок и замки твоих противников. Прокачивай и улучшай свои владения! На первом континенте максимальный уровень замков равен 2. Повышай уровень замка, развивай свои войска, и победа будет за нами!",
+                textEN = "Look at the map! Here is our primary castle and the castles of your opponents. Upgrade and improve your domains! On the first continent, the maximum castle level is Level 2. Raise your castle level, grow your armies, and victory shall be ours!",
+                textCH = "看地图！这是我们的主城和对手的城堡。升级并改善你的领地！在第一大陆，城堡的最高等级为二级。提高城堡等级，训练你的军队，胜利一定属于我们！",
+                textKR = "지도를 보아ра! 이곳이 우리의 주 성이며 주변이 상대 적들의 요새да. 영то의 지배권을 높이고 업그레이д해라! 첫 번째 대륙에서 성의 최대 레벨은 2단계까지다. 성채를 육성하고 부대를 강화한다면 승리는 우리의 것이다!",
+                choicesRU = new string[] { "Начать завоевание" },
+                choicesEN = new string[] { "Start conquest" },
+                choicesCH = new string[] { "开始征服" },
+                choicesKR = new string[] { "정복 시작하기" },
+                nextLineIndexes = null // Конец диалога
+            };
+
+            dialogueSteps.Add(l9);
+            dialogueSteps.Add(l10);
+            dialogueSteps.Add(l11);
+            dialogueSteps.Add(l12);
+            dialogueSteps.Add(l13);
         }
     }
 }

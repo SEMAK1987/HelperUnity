@@ -506,17 +506,17 @@ async function generateMasterBlueprint() {
     const blueprint = await fs.readJson(blueprintJsonPath);
     
     let md = `# PROJECT MASTER BLUEPRINT: ${blueprint.project_name || "Unity & Blender AI Assistant"} (Total Knowledge Archive Edition)\n\n`;
-    md += `> **ВНИМАНИЕ:** Этот документ является \"источников истины\" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.11.10.\n\n`;
+    md += `> **ВНИМАНИЕ:** Этот документ является \"источников истины\" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.11.11.\n\n`;
     md += `## 1. Общая информация\n`;
-    md += `- **Версия Помощника:** ${blueprint.version || "18.11.10"}\n`;
-    md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (v18.11.10 - 4-Zone Spawn Match, Map Sync & Marker Depth Correction) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Интеграция адаптивного переключения ввода, калибровка зум-параметров при высадке, позиционирование маркеров по Z=-2.0f и сохранение прогресса."}\n`;
+    md += `- **Версия Помощника:** ${blueprint.version || "18.11.11"}\n`;
+    md += `- **Описание:** ${blueprint.description || "Гибридный ИИ-помощник нового поколения (v18.11.11 - Real-Time Bound Locking, Edge Scrolling & Ocean Planes Setup) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Интеграция адаптивного переключения ввода, калибровка зум-параметров при высадке, позиционирование маркеров по Z=-2.0f и сохранение прогресса."}\n`;
     md += `- **Путь проекта:** ${kb.project_path || "Не задан"}\n`;
     md += `- **Локальное хранилище:** ${kb.local_training_path || "Не задано"}\n`;
     md += `- **Версия Unity:** ${currentUnityStatus.version}\n`;
     md += `- **Версия Blender:** ${currentBlenderStatus.version}\n`;
     md += `- **Версия GIMP:** ${currentGimpStatus.version}\n`;
     md += `- **Версия Redot:** ${currentRedotStatus.version}\n`;
-    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_11_10_FATE_MASTER]\n\n`;
+    md += `- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_11_11_FATE_MASTER]\n\n`;
     
     md += `## 2. Структура интерфейса\n`;
     md += `### Вкладки\n`;
@@ -559,13 +559,13 @@ async function generateMasterBlueprint() {
     md += `\n### Системные инструкции\n`;
     md += `\`\`\`text\n${kb.system_instruction}\n\`\`\`\n\n`;
 
-    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.11.10 - 4-Zone Spawn Match & Map Sync)\n`;
+    md += `\n## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.11.11 - Real-Time Bound Locking & Ocean Backdrop)\n`;
     md += `### Режимы работы и Архитектурные уровни\n`;
     md += `- **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.\n`;
     md += `- **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.\n`;
     md += `- **No-Internet Mode (Quantum Archive):** 10,000+ видео-уроков. Мгновенный доступ при любых внешних условиях.\n\n`;
 
-    md += `### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.11.10 Sync)\n`;
+    md += `### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.11.11 Sync)\n`;
     md += `- **Unity 6 Physics & Optimization:** [Video #2](https://www.youtube.com/watch?v=9vuyis_Y-LY)\n`;
     md += `- **Blender Advanced Rigging:** [Video #3](https://www.youtube.com/watch?v=UKZp67dY1_w)\n`;
     md += `- **Shader Graph Mastery:** [Video #4](https://www.youtube.com/watch?v=-hvxjyzcSkI)\n`;

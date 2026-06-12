@@ -255,6 +255,10 @@ public class SettingsManager : MonoBehaviour
             }
             Debug.Log("[FATE SETTINGS] fullscreenToggle успешно привязан.");
         }
+
+        // Гарантируем, что качество океана привязывается к сохраненным настройкам PlayerPrefs при старте/загрузке сцены
+        int savedQuality = PlayerPrefs.GetInt("QualityLevel", QualitySettings.GetQualityLevel());
+        ApplyOceanQuality(savedQuality);
     }
 
     // Воспроизведение звука наведения по индексу (0-9)
@@ -389,6 +393,45 @@ public class SettingsManager : MonoBehaviour
     {
         QualitySettings.SetQualityLevel(index);
         PlayerPrefs.SetInt("QualityLevel", index);
+        ApplyOceanQuality(index);
+    }
+
+    /// <summary>
+    /// Автоматически адаптирует свойства материала Fate_Ocean_Plane под выбранный уровень графики.
+    /// Предотвращает лаги на слабых системах и раскрывает всю глубину 8K текстуры на Ultra уровнях.
+    /// </summary>
+    public void ApplyOceanQuality(int index)
+    {
+        GameObject ocean = GameObject.Find("Fate_Ocean_Plane");
+        if (ocean != null)
+        {
+            MeshRenderer mr = ocean.GetComponent<MeshRenderer>();
+            if (mr != null && mr.material != null)
+            {
+                // Уровни графики Unity: 0 (Очень низкие), 1 (Низкие), 2 (Средние), 3 (Высокие), 4 (Очень высокие), 5 (Ультра)
+                if (index <= 1)
+                {
+                    // Оптимизация под слабые ПК: убираем отражения и отключаем тени на плоскости
+                    mr.material.SetFloat("_Glossiness", 0.1f);
+                    mr.material.SetFloat("_Metallic", 0.0f);
+                    mr.receiveShadows = false;
+                }
+                else if (index <= 3)
+                {
+                    // Баланс качества и производительности
+                    mr.material.SetFloat("_Glossiness", 0.5f);
+                    mr.material.SetFloat("_Metallic", 0.1f);
+                    mr.receiveShadows = true;
+                }
+                else
+                {
+                    // Ультра-настройки: включаем полный шейдерный блеск, блики и отражения
+                    mr.material.SetFloat("_Glossiness", 0.85f);
+                    mr.material.SetFloat("_Metallic", 0.3f);
+                    mr.receiveShadows = true;
+                }
+            }
+        }
     }
 
     public void SetFullscreen(bool isFullscreen)

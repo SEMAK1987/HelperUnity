@@ -60,6 +60,20 @@ namespace FateContinent
         [Tooltip("Ограничение по оси Z (вперед/назад)")]
         public Vector2 zBounds = new Vector2(-150f, 150f);
 
+        [Header("📐 Автоматический расчет границ")]
+        [Tooltip("Автоматически ограничивать по размерам New_Kontinent, если он найден")]
+        public bool autoFitToContinent = true;
+        [Tooltip("Запас (padding) при автоматическом расчете границ")]
+        public float autoFitPadding = 5.0f;
+
+        [Header("🖥️ Прокрутка по краям экрана (Edge Scrolling)")]
+        [Tooltip("Включить прокрутку камеры при подведении мыши к краю экрана")]
+        public bool useEdgeScrolling = true;
+        [Tooltip("Ширина активной зоны у края экрана (в пикселях)")]
+        public float edgeScrollBorder = 20f;
+        [Tooltip("Скорость прокрутки по краям")]
+        public float edgeScrollSpeed = 12.0f;
+
         // Внутренние переменные для плавного демпфирования
         private Vector3 targetPosition;
         private float targetZoom;
@@ -95,6 +109,9 @@ namespace FateContinent
                 Debug.Log($"<color=#00FFCC>[CAMERA CALIBRATION]</color> Скорректировали максимальную высоту камеры с {maxHeight}f до идеальных 8.0f.");
             }
 
+            // Пытаемся автоматически подстроить границы под размеры New_Kontinent
+            AutoFitBounds();
+
             // Считываем стартовые координаты
             targetPosition = transform.position;
             // Рассчитываем начальный зум на основе текущей высоты камеры
@@ -106,10 +123,142 @@ namespace FateContinent
         {
             if (!isControlEnabled) return;
 
+            // Раз в секунду (приблизительно 60 кадров) пересчитываем границы, если континент масштабируется
+            if (autoFitToContinent && Time.frameCount % 60 == 0)
+            {
+                AutoFitBounds();
+            }
+
             HandleKeyboardMovement();
             HandleMouseDrag();
+            HandleMouseEdgeScrolling();
             HandleZoom();
             ApplyCameraTransforms();
+        }
+
+        /// <summary>
+        /// Автоматический расчет границ камеры по размеру New_Kontinent
+        /// </summary>
+        public void AutoFitBounds()
+        {
+            if (!autoFitToContinent) return;
+
+            GameObject continent = GameObject.Find("New_Kontinent");
+            if (continent != null)
+            {
+                Renderer[] renderers = continent.GetComponentsInChildren<Renderer>();
+                if (renderers.Length > 0)
+                {
+                    Bounds combinedBounds = renderers[0].bounds;
+                    bool hasValidBound = false;
+
+                    if (combinedBounds.size.magnitude > 0.1f) hasValidBound = true;
+
+                    for (int i = 1; i < renderers.Length; i++)
+                    {
+                        if (renderers[i].bounds.size.magnitude > 0.1f)
+                        {
+                            if (!hasValidBound)
+                            {
+                                combinedBounds = renderers[i].bounds;
+                                hasValidBound = true;
+                            }
+                            else
+                            {
+                                combinedBounds.Encapsulate(renderers[i].bounds);
+                            }
+                        }
+                    }
+
+                    if (hasValidBound)
+                    {
+                        xBounds = new Vector2(combinedBounds.min.x - autoFitPadding, combinedBounds.max.x + autoFitPadding);
+                        zBounds = new Vector2(combinedBounds.min.z - autoFitPadding, combinedBounds.max.z + autoFitPadding);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Ограничивает позицию камеры так, чтобы точка фокуса (куда смотрит центр экрана на плоскости Y = 0)
+        /// не выходила за пределы игровых границ xBounds и zBounds.
+        /// </summary>
+        public Vector3 ClampCameraPositionByGroundFocus(Vector3 camPos, float zoomVal)
+        {
+            float height = Mathf.Lerp(minHeight, maxHeight, zoomVal);
+            float tilt = Mathf.Lerp(tiltAtMinHeight, tiltAtMaxHeight, zoomVal);
+            
+            // Направление взгляда камеры с учетом текущего наклона (Pitch)
+            Quaternion rot = Quaternion.Euler(tilt, transform.rotation.eulerAngles.y, 0f);
+            Vector3 forwardDir = rot * Vector3.forward;
+            
+            // Предотвращаем деление на ноль или взгляд горизонтально/вверх
+            if (forwardDir.y >= -0.01f)
+            {
+                camPos.x = Mathf.Clamp(camPos.x, xBounds.x, xBounds.y);
+                camPos.z = Mathf.Clamp(camPos.z, zBounds.x, zBounds.y);
+                return camPos;
+            }
+            
+            // Ищем расстояние вдоль вектора взгляда до плоскости Y = 0 (земля)
+            float distanceToGround = -height / forwardDir.y;
+            Vector3 groundPoint = camPos + forwardDir * distanceToGround;
+            
+            // Зажимаем фокус на земле в пределах дозволенных границ
+            float clampedGroundX = Mathf.Clamp(groundPoint.x, xBounds.x, xBounds.y);
+            float clampedGroundZ = Mathf.Clamp(groundPoint.z, zBounds.x, zBounds.y);
+            
+            // Из зажатой точки на земле вычисляем обратную позицию камеры
+            Vector3 clampedCamPos = new Vector3(clampedGroundX, 0f, clampedGroundZ) - forwardDir * distanceToGround;
+            clampedCamPos.y = height; // Удерживаем верную высоту
+            
+            return clampedCamPos;
+        }
+
+        /// <summary>
+        /// Прокрутка камеры движением мыши к краям экрана (Pan / Edge Scroll)
+        /// </summary>
+        private void HandleMouseEdgeScrolling()
+        {
+            if (!useEdgeScrolling) return;
+
+            float horizontal = 0f;
+            float vertical = 0f;
+
+            Vector2 mousePos = Vector2.zero;
+#if ENABLE_INPUT_SYSTEM
+            var mouse = Mouse.current;
+            if (mouse != null) mousePos = mouse.position.ReadValue();
+#else
+            mousePos = Input.mousePosition;
+#endif
+
+            if (mousePos.x >= 0 && mousePos.x <= Screen.width && mousePos.y >= 0 && mousePos.y <= Screen.height)
+            {
+                if (mousePos.x < edgeScrollBorder) horizontal = -1f;
+                else if (mousePos.x > Screen.width - edgeScrollBorder) horizontal = 1f;
+
+                if (mousePos.y < edgeScrollBorder) vertical = -1f;
+                else if (mousePos.y > Screen.height - edgeScrollBorder) vertical = 1f;
+            }
+
+            if (Mathf.Abs(horizontal) > 0.1f || Mathf.Abs(vertical) > 0.1f)
+            {
+                Vector3 inputDirection = new Vector3(horizontal, 0f, vertical).normalized;
+                
+                Vector3 cameraForward = transform.forward;
+                cameraForward.y = 0f;
+                cameraForward.Normalize();
+
+                Vector3 cameraRight = transform.right;
+                cameraRight.y = 0f;
+                cameraRight.Normalize();
+
+                Vector3 movement = (cameraForward * inputDirection.z + cameraRight * inputDirection.x) * edgeScrollSpeed * Time.deltaTime;
+                targetPosition += movement;
+
+                targetPosition = ClampCameraPositionByGroundFocus(targetPosition, targetZoom);
+            }
         }
 
         /// <summary>
@@ -118,14 +267,14 @@ namespace FateContinent
         public void FocusOnPoint(Vector3 worldPoint, Vector3 offset)
         {
             targetPosition = worldPoint + offset;
-            // Автоматически ограничиваем в рамках дозволенных границ
-            targetPosition.x = Mathf.Clamp(targetPosition.x, xBounds.x, xBounds.y);
-            targetPosition.z = Mathf.Clamp(targetPosition.z, zBounds.x, zBounds.y);
             
             // Задаем средний зум по умолчанию при фокусировке и мгновенно сбрасываем текущий интерполированный зум,
             // чтобы избежать моментального взлета и улета камеры вверх!
             targetZoom = 0.4f; 
             currentZoom = 0.4f;
+
+            // Ограничиваем в рамках дозволенных границ focus-точку
+            targetPosition = ClampCameraPositionByGroundFocus(targetPosition, targetZoom);
             
             // Если игрок еще не управлял камерой, переносим физически сразу, чтобы не было "дергания"
             if (!isControlEnabled)
@@ -186,9 +335,8 @@ namespace FateContinent
                 Vector3 movement = (cameraForward * inputDirection.z + cameraRight * inputDirection.x) * speed * Time.deltaTime;
                 targetPosition += movement;
 
-                // Зажимаем целевую позицию в границах карты
-                targetPosition.x = Mathf.Clamp(targetPosition.x, xBounds.x, xBounds.y);
-                targetPosition.z = Mathf.Clamp(targetPosition.z, zBounds.x, zBounds.y);
+                // Зажимаем целевую позицию в границах карты (по точке взгляда)
+                targetPosition = ClampCameraPositionByGroundFocus(targetPosition, targetZoom);
             }
         }
 
@@ -239,8 +387,7 @@ namespace FateContinent
                     Vector3 dragMovement = (-cameraRight * delta.x - cameraForward * delta.y) * finalSensitivity;
                     targetPosition += dragMovement;
 
-                    targetPosition.x = Mathf.Clamp(targetPosition.x, xBounds.x, xBounds.y);
-                    targetPosition.z = Mathf.Clamp(targetPosition.z, zBounds.x, zBounds.y);
+                    targetPosition = ClampCameraPositionByGroundFocus(targetPosition, targetZoom);
 
                     lastDragMousePosition = currentMousePos;
                 }
@@ -254,7 +401,7 @@ namespace FateContinent
             var mouse = Mouse.current;
             if (mouse != null)
             {
-                scroll = mouse.scroll.ReadValue().y * 0.005f; // Корректируем коэффициент прокрутки под новый Input System
+                scroll = mouse.scroll.ReadValue().y * 0.005f; // ...
             }
 #else
             scroll = Input.GetAxis("Mouse ScrollWheel");
@@ -275,8 +422,14 @@ namespace FateContinent
             float targetHeight = Mathf.Lerp(minHeight, maxHeight, currentZoom);
             targetPosition.y = targetHeight;
 
+            // 2.1. Дополнительно зажимаем саму целевую позицию к границам карты (по точке взгляда)
+            targetPosition = ClampCameraPositionByGroundFocus(targetPosition, currentZoom);
+
             // 3. Плавно интерполируем позицию всей камеры
             transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * movementSmoothing);
+
+            // 3.1. Обеспечиваем гарантированное строгое удержание камеры в рамках границ (по точке взгляда)
+            transform.position = ClampCameraPositionByGroundFocus(transform.position, currentZoom);
 
             // 4. Плавно интерполируем угол наклона (Tilt) — при приближении камера наклоняется к горизонту, при отдалении смотрит строго вниз
             float targetTilt = Mathf.Lerp(tiltAtMinHeight, tiltAtMaxHeight, currentZoom);

@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.10. 4-Zone Spawn Match & Map Sync - matches physical spawn anchors and increases interactive marker Z depth to -2.0f and companions/heroes to -2.05f to prevent clipping.",
+  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.11. Real-time camera bounds auto-fitting, Edge Scrolling, and automated background ocean plane Setup with 8K texture prompts.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

@@ -177,11 +177,19 @@ namespace FateContinent
             return false;
         }
 
+        public bool isPauseBlockedManually = false;
+
         private void Update()
         {
             // Обработка кнопки ESC с использованием безопасного метода IsEscapePressed
             if (IsEscapePressed())
             {
+                if (isPauseBlockedManually)
+                {
+                    Debug.Log("[FATE PAUSE] ESC заблокирован вручную (блокировка во время важных сцен)!");
+                    return;
+                }
+
                 // Запрещаем ESC во время активного диалога
                 if (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.IsDialogueActive)
                 {

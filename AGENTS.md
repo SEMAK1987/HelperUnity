@@ -1,9 +1,13 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.11.10)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.11.14)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** 18.11.10
+- **Version:** 18.11.14
 - **Engine:** Unity 6 (6000.3.10f1)
+- **v18.11.14 Update:** Post-Landing Narrative & Castle Progression System - Implements scale and offset persistence for the tactical world map preventing reset on play. Adds a multi-phase post-landing narrative briefing starting at DialogStep 8 through 12, focusing the camera on the player castle, locking movement and pausing. Programmatically spawns four majestic 3D castles (emerald neon for player, ruby neon for enemy built using Standard/URP-compatible materials) and establishes the interactive Castle Management logic featuring Zenith Glassmorphism UI, passive gold income tick system, military recruitment, shop equipment and espionage.
+- **v18.11.13 Update:** Ground-Focused Camera Clamping - Refactors camera coordinates clamping in StrategicCameraController.cs to mathematically limit the screen's visual center focal point projected on the ground (Y = 0) rather than restricting raw camera coordinates. This solves physical camera locks at high elevations and allows manual limits to perfectly match visual map coordinate dimensions.
+- **v18.11.12 Update:** Dynamic Ocean Occlusion & Quality Synchronization - Integrates auto-active ocean plane hide on Start() and show on DispatchLanding() for dialogue sequence protection; fixes pink standard shader issues in Universal Render Pipeline projects by detecting `M_Ocean_Background` automatically or compiling URP-compatible lit fallbacks; and dynamically scales water glossiness and metallic parameters based on system graphics quality levels (Low, Med, Ultra) loaded from `PlayerPrefs`.
+- **v18.11.11 Update:** Real-Time Bound Locking, Edge Scrolling & Ocean Planes - Integrates strict real-time coordinate constraints in StrategicCameraController.cs with a dynamic AutoFitBounds() system that automatically calculates bounds according to New_Kontinent's mesh, implements mouse-steerable Edge Scrolling, and instantiates an automatic Ocean background Plane with 40x40 UV tiling ready for seamless 8K high-res textures.
 - **v18.11.10 Update:** 4-Zone Spawn Match & Map Sync - Matches indices and names of zones ("Кровавые Пустоши" -> Oasis_SpawnPoint, "Ледяной Пик" -> Outpost_SpawnPoint, "Древние Руины" -> Shore_SpawnPoint, "Святилище Зенита" -> Citadel_SpawnPoint) in LandingPositionManager.cs to match interactive rings and user's customized map catalog. Fixes clipping/clipping depth by placing Ring interactive markers local Z coordinate at -2.0f and companions/heroes at -2.05f to bypass overlapping from any 3D continent textures.
 - **v18.11.9 Update:** Input System Auto-Switch & Camera Rig Calibration - Solves New Input System 999+ Exception errors in StrategicCameraController.cs using smart preprocessor compilation. Calibrates landing point cameraOffset defaults from obsolete 15f height to ideal 2.5f height with auto-correction on startup, and sets crisp strategic min/max zoom limits (0.6f / 8.0f) for full continent overview.
 - **v18.11.8 Update:** 4-Zone Landing Position Auto-Sync & Anchor Persistence - Binds four distinct landing points and automatically synchronizes physical spawn anchors (`Wastes_SpawnPoint`, `Peak_SpawnPoint`, `Ruins_SpawnPoint`, `Crags_SpawnPoint`), securely caching player selection across sessions with persistent PlayerPrefs. Fully masks 3D environments during dialog panels to secure scene purity.
@@ -28,7 +32,7 @@
 - **Audio Rule (CRITICAL):** Используйте только `SettingsManager.cs` для управления звуком и музыкой (включая hover-эффекты и списки воспроизведения). Скрипты `AudioHandler` и `AudioManager` должны быть полностью удалены для чистоты проекта. Музыкальные клипы продлеваются через Suno/Udio и настраиваются на бесшовное зацикливание (`loop = true`). Звуковые файлы берем с Pixabay/Freesound по CC0-лицензии и подключаем напрямую к SettingsManager или через AudioMixer.
 
 ## 🚀 Протокол «Пошаговое Мастерство» (Step-by-Step Mastery)
-1. **Отслеживание прогресса:** Текущая версия v18.11.10 (4-Zone Spawn Match & Map Sync, v18.11.10).
+1. **Отслеживание прогресса:** Текущая версия v18.11.13 (Ground-Focused Camera Clamping, v18.11.13).
 2. **Инструкции Настройки Компонентов (Verified Inspector Settings):**
    - **FateMapManager (FATE_WORLD_MAP):**
      - *Maps List:* [+] Слот для глобальной карты (Map Name = "Континент Судьбы", Map Background = фоновый спрайт карты).

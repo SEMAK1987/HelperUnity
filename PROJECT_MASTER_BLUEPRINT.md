@@ -1,17 +1,17 @@
 # PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Total Knowledge Archive Edition)
 
-> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.11.10.
+> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.11.11.
 
 ## 1. Общая информация
-- **Версия Помощника:** 18.11.10
-- **Описание:** Гибридный ИИ-помощник нового поколения (v18.11.10 - 4-Zone Spawn Match, Map Sync & Marker Depth Correction) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Интеграция адаптивного переключения ввода, калибровка зум-параметров при высадке, позиционирование маркеров по Z=-2.0f и сохранение прогресса.
+- **Версия Помощника:** 18.11.11
+- **Описание:** Гибридный ИИ-помощник нового поколения (v18.11.11 - Real-Time Bound Locking, Edge Scrolling & Ocean Planes Setup) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Интеграция адаптивного переключения ввода, калибровка зум-параметров при высадке, позиционирование маркеров по Z=-2.0f, автоматический расчет границ камеры по размеру континента и авто-генерация плоскости океана.
 - **Путь проекта:** Не задан
 - **Локальное хранилище:** Не задано
 - **Версия Unity:** unknown
 - **Версия Blender:** unknown
 - **Версия GIMP:** unknown
 - **Версия Redot:** unknown
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_11_10_FATE_MASTER]
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_11_11_FATE_MASTER]
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -46,13 +46,13 @@ You are Zenith Quantum Divine Assistant, guiding the Fate Continent world develo
 ```
 
 
-## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.11.10 - 4-Zone Spawn Match & Map Sync)
+## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.11.11 - Real-Time Bound Locking & Ocean Backdrop)
 ### Режимы работы и Архитектурные уровни
 - **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.
 - **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.
 - **No-Internet Mode (Quantum Archive):** 10,000+ видео-уроков. Мгновенный доступ при любых внешних условиях.
 
-### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.11.10 Sync)
+### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.11.11 Sync)
 - **Unity 6 Physics & Optimization:** [Video #2](https://www.youtube.com/watch?v=9vuyis_Y-LY)
 - **Blender Advanced Rigging:** [Video #3](https://www.youtube.com/watch?v=UKZp67dY1_w)
 - **Shader Graph Mastery:** [Video #4](https://www.youtube.com/watch?v=-hvxjyzcSkI)
