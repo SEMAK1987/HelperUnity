@@ -5,9 +5,8 @@ using UnityEngine;
 
 /// <summary>
 /// Разработчик: Fate Continent (Континент Судьбы)
-/// Zenith Glassmorphism Design System (8K Ultra-High Density)
-/// Castle Progression and Income Management System.
-/// Coordinates with SaveGameSystem.CurrentData.gold and persists state.
+/// Zenith Glassmorphism Design System (8K Ultra-High Density) • v18.11.15
+/// Скрипт пошаговой экономики, процедурного 3D-морфинга замков, 2D-города и ИИ-оппонентов.
 /// </summary>
 public class FateCastleManager : MonoBehaviour
 {
@@ -19,21 +18,40 @@ public class FateCastleManager : MonoBehaviour
         public int zoneIndex;
         public string nameRU;
         public string nameEN;
+        public string nameCH;
+        public string nameKR;
         public string owner; // "Player" or "Enemy"
-        public int level = 1; // 1 to 5
+        public int level = 1; // 1 to 6
         public float goldAccumulated;
         [System.NonSerialized] public GameObject visualRoot;
+        
+        // AI commander stats
+        public int aiCommanderLevel = 1;
+        public int aiTroopsPower = 10;
+        public int aiArmorTier = 1;
+        public int aiPotionsStock = 1;
     }
 
     public List<CastleInstance> castles = new List<CastleInstance>();
     
-    // UI Panels tracking
+    // UI states and trackers
+    public bool isTownViewActive = false;
     private bool isDetailsOpen = false;
     private int activeDetailsIndex = -1;
     private string feedbackMessage = "";
     private float messageTimer = 0f;
+    
+    public int currentDay = 1;
 
-    private float passiveIncomeTimer = 0f;
+    // AI notification logs shown during new-day transition
+    private List<string> aiLogs = new List<string>();
+    private bool showNewDayOverlay = false;
+    private float overlayTimer = 0f;
+
+    // Scroll vectors for columns
+    private Vector2 barracksScroll = Vector2.zero;
+    private Vector2 forgeScroll = Vector2.zero;
+    private Vector2 academyScroll = Vector2.zero;
 
     private void Awake()
     {
@@ -53,8 +71,8 @@ public class FateCastleManager : MonoBehaviour
 
     private void Start()
     {
-        // Каждую секунду пассивный доход
-        StartCoroutine(PassiveIncomeRoutine());
+        currentDay = PlayerPrefs.GetInt("Fate_Current_Day", 1);
+        SpawnAllCastles();
     }
 
     private void Update()
@@ -68,17 +86,108 @@ public class FateCastleManager : MonoBehaviour
             }
         }
 
-        // Клик по замкам через луч из камеры
+        if (showNewDayOverlay)
+        {
+            overlayTimer -= Time.deltaTime;
+            if (overlayTimer <= 0f)
+            {
+                showNewDayOverlay = false;
+            }
+        }
+
+        // Raycast click tracking on 3D castle structures
         HandleCastleClicks();
+
+        // High gloss rotations on active landmarks
+        RotateCastleGems();
+    }
+
+    private void HandleCastleClicks()
+    {
+        // Avoid clicking 3D structures if details are open or town view is active
+        if (isTownViewActive || isDetailsOpen || showNewDayOverlay) return;
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (Camera.main != null)
+            {
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit;
+                if (Physics.Raycast(ray, out hit, 150f))
+                {
+                    InteractiveCastle ic = hit.collider.GetComponentInParent<InteractiveCastle>() 
+                                         ?? hit.collider.GetComponent<InteractiveCastle>();
+                    if (ic != null)
+                    {
+                        activeDetailsIndex = ic.zoneIndex;
+                        isDetailsOpen = true;
+                        isTownViewActive = false;
+                        feedbackMessage = "";
+                        Debug.Log($"[CASTLE MGR] Clicked Castle at zone {ic.zoneIndex}");
+                    }
+                }
+            }
+        }
+    }
+
+    private void RotateCastleGems()
+    {
+        for (int i = 0; i < castles.Count; i++)
+        {
+            if (castles[i].visualRoot != null)
+            {
+                Transform spire = castles[i].visualRoot.transform.Find("SpireDiamond");
+                if (spire != null)
+                {
+                    spire.Rotate(Vector3.up, 42f * Time.deltaTime, Space.Self);
+                }
+
+                Transform ring = castles[i].visualRoot.transform.Find("ZenithRing");
+                if (ring != null)
+                {
+                    ring.Rotate(Vector3.up, -28f * Time.deltaTime, Space.Self);
+                    ring.Rotate(Vector3.right, 14f * Time.deltaTime, Space.Self);
+                }
+            }
+        }
+    }
+
+    public int GetUpgradeCost(int currentLevel)
+    {
+        switch (currentLevel)
+        {
+            case 1: return 300;
+            case 2: return 500;
+            case 3: return 1200;
+            case 4: return 2300;
+            case 5: return 4000;
+            default: return 7000;
+        }
+    }
+
+    public int GetGoldIncome(int level)
+    {
+        switch (level)
+        {
+            case 1: return 5;
+            case 2: return 15;
+            case 3: return 35;
+            case 4: return 75;
+            case 5: return 150;
+            case 6: return 280;
+            default: return 5;
+        }
     }
 
     private void InitializeCastleStates()
     {
         castles.Clear();
+        currentDay = PlayerPrefs.GetInt("Fate_Current_Day", 1);
 
-        // 4 зоны нашего континента
         string[] zonesRU = { "Кровавые Пустоши", "Ледяной Пик", "Древние Руины", "Святилище Зенита" };
         string[] zonesEN = { "Crimson Wastes", "Ice-Bound Peak", "Ancient Ruins", "Zenith Sanctuary" };
+        string[] zonesCH = { "血红荒原", "冰封之巅", "古代废墟", "巅峰避难所" };
+        string[] zonesKR = { "붉은 황무지", "얼음 봉우리", "고대 유적지", "제니스 성소" };
 
         for (int i = 0; i < 4; i++)
         {
@@ -87,20 +196,27 @@ public class FateCastleManager : MonoBehaviour
                 zoneIndex = i,
                 nameRU = zonesRU[i],
                 nameEN = zonesEN[i],
+                nameCH = zonesCH[i],
+                nameKR = zonesKR[i],
                 level = PlayerPrefs.GetInt("Castle_Level_" + i, 1),
-                owner = PlayerPrefs.GetString("Castle_Owner_" + i, "Enemy")
+                owner = PlayerPrefs.GetString("Castle_Owner_" + i, i == 0 ? "Player" : "Enemy") // Auto start Player in first zone
             };
+            
+            // Re-load opponent simulated progression
+            castle.aiCommanderLevel = PlayerPrefs.GetInt("Castle_AI_CommanderLvl_" + i, UnityEngine.Random.Range(1, 3));
+            castle.aiTroopsPower = PlayerPrefs.GetInt("Castle_AI_Troops_" + i, UnityEngine.Random.Range(8, 20));
+            castle.aiArmorTier = PlayerPrefs.GetInt("Castle_AI_Armor_" + i, 1);
+            castle.aiPotionsStock = PlayerPrefs.GetInt("Castle_AI_Potions_" + i, UnityEngine.Random.Range(1, 4));
+
             castles.Add(castle);
         }
     }
 
     /// <summary>
-    /// Автоматически спавнит 3D замки на тактической карте
+    /// Автоматический процедурный спавнер 3D замков на тактической карте (Морфинг уровней 1-6)
     /// </summary>
     public void SpawnAllCastles()
     {
-        Debug.Log("<color=#00FFCC>[CASTLE MGR]</color> Генерация 3D объектов замков в тактическом 3D-пространстве...");
-        
         int playerZone = 0;
         if (DialogueSystem_Manager.Instance != null)
         {
@@ -110,7 +226,7 @@ public class FateCastleManager : MonoBehaviour
         LandingPositionManager lpm = LandingPositionManager.Instance;
         if (lpm == null)
         {
-            Debug.LogError("[CASTLE MGR] LandingPositionManager не найден. Не могу спавнить замки!");
+            Debug.LogWarning("[CASTLE MGR] LandingPositionManager не найден. Пропуск 3D спавна.");
             return;
         }
 
@@ -118,7 +234,7 @@ public class FateCastleManager : MonoBehaviour
         {
             CastleInstance castle = castles[i];
             
-            // Если игрок выбрал эту точку в качестве точки высадки, замок принадлежит ему!
+            // Синхронизация роли
             if (i == playerZone)
             {
                 castle.owner = "Player";
@@ -127,12 +243,9 @@ public class FateCastleManager : MonoBehaviour
             {
                 castle.owner = "Enemy";
             }
-
-            // Пересохраняем владельца
             PlayerPrefs.SetString("Castle_Owner_" + i, castle.owner);
             PlayerPrefs.Save();
 
-            // Если visual уже создан, уничтожаем старый перед повторным созданием
             if (castle.visualRoot != null)
             {
                 Destroy(castle.visualRoot);
@@ -144,382 +257,693 @@ public class FateCastleManager : MonoBehaviour
             }
 
             Transform anchor = lpm.landingPoints[i].spawnAnchor;
+            Vector3 spawnPos = anchor.position + new Vector3(3.2f, 0f, 3.2f);
             
-            // Спавним замок с небольшим смещением, чтобы он стоял красивой ратушей рядом с лагерем высадки героя!
-            Vector3 spawnPos = anchor.position + new Vector3(2.5f, 0f, 2.5f);
-            
-            // Находим высоту террейна, чтобы замок не парил
+            // Проецирование на террейн заземленно
             RaycastHit hit;
             if (Physics.Raycast(spawnPos + Vector3.up * 50f, Vector3.down, out hit, 100f))
             {
                 spawnPos.y = hit.point.y;
             }
 
-            // Создаем корневой объект
-            GameObject root = new GameObject("Castle_" + i);
+            GameObject root = new GameObject("3D_Castle_" + i);
             root.transform.position = spawnPos;
             root.transform.rotation = Quaternion.identity;
 
-            // Навешиваем скрипт клика
             InteractiveCastle ic = root.AddComponent<InteractiveCastle>();
             ic.zoneIndex = i;
 
-            // Навешиваем BoxCollider на корень всей композиции
             BoxCollider col = root.AddComponent<BoxCollider>();
-            col.center = new Vector3(0f, 1.25f, 0f);
-            col.size = new Vector3(2.2f, 3.0f, 2.2f);
+            col.center = new Vector3(0f, 2.5f, 0f);
+            col.size = new Vector3(4.5f, 6.0f, 4.5f);
 
-            // Безопасно настраиваем совместимый шейдер без "розового" материала
             Shader urpShader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("URP/Lit") ?? Shader.Find("Standard");
             Material castleMat = new Material(urpShader);
-            
-            // Игрок - сочно изумрудный неон, Враг - глубокий неоновый рубин
-            if (castle.owner == "Player")
+            castleMat.color = castle.owner == "Player" ? new Color(0.12f, 0.88f, 0.45f, 1.0f) : new Color(0.92f, 0.12f, 0.28f, 1.0f);
+
+            if (castleMat.HasProperty("_Glossiness")) castleMat.SetFloat("_Glossiness", 0.7f);
+            if (castleMat.HasProperty("_Smoothness")) castleMat.SetFloat("_Smoothness", 0.7f);
+            if (castleMat.HasProperty("_Metallic")) castleMat.SetFloat("_Metallic", 0.45f);
+
+            // МОРФИНГ ФОРМ в зависимости от Уровня (1 - 6)
+            if (castle.level == 1)
             {
-                castleMat.color = new Color(0.1f, 0.9f, 0.4f, 1.0f);
+                // LEVEL 1: Одиночный форпост (Один квадратный блок с малой башней)
+                GameObject fort = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Destroy(fort.GetComponent<BoxCollider>());
+                fort.transform.SetParent(root.transform);
+                fort.transform.localPosition = new Vector3(0f, 0.8f, 0f);
+                fort.transform.localScale = new Vector3(1.1f, 1.6f, 1.1f);
+                fort.GetComponent<Renderer>().material = castleMat;
+
+                GameObject crown = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Destroy(crown.GetComponent<BoxCollider>());
+                crown.transform.SetParent(root.transform);
+                crown.transform.localPosition = new Vector3(0f, 1.75f, 0f);
+                crown.transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
+                crown.GetComponent<Renderer>().material = castleMat;
+            }
+            else if (castle.level == 2)
+            {
+                // LEVEL 2: Укреплённый донжон (2 боковые стены и центральный шпиль)
+                GameObject keep = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Destroy(keep.GetComponent<BoxCollider>());
+                keep.transform.SetParent(root.transform);
+                keep.transform.localPosition = new Vector3(0f, 1.4f, 0f);
+                keep.transform.localScale = new Vector3(1.4f, 2.8f, 1.4f);
+                keep.GetComponent<Renderer>().material = castleMat;
+
+                float offset = 0.75f;
+                for (float z = -offset; z <= offset; z += offset * 2)
+                {
+                    GameObject w = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    Destroy(w.GetComponent<BoxCollider>());
+                    w.transform.SetParent(root.transform);
+                    w.transform.localPosition = new Vector3(0f, 0.7f, z);
+                    w.transform.localScale = new Vector3(0.5f, 1.4f, 0.5f);
+                    w.GetComponent<Renderer>().material = castleMat;
+                }
+            }
+            else if (castle.level == 3)
+            {
+                // LEVEL 3: Мифриловая крепость (Квадратный мощный бастион с угловыми башнями)
+                GameObject baseBlock = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Destroy(baseBlock.GetComponent<BoxCollider>());
+                baseBlock.transform.SetParent(root.transform);
+                baseBlock.transform.localPosition = new Vector3(0f, 1.0f, 0f);
+                baseBlock.transform.localScale = new Vector3(2.1f, 2.0f, 2.1f);
+                baseBlock.GetComponent<Renderer>().material = castleMat;
+
+                float off = 0.95f;
+                for (float x = -off; x <= off; x += off * 2)
+                {
+                    for (float z = -off; z <= off; z += off * 2)
+                    {
+                        GameObject colTower = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                        Destroy(colTower.GetComponent<BoxCollider>());
+                        colTower.transform.SetParent(root.transform);
+                        colTower.transform.localPosition = new Vector3(x, 1.5f, z);
+                        colTower.transform.localScale = new Vector3(0.5f, 3.0f, 0.5f);
+                        colTower.GetComponent<Renderer>().material = castleMat;
+                    }
+                }
+            }
+            else if (castle.level == 4)
+            {
+                // LEVEL 4: Облачный бастион (Двухъярусная цитадель, боковые пристройки и эммисионный энергетический кристалл)
+                GameObject bodyLower = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Destroy(bodyLower.GetComponent<BoxCollider>());
+                bodyLower.transform.SetParent(root.transform);
+                bodyLower.transform.localPosition = new Vector3(0f, 1.2f, 0f);
+                bodyLower.transform.localScale = new Vector3(2.5f, 2.4f, 1.8f);
+                bodyLower.GetComponent<Renderer>().material = castleMat;
+
+                GameObject coreTower = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Destroy(coreTower.GetComponent<BoxCollider>());
+                coreTower.transform.SetParent(root.transform);
+                coreTower.transform.localPosition = new Vector3(0f, 3.2f, 0f);
+                coreTower.transform.localScale = new Vector3(1.1f, 2.2f, 1.1f);
+                coreTower.GetComponent<Renderer>().material = castleMat;
+
+                // Glowing core spire
+                Material glowingMat = new Material(urpShader);
+                glowingMat.color = castle.owner == "Player" ? new Color(0.1f, 0.9f, 1.0f, 1.0f) : new Color(1.0f, 0.2f, 0.1f, 1.0f);
+                if (glowingMat.HasProperty("_EmissionColor")) glowingMat.SetColor("_EmissionColor", glowingMat.color * 3.0f);
+
+                GameObject spireDiamond = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                spireDiamond.name = "SpireDiamond";
+                Destroy(spireDiamond.GetComponent<BoxCollider>());
+                spireDiamond.transform.SetParent(root.transform);
+                spireDiamond.transform.localPosition = new Vector3(0f, 4.5f, 0f);
+                spireDiamond.transform.localScale = new Vector3(0.4f, 0.7f, 0.4f);
+                spireDiamond.transform.localRotation = Quaternion.Euler(45f, 45f, 45f);
+                spireDiamond.GetComponent<Renderer>().material = glowingMat;
+            }
+            else if (castle.level == 5)
+            {
+                // LEVEL 5: Имперская твердыня (Парящие платформы, огромные донжоны, монументальные парапеты)
+                GameObject structure = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Destroy(structure.GetComponent<BoxCollider>());
+                structure.transform.SetParent(root.transform);
+                structure.transform.localPosition = new Vector3(0f, 1.5f, 0f);
+                structure.transform.localScale = new Vector3(2.8f, 3.0f, 2.8f);
+                structure.GetComponent<Renderer>().material = castleMat;
+
+                GameObject highKeep = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Destroy(highKeep.GetComponent<BoxCollider>());
+                highKeep.transform.SetParent(root.transform);
+                highKeep.transform.localPosition = new Vector3(0f, 4.1f, 0f);
+                highKeep.transform.localScale = new Vector3(1.3f, 2.5f, 1.3f);
+                highKeep.GetComponent<Renderer>().material = castleMat;
+
+                // Flanking barriers
+                float offset = 1.7f;
+                GameObject lWall = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Destroy(lWall.GetComponent<BoxCollider>());
+                lWall.transform.SetParent(root.transform);
+                lWall.transform.localPosition = new Vector3(-offset, 1.0f, 0f);
+                lWall.transform.localScale = new Vector3(0.8f, 2.0f, 0.8f);
+                lWall.GetComponent<Renderer>().material = castleMat;
+
+                GameObject rWall = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Destroy(rWall.GetComponent<BoxCollider>());
+                rWall.transform.SetParent(root.transform);
+                rWall.transform.localPosition = new Vector3(offset, 1.0f, 0f);
+                rWall.transform.localScale = new Vector3(0.8f, 2.0f, 0.8f);
+                rWall.GetComponent<Renderer>().material = castleMat;
+
+                Material coreMat = new Material(urpShader);
+                coreMat.color = castle.owner == "Player" ? new Color(1.0f, 0.8f, 0.1f, 1.0f) : new Color(0.9f, 0.1f, 0.5f, 1.0f);
+                if (coreMat.HasProperty("_EmissionColor")) coreMat.SetColor("_EmissionColor", coreMat.color * 4.0f);
+
+                GameObject spireDiamond = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                spireDiamond.name = "SpireDiamond";
+                Destroy(spireDiamond.GetComponent<BoxCollider>());
+                spireDiamond.transform.SetParent(root.transform);
+                spireDiamond.transform.localPosition = new Vector3(0f, 5.6f, 0f);
+                spireDiamond.transform.localScale = new Vector3(0.5f, 0.9f, 0.5f);
+                spireDiamond.transform.localRotation = Quaternion.Euler(30f, 45f, 30f);
+                spireDiamond.GetComponent<Renderer>().material = coreMat;
             }
             else
             {
-                castleMat.color = new Color(0.9f, 0.1f, 0.3f, 1.0f);
+                // LEVEL 6: Легендарная Цитадель Зенита (Парящие защитные кольца, многоуровневая структура, супер-излучение)
+                GameObject comp = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Destroy(comp.GetComponent<BoxCollider>());
+                comp.transform.SetParent(root.transform);
+                comp.transform.localPosition = new Vector3(0f, 2.0f, 0f);
+                comp.transform.localScale = new Vector3(3.2f, 4.0f, 3.2f);
+                comp.GetComponent<Renderer>().material = castleMat;
+
+                // Twin massive peak wings
+                GameObject pk1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Destroy(pk1.GetComponent<BoxCollider>());
+                pk1.transform.SetParent(root.transform);
+                pk1.transform.localPosition = new Vector3(-0.9f, 5.2f, 0f);
+                pk1.transform.localScale = new Vector3(0.7f, 3.2f, 0.7f);
+                pk1.GetComponent<Renderer>().material = castleMat;
+
+                GameObject pk2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Destroy(pk2.GetComponent<BoxCollider>());
+                pk2.transform.SetParent(root.transform);
+                pk2.transform.localPosition = new Vector3(0.9f, 5.2f, 0f);
+                pk2.transform.localScale = new Vector3(0.7f, 3.2f, 0.7f);
+                pk2.GetComponent<Renderer>().material = castleMat;
+
+                // Zenith Protection Aegis Sphere
+                GameObject zenithRing = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                zenithRing.name = "ZenithRing";
+                Destroy(zenithRing.GetComponent<BoxCollider>());
+                zenithRing.transform.SetParent(root.transform);
+                zenithRing.transform.localPosition = new Vector3(0f, 7.2f, 0f);
+                zenithRing.transform.localScale = new Vector3(2.4f, 0.2f, 2.4f);
+
+                Material ringMat = new Material(urpShader);
+                ringMat.color = castle.owner == "Player" ? new Color(0.1f, 1.0f, 1.0f, 1.0f) : new Color(1.0f, 0.1f, 0.4f, 1.0f);
+                if (ringMat.HasProperty("_EmissionColor")) ringMat.SetColor("_EmissionColor", ringMat.color * 4.5f);
+                zenithRing.GetComponent<Renderer>().material = ringMat;
+
+                // Central high diamond
+                GameObject spireDiamond = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                spireDiamond.name = "SpireDiamond";
+                Destroy(spireDiamond.GetComponent<BoxCollider>());
+                spireDiamond.transform.SetParent(root.transform);
+                spireDiamond.transform.localPosition = new Vector3(0f, 7.2f, 0f);
+                spireDiamond.transform.localScale = new Vector3(0.6f, 1.2f, 0.6f);
+                spireDiamond.GetComponent<Renderer>().material = ringMat;
+
+                // Flanking side-annex blocks for grandeur size
+                GameObject leftA = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Destroy(leftA.GetComponent<BoxCollider>());
+                leftA.transform.SetParent(root.transform);
+                leftA.transform.localPosition = new Vector3(-2.5f, 1.2f, 0f);
+                leftA.transform.localScale = new Vector3(1.5f, 2.4f, 1.5f);
+                leftA.GetComponent<Renderer>().material = castleMat;
+
+                GameObject rightA = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Destroy(rightA.GetComponent<BoxCollider>());
+                rightA.transform.SetParent(root.transform);
+                rightA.transform.localPosition = new Vector3(2.5f, 1.2f, 0f);
+                rightA.transform.localScale = new Vector3(1.5f, 2.4f, 1.5f);
+                rightA.GetComponent<Renderer>().material = castleMat;
             }
-
-            if (castleMat.HasProperty("_Glossiness")) castleMat.SetFloat("_Glossiness", 0.6f);
-            if (castleMat.HasProperty("_Smoothness")) castleMat.SetFloat("_Smoothness", 0.6f);
-            if (castleMat.HasProperty("_Metallic")) castleMat.SetFloat("_Metallic", 0.3f);
-
-            // 1. Центральная Квадратная Башня
-            GameObject tower = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            Destroy(tower.GetComponent<BoxCollider>()); // Убираем лишние коллайдеры
-            tower.transform.SetParent(root.transform);
-            tower.transform.localPosition = new Vector3(0f, 1.25f, 0f);
-            tower.transform.localScale = new Vector3(0.9f, 2.5f, 0.9f);
-            tower.GetComponent<Renderer>().material = castleMat;
-
-            // 2. Четыре угловые оборонительные колонны для величия
-            float offset = 0.55f;
-            for (float ox = -offset; ox <= offset; ox += offset * 2)
-            {
-                for (float oz = -offset; oz <= offset; oz += offset * 2)
-                {
-                    GameObject pillar = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    Destroy(pillar.GetComponent<BoxCollider>());
-                    pillar.transform.SetParent(root.transform);
-                    pillar.transform.localPosition = new Vector3(ox, 0.8f, oz);
-                    pillar.transform.localScale = new Vector3(0.40f, 1.6f, 0.40f);
-                    pillar.GetComponent<Renderer>().material = castleMat;
-                }
-            }
-
-            // 3. Неоновая светящаяся Корона / Цитадель на верхушке башни
-            GameObject crown = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            Destroy(crown.GetComponent<BoxCollider>());
-            crown.transform.SetParent(root.transform);
-            crown.transform.localPosition = new Vector3(0f, 2.75f, 0f);
-            crown.transform.localScale = new Vector3(0.35f, 0.35f, 0.35f);
-            
-            Material crownMat = new Material(urpShader);
-            crownMat.color = castle.owner == "Player" ? new Color(0.5f, 1.0f, 0.6f, 1.0f) : new Color(1.0f, 0.6f, 0.7f, 1.0f);
-            if (crownMat.HasProperty("_EmissionColor")) crownMat.SetColor("_EmissionColor", crownMat.color * 2.0f);
-            crown.GetComponent<Renderer>().material = crownMat;
 
             castle.visualRoot = root;
         }
     }
 
-    private void HandleCastleClicks()
+    /// <summary>
+    /// ПОШАГОВОЕ ЗАВЕРШЕНИЕ ДНЯ (End Turn / Пропустить ход)
+    /// </summary>
+    public void AdvanceDay()
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            // Проверка: клик поверх UI исключается во избежание закрытия по клику
-            if (UnityEngine.EventSystems.EventSystem.current != null && 
-                UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
-            {
-                return;
-            }
+        currentDay++;
+        PlayerPrefs.SetInt("Fate_Current_Day", currentDay);
+        PlayerPrefs.Save();
 
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, 500f))
+        aiLogs.Clear();
+
+        // 1. Пополнение кошелька за счёт принадлежащих игроку территорий
+        int totalIncome = 0;
+        for (int i = 0; i < castles.Count; i++)
+        {
+            if (castles[i].owner == "Player")
             {
-                InteractiveCastle clicked = hit.collider.GetComponentInParent<InteractiveCastle>();
-                if (clicked != null)
-                {
-                    OpenCastleDetails(clicked.zoneIndex);
-                }
+                totalIncome += GetGoldIncome(castles[i].level);
             }
         }
+        SaveGameSystem.CurrentData.gold += totalIncome;
+
+        // 2. АВТОМАТИЧЕСКАЯ ИУ-СИМУЛЯЦИЯ (Действия Лордов компьютера в зависимости от сложности)
+        int diff = SaveGameSystem.CurrentData.selectedDifficulty; // 0: Easy, 1: Med, 2: Hard, 3: Nightmare, 4: Hell
+        
+        for (int i = 0; i < castles.Count; i++)
+        {
+            CastleInstance c = castles[i];
+            if (c.owner == "Enemy")
+            {
+                // Начисление золота ИИ
+                int aiIncome = GetGoldIncome(c.level);
+                float diffMultiplier = 1.0f + (diff * 0.4f); // Чем выше сложность, тем больше золота у ИИ
+                c.goldAccumulated += aiIncome * diffMultiplier;
+
+                // Логические вероятности прокачек компьютера на ход
+                float upgradeChance = 0.15f + (diff * 0.20f); 
+                float recruitChance = 0.25f + (diff * 0.15f);
+                float equipmentChance = 0.20f + (diff * 0.12f);
+
+                // А. Попытка улучшения замка компьютером
+                if (c.level < 6 && c.goldAccumulated >= GetUpgradeCost(c.level) && UnityEngine.Random.value < upgradeChance)
+                {
+                    c.goldAccumulated -= GetUpgradeCost(c.level);
+                    c.level++;
+                    PlayerPrefs.SetInt("Castle_Level_" + i, c.level);
+                    
+                    string upLog = Translator.LanguageID == 0 ? 
+                        $"🛡️ [{c.nameRU}] Вражеский Лорд улучшил цитадель до {c.level} уровня!" :
+                        $"🛡️ [{c.nameEN}] Enemy Lord upgraded fortress to Level {c.level}!";
+                    if (Translator.LanguageID == 8) upLog = $"🛡️ [{c.nameCH}] 敌方领主将主城升级至第 {c.level} 级！";
+                    if (Translator.LanguageID == 7) upLog = $"🛡️ [{c.nameKR}] 적 군주가 요새를 {c.level}단계로 강화했습니다!";
+                    
+                    aiLogs.Add(upLog);
+                }
+
+                // Б. Вербовка войск компьютером в гарнизон
+                if (UnityEngine.Random.value < recruitChance)
+                {
+                    int troopGain = UnityEngine.Random.Range(5, 12) + (diff * 4);
+                    c.aiTroopsPower += troopGain;
+                    PlayerPrefs.SetInt("Castle_AI_Troops_" + i, c.aiTroopsPower);
+
+                    string trLog = Translator.LanguageID == 0 ?
+                        $"⚔️ [{c.nameRU}] Силы гарнизона усилены ветеранами (+{troopGain} боевая мощь)." :
+                        $"⚔️ [{c.nameEN}] Garrison defenses reinforced (+{troopGain} combat power).";
+                    if (Translator.LanguageID == 8) trLog = $"⚔️ [{c.nameCH}] 守军获得精锐部队增援（+{troopGain} 战斗力）。";
+                    if (Translator.LanguageID == 7) trLog = $"⚔️ [{c.nameKR}] 수비 대열에 숙련병 훈련 완료 소집 (+{troopGain} 전투 성능).";
+
+                    aiLogs.Add(trLog);
+                }
+
+                // В. Закупка снаряжения и раздача ИИ героям (Формула зависимости)
+                if (c.aiArmorTier < 6 && UnityEngine.Random.value < equipmentChance)
+                {
+                    c.aiArmorTier++;
+                    PlayerPrefs.SetInt("Castle_AI_Armor_" + i, c.aiArmorTier);
+
+                    string armorNameRU = GetEquipmentTierName(c.aiArmorTier, 0);
+                    string armorNameEN = GetEquipmentTierName(c.aiArmorTier, 1);
+
+                    string eqLog = Translator.LanguageID == 0 ?
+                        $"🛡️ Вражеский полководец в [{c.nameRU}] экипирован: {armorNameRU}!" :
+                        $"🛡️ Enemy commander in [{c.nameEN}] equipped: {armorNameEN}!";
+                    if (Translator.LanguageID == 8) eqLog = $"🛡️ 在 [{c.nameCH}] 的敌方军官装备了新的防具：{GetEquipmentTierName(c.aiArmorTier, 8)}！";
+                    if (Translator.LanguageID == 7) eqLog = $"🛡️ [{c.nameKR}] 의 적 지휘관이 중갑 보급품 {GetEquipmentTierName(c.aiArmorTier, 7)}을(를) 수령 및 무장했습니다!";
+
+                    aiLogs.Add(eqLog);
+                }
+
+                // Г. Покупка зелий и их применение
+                if (UnityEngine.Random.value < 0.4f)
+                {
+                    c.aiPotionsStock += UnityEngine.Random.Range(1, 3);
+                    PlayerPrefs.SetInt("Castle_AI_Potions_" + i, c.aiPotionsStock);
+                }
+
+                // Д. Прогресс прокачки уровней воинов ИИ
+                c.aiCommanderLevel += UnityEngine.Random.value < (0.3f + diff * 0.1f) ? 1 : 0;
+                PlayerPrefs.SetInt("Castle_AI_CommanderLvl_" + i, c.aiCommanderLevel);
+            }
+        }
+
+        PlayerPrefs.Save();
+
+        // Пересоздаем визуал, чтобы отразить процедурный морфинг для крепостей ИИ
+        SpawnAllCastles();
+
+        // 3. Вызов наглядного системного отчета
+        showNewDayOverlay = true;
+        overlayTimer = 5.5f;
+
+        string finishMsg = Translator.LanguageID == 0 ? 
+            $"Пассивный доход зачислен! Доход: +{totalIncome} 💰. Начался День {currentDay}." : 
+            $"Passive taxes received! Gold flow: +{totalIncome} 💰. Day {currentDay} has arisen!";
+        if (Translator.LanguageID == 8) finishMsg = $"已发放财富岁入！税税金所得：+{totalIncome} 💰。第 {currentDay} 天开始。";
+        if (Translator.LanguageID == 7) finishMsg = $"자원 획득 완료! 이자 배당금: +{totalIncome} 💰. 제 {currentDay} 일이 되었습니다.";
+
+        ShowFeedback(finishMsg);
     }
 
-    public void OpenCastleDetails(int index)
+    private string GetEquipmentTierName(int tier, int lang)
     {
-        if (index >= 0 && index < castles.Count)
-        {
-            activeDetailsIndex = index;
-            isDetailsOpen = true;
-            feedbackMessage = "";
-            Debug.Log($"[CASTLE MGR] Открыты детали замка зоны {index}: {castles[index].nameRU}");
-        }
-    }
+        string[][] names = new string[][] {
+            new string[] { "Бронзовая броня", "Стальной комплект", "Мифриловое вооружение", "Кристальные пластины", "Звездный доспех эгиды", "Легендарный Сет Зенита" },
+            new string[] { "Bronze Aegis", "Iron Garrison Gear", "Mithril Greatplates", "Crystalline Platemail", "Star-Forged Sentinel", "Legendary Zenith Crest" },
+            new string[] { "青铜卫士半身护铠", "强化精制钢重型甲", "秘银高密晶刃防具", "水晶雕琢流光束装", "铸星不灭光环御盾", "巅峰至尊神格圣甲" },
+            new string[] { "청동 에이전트 아머", "강철 가리슨 장비", "미스릴 중장 대갑옷", "크리스탈 유광 플레이트", "정련된 별의 구도자", "전설의 제니스 신성 세트" }
+        };
 
-    private IEnumerator PassiveIncomeRoutine()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(1.0f);
+        int idx = Mathf.Clamp(tier - 1, 0, 5);
+        int langIdx = 1; // Default EN
+        if (lang == 0) langIdx = 0;
+        if (lang == 8) langIdx = 2;
+        if (lang == 7) langIdx = 3;
 
-            // Каждую секунду вычисляем доход со всех принадлежащих игроку замков
-            int income = 0;
-            for (int i = 0; i < castles.Count; i++)
-            {
-                if (castles[i].owner == "Player")
-                {
-                    // Level 1 = 5 gold/sec, Level 2 = 15 gold/sec
-                    income += castles[i].level == 1 ? 5 : 15;
-                }
-            }
-
-            if (income > 0)
-            {
-                SaveGameSystem.CurrentData.gold += income;
-            }
-        }
+        return names[langIdx][idx];
     }
 
     private void ShowFeedback(string msg)
     {
         feedbackMessage = msg;
-        messageTimer = 3.5f;
+        messageTimer = 4.0f;
     }
 
     private void OnGUI()
     {
-        // 1. Постоянный красивый индикатор кошелька Золота в верхнем правом углу
         int curLang = Translator.LanguageID;
-        string goldText = curLang == 0 ? "Золото: " : "Gold: ";
-        if (curLang == 8) goldText = "金币: ";
-        if (curLang == 7) goldText = "골드: ";
 
-        GUIStyle goldStyle = new GUIStyle(GUI.skin.box);
-        goldStyle.fontSize = 17;
-        goldStyle.fontStyle = FontStyle.Bold;
-        goldStyle.normal.textColor = new Color(1.0f, 0.85f, 0.1f, 1.0f); // Насыщенный золотой
-        goldStyle.alignment = TextAnchor.MiddleCenter;
+        // Если активен 2D вид города, рисуем его во весь экран
+        if (isTownViewActive)
+        {
+            DrawTownViewGUI(curLang);
+            return;
+        }
 
-        GUI.Box(new Rect(Screen.width - 230f, 20f, 210f, 45f), $"💰 {goldText}{SaveGameSystem.CurrentData.gold}", goldStyle);
+        // РИСОВАНИЕ НА ТАКТИЧЕСКОЙ КАРТЕ
+        // 1. Кошелек золота в верхнем правом углу
+        string goldText = curLang == 0 ? "Казна: " : "Treasury: ";
+        if (curLang == 8) goldText = "国库金币: ";
+        if (curLang == 7) goldText = "소지금: ";
 
-        // 2. Окно деталей выбранного замка
+        GUIStyle walletStyle = new GUIStyle(GUI.skin.box);
+        walletStyle.fontSize = 16;
+        walletStyle.fontStyle = FontStyle.Bold;
+        walletStyle.normal.textColor = new Color(1.0f, 0.84f, 0.0f, 1.0f);
+        walletStyle.alignment = TextAnchor.MiddleCenter;
+
+        GUI.Box(new Rect(Screen.width - 240f, 20f, 220f, 42f), $"💰 {goldText}{SaveGameSystem.CurrentData.gold}", walletStyle);
+
+        // 2. Индикатор Дня
+        string dayLabel = curLang == 0 ? "День: " : "Day: ";
+        if (curLang == 8) dayLabel = "当前天数: ";
+        if (curLang == 7) dayLabel = "일차: ";
+
+        GUIStyle dStyle = new GUIStyle(GUI.skin.box);
+        dStyle.fontSize = 14;
+        dStyle.fontStyle = FontStyle.Bold;
+        dStyle.normal.textColor = new Color(0.12f, 0.88f, 1.0f, 1.0f);
+        dStyle.alignment = TextAnchor.MiddleCenter;
+
+        GUI.Box(new Rect(Screen.width - 240f, 65f, 220f, 38f), $"📅 {dayLabel}{currentDay}", dStyle);
+
+        // 3. Кнопка "Пропустить ход" UI
+        string nextDayBtnText = curLang == 0 ? "ПРОПУСТИТЬ ХОД" : "END TURN";
+        if (curLang == 8) nextDayBtnText = "结束回合";
+        if (curLang == 7) nextDayBtnText = "턴 넘기기";
+
+        GUIStyle nextDayStyle = new GUIStyle(GUI.skin.button);
+        nextDayStyle.fontSize = 13;
+        nextDayStyle.fontStyle = FontStyle.Bold;
+        nextDayStyle.normal.textColor = Color.white;
+        nextDayStyle.alignment = TextAnchor.MiddleCenter;
+
+        GUI.backgroundColor = new Color(0.1f, 0.65f, 0.95f, 1.0f);
+        if (GUI.Button(new Rect(Screen.width - 240f, 107f, 220f, 44f), $"▶ {nextDayBtnText}", nextDayStyle))
+        {
+            AdvanceDay();
+        }
+        GUI.backgroundColor = Color.white;
+
+        // Overlay нового дня (ИИ отчеты)
+        if (showNewDayOverlay)
+        {
+            DrawNewDayOverlay(curLang);
+        }
+
+        // Окно настроек деталей
         if (!isDetailsOpen || activeDetailsIndex < 0 || activeDetailsIndex >= castles.Count) return;
 
+        DrawDetailsWindow(curLang);
+    }
+
+    private void DrawNewDayOverlay(int curLang)
+    {
+        float wWidth = Screen.width * 0.55f;
+        float wHeight = Screen.height * 0.60f;
+        float wx = (Screen.width - wWidth) / 2f;
+        float wy = (Screen.height - wHeight) / 2f;
+
+        GUI.backgroundColor = new Color(0.02f, 0.05f, 0.12f, 0.99f);
+        GUILayout.BeginArea(new Rect(wx, wy, wWidth, wHeight), GUI.skin.box);
+        
+        GUILayout.Space(12);
+        GUIStyle tStyle = new GUIStyle(GUI.skin.label);
+        tStyle.alignment = TextAnchor.MiddleCenter;
+        tStyle.fontSize = 24;
+        tStyle.fontStyle = FontStyle.Bold;
+        tStyle.normal.textColor = Color.cyan;
+
+        string repHeader = curLang == 0 ? "ОТЧЕТ КОНТИНЕНТА СУДЬБЫ" : "REPORT OF THE FATE CONTINENT";
+        if (curLang == 8) repHeader = "命运大陆军事汇报总览";
+        if (curLang == 7) repHeader = "운명의 대륙 군사 정찰 보고서";
+        GUILayout.Label($"📅 {repHeader} (День {currentDay})", tStyle);
+
+        GUILayout.Space(15);
+
+        GUIStyle itemStyle = new GUIStyle(GUI.skin.label);
+        itemStyle.fontSize = 14;
+        itemStyle.alignment = TextAnchor.MiddleLeft;
+        itemStyle.normal.textColor = new Color(0.95f, 0.95f, 0.95f);
+
+        GUILayout.Label(curLang == 0 ? "События на континенте во время смены хода:" : "Actions taken by rival factions during overnight transition:", itemStyle);
+        GUILayout.Space(8);
+
+        if (aiLogs.Count == 0)
+        {
+            GUILayout.Label(curLang == 0 ? "• Спокойный ход времени. Активных конфликтов не обнаружено." : "• Tranquil hours. No unexpected border development or assaults reported.", itemStyle);
+        }
+        else
+        {
+            for (int i = 0; i < aiLogs.Count; i++)
+            {
+                GUILayout.Label($"• {aiLogs[i]}", itemStyle);
+            }
+        }
+
+        GUILayout.FlexibleSpace();
+
+        GUI.backgroundColor = new Color(0.12f, 0.88f, 0.45f, 1.0f);
+        string contBtnLabel = curLang == 0 ? "ПРИНЯТЬ ОТЧЕТ" : "ACKNOWLEDGE REPORT";
+        if (curLang == 8) contBtnLabel = "阅览并关闭汇报";
+        if (curLang == 7) contBtnLabel = "정찰 보고서 확인";
+
+        if (GUILayout.Button(contBtnLabel, GUILayout.Height(40)))
+        {
+            showNewDayOverlay = false;
+        }
+        GUI.backgroundColor = Color.white;
+
+        GUILayout.Space(12);
+        GUILayout.EndArea();
+    }
+
+    private void DrawDetailsWindow(int curLang)
+    {
         CastleInstance castle = castles[activeDetailsIndex];
 
-        // ZENITH GLASSMORPHISM PANEL LAYOUT
-        float panelWidth = 470f;
-        float panelHeight = 490f;
+        float panelWidth = 485f;
+        float panelHeight = 540f;
         float px = (Screen.width - panelWidth) / 2f;
         float py = (Screen.height - panelHeight) / 2f;
 
-        // Фон панели
-        GUI.backgroundColor = new Color(0.04f, 0.08f, 0.2f, 0.98f);
+        GUI.backgroundColor = new Color(0.04f, 0.08f, 0.22f, 0.98f);
+        
         GUIStyle windowStyle = new GUIStyle(GUI.skin.window);
-        windowStyle.normal.textColor = Color.white;
-        windowStyle.fontSize = 16;
+        windowStyle.fontSize = 15;
         windowStyle.fontStyle = FontStyle.Bold;
 
-        string windowHeader = curLang == 0 ? "Управление Замком" : "Castle Stronghold";
-        if (curLang == 8) windowHeader = "城堡大厅";
-        if (curLang == 7) windowHeader = "성채 관리실";
+        string detailsTitle = curLang == 0 ? "Панель Информации" : "Citadel Interface";
+        if (curLang == 8) detailsTitle = "内政控制枢纽";
+        if (curLang == 7) detailsTitle = "성채 제어 장치";
 
-        GUI.Window(99, new Rect(px, py, panelWidth, panelHeight), WindowFunction, windowHeader, windowStyle);
+        GUI.Window(100, new Rect(px, py, panelWidth, panelHeight), DetailsWindowFunction, detailsTitle, windowStyle);
     }
 
-    private void WindowFunction(int windowID)
+    private void DetailsWindowFunction(int windowID)
     {
         int curLang = Translator.LanguageID;
         CastleInstance castle = castles[activeDetailsIndex];
 
-        // Стили текста
-        GUIStyle nameStyle = new GUIStyle(GUI.skin.label);
-        nameStyle.alignment = TextAnchor.MiddleCenter;
-        nameStyle.fontSize = 20;
-        nameStyle.fontStyle = FontStyle.Bold;
-        nameStyle.normal.textColor = castle.owner == "Player" ? new Color(0.2f, 1.0f, 0.6f) : new Color(1.0f, 0.3f, 0.4f);
+        GUIStyle titleS = new GUIStyle(GUI.skin.label);
+        titleS.alignment = TextAnchor.MiddleCenter;
+        titleS.fontSize = 20;
+        titleS.fontStyle = FontStyle.Bold;
+        titleS.normal.textColor = castle.owner == "Player" ? new Color(0.2f, 1.0f, 0.6f) : new Color(1.0f, 0.3f, 0.4f);
 
         string labelName = curLang == 0 ? castle.nameRU : castle.nameEN;
-        GUILayout.Label($"🏰 {labelName.ToUpper()}", nameStyle);
+        if (curLang == 8) labelName = castle.nameCH;
+        if (curLang == 7) labelName = castle.nameKR;
 
-        GUIStyle infoStyle = new GUIStyle(GUI.skin.label);
-        infoStyle.alignment = TextAnchor.MiddleCenter;
-        infoStyle.fontSize = 14;
-        infoStyle.normal.textColor = Color.gray;
+        GUILayout.Label($"🏰 {labelName.ToUpper()}", titleS);
+
+        GUIStyle subSt = new GUIStyle(GUI.skin.label);
+        subSt.alignment = TextAnchor.MiddleCenter;
+        subSt.fontSize = 13;
+        subSt.normal.textColor = Color.gray;
 
         string ownerTxt = castle.owner == "Player" ? 
-            (curLang == 0 ? "КОНТРОЛИРУЕТСЯ ИГРОКОМ" : "CONTROLLED BY YOU") : 
-            (curLang == 0 ? "КОНТРОЛИРУЕТСЯ ВРАГОМ" : "UNDER ENEMY CONTROL");
-        GUILayout.Label(ownerTxt, infoStyle);
+            (curLang == 0 ? "ФРАКЦИОННЫЙ ЦЕНТР ВЫСАДКИ" : "CONTROLLED INTEGRATED outpost") : 
+            (curLang == 0 ? "ВРАЖЕСКАЯ ЦИТАДЕЛЬ КЛАНА" : "GARRISON FORTS OF THE ENEMY CLAN");
+        GUILayout.Label(ownerTxt, subSt);
 
         GUILayout.Space(8);
 
-        // Уровень Замка
-        GUIStyle levelStyle = new GUIStyle(GUI.skin.label);
-        levelStyle.alignment = TextAnchor.MiddleCenter;
-        levelStyle.fontSize = 17;
-        levelStyle.fontStyle = FontStyle.Bold;
-        levelStyle.normal.textColor = Color.white;
-        string lvlName = curLang == 0 ? "УРОВЕНЬ" : "LEVEL";
-        GUILayout.Label($"{lvlName}: {castle.level} / 5", levelStyle);
+        GUIStyle descS = new GUIStyle(GUI.skin.label);
+        descS.fontSize = 15;
+        descS.alignment = TextAnchor.MiddleCenter;
+        descS.normal.textColor = Color.white;
 
-        // Пассивный Поток
-        int speed = castle.level == 1 ? 5 : 15;
-        string flowTxt = curLang == 0 ? 
-            $"Пассивная добыча золота: +{speed} 💰 / сек" : 
-            $"Passive gold collection: +{speed} 💰 / sec";
-        GUILayout.Label(flowTxt, infoStyle);
+        string lvlPrefix = curLang == 0 ? "Уровень Цитадели" : "Stronghold Tier";
+        if (curLang == 8) lvlPrefix = "领地级别";
+        if (curLang == 7) lvlPrefix = "성채 레벨";
+
+        GUILayout.Label($"{lvlPrefix}: {castle.level} / 6", descS);
+
+        int inc = GetGoldIncome(castle.level);
+        string flowTxt = curLang == 0 ?
+            $"Ежедневный сбор налога: +{inc} 💰 за ход" :
+            $"Daily base gold tax: +{inc} 💰 per turn";
+        if (curLang == 8) flowTxt = $"每日领地税金: +{inc} 💰 每回合";
+        if (curLang == 7) flowTxt = $"일일 연구비 영수: +{inc} 💰 턴당";
+        GUILayout.Label(flowTxt, subSt);
 
         GUILayout.Space(12);
 
-        // ФИДБЕК МЕССАДЖИ
+        // Feedback
         if (!string.IsNullOrEmpty(feedbackMessage))
         {
-            GUIStyle feedStyle = new GUIStyle(GUI.skin.box);
-            feedStyle.normal.textColor = new Color(0.0f, 1.0f, 1.0f);
-            feedStyle.alignment = TextAnchor.MiddleCenter;
-            feedStyle.fontSize = 13;
-            GUILayout.Box(feedbackMessage, feedStyle, GUILayout.Height(35));
+            GUIStyle feedS = new GUIStyle(GUI.skin.box);
+            feedS.normal.textColor = Color.cyan;
+            feedS.alignment = TextAnchor.MiddleCenter;
+            feedS.fontSize = 13;
+            GUILayout.Box(feedbackMessage, feedS, GUILayout.Height(30));
         }
         else
         {
-            GUILayout.Space(39);
+            GUILayout.Space(34);
         }
 
-        GUILayout.Space(5);
+        GUILayout.Space(10);
 
         GUILayout.BeginVertical(GUI.skin.box);
 
         if (castle.owner == "Player")
         {
-            // ДЕЙСТВИЯ СОЮЗНОГО ЗАМКА
-            string upgradeBtnText = curLang == 0 ? "УЛУЧШИТЬ ЗАМОК (200 💰)" : "UPGRADE CASTLE (200 💰)";
-            if (GUILayout.Button(upgradeBtnText, GUILayout.Height(40)))
+            // Upgrade button logic
+            if (castle.level < 6)
             {
-                if (castle.level >= 2)
+                int nextLvl = castle.level + 1;
+                int cost = GetUpgradeCost(castle.level);
+                int nextInc = GetGoldIncome(nextLvl);
+
+                string upLabel = curLang == 0 ?
+                    $"ПОВЫСИТЬ ДО УРОВНЯ {nextLvl} ({cost} 💰) | Доход: +{nextInc} 💰" :
+                    $"UPGRADE TO TIER {nextLvl} ({cost} 💰) | Income: +{nextInc} 💰";
+                if (curLang == 8) upLabel = $"升级领地级别 {nextLvl} ({cost} 💰) | 收益: +{nextInc}";
+                if (curLang == 7) upLabel = $"영지 무구 개량 {nextLvl}단 ({cost} 💰) | 배당금: +{nextInc}";
+
+                GUI.backgroundColor = new Color(1.0f, 0.85f, 0.15f, 1.0f);
+                if (GUILayout.Button(upLabel, GUILayout.Height(42)))
                 {
-                    string restrict = curLang == 0 ? 
-                        "Максимум 2 уровень на первом континенте!" : 
-                        "Maximum level is 2 on the first continent!";
-                    ShowFeedback(restrict);
+                    if (SaveGameSystem.CurrentData.gold < cost)
+                    {
+                        string nog = curLang == 0 ? "Недостаточно королевского золота!" : "Insufficient gold supplies!";
+                        ShowFeedback(nog);
+                    }
+                    else
+                    {
+                        SaveGameSystem.CurrentData.gold -= cost;
+                        castle.level++;
+                        PlayerPrefs.SetInt("Castle_Level_" + activeDetailsIndex, castle.level);
+                        PlayerPrefs.Save();
+
+                        SpawnAllCastles();
+
+                        string okMsg = curLang == 0 ?
+                            $"Цитадель расширена до Уровня {castle.level}! Новые чертежи разблокированы." :
+                            $"Fortress expanded to Tier {castle.level}! New strategic blueprints unlocked.";
+                        ShowFeedback(okMsg);
+                    }
                 }
-                else if (SaveGameSystem.CurrentData.gold < 200)
-                {
-                    string noGold = curLang == 0 ? "Недостаточно золота!" : "Not enough gold!";
-                    ShowFeedback(noGold);
-                }
-                else
-                {
-                    SaveGameSystem.CurrentData.gold -= 200;
-                    castle.level = 2;
-                    PlayerPrefs.SetInt("Castle_Level_" + activeDetailsIndex, 2);
-                    PlayerPrefs.Save();
-                    
-                    string upgraded = curLang == 0 ? 
-                        "Замок успешно улучшен до 2 уровня! Привилегии увеличены." : 
-                        "Castle successfully upgraded to Level 2! Privileges increased.";
-                    ShowFeedback(upgraded);
-                }
+                GUI.backgroundColor = Color.white;
             }
-
-            GUILayout.Space(6);
-
-            // Наём Войск
-            string hireHeader = curLang == 0 ? "--- НАЁМ АРМИИ ---" : "--- RECRUIT SOLDIERS ---";
-            GUILayout.Label(hireHeader, infoStyle);
-
-            GUILayout.BeginHorizontal();
-            
-            string wName = curLang == 0 ? "Мечник (50 💰)" : "Warrior (50 💰)";
-            if (GUILayout.Button(wName, GUILayout.Height(30)))
+            else
             {
-                BuyUnit(50, curLang == 0 ? "Великий воин готов к бою!" : "Great warrior recruited!");
+                GUIStyle maxS = new GUIStyle(GUI.skin.label);
+                maxS.alignment = TextAnchor.MiddleCenter;
+                maxS.fontStyle = FontStyle.Bold;
+                maxS.normal.textColor = new Color(0.2f, 1.0f, 0.95f, 1.0f);
+                GUILayout.Label(curLang == 0 ? "👑 ДОСТИГНУТ ЛЕГЕНДАРНЫЙ УРОВЕНЬ ЦИТАДЕЛИ" : "👑 LEGENDARY ZENITH OUTPOST FULLY EXPANDED", maxS);
             }
-            
-            string aName = curLang == 0 ? "Лучник (75 💰)" : "Archer (75 💰)";
-            if (GUILayout.Button(aName, GUILayout.Height(30)))
+
+            GUILayout.Space(10);
+
+            // КНОПКА ВХОДА В 2D ГОРОД
+            string townBtnLabel = curLang == 0 ? "🏟️ ВОЙТИ В 2D ЗАМКОВЫЙ ГОРОД" : "🏟️ ENTER 2D CASTLE TOWN";
+            if (curLang == 8) townBtnLabel = "🏟️ 进入2D城堡内城";
+            if (curLang == 7) townBtnLabel = "🏟️ 2D 영지 마을 입장";
+
+            GUI.backgroundColor = new Color(0.0f, 0.82f, 0.98f, 1.0f);
+            if (GUILayout.Button(townBtnLabel, GUILayout.Height(46)))
             {
-                BuyUnit(75, curLang == 0 ? "Снайпер нанят! Лук натянут." : "Expert sniper is ready!");
+                isTownViewActive = true;
+                isDetailsOpen = false;
+                ShowFeedback("");
             }
-
-            string mName = curLang == 0 ? "Маг (120 💰)" : "Mage (120 💰)";
-            if (GUILayout.Button(mName, GUILayout.Height(30)))
-            {
-                BuyUnit(120, curLang == 0 ? "Боевой архимаг вступил в отряд!" : "Battle Archmage is ready!");
-            }
-            
-            GUILayout.EndHorizontal();
-
-            GUILayout.Space(6);
-
-            // Покупка Зелий и Снаряжения
-            string storeHeader = curLang == 0 ? "--- ЛАВКА СНАРЯЖЕНИЯ ---" : "--- EQUIPMENT SHOP ---";
-            GUILayout.Label(storeHeader, infoStyle);
-
-            GUILayout.BeginHorizontal();
-            string potBtn = curLang == 0 ? "Зелье здоровья (30 💰)" : "Healing Potion (30 💰)";
-            if (GUILayout.Button(potBtn, GUILayout.Height(30)))
-            {
-                BuyItem(30, curLang == 0 ? "Лечебное зелье добавлено герою!" : "Healing potion added!");
-            }
-
-            string eqBtn = curLang == 0 ? "Латы & Меч (90 💰)" : "Heavy Armor (90 💰)";
-            if (GUILayout.Button(eqBtn, GUILayout.Height(30)))
-            {
-                BuyItem(90, curLang == 0 ? "Экипировка улучшена! Защита +15." : "Heavy armor customized!");
-            }
-            GUILayout.EndHorizontal();
-
-            GUILayout.Space(6);
-
-            // Тренировочный плац
-            string trainHeader = curLang == 0 ? "--- ТРЕНИРОВОЧНЫЙ ЦЕНТР ---" : "--- TRAINING PLAZA ---";
-            GUILayout.Label(trainHeader, infoStyle);
-
-            string trBtn = curLang == 0 ? "⚔️ Начать учения и тренировки (Бесплатно)" : "⚔️ Begin combat training (Free)";
-            if (GUILayout.Button(trBtn, GUILayout.Height(30)))
-            {
-                SaveGameSystem.CurrentData.currentXP += 15;
-                if (SaveGameSystem.CurrentData.currentXP >= 100)
-                {
-                    SaveGameSystem.CurrentData.currentXP = 0;
-                    SaveGameSystem.CurrentData.playerLevel++;
-                }
-                string feed = curLang == 0 ? 
-                    $"Герой прошел тренировку! +15 опыта получено. Уровень: {SaveGameSystem.CurrentData.playerLevel}" : 
-                    $"Hero finished training! +15 XP. Level: {SaveGameSystem.CurrentData.playerLevel}";
-                ShowFeedback(feed);
-            }
+            GUI.backgroundColor = Color.white;
         }
         else
         {
-            // ДЕЙСТВИЯ ВРАЖЕСКОГО ЗАМКА
-            GUIStyle warningStyle = new GUIStyle(GUI.skin.label);
-            warningStyle.alignment = TextAnchor.MiddleCenter;
-            warningStyle.fontStyle = FontStyle.Bold;
-            warningStyle.fontSize = 14;
-            warningStyle.normal.textColor = new Color(1.0f, 0.4f, 0.4f);
+            // Вражеский замок
+            GUIStyle warnS = new GUIStyle(GUI.skin.label);
+            warnS.alignment = TextAnchor.MiddleCenter;
+            warnS.fontStyle = FontStyle.Bold;
+            warnS.fontSize = 13;
+            warnS.normal.textColor = new Color(1.0f, 0.35f, 0.35f, 1.0f);
 
-            string warn = curLang == 0 ? 
-                "ЭТОТ ЗАМОК ДЕРЖИТ В ОБОРОНЕ ВРАЖЕСКИЙ КЛАН.\nЗахватывайте земли и копите золото для осады!" : 
-                "THIS STRONGHOLD IS GUARDED BY AN OPPOSING CLAN.\nConquer territories and prepare resources for siege!";
-            GUILayout.Label(warn, warningStyle);
-            
+            string warnDesc = curLang == 0 ?
+                "ЭТИ ЗЕМЛИ НАХОДЯТСЯ ПОД КОНТРОЛЕМ ВРАЖЕСКИХ ЛОРДОВ.\nПодготовьте армию и атакуйте крепость, когда зачистите Пустоши!" :
+                "THIS PROVINCE LIES DEEP WITHIN ENEMY BORDERS.\nRaise an imperial army and prepare units for assault!";
+            GUILayout.Label(warnDesc, warnS);
+
             GUILayout.Space(15);
-            
-            string spyBtn = curLang == 0 ? "🕵️ Отправить лазутчика (Бесплатно)" : "🕵️ Dispatch spy (Free)";
+
+            string spyBtn = curLang == 0 ? "🕵️ Отправить шпиона в гарнизон" : "🕵️ Send spy to investigate defenses";
             if (GUILayout.Button(spyBtn, GUILayout.Height(40)))
             {
-                int garrison = UnityEngine.Random.Range(3, 12);
-                string spyFeed = curLang == 0 ? 
-                    $"Шпион докладывает: в замке находится {garrison} воинов противника!" : 
-                    $"Spy reports: a garrison of {garrison} enemy soldiers defends the fort!";
-                ShowFeedback(spyFeed);
+                string infoFeed = curLang == 0 ?
+                    $"Шпионские данные: Сила охраны: {castle.aiTroopsPower} | Оружие: Т-{castle.aiArmorTier}" :
+                    $"Intel: Defense integrity power: {castle.aiTroopsPower} | Armament tier: T-{castle.aiArmorTier}";
+                ShowFeedback(infoFeed);
             }
         }
 
@@ -527,42 +951,518 @@ public class FateCastleManager : MonoBehaviour
 
         GUILayout.FlexibleSpace();
 
-        // Кнопка Закрыть
-        GUI.backgroundColor = new Color(1.0f, 0.3f, 0.3f, 1.0f);
-        string closeText = curLang == 0 ? "ЗАКРЫТЬ ДЕТАЛИ" : "CLOSE DETAILS";
-        if (GUILayout.Button(closeText, GUILayout.Height(35)))
+        GUI.backgroundColor = new Color(0.9f, 0.25f, 0.3f, 1.0f);
+        string closeText = curLang == 0 ? "ЗАКРЫТЬ ОКНО" : "CLOSE WINDOW";
+        if (GUILayout.Button(closeText, GUILayout.Height(36)))
         {
             isDetailsOpen = false;
         }
         GUI.backgroundColor = Color.white;
     }
 
-    private void BuyUnit(int price, string successMsg)
+    /// <summary>
+    /// ТРЕХКОЛОНОЧНЫЙ КРАСИВЫЙ 2D ИНТЕРФЕЙС ЗАМКОВОГО ГОРОДА
+    /// </summary>
+    private void DrawTownViewGUI(int curLang)
     {
-        if (SaveGameSystem.CurrentData.gold < price)
+        float wWidth = Screen.width * 0.94f;
+        float wHeight = Screen.height * 0.88f;
+        float wx = (Screen.width - wWidth) / 2f;
+        float wy = (Screen.height - wHeight) / 2f;
+
+        GUI.backgroundColor = new Color(0.01f, 0.04f, 0.15f, 0.99f);
+        GUILayout.BeginArea(new Rect(wx, wy, wWidth, wHeight), GUI.skin.box);
+
+        GUILayout.Space(10);
+
+        // Header
+        GUIStyle tStyle = new GUIStyle(GUI.skin.label);
+        tStyle.alignment = TextAnchor.MiddleCenter;
+        tStyle.fontSize = 24;
+        tStyle.fontStyle = FontStyle.Bold;
+        tStyle.normal.textColor = Color.cyan;
+
+        string header = curLang == 0 ? "🏟️ 2D ЗАМКОВЫЙ ГОРОД • ПАНЕЛЬ УПРАВЛЕНИЯ 🏟️" : "🏟️ 2D CASTLE TOWN • OUTPOST REGULATION 🏟️";
+        if (curLang == 8) header = "🏟️ 2D 城堡内政管制大厅 🏟️";
+        if (curLang == 7) header = "🏟️ 2D 영토 성채 제어반 🏟️";
+        GUILayout.Label(header, tStyle);
+
+        // Subhead
+        GUIStyle subSt = new GUIStyle(GUI.skin.label);
+        subSt.alignment = TextAnchor.MiddleCenter;
+        subSt.fontSize = 13;
+        subSt.normal.textColor = Color.gray;
+
+        CastleInstance activeCastle = castles[activeDetailsIndex >= 0 ? activeDetailsIndex : 0];
+        string cLabel = curLang == 0 ? activeCastle.nameRU : activeCastle.nameEN;
+        if (curLang == 8) cLabel = activeCastle.nameCH;
+        if (curLang == 7) cLabel = activeCastle.nameKR;
+
+        GUILayout.Label($"{cLabel.ToUpper()} (Уровень {activeCastle.level}) | {(curLang == 0 ? "Казна" : "Treasury")}: {SaveGameSystem.CurrentData.gold} 💰 | {(curLang == 0 ? "Уровень" : "Level")}: {SaveGameSystem.CurrentData.playerLevel} (XP: {SaveGameSystem.CurrentData.currentXP}/100)", subSt);
+
+        GUILayout.Space(12);
+
+        // 3-Column horizontal division space
+        GUILayout.BeginHorizontal();
+
+        // ------------------ COLUMN 1: BARRACKS ------------------
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(wWidth / 3.12f));
+        GUIStyle colHeader1 = new GUIStyle(GUI.skin.label);
+        colHeader1.alignment = TextAnchor.MiddleCenter;
+        colHeader1.fontSize = 17;
+        colHeader1.fontStyle = FontStyle.Bold;
+        colHeader1.normal.textColor = new Color(0.2f, 1.0f, 0.6f);
+        GUILayout.Label("⚔️ КАЗАРМЫ [Казармы]", colHeader1);
+        
+        string bDesc = curLang == 0 ? "Найм войск в армию согласно уровню замка" : "Troop recruitment matching castle tier";
+        GUILayout.Label(bDesc, subSt);
+
+        GUILayout.Space(10);
+        barracksScroll = GUILayout.BeginScrollView(barracksScroll);
+
+        // Unit definitions (cost, level requirement, display names, PlayerPrefs key suffix)
+        DrawUnitItem("warrior", "Боец фракции", "Faction Warrior", "皇室精锐战士", "왕실 정예 전사", 50, 1, activeCastle.level);
+        DrawUnitItem("archer", "Эльфийский Лучник", "Elven Archer", "精灵神射手", "엘프 신궁 대원", 75, 1, activeCastle.level);
+        DrawUnitItem("mage", "Боевой Маг Зенита", "Zenith Battle Mage", "제니스 전투 마법사", "제니스 전투 마법사", 120, 1, activeCastle.level);
+        DrawUnitItem("paladin", "Паладин Света", "Holy Paladin", "圣光审判圣骑士", "성광의 발키리 기사", 200, 2, activeCastle.level);
+        DrawUnitItem("cavalry", "Имперская Конница", "Imperial Cavalry", "帝国重装重骑兵", "황실 중갑 철기병", 320, 3, activeCastle.level);
+        DrawUnitItem("cannoneer", "Осадно-боевой Пушкарь", "Garrison Cannoneer", "重击攻锤铁炮手", "공성 사격 철포병", 450, 4, activeCastle.level);
+        DrawUnitItem("centaur", "Кентавр Степей", "Steppe Centaur", "荒野疾行百里人马", "초원의 켄타우로스", 130, 5, activeCastle.level);
+        DrawUnitItem("necromancer", "Некромант Тьмы", "Shadow Necromancer", "黑暗禁忌亡灵巫师", "어둠의 네크로맨서", 260, 5, activeCastle.level);
+        DrawUnitItem("griffin", "Элитный Королевский Грифон", "Royal Griffin", "皇家狮鹫守御猛禽", "황실 고대 그리폰", 380, 5, activeCastle.level);
+        DrawUnitItem("overlord", "Рыцарь-Властелин", "Dread Overlord", "铁王座幽夜统治者", "공포의 지옥 영주", 680, 5, activeCastle.level);
+        DrawUnitItem("hydra", "Многоголовая Гидра", "Swamp Hydra", "九头沼泽极冻毒蜃", "맹독의 아홉머리 히드라", 800, 5, activeCastle.level);
+        DrawUnitItem("dragon", "Легендарный Дракон Пустоты", "Void Dragon", "虚空至尊不灭邪龙", "허공의 전설 고대 용", 1500, 6, activeCastle.level);
+        DrawUnitItem("mountain_bear", "Ураганный Медведь Гор", "Mountain Bear Guard", "极寒高山怒嚎巨熊", "태산의 수호 거대 곰", 1000, 6, activeCastle.level);
+        DrawUnitItem("wasteland_serpent", "Гигантская Змея Пустошей", "Wasteland Serpent", "荒原巨型暴食沙蟒", "황무지의 고대 거대 뱀", 1100, 6, activeCastle.level);
+
+        GUILayout.EndScrollView();
+        GUILayout.EndVertical();
+
+        // ------------------ COLUMN 2: FORGE & HEALTH SHOP ------------------
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(wWidth / 3.12f));
+        GUIStyle colHeader2 = new GUIStyle(GUI.skin.label);
+        colHeader2.alignment = TextAnchor.MiddleCenter;
+        colHeader2.fontSize = 17;
+        colHeader2.fontStyle = FontStyle.Bold;
+        colHeader2.normal.textColor = new Color(1.0f, 0.7f, 0.15f);
+        GUILayout.Label("🧪 КУЗНИЦА И ЛАВКА [Магазин]", colHeader2);
+        
+        string fDesc = curLang == 0 ? "Покупка зелий разного уровня и 6 тиров доспехов" : "Purchase elixirs & progressive 6 tiers armor gear";
+        GUILayout.Label(fDesc, subSt);
+
+        GUILayout.Space(10);
+        forgeScroll = GUILayout.BeginScrollView(forgeScroll);
+
+        // POTIONS sections (dynamic scaling with Castle Level and potion levels (1 to 3))
+        int potionIndex = PlayerPrefs.GetInt("Town_Selected_PotionLvl", 1);
+        GUILayout.BeginHorizontal();
+        GUILayout.Label((curLang == 0 ? "Выбор ур-ня зелья: " : "Select Potion level: ") + potionIndex, GUILayout.Width(170));
+        if (GUILayout.Button("-", GUILayout.Width(35))) { if (potionIndex > 1) potionIndex--; PlayerPrefs.SetInt("Town_Selected_PotionLvl", potionIndex); }
+        if (GUILayout.Button("+", GUILayout.Width(35))) { if (potionIndex < 3) potionIndex++; PlayerPrefs.SetInt("Town_Selected_PotionLvl", potionIndex); }
+        GUILayout.EndHorizontal();
+
+        DrawPotionItem("hp", "Зелье Жизни", "Elixir of Vital Health", "生命圣水", "체력 신성 물약", 30, potionIndex, activeCastle.level);
+        DrawPotionItem("str", "Зелье Силы", "Potion of Giant Strength", "巨人之力药水", "거인의 괴력 물약", 45, potionIndex, activeCastle.level);
+        DrawPotionItem("def", "Зелье Защиты", "Tome of Bastion Defense", "石像鬼坚韧合剂", "철갑 안개의 물약", 40, potionIndex, activeCastle.level);
+
+        GUILayout.Space(15);
+        GUILayout.Box(curLang == 0 ? "⚔️ КУЗНИЦА ДОСПЕХОВ" : "⚔️ FORGE DEPARTMENT", GUILayout.Height(20));
+
+        // Progressive 6 levels of equipment with gold values proportional to level
+        int armorLv = PlayerPrefs.GetInt("Player_HeroArmor_Tier", 1);
+        string curArmorName = GetEquipmentTierName(armorLv, curLang);
+        GUILayout.Label($"{(curLang == 0 ? "Текущие Латы" : "Current Gear")}: {curArmorName} (Tier {armorLv})");
+
+        if (armorLv < 6)
         {
-            string noG = Translator.LanguageID == 0 ? "Недостаточно золота!" : "Not enough gold!";
-            ShowFeedback(noG);
+            int nextLv = armorLv + 1;
+            int armorPrice = 90 * nextLv * activeCastle.level;
+            string eqBtnName = curLang == 0 ? 
+                $"Выковать {GetEquipmentTierName(nextLv, 0)} ({armorPrice} 💰)" : 
+                $"Forge {GetEquipmentTierName(nextLv, 1)} ({armorPrice} 💰)";
+            if (curLang == 8) eqBtnName = $"锻造 {GetEquipmentTierName(nextLv, 8)} ({armorPrice} 💰)";
+            if (curLang == 7) eqBtnName = $"제작 {GetEquipmentTierName(nextLv, 7)} ({armorPrice} 💰)";
+
+            if (GUILayout.Button(eqBtnName, GUILayout.Height(40)))
+            {
+                if (SaveGameSystem.CurrentData.gold < armorPrice)
+                {
+                    ShowFeedback(curLang == 0 ? "Недостаточно королевского угля и золота!" : "Insufficient gold for smithy services!");
+                }
+                else
+                {
+                    SaveGameSystem.CurrentData.gold -= armorPrice;
+                    PlayerPrefs.SetInt("Player_HeroArmor_Tier", nextLv);
+                    PlayerPrefs.Save();
+                    ShowFeedback(curLang == 0 ? "Кузнец успешно перековал ваши латы!" : "Plate armor upgraded permanently!");
+                }
+            }
         }
         else
         {
-            SaveGameSystem.CurrentData.gold -= price;
-            ShowFeedback(successMsg);
+            GUILayout.Label(curLang == 0 ? "✓ Достигнуто легендарное качество ковки!" : "✓ Ultimate god-roll forging reached!", GUI.skin.box);
+        }
+
+        GUILayout.Space(15);
+        GUILayout.Box(curLang == 0 ? "🕵️ НАЙМ ПРОСТЫХ ГЕРОЕВ" : "🕵️ RECRUIT ALLIED HEROES", GUILayout.Height(20));
+        
+        // Simple Heroes recruitment
+        DrawHeroRecruitItem("ArcherHero", "Герой: Стрелок", "Comrade: Marksman Hero", "游侠英雄-神射手", "동료 영웅 - 명사수", 300);
+        DrawHeroRecruitItem("WarriorHero", "Герой: Воин", "Comrade: Iron Warrior", "先锋英雄-铁血战士", "동료 영웅 - 광전사", 350);
+        DrawHeroRecruitItem("MageHero", "Герой: Боевой Маг", "Comrade: Sorcerer Elite", "元素英雄-奥术法皇", "동료 영웅 - 원소 법사", 450);
+
+        GUILayout.EndScrollView();
+        GUILayout.EndVertical();
+
+        // ------------------ COLUMN 3: TRAINING ACADEMY ------------------
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(wWidth / 3.12f));
+        GUIStyle colHeader3 = new GUIStyle(GUI.skin.label);
+        colHeader3.alignment = TextAnchor.MiddleCenter;
+        colHeader3.fontSize = 17;
+        colHeader3.fontStyle = FontStyle.Bold;
+        colHeader3.normal.textColor = new Color(0.8f, 0.35f, 1.0f);
+        GUILayout.Label("🔮 АКАДЕМИЯ И АРЕНА [Арена]", colHeader3);
+        
+        string aDesc = curLang == 0 ? "Тренировки, прокачка XP и ранги воинов" : "Gladiator maneuvers and combat upgrades";
+        GUILayout.Label(aDesc, subSt);
+
+        GUILayout.Space(10);
+        academyScroll = GUILayout.BeginScrollView(academyScroll);
+
+        // MAX LEVEL CAP formula based on Castle level on 1st island
+        int maxLvlLimit = 10 + activeCastle.level * 5; // Level 1: Max 15, Level 6: Max 40
+        GUILayout.Box($"{(curLang == 0 ? "Предел Уровня на 1-ой карте: " : "Map Lvl limit: ")} {maxLvlLimit}", GUI.skin.box);
+
+        GUILayout.Space(8);
+
+        // TARGET SELECTION for training (Main Hero vs Hired basic heroes)
+        int selectedTrainingTarget = PlayerPrefs.GetInt("Town_Training_Target", 0); // 0: Main hero, 1: Archer comrades, 2: Warrior comrades, 3: Mage comrades
+        GUILayout.Label(curLang == 0 ? "Кого тренируем на плацу:" : "Choose tactical trainee:");
+        
+        string[] targNames = curLang == 0 ? 
+            new string[] { "Основной Герой", "Нанятые Стрелки", "Нанятые Воины", "Нанятые Маги" } :
+            new string[] { "Main protagonist", "Recruited Archers", "Recruited Warriors", "Recruited Mages" };
+        
+        for (int t = 0; t < 4; t++)
+        {
+            if (GUILayout.Toggle(selectedTrainingTarget == t, targNames[t], GUI.skin.button))
+            {
+                selectedTrainingTarget = t;
+                PlayerPrefs.SetInt("Town_Training_Target", t);
+            }
+        }
+
+        GUILayout.Space(12);
+
+        // 1. FREE TRAINING (Maneuvers)
+        string freeTrainingLabel = curLang == 0 ? 
+            "Арена: Маневры (XP +15/+30) | БЕСПЛАТНО" : 
+            "Arena Tactics (XP +15/+30) | FREE";
+        if (GUILayout.Button(freeTrainingLabel, GUILayout.Height(40)))
+        {
+            TriggerTraining(selectedTrainingTarget, 15, 30, maxLvlLimit, 0, curLang);
+        }
+
+        GUILayout.Space(8);
+
+        // 2. COMMAND COURSE (PAID ELITE COURSE)
+        int paidCourseCo = 150 * activeCastle.level;
+        string paidLabel = curLang == 0 ?
+            $"Курс Командоров (+60 XP) | {paidCourseCo} 💰" :
+            $"Elite Captain drills (+60 XP) | {paidCourseCo} 💰";
+        if (GUILayout.Button(paidLabel, GUILayout.Height(40)))
+        {
+            if (SaveGameSystem.CurrentData.gold < paidCourseCo)
+            {
+                ShowFeedback(curLang == 0 ? "Недостаточно золота в бюджете фракции!" : "Insufficient gold to purchase tactics textbook!");
+            }
+            else
+            {
+                TriggerTraining(selectedTrainingTarget, 60, 100, maxLvlLimit, paidCourseCo, curLang);
+            }
+        }
+
+        GUILayout.Space(15);
+        GUILayout.Box(curLang == 0 ? "🏆 ПРОКАЧКА РАНГОВ ВОЙНОВ" : "🏆 TROOP RANK ASCENSION", GUILayout.Height(20));
+
+        // Troop Ranks upgrade mechanics
+        int unitRank = PlayerPrefs.GetInt("Player_ArmyUnit_Rank", 1);
+        string[] rankNamesRU = { "Новобранцы", "Регулярная армия", "Ветераны", "Гвардия завета", "Элита Зенита" };
+        string[] rankNamesEN = { "Conscripts", "Regular Infantry", "Honored Veterans", "Covenant Guard", "Zenith Champions Elite" };
+
+        string currentRankName = curLang == 0 ? rankNamesRU[Mathf.Clamp(unitRank - 1, 0, 4)] : rankNamesEN[Mathf.Clamp(unitRank - 1, 0, 4)];
+        GUILayout.Label($"{(curLang == 0 ? "Ранг воинов: " : "Troop Rank: ")} {currentRankName}");
+
+        if (unitRank < 5)
+        {
+            int rankPrice = 250 * unitRank * activeCastle.level;
+            string rankUpLabel = curLang == 0 ?
+                $"Повысить ранг до {unitRank + 1} ({rankPrice} 💰)" :
+                $"Promote rank to {unitRank + 1} ({rankPrice} 💰)";
+            if (curLang == 8) rankUpLabel = $"提升士兵级别至 {unitRank + 1} ({rankPrice} 💰)";
+            if (curLang == 7) rankUpLabel = $"아군 병사 등급 향상 {unitRank + 1}단계 ({rankPrice} 💰)";
+
+            if (GUILayout.Button(rankUpLabel, GUILayout.Height(40)))
+            {
+                if (SaveGameSystem.CurrentData.gold < rankPrice)
+                {
+                    ShowFeedback(curLang == 0 ? "Недостаточно золога на экипировку гвардии!" : "Not enough gold to replace weapons!");
+                }
+                else
+                {
+                    SaveGameSystem.CurrentData.gold -= rankPrice;
+                    unitRank++;
+                    PlayerPrefs.SetInt("Player_ArmyUnit_Rank", unitRank);
+                    PlayerPrefs.Save();
+                    
+                    string rankMsg = curLang == 0 ?
+                        "Ранг всей вашей армии повышен! Характеристики возросли." :
+                        "Your global cohort promoted successfully to absolute veteran height!";
+                    ShowFeedback(rankMsg);
+                }
+            }
+        }
+        else
+        {
+            GUILayout.Label(curLang == 0 ? "✓ Ваша армия достигла максимальной боевой славы!" : "✓ Army reached supreme zenith classification!", GUI.skin.box);
+        }
+
+        GUILayout.EndScrollView();
+        GUILayout.EndVertical();
+
+        GUILayout.EndHorizontal();
+
+        GUILayout.FlexibleSpace();
+
+        // Feedback in Town block
+        if (!string.IsNullOrEmpty(feedbackMessage))
+        {
+            GUIStyle feedbackS = new GUIStyle(GUI.skin.box);
+            feedbackS.normal.textColor = Color.cyan;
+            feedbackS.alignment = TextAnchor.MiddleCenter;
+            feedbackS.fontSize = 14;
+            GUILayout.Box(feedbackMessage, feedbackS, GUILayout.Height(36));
+        }
+
+        GUILayout.Space(8);
+
+        // Return button
+        GUI.backgroundColor = new Color(0.9f, 0.2f, 0.25f, 1.0f);
+        string leaveLabel = curLang == 0 ? "◀ ВЕРНУТЬСЯ НА ТАКТИЧЕСКУЮ КАРТУ" : "◀ LEAVE AND RETURN TO STRATEGIC WORLD";
+        if (curLang == 8) leaveLabel = "◀ 返回战略沙盘图";
+        if (curLang == 7) leaveLabel = "◀ 전략 지도 뷰어 복귀";
+
+        if (GUILayout.Button(leaveLabel, GUILayout.Height(45)))
+        {
+            isTownViewActive = false;
+        }
+        GUI.backgroundColor = Color.white;
+
+        GUILayout.Space(10);
+        GUILayout.EndArea();
+    }
+
+    private void TriggerTraining(int target, int baseXP, int mainHeroXP, int cap, int goldCost, int lang)
+    {
+        if (goldCost > 0)
+        {
+            SaveGameSystem.CurrentData.gold -= goldCost;
+        }
+
+        if (target == 0)
+        {
+            // Main Hero training
+            if (SaveGameSystem.CurrentData.playerLevel >= cap)
+            {
+                string maxMsg = lang == 0 ? 
+                    "Основной герой достиг лимита для этой карты! Улучшите замок." : 
+                    "Main protagonist reached maximum level limit of this area! Expand castle.";
+                ShowFeedback(maxMsg);
+                return;
+            }
+
+            SaveGameSystem.CurrentData.currentXP += mainHeroXP;
+            if (SaveGameSystem.CurrentData.currentXP >= 100)
+            {
+                SaveGameSystem.CurrentData.currentXP -= 100;
+                SaveGameSystem.CurrentData.playerLevel++;
+                
+                string sfxLvl = lang == 0 ?
+                    $"🌟 УРОВЕНЬ ПОВЫШЕН! Основной герой достиг {SaveGameSystem.CurrentData.playerLevel} уровня!" :
+                    $"🌟 protagonist LEVEL UP achieved! Protagonist reached Level {SaveGameSystem.CurrentData.playerLevel}!";
+                ShowFeedback(sfxLvl);
+            }
+            else
+            {
+                string feed = lang == 0 ?
+                    $"Тренировка основного персонажа завершена! (+{mainHeroXP} XP)" :
+                    $"protagonist training complete! (+{mainHeroXP} XP)";
+                ShowFeedback(feed);
+            }
+        }
+        else
+        {
+            // Companion training
+            string classKey = target == 1 ? "ArcherHero" : (target == 2 ? "WarriorHero" : "MageHero");
+            int comradeCount = PlayerPrefs.GetInt("Player_HiredCount_" + classKey, 0);
+
+            if (comradeCount == 0)
+            {
+                string noH = lang == 0 ?
+                    "Вы ещё не наняли союзных героев этого класса в лавке!" :
+                    "You have not hired any companion heroes of this class yet!";
+                ShowFeedback(noH);
+                return;
+            }
+
+            int currentCompLvl = PlayerPrefs.GetInt("Companion_Lvl_" + classKey, 1);
+            int currentCompXP = PlayerPrefs.GetInt("Companion_XP_" + classKey, 0);
+
+            if (currentCompLvl >= cap - 2) // Companion cap slightly lower for progression balance
+            {
+                string maxComp = lang == 0 ?
+                    "Покупные герои достигли лимита опыта для этой области!" :
+                    "Comrades reached local combat ceiling!";
+                ShowFeedback(maxComp);
+                return;
+            }
+
+            currentCompXP += baseXP;
+            if (currentCompXP >= 100)
+            {
+                currentCompXP -= 100;
+                currentCompLvl++;
+                PlayerPrefs.SetInt("Companion_Lvl_" + classKey, currentCompLvl);
+
+                string lvlMsg = lang == 0 ?
+                    $"🌟 ПОДДЕРЖКА ПОВЫШЕНА! Союзные {classKey} подняты до {currentCompLvl} раунда!" :
+                    $"🌟 COM COMPANION UPGRADE COMPLETE! Supporting comrades scaled to {currentCompLvl} round!";
+                ShowFeedback(lvlMsg);
+            }
+            else
+            {
+                string xpMsg = lang == 0 ?
+                    $"Отряд союзников потренировался. (+{baseXP} XP)" :
+                    $"Recruited cohort trained beautifully. (+{baseXP} XP)";
+                ShowFeedback(xpMsg);
+            }
+
+            PlayerPrefs.SetInt("Companion_XP_" + classKey, currentCompXP);
+            PlayerPrefs.Save();
         }
     }
 
-    private void BuyItem(int price, string successMsg)
+    private void DrawUnitItem(string id, string nameRU, string nameEN, string nameCH, string nameKR, int price, int requiredLvl, int castleLvl)
     {
-        if (SaveGameSystem.CurrentData.gold < price)
+        int curLang = Translator.LanguageID;
+        int count = PlayerPrefs.GetInt("Player_Unit_" + id, 0);
+        string name = curLang == 0 ? nameRU : nameEN;
+        if (curLang == 8) name = nameCH;
+        if (curLang == 7) name = nameKR;
+
+        GUILayout.BeginHorizontal(GUI.skin.box);
+        GUILayout.Label($"{name}\n(Ур.{requiredLvl} +) | [В наличии: {count}]", GUILayout.Width(180));
+
+        if (castleLvl < requiredLvl)
         {
-            string noG = Translator.LanguageID == 0 ? "Недостаточно золота!" : "Not enough gold!";
-            ShowFeedback(noG);
+            GUI.backgroundColor = Color.grey;
+            GUILayout.Button(curLang == 0 ? "⚡ Замок LVL " + requiredLvl : "⚡ Build T-" + requiredLvl, GUILayout.Height(35));
+            GUI.backgroundColor = Color.white;
         }
         else
         {
-            SaveGameSystem.CurrentData.gold -= price;
-            ShowFeedback(successMsg);
+            if (GUILayout.Button($"{price} 💰", GUILayout.Height(35)))
+            {
+                if (SaveGameSystem.CurrentData.gold < price)
+                {
+                    ShowFeedback(curLang == 0 ? "Недостаточно золота в казне!" : "Not enough gold!");
+                }
+                else
+                {
+                    SaveGameSystem.CurrentData.gold -= price;
+                    count++;
+                    PlayerPrefs.SetInt("Player_Unit_" + id, count);
+                    PlayerPrefs.Save();
+                    
+                    string buyMsg = curLang == 0 ?
+                        $"Отряд {name} нанят в гарнизон!" :
+                        $"Cohort {name} recruited successfully!";
+                    ShowFeedback(buyMsg);
+                }
+            }
         }
+        GUILayout.EndHorizontal();
+    }
+
+    private void DrawPotionItem(string id, string nameRU, string nameEN, string nameCH, string nameKR, int basePrice, int potionLvl, int castleLvl)
+    {
+        int curLang = Translator.LanguageID;
+        int price = Mathf.RoundToInt(basePrice * potionLvl * (castleLvl * 0.4f + 0.6f));
+        int count = PlayerPrefs.GetInt($"Player_Potion_{id}_Lvl_{potionLvl}", 0);
+
+        string name = curLang == 0 ? nameRU : nameEN;
+        if (curLang == 8) name = nameCH;
+        if (curLang == 7) name = nameKR;
+
+        GUILayout.BeginHorizontal(GUI.skin.box);
+        string itemTitle = $"{name} (Ур.{potionLvl})\n[Запас: {count}]";
+        GUILayout.Label(itemTitle, GUILayout.Width(180));
+
+        if (GUILayout.Button($"{price} 💰", GUILayout.Height(35)))
+        {
+            if (SaveGameSystem.CurrentData.gold < price)
+            {
+                ShowFeedback(curLang == 0 ? "Жители города отказываются продавать снадобье в долг!" : "Potion merchants deny debt!");
+            }
+            else
+            {
+                SaveGameSystem.CurrentData.gold -= price;
+                count++;
+                PlayerPrefs.SetInt($"Player_Potion_{id}_Lvl_{potionLvl}", count);
+                PlayerPrefs.Save();
+
+                string okFeed = curLang == 0 ?
+                    $"Куплено: {name} (Ур.{potionLvl})!" :
+                    $"Acquired: {name} (Level {potionLvl})!";
+                ShowFeedback(okFeed);
+            }
+        }
+        GUILayout.EndHorizontal();
+    }
+
+    private void DrawHeroRecruitItem(string key, string nameRU, string nameEN, string nameCH, string nameKR, int basePrice)
+    {
+        int curLang = Translator.LanguageID;
+        int count = PlayerPrefs.GetInt("Player_HiredCount_" + key, 0);
+
+        string name = curLang == 0 ? nameRU : nameEN;
+        if (curLang == 8) name = nameCH;
+        if (curLang == 7) name = nameKR;
+
+        GUILayout.BeginHorizontal(GUI.skin.box);
+        GUILayout.Label($"{name}\n[Нанято: {count}]", GUILayout.Width(180));
+
+        if (GUILayout.Button($"{basePrice} 💰", GUILayout.Height(35)))
+        {
+            if (SaveGameSystem.CurrentData.gold < basePrice)
+            {
+                ShowFeedback(curLang == 0 ? "Легендарные рекруты стоят дорого!" : "Noble adventurers deny cheap calls!");
+            }
+            else
+            {
+                SaveGameSystem.CurrentData.gold -= basePrice;
+                count++;
+                PlayerPrefs.SetInt("Player_HiredCount_" + key, count);
+                PlayerPrefs.Save();
+
+                string joinFeed = curLang == 0 ?
+                    $"Герой присоединился к вашим силам на Континенте!" :
+                    $"Renowned combat leader of class joined your cause!";
+                ShowFeedback(joinFeed);
+            }
+        }
+        GUILayout.EndHorizontal();
     }
 }
 

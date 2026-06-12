@@ -1,9 +1,10 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.11.14)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.11.15)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** 18.11.14
+- **Version:** 18.11.15
 - **Engine:** Unity 6 (6000.3.10f1)
+- **v18.11.15 Update:** Turn-Based Castle Income & Dynamic Visual Morphing - Replaces the real-time (per-second) passive gold accumulation with a fully turn-based "End Turn" (Пропустить ход) mechanical system, implementing a daily cycle counter with an integrated glassmorphic GUI panel (Day tracker & Cyan controller). Establishes shape-shifting C# procedural builders that physically transform Castle 3D models upon upgrading from Level 1 (single-tower sentry post) to Level 2 (majestic royal citadel featuring defensive outer ramparts, custom side wings, and a rotating gem spire with custom emission colors).
 - **v18.11.14 Update:** Post-Landing Narrative & Castle Progression System - Implements scale and offset persistence for the tactical world map preventing reset on play. Adds a multi-phase post-landing narrative briefing starting at DialogStep 8 through 12, focusing the camera on the player castle, locking movement and pausing. Programmatically spawns four majestic 3D castles (emerald neon for player, ruby neon for enemy built using Standard/URP-compatible materials) and establishes the interactive Castle Management logic featuring Zenith Glassmorphism UI, passive gold income tick system, military recruitment, shop equipment and espionage.
 - **v18.11.13 Update:** Ground-Focused Camera Clamping - Refactors camera coordinates clamping in StrategicCameraController.cs to mathematically limit the screen's visual center focal point projected on the ground (Y = 0) rather than restricting raw camera coordinates. This solves physical camera locks at high elevations and allows manual limits to perfectly match visual map coordinate dimensions.
 - **v18.11.12 Update:** Dynamic Ocean Occlusion & Quality Synchronization - Integrates auto-active ocean plane hide on Start() and show on DispatchLanding() for dialogue sequence protection; fixes pink standard shader issues in Universal Render Pipeline projects by detecting `M_Ocean_Background` automatically or compiling URP-compatible lit fallbacks; and dynamically scales water glossiness and metallic parameters based on system graphics quality levels (Low, Med, Ultra) loaded from `PlayerPrefs`.
