@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using FateContinent;
 
 /// <summary>
 /// Разработчик: Fate Continent (Континент Судьбы)
@@ -33,6 +34,18 @@ public class FateCastleManager : MonoBehaviour
     }
 
     public List<CastleInstance> castles = new List<CastleInstance>();
+
+    [Header("MANUAL / AUTONOMOUS ESPIONAGE CONFIG (v18.11.15)")]
+    public bool useAutonomousEspionageSettings = true;
+    public int manualMinLevelForEspionage = 3;
+    public int manualBaseSpyCost = 150;
+    
+    [Header("MANUAL / AUTONOMOUS GARRISON CAPACITY (v18.11.15)")]
+    public bool useAutonomousGarrisonSettings = true;
+    public int manualLevel1_2_Cap = 4;
+    public int manualLevel3_4_Cap = 5;
+    public int manualLevel5_Cap = 6;
+    public int manualLevel6_Cap = 7;
     
     // UI states and trackers
     public bool isTownViewActive = false;
@@ -52,6 +65,139 @@ public class FateCastleManager : MonoBehaviour
     private Vector2 barracksScroll = Vector2.zero;
     private Vector2 forgeScroll = Vector2.zero;
     private Vector2 academyScroll = Vector2.zero;
+
+    // ==========================================
+    // HELPER METHODS FOR GARRISON & ESPIONAGE (v18.11.15)
+    // ==========================================
+    public int GetHeroCapacity(int lvl)
+    {
+        if (!useAutonomousGarrisonSettings)
+        {
+            if (lvl <= 2) return manualLevel1_2_Cap;
+            if (lvl <= 4) return manualLevel3_4_Cap;
+            if (lvl == 5) return manualLevel5_Cap;
+            return manualLevel6_Cap;
+        }
+        
+        // Autonomous logic requested by the user:
+        if (lvl <= 2) return 4;
+        if (lvl <= 4) return 5;
+        if (lvl == 5) return 6;
+        return 7;
+    }
+
+    public int GetSpyCost(int enemyLvl)
+    {
+        int baseCost = useAutonomousEspionageSettings ? 150 : manualBaseSpyCost;
+        return enemyLvl * baseCost;
+    }
+
+    public int GetMinSpyRequiredLevel()
+    {
+        return useAutonomousEspionageSettings ? 3 : manualMinLevelForEspionage;
+    }
+
+    public int GetHeroesCountInCastle(int zoneIndex)
+    {
+        int count = 0;
+        // Main hero is present in player's active landed zone (or if activeDetailsIndex matches)
+        int landedZone = PlayerPrefs.GetInt("LandedZoneIndex", 0);
+        if (landedZone == zoneIndex)
+        {
+            count += 1; // Protagonist
+        }
+        count += GetHeroCount("ArcherHero", zoneIndex);
+        count += GetHeroCount("WarriorHero", zoneIndex);
+        count += GetHeroCount("MageHero", zoneIndex);
+        return count;
+    }
+
+    public int GetPlayerMaxCastleLevel()
+    {
+        int maxLvl = 1;
+        for (int i = 0; i < castles.Count; i++)
+        {
+            if (castles[i].owner == "Player" && castles[i].level > maxLvl)
+            {
+                maxLvl = castles[i].level;
+            }
+        }
+        return maxLvl;
+    }
+
+    public string GetCastleRace(int zoneIndex, int lang)
+    {
+        switch (zoneIndex)
+        {
+            case 0:
+                return lang == 0 ? "Орки Кровавых Пустошей" : "Wasteland Orcs";
+            case 1:
+                return lang == 0 ? "Владыки Ледяного Пика" : "Frost Peak Overlords";
+            case 2:
+                return lang == 0 ? "Дикари Древних Руин" : "Ancient Ruins Savages";
+            case 3:
+                return lang == 0 ? "Небожители Сакрального Зенита" : "Sacred Zenith Celestials";
+            default:
+                return lang == 0 ? "Имперский Альянс" : "Imperial Alliance";
+        }
+    }
+
+    // ZONE SPECIFIC HERO & UNIT PERSISTENCE (MIGRATION INCLUDED)
+    public int GetHeroCount(string key, int zoneIndex)
+    {
+        string zoneKey = "Player_HiredCount_" + key + "_Zone_" + zoneIndex;
+        if (!PlayerPrefs.HasKey(zoneKey))
+        {
+            int oldVal = PlayerPrefs.GetInt("Player_HiredCount_" + key, 0);
+            int mainZone = PlayerPrefs.GetInt("LandedZoneIndex", 0);
+            if (zoneIndex == mainZone)
+            {
+                PlayerPrefs.SetInt(zoneKey, oldVal);
+            }
+            else
+            {
+                PlayerPrefs.SetInt(zoneKey, 0);
+            }
+            // Clear old global to complete migration safely
+            PlayerPrefs.DeleteKey("Player_HiredCount_" + key);
+            PlayerPrefs.Save();
+        }
+        return PlayerPrefs.GetInt(zoneKey, 0);
+    }
+
+    public void SetHeroCount(string key, int zoneIndex, int val)
+    {
+        PlayerPrefs.SetInt("Player_HiredCount_" + key + "_Zone_" + zoneIndex, val);
+        PlayerPrefs.Save();
+    }
+
+    public int GetUnitCount(string id, int zoneIndex)
+    {
+        string zoneKey = "Player_Unit_" + id + "_Zone_" + zoneIndex;
+        if (!PlayerPrefs.HasKey(zoneKey))
+        {
+            int oldVal = PlayerPrefs.GetInt("Player_Unit_" + id, 0);
+            int mainZone = PlayerPrefs.GetInt("LandedZoneIndex", 0);
+            if (zoneIndex == mainZone)
+            {
+                PlayerPrefs.SetInt(zoneKey, oldVal);
+            }
+            else
+            {
+                PlayerPrefs.SetInt(zoneKey, 0);
+            }
+            // Clear old global to complete migration safely
+            PlayerPrefs.DeleteKey("Player_Unit_" + id);
+            PlayerPrefs.Save();
+        }
+        return PlayerPrefs.GetInt(zoneKey, 0);
+    }
+
+    public void SetUnitCount(string id, int zoneIndex, int val)
+    {
+        PlayerPrefs.SetInt("Player_Unit_" + id + "_Zone_" + zoneIndex, val);
+        PlayerPrefs.Save();
+    }
 
     private void Awake()
     {
@@ -104,13 +250,32 @@ public class FateCastleManager : MonoBehaviour
 
     private void HandleCastleClicks()
     {
-        // Avoid clicking 3D structures if details are open or town view is active
-        if (isTownViewActive || isDetailsOpen || showNewDayOverlay) return;
+        // Avoid clicking 3D structures if town view is active or day overlay is showing
+        if (isTownViewActive || showNewDayOverlay) return;
 
         if (Input.GetMouseButtonDown(0))
         {
             if (Camera.main != null)
             {
+                // Ensure we don't click on GUI Windows
+                if (isDetailsOpen)
+                {
+                    // GUI coordinates are Y-down, but screen coordinates are Y-up.
+                    // Keep clicking robust: if click is in the lower/upper right pane or middle details rect, ignore 3D raycast.
+                    Vector2 mousePos = Input.mousePosition;
+                    float panelWidth = 360f;
+                    float panelHeight = 520f;
+                    float px = Screen.width - panelWidth - 30f;
+                    float py = 30f; // from top
+                    Rect guiRect = new Rect(px, py, panelWidth, panelHeight);
+                    // Match screen pos (Y up) to GUI pos (Y down)
+                    Vector2 guiMouse = new Vector2(mousePos.x, Screen.height - mousePos.y);
+                    if (guiRect.Contains(guiMouse))
+                    {
+                        return; // Clicked inside Details panel, ignore raycast
+                    }
+                }
+
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hit;
                 if (Physics.Raycast(ray, out hit, 150f))
@@ -220,7 +385,7 @@ public class FateCastleManager : MonoBehaviour
         int playerZone = 0;
         if (DialogueSystem_Manager.Instance != null)
         {
-            playerZone = DialogueSystem_Manager.Instance.selectedZoneIndex;
+            playerZone = DialogueSystem_Manager.Instance.SelectedZoneIndex;
         }
 
         LandingPositionManager lpm = LandingPositionManager.Instance;
@@ -805,6 +970,34 @@ public class FateCastleManager : MonoBehaviour
 
         GUILayout.Label($"🏰 {labelName.ToUpper()}", titleS);
 
+        // QUICK PLAYER CASTLE SWITCHER (v18.11.15)
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        for (int i = 0; i < castles.Count; i++)
+        {
+            if (castles[i].owner == "Player")
+            {
+                string tabName = curLang == 0 ? castles[i].nameRU : castles[i].nameEN;
+                if (curLang == 8) tabName = castles[i].nameCH;
+                if (curLang == 7) tabName = castles[i].nameKR;
+
+                // Simple truncation for small buttons
+                if (tabName.Length > 10) tabName = tabName.Substring(0, 9) + "..";
+
+                GUI.backgroundColor = (i == activeDetailsIndex) ? new Color(0.12f, 0.82f, 0.98f, 1.0f) : Color.white;
+                if (GUILayout.Button($"🏰 {tabName} (L-{castles[i].level})", GUILayout.Height(26)))
+                {
+                    activeDetailsIndex = i;
+                    feedbackMessage = "";
+                }
+            }
+        }
+        GUI.backgroundColor = Color.white;
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+
+        GUILayout.Space(6);
+
         GUIStyle subSt = new GUIStyle(GUI.skin.label);
         subSt.alignment = TextAnchor.MiddleCenter;
         subSt.fontSize = 13;
@@ -835,6 +1028,32 @@ public class FateCastleManager : MonoBehaviour
         if (curLang == 8) flowTxt = $"每日领地税金: +{inc} 💰 每回合";
         if (curLang == 7) flowTxt = $"일일 연구비 영수: +{inc} 💰 턴당";
         GUILayout.Label(flowTxt, subSt);
+
+        if (castle.owner == "Player")
+        {
+            int hCount = GetHeroesCountInCastle(castle.zoneIndex);
+            int hCap = GetHeroCapacity(castle.level);
+            
+            string capLabel = curLang == 0 ?
+                $"Размещено Героев: {hCount} / {hCap} 👥" :
+                $"Garrisoned Heroes: {hCount} / {hCap} 👥";
+            if (curLang == 8) capLabel = $"驻军部将: {hCount} / {hCap} 👥";
+            if (curLang == 7) capLabel = $"수령 완료 영웅: {hCount} / {hCap} 👥";
+            
+            GUILayout.Label(capLabel, descS);
+        }
+        else
+        {
+            // Enemy Castle
+            string rName = GetCastleRace(castle.zoneIndex, curLang);
+            string rLabel = curLang == 0 ?
+                $"Раса гарнизона: {rName} 🛡️" :
+                $"Garrison Clan: {rName} 🛡️";
+            if (curLang == 8) rLabel = $"防守部族: {rName} 🛡️";
+            if (curLang == 7) rLabel = $"수비 진영: {rName} 🛡️";
+            
+            GUILayout.Label(rLabel, descS);
+        }
 
         GUILayout.Space(12);
 
@@ -923,28 +1142,133 @@ public class FateCastleManager : MonoBehaviour
         }
         else
         {
-            // Вражеский замок
+            // Вражеский замок - Espionage & Info Panel
             GUIStyle warnS = new GUIStyle(GUI.skin.label);
             warnS.alignment = TextAnchor.MiddleCenter;
             warnS.fontStyle = FontStyle.Bold;
-            warnS.fontSize = 13;
+            warnS.fontSize = 12;
             warnS.normal.textColor = new Color(1.0f, 0.35f, 0.35f, 1.0f);
 
             string warnDesc = curLang == 0 ?
-                "ЭТИ ЗЕМЛИ НАХОДЯТСЯ ПОД КОНТРОЛЕМ ВРАЖЕСКИХ ЛОРДОВ.\nПодготовьте армию и атакуйте крепость, когда зачистите Пустоши!" :
-                "THIS PROVINCE LIES DEEP WITHIN ENEMY BORDERS.\nRaise an imperial army and prepare units for assault!";
+                "ЭТИ ЗЕМЛИ НАХОДЯТСЯ ПОД КОНТРОЛЕМ ВРАЖЕСКИХ ЛОРДОВ.\nДля захвата зачистите Пустоши и поднимите армию!" :
+                "THIS PROVINCE LIES DEEP WITHIN ENEMY BORDERS.\nClear tasks and raise an imperial army to assault!";
             GUILayout.Label(warnDesc, warnS);
 
-            GUILayout.Space(15);
+            GUILayout.Space(8);
 
-            string spyBtn = curLang == 0 ? "🕵️ Отправить шпиона в гарнизон" : "🕵️ Send spy to investigate defenses";
-            if (GUILayout.Button(spyBtn, GUILayout.Height(40)))
+            // Espionage logic (v18.11.15)
+            int reqMinLevel = GetMinSpyRequiredLevel();
+            int pMaxLvl = GetPlayerMaxCastleLevel();
+            bool hasMinLvlUnlocked = pMaxLvl >= reqMinLevel;
+            bool lvlMatch = pMaxLvl >= castle.level;
+            bool isSpied = PlayerPrefs.GetInt("Castle_Spied_" + castle.zoneIndex, 0) == 1;
+
+            GUIStyle intelBox = new GUIStyle(GUI.skin.box);
+            intelBox.normal.textColor = Color.yellow;
+            intelBox.alignment = TextAnchor.MiddleLeft;
+            intelBox.fontSize = 13;
+
+            GUILayout.BeginVertical(intelBox);
+            
+            string reportHeader = curLang == 0 ? "📋 ДАННЫЕ ВОЕННОЙ РАЗВЕДКИ:" : "📋 MILITARY INTELLIGENCE REPORT:";
+            if (curLang == 8) reportHeader = "📋 军事情报搜集总览:";
+            if (curLang == 7) reportHeader = "📋 군사 정찰 보고 데이터:";
+            GUILayout.Label(reportHeader, GUI.skin.label);
+            
+            GUILayout.Space(4);
+
+            if (isSpied)
             {
-                string infoFeed = curLang == 0 ?
-                    $"Шпионские данные: Сила охраны: {castle.aiTroopsPower} | Оружие: Т-{castle.aiArmorTier}" :
-                    $"Intel: Defense integrity power: {castle.aiTroopsPower} | Armament tier: T-{castle.aiArmorTier}";
-                ShowFeedback(infoFeed);
+                string guardPowerText = curLang == 0 ?
+                    $"• Общая мощь гарнизона: {castle.aiTroopsPower} ед. мощи\n" +
+                    $"• Уровень Полководца: {castle.aiCommanderLevel} ур.\n" +
+                    $"• Класс ковки защиты: Tier {castle.aiArmorTier}\n" +
+                    $"• Запас боевых зелий: {castle.aiPotionsStock} шт." :
+                    $"• Total Defense Power: {castle.aiTroopsPower} Combat rating\n" +
+                    $"• Faction Commander: Level {castle.aiCommanderLevel}\n" +
+                    $"• Guard Armor Quality: Tier {castle.aiArmorTier}\n" +
+                    $"• Supply Potions count: {castle.aiPotionsStock} bottles";
+                
+                if (curLang == 8) guardPowerText = $"• 戍军总战斗力: {castle.aiTroopsPower} 点\n• 守城将领等级: {castle.aiCommanderLevel} 级\n• 防具锻造等级: Tier {castle.aiArmorTier}\n• 备用药水数量: {castle.aiPotionsStock} 瓶";
+                if (curLang == 7) guardPowerText = $"• 총 가드 수비력: {castle.aiTroopsPower}\n• 영주 사령관 훈련: {castle.aiCommanderLevel} 렙\n• 장갑 무구 구조: {castle.aiArmorTier} 단계\n• 회복 약물 비축량: {castle.aiPotionsStock} 개";
+
+                GUILayout.Label(guardPowerText, GUI.skin.label);
+                
+                GUILayout.Space(5);
+                GUIStyle okS = new GUIStyle(GUI.skin.label);
+                okS.normal.textColor = Color.green;
+                okS.alignment = TextAnchor.MiddleCenter;
+                okS.fontStyle = FontStyle.Bold;
+                GUILayout.Label(curLang == 0 ? "✓ [РАЗВЕДДАННЫЕ ПОЛУЧЕНЫ]" : "✓ [INTEL ACQUIRED]", okS);
             }
+            else
+            {
+                string hiddenText = curLang == 0 ?
+                    "• Общая мощь гарнизона: ??? (Скрыто)\n" +
+                    "• Уровень Полководца: ??? (Скрыто)\n" +
+                    "• Класс ковки защиты: ??? (Скрыто)\n" +
+                    "• Запас боевых зелий: ??? (Скрыто)" :
+                    "• Total Defense Power: ??? (Hidden)\n" +
+                    "• Faction Commander: ??? (Hidden)\n" +
+                    "• Guard Armor Quality: ??? (Hidden)\n" +
+                    "• Supply Potions count: ??? (Hidden)";
+                
+                if (curLang == 8) hiddenText = "• 戍军总战斗力: ??? (未知)\n• 守城将领等级: ??? (未知)\n• 防具锻造等级: ??? (未知)\n• 备用药水数量: ??? (未知)";
+                if (curLang == 7) hiddenText = "• 총 가д 수비력: ??? (백지)\n• 영주 사령관 훈련: ??? (백지)\n• 장갑 무구 구조: ??? (백지)\n• 회복 약물 비축량: ??? (백지)";
+
+                GUILayout.Label(hiddenText, GUI.skin.label);
+                
+                GUILayout.Space(5);
+
+                int cost = GetSpyCost(castle.level);
+
+                if (!hasMinLvlUnlocked)
+                {
+                    GUI.backgroundColor = new Color(0.8f, 0.4f, 0.4f);
+                    GUILayout.Label(curLang == 0 ? 
+                        $"🔒 Шпионаж заблокирован!\nТребуется уровень Вашего замка: {reqMinLevel}+. У вас: {pMaxLvl}." :
+                        $"🔒 Espionage limits reached!\nRequires your castle tier: {reqMinLevel}+. You have: {pMaxLvl}.", GUI.skin.box);
+                    GUI.backgroundColor = Color.white;
+                }
+                else if (!lvlMatch)
+                {
+                    GUI.backgroundColor = new Color(0.8f, 0.4f, 0.4f);
+                    GUILayout.Label(curLang == 0 ? 
+                        $"🔒 Уровень Вашего замка низок!\nТребуется ранг Вашего замка: {castle.level}+. У вас: {pMaxLvl}." :
+                        $"🔒 Target protection too secure!\nRequires your castle tier: {castle.level}+ representing equal standard. You have: {pMaxLvl}.", GUI.skin.box);
+                    GUI.backgroundColor = Color.white;
+                }
+                else
+                {
+                    string btnSpyText = curLang == 0 ?
+                        $"🕵️ КУПИТЬ ШПИОНАЖ ({cost} 💰)" :
+                        $"🕵️ ACTIVATE ESPIONAGE ({cost} 💰)";
+                    if (curLang == 8) btnSpyText = $"🕵️ 派遣密探渗透 ({cost} 💰)";
+                    if (curLang == 7) btnSpyText = $"🕵️ 첩자 파견 ({cost} 💰)";
+
+                    GUI.backgroundColor = new Color(0.12f, 0.82f, 0.98f, 1.0f);
+                    if (GUILayout.Button(btnSpyText, GUILayout.Height(36)))
+                    {
+                        if (SaveGameSystem.CurrentData.gold < cost)
+                        {
+                            ShowFeedback(curLang == 0 ? "Недостаточно королевского золота!" : "Insufficient gold supplies!");
+                        }
+                        else
+                        {
+                            SaveGameSystem.CurrentData.gold -= cost;
+                            PlayerPrefs.SetInt("Castle_Spied_" + castle.zoneIndex, 1);
+                            PlayerPrefs.Save();
+                            
+                            string spyDone = curLang == 0 ?
+                                "Шпион проник в лагерь врага! Данные составлены." :
+                                "Espionage infiltration successful! Report compiled.";
+                            ShowFeedback(spyDone);
+                        }
+                    }
+                    GUI.backgroundColor = Color.white;
+                }
+            }
+            GUILayout.EndVertical();
         }
 
         GUILayout.EndVertical();
@@ -987,6 +1311,32 @@ public class FateCastleManager : MonoBehaviour
         if (curLang == 7) header = "🏟️ 2D 영토 성채 제어반 🏟️";
         GUILayout.Label(header, tStyle);
 
+        // TOWN SELECT QUICK SWITCH TABS (v18.11.15)
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        for (int i = 0; i < castles.Count; i++)
+        {
+            if (castles[i].owner == "Player")
+            {
+                string tabName = curLang == 0 ? castles[i].nameRU : castles[i].nameEN;
+                if (curLang == 8) tabName = castles[i].nameCH;
+                if (curLang == 7) tabName = castles[i].nameKR;
+
+                GUI.backgroundColor = (i == activeDetailsIndex) ? new Color(0.12f, 0.82f, 0.98f, 1.0f) : Color.white;
+                string btnLabel = curLang == 0 ? $"🏰 {tabName.ToUpper()} (Ур.{castles[i].level})" : $"🏰 {tabName.ToUpper()} (Tier {castles[i].level})";
+                if (GUILayout.Button(btnLabel, GUILayout.Height(32), GUILayout.Width(wWidth / 4.4f)))
+                {
+                    activeDetailsIndex = i;
+                    feedbackMessage = "";
+                }
+            }
+        }
+        GUI.backgroundColor = Color.white;
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+
+        GUILayout.Space(8);
+
         // Subhead
         GUIStyle subSt = new GUIStyle(GUI.skin.label);
         subSt.alignment = TextAnchor.MiddleCenter;
@@ -998,7 +1348,18 @@ public class FateCastleManager : MonoBehaviour
         if (curLang == 8) cLabel = activeCastle.nameCH;
         if (curLang == 7) cLabel = activeCastle.nameKR;
 
-        GUILayout.Label($"{cLabel.ToUpper()} (Уровень {activeCastle.level}) | {(curLang == 0 ? "Казна" : "Treasury")}: {SaveGameSystem.CurrentData.gold} 💰 | {(curLang == 0 ? "Уровень" : "Level")}: {SaveGameSystem.CurrentData.playerLevel} (XP: {SaveGameSystem.CurrentData.currentXP}/100)", subSt);
+        int activeIncome = GetGoldIncome(activeCastle.level);
+        int activeHeroes = GetHeroesCountInCastle(activeCastle.zoneIndex);
+        int activeCap = GetHeroCapacity(activeCastle.level);
+        
+        string subLabel = curLang == 0 ?
+            $"{cLabel.ToUpper()} (Ур.{activeCastle.level}) | Доход: +{activeIncome} 💰/ход | Вместимость: {activeHeroes}/{activeCap} Героев 👥\nКазна фракции: {SaveGameSystem.CurrentData.gold} 💰 | Ранг игрока: {SaveGameSystem.CurrentData.playerLevel} (XP: {SaveGameSystem.CurrentData.currentXP}/100)" :
+            $"{cLabel.ToUpper()} (Tier {activeCastle.level}) | Income: +{activeIncome} 💰/turn | Population: {activeHeroes}/{activeCap} Heroes 👥\nKingdom Gold: {SaveGameSystem.CurrentData.gold} 💰 | Player Level: {SaveGameSystem.CurrentData.playerLevel} (XP: {SaveGameSystem.CurrentData.currentXP}/100)";
+        
+        if (curLang == 8) subLabel = $"{cLabel.ToUpper()} (等级 {activeCastle.level}) | 收益: +{activeIncome} 💰/回合 | 英雄容量: {activeHeroes}/{activeCap} 👥\n帝国资金: {SaveGameSystem.CurrentData.gold} 💰 | 角色级别: {SaveGameSystem.CurrentData.playerLevel}";
+        if (curLang == 7) subLabel = $"{cLabel.ToUpper()} (레벨 {activeCastle.level}) | 영지 소득: +{activeIncome} 💰/턴 | 인구: {activeHeroes}/{activeCap} 영웅 👥\n종족 금고: {SaveGameSystem.CurrentData.gold} 💰 | 플레이어 등급: {SaveGameSystem.CurrentData.playerLevel}";
+
+        GUILayout.Label(subLabel, subSt);
 
         GUILayout.Space(12);
 
@@ -1356,7 +1717,7 @@ public class FateCastleManager : MonoBehaviour
     private void DrawUnitItem(string id, string nameRU, string nameEN, string nameCH, string nameKR, int price, int requiredLvl, int castleLvl)
     {
         int curLang = Translator.LanguageID;
-        int count = PlayerPrefs.GetInt("Player_Unit_" + id, 0);
+        int count = GetUnitCount(id, activeDetailsIndex);
         string name = curLang == 0 ? nameRU : nameEN;
         if (curLang == 8) name = nameCH;
         if (curLang == 7) name = nameKR;
@@ -1382,8 +1743,7 @@ public class FateCastleManager : MonoBehaviour
                 {
                     SaveGameSystem.CurrentData.gold -= price;
                     count++;
-                    PlayerPrefs.SetInt("Player_Unit_" + id, count);
-                    PlayerPrefs.Save();
+                    SetUnitCount(id, activeDetailsIndex, count);
                     
                     string buyMsg = curLang == 0 ?
                         $"Отряд {name} нанят в гарнизон!" :
@@ -1434,18 +1794,31 @@ public class FateCastleManager : MonoBehaviour
     private void DrawHeroRecruitItem(string key, string nameRU, string nameEN, string nameCH, string nameKR, int basePrice)
     {
         int curLang = Translator.LanguageID;
-        int count = PlayerPrefs.GetInt("Player_HiredCount_" + key, 0);
+        int count = GetHeroCount(key, activeDetailsIndex);
 
         string name = curLang == 0 ? nameRU : nameEN;
         if (curLang == 8) name = nameCH;
         if (curLang == 7) name = nameKR;
 
         GUILayout.BeginHorizontal(GUI.skin.box);
-        GUILayout.Label($"{name}\n[Нанято: {count}]", GUILayout.Width(180));
+        GUILayout.Label($"{name}\n[В замке: {count}]", GUILayout.Width(180));
 
         if (GUILayout.Button($"{basePrice} 💰", GUILayout.Height(35)))
         {
-            if (SaveGameSystem.CurrentData.gold < basePrice)
+            CastleInstance activeCastle = castles[activeDetailsIndex >= 0 ? activeDetailsIndex : 0];
+            int currentHeroes = GetHeroesCountInCastle(activeCastle.zoneIndex);
+            int capacity = GetHeroCapacity(activeCastle.level);
+
+            if (currentHeroes >= capacity)
+            {
+                string limitTxt = curLang == 0 ?
+                    $"Достигнут лимит героев в этом замке ({currentHeroes}/{capacity})! Повысьте уровень цитадели." :
+                    $"Castle hero garrison limit reached ({currentHeroes}/{capacity})! Upgrade stronghold first.";
+                if (curLang == 8) limitTxt = $"已达城堡英雄上限 ({currentHeroes}/{capacity})！请先升级主城。";
+                if (curLang == 7) limitTxt = $"성채 영웅 한도 초과 ({currentHeroes}/{capacity})! 성채를 먼저 업그레이드 하십시오.";
+                ShowFeedback(limitTxt);
+            }
+            else if (SaveGameSystem.CurrentData.gold < basePrice)
             {
                 ShowFeedback(curLang == 0 ? "Легендарные рекруты стоят дорого!" : "Noble adventurers deny cheap calls!");
             }
@@ -1453,12 +1826,11 @@ public class FateCastleManager : MonoBehaviour
             {
                 SaveGameSystem.CurrentData.gold -= basePrice;
                 count++;
-                PlayerPrefs.SetInt("Player_HiredCount_" + key, count);
-                PlayerPrefs.Save();
+                SetHeroCount(key, activeDetailsIndex, count);
 
                 string joinFeed = curLang == 0 ?
-                    $"Герой присоединился к вашим силам на Континенте!" :
-                    $"Renowned combat leader of class joined your cause!";
+                    $"Герой успешно размещен в гарнизоне замка!" :
+                    $"Renowned combat leader joined the castle garrison!";
                 ShowFeedback(joinFeed);
             }
         }
