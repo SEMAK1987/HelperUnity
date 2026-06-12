@@ -199,7 +199,7 @@ function GameHelpView() {
              <BookOpen className="w-8 h-8 text-blue-500" />
              Помощь По Игре (Unity 6)
           </h2>
-          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v18.11.9</p>
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v18.11.10</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -746,7 +746,7 @@ export default function App() {
 
   const [kb, setKb] = useState<KBData | null>(null);
   const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info' | 'migration' | 'game_design' | 'game_help'>('chat');
-  const [appVersion, setAppVersion] = useState('18.11.9');
+  const [appVersion, setAppVersion] = useState('18.11.10');
 
   useEffect(() => {
     // Автоматическая синхронизация версии с сервером
@@ -5243,7 +5243,7 @@ export default function App() {
                                       {simDialogueLang === 'RU' ? 'Перейти к выбору области континента ➔' : simDialogueLang === 'KR' ? '지역 선택 대화로 진입 ➔' : simDialogueLang === 'CH' ? '进入区域选择 ➔' : 'Select territory ➔'}
                                     </button>
                                   ) : simDialogueStep === 3 ? (() => {
-                                    /* THE 12-CELL TACTICAL GRID FOR THE NEW_KONTINENT - v18.11.9 */
+                                    /* THE 12-CELL TACTICAL GRID FOR THE NEW_KONTINENT - v18.11.10 */
                                     const TACTICAL_TILES = [
                                       // ROW 0
                                       {
@@ -5646,7 +5646,7 @@ export default function App() {
                                           {/* RIGHT: DYNAMIC HUD SPEC PANEL FITTED TO HIGHLIGHTED TILE */}
                                           <div className="lg:col-span-12 xl:col-span-5 flex flex-col justify-between min-h-[380px]">
                                             {!activeTile ? (
-                                              /* Tactical Empty Selection HUD - v18.11.9 */
+                                              /* Tactical Empty Selection HUD - v18.11.10 */
                                               <div className="flex-1 flex flex-col items-center justify-center text-center p-6 rounded-3xl bg-white/5 border border-dashed border-indigo-400/20 backdrop-blur-sm">
                                                 <Compass className="w-9 h-9 text-indigo-400/30 animate-pulse mb-3" />
                                                 <h5 className="text-xs font-black text-slate-300 uppercase tracking-widest">

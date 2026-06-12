@@ -1,10 +1,11 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.11.9)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.11.10)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** 18.11.9
+- **Version:** 18.11.10
 - **Engine:** Unity 6 (6000.3.10f1)
-- **Updates:** Input System Auto-Switch & Camera Rig Calibration - Solves New Input System 999+ Exception errors in StrategicCameraController.cs using smart preprocessor compilation. Calibrates landing point cameraOffset defaults from obsolete 15f height to ideal 2.5f height with auto-correction on startup, and sets crisp strategic min/max zoom limits (0.6f / 8.0f) for full continent overview.
+- **v18.11.10 Update:** 4-Zone Spawn Match & Map Sync - Matches indices and names of zones ("Кровавые Пустоши" -> Oasis_SpawnPoint, "Ледяной Пик" -> Outpost_SpawnPoint, "Древние Руины" -> Shore_SpawnPoint, "Святилище Зенита" -> Citadel_SpawnPoint) in LandingPositionManager.cs to match interactive rings and user's customized map catalog. Fixes clipping/clipping depth by placing Ring interactive markers local Z coordinate at -2.0f and companions/heroes at -2.05f to bypass overlapping from any 3D continent textures.
+- **v18.11.9 Update:** Input System Auto-Switch & Camera Rig Calibration - Solves New Input System 999+ Exception errors in StrategicCameraController.cs using smart preprocessor compilation. Calibrates landing point cameraOffset defaults from obsolete 15f height to ideal 2.5f height with auto-correction on startup, and sets crisp strategic min/max zoom limits (0.6f / 8.0f) for full continent overview.
 - **v18.11.8 Update:** 4-Zone Landing Position Auto-Sync & Anchor Persistence - Binds four distinct landing points and automatically synchronizes physical spawn anchors (`Wastes_SpawnPoint`, `Peak_SpawnPoint`, `Ruins_SpawnPoint`, `Crags_SpawnPoint`), securely caching player selection across sessions with persistent PlayerPrefs. Fully masks 3D environments during dialog panels to secure scene purity.
 - **v18.11.7 Update:** Selective Dialogue Map Dismissal & Hidden Faction Markers - Dismisses map background, landing rings, and companion/hero markers upon clicking 'End Dialogue' or ending conversation. Hides non-glowing faction reference circles (`Faction_Marker_Aelyssa` / class markers) inside the tactical view to keep the landing layout extremely pristine.
 - **Design System:** Zenith Glassmorphism (8K Ultra-High Density)
@@ -27,7 +28,7 @@
 - **Audio Rule (CRITICAL):** Используйте только `SettingsManager.cs` для управления звуком и музыкой (включая hover-эффекты и списки воспроизведения). Скрипты `AudioHandler` и `AudioManager` должны быть полностью удалены для чистоты проекта. Музыкальные клипы продлеваются через Suno/Udio и настраиваются на бесшовное зацикливание (`loop = true`). Звуковые файлы берем с Pixabay/Freesound по CC0-лицензии и подключаем напрямую к SettingsManager или через AudioMixer.
 
 ## 🚀 Протокол «Пошаговое Мастерство» (Step-by-Step Mastery)
-1. **Отслеживание прогресса:** Текущая версия v18.11.9 (Input System Auto-Switch & Camera Calibration, v18.11.9).
+1. **Отслеживание прогресса:** Текущая версия v18.11.10 (4-Zone Spawn Match & Map Sync, v18.11.10).
 2. **Инструкции Настройки Компонентов (Verified Inspector Settings):**
    - **FateMapManager (FATE_WORLD_MAP):**
      - *Maps List:* [+] Слот для глобальной карты (Map Name = "Континент Судьбы", Map Background = фоновый спрайт карты).

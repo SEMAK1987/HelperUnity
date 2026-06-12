@@ -495,7 +495,7 @@ namespace FateContinent
                         ringObj = new GameObject(expectedName);
                         ringObj.transform.SetParent(this.transform);
                         marker = ringObj.AddComponent<FactionMapMarker>();
-                        ringObj.transform.localPosition = new Vector3(ringConf.localPosition.x, ringConf.localPosition.y, -1.0f);
+                        ringObj.transform.localPosition = new Vector3(ringConf.localPosition.x, ringConf.localPosition.y, -2.0f);
                         ringObj.transform.localScale = ringConf.localScale;
                     }
                     else
@@ -554,14 +554,14 @@ namespace FateContinent
 
                 marker.localScaleOverride = ringConf.localScale;
                 
-                // Всегда гарантированно выставляем Z координату ровно в -1.0f по требованию пользователя
+                // Всегда гарантированно выставляем Z координату ровно в -2.0f по требованию пользователя
                 Vector2 currentOffset = Vector2.zero;
                 if (i == 0) currentOffset = new Vector2(ring1OffsetX, ring1OffsetY);
                 else if (i == 1) currentOffset = new Vector2(ring2OffsetX, ring2OffsetY);
                 else if (i == 2) currentOffset = new Vector2(ring3OffsetX, ring3OffsetY);
                 else if (i == 3) currentOffset = new Vector2(ring4OffsetX, ring4OffsetY);
 
-                ringObj.transform.localPosition = new Vector3(ringConf.localPosition.x + currentOffset.x, ringConf.localPosition.y + currentOffset.y, -1.0f);
+                ringObj.transform.localPosition = new Vector3(ringConf.localPosition.x + currentOffset.x, ringConf.localPosition.y + currentOffset.y, -2.0f);
                 ringObj.transform.localScale = ringConf.localScale;
 
                 SpriteRenderer sr = ringObj.GetComponent<SpriteRenderer>();
@@ -662,8 +662,8 @@ namespace FateContinent
                     else if (i == 2) { ringX += ring3OffsetX; ringY += ring3OffsetY; }
                     else if (i == 3) { ringX += ring4OffsetX; ringY += ring4OffsetY; }
 
-                    // Сбрасываем Z координату ровно в -1.0f по требованию пользователя
-                    activeRings[i].transform.localPosition = new Vector3(ringX, ringY, -1.0f);
+                    // Сбрасываем Z координату ровно в -2.0f по требованию пользователя
+                    activeRings[i].transform.localPosition = new Vector3(ringX, ringY, -2.0f);
                     
                     // --- COMPENSATED INDEPENDENT SCALE ---
                     float compensatedScale = ringScale / (mapScale > 0.001f ? mapScale : 1f);
@@ -717,8 +717,8 @@ namespace FateContinent
                     GameObject aelyssaMarker = GetFactionMarker("Faction_Marker_Aelyssa");
                     if (aelyssaMarker != null)
                     {
-                        // Сдвигаем маркер Аэлиссы на точные X, Y кольца, Z делаем чуть выше (-1.05f) для идеального наложения
-                        aelyssaMarker.transform.localPosition = new Vector3(ringPos.x, ringPos.y, -1.05f);
+                        // Сдвигаем маркер Аэлиссы на точные X, Y кольца, Z делаем чуть выше (-2.05f) для идеального наложения
+                        aelyssaMarker.transform.localPosition = new Vector3(ringPos.x, ringPos.y, -2.05f);
                         Debug.Log($"[ZENITH SYNC] Привязали координаты Faction_Marker_Aelyssa к точке {ringIndex}: {aelyssaMarker.transform.localPosition}");
                     }
 
@@ -729,7 +729,7 @@ namespace FateContinent
                         GameObject heroMarker = GetFactionMarker(heroName);
                         if (heroMarker != null)
                         {
-                            heroMarker.transform.localPosition = new Vector3(ringPos.x, ringPos.y, -1.05f);
+                            heroMarker.transform.localPosition = new Vector3(ringPos.x, ringPos.y, -2.05f);
                             Debug.Log($"[ZENITH SYNC] Привязали координаты {heroName} к точке {ringIndex}: {heroMarker.transform.localPosition}");
                         }
                     }

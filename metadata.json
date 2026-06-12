@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.9. Input System Auto-Switch & Camera Calibration - Solves New Input System 999+ Exception errors and calibrates strategic camera offset zoom values to fit the map perfectly.",
+  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.10. 4-Zone Spawn Match & Map Sync - matches physical spawn anchors and increases interactive marker Z depth to -2.0f and companions/heroes to -2.05f to prevent clipping.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

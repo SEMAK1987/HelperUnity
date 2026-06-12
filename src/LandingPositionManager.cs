@@ -71,17 +71,17 @@ namespace FateContinent
             }
 
             // Настройка имен по умолчанию
-            landingPoints[0].zoneID = "Oasis";
-            landingPoints[0].zoneName = "Оазис";
+            landingPoints[0].zoneID = "Wastes";
+            landingPoints[0].zoneName = "Кровавые Пустоши";
 
-            landingPoints[1].zoneID = "Outpost";
-            landingPoints[1].zoneName = "Аванпост";
+            landingPoints[1].zoneID = "Peak";
+            landingPoints[1].zoneName = "Ледяной Пик";
 
-            landingPoints[2].zoneID = "Shore";
-            landingPoints[2].zoneName = "Побережье";
+            landingPoints[2].zoneID = "Ruins";
+            landingPoints[2].zoneName = "Древние Руины";
 
-            landingPoints[3].zoneID = "Citadel";
-            landingPoints[3].zoneName = "Цитадель";
+            landingPoints[3].zoneID = "Sanctuary";
+            landingPoints[3].zoneName = "Святилище Зенита";
 
             // Автоматический поиск пустышек, чтобы ничего не сбрасывалось и не требовалось перетаскивать вручную
             AutoFindSpawnAnchors();
