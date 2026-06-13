@@ -4,6 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using FateContinent;
 
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
+
 /// <summary>
 /// Разработчик: Fate Continent (Континент Судьбы)
 /// Zenith Glassmorphism Design System (8K Ultra-High Density) • v18.11.15
@@ -34,6 +38,41 @@ public class FateCastleManager : MonoBehaviour
     }
 
     public List<CastleInstance> castles = new List<CastleInstance>();
+
+    [Header("🏰 MANUAL CASTLE PLACEMENT & OVERRIDES")]
+    [Tooltip("If checked, the script will use the custom manual positions specified below instead of landing point anchors")]
+    public bool useManualCastlePositions = true;
+    
+    [Tooltip("Manual 3D positions for the 4 castles (0: Wastes, 1: Peak, 2: Ruins, 3: Zenith). Default is matched to continent aesthetics")]
+    public Vector3[] customCastlePositions = new Vector3[4]
+    {
+        new Vector3(-5.3f, -0.4f, 4.2f),   // Кровавые Пустоши
+        new Vector3(14.8f, 1.2f, 12.5f),   // Ледяной Пик
+        new Vector3(-12.4f, -0.3f, -10.2f), // Древние Руины
+        new Vector3(6.5f, 0.8f, -4.5f)     // Святилище Зенита
+    };
+
+    [Tooltip("Manual offset added to the spawn anchor of each landing point if not using customCastlePositions")]
+    public Vector3[] castleManualOffsets = new Vector3[4]
+    {
+        new Vector3(3.2f, 0f, 3.2f),
+        new Vector3(3.2f, 0f, 3.2f),
+        new Vector3(3.2f, 0f, 3.2f),
+        new Vector3(3.2f, 0f, 3.2f)
+    };
+
+    [Tooltip("Snaps the final height coordinate of any spawned 3D castle onto the terrain below it")]
+    public bool snapCastlesToTerrain = true;
+
+    [Header("💵 MANUAL CHRONO & TREASURY CONFIG")]
+    [Tooltip("Initial day of the campaign (Default to 1)")]
+    public int initialDaySetting = 1;
+    
+    [Tooltip("Initial gold/treasury of the campaign (Default to 100)")]
+    public int initialGoldSetting = 100;
+
+    [HideInInspector]
+    public bool isContinentGameplayActive = false;
 
     [Header("MANUAL / AUTONOMOUS ESPIONAGE CONFIG (v18.11.15)")]
     public bool useAutonomousEspionageSettings = true;
@@ -217,8 +256,45 @@ public class FateCastleManager : MonoBehaviour
 
     private void Start()
     {
-        currentDay = PlayerPrefs.GetInt("Fate_Current_Day", 1);
+        isContinentGameplayActive = PlayerPrefs.GetInt("ContinentGameplayActive", 0) == 1;
+        currentDay = PlayerPrefs.GetInt("Fate_Current_Day", initialDaySetting);
+        if (isContinentGameplayActive)
+        {
+            SpawnAllCastles();
+        }
+    }
+
+    public void EnableContinentGameplay()
+    {
+        isContinentGameplayActive = true;
+        PlayerPrefs.SetInt("ContinentGameplayActive", 1);
+        PlayerPrefs.Save();
+        
+        // Spawn the 3D castles visual structures now!
         SpawnAllCastles();
+    }
+
+    public void ResetToInitialSettings()
+    {
+        PlayerPrefs.SetInt("ContinentGameplayActive", 0);
+        isContinentGameplayActive = false;
+        
+        PlayerPrefs.SetInt("Fate_Current_Day", initialDaySetting);
+        currentDay = initialDaySetting;
+        
+        SaveGameSystem.CurrentData.gold = initialGoldSetting;
+
+        // Remove spawned castles if any
+        for (int i = 0; i < castles.Count; i++)
+        {
+            if (castles[i].visualRoot != null)
+            {
+                Destroy(castles[i].visualRoot);
+            }
+        }
+        
+        PlayerPrefs.Save();
+        Debug.Log($"[CASTLE MGR] Сброс параметров кампании: День={initialDaySetting}, Золото={initialGoldSetting}");
     }
 
     private void Update()
@@ -248,21 +324,43 @@ public class FateCastleManager : MonoBehaviour
         RotateCastleGems();
     }
 
+    private Vector2 GetMousePosition()
+    {
+#if ENABLE_INPUT_SYSTEM
+        var mouse = Mouse.current;
+        if (mouse != null) return mouse.position.ReadValue();
+        return Vector2.zero;
+#else
+        return Input.mousePosition;
+#endif
+    }
+
+    private bool WasLeftMouseButtonClicked()
+    {
+#if ENABLE_INPUT_SYSTEM
+        var mouse = Mouse.current;
+        if (mouse != null) return mouse.leftButton.wasPressedThisFrame;
+        return false;
+#else
+        return Input.GetMouseButtonDown(0);
+#endif
+    }
+
     private void HandleCastleClicks()
     {
-        // Avoid clicking 3D structures if town view is active or day overlay is showing
-        if (isTownViewActive || showNewDayOverlay) return;
+        // Avoid clicking 3D structures if continent gameplay is not fully active, town view is active, or day overlay is showing
+        if (!isContinentGameplayActive || isTownViewActive || showNewDayOverlay) return;
 
-        if (Input.GetMouseButtonDown(0))
+        if (WasLeftMouseButtonClicked())
         {
             if (Camera.main != null)
             {
+                Vector2 mousePos = GetMousePosition();
                 // Ensure we don't click on GUI Windows
                 if (isDetailsOpen)
                 {
                     // GUI coordinates are Y-down, but screen coordinates are Y-up.
                     // Keep clicking robust: if click is in the lower/upper right pane or middle details rect, ignore 3D raycast.
-                    Vector2 mousePos = Input.mousePosition;
                     float panelWidth = 360f;
                     float panelHeight = 520f;
                     float px = Screen.width - panelWidth - 30f;
@@ -276,7 +374,7 @@ public class FateCastleManager : MonoBehaviour
                     }
                 }
 
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                Ray ray = Camera.main.ScreenPointToRay(mousePos);
                 RaycastHit hit;
                 if (Physics.Raycast(ray, out hit, 150f))
                 {
@@ -416,19 +514,37 @@ public class FateCastleManager : MonoBehaviour
                 Destroy(castle.visualRoot);
             }
 
-            if (i >= lpm.landingPoints.Length || lpm.landingPoints[i].spawnAnchor == null)
+            Vector3 spawnPos;
+            if (useManualCastlePositions)
             {
-                continue;
+                if (customCastlePositions != null && i < customCastlePositions.Length)
+                {
+                    spawnPos = customCastlePositions[i];
+                }
+                else
+                {
+                    spawnPos = Vector3.zero;
+                }
+            }
+            else
+            {
+                if (i >= lpm.landingPoints.Length || lpm.landingPoints[i].spawnAnchor == null)
+                {
+                    continue;
+                }
+                Transform anchor = lpm.landingPoints[i].spawnAnchor;
+                Vector3 offset = (castleManualOffsets != null && i < castleManualOffsets.Length) ? castleManualOffsets[i] : new Vector3(3.2f, 0f, 3.2f);
+                spawnPos = anchor.position + offset;
             }
 
-            Transform anchor = lpm.landingPoints[i].spawnAnchor;
-            Vector3 spawnPos = anchor.position + new Vector3(3.2f, 0f, 3.2f);
-            
             // Проецирование на террейн заземленно
-            RaycastHit hit;
-            if (Physics.Raycast(spawnPos + Vector3.up * 50f, Vector3.down, out hit, 100f))
+            if (snapCastlesToTerrain)
             {
-                spawnPos.y = hit.point.y;
+                RaycastHit hit;
+                if (Physics.Raycast(spawnPos + Vector3.up * 50f, Vector3.down, out hit, 100f))
+                {
+                    spawnPos.y = hit.point.y;
+                }
             }
 
             GameObject root = new GameObject("3D_Castle_" + i);
@@ -804,6 +920,10 @@ public class FateCastleManager : MonoBehaviour
 
     private void OnGUI()
     {
+        // Не рисуем игровой HUD (кошелек, день, пропустить ход, новое наложение дня и информацию о замке), 
+        // пока игрок полностью не завершил 2-й диалог-инструктаж с Аэлиссой!
+        if (!isContinentGameplayActive) return;
+
         int curLang = Translator.LanguageID;
 
         // Если активен 2D вид города, рисуем его во весь экран

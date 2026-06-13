@@ -639,6 +639,16 @@ namespace FateContinent
                 SetupFallbackDialogues();
             }
 
+            if (startIndex == 0)
+            {
+                PlayerPrefs.SetInt("ContinentGameplayActive", 0);
+                PlayerPrefs.Save();
+                if (FateCastleManager.Instance != null)
+                {
+                    FateCastleManager.Instance.ResetToInitialSettings();
+                }
+            }
+
             isDialogueActive = true;
             currentLineIndex = startIndex;
 
@@ -941,6 +951,12 @@ namespace FateContinent
                 if (dialogPanel != null)
                 {
                     dialogPanel.SetActive(false);
+                }
+                
+                // Активируем полнофункциональный HUD и 3D спавн замков кампании Континента
+                if (FateCastleManager.Instance != null)
+                {
+                    FateCastleManager.Instance.EnableContinentGameplay();
                 }
                 
                 if (FateMapManager.Instance != null)
