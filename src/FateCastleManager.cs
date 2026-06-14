@@ -15,7 +15,25 @@ using UnityEngine.InputSystem;
 /// </summary>
 public class FateCastleManager : MonoBehaviour
 {
-    public static FateCastleManager Instance { get; private set; }
+    public static FateCastleManager Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = FindFirstObjectByType<FateCastleManager>();
+                if (instance == null)
+                {
+                    GameObject go = new GameObject("FateCastleManager_Runtime");
+                    instance = go.AddComponent<FateCastleManager>();
+                    DontDestroyOnLoad(go);
+                    Debug.Log("<color=cyan>[FATE CASTLE] Dynamic runtime self-instantiation triggered.</color>");
+                }
+            }
+            return instance;
+        }
+    }
+    private static FateCastleManager instance;
 
     [System.Serializable]
     public class CastleInstance
@@ -85,6 +103,28 @@ public class FateCastleManager : MonoBehaviour
     public int manualLevel3_4_Cap = 5;
     public int manualLevel5_Cap = 6;
     public int manualLevel6_Cap = 7;
+
+    [Header("🤖 MANUAL AI OPPONENT SIMULATION CONFIG (v18.11.15 EXPOSED)")]
+    [Tooltip("If checked, use the manual opponent variables declared below instead of the auto formulas based on selected difficulty settings")]
+    public bool useManualAiSimulationSettings = false;
+    
+    [Range(0f, 1f)]
+    [Tooltip("Manual base probability of opponent castle automatic upgrade per turn")]
+    public float manualAiUpgradeProbability = 0.30f;
+
+    [Range(0f, 1f)]
+    [Tooltip("Manual base probability of opponent garrison troop recruitment per turn")]
+    public float manualAiRecruitProbability = 0.40f;
+
+    [Range(0f, 1f)]
+    [Tooltip("Manual base probability of opponent equipment tier upgrade per turn")]
+    public float manualAiEquipmentProbability = 0.35f;
+
+    [Tooltip("Manual opponent starting base gold income per level multiplier")]
+    public float manualAiIncomeMultiplier = 1.35f;
+    
+    [Tooltip("Manual starting troop power boost for all opponent castles on campaign start")]
+    public int manualAiStartingTroopPower = 15;
     
     // UI states and trackers
     public bool isTownViewActive = false;
@@ -240,12 +280,12 @@ public class FateCastleManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
+        if (instance == null)
         {
-            Instance = this;
+            instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        else
+        else if (instance != this)
         {
             Destroy(gameObject);
             return;
@@ -467,7 +507,10 @@ public class FateCastleManager : MonoBehaviour
             
             // Re-load opponent simulated progression
             castle.aiCommanderLevel = PlayerPrefs.GetInt("Castle_AI_CommanderLvl_" + i, UnityEngine.Random.Range(1, 3));
-            castle.aiTroopsPower = PlayerPrefs.GetInt("Castle_AI_Troops_" + i, UnityEngine.Random.Range(8, 20));
+            
+            int defaultPower = useManualAiSimulationSettings ? manualAiStartingTroopPower : UnityEngine.Random.Range(8, 20);
+            castle.aiTroopsPower = PlayerPrefs.GetInt("Castle_AI_Troops_" + i, defaultPower);
+
             castle.aiArmorTier = PlayerPrefs.GetInt("Castle_AI_Armor_" + i, 1);
             castle.aiPotionsStock = PlayerPrefs.GetInt("Castle_AI_Potions_" + i, UnityEngine.Random.Range(1, 4));
 
@@ -480,10 +523,14 @@ public class FateCastleManager : MonoBehaviour
     /// </summary>
     public void SpawnAllCastles()
     {
-        int playerZone = 0;
+        int playerZone = PlayerPrefs.GetInt("LandedZoneIndex", 0);
         if (DialogueSystem_Manager.Instance != null)
         {
-            playerZone = DialogueSystem_Manager.Instance.SelectedZoneIndex;
+            int selected = DialogueSystem_Manager.Instance.SelectedZoneIndex;
+            if (selected > 0)
+            {
+                playerZone = selected;
+            }
         }
 
         LandingPositionManager lpm = LandingPositionManager.Instance;
@@ -523,18 +570,24 @@ public class FateCastleManager : MonoBehaviour
                 }
                 else
                 {
-                    spawnPos = Vector3.zero;
+                    spawnPos = new Vector3((i - 1.5f) * 15f, 0f, 0f);
                 }
             }
             else
             {
-                if (i >= lpm.landingPoints.Length || lpm.landingPoints[i].spawnAnchor == null)
+                if (i < lpm.landingPoints.Length && lpm.landingPoints[i].spawnAnchor != null)
                 {
-                    continue;
+                    Transform anchor = lpm.landingPoints[i].spawnAnchor;
+                    Vector3 offset = (castleManualOffsets != null && i < castleManualOffsets.Length) ? castleManualOffsets[i] : new Vector3(3.2f, 0f, 3.2f);
+                    spawnPos = anchor.position + offset;
                 }
-                Transform anchor = lpm.landingPoints[i].spawnAnchor;
-                Vector3 offset = (castleManualOffsets != null && i < castleManualOffsets.Length) ? castleManualOffsets[i] : new Vector3(3.2f, 0f, 3.2f);
-                spawnPos = anchor.position + offset;
+                else
+                {
+                    // НАДЁЖНЫЙ РЕЗЕРВНЫЙ ФОЛЛБЕК: Если физический анкер стёрт или отсутствует в иерархии Unity,
+                    // мы выставляем безопасные 3D-координаты. Замки НИКОГДА больше не пропадают после пропуска хода (AdvanceDay)!
+                    spawnPos = new Vector3((i - 1.5f) * 18f, 1.2f, (i % 2 == 0 ? 8f : -8f));
+                    Debug.LogWarning($"[CASTLE MGR] Точка привязки для замка '{castle.nameRU}' не задана. Использована резервная 3D координата: {spawnPos}");
+                }
             }
 
             // Проецирование на террейн заземленно
@@ -805,13 +858,13 @@ public class FateCastleManager : MonoBehaviour
             {
                 // Начисление золота ИИ
                 int aiIncome = GetGoldIncome(c.level);
-                float diffMultiplier = 1.0f + (diff * 0.4f); // Чем выше сложность, тем больше золота у ИИ
+                float diffMultiplier = useManualAiSimulationSettings ? manualAiIncomeMultiplier : (1.0f + (diff * 0.4f)); // Чем выше сложность, тем больше золота у ИИ
                 c.goldAccumulated += aiIncome * diffMultiplier;
 
                 // Логические вероятности прокачек компьютера на ход
-                float upgradeChance = 0.15f + (diff * 0.20f); 
-                float recruitChance = 0.25f + (diff * 0.15f);
-                float equipmentChance = 0.20f + (diff * 0.12f);
+                float upgradeChance = useManualAiSimulationSettings ? manualAiUpgradeProbability : (0.15f + (diff * 0.20f)); 
+                float recruitChance = useManualAiSimulationSettings ? manualAiRecruitProbability : (0.25f + (diff * 0.15f));
+                float equipmentChance = useManualAiSimulationSettings ? manualAiEquipmentProbability : (0.20f + (diff * 0.12f));
 
                 // А. Попытка улучшения замка компьютером
                 if (c.level < 6 && c.goldAccumulated >= GetUpgradeCost(c.level) && UnityEngine.Random.value < upgradeChance)

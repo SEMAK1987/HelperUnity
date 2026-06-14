@@ -707,8 +707,8 @@ namespace FateContinent
 
                 if (Application.isPlaying)
                 {
-                    // Активируем ТОЛЬКО выбранное кольцо, если сама карта видима
-                    activeRings[i].SetActive(isMapVisible && (i == ringIndex));
+                    // Показываем ВСЕ кольца выбора на карте, давая игроку наглядно выбирать из них, а не скрывая неактивные!
+                    activeRings[i].SetActive(isMapVisible);
                 }
             }
 

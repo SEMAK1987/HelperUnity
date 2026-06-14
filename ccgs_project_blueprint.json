@@ -12,10 +12,10 @@
   },
   "agents_count": 52,
   "project_assets": {
-    "scripts_count": 31,
+    "scripts_count": 32,
     "prefabs_count": 0,
     "videos_count": 0,
-    "total_files": 64,
+    "total_files": 65,
     "video_list": [],
     "script_list": [
       "FactionMapMarker.cs",
@@ -28,6 +28,7 @@
       "src/CharacterSelectionController.cs",
       "src/DialogueSystem_Manager.cs",
       "src/EventHub.cs",
+      "src/FateCastleManager.cs",
       "src/FateGameplayIntro_Manager.cs",
       "src/FateMapManager.cs",
       "src/GamePause_Manager.cs",
@@ -51,5 +52,5 @@
       "src/UnitBase.cs"
     ]
   },
-  "last_scan": "2026-06-11T16:11:35.774Z"
+  "last_scan": "2026-06-14T08:35:59.209Z"
 }

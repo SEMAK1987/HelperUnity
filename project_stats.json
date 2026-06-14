@@ -10,6 +10,7 @@
     "src/CharacterSelectionController.cs",
     "src/DialogueSystem_Manager.cs",
     "src/EventHub.cs",
+    "src/FateCastleManager.cs",
     "src/FateGameplayIntro_Manager.cs",
     "src/FateMapManager.cs",
     "src/GamePause_Manager.cs",
@@ -39,12 +40,12 @@
   "pdfs": [],
   "videos": [],
   "others": [],
-  "total_files": 64,
+  "total_files": 65,
   "analysis": {
     "audit_issues": [],
     "todos": [],
     "asset_stats": {
-      "total_size": 1384917,
+      "total_size": 1628803,
       "large_files": []
     },
     "dependencies": {
@@ -99,6 +100,14 @@
         "UnityEngine",
         "System",
         "System.Collections.Generic"
+      ],
+      "FateCastleManager": [
+        "System",
+        "System.Collections",
+        "System.Collections.Generic",
+        "UnityEngine",
+        "FateContinent",
+        "UnityEngine.InputSystem"
       ],
       "FateGameplayIntro_Manager": [
         "UnityEngine",
@@ -212,5 +221,5 @@
       ]
     }
   },
-  "last_updated": "2026-06-11T16:11:38.417Z"
+  "last_updated": "2026-06-14T08:36:02.294Z"
 }

@@ -29,6 +29,12 @@ public static class SaveGameSystem
         public int gold = 100;
         public float currentHealth = 100f;
         public float maxHealth = 100f;
+        
+        [Header("Weapon Levels & Skill Points (v18.11.15)")]
+        public int swordLevel = 1;
+        public int bowLevel = 1;
+        public int staffLevel = 1;
+        public int availableSkillPoints = 30;
 
         [Header("Координаты (Позиция игрока в мире)")]
         public float posX = 0f;

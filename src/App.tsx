@@ -413,6 +413,10 @@ function MenuStudioPreview({ onDownload }: { onDownload: () => void }) {
     '简体中文': { 
       play: '开始', settings: '设置', exit: '退出', back: '返回', volume: '音量', music: '音乐', quality: '画质 (8K)', res: '分辨率 (ULTRA)', fs: '全屏', graphics: '图像', lang: '语言', help: '游戏帮助', capabilities: 'AI 能力', ollama: 'Ollama: 正常', ollamaOff: 'Ollama: 关闭', sync: '奇点语法', offline: '安全模式', clear: '清除', clearing: '正在清除...', thinking: '皮层矩阵分析 (8K)', synth: '综合 Unity 6 & Blender 5.2 数据', proMastery: 'Menu Studio Visuals Mastery', downloadBg: '下载背景 (JPG 8K)',
       q_vlow: '极低', q_low: '低', q_med: '中', q_high: '高', q_vhigh: '极高', q_ultra: '终极'
+    },
+    'Português': { 
+      play: 'Jogar', settings: 'Configurações', exit: 'Sair', back: 'Voltar', volume: 'Som', music: 'Música', quality: 'Qualidade (8K)', res: 'Resolução (ULTRA)', fs: 'Tela cheia', graphics: 'Gráficos', lang: 'Idioma', help: 'Ajuda do Jogo', capabilities: 'Capacidades de IA', ollama: 'Ollama: OK', ollamaOff: 'Ollama: Off', sync: 'Sintaxe de Singularidade', offline: 'Modo Seguro', clear: 'Limpar', clearing: 'Limpando...', thinking: 'Análise da Matriz Cortex (8K)', synth: 'Sintetizando dados de Unity 6 e Blender 5.2', proMastery: 'Menu Studio Visuals Mastery', downloadBg: 'Baixar Fundo (JPG 8K)',
+      q_vlow: 'Muito Baixo', q_low: 'Baixo', q_med: 'Médio', q_high: 'Alto', q_vhigh: 'Muito Alto', q_ultra: 'Ultra'
     }
   }[language as keyof typeof t] || { 
     play: 'Play', settings: 'Settings', exit: 'Exit', back: 'Back', volume: 'Sound', music: 'Music', quality: 'Quality', res: 'Resolution', fs: 'Fullscreen', graphics: 'Graphics', lang: 'Language', downloadBg: 'Download',
@@ -631,7 +635,7 @@ function MenuStudioPreview({ onDownload }: { onDownload: () => void }) {
                         animate={{ opacity: 1, y: 0 }}
                         className="absolute bottom-full mb-2 w-full bg-slate-900 border border-white/20 rounded-xl overflow-hidden z-50 shadow-2xl"
                       >
-                        {['Русский', 'English', 'Deutsch', 'Français', 'Español', '日本語', '한국어', '简体中文'].map(l => (
+                        {['Русский', 'English', 'Deutsch', 'Français', 'Español', 'Português', '日本語', '한국어', '简体中文'].map(l => (
                           <button 
                             key={l}
                             onClick={() => { setLanguage(l); setShowLanguageList(false); }}
@@ -729,6 +733,199 @@ function AtmosphericOverlay() {
 }
 
 const MemoizedAtmosphericOverlay = React.memo(AtmosphericOverlay);
+
+const DIALOGUE_TRANSLATIONS: Record<
+  number,
+  Record<'RU' | 'EN' | 'DE' | 'FR' | 'ES' | 'PT' | 'JA' | 'KR' | 'CH', string>
+> = {
+  0: {
+    RU: "Здравствуй, путник! Наш Континент Судьбы погружается во тьму древнего безвременья. Я буду сопровождать тебя в этом опасном походе.",
+    EN: "Greetings, traveler! Our Fate Continent is sinking into the darkness of ancient timelessness. I will accompany you in this dangerous journey.",
+    DE: "Seid gegrüßt, Reisender! Unser Schicksalskontinent versinkt in der Dunkelheit der alten Zeitlosigkeit. Ich werde euch auf dieser gefährlichen Reise begleiten.",
+    FR: "Salutations, voyageur ! Notre Continent du Destin sombre dans les ténèbres d'une intemporalité ancienne. Je vous accompagnerai dans ce voyage dangereux.",
+    ES: "¡Saludos, viajero! Nuestro Continente del Destino se está hundiendo en la oscuridad de una atemporalidad antigua. Te acompañaré en este peligroso viaje.",
+    PT: "Saudações, viajante! Nosso Continente do Destino está afundando na escuridão de uma atemporalidade antiga. Eu irei acompanhá-lo nesta jornada perigosa.",
+    JA: "旅人よ、挨拶を！私たちの運命の大陸は、古代の永遠の闇へと沈みつつあります。この危険な旅路、私が同行しましょう。",
+    KR: "반갑다, 여행자여! 우리의 운명 대륙이 고대 무한의 어둠 속으로 잠기고 있다. 내가 이 위험한 여정에 동행하겠다.",
+    CH: "你好，旅人！我们的命运大陆正在沉入远古无尽的黑暗之中。我将陪伴你度过这段危险的旅程。"
+  },
+  1: {
+    RU: "Меня зовут Аэлисса, хранительница священного Кристалла Зенита. Моя магия защитит тебя от коварства Кровавых Пустошей.",
+    EN: "My name is Aelyssa, keeper of the sacred Zenith Crystal. My magic will protect you from the treachery of the Crimson Wastes.",
+    DE: "Mein Name is Aelyssa, Hüterin des heiligen Zenit-Kristalls. Meine Magie wird euch vor dem Verrat der Blutigen Ödlande schützen.",
+    FR: "Je m'appelle Aelyssa, gardienne du cristal sacré du Zénith. Ma magie vous protégera de la trahison des Landes Sanglantes.",
+    ES: "Mi nombre es Aelyssa, guardiana del sagrado Cristal Cenit. Mi magia te protegerá de la traición de los Páramos Sangrientos.",
+    PT: "Meu nome é Aelyssa, guardiã do sagrado Cristal Zenith. Minha magia irá protegê-lo da traição das Terras Desoladas Carmesins.",
+    JA: "私はアエリッサ、聖なるゼни스크ристаルの守護者です。私の魔法が、血の荒野の邪悪からあなたを守るでしょう。",
+    KR: "내 이름은 앨리사, 신성한 제니스 크리스탈의 수호자다. 나의 마법이 크림슨 황무지의 배신으로부터 당신을 지켜줄 것이다.",
+    CH: "我叫艾莉莎，神圣天顶水晶的守护者。我的魔法将保护你免受绯红荒野的背叛。"
+  },
+  2: {
+    RU: "Отлично! Твое оружие заряжено энергией Зенита. Двинемся вперед через северные врата замка!",
+    EN: "Excellent! Your weapon is infused with Zenith energy. Let us move forward through the northern castle gates!",
+    DE: "Hervorragend! Ihre Waffe ist mit Zenit-Energie erfüllt. Lasst uns durch die nördlichen Burgtore vorrücken!",
+    FR: "Excellent ! Votre arme est imprégnée de l'énergie du Zénith. Avançons par les portes nord du château !",
+    ES: "¡Excelente! Tu arma está infundida con energía Cenit. ¡Avancemos por las puertas del norte del castillo!",
+    PT: "Excelente! Sua arma está infundida com empolgante energia Zenith. Vamos avançar pelos portões norte do castelo!",
+    JA: "素晴らしい！あなたの武器にはゼニスのマ力が注入されました。城の北門を通り、前進しましょう！",
+    KR: "훌륭하다! 당신의 무기에 제니스 에너지가 주입되었다. 북쪽 성문을 통해 전진하자!",
+    CH: "太棒了！你的武器被注入了天顶能量。让我们从北门穿过城堡前进吧！"
+  },
+  3: {
+    RU: "Помни: каждый выбор здесь имеет значение. Наш отряд готов к бою. Теперь выбери область на Континенте Судьбы для первой боевой зачистки:",
+    EN: "Remember: every choice here has consequences. Our squad is ready. Now select a territory on the Fate Continent for the initial tactical sweep:",
+    DE: "Denkt daran: Jede Entscheidung hier hat Konsequenzen. Unsere Truppe ist bereit. Wählt nun ein Gebiet auf dem Schicksalskontinent für die erste taktische Säuberung aus:",
+    FR: "Rappelez-vous : chaque choix ici a des conséquences. Notre escouade est prête. Sélectionnez maintenant un territoire sur le Continent du Destin pour le nettoyage tactique initial :",
+    ES: "Recuerda: cada elección aquí tiene consecuencias. Nuestro escuadra está listo. Ahora selecciona un territory en el Continente del Destino para el barrido táctico inicial:",
+    PT: "Lembre-se: cada escolha aqui tem consequências. Nosso esquadrão está pronto. Agora selecione um território no Continent do Destino para a varredura tática inicial:",
+    JA: "忘れないでください、ここでの選択にはすべて結果が伴います。私たちの部隊は準備万端です。さあ、最初の戦術的掃討のために、運命の大陸から地域を選択してください：",
+    KR: "기억해라: 이곳에서의 모든 선택은 그 결과가 따른다. 우리 부대는 전투 준비가 끝났다. 이제 운명의 대륙에서 첫 전술적 소탕을 전개할 지역을 선택해라:",
+    CH: "记住：这里的每一个选择都有其后果。我们的队伍已准备就绪。现在请选择命运大陆上的一个区域进行首次战术肃清："
+  },
+  4: {
+    RU: "Вы выбрали Кровавые Пустоши! Здесь сильны орды бандитов и адские ветры Зенита. Да пребудет с тобой благословение Кристалла! Мы отправляемся в бой.",
+    EN: "You have selected the Crimson Wastes! Bandit hordes and infernal Zenith winds plague this land. May the blessing of the Crystal guide us! Charging into battle.",
+    DE: "Ihr habt die Blutigen Öдланде gewählt! Banditenhorden und höllische Zenit-Winde plagen dieses Land. Möge der Segen des Kristalls uns leiten! Wir ziehen in den Kampf.",
+    FR: "Vous avez choisi les Landes Sanglantes ! Des hordes de bandits et des vents infernaux du Zénith accablent cette terre. Que la bénédiction du Cristal nous guide ! En route vers la bataille.",
+    ES: "¡Has seleccionado los Páramos Sangrientos! Las hordas de bandidos y los vientos infernales de Cenit asolan esta tierra. ¡Que la bendición del Cristal nos guíe! Entrando en batalla.",
+    PT: "Você selecionou as Terras Desoladas Carmesins! Hordas de bandidos e ventos infernais de Zenith assolam esta terra. Que a bênção do Cristal nos guie! Entrando em batalha.",
+    JA: "血の荒野を選択しましたね！山賊の群れと荒れ狂うゼニスの魔力嵐が大地を襲っています。クリスタルの祝福があなたを導いてくれますように！戦場へ進撃します。",
+    KR: "크림슨 황무지를 선택하셨습니다! 무법자 무리들과 매서운 제니스의 폭풍이 부는 거친 대지입니다. 크리스탈의 축복이 우리를 이끌어 주기를! 전투로 나아갑니다.",
+    CH: "你选择了绯红荒野！这里充满着强盗豪客与无情的天顶烈风。愿水晶的庇护指引我们！前进杀入战场。"
+  },
+  5: {
+    RU: "Вы выбрали Ледяной Пик! Вечная мерзлота испытывает сильных духом, а гигантские Големы Льда охраняют древние секреты. Да пребудет с нами благословение Кристалла!",
+    EN: "You have selected the Ice-Bound Peak! Permafrost tests the strong, and giant Ice Golems guard ancient secrets. May the blessing of the Crystal protect us!",
+    DE: "Ihr habt den Eisigen Gipfel gewählt! Permafrost prüft die Starken, und gigantische Eisgolems bewachen uralte Geheimnisse. Möge der Kristall uns schützen!",
+    FR: "Vous avez choisi le Pic de Glace ! Le pergélisol met à l'épreuve les forts, et des Golems de glace géants gardent des secrets anciens. Que la bénédiction du Cristal nous protège !",
+    ES: "¡Has seleccionado el Pico Helado! El permafrost pone a prueba a los fuertes y los Golems de Hielo gigantes custodian antiguos secretos. ¡Que la bendición de Cristal nos proteja!",
+    PT: "Você selecionou o Pico Congelado! O permafrost testa os fortes, enquanto gigantescos Golems de Gelo protegem os tesouros antigos. Que o Cristal nos proteja!",
+    JA: "氷結의 峰を選択しましたね！過酷な永久凍土が意志を試しており、巨大な氷のゴーレムたちが古代の神秘を守るために立ちはだかっています。クリスタルの保護がありますように！",
+    KR: "빙설의 봉우리를 선택했다! 혹독한 영구 동토가 의지를 시험하며, 거대한 얼음 골렘들이 고대의 신비를 경비하고 있다. 크리스탈의 보살핌이 있기를!",
+    CH: "你选择了冰封之巅！永恒的极寒将考验你的意志，而寒冰巨魔正守护着古老奇迹。愿水晶庇护我们！"
+  },
+  6: {
+    RU: "Вы выбрали Древние Руины! Забытые катакомбы хранят остатки древних кристаллов Зенита, но берегись ловушек и древних теней. Да пребудет с тобой благословение Кристалла!",
+    EN: "You have selected the Ancient Ruins! Forgotten catacombs hold remnants of ancient Zenith energy crystals, but beware deadly traps and immortal shadows. Crystal bless you!",
+    DE: "Ihr habt die Alten Ruinen gewählt! Vergessene Katakomben bergen Reste uralter Zenit-Kristalle, aber hütет euch vor тодличных ловушек и древних теней. Möге der Kristall euch segnen!",
+    FR: "Vous avez choisi les Ruines Anciennes ! Des catacombes oubliées recèlent des vestiges d'anciens cristaux d'énergie du Zénит, maar gare aux pièges mortels et aux ombres anciennes. Que le Cristal vous bénisse !",
+    ES: "¡Has seleccionado las Ruinas Antiguas! Catacumbas olvidadas albergan restos de los antiguos cristales de energía Cenit, pero ten cuidado con las trampas mortales y las sombras antiguas. ¡El Cristal te bendiga!",
+    PT: "Você selecionou as Ruínas Antigas! Catacumbas esquecidas guardam vestígios dos antigos cristais de energia Zenith, mas cuidado com armadilhas mortais e sombras imortais. Que o Cristal o abençoe!",
+    JA: "古代の遺跡を選択しましたね！忘れられた地下墓地には古代のゼニスマ力結晶の残骸が隠されていますが、致命的な罠と不滅の影を警戒してください。クリスタルの祝福を！",
+    KR: "고대 유적지를 선택했다! 잊혀진 지하 묘지에 고대 제니스 마력 결정의 잔재가 숨겨져 있지만, 치명적인 함정과 불멸의 그림자를 경계해라. 크리스탈의 축복을!",
+    CH: "你选择了远古遗迹！被遗忘的墓穴藏有远古天顶能量水晶的余烬，但务必小心致命的陷阱与不死的幽影。愿水晶赐福于你！"
+  },
+  7: {
+    RU: "Вы выбрали Грозовые Кряжи! Облачный архипелаг, парящий над бездной. Здесь бушуют постоянные молнии, а воздух раздирают стихийные бури. Да пребудет с нами Кристалл!",
+    EN: "You have selected the Storm Ridges! A cloud archipelago floating over the abyss. Constant lightning storms rage here, and elemental tempests tear the air. May the Crystal protect us!",
+    DE: "Ihr habt die Sturmkämme gewählt! Ein Wolkenarchipel, der über dem Abgrund schwebt. Hier wüten ständige Gewitter und Elementarstürmе zerreißt die Luft. Möге der Kristall uns schützen!",
+    FR: "Vous avez choisi les Crêtes de Tempête ! Un archipel de nuages flottant au-dessus de l'abîme. Des tempêtes de foudre constantes y font rage, et des tempêtes élémentaires déchirent l'air. Que le Cristal nous protège !",
+    ES: "¡Has seleccionado las Crestas de Tormenta! Un archipiélago de nubes que flota sobre el abismo. Constantemente rugen tormentas de rayos и las tempestades elementales desgarran el aire. ¡Que el Cristal nos proteja!",
+    PT: "Você selecionou os Cumes da Tempestade! Um arquipélago de nuvens flutuando sobre o abismo. Tempestades de raios constantes rugem aqui, e tempestades elementais rasгам os ar. Que o Cristal nos proteжа!",
+    JA: "嵐 of 尾根を選択しましたね！深淵の上に浮かぶ雲の群島です。絶え間ない雷雨が吹き荒れ、元素の嵐が空気を引き裂いています。クリスタルの加護がありますように！",
+    KR: "폭풍 산맥을 선택했다! 심연 위에 떠 있는 구름 군도입니다. 이곳에는 끊임없는 번개 폭풍이 치고 원소의 폭풍이 공기를 찢고 있습니다. 크리스탈의 보살핌이 있기를!",
+    CH: "你选择了雷暴山脊！悬浮在深渊之上的云中群岛。这里肆虐着连绵不断的雷暴，元素风暴撕裂着空气。愿水晶庇护我们！"
+  },
+  8: {
+    RU: "Прекрасно! Мы прибыли на выбранную точку Контента Судьбы. Гляди, здесь заложена наша первая Башня (1 ур. — аванпост с сигнальным огнем). Она выглядит скромно, но её сияние рассеивает тьму.",
+    EN: "Fabulous! We arrived at your selected point. Look, here lies our first Tower (Level 1 — basic sentry post). It is modest for now, but its light guards us from ancient shadows.",
+    DE: "Fabelhaft! We are an Ihrem ausgewählten Ort angekommen. Schauen Sie, hier steht unser erster Turm (Stufe 1). Er ist noch bescheiden, aber sein Licht vertreibt die Dunkelheit.",
+    FR: "Merveilleux ! Nous sommes arrivés au point sélectionné. Regardez, voici notre premier château (Niveau 1). Il est modeste pour l'instant, mais sa lumière dissipe les ténébres.",
+    ES: "¡Fabuloso! Hemos llegado a tu punto seleccionado. Mira, aquí yace nuestro primer Castillo (Nivel 1). Es modesto por ahora, pero su luz disipa la oscuridad.",
+    PT: "Fabulo! Chegamos ao seu ponto selecionado. Olhe, aqui jaz nossa primeira Torre (Nível 1). É modesta por enquanto, mas sua luz dissipa as sombras.",
+    JA: "見事です！選択した地点に到着しました。ご覧ください、これが私たちの最初の塔（レベル1）です。今はまだささやかですが、その光は古代の闇を払いのけます。",
+    KR: "훌륭하다! 당신이 선택한 영지에 도착했다. 보라, 이곳에 우리의 첫 번째 타워(1레벨)가 세워졌다. 지금은 검소하지만 그 빛이 어둠을 걷어낸다.",
+    CH: "太棒了！我们已经到达了你所选择的地点。看，这里建成了我们的第一座城堡（1级）。虽然目前它还很简陋，但它的光芒能够驱散远古的黑暗。"
+  },
+  9: {
+    RU: "Великолепная работа! Ты улучшил Башню до 2-го уровня! Посмотри на эти прочные каменные пристройки, боковые крылья обороны и вращающийся шпиль с Кристаллом Zenith.",
+    EN: "Magnificent work! You upgraded our Tower to Level 2! Look at these heavy stone structures, custom side wings, and the spinning Crystal Zenith spire emitting cyan color.",
+    DE: "Großartige Arbeit! Sie haben unseren Turm auf Stufe 2 настраивать! Sehen Sie sich diese schweren Steinstrukturen und die rotierende Spitze des Zenit-Kristalls an.",
+    FR: "Travail magnifique ! Vous avez amélioré le château au Niveau 2 ! Regardez ces structures de pierre solides, les ailes de défense et la flèche rotative du Cristal Zenith.",
+    ES: "¡Trabajo magnífico! ¡Mejoraste nuestro Castillo al Nivel 2! Mira las estructuras de piedra, las alas defensivas y la aguja giratoria del Cristal Cenit.",
+    PT: "Trabalho magnífico! Você atualizou nossa Torre para o Nível 2! Veja estas estruturas de pedra pesadas, asas de defesa e a agulha rotativa do Cristal Zenith.",
+    JA: "見事な手際です！塔をレベル2へアップグレードしましたね！頑丈な石造りの外壁、防衛用の側翼、그리고 シアン色の光を放つ回転式のゼニスクリスタル尖塔をご覧ください。",
+    KR: "장엄한 업적이다! 타워를 2레벨로 승급시켰다! 견고한 돌 벽과 방어용 사이드 윙, 그리고 청록색으로 자전하는 제니스 크리스탈 첨탑을 느껴보라.",
+    CH: "叹为观止的杰作！你已成功将城堡升级至2级！快看看这些坚固的石质外墙、侧翼防卫设施，以及散发着青色荧光的旋转天顶水晶塔尖。"
+  },
+  10: {
+    RU: "Теперь мы можем войти внутрь Цитадели 2-го уровня. Здесь построены 3 ключевые здания: 1) Военные Казармы (покупка воинов), 2) Оружейная (снаряжение), 3) Шпионская Тайная Ложа.",
+    EN: "Now we can enter inside the Level 2 Citadel. Three essential facilities are active: 1) Military Barracks (hire soldiers), 2) Armory Warehouse (equipment), 3) Secret Espionage Lodge.",
+    DE: "Jetzt können wir das Innere der Zitadelle von Stufe 2 betreten. Drei wichtige Einrichtungen sind aktiv: 1) Kasernen, 2) Rüstkammer, 3) Geheime Spionage-Loge.",
+    FR: "Nous pouvons maintenant entrer dans la Citadelle de Niveau 2. Trois bâtiments clés sont actifs : 1) Caserne militaire, 2) Armurerie (équipements), 3) Loge secrète d'espionnage.",
+    ES: "Ahora podemos entrar al Castillo de Nivel 2. Tres edificios clave están activos: 1) Cuartel militar, 2) Armería (equipamiento), 3) Logia secreта de espionaje.",
+    PT: "Agora podemos entrar dentro do Castelo de Nível 2. Três instalações essenciais estão ativas: 1) Quartel militar, 2) Armaria (equipamento), 3) Loja secreta de espionagem.",
+    JA: "これでレベル2シтаデルの内部に入ることができます。ここには3つの重要施設があります：1）軍事兵舎（兵士의 雇用）、2）装備武器庫、3）隠密スパイ諜報機関です。",
+    KR: "이제 2레벨 요새 내부로 진입할 수 있다. 세 가지 핵심 건물이 가동 중이다: 1) 군사 병영(병사 고용), 2) 전술 무기고(장비), 3) 장막의 스파이 첩보원 길드.",
+    CH: "现在我们可以进入2级城堡的内部了。这里已经建成了三座核心建筑：1) 军旅兵营（招募士兵）、2) 战备军械库（挑选装备）、3) 密探斥候会所（刺探军情）。"
+  },
+  11: {
+    RU: "Каждый Лорд-Герой имеет жесткий лимит войска. На 5-м уровне ты можешь нести с собой максимум 4 отряда воинов. Один отряд воинов дает +15 к Силе Гарнизона твоей Башни Земли.",
+    EN: "Every Lord Hero has strict troop capacity limits. At level 5, you can carry a maximum of 4 troop squads. Each hired squad grants +15 Garrison Power to your Land Tower.",
+    DE: "Jeder Lord-Held hat strenge Truppenlimits. Auf Stufe 5 können Sie maximal 4 Truppenteile mitführen. Jede angeworbene Truppe erhöht die Garnisonsstärke um +15.",
+    FR: "Chaque Héros a des limites de troupes strictes. Au niveau 5, vous можете transporter un maximum de 4 escouades. Chaque troupe recrutée ajoute +15 à la puissance de la garnison.",
+    ES: "Cada Héroe tiene límites de tropas estrictos. En el nivel 5, puedes llevar un máximo de 4 escuadrones. Cada tropa reclutada añade +15 al poder de la guarnición.",
+    PT: "Cada Herói tem limites estritos de tropas. No nível 5, você pode carregar no máximo 4 esquadrões. Cada tropa contratada adiciona +15 ao poder da guarnição.",
+    JA: "各ロード（英雄）には厳格な兵力上限が設けられています。レベル5のあなたが一帯に連れて歩けるのは最大4部隊までです。1部隊雇用するごとに、拠点の防衛評値が+15されます。",
+    KR: "각각의 로드(영웅)는 엄격한 군대 최대 소지 제한이 있다. 5레벨인 전사는 최대 4개 소대까지 데리고 다닐 수 있다. 고용 시 소대당 영지 방어력이 +15 증가한다.",
+    CH: "每一位领主英雄都有极严格的带兵上限。在当前的5级状态下，你最多只能携带4支士兵分队。每招募一支分队，都会为你的地盘防御战力提供 +15 评分加成。"
+  },
+  12: {
+    RU: "Одень героя! Нажми на иконку вверху слева, чтобы открыть Меню Снаряжения. Здесь ты можешь перетаскивать оружие в ячейки и запустить спутник-разведчик тайной Шпионской Ложи за 150 золота!",
+    EN: "Equip your Hero! Tap the top-left player icon to open the Equipment grid. Drag your glowing swords or armor into active slots, and deploy a stealth spy for 150 gold!",
+    DE: "Rüstet euren Helden aus! Klickt auf das Symbol oben links, um das Ausrüstungmenü zu öffnen. Zieht Waffen in Slots und entsendet einen Spion für 150 Gold!",
+    FR: "Équipez votre Héros ! Cliquez sur l'icône en haut à gauche pour ouvrir la grille d'équipement. Glissez vos armes dans les fentes et envoyez un espion pour 150 pièces d'or !",
+    ES: "¡Equipa a tu Héroe! Haz clic en el icono superior izquierdo para abrir el menú de equipamiento. ¡Arrastra tus armas a las ranuras y envía un espía por 150 de oro!",
+    PT: "Equipe seu Herói! Clique no ícone superior esquerdo para abrir o painel de equipamentos. Arrasте suas armas para os compartimentos e envie um espião por 150 de ouro!",
+    JA: "英雄を装備させましょう！左上のプレイヤーアイコンをクリックして、装備画面を開きます。武器や防具をスロットにドラッグ＆ドロップし、150ゴールドでスパイを隠密派遣してください！",
+    KR: "영웅을 무장시키십시오! 왼쪽 상단 프로필을 클릭하여 장비 교환 패널을 엽니다. 무기를 빈 슬롯에 장착하고, 150 골드로 성의 정찰 길드에서 첩보원을 파견하십시오!",
+    CH: "全副武装，准备迎战！点击左上角的角色头像，即可打开装备栏。直接将神兵利器 or 重铠防具拖入对应槽位，甚至可以消耗 150 金币开启密探谍报侦察！"
+  }
+};
+const SPEAKER_NAMES: Record<'RU' | 'EN' | 'DE' | 'FR' | 'ES' | 'PT' | 'JA' | 'KR' | 'CH', string> = {
+  RU: 'Аэлисса, Хранительница Кристалла',
+  EN: 'Aelyssa, Keeper of Crystal',
+  DE: 'Aelyssa, Hüterin des Kristalls',
+  FR: 'Aelyssa, Gardienne du Cristal',
+  ES: 'Aelyssa, Guardiana del Cristal',
+  PT: 'Aelyssa, Guardiã do Cristal',
+  JA: 'クリスタルの守護者アエリッサ',
+  KR: '크리스탈의 수호자 엘리사',
+  CH: '水晶守护者 艾莉莎'
+};
+
+const LEVEL_LABELS: Record<'RU' | 'EN' | 'DE' | 'FR' | 'ES' | 'PT' | 'JA' | 'KR' | 'CH', string> = {
+  RU: 'Ур.',
+  EN: 'Lvl',
+  DE: 'Stufe',
+  FR: 'Niv.',
+  ES: 'Nivel',
+  PT: 'Nível',
+  JA: 'Lv.',
+  KR: '레벨',
+  CH: '等级'
+};
+
+const STATS_LABELS: Record<'XP' | 'MANA' | 'UPGRADE' | 'GAIN_XP' | 'USE_MANA' | 'RESET', Record<'RU' | 'EN' | 'DE' | 'FR' | 'ES' | 'PT' | 'JA' | 'KR' | 'CH', string>> = {
+  XP: {
+    RU: 'Опыт', EN: 'XP', DE: 'EP', FR: 'XP', ES: 'EXP', PT: 'XP', JA: '経験値', KR: '경험치', CH: '经验'
+  },
+  MANA: {
+    RU: 'Мана', EN: 'Mana', DE: 'Mana', FR: 'Mana', ES: 'Maná', PT: 'Mana', JA: 'マナ', KR: '마나', CH: '魔法值'
+  },
+  UPGRADE: {
+    RU: 'Лвл Ап +', EN: 'Lvl Up +', DE: 'Aufsteigen +', FR: 'Niveau +', ES: 'Nivel +', PT: 'Nível +', JA: 'レベルアップ +', KR: '레벨업 +', CH: '升级 +'
+  },
+  GAIN_XP: {
+    RU: 'Получить Опыт', EN: 'Gain XP', DE: 'EP Erhalten', FR: 'Plus d\'XP', ES: 'Ganar EXP', PT: 'Ganhar XP', JA: '経験値獲得', KR: '경험치 획득', CH: '获得经验'
+  },
+  USE_MANA: {
+    RU: 'Тратить Ману', EN: 'Spend Mana', DE: 'Mana Ausgeben', FR: 'Utiliser Mana', ES: 'Gastar Maná', PT: 'Gastar Mana', JA: 'マナ消費', KR: '마나 소비', CH: '消耗魔法'
+  },
+  RESET: {
+    RU: '← Сбросить сюжет', EN: '← Restart quest', DE: '← Quest neu starten', FR: '← Relancer la quête', ES: '← Reiniciar misión', PT: '← Reiniciar jornada', JA: '← クエスト再起動', KR: '← 퀘스트 재시작', CH: '← 重新开始'
+  }
+};
 
 export default function App() {
   async function fetchWithRetry(url: string, retries = 5, delay = 1000) {
@@ -1328,6 +1525,31 @@ export default function App() {
       synth: '综合 Unity 6 & Blender 4.3 数据',
       proMastery: '专业多工具大师级',
       downloadBg: '下载背景 (JPG 4K)'
+    },
+    'Português': { 
+      play: 'Jogar', 
+      settings: 'Configurações', 
+      exit: 'Sair', 
+      back: 'Voltar', 
+      volume: 'Som', 
+      music: 'Música', 
+      quality: 'Qualidade', 
+      res: 'Resolução', 
+      fs: 'Tela cheia', 
+      graphics: 'Gráficos', 
+      lang: 'Idioma',
+      help: 'Ajuda de Jogo',
+      capabilities: 'Capacidades de IA',
+      ollama: 'Ollama: OK',
+      ollamaOff: 'Ollama: Off',
+      sync: 'Sintaxe de Singularidade',
+      offline: 'Modo Seguro',
+      clear: 'Limpar',
+      clearing: 'Limpando...',
+      thinking: 'Análise da Matriz Cortex',
+      synth: 'Sintetizando dados de Unity 6 e Blender 4.3',
+      proMastery: 'Domínio de Multi-Ferramentas Profissional',
+      downloadBg: 'Baixar Fundo (JPG 4K)'
     }
   }[language as keyof any] || { play: 'Играть', settings: 'Настройки', exit: 'Выход', back: 'Назад', volume: 'Звук', music: 'Музыка', quality: 'Качество', res: 'Разрешение', fs: 'Весь экран', graphics: 'Графика', lang: 'Язык' };
 
@@ -1363,11 +1585,76 @@ export default function App() {
   const [activeQuests, setActiveQuests] = useState<any[]>([]);
   const [synergyHeroType, setSynergyHeroType] = useState<'simple' | 'main'>('simple');
   const [simDialogueHero, setSimDialogueHero] = useState<'warrior' | 'archer' | 'mage'>('warrior');
-  const [simDialogueLang, setSimDialogueLang] = useState<'RU' | 'EN' | 'KR' | 'CH'>('RU');
+  const [simDialogueLang, setSimDialogueLang] = useState<'RU' | 'EN' | 'DE' | 'FR' | 'ES' | 'PT' | 'JA' | 'KR' | 'CH'>('RU');
   const [simDialogueStep, setSimDialogueStep] = useState<number>(0);
+  const [simHeroLvl, setSimHeroLvl] = useState<number>(5);
+  const [simHeroXp, setSimHeroXp] = useState<number>(1420);
+  const [simHeroMana, setSimHeroMana] = useState<number>(240);
   const [dialogueActiveScene, setDialogueActiveScene] = useState<boolean>(false);
   const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
   const [midjourneyContTab, setMidjourneyContTab] = useState<'astralis' | 'vulcania' | 'nordgard' | 'zenith'>('astralis');
+
+  // RPG & Castle simulation States for v18.11.15
+  const [isCharacterMenuOpen, setIsCharacterMenuOpen] = useState<boolean>(false);
+  const [simCastleLevel, setSimCastleLevel] = useState<number>(1);
+  const [playerGold, setPlayerGold] = useState<number>(500);
+  const [recruitedTroops, setRecruitedTroops] = useState<number>(15);
+  const [garrisonTroops, setGarrisonTroops] = useState<number>(8);
+  const [aiUpgradeProb, setAiUpgradeProb] = useState<number>(0.30);
+  const [aiRecruitProb, setAiRecruitProb] = useState<number>(0.40);
+  const [aiEquipProb, setAiEquipProb] = useState<number>(0.35);
+  const [aiIncomeMult, setAiIncomeMult] = useState<number>(1.35);
+  const [aiStartingPower, setAiStartingPower] = useState<number>(15);
+  const [useManualConfig, setUseManualConfig] = useState<boolean>(false);
+
+  // Weapon Skill Stats Leveling (v18.11.15)
+  const [swordLevel, setSwordLevel] = useState<number>(1);
+  const [bowLevel, setBowLevel] = useState<number>(1);
+  const [staffLevel, setStaffLevel] = useState<number>(1);
+
+  // Castle positioning modes & coordinate settings (v18.11.15)
+  const [isCastlePlacementManual, setIsCastlePlacementManual] = useState<boolean>(false);
+  const [manualCastlePositions, setManualCastlePositions] = useState<Record<string, { x: number; y: number; z: number }>>({
+    player: { x: -5.3, y: -0.4, z: 4.2 },
+    peak: { x: 14.8, y: 1.2, z: 12.5 },
+    ruins: { x: -12.4, y: -0.3, z: -10.2 },
+    zenith: { x: 6.5, y: 0.8, z: -4.5 }
+  });
+
+  // Spire visual customizable params
+  const [spireColor, setSpireColor] = useState<string>('#22d3ee'); // cyan
+  const [spireRotationSpeed, setSpireRotationSpeed] = useState<number>(3.5); // seconds
+  const [spireGlowStrength, setSpireGlowStrength] = useState<number>(20); // pixels
+  const [gameDayCount, setGameDayCount] = useState<number>(1);
+  const [aiActionLogs, setAiActionLogs] = useState<string[]>([
+    "День 1: Лорд Мельгард (ИИ) получил пассивное золото (+60).",
+    "День 1: Лорд Мельгард завербовал 4 лучников во втором замке.",
+  ]);
+
+
+  const [equippedItems, setEquippedItems] = useState<Record<string, { name: string; bonus: string; icon: string }>>({
+    helmet: { name: 'Прошитый кожаный чепец', bonus: '+3 Броня', icon: '🪖' },
+    armor: { name: 'Железный нагрудник авангарда', bonus: '+15 Броня', icon: '👕' },
+    weapon: { name: 'Стальной меч Судьбы', bonus: '+25 Сила', icon: '🗡️' },
+    shield: { name: 'Приточный щит Альянса', bonus: '+8 Блок', icon: '🛡️' },
+    boots: { name: 'Кованые латные сапоги', bonus: '+10 Скор.', icon: '👢' },
+    ring: { name: 'Перстень Кристалла', bonus: '+35 Мана', icon: '💍' },
+  });
+
+  const [activeSpellPrompt, setActiveSpellPrompt] = useState<{ name: string; cost: number; desc: string; command: string } | null>(null);
+  const [activeTransferPrompt, setActiveTransferPrompt] = useState<boolean>(false);
+
+  // Sync starting gold with selected difficulty levels 
+  useEffect(() => {
+    if (selectedDifficulty === 'Легкий') {
+      setPlayerGold(800);
+    } else if (selectedDifficulty === 'Тяжелый') {
+      setPlayerGold(300);
+    } else {
+      setPlayerGold(500);
+    }
+  }, [selectedDifficulty]);
+
 
 
   const fetchPackagesInfo = async () => {
@@ -4815,11 +5102,11 @@ export default function App() {
                         <div className="flex flex-wrap items-center gap-4 relative z-20">
                           <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Язык озвучки / текста:</span>
                           <div className="bg-black/40 p-1 rounded-xl border border-white/5 flex gap-1">
-                            {['RU', 'EN', 'KR', 'CH'].map((lang) => (
+                            {['RU', 'EN', 'DE', 'FR', 'ES', 'PT', 'JA', 'KR', 'CH'].map((lang) => (
                               <button
                                 key={lang}
                                 onClick={() => {
-                                  setSimDialogueLang(lang as 'RU' | 'EN' | 'KR' | 'CH');
+                                  setSimDialogueLang(lang as any);
                                   // Play synth click
                                   try {
                                     const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -4836,7 +5123,7 @@ export default function App() {
                                     osc.stop(ctx.currentTime + 0.05);
                                   } catch (e) {}
                                 }}
-                                className={`px-3 py-1.5 rounded-lg text-[10px] font-black tracking-wider transition-all ${
+                                className={`px-2 md:px-3 py-1.5 rounded-lg text-[10px] font-black tracking-wider transition-all ${
                                   simDialogueLang === lang 
                                     ? 'bg-indigo-600 text-white shadow-md' 
                                     : 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -5054,7 +5341,1541 @@ export default function App() {
                           </div>
 
                           {/* The Active RPG Screen Layout mockup with guides */}
-                          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-center pt-2 relative">
+                          {simDialogueStep >= 4 ? (
+                            /* TRANSITIONAL BATTLE ZONE & HERO STATUS HUD OVERVIEW */
+                            <div className="w-full min-h-[500px] rounded-[3rem] bg-slate-950/90 border-2 border-indigo-500/20 relative overflow-hidden p-6 md:p-8 flex flex-col justify-between animate-fade-in font-sans" id="TransitionalBattleZone">
+                              {/* SLIDING LEFT SIDE HERO CUSTOMIZATION PANEL & CHARACTER MENU */}
+                              <div 
+                                className={`absolute top-0 left-0 h-full w-[350px] sm:w-[420px] md:w-[480px] z-50 bg-slate-950/98 border-r-2 border-[#22d3ee]/30 shadow-[10px_0_40px_rgba(0,0,0,0.85)] p-5 flex flex-col justify-between overflow-y-auto filter backdrop-blur-2xl transition-all duration-300 transform ${isCharacterMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
+                                id="Hero_Sliding_Character_Panel"
+                              >
+                                <div>
+                                  {/* Header with Title & Close Action */}
+                                  <div className="flex justify-between items-center pb-3 border-b border-white/5 mb-4">
+                                    <div>
+                                      <h3 className="text-xs font-black text-cyan-400 uppercase tracking-widest">
+                                        🛡️ {simDialogueLang === 'RU' ? 'МЕНЮ ПЕРСОНАЖА' : 'CHARACTER INVENTORY'}
+                                      </h3>
+                                      <span className="text-[7px] font-mono text-slate-500 block">GameObject: Character_Panel_Side_Menu</span>
+                                    </div>
+                                    <button 
+                                      onClick={() => {
+                                        setIsCharacterMenuOpen(false);
+                                        try {
+                                          const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                          const osc = ctx.createOscillator();
+                                          osc.frequency.setValueAtTime(300, ctx.currentTime);
+                                          const g = ctx.createGain(); g.gain.setValueAtTime(0.08, ctx.currentTime);
+                                          osc.connect(g); g.connect(ctx.destination);
+                                          osc.start(); osc.stop(ctx.currentTime + 0.1);
+                                        } catch(e){}
+                                      }}
+                                      className="w-7 h-7 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-all font-black text-xs"
+                                    >
+                                      ✕
+                                    </button>
+                                  </div>
+
+                                  {/* Hero Synergy and Class Toggler Badges inside HUD */}
+                                  <div className="bg-slate-900/60 p-3 rounded-2xl border border-white/5 mb-4 space-y-2">
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider">{simDialogueLang === 'RU' ? 'Тип Синергии:' : 'Synergy Type:'}</span>
+                                      <div className="flex gap-1.5">
+                                        <button 
+                                          onClick={() => setSynergyHeroType('simple')}
+                                          className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase transition-all ${synergyHeroType === 'simple' ? 'bg-indigo-600 text-white shadow-[0_0_10px_rgba(99,102,241,0.4)]' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
+                                        >
+                                          {simDialogueLang === 'RU' ? 'Простой' : 'Simple'}
+                                        </button>
+                                        <button 
+                                          onClick={() => setSynergyHeroType('main')}
+                                          className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase transition-all ${synergyHeroType === 'main' ? 'bg-amber-500 text-black font-black shadow-[0_0_10px_rgba(245,158,11,0.4)]' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
+                                        >
+                                          {simDialogueLang === 'RU' ? 'Основной' : 'Main'}
+                                        </button>
+                                      </div>
+                                    </div>
+
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider">{simDialogueLang === 'RU' ? 'Сменить Класс:' : 'Switch Class:'}</span>
+                                      <div className="flex gap-1">
+                                        {(['warrior', 'archer', 'mage'] as const).map((cls) => (
+                                          <button
+                                            key={cls}
+                                            onClick={() => setSimDialogueHero(cls)}
+                                            className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase transition-all ${simDialogueHero === cls ? 'bg-cyan-500 text-black font-black' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
+                                          >
+                                            {cls === 'warrior' ? (simDialogueLang === 'RU' ? '⚔️ Воин' : '⚔️ Warrior')
+                                             : cls === 'archer' ? (simDialogueLang === 'RU' ? '🏹 Лучник' : '🏹 Archer')
+                                             : (simDialogueLang === 'RU' ? '🧙‍♂️ Маг' : '🧙‍♂️ Mage')}
+                                          </button>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {/* TWO COLUMNS: LEFT EQUIPMENT & RIGHT STATS */}
+                                  <div className="grid grid-cols-12 gap-3 mb-4">
+                                    {/* Left Slot Box: Equipment Grid */}
+                                    <div className="col-span-6 bg-slate-900/40 border border-white/5 p-3 rounded-2xl space-y-2">
+                                      <span className="text-[7.5px] font-black text-slate-500 uppercase block tracking-wider text-center">{simDialogueLang === 'RU' ? 'СНАРЯЖЕНИЕ' : 'EQUIPMENT SLOTS'}</span>
+                                      
+                                      <div className="grid grid-cols-2 gap-2">
+                                        {Object.entries(equippedItems).map(([slotKey, item]) => (
+                                          <div 
+                                            key={slotKey} 
+                                            onClick={() => {
+                                              showNotification(`${item.icon} ${item.name}: ${item.bonus}`, "info");
+                                            }}
+                                            className="bg-slate-950 hover:bg-slate-900/80 p-1.5 rounded-xl border border-white/5 hover:border-cyan-500/20 transition-all text-center cursor-pointer group"
+                                            title={item.name}
+                                          >
+                                            <div className="text-sm mb-0.5">{item.icon}</div>
+                                            <div className="text-[6.5px] font-mono text-slate-400 truncate">{item.name}</div>
+                                            <div className="text-[5.5px] text-cyan-400 font-bold">{item.bonus}</div>
+                                          </div>
+                                        ))}
+                                      </div>
+
+                                      <button
+                                        onClick={() => {
+                                          setActiveTransferPrompt(true);
+                                          try {
+                                            const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                            const osc = ctx.createOscillator();
+                                            osc.frequency.setValueAtTime(440, ctx.currentTime);
+                                            osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1);
+                                            const g = ctx.createGain(); g.gain.setValueAtTime(0.08, ctx.currentTime);
+                                            osc.connect(g); g.connect(ctx.destination);
+                                            osc.start(); osc.stop(ctx.currentTime + 0.2);
+                                          } catch(e){}
+                                        }}
+                                        className="w-full py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-black text-[7.5px] uppercase tracking-wider rounded-xl transition-all shadow-[0_0_15px_rgba(245,158,11,0.25)] hover:scale-[1.01]"
+                                      >
+                                        🚀 {simDialogueLang === 'RU' ? 'ПЕРЕНЕСТИ НА СЦЕНУ (C#)' : 'TRANSFER TO SCENE'}
+                                      </button>
+                                    </div>
+
+                                    {/* Right Slot Box: Characteristics with level points distribution (v18.11.15) */}
+                                    {(() => {
+                                      const getStartingPoints = () => {
+                                        const diff = String(selectedDifficulty || 'Средний').toLowerCase();
+                                        if (diff.includes('легк') || diff.includes('easy')) return 45;
+                                        if (diff.includes('сложн') || diff.includes('hard')) return 15;
+                                        if (diff.includes('кошм') || diff.includes('nightmare')) return 0;
+                                        return 30; // 'Средний' / 'Medium' 
+                                      };
+
+                                      const startingPoints = getStartingPoints();
+                                      const levelPoints = simHeroLvl * 5;
+                                      const totalPointsAllocatable = startingPoints + levelPoints;
+                                      const spentPoints = (swordLevel - 1) + (bowLevel - 1) + (staffLevel - 1);
+                                      const availablePoints = totalPointsAllocatable - spentPoints;
+
+                                      const playStatTune = (pitch: number) => {
+                                        try {
+                                          const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                          const osc = ctx.createOscillator();
+                                          const g = ctx.createGain();
+                                          osc.frequency.setValueAtTime(pitch, ctx.currentTime);
+                                          osc.frequency.exponentialRampToValueAtTime(pitch * 1.5, ctx.currentTime + 0.1);
+                                          g.gain.setValueAtTime(0.06, ctx.currentTime);
+                                          osc.connect(g); g.connect(ctx.destination);
+                                          osc.start(); osc.stop(ctx.currentTime + 0.1);
+                                        } catch(e){}
+                                      };
+
+                                      const handleAddStat = (stat: 'sword' | 'bow' | 'staff') => {
+                                        if (availablePoints > 0) {
+                                          if (stat === 'sword') setSwordLevel(prev => prev + 1);
+                                          if (stat === 'bow') setBowLevel(prev => prev + 1);
+                                          if (stat === 'staff') setStaffLevel(prev => prev + 1);
+                                          playStatTune(523.25);
+                                        }
+                                      };
+
+                                      const handleSubtractStat = (stat: 'sword' | 'bow' | 'staff') => {
+                                        if (stat === 'sword' && swordLevel > 1) {
+                                          setSwordLevel(prev => prev - 1);
+                                          playStatTune(392);
+                                        }
+                                        if (stat === 'bow' && bowLevel > 1) {
+                                          setBowLevel(prev => prev - 1);
+                                          playStatTune(392);
+                                        }
+                                        if (stat === 'staff' && staffLevel > 1) {
+                                          setStaffLevel(prev => prev - 1);
+                                          playStatTune(392);
+                                        }
+                                      };
+
+                                      const handleResetStats = () => {
+                                        setSwordLevel(1);
+                                        setBowLevel(1);
+                                        setStaffLevel(1);
+                                        try {
+                                          const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                          const osc = ctx.createOscillator();
+                                          const g = ctx.createGain();
+                                          osc.frequency.setValueAtTime(300, ctx.currentTime);
+                                          osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.25);
+                                          g.gain.setValueAtTime(0.1, ctx.currentTime);
+                                          osc.connect(g); g.connect(ctx.destination);
+                                          osc.start(); osc.stop(ctx.currentTime + 0.25);
+                                        } catch(e){}
+                                        showNotification(simDialogueLang === 'RU' ? 'Характеристики успешно сброшены!' : 'Weapon points reset successfully!', "info");
+                                      };
+
+                                      return (
+                                        <div className="col-span-6 bg-slate-900/40 border border-white/5 p-3 rounded-2xl flex flex-col justify-between">
+                                          <div>
+                                            <span className="text-[7.5px] font-black text-slate-500 uppercase block tracking-wider text-center mb-1.5">{simDialogueLang === 'RU' ? 'ХАРАКТЕРИСТИКИ' : 'CHARACTERISTICS'}</span>
+                                            
+                                            <div className="space-y-1 text-[8px]">
+                                              <div className="flex justify-between border-b border-white/5 pb-0.5">
+                                                <span className="text-slate-400">{simDialogueLang === 'RU' ? 'Уровень:' : 'Level:'}</span>
+                                                <span className="font-mono text-amber-400 font-bold">{simHeroLvl}</span>
+                                              </div>
+                                              
+                                              {/* Subtitle with unspent point counters */}
+                                              <div className="py-1 px-1.5 bg-cyan-950/40 border border-cyan-500/10 rounded-lg flex justify-between items-center text-[7.5px] font-bold">
+                                                <span className="text-[#22d3ee]">{simDialogueLang === 'RU' ? 'Свободные Очки:' : 'Skill Points:'}</span>
+                                                <span className={`font-mono px-1 rounded ${availablePoints > 0 ? 'bg-[#22d3ee] text-slate-950 animate-pulse font-black' : 'text-slate-400 bg-slate-900'}`}>{availablePoints}</span>
+                                              </div>
+
+                                              {/* Stat 1: Sword level */}
+                                              <div className="flex items-center justify-between py-0.5 border-b border-white/5">
+                                                <span className="text-slate-300 font-sans flex items-center gap-1">⚔️ {simDialogueLang === 'RU' ? 'Меч' : 'Sword'}</span>
+                                                <div className="flex items-center gap-1.5">
+                                                  <button onClick={() => handleSubtractStat('sword')} disabled={swordLevel <= 1} className="w-4 h-4 bg-slate-800 disabled:opacity-30 hover:bg-red-950 hover:text-red-400 text-slate-200 border border-white/10 rounded flex items-center justify-center font-bold text-[9px] transition-all">-</button>
+                                                  <span className="font-mono font-black text-white text-[8.5px] w-4 text-center">{swordLevel}</span>
+                                                  <button onClick={() => handleAddStat('sword')} disabled={availablePoints <= 0} className="w-4 h-4 bg-slate-800 disabled:opacity-30 hover:bg-emerald-950 hover:text-emerald-400 text-slate-200 border border-white/10 rounded flex items-center justify-center font-bold text-[9px] transition-all">+</button>
+                                                </div>
+                                              </div>
+
+                                              {/* Stat 2: Bow level */}
+                                              <div className="flex items-center justify-between py-0.5 border-b border-white/5">
+                                                <span className="text-slate-300 font-sans flex items-center gap-1">🏹 {simDialogueLang === 'RU' ? 'Лук' : 'Bow'}</span>
+                                                <div className="flex items-center gap-1.5">
+                                                  <button onClick={() => handleSubtractStat('bow')} disabled={bowLevel <= 1} className="w-4 h-4 bg-slate-800 disabled:opacity-30 hover:bg-red-950 hover:text-red-400 text-slate-200 border border-white/10 rounded flex items-center justify-center font-bold text-[9px] transition-all">-</button>
+                                                  <span className="font-mono font-black text-white text-[8.5px] w-4 text-center">{bowLevel}</span>
+                                                  <button onClick={() => handleAddStat('bow')} disabled={availablePoints <= 0} className="w-4 h-4 bg-slate-800 disabled:opacity-30 hover:bg-emerald-950 hover:text-emerald-400 text-slate-200 border border-white/10 rounded flex items-center justify-center font-bold text-[9px] transition-all">+</button>
+                                                </div>
+                                              </div>
+
+                                              {/* Stat 3: Staff level */}
+                                              <div className="flex items-center justify-between py-0.5 border-b border-white/5">
+                                                <span className="text-slate-300 font-sans flex items-center gap-1">🔮 {simDialogueLang === 'RU' ? 'Посох' : 'Staff'}</span>
+                                                <div className="flex items-center gap-1.5">
+                                                  <button onClick={() => handleSubtractStat('staff')} disabled={staffLevel <= 1} className="w-4 h-4 bg-slate-800 disabled:opacity-30 hover:bg-red-950 hover:text-red-400 text-slate-200 border border-white/10 rounded flex items-center justify-center font-bold text-[9px] transition-all">-</button>
+                                                  <span className="font-mono font-black text-white text-[8.5px] w-4 text-center">{staffLevel}</span>
+                                                  <button onClick={() => handleAddStat('staff')} disabled={availablePoints <= 0} className="w-4 h-4 bg-slate-800 disabled:opacity-30 hover:bg-emerald-950 hover:text-emerald-400 text-slate-200 border border-white/10 rounded flex items-center justify-center font-bold text-[9px] transition-all">+</button>
+                                                </div>
+                                              </div>
+
+                                              <div className="flex justify-between border-b border-white/5 pb-0.5 text-slate-500 text-[7px] font-mono">
+                                                <span>{simDialogueLang === 'RU' ? 'Баз. (Сложность):' : 'Diff Base:'}</span>
+                                                <span>{startingPoints} pts ({selectedDifficulty})</span>
+                                              </div>
+
+                                              <div className="flex justify-between text-slate-500 text-[7px] font-mono">
+                                                <span>{simDialogueLang === 'RU' ? 'За Уровни (+5/ур):' : 'From Lvl (+5/lvl):'}</span>
+                                                <span>+{levelPoints} pts</span>
+                                              </div>
+                                            </div>
+                                            
+                                            <button
+                                              onClick={handleResetStats}
+                                              className="mt-3 w-full py-1.5 bg-slate-850 hover:bg-red-950 border border-white/10 rounded-xl text-white font-black text-[7.5px] uppercase tracking-widest transition-all"
+                                            >
+                                              🔄 {simDialogueLang === 'RU' ? 'СБРОСИТЬ ОЧКИ' : 'RESET STATS'}
+                                            </button>
+                                          </div>
+
+                                          <div className="bg-slate-950/70 p-1.5 rounded-xl text-[6px] text-slate-500 leading-normal border border-white/5 mt-2">
+                                            {simDialogueLang === 'RU' 
+                                              ? '* Нажмите СБРОС для обнуления. Очки меняются также в зависимости от вашей сложности.' 
+                                              : '* Press RESET. Points calculate dynamically based on current game difficulty.'
+                                            }
+                                          </div>
+                                        </div>
+                                      );
+                                    })()}
+                                  </div>
+
+                                  {/* BOTTOM PART: ACTIVE SKILLS & CAST SPELL PROMPTS */}
+                                  <div className="bg-slate-900/30 p-4 border border-white/5 rounded-2xl relative">
+                                    <div className="flex justify-between items-center mb-3">
+                                      <span className="text-[8px] font-black text-[#22d3ee] uppercase tracking-widest">
+                                        ⚡ {simDialogueLang === 'RU' ? 'НАВЫКИ И УМЕНИЯ КЛАССА' : 'CLASS SKILLS & SPELLS'}
+                                      </span>
+                                      <span className="px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-400 font-mono text-[6px] uppercase">
+                                        {synergyHeroType === 'main' ? (simDialogueLang === 'RU' ? 'Главный' : 'Main Hero') : (simDialogueLang === 'RU' ? 'Простой' : 'Simple Companion')}
+                                      </span>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                      {simDialogueHero === 'warrior' && (
+                                        synergyHeroType === 'main' ? (
+                                          <>
+                                            <div onClick={() => setActiveSpellPrompt({ name: '🌋 Сокрушительный Удар Земли', cost: 50, desc: 'Вызывает подземную волну, наносящую 250 урона и оглушающую противника на 2 секунды во всей зоне.', command: 'CAST_SPELL ID=Slam_Seismic -Owner=Player -Dmg=250 -Stun=2s' })} className="bg-slate-950 hover:bg-slate-900 border border-white/5 hover:border-cyan-400/20 p-2 rounded-xl transition cursor-pointer flex justify-between items-center group">
+                                              <div>
+                                                <div className="text-[9px] font-bold text-slate-200 group-hover:text-white">🌋 Сокрушительный Удар Земли</div>
+                                                <div className="text-[6.5px] text-slate-500">Seismic Slam (Seismic Wave, stun)</div>
+                                              </div>
+                                              <span className="px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 font-mono text-[7px] font-bold">50 MP 🧪</span>
+                                            </div>
+                                            <div onClick={() => setActiveSpellPrompt({ name: '👹 Ярость Великана', cost: 70, desc: 'Вводит героя в неистовство. Показатель силы увеличивается на 100%, скорость атаки удваивается на 8 секунд.', command: 'CAST_SPELL ID=Giant_Rage -Owner=Player -StatMult=Strength,2.0 -Dur=8s' })} className="bg-slate-950 hover:bg-slate-900 border border-white/5 hover:border-cyan-400/20 p-2 rounded-xl transition cursor-pointer flex justify-between items-center group">
+                                              <div>
+                                                <div className="text-[9px] font-bold text-slate-200 group-hover:text-white">👹 Ярость Великана</div>
+                                                <div className="text-[6.5px] text-slate-500">Giant\'s Reckless Rage (Strength +100%)</div>
+                                              </div>
+                                              <span className="px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 font-mono text-[7px] font-bold">70 MP 🧪</span>
+                                            </div>
+                                            <div onClick={() => setActiveSpellPrompt({ name: '🛡️ Щит Судьбы', cost: 60, desc: 'Накладывает на всю армию барьер поглощения урона (400 единиц прочности) под свечением Bloom.', command: 'CAST_SPELL ID=Fate_Shield -Owner=Player -ShieldDurability=400 -Color=Cyan' })} className="bg-slate-950 hover:bg-slate-900 border border-white/5 hover:border-cyan-400/20 p-2 rounded-xl transition cursor-pointer flex justify-between items-center group">
+                                              <div>
+                                                <div className="text-[9px] font-bold text-slate-200 group-hover:text-white">🛡️ Щит Судьбы</div>
+                                                <div className="text-[6.5px] text-slate-500">Sovereign Fate Wall (Absorption Shield)</div>
+                                              </div>
+                                              <span className="px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 font-mono text-[7px] font-bold">60 MP 🧪</span>
+                                            </div>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <div onClick={() => setActiveSpellPrompt({ name: '🔨 Тяжелый Удар', cost: 30, desc: 'Простой направленный выпад мечом. Урон 120, сбрасывает каст врагу.', command: 'CAST_SPELL ID=Heavy_Strike -Owner=Player -Dmg=120' })} className="bg-slate-950 hover:bg-slate-900 border border-white/5 hover:border-cyan-400/20 p-2 rounded-xl transition cursor-pointer flex justify-between items-center group">
+                                              <div>
+                                                <div className="text-[9px] font-bold text-slate-200 group-hover:text-white">🔨 Тяжелый Удар</div>
+                                                <div className="text-[6.5px] text-slate-500">Basic Heavy Sword Strike</div>
+                                              </div>
+                                              <span className="px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 font-mono text-[7px] font-bold">30 MP 🧪</span>
+                                            </div>
+                                            <div onClick={() => setActiveSpellPrompt({ name: '🛡️ Блок Щитом', cost: 25, desc: 'Блокирует 50% входящего физического урона в течение 5 секунд.', command: 'CAST_SPELL ID=Basic_Block -Owner=Player -BlockReduction=50% -Dur=5s' })} className="bg-slate-950 hover:bg-slate-900 border border-white/5 hover:border-cyan-400/20 p-2 rounded-xl transition cursor-pointer flex justify-between items-center group">
+                                              <div>
+                                                <div className="text-[9px] font-bold text-slate-200 group-hover:text-white">🛡️ Блок Щитом</div>
+                                                <div className="text-[6.5px] text-slate-500">Simple Shield Block</div>
+                                              </div>
+                                              <span className="px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 font-mono text-[7px] font-bold">25 MP 🧪</span>
+                                            </div>
+                                          </>
+                                        )
+                                      )}
+
+                                      {simDialogueHero === 'archer' && (
+                                        synergyHeroType === 'main' ? (
+                                          <>
+                                            <div onClick={() => setActiveSpellPrompt({ name: '🏹 Град Стрел Зенит', cost: 55, desc: 'Призывает сокрушительный огненный ливень стрел на отряд противника. Урон 300 в секунду в течение 3 сек.', command: 'CAST_SPELL ID=Zenith_Rain -Owner=Player -DPS=300 -Dur=3s' })} className="bg-slate-950 hover:bg-slate-900 border border-white/5 hover:border-cyan-400/20 p-2 rounded-xl transition cursor-pointer flex justify-between items-center group">
+                                              <div>
+                                                <div className="text-[9px] font-bold text-slate-200 group-hover:text-white">🏹 Град Стрел Зенит</div>
+                                                <div className="text-[6.5px] text-slate-500">Zenith Rain of Star-Fire (AoE DPS)</div>
+                                              </div>
+                                              <span className="px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 font-mono text-[7px] font-bold">55 MP 🧪</span>
+                                            </div>
+                                            <div onClick={() => setActiveSpellPrompt({ name: '🎯 Выстрел Точности', cost: 45, desc: 'Выстрел по уязвимому месту. Наносит 450 критического чистого урона, игнорируя броню вражеского лорда.', command: 'CAST_SPELL ID=Deadly_Shot -Owner=Player -TrueDmg=450' })} className="bg-slate-950 hover:bg-slate-900 border border-white/5 hover:border-cyan-400/20 p-2 rounded-xl transition cursor-pointer flex justify-between items-center group">
+                                              <div>
+                                                <div className="text-[9px] font-bold text-slate-200 group-hover:text-white">🎯 Выстрел Точности</div>
+                                                <div className="text-[6.5px] text-slate-500">Deadly Precision Bolt (Armor Ignore)</div>
+                                              </div>
+                                              <span className="px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 font-mono text-[7px] font-bold">45 MP 🧪</span>
+                                            </div>
+                                            <div onClick={() => setActiveSpellPrompt({ name: '💨 Дымовая Завеса', cost: 40, desc: 'Создает облако дыма, дающее 100% уклонения и скрывающее замок/героя на 10 секунд на стратегической карте.', command: 'CAST_SPELL ID=Smoke_Escape -Owner=Player -Evasion=100% -Dur=10s' })} className="bg-slate-950 hover:bg-slate-900 border border-white/5 hover:border-cyan-400/20 p-2 rounded-xl transition cursor-pointer flex justify-between items-center group">
+                                              <div>
+                                                <div className="text-[9px] font-bold text-slate-200 group-hover:text-white">💨 Дымовая Завеса</div>
+                                                <div className="text-[6.5px] text-slate-500">Tactical Smokescreen Escape</div>
+                                              </div>
+                                              <span className="px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 font-mono text-[7px] font-bold">40 MP 🧪</span>
+                                            </div>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <div onClick={() => setActiveSpellPrompt({ name: '⚡ Быстрая Стрела', cost: 20, desc: 'Наносит быстрый точечный урон в 80 единиц с быстрой перезарядкой.', command: 'CAST_SPELL ID=Quick_Arrow -Owner=Player -Dmg=80' })} className="bg-slate-950 hover:bg-slate-900 border border-white/5 hover:border-cyan-400/20 p-2 rounded-xl transition cursor-pointer flex justify-between items-center group">
+                                              <div>
+                                                <div className="text-[9px] font-bold text-slate-200 group-hover:text-white">⚡ Быстрая Стрела</div>
+                                                <div className="text-[6.5px] text-slate-500">Basic Quick Arrow (Low cooldown)</div>
+                                              </div>
+                                              <span className="px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 font-mono text-[7px] font-bold">20 MP 🧪</span>
+                                            </div>
+                                            <div onClick={() => setActiveSpellPrompt({ name: '⚙️ Стальной Капкан', cost: 35, desc: 'Останавливает движение задетой цели на 4 секунды.', command: 'CAST_SPELL ID=Basic_Snare -Owner=Player -Root=4s' })} className="bg-slate-950 hover:bg-slate-900 border border-white/5 hover:border-cyan-400/20 p-2 rounded-xl transition cursor-pointer flex justify-between items-center group">
+                                              <div>
+                                                <div className="text-[9px] font-bold text-slate-200 group-hover:text-white">⚙️ Стальной Капкан</div>
+                                                <div className="text-[6.5px] text-slate-500">Simple Mechanical Snare Trap</div>
+                                              </div>
+                                              <span className="px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 font-mono text-[7px] font-bold">35 MP 🧪</span>
+                                            </div>
+                                          </>
+                                        )
+                                      )}
+
+                                      {simDialogueHero === 'mage' && (
+                                        synergyHeroType === 'main' ? (
+                                          <>
+                                            <div onClick={() => setActiveSpellPrompt({ name: '☄️ Метеоритный Спектр', cost: 80, desc: 'Обрушивает космическую волну метеоритов на указанную крепость. Наносит 600 урона боссам и рушит оборонительные стены.', command: 'CAST_SPELL ID=Meteor_Spectrum -Owner=Player -Dmg=600 -SiegeDmg=150' })} className="bg-slate-950 hover:bg-slate-900 border border-white/5 hover:border-cyan-400/20 p-2 rounded-xl transition cursor-pointer flex justify-between items-center group">
+                                              <div>
+                                                <div className="text-[9px] font-bold text-slate-200 group-hover:text-white">☄️ Метеоритный Спектр</div>
+                                                <div className="text-[6.5px] text-slate-500">Meteor Spectrum Cosmic Blast (Siege, AoE)</div>
+                                              </div>
+                                              <span className="px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 font-mono text-[7px] font-bold">80 MP 🧪</span>
+                                            </div>
+                                            <div onClick={() => setActiveSpellPrompt({ name: '🔮 Энергетический Барьер', cost: 60, desc: 'Генерирует вокруг Кристалла мана-купол на 12 секунд. Отражает любые снаряды противника назад в стрелка.', command: 'CAST_SPELL ID=Mana_Barrier -Owner=Player -ReflectProjectiles=True -Dur=12s' })} className="bg-slate-950 hover:bg-slate-900 border border-white/5 hover:border-cyan-400/20 p-2 rounded-xl transition cursor-pointer flex justify-between items-center group">
+                                              <div>
+                                                <div className="text-[9px] font-bold text-slate-200 group-hover:text-white">🔮 Энергетический Барьер</div>
+                                                <div className="text-[6.5px] text-slate-500">Mana Mirror Aegis (Deflect shield)</div>
+                                              </div>
+                                              <span className="px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 font-mono text-[7px] font-bold">60 MP 🧪</span>
+                                            </div>
+                                            <div onClick={() => setActiveSpellPrompt({ name: '🌀 Абсолютный Телепорт', cost: 50, desc: 'Герой мгновенно телепортируется в любую точку на карте Континента, уклоняясь от всех засад.', command: 'CAST_SPELL ID=Absolute_Teleport -Owner=Player -Target=SelectedZone' })} className="bg-slate-950 hover:bg-slate-900 border border-white/5 hover:border-cyan-400/20 p-2 rounded-xl transition cursor-pointer flex justify-between items-center group">
+                                              <div>
+                                                <div className="text-[9px] font-bold text-slate-200 group-hover:text-white">🌀 Абсолютный Телепорт</div>
+                                                <div className="text-[6.5px] text-slate-500">Zenith Absolute Blink Portal</div>
+                                              </div>
+                                              <span className="px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 font-mono text-[7px] font-bold">50 MP 🧪</span>
+                                            </div>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <div onClick={() => setActiveSpellPrompt({ name: '🔥 Огненная Вспышка', cost: 25, desc: 'Легкий огненный заряд. Наносит 100 взрывного урона по одиночной цели.', command: 'CAST_SPELL ID=Spark_Shot -Owner=Player -Dmg=100' })} className="bg-slate-950 hover:bg-slate-900 border border-white/5 hover:border-cyan-400/20 p-2 rounded-xl transition cursor-pointer flex justify-between items-center group">
+                                              <div>
+                                                <div className="text-[9px] font-bold text-slate-200 group-hover:text-white">🔥 Огненная Вспышка</div>
+                                                <div className="text-[6.5px] text-slate-500">Simple Fireball Spark</div>
+                                              </div>
+                                              <span className="px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 font-mono text-[7px] font-bold">25 MP 🧪</span>
+                                            </div>
+                                            <div onClick={() => {
+                                              if (playerGold >= 50) {
+                                                setPlayerGold(prev => prev - 50);
+                                                setSimHeroMana(prev => Math.min(300, prev + 100));
+                                                showNotification("✨ Залито +100 Маны за 50 золота!", "success");
+                                              } else {
+                                                showNotification("❌ Недостаточно золота для закупки зелья маны (50)!", "error");
+                                              }
+                                            }} className="bg-slate-950 hover:bg-slate-900 border border-white/5 hover:border-cyan-400/20 p-2 rounded-xl transition cursor-pointer flex justify-between items-center group">
+                                              <div>
+                                                <div className="text-[9px] font-bold text-slate-200 group-hover:text-white">🧪 Заливка Маны (+100 за 50💰)</div>
+                                                <div className="text-[6.5px] text-slate-500">Consumes gold to restore chemical mana</div>
+                                              </div>
+                                              <span className="px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 font-mono text-[7px] font-bold">50 Gold 💰</span>
+                                            </div>
+                                          </>
+                                        )
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="pt-4 border-t border-white/5 text-center">
+                                  <span className="text-[8px] text-slate-400 block mb-1">
+                                    {simDialogueLang === 'RU' ? 'Fate Continent • Версия 18.11.15' : 'Fate Continent • Lvl 18.11.15'}
+                                  </span>
+                                  <span className="text-[6.5px] text-slate-600 block leading-tight">
+                                    {simDialogueLang === 'RU' ? 'Интеграция с С#-скриптом SaveGameSystem.cs и SettingsManager.cs завершена.' : 'Ready for direct transmission and persistent save loading.'}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* INTERACTIVE PROMPT OVERLAY: SPELL CASTING COMMAND TRANSMISSION */}
+                              {activeSpellPrompt && (
+                                <div className="absolute inset-0 bg-black/85 z-[60] flex items-center justify-center p-6 animate-fade-in font-sans">
+                                  <div className="bg-slate-900 border border-indigo-500/40 rounded-3xl p-6 max-w-sm w-full space-y-4 shadow-[0_0_50px_rgba(34,211,238,0.3)]">
+                                    <div className="text-center">
+                                      <div className="text-2xl mb-1">⚡</div>
+                                      <h4 className="text-xs font-black text-cyan-400 uppercase tracking-widest">
+                                        СИМУЛЯЦИЯ ЗАКЛИНАНИЯ (C# CAST)
+                                      </h4>
+                                      <span className="text-[7px] font-mono text-slate-500">COMMAND PORTAL TRANSMITTER</span>
+                                    </div>
+
+                                    <div className="bg-slate-950 p-4 rounded-xl border border-white/5 space-y-2">
+                                      <div className="text-[10px] text-white font-black">{activeSpellPrompt.name}</div>
+                                      <div className="text-[8.5px] text-slate-400 leading-relaxed italic">"{activeSpellPrompt.desc}"</div>
+                                      
+                                      <div className="pt-2 border-t border-white/5">
+                                        <div className="text-[7.5px] text-slate-500 uppercase font-bold mb-1">C# Command String (Passed via UDP/IPC)</div>
+                                        <span className="block p-1.5 bg-slate-900 rounded font-mono text-[7.5px] text-amber-300 break-words">{activeSpellPrompt.command}</span>
+                                      </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-3 text-[9px] font-bold uppercase tracking-wider">
+                                      <button 
+                                        onClick={() => setActiveSpellPrompt(null)}
+                                        className="py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition"
+                                      >
+                                        {simDialogueLang === 'RU' ? 'Отмена' : 'Cancel'}
+                                      </button>
+                                      <button 
+                                        onClick={() => {
+                                          if (simHeroMana >= activeSpellPrompt.cost) {
+                                            setSimHeroMana(prev => prev - activeSpellPrompt.cost);
+                                            showNotification(`✨ Успешно кастовано ${activeSpellPrompt.name}! Передано в C# сцену.`, "success");
+                                            
+                                            try {
+                                              const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                              const osc = ctx.createOscillator();
+                                              const filter = ctx.createBiquadFilter();
+                                              const gain = ctx.createGain();
+                                              
+                                              osc.type = 'sawtooth';
+                                              osc.frequency.setValueAtTime(150, ctx.currentTime);
+                                              osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.4);
+                                              
+                                              filter.type = 'lowpass';
+                                              filter.frequency.setValueAtTime(800, ctx.currentTime);
+                                              filter.Q.setValueAtTime(10, ctx.currentTime);
+                                              
+                                              gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                                              gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.45);
+                                              
+                                              osc.connect(filter);
+                                              filter.connect(gain);
+                                              gain.connect(ctx.destination);
+                                              
+                                              osc.start(); osc.stop(ctx.currentTime + 0.45);
+                                            } catch(e){}
+                                          } else {
+                                            showNotification("❌ Недостаточно маны! Используйте зелье или восстановите её.", "error");
+                                          }
+                                          setActiveSpellPrompt(null);
+                                        }}
+                                        className="py-2.5 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white rounded-xl transition"
+                                      >
+                                        {simDialogueLang === 'RU' ? 'Кастовать 🔮' : 'Cast Spell 🔮'}
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* INTERACTIVE PROMPT OVERLAY: HERO & RECRUITED GEAR TRANSFER TO SCENE */}
+                              {activeTransferPrompt && (
+                                <div className="absolute inset-0 bg-black/85 z-[60] flex items-center justify-center p-6 animate-fade-in font-sans">
+                                  <div className="bg-slate-900 border border-amber-500/40 rounded-3xl p-6 max-w-sm w-full space-y-4 shadow-[0_0_50px_rgba(245,158,11,0.25)]">
+                                    <div className="text-center">
+                                      <div className="text-2xl mb-1">🚀</div>
+                                      <h4 className="text-xs font-black text-amber-400 uppercase tracking-widest">
+                                        ВЫСАДКА НА СЦЕНУ (SPAWN HERO)
+                                      </h4>
+                                      <span className="text-[7px] font-mono text-slate-500">C# PROCEDURAL TRANSMISSION AGENT</span>
+                                    </div>
+
+                                    <div className="bg-slate-950 p-4 rounded-xl border border-white/5 text-[9.5px] text-slate-300 space-y-1.5 leading-normal">
+                                      <p className="text-white font-bold text-center mb-1">
+                                        {simDialogueLang === 'RU' ? 'Перенести героя и артефакты на 3D сцену?' : 'Deploy commander and equipped items to active 3D Continent?'}
+                                      </p>
+                                      <div>👉 <span className="text-cyan-400 font-bold">Персонаж</span>: {simDialogueHero === 'warrior' ? 'Рэгнар (Воин)' : simDialogueHero === 'archer' ? 'Аларик (Стрелок)' : 'Элизиус (Маг)'}</div>
+                                      <div>👉 <span className="text-cyan-400 font-bold">Синергия</span>: {synergyHeroType === 'main' ? 'Главный (Main)' : 'Простой (Simple)'}</div>
+                                      <div>👉 <span className="text-cyan-400 font-bold font-mono">Вещи для спавна</span>: {Object.values(equippedItems).map(x=>x.icon).join(' ')} ({Object.keys(equippedItems).length} шт.)</div>
+                                      <div>👉 <span className="text-cyan-400 font-bold">Свита в походе</span>: <span className="font-mono text-white font-black">{recruitedTroops} воинов</span></div>
+
+                                      <div className="pt-2 mt-2 border-t border-white/5">
+                                        <div className="text-[7px] text-slate-500 uppercase font-bold mb-1">Command Code (Passed to Unity Engine)</div>
+                                        <span className="block p-1 bg-slate-900 rounded font-mono text-[7px] text-emerald-400 break-words">
+                                          SPAWN_HERO Class={simDialogueHero} Lvl={simHeroLvl} Synergy={synergyHeroType} Troops={recruitedTroops} Items={Object.keys(equippedItems).join(',')}
+                                        </span>
+                                      </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-3 text-[9px] font-bold uppercase tracking-wider">
+                                      <button 
+                                        onClick={() => setActiveTransferPrompt(false)}
+                                        className="py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition"
+                                      >
+                                        {simDialogueLang === 'RU' ? 'Отмена' : 'Cancel'}
+                                      </button>
+                                      <button 
+                                        onClick={() => {
+                                          showNotification(simDialogueLang === 'RU' ? `🚀 Герой ${simDialogueHero === 'warrior' ? 'Рэгнар' : simDialogueHero === 'archer' ? 'Аларик' : 'Элизиус'} перенесен на 3D поле Континента Судьбы!` : `Deployed ${simDialogueHero} successfully!`, "success");
+                                          
+                                          try {
+                                            const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                            const osc = ctx.createOscillator();
+                                            const osc2 = ctx.createOscillator();
+                                            const g = ctx.createGain();
+                                            osc.frequency.setValueAtTime(100, ctx.currentTime);
+                                            osc.frequency.linearRampToValueAtTime(1500, ctx.currentTime + 0.6);
+                                            osc2.frequency.setValueAtTime(200, ctx.currentTime);
+                                            osc2.frequency.linearRampToValueAtTime(3000, ctx.currentTime + 0.6);
+                                            g.gain.setValueAtTime(0.14, ctx.currentTime);
+                                            g.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.65);
+                                            osc.connect(g); osc2.connect(g);
+                                            g.connect(ctx.destination);
+                                            osc.start(); osc2.start();
+                                            osc.stop(ctx.currentTime + 0.65); osc2.stop(ctx.currentTime + 0.65);
+                                          } catch(e){}
+                                          
+                                          setActiveTransferPrompt(false);
+                                        }}
+                                        className="py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-black rounded-xl transition shadow-[0_0_20px_rgba(245,158,11,0.4)]"
+                                      >
+                                        {simDialogueLang === 'RU' ? 'Высадить 🚀' : 'Deploy Hero 🚀'}
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                              {/* TOP-LEFT FLOATING GLASSMORPHIC STATUS FRAME "РАМКА ШАПКА" */}
+                              <div 
+                                onClick={() => {
+                                  setIsCharacterMenuOpen(p => !p);
+                                  try {
+                                    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                    const osc = ctx.createOscillator();
+                                    const g = ctx.createGain();
+                                    osc.frequency.setValueAtTime(600, ctx.currentTime);
+                                    osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.1);
+                                    g.gain.setValueAtTime(0.08, ctx.currentTime);
+                                    osc.connect(g); g.connect(ctx.destination);
+                                    osc.start(); osc.stop(ctx.currentTime + 0.1);
+                                  } catch(e){}
+                                }}
+                                className="absolute top-4 left-4 z-40 bg-slate-900/95 border-2 border-indigo-400 shadow-[0_0_30px_rgba(99,102,241,0.5)] p-4 md:p-5 rounded-[2rem] max-w-sm w-[290px] md:w-[320px] filter backdrop-blur-md transition-all group hover:scale-[1.03] cursor-pointer" 
+                                id="Player_Status_HUD_Frame"
+                                title="Нажмите для открытия меню снаряжения и характеристик"
+                              >
+                                <div className="absolute top-2 right-4 text-[7px] font-black text-amber-400 uppercase tracking-widest animate-pulse">Кликните: Меню Персонажа ⚙️</div>
+                                <div className="absolute -inset-1 border border-dashed border-indigo-500/20 rounded-[2.2rem] pointer-events-none" />
+                                <span className="text-[7px] text-slate-500 font-mono tracking-widest block font-bold uppercase select-none mb-1">GameObject: Player_Status_HUD_Frame</span>
+                                
+                                <div className="flex items-center gap-4">
+                                  {/* Mini Profile Portrait with neon glowing border archetype */}
+                                  <div className={`w-14 h-14 rounded-2xl bg-black/50 border-2 flex items-center justify-center p-1.5 shrink-0 ${
+                                    simDialogueHero === 'warrior' ? 'border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)]' 
+                                    : simDialogueHero === 'archer' ? 'border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.4)]' 
+                                    : 'border-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.4)]'
+                                  }`}>
+                                    {simDialogueHero === 'warrior' ? (
+                                      <svg className="w-full h-full" viewBox="0 0 100 100" fill="none">
+                                        <circle cx="50" cy="50" r="45" fill="#1e1b4b" />
+                                        <path d="M25 50C25 30 35 20 50 20C65 20 75 30 75 50Z" fill="#64748b" />
+                                        <path d="M50 22V85" stroke="#f59e0b" strokeWidth="4" />
+                                      </svg>
+                                    ) : simDialogueHero === 'archer' ? (
+                                      <svg className="w-full h-full" viewBox="0 0 100 100" fill="none">
+                                        <circle cx="50" cy="50" r="45" fill="#064e3b" />
+                                        <path d="M25 55C25 32 35 15 50 15C65 15 75 32 75 55Z" fill="#10b981" />
+                                      </svg>
+                                    ) : (
+                                      <svg className="w-full h-full" viewBox="0 0 100 100" fill="none">
+                                        <circle cx="50" cy="50" r="45" fill="#311042" />
+                                        <path d="M15 58L50 5L85 58Z" fill="#2e1065" />
+                                      </svg>
+                                    )}
+                                  </div>
+
+                                  {/* Hero Name and current dynamic localized level */}
+                                  <div className="flex-1 min-w-0">
+                                    <h5 className="text-xs font-black text-white uppercase tracking-tight truncate">
+                                      {simDialogueHero === 'warrior' ? (simDialogueLang === 'RU' ? 'Рэгнар (Воин)' : 'Ragnar (Warrior)')
+                                       : simDialogueHero === 'archer' ? (simDialogueLang === 'RU' ? 'Аларик (Стрелок)' : 'Alaric (Archer)')
+                                       : (simDialogueLang === 'RU' ? 'Элизиус (Маг)' : 'Elysius (Mage)')}
+                                    </h5>
+                                    
+                                    <div className="flex items-center gap-1.5 mt-0.5">
+                                      <span className="text-[10px] font-black text-amber-400 uppercase tracking-widest bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
+                                        {LEVEL_LABELS[simDialogueLang]} {simHeroLvl}
+                                      </span>
+                                      <span className="text-[8.5px] text-slate-400 font-mono">
+                                        {simDialogueLang === 'RU' ? 'Континент Судьбы' : 'Fate Continent'}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* XP Progress Bar & Control */}
+                                <div className="mt-4 space-y-1">
+                                  <div className="flex justify-between text-[9px] font-black text-indigo-200">
+                                    <span>{STATS_LABELS.XP[simDialogueLang]}</span>
+                                    <span className="font-mono">{simHeroXp} / 2500</span>
+                                  </div>
+                                  <div className="h-2 bg-slate-950 rounded-full overflow-hidden border border-white/5 p-[1px]">
+                                    <div 
+                                      className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-indigo-500 shadow-[0_0_10px_rgba(34,211,238,0.5)] transition-all duration-300" 
+                                      style={{ width: `${Math.min(100, (simHeroXp / 2500) * 100)}%` }}
+                                    />
+                                  </div>
+                                </div>
+
+                                {/* Mana Progress Bar & Spend Control */}
+                                <div className="mt-3 space-y-1">
+                                  <div className="flex justify-between text-[9px] font-black text-cyan-200">
+                                    <span>{STATS_LABELS.MANA[simDialogueLang]}</span>
+                                    <span className="font-mono">{simHeroMana} / 300</span>
+                                  </div>
+                                  <div className="h-2 bg-slate-950 rounded-full overflow-hidden border border-white/5 p-[1px]">
+                                    <div 
+                                      className="h-full rounded-full bg-gradient-to-r from-purple-400 to-pink-500 shadow-[0_0_10px_rgba(244,114,182,0.5)] transition-all duration-300" 
+                                      style={{ width: `${Math.min(100, (simHeroMana / 300) * 100)}%` }}
+                                    />
+                                  </div>
+                                </div>
+
+                                {/* Micro status controls inside HUD */}
+                                <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-white/5">
+                                  <button 
+                                    onClick={() => {
+                                      try {
+                                        const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                        const osc = ctx.createOscillator();
+                                        const g = ctx.createGain();
+                                        osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+                                        osc.frequency.exponentialRampToValueAtTime(1046.50, ctx.currentTime + 0.2);
+                                        g.gain.setValueAtTime(0.12, ctx.currentTime);
+                                        osc.connect(g); g.connect(ctx.destination);
+                                        osc.start(); osc.stop(ctx.currentTime + 0.2);
+                                      } catch(e){}
+                                      
+                                      setSimHeroXp(prev => {
+                                        const added = prev + 350;
+                                        if (added >= 2500) {
+                                          setSimHeroLvl(l => l + 1);
+                                          showNotification(simDialogueLang === 'RU' ? '🎉 УРОВЕНЬ ПОВЫШЕН!' : '🎉 LEVEL UP!', "success");
+                                          return added - 2500;
+                                        } else {
+                                          showNotification(simDialogueLang === 'RU' ? '⭐ Получено +350 опыта!' : '⭐ Received +350 XP!', "info");
+                                          return added;
+                                        }
+                                      });
+                                    }}
+                                    className="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-[8px] font-black uppercase text-white transition-all text-center border border-indigo-400/30"
+                                  >
+                                    ➕ {STATS_LABELS.GAIN_XP[simDialogueLang]}
+                                  </button>
+
+                                  <button 
+                                    onClick={() => {
+                                      if (simHeroMana >= 40) {
+                                        setSimHeroMana(prev => prev - 40);
+                                        showNotification(simDialogueLang === 'RU' ? '🔥 Израсходовано 40 маны!' : '🔥 Expended 40 Mana!', "info");
+                                        try {
+                                          const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                          const osc = ctx.createOscillator();
+                                          osc.frequency.setValueAtTime(200, ctx.currentTime);
+                                          osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.15);
+                                          const g = ctx.createGain(); g.gain.setValueAtTime(0.1, ctx.currentTime);
+                                          osc.connect(g); g.connect(ctx.destination);
+                                          osc.start(); osc.stop(ctx.currentTime + 0.15);
+                                        } catch(e){}
+                                      } else {
+                                        setSimHeroMana(300);
+                                        showNotification(simDialogueLang === 'RU' ? '✨ Мана полностью восстановлена!' : '✨ Mana completely restored!', "success");
+                                        try {
+                                          const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                          const osc = ctx.createOscillator();
+                                          osc.frequency.setValueAtTime(880, ctx.currentTime);
+                                          osc.frequency.exponentialRampToValueAtTime(1760, ctx.currentTime + 0.2);
+                                          const g = ctx.createGain(); g.gain.setValueAtTime(0.08, ctx.currentTime);
+                                          osc.connect(g); g.connect(ctx.destination);
+                                          osc.start(); osc.stop(ctx.currentTime + 0.2);
+                                        } catch(e){}
+                                      }
+                                    }}
+                                    className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 hover:text-white rounded-xl text-[8px] font-black uppercase text-slate-300 transition-all text-center border border-white/5"
+                                  >
+                                    🧙‍♂️ {simHeroMana >= 40 ? STATS_LABELS.USE_MANA[simDialogueLang] : (simDialogueLang === 'RU' ? 'Залить Ману' : 'Restore Mana')}
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* MAIN BG GRAPHIC AND TERRIROY OVERVIEW or CASTLE SIMULATION */}
+                              {simDialogueStep < 8 ? (
+                                <div className="flex-1 flex flex-col items-center justify-center text-center p-8 space-y-6 pt-[300px] md:pt-[240px]">
+                                  <div className="w-16 h-16 rounded-full bg-indigo-500/10 border-2 border-indigo-400/40 flex items-center justify-center animate-pulse">
+                                    <Compass className="w-8 h-8 text-indigo-400" />
+                                  </div>
+
+                                  <div className="space-y-2">
+                                    <span className="text-[10px] font-black bg-indigo-600/20 text-indigo-400 px-3 py-1 rounded-full border border-indigo-500/30 uppercase tracking-widest">
+                                      {simDialogueLang === 'RU' ? 'Десантирование завершено' : 'VANGUARD DEPLOYMENT COMPLETED'}
+                                    </span>
+                                    <h4 className="text-xl font-black text-white uppercase italic tracking-tighter">
+                                      {simDialogueStep === 4 ? (simDialogueLang === 'RU' ? '🩸 Кровавые Пустоши' : '🩸 Crimson Wastes')
+                                       : simDialogueStep === 5 ? (simDialogueLang === 'RU' ? '❄️ Ледяной Пик' : '❄️ Ice-Bound Peak')
+                                       : simDialogueStep === 6 ? (simDialogueLang === 'RU' ? '🏛️ Древние Руины' : '🏛️ Ancient Ruins')
+                                       : (simDialogueLang === 'RU' ? '🌿 Святилище Зенита' : '🌿 Zenith Sanctuary')}
+                                    </h4>
+                                    <p className="text-xs text-slate-400 max-w-xl mx-auto leading-relaxed">
+                                      {DIALOGUE_TRANSLATIONS[simDialogueStep]?.[simDialogueLang] || DIALOGUE_TRANSLATIONS[simDialogueStep]?.RU}
+                                    </p>
+                                  </div>
+
+                                  <div className="p-4 max-w-lg bg-indigo-950/40 border border-indigo-500/20 rounded-2xl text-[10px] text-slate-300 italic text-center">
+                                    {simDialogueLang === 'RU' ? (
+                                      '🔥 Ваша преданность Кристаллу вдохновляет армию! Все 3D шейдеры Континента автоматически переключаются в боевой режим. На панели HUD сверху слева в Unity теперь отображается статус вашего выбранного персонажа, вычисляемый динамически.'
+                                    ) : (
+                                      '🔥 Your absolute loyalty to the Crystal ignites the battlefield! All 3-dimensional shaders of the New Continent automatically adapt into combat state. Your floating status HUD HUD top-left is fully active.'
+                                    )}
+                                  </div>
+
+                                  <div className="flex flex-wrap gap-4 justify-center items-center w-full">
+                                    <button
+                                      onClick={() => {
+                                        setSimDialogueStep(8);
+                                        try {
+                                          const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                          const osc = ctx.createOscillator();
+                                          const g = ctx.createGain();
+                                          osc.frequency.setValueAtTime(440, ctx.currentTime);
+                                          osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.25);
+                                          g.gain.setValueAtTime(0.1, ctx.currentTime);
+                                          osc.connect(g); g.connect(ctx.destination);
+                                          osc.start(); osc.stop(ctx.currentTime + 0.25);
+                                        } catch(e){}
+                                        showNotification(simDialogueLang === 'RU' ? 'Вы высадились в замок! Шаг 8 активирован.' : 'Deployed to Castle! Step 8 active.', "success");
+                                      }}
+                                      className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white border border-emerald-400/20 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all shadow-[0_0_25px_rgba(16,185,129,0.3)] hover:scale-105"
+                                    >
+                                      {simDialogueLang === 'RU' ? '🏰 Построить первую Башню (Шаг 8)' : '🏰 Build First Tower (Step 8)'} ➔
+                                    </button>
+
+                                    <button
+                                      onClick={() => {
+                                        setSimDialogueStep(0);
+                                        showNotification(simDialogueLang === 'RU' ? 'Сюжет сброшен!' : 'Quest has been reset!', "info");
+                                      }}
+                                      className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-wider transition-all"
+                                    >
+                                      {STATS_LABELS.RESET[simDialogueLang]}
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                /* NEW CASTLE SYSTEM INTERACTIVE SIMULATOR (Steps 8-12) */
+                                <div className="flex-1 flex flex-col space-y-6 pt-24 animate-fade-in w-full text-left">
+                                  {/* Day Tracker & Cyan controller and End Turn HUD top panel */}
+                                  <div className="bg-slate-900/95 border border-emerald-500/30 p-4 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-4 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+                                    <div className="flex items-center gap-4">
+                                      <div className="px-4 py-2 bg-gradient-to-r from-emerald-900 to-teal-950 border border-emerald-500/40 rounded-2xl text-center">
+                                        <span className="text-[8px] text-emerald-400 font-mono uppercase block font-black">Day Counter</span>
+                                        <span className="text-xl font-black text-white font-mono">ДЕНЬ {gameDayCount}</span>
+                                      </div>
+                                      <div>
+                                        <h5 className="text-[10px] uppercase font-black tracking-widest text-[#22d3ee] flex items-center gap-1.5">
+                                          <span>🔮 {simDialogueLang === 'RU' ? 'КОНТРОЛЛЕР СВЕЧЕНИЯ ЗЕНИТА' : 'ZENITH SHADER CONTROLLER'}</span>
+                                        </h5>
+                                        <span className="text-[9px] text-slate-400 block font-sans">
+                                          {simDialogueLang === 'RU' ? 'Управляйте материалами URP шейдеров замка напрямую!' : 'Tune C# shader emission variables dynamically.'}
+                                        </span>
+                                      </div>
+                                    </div>
+
+                                    {/* Passive Turn-Based Gold Income Action */}
+                                    <div className="flex items-center gap-3">
+                                      <div className="text-right">
+                                        <span className="text-[9px] text-slate-400 block">{simDialogueLang === 'RU' ? 'Казна Лорда:' : 'Lord Treasure:'}</span>
+                                        <span className="text-base font-black text-amber-400 font-mono">💰 {playerGold} {simDialogueLang === 'RU' ? 'золота' : 'gold'}</span>
+                                      </div>
+                                      <button
+                                        onClick={() => {
+                                          // Increment turn day
+                                          setGameDayCount(prev => prev + 1);
+                                          // Add Passive income matching castle level
+                                          const income = simCastleLevel === 1 ? 25 : 75;
+                                          setPlayerGold(prev => prev + income);
+                                          
+                                          // Simulate AI action!
+                                          // AI upgrades base or hires
+                                          const didUpgrade = Math.random() < aiUpgradeProb;
+                                          const didRecruit = Math.random() < aiRecruitProb;
+                                          let aiLog = "";
+                                          if (didUpgrade) {
+                                            aiLog = `День ${gameDayCount + 1}: Лорд Мельгард (Оппонент) успешно улучшил Обитель Зла до 2 ур.! Сгенерирован Рубиновый неон.`;
+                                          } else if (didRecruit) {
+                                            const troops = Math.floor(Math.random() * 6) + 3;
+                                            aiLog = `День ${gameDayCount + 1}: Противник потратил золото и нанял +${troops} воинов через Казармы Тьмы.`;
+                                          } else {
+                                            aiLog = `День ${gameDayCount + 1}: Противник пропустил ход, накапливая золото (+${Math.floor(60 * aiIncomeMult)} золота).`;
+                                          }
+                                          setAiActionLogs(prev => [aiLog, ...prev.slice(0, 5)]);
+
+                                          try {
+                                            const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                            const osc = ctx.createOscillator();
+                                            const osc2 = ctx.createOscillator();
+                                            const g = ctx.createGain();
+                                            
+                                            osc.frequency.setValueAtTime(330, ctx.currentTime);
+                                            osc.frequency.exponentialRampToValueAtTime(660, ctx.currentTime + 0.35);
+                                            osc2.frequency.setValueAtTime(440, ctx.currentTime);
+                                            osc2.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.35);
+                                            
+                                            g.gain.setValueAtTime(0.08, ctx.currentTime);
+                                            g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+                                            
+                                            osc.connect(g); osc2.connect(g);
+                                            g.connect(ctx.destination);
+                                            osc.start(); osc2.start();
+                                            osc.stop(ctx.currentTime + 0.4); osc2.stop(ctx.currentTime + 0.4);
+                                          } catch(e){}
+
+                                          showNotification(simDialogueLang === 'RU' ? `Ход пропущен! Начислено +${income} за замок.` : `Turn passed! Received +${income} from castle.`, "success");
+                                        }}
+                                        className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white rounded-2xl text-[10.5px] font-black uppercase tracking-widest transition-all hover:scale-[1.03] active:scale-[0.98] shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                                      >
+                                        ⏳ {simDialogueLang === 'RU' ? 'ПРОПУСТИТЬ ХОД' : 'END TURN'}
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  {/* Dialogue Box Inside Castle View */}
+                                  <div className="bg-slate-900/90 border-2 border-[#22d3ee]/40 rounded-[2rem] p-5 relative overflow-hidden shadow-[0_0_25px_rgba(34,211,238,0.15)]">
+                                    <div className="flex items-center gap-2 mb-2 pb-2 border-b border-white/5">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-[#22d3ee] animate-pulse" />
+                                      <span className="text-[10px] font-black text-[#22d3ee] uppercase tracking-widest">
+                                        🧝‍♀️ {simDialogueLang === 'RU' ? 'Аэлисса Сюжетный Гид' : 'AELYSSA STORY MENTOR'} • Шаг {simDialogueStep}
+                                      </span>
+                                    </div>
+                                    <p className="text-xs text-slate-200 leading-relaxed italic">
+                                      "{DIALOGUE_TRANSLATIONS[simDialogueStep]?.[simDialogueLang] || DIALOGUE_TRANSLATIONS[simDialogueStep]?.RU}"
+                                    </p>
+                                  </div>
+
+                                  {/* Castle Building Visual Structure & Upgrade section */}
+                                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-20">
+                                    {/* Left 5 Cols: Graphic of the castle (morphed based on level 1 or 2 with shader settings) */}
+                                    <div className="lg:col-span-5 bg-slate-950 border border-white/5 rounded-3xl p-5 flex flex-col items-center justify-between min-h-[350px]">
+                                      <div className="text-center w-full">
+                                        <span className="text-[8px] tracking-widest font-mono text-slate-500 font-bold block uppercase">
+                                          UNITY PROCEDURAL BUILDER SHADER VIEW
+                                        </span>
+                                        <h5 className="text-xs font-black text-white uppercase tracking-tight mt-1">
+                                          {simCastleLevel === 1 
+                                            ? (simDialogueLang === 'RU' ? '🏰 Одинокая Застава (Ур. 1)' : '🏰 Basic Sentry Outpost (Lvl 1)')
+                                            : (simDialogueLang === 'RU' ? '🏰 Величественный Замок Зенит (Ур. 2)' : '🏰 Sovereign Zenith Citadel (Lvl 2)')
+                                          }
+                                        </h5>
+                                      </div>
+
+                                      {/* Interactive SVG Castle */}
+                                      <div className="w-full max-w-[200px] h-[200px] relative my-4 flex items-center justify-center">
+                                        <svg className="w-full h-full" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+                                          {/* Sky subtle backlight shadow based on customization */}
+                                          <circle cx="50" cy="50" r="30" fill={spireColor} opacity="0.1" className="animate-pulse" style={{ filter: `blur(${spireGlowStrength}px)` }} />
+                                          <g id="CastleMesh">
+                                            {/* Landscape grass ground */}
+                                            <path d="M10 110 L90 110 L85 115 L15 115 Z" fill="#1e293b" />
+                                            {/* Level 1 Sentry Tower core structure */}
+                                            <rect x="38" y="55" width="24" height="55" fill="#334155" stroke="#475569" strokeWidth="2" />
+                                            {/* Tower window */}
+                                            <rect x="47" y="65" width="6" height="12" rx="3" fill="#0f172a" />
+                                            {/* Window glass sparkle */}
+                                            <circle cx="50" cy="71" r="1.5" fill={spireColor} />
+
+                                            {/* LEVEL 2 EXTRACTED CITADEL MORPHS ON VALUE CHANGE */}
+                                            {simCastleLevel >= 2 && (
+                                              <>
+                                                {/* Left lateral side wing (флигель) */}
+                                                <rect x="18" y="70" width="20" height="40" fill="#1e293b" stroke="#334155" strokeWidth="2" className="animate-bounce" style={{ animationDuration: '4s' }} />
+                                                <polygon points="18,70 28,55 38,70" fill="#0f172a" stroke="#334155" />
+                                                <line x1="28" y1="57" x2="28" y2="110" stroke={spireColor} strokeWidth="1" opacity="0.5" />
+
+                                                {/* Right lateral side wing */}
+                                                <rect x="62" y="70" width="20" height="40" fill="#1e293b" stroke="#334155" strokeWidth="2" className="animate-bounce" style={{ animationDuration: '4s', animationDelay: '1s' }} />
+                                                <polygon points="62,70 72,55 82,70" fill="#0f172a" stroke="#334155" />
+                                                <line x1="72" y1="57" x2="72" y2="110" stroke={spireColor} strokeWidth="1" opacity="0.5" />
+
+                                                {/* Front outer defensive ramparts (крепостная стена) */}
+                                                <rect x="10" y="90" width="80" height="20" fill="#0f172a" opacity="0.9" stroke="#334155" strokeWidth="2" />
+                                                {/* Battlements for defense on ramparts */}
+                                                <rect x="15" y="84" width="8" height="6" fill="#1e293b" stroke="#334155" />
+                                                <rect x="35" y="84" width="8" height="6" fill="#1e293b" stroke="#334155" />
+                                                <rect x="55" y="84" width="8" height="6" fill="#1e293b" stroke="#334155" />
+                                                <rect x="75" y="84" width="8" height="6" fill="#1e293b" stroke="#334155" />
+                                              </>
+                                            )}
+
+                                            {/* Central tower battlements roof crown */}
+                                            <polygon points="34,55 50,30 66,55" fill="#1e293b" stroke="#475569" strokeWidth="1.5" />
+
+                                            {/* Rotating spire crystal matching custom speed and color */}
+                                            <g className="origin-center" style={{ transformOrigin: '50px 25px', animation: `spin ${spireRotationSpeed}s linear infinite` }}>
+                                              {/* Spire tip line holding gem */}
+                                              <line x1="50" y1="30" x2="50" y2="15" stroke="#f59e0b" strokeWidth="2.5" />
+                                              {/* Sparkling Neon Gem Crystal Spire with custom emission lights */}
+                                              <polygon points="50,5 56,15 50,25 44,15" fill={spireColor} stroke="#ffffff" strokeWidth="1" style={{ filter: `drop-shadow(0 0 8px ${spireColor})` }} />
+                                            </g>
+                                          </g>
+                                        </svg>
+
+                                        {/* CSS Keyframe rotation hack built dynamically */}
+                                        <style dangerouslySetInnerHTML={{ __html: `
+                                          @keyframes spin {
+                                            from { transform: rotate(0deg); }
+                                            to { transform: rotate(360deg); }
+                                          }
+                                        `}} />
+                                      </div>
+
+                                      {/* Micro Shader config controllers */}
+                                      <div className="w-full space-y-3 p-3 bg-black/60 rounded-2xl border border-white/5">
+                                        <span className="text-[8px] text-cyan-400 font-mono block uppercase tracking-wide font-black">
+                                          🔬 Dynamic Material Shader parameters
+                                        </span>
+                                        
+                                        {/* Color Picker presets */}
+                                        <div className="space-y-1">
+                                          <div className="flex justify-between text-[7.5px] text-slate-400 font-bold uppercase">
+                                            <span>Emission Color</span>
+                                            <span style={{ color: spireColor }}>{spireColor === '#22d3ee' ? 'Cyan (Alliance)' : spireColor === '#ef4444' ? 'Ruby (Opponent)' : spireColor === '#a855f7' ? 'Amethyst' : 'Emerald'}</span>
+                                          </div>
+                                          <div className="flex gap-2">
+                                            <button onClick={() => setSpireColor('#22d3ee')} className={`w-3 h-3 rounded-full bg-cyan-400 transition-all ${spireColor === '#22d3ee' ? 'ring-2 ring-white scale-125' : ''}`} />
+                                            <button onClick={() => setSpireColor('#ef4444')} className={`w-3 h-3 rounded-full bg-red-500 transition-all ${spireColor === '#ef4444' ? 'ring-2 ring-white scale-125' : ''}`} />
+                                            <button onClick={() => setSpireColor('#a855f7')} className={`w-3 h-3 rounded-full bg-purple-500 transition-all ${spireColor === '#a855f7' ? 'ring-2 ring-white scale-125' : ''}`} />
+                                            <button onClick={() => setSpireColor('#10b981')} className={`w-3 h-3 rounded-full bg-emerald-500 transition-all ${spireColor === '#10b981' ? 'ring-2 ring-white scale-125' : ''}`} />
+                                          </div>
+                                        </div>
+
+                                        {/* Rotation Speed control slider */}
+                                        <div className="space-y-0.5">
+                                          <div className="flex justify-between text-[7.5px] text-slate-400 font-bold uppercase">
+                                            <span>Rotate Velocity (Seconds)</span>
+                                            <span className="font-mono text-cyan-400">{spireRotationSpeed}s</span>
+                                          </div>
+                                          <input 
+                                            type="range" min="1" max="10" step="0.5" 
+                                            value={spireRotationSpeed} 
+                                            onChange={(e) => setSpireRotationSpeed(parseFloat(e.target.value))} 
+                                            className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[#22d3ee]"
+                                          />
+                                        </div>
+
+                                        {/* Bloom intensity glow strength */}
+                                        <div className="space-y-0.5">
+                                          <div className="flex justify-between text-[7.5px] text-slate-400 font-bold uppercase">
+                                            <span>Bloom Glow Size</span>
+                                            <span className="font-mono text-cyan-400">{spireGlowStrength}px</span>
+                                          </div>
+                                          <input 
+                                            type="range" min="5" max="40" step="1" 
+                                            value={spireGlowStrength} 
+                                            onChange={(e) => setSpireGlowStrength(parseInt(e.target.value))} 
+                                            className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[#22d3ee]"
+                                          />
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                       {/* Castle positioning & Enemy AI config controller (v18.11.15) */}
+                                       <div className="w-full space-y-3 p-3 bg-black/60 rounded-2xl border border-white/5 mt-3 text-slate-200">
+                                         <div className="flex justify-between items-center pb-2 border-b border-white/10">
+                                           <span className="text-[8px] text-cyan-400 font-mono uppercase tracking-wide font-black">
+                                             🏰 {simDialogueLang === 'RU' ? 'Размещение Замков & ИИ Врага' : 'Castle Placement & Enemy AI'}
+                                           </span>
+                                           <span className="px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-400 font-mono text-[6px] uppercase font-bold">
+                                             v18.11.15
+                                           </span>
+                                         </div>
+
+                                         {/* Mode Selector */}
+                                         <div className="flex gap-2 p-1 bg-slate-900 rounded-lg border border-white/5">
+                                           <button
+                                             type="button"
+                                             onClick={() => {
+                                               setIsCastlePlacementManual(false);
+                                               showNotification(simDialogueLang === 'RU' ? 'Включено авто-размещение замков' : 'Autonomous castle placement active', "info");
+                                             }}
+                                             className={`flex-1 py-1 rounded text-[7.5px] uppercase font-bold transition-all ${!isCastlePlacementManual ? 'bg-cyan-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'}`}
+                                           >
+                                             🤖 {simDialogueLang === 'RU' ? 'Автономно' : 'Auto'}
+                                           </button>
+                                           <button
+                                             type="button"
+                                             onClick={() => {
+                                               setIsCastlePlacementManual(true);
+                                               showNotification(simDialogueLang === 'RU' ? 'Включено ручное размещение' : 'Manual castle positioning enabled', "info");
+                                             }}
+                                             className={`flex-1 py-1 rounded text-[7.5px] uppercase font-bold transition-all ${isCastlePlacementManual ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'}`}
+                                           >
+                                             🔧 {simDialogueLang === 'RU' ? 'Ручные оси (X,Y,Z)' : 'Manual Offsets'}
+                                           </button>
+                                         </div>
+
+                                         {/* If manual mode is active, show the 4 castle dimension sliders */}
+                                         {isCastlePlacementManual && (
+                                           <div className="space-y-2.5 pt-1 border-t border-white/5">
+                                             {/* 1. Player Castle */}
+                                             <div className="p-2 bg-slate-950/80 rounded-xl space-y-2 border border-white/5 border-emerald-500/10">
+                                               <div className="flex justify-between items-center text-[7.5px] text-green-400 font-black uppercase">
+                                                 <span>{simDialogueLang === 'RU' ? 'Твой Замок (Оазис)' : 'Player Castle'}</span>
+                                                 <span className="font-mono text-slate-500 text-[6.5px]">X:{manualCastlePositions.player.x.toFixed(1)} Y:{manualCastlePositions.player.y.toFixed(1)} Z:{manualCastlePositions.player.z.toFixed(1)}</span>
+                                               </div>
+                                               <div className="grid grid-cols-3 gap-1.5 text-[6px]">
+                                                 <div>
+                                                    <span className="text-slate-500">X:</span>
+                                                    <input type="range" min="-20" max="20" step="0.5" value={manualCastlePositions.player.x} onChange={(e) => setManualCastlePositions(prev => ({...prev, player: {...prev.player, x: parseFloat(e.target.value)}}))} className="w-full h-1 accent-green-400" />
+                                                 </div>
+                                                 <div>
+                                                    <span className="text-slate-500">Y:</span>
+                                                    <input type="range" min="-10" max="10" step="0.5" value={manualCastlePositions.player.y} onChange={(e) => setManualCastlePositions(prev => ({...prev, player: {...prev.player, y: parseFloat(e.target.value)}}))} className="w-full h-1 accent-green-400" />
+                                                 </div>
+                                                 <div>
+                                                    <span className="text-slate-500">Z:</span>
+                                                    <input type="range" min="-20" max="20" step="0.5" value={manualCastlePositions.player.z} onChange={(e) => setManualCastlePositions(prev => ({...prev, player: {...prev.player, z: parseFloat(e.target.value)}}))} className="w-full h-1 accent-green-400" />
+                                                 </div>
+                                               </div>
+                                             </div>
+
+                                             {/* 2. Enemy Peak Castle */}
+                                             <div className="p-2 bg-slate-950/80 rounded-xl space-y-2 border border-white/5 border-red-500/10">
+                                               <div className="flex justify-between items-center text-[7.5px] text-red-500 font-black uppercase">
+                                                 <span>{simDialogueLang === 'RU' ? 'Ледяной Пик' : 'Peak Outpost'}</span>
+                                                 <span className="font-mono text-slate-500 text-[6.5px]">X:{manualCastlePositions.peak.x.toFixed(1)} Y:{manualCastlePositions.peak.y.toFixed(1)} Z:{manualCastlePositions.peak.z.toFixed(1)}</span>
+                                               </div>
+                                               <div className="grid grid-cols-3 gap-1.5 text-[6px]">
+                                                 <div>
+                                                    <span className="text-slate-500">X:</span>
+                                                    <input type="range" min="-20" max="20" step="0.5" value={manualCastlePositions.peak.x} onChange={(e) => setManualCastlePositions(prev => ({...prev, peak: {...prev.peak, x: parseFloat(e.target.value)}}))} className="w-full h-1 accent-red-400" />
+                                                 </div>
+                                                 <div>
+                                                    <span className="text-slate-500">Y:</span>
+                                                    <input type="range" min="-10" max="10" step="0.5" value={manualCastlePositions.peak.y} onChange={(e) => setManualCastlePositions(prev => ({...prev, peak: {...prev.peak, y: parseFloat(e.target.value)}}))} className="w-full h-1 accent-red-400" />
+                                                 </div>
+                                                 <div>
+                                                    <span className="text-slate-500">Z:</span>
+                                                    <input type="range" min="-20" max="20" step="0.5" value={manualCastlePositions.peak.z} onChange={(e) => setManualCastlePositions(prev => ({...prev, peak: {...prev.peak, z: parseFloat(e.target.value)}}))} className="w-full h-1 accent-red-400" />
+                                                 </div>
+                                               </div>
+                                             </div>
+
+                                             {/* 3. Enemy Ruins Castle */}
+                                             <div className="p-2 bg-slate-950/80 rounded-xl space-y-2 border border-white/5 border-purple-500/10">
+                                               <div className="flex justify-between items-center text-[7.5px] text-purple-400 font-black uppercase">
+                                                 <span>{simDialogueLang === 'RU' ? 'Древние Руины' : 'Ancient Ruins'}</span>
+                                                 <span className="font-mono text-slate-500 text-[6.5px]">X:{manualCastlePositions.ruins.x.toFixed(1)} Y:{manualCastlePositions.ruins.y.toFixed(1)} Z:{manualCastlePositions.ruins.z.toFixed(1)}</span>
+                                               </div>
+                                               <div className="grid grid-cols-3 gap-1.5 text-[6px]">
+                                                 <div>
+                                                    <span className="text-slate-500">X:</span>
+                                                    <input type="range" min="-20" max="20" step="0.5" value={manualCastlePositions.ruins.x} onChange={(e) => setManualCastlePositions(prev => ({...prev, ruins: {...prev.ruins, x: parseFloat(e.target.value)}}))} className="w-full h-1 accent-purple-400" />
+                                                 </div>
+                                                 <div>
+                                                    <span className="text-slate-500">Y:</span>
+                                                    <input type="range" min="-10" max="10" step="0.5" value={manualCastlePositions.ruins.y} onChange={(e) => setManualCastlePositions(prev => ({...prev, ruins: {...prev.ruins, y: parseFloat(e.target.value)}}))} className="w-full h-1 accent-purple-400" />
+                                                 </div>
+                                                 <div>
+                                                    <span className="text-slate-500">Z:</span>
+                                                    <input type="range" min="-20" max="20" step="0.5" value={manualCastlePositions.ruins.z} onChange={(e) => setManualCastlePositions(prev => ({...prev, ruins: {...prev.ruins, z: parseFloat(e.target.value)}}))} className="w-full h-1 accent-purple-400" />
+                                                 </div>
+                                               </div>
+                                             </div>
+                                           </div>
+                                         )}
+
+                                         {/* Enemy Castle AI configs */}
+                                         <div className="space-y-1.5 pt-2 border-t border-white/10 hover:text-white">
+                                           <span className="text-[7.5px] text-amber-400 font-mono uppercase block tracking-wider font-extrabold pb-1">
+                                             🤖 {simDialogueLang === 'RU' ? 'Параметры тактики ИИ Врага' : 'Enemy Tactics Config'}
+                                           </span>
+
+                                           <div className="grid grid-cols-2 gap-2 text-[6.5px]">
+                                             <div className="space-y-0.5">
+                                               <div className="flex justify-between uppercase font-mono">
+                                                 <span>Upgrade</span>
+                                                 <span className="text-red-400 font-bold">{(aiUpgradeProb * 100).toFixed(0)}%</span>
+                                               </div>
+                                               <input type="range" min="0" max="1" step="0.05" value={aiUpgradeProb} onChange={(e) => setAiUpgradeProb(parseFloat(e.target.value))} className="w-full h-0.5" />
+                                             </div>
+                                             <div className="space-y-0.5">
+                                               <div className="flex justify-between uppercase font-mono">
+                                                 <span>Recruit</span>
+                                                 <span className="text-red-400 font-bold">{(aiRecruitProb * 100).toFixed(0)}%</span>
+                                               </div>
+                                               <input type="range" min="0" max="1" step="0.05" value={aiRecruitProb} onChange={(e) => setAiRecruitProb(parseFloat(e.target.value))} className="w-full h-0.5" />
+                                             </div>
+                                             <div className="space-y-0.5">
+                                               <div className="flex justify-between uppercase font-mono">
+                                                 <span>Equip</span>
+                                                 <span className="text-red-400 font-bold">{(aiEquipProb * 100).toFixed(0)}%</span>
+                                               </div>
+                                               <input type="range" min="0" max="1" step="0.05" value={aiEquipProb} onChange={(e) => setAiEquipProb(parseFloat(e.target.value))} className="w-full h-0.5" />
+                                             </div>
+                                             <div className="space-y-0.5">
+                                               <div className="flex justify-between uppercase font-mono">
+                                                 <span>Gold</span>
+                                                 <span className="text-red-400 font-bold">{aiIncomeMult.toFixed(2)}x</span>
+                                               </div>
+                                               <input type="range" min="1.0" max="3.0" step="0.05" value={aiIncomeMult} onChange={(e) => setAiIncomeMult(parseFloat(e.target.value))} className="w-full h-0.5" />
+                                             </div>
+                                           </div>
+
+                                           <div className="space-y-0.5 mt-1">
+                                             <div className="flex justify-between text-[6.5px] text-slate-400 uppercase font-mono">
+                                               <span>Starting Soldiers</span>
+                                               <span className="font-mono text-red-400 font-bold">{aiStartingPower}</span>
+                                             </div>
+                                             <input
+                                               type="range" min="5" max="100" step="5"
+                                               value={aiStartingPower}
+                                               onChange={(e) => setAiStartingPower(parseInt(e.target.value))}
+                                               className="w-full h-1 accent-red-500"
+                                             />
+                                           </div>
+                                         </div>
+                                       </div>
+
+                                    {/* Right 7 Cols: Contextual action box depending on step */}
+                                    <div className="lg:col-span-7 flex flex-col justify-between space-y-4">
+                                      {/* STEP 8: THE UPGRADE MANDATE */}
+                                      {simDialogueStep === 8 && (
+                                        <div className="bg-slate-900 border border-indigo-500/20 rounded-3xl p-5 md:p-6 flex-1 flex flex-col justify-between">
+                                          <div>
+                                            <h6 className="text-xs font-black text-amber-400 uppercase tracking-widest mb-2">
+                                              🛡️ ЗАДАНИЕ НА ПОВЫШЕНИЕ ЗАСТАВЫ
+                                            </h6>
+                                            <p className="text-[11px] text-slate-300 leading-relaxed mb-4">
+                                              Аэлисса просит вас улучшить заставу до <strong className="text-white">Уровня 2</strong>! Наша одинокая сигнальная вышка не выдержит шторма. 
+                                              Улучшение откроет Казармы, Оружейную и Шпионский пост для подготовки к обороне.
+                                            </p>
+                                            
+                                            {/* Cost preview and current gold statement */}
+                                            <div className="bg-slate-950/80 p-4 rounded-2xl space-y-2 border border-white/5 my-2">
+                                              <div className="flex justify-between text-[10px]">
+                                                <span className="text-slate-400">Стоимость апгрейда:</span>
+                                                <span className="font-mono text-amber-400 font-black">250 золота</span>
+                                              </div>
+                                              <div className="flex justify-between text-[10px]">
+                                                <span className="text-slate-400">Ваша казна:</span>
+                                                <span className={`font-mono font-black ${playerGold >= 250 ? 'text-green-400' : 'text-red-400'}`}>💰 {playerGold} золота</span>
+                                              </div>
+                                              {playerGold < 250 && (
+                                                <div className="text-[9px] text-amber-500 italic">Недостаточно золота для апгрейда! Добавьте в казну монет ниже.</div>
+                                              )}
+                                            </div>
+                                          </div>
+
+                                          <div className="space-y-3 pt-4">
+                                            {playerGold < 250 && (
+                                              <button
+                                                onClick={() => {
+                                                  setPlayerGold(prev => prev + 500);
+                                                  try {
+                                                    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                                    const osc = ctx.createOscillator();
+                                                    const g = ctx.createGain();
+                                                    osc.frequency.setValueAtTime(659.25, ctx.currentTime);
+                                                    osc.frequency.setValueAtTime(987.77, ctx.currentTime + 0.1);
+                                                    g.gain.setValueAtTime(0.08, ctx.currentTime);
+                                                    osc.connect(g); g.connect(ctx.destination);
+                                                    osc.start(); osc.stop(ctx.currentTime + 0.25);
+                                                  } catch(e){}
+                                                  showNotification("💰 Нажато «Добавить монет» (+500 золота в казну)!", "success");
+                                                }}
+                                                className="w-full py-2 bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 border border-amber-500/40 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all"
+                                              >
+                                                🪙 Добавить монет (+500 золота)
+                                              </button>
+                                            )}
+
+                                            <button
+                                              onClick={() => {
+                                                if (playerGold >= 250) {
+                                                  setPlayerGold(prev => prev - 250);
+                                                  setSimCastleLevel(2);
+                                                  setSimDialogueStep(9);
+                                                  try {
+                                                    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                                    const osc = ctx.createOscillator();
+                                                    const osc2 = ctx.createOscillator();
+                                                    const g = ctx.createGain();
+                                                    osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+                                                    osc.frequency.exponentialRampToValueAtTime(1046.50, ctx.currentTime + 0.4);
+                                                    osc2.frequency.setValueAtTime(659.25, ctx.currentTime);
+                                                    osc2.frequency.exponentialRampToValueAtTime(1318.51, ctx.currentTime + 0.4);
+                                                    g.gain.setValueAtTime(0.12, ctx.currentTime);
+                                                    g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.45);
+                                                    osc.connect(g); osc2.connect(g);
+                                                    g.connect(ctx.destination);
+                                                    osc.start(); osc2.start();
+                                                    osc.stop(ctx.currentTime + 0.45);
+                                                  } catch(e){}
+                                                  showNotification("🎉 Башня успешно улучшена до Уровня 2! Включается морфинг 3D моделей.", "success");
+                                                } else {
+                                                  showNotification("❌ Недостаточно пассивного золота! Нажмите Добавить монет или завершите ходы.", "error");
+                                                }
+                                              }}
+                                              className="w-full py-3.5 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-[0_0_25px_rgba(6,182,212,0.3)] hover:scale-[1.01]"
+                                            >
+                                              🔨 Улучшить Башню до Уровня 2 (250 золота)
+                                            </button>
+                                          </div>
+                                        </div>
+                                      )}
+
+                                      {/* STEP 9: TRANSITIONAL ROYAL REVEAL */}
+                                      {simDialogueStep === 9 && (
+                                        <div className="bg-slate-900 border border-emerald-500/20 rounded-3xl p-5 md:p-6 flex-1 flex flex-col justify-between">
+                                          <div>
+                                            <h6 className="text-xs font-black text-emerald-400 uppercase tracking-widest mb-2">
+                                              ⚔️ УРОВЕНЬ ПОВЫШЕН: ЦИТАДЕЛЬ АЛЬЯНСА-ЗЕНИТА
+                                            </h6>
+                                            <p className="text-[11px] text-slate-300 leading-relaxed mb-4">
+                                              Превосходно! Теперь наша крепость обзавелась прочными боковыми флигелями, внешним частоколом для прикрытия отрядов и шпилем над Кристаллом Zenith. 
+                                              Заметьте, как изменились её 3D очертания и выросла пассивная ежедневная прибыль с <strong className="text-emerald-400">+25 до +75 золота за пропускаемый ход!</strong>
+                                            </p>
+
+                                            <div className="bg-slate-950/80 p-4 rounded-2xl space-y-1 border border-white/5 my-2 text-[10px] text-slate-300">
+                                              <div>✅ <span className="text-cyan-400 font-bold">Отработан C# Морфинг</span>: спавн боковых башен</div>
+                                              <div>✅ <span className="text-cyan-400 font-bold">Цвет свечений</span>: кастомизирован под Зенит</div>
+                                              <div>✅ <span className="text-cyan-400 font-bold">Интерактивные здания</span>: здания внутри замка готовы к осмотру!</div>
+                                            </div>
+                                          </div>
+
+                                          <button
+                                            onClick={() => {
+                                              setSimDialogueStep(10);
+                                              showNotification("Добро пожаловать внутрь замка!", "success");
+                                            }}
+                                            className="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                                          >
+                                            🚪 Войти в Цитадель и осмотреть строения (Шаг 10) ➔
+                                          </button>
+                                        </div>
+                                      )}
+
+                                      {/* STEP 10, 11, 12: THE INNER CITADEL BUILDING BOARD */}
+                                      {simDialogueStep >= 10 && (
+                                        <div className="bg-slate-900 border border-cyan-500/20 rounded-3xl p-5 flex-1 flex flex-col justify-between">
+                                          <div>
+                                            <div className="flex border-b border-white/5 pb-2 mb-3">
+                                              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                                                💒 Внутренняя структура Цитадели • Подробный перечень
+                                              </span>
+                                            </div>
+
+                                            {/* Grid of the 3 Buildings */}
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                              {/* 1. Military Barracks */}
+                                              <div className="bg-slate-950 p-3 rounded-2xl border border-white/5 flex flex-col justify-between space-y-2">
+                                                <div>
+                                                  <div className="text-[9.5px] font-black text-amber-400 uppercase tracking-tight">🏰 КАЗАРМЫ</div>
+                                                  <span className="text-[7.5px] font-mono text-slate-500 block mb-1">GameObject: Troops_Barracks</span>
+                                                  <p className="text-[9px] text-slate-400 leading-tight">
+                                                    Нанимайте воинов для зачистки. Лимит: максимум 50 бойцов в гарнизоне.
+                                                  </p>
+                                                </div>
+                                                <div className="pt-2 border-t border-white/5">
+                                                  <div className="flex justify-between text-[9px] mb-1 font-mono">
+                                                    <span>Отряд:</span>
+                                                    <span className="text-white">{recruitedTroops} / 50 👥</span>
+                                                  </div>
+                                                  <button
+                                                    onClick={() => {
+                                                      if (recruitedTroops >= 50) {
+                                                        showNotification("❌ Достигнут жесткий лимит на бойцов (50 единиц) на одного героя!", "error");
+                                                        return;
+                                                      }
+                                                      if (playerGold >= 75) {
+                                                        setPlayerGold(prev => prev - 75);
+                                                        setRecruitedTroops(prev => Math.min(50, prev + 5));
+                                                        try {
+                                                          const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                                          const osc = ctx.createOscillator();
+                                                          const g = ctx.createGain();
+                                                          osc.frequency.setValueAtTime(220, ctx.currentTime);
+                                                          osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.15);
+                                                          g.gain.setValueAtTime(0.12, ctx.currentTime);
+                                                          osc.connect(g); g.connect(ctx.destination);
+                                                          osc.start(); osc.stop(ctx.currentTime + 0.15);
+                                                        } catch(e){}
+                                                        showNotification("👥 Успешно нанято +5 воинов за 75 золота!", "success");
+                                                      } else {
+                                                        showNotification("❌ Недостаточно монет! Пропустите ход для пассивного притока.", "error");
+                                                      }
+                                                    }}
+                                                    className="w-full py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[8.5px] font-black uppercase tracking-tight transition-all"
+                                                  >
+                                                    Нанять (+5 за 75)
+                                                  </button>
+                                                </div>
+                                              </div>
+
+                                              {/* 2. Armory Shop */}
+                                              <div className="bg-slate-950 p-3 rounded-2xl border border-white/5 flex flex-col justify-between space-y-2">
+                                                <div>
+                                                  <div className="text-[9.5px] font-black text-[#22d3ee] uppercase tracking-tight">🗡️ ОРУЖЕЙНАЯ</div>
+                                                  <span className="text-[7.5px] font-mono text-slate-500 block mb-1">GameObject: Armory_Shop</span>
+                                                  <p className="text-[9px] text-slate-400 leading-tight">
+                                                    Приобрести обмундирование. При покупке вещь моментально перемещается в ячейку.
+                                                  </p>
+                                                </div>
+                                                <div className="pt-2 border-t border-white/5 space-y-2">
+                                                  {/* Swords & Platetails */}
+                                                  <span className="text-[7px] text-slate-500 block uppercase font-bold text-center">Купить Снаряжение</span>
+                                                  <button
+                                                    onClick={() => {
+                                                      if (playerGold >= 150) {
+                                                        setPlayerGold(prev => prev - 150);
+                                                        setEquippedItems(prev => ({
+                                                          ...prev,
+                                                          armor: { name: 'Железный латный доспех', bonus: '+25 Броня', icon: '👕' }
+                                                        }));
+                                                        try {
+                                                          const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                                          const osc = ctx.createOscillator();
+                                                          const g = ctx.createGain();
+                                                          osc.type = 'sawtooth';
+                                                          osc.frequency.setValueAtTime(150, ctx.currentTime);
+                                                          osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.12);
+                                                          g.gain.setValueAtTime(0.12, ctx.currentTime);
+                                                          osc.connect(g); g.connect(ctx.destination);
+                                                          osc.start(); osc.stop(ctx.currentTime + 0.12);
+                                                        } catch(e){}
+                                                        showNotification("👕 Куплен и успешно надет доспех (+25 Броня)!", "success");
+                                                      } else {
+                                                        showNotification("❌ Недостаточно золота для покупки панциря (150)!", "error");
+                                                      }
+                                                    }}
+                                                    className="w-full py-1 bg-[#22d3ee]/20 hover:bg-[#22d3ee]/30 text-[#22d3ee] border border-[#22d3ee]/30 rounded text-[7.5px] font-bold uppercase transition-all"
+                                                  >
+                                                    🛡️ Панцирь (150 за)
+                                                  </button>
+                                                  <button
+                                                    onClick={() => {
+                                                      if (playerGold >= 200) {
+                                                        setPlayerGold(prev => prev - 200);
+                                                        setEquippedItems(prev => ({
+                                                          ...prev,
+                                                          weapon: { name: 'Эльфийский Огненный Скимитар', bonus: '+45 Сила', icon: '🗡️' }
+                                                        }));
+                                                        try {
+                                                          const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                                          const osc = ctx.createOscillator();
+                                                          const g = ctx.createGain();
+                                                          osc.type = 'triangle';
+                                                          osc.frequency.setValueAtTime(400, ctx.currentTime);
+                                                          osc.frequency.exponentialRampToValueAtTime(900, ctx.currentTime + 0.15);
+                                                          g.gain.setValueAtTime(0.1, ctx.currentTime);
+                                                          osc.connect(g); g.connect(ctx.destination);
+                                                          osc.start(); osc.stop(ctx.currentTime + 0.15);
+                                                        } catch(e){}
+                                                        showNotification("🗡️ Куплен Легендарный Скимитар (+45 Сила)!", "success");
+                                                      } else {
+                                                        showNotification("❌ Недостаточно денег на Огненный клинок (200)!", "error");
+                                                      }
+                                                    }}
+                                                    className="w-full py-1 bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/30 rounded text-[7.5px] font-bold uppercase transition-all"
+                                                  >
+                                                    ⚔️ Скимитар (200 за)
+                                                  </button>
+                                                </div>
+                                              </div>
+
+                                              {/* 3. Espionage Lodge with manual settings sliders! */}
+                                              <div className="bg-slate-950 p-3 rounded-2xl border border-white/5 flex flex-col justify-between space-y-2 col-span-1">
+                                                <div>
+                                                  <div className="text-[9px] font-black text-rose-400 flex justify-between items-center uppercase tracking-tight">
+                                                    <span>👁️ ШПИОНАЖ ИИ</span>
+                                                    <span className="px-1 bg-red-500/20 rounded text-[6px] text-red-400 font-mono">OPPONENT</span>
+                                                  </div>
+                                                  <span className="text-[7px] font-mono text-slate-500 block mb-1">GameObject: Spy_Lodge</span>
+                                                  <p className="text-[9px] text-slate-400 leading-tight">
+                                                    Тонкая калибровка ходов AI оппонента для ручной настройки замков на карте:
+                                                  </p>
+                                                </div>
+                                                <div className="pt-2 border-t border-white/5 space-y-1">
+                                                  {/* Interactive toggles and configs */}
+                                                  <div className="space-y-1">
+                                                    <label className="text-[7px] font-bold text-slate-400 uppercase flex justify-between">
+                                                      <span>AI Замки Апгрейд (Chance)</span>
+                                                      <span className="text-rose-400">{(aiUpgradeProb * 100).toFixed(0)}%</span>
+                                                    </label>
+                                                    <input 
+                                                      type="range" min="0" max="1" step="0.05"
+                                                      value={aiUpgradeProb} onChange={(e) => setAiUpgradeProb(parseFloat(e.target.value))}
+                                                      className="w-full h-1 bg-slate-800 accent-rose-500 rounded cursor-pointer"
+                                                    />
+                                                  </div>
+
+                                                  <div className="space-y-1">
+                                                    <label className="text-[7px] font-bold text-slate-400 uppercase flex justify-between">
+                                                      <span>AI Наём Воинства (Chance)</span>
+                                                      <span className="text-rose-400">{(aiRecruitProb * 100).toFixed(0)}%</span>
+                                                    </label>
+                                                    <input 
+                                                      type="range" min="0" max="1" step="0.05"
+                                                      value={aiRecruitProb} onChange={(e) => setAiRecruitProb(parseFloat(e.target.value))}
+                                                      className="w-full h-1 bg-slate-800 accent-rose-500 rounded cursor-pointer"
+                                                    />
+                                                  </div>
+
+                                                  <div className="space-y-1">
+                                                    <label className="text-[7px] font-bold text-slate-400 uppercase flex justify-between">
+                                                      <span>Золото Множитель ИИ</span>
+                                                      <span className="text-rose-400">x{aiIncomeMult}</span>
+                                                    </label>
+                                                    <input 
+                                                      type="range" min="1.0" max="3.0" step="0.05"
+                                                      value={aiIncomeMult} onChange={(e) => setAiIncomeMult(parseFloat(e.target.value))}
+                                                      className="w-full h-1 bg-slate-800 accent-rose-500 rounded cursor-pointer"
+                                                    />
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+
+                                            {/* AI Simulation Logs to let the player track how opponents play when skipping turns */}
+                                            <div className="mt-4 bg-slate-950 p-3 rounded-2xl border border-white/5 space-y-2">
+                                              <span className="text-[7.5px] font-black font-mono text-slate-400 block uppercase tracking-wide">
+                                                📝 ХРОНИКА ОППОНЕНТОВ НА КАРТЕ (СИМУЛЯЦИЯ ХОДОВ ИИ)
+                                              </span>
+                                              <div className="max-h-[75px] overflow-y-auto space-y-1 text-[8.5px] font-mono scrollbar-thin">
+                                                {aiActionLogs.map((log, i) => (
+                                                  <div key={i} className="text-slate-300 border-l border-emerald-500/40 pl-2 leading-tight">
+                                                    {log}
+                                                  </div>
+                                                ))}
+                                              </div>
+                                            </div>
+                                          </div>
+
+                                          <div className="flex justify-between items-center gap-4 pt-4 mt-2 border-t border-white/5">
+                                            <div className="text-[9px] text-slate-400">
+                                              {simDialogueStep < 12 ? (
+                                                <span>👉 Аэлисса просит Вас <strong className="text-white">нажать на иконку HUD вверху слева</strong>, чтобы сменить снаряжение.</span>
+                                              ) : (
+                                                <span>🎉 Поздравляем! Обучение пошаговой застройки замка и снаряжения успешно завершено.</span>
+                                              )}
+                                            </div>
+
+                                            <div className="flex gap-2">
+                                              {simDialogueStep < 12 ? (
+                                                <button
+                                                  onClick={() => {
+                                                    setSimDialogueStep(prev => prev + 1);
+                                                    try {
+                                                      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                                      const osc = ctx.createOscillator();
+                                                      osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+                                                      osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1);
+                                                      const g = ctx.createGain(); g.gain.setValueAtTime(0.08, ctx.currentTime);
+                                                      osc.connect(g); g.connect(ctx.destination);
+                                                      osc.start(); osc.stop(ctx.currentTime + 0.2);
+                                                    } catch(e){}
+                                                  }}
+                                                  className="px-4 py-1.5 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white rounded-xl text-[8px] font-black uppercase tracking-wider transition-all"
+                                                >
+                                                  {simDialogueLang === 'RU' ? 'Далее ➔' : 'Next ➔'}
+                                                </button>
+                                              ) : (
+                                                <button
+                                                  onClick={() => {
+                                                    setSimDialogueStep(0);
+                                                    setDialogueActiveScene(false);
+                                                    showNotification(simDialogueLang === 'RU' ? 'Прохождение завершено! Возврат на карту.' : 'Campaign completed! Returning to map.', "success");
+                                                  }}
+                                                  className="px-4 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl text-[8px] font-black uppercase tracking-wider transition-all"
+                                                >
+                                                  {simDialogueLang === 'RU' ? 'Завершить Кампанию 🏁' : 'Complete Campaign 🏁'}
+                                                </button>
+                                              )}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-center pt-2 relative">
                             
                             {/* LEFT COLUMN: COMPANION (AELYSSA) INSIDE SMALL FRAME */}
                             <div className="lg:col-span-1 flex flex-col items-center space-y-3 relative group">
@@ -5062,6 +6883,12 @@ export default function App() {
                               <div className="absolute -top-12 bg-indigo-950/90 border border-indigo-400 text-cyan-400 px-3 py-1.5 rounded-xl text-[9.5px] font-bold text-center z-30 max-w-xs shadow-xl animate-bounce pointer-events-none">
                                 <span className="block font-black uppercase text-white mb-0.5">Портрет-компаньон</span>
                                 Перетащите сюда Aelyssa.png
+                              </div>
+
+                              {/* Dialogue Companion Header Prefab Badge Slots "ШАПКА ДИАЛОГА" */}
+                              <div className="w-full bg-slate-900/95 border-2 border-indigo-500/40 rounded-2xl px-3 py-2 text-center text-[10px] font-black uppercase text-cyan-400 tracking-wider shadow-[0_0_20px_rgba(99,102,241,0.35)] relative overflow-hidden group hover:scale-[1.02] transition-transform" id="Dialogue_Header_Companion_Plaque">
+                                <span className="text-[6px] text-slate-500 font-mono block mb-0.5">GameObject: Dialogue_Header_Prefab_Slot (Left)</span>
+                                🏰 {simDialogueLang === 'RU' ? 'АЭЛИССА (НАСТАВНИК)' : 'AELYSSA (MENTOR)'}
                               </div>
 
                               <div className="w-32 h-32 md:w-40 md:h-40 rounded-[2.5rem] bg-indigo-950/60 border-2 border-indigo-500 shadow-[0_0_30px_rgba(99,102,241,0.3)] relative overflow-hidden transition-all duration-300 ring-4 ring-indigo-500/10 hover:scale-105">
@@ -5790,6 +7617,12 @@ export default function App() {
                             </div>
 
                             {/* RIGHT COLUMN: PLAYER HERO AVATAR IN DUAL LAYOUT */}
+                            <div className="w-full bg-slate-900/95 border-2 border-amber-500/40 rounded-2xl px-3 py-2 text-center text-[10px] font-black uppercase text-amber-400 tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.25)] relative overflow-hidden group hover:scale-[1.02] transition-transform z-20" id="Dialogue_Header_Player_Plaque">
+                              <span className="text-[6px] text-slate-500 font-mono block mb-0.5">GameObject: Dialogue_Header_Prefab_Slot (Right)</span>
+                              🛡️ {simDialogueHero === 'warrior' ? (simDialogueLang === 'RU' ? 'РЭГНАР (ВОИН)' : 'RAGNAR (WARRIOR)')
+                                  : simDialogueHero === 'archer' ? (simDialogueLang === 'RU' ? 'АЛАРИК (СТРЕЛОК)' : 'ALARIC (ARCHER)')
+                                  : (simDialogueLang === 'RU' ? 'ЭЛИЗИУС (МАГ)' : 'ELYSIUS (MAGE)')}
+                            </div>
                             <div className="lg:col-span-1 flex flex-col items-center space-y-3 relative group">
                               <div className="absolute -top-12 bg-indigo-950/90 border border-indigo-400 text-yellow-400 px-3 py-1.5 rounded-xl text-[9.5px] font-bold text-center z-30 max-w-xs shadow-xl animate-bounce pointer-events-none font-sans">
                                 <span className="block font-black uppercase text-white mb-0.5">Класс Игрока</span>
@@ -5847,6 +7680,7 @@ export default function App() {
                             </div>
 
                           </div>
+                        )}
                         </div>
                       )}
 

@@ -135,15 +135,22 @@ namespace FateContinent
             isHighlightedChoice = active;
             isHovered = false;
             
-            // Если включен инстанцированный материал, обновляем его цвета мгновенно
             if (active)
             {
-                SetGlowColor(hoverGlowColor);
+                if (spriteRenderer != null)
+                {
+                    spriteRenderer.color = Color.white; // Яркое полное сияние
+                }
+                SetGlowColor(new Color(0.18f, 0.76f, 1.0f, 1.0f)); // Красивое аквамариновое/циан Zenith кольцо
             }
             else
             {
-                // Никогда не затемняем и не приглушаем неактивные точки! Альфа канал всегда на максимум!
-                SetGlowColor(normalGlowColor);
+                // Полностью гасим неактивные точки, делая их нейтральными, не захваченными!
+                if (spriteRenderer != null)
+                {
+                    spriteRenderer.color = new Color(0.32f, 0.32f, 0.32f, 0.4f); // Приглушенный серый оттенок без захвата
+                }
+                SetGlowColor(new Color(0.04f, 0.04f, 0.04f, 0.05f)); // Сверхнизкое, почти выключенное нейтральное свечение
             }
         }
 
@@ -212,7 +219,13 @@ namespace FateContinent
                 // Если включен HDR материал, пульсируем его интенсивность свечения
                 if (instancedMaterial != null && Application.isPlaying)
                 {
-                    Color pulsedColor = normalGlowColor * (1.0f + pulse * 0.5f);
+                    Color baseGlowColor = normalGlowColor;
+                    if (!isHighlightedChoice)
+                    {
+                        // Если точка не выбрана игроком, держим ее нейтральной и тусклой
+                        baseGlowColor = new Color(0.04f, 0.04f, 0.04f, 0.05f);
+                    }
+                    Color pulsedColor = baseGlowColor * (1.0f + pulse * 0.5f);
                     SetGlowColor(pulsedColor);
                 }
             }
@@ -275,7 +288,15 @@ namespace FateContinent
 
             if (spriteRenderer != null)
             {
-                spriteRenderer.color = Color.white; // Постоянно держим исходный белый цвет без тинта
+                // Постоянно держим исходный белый цвет без тинта ТОЛЬКО если точка выделена или нажата, иначе сохраняем серый нейтральный тон!
+                if (isHighlightedChoice || isHovered)
+                {
+                    spriteRenderer.color = Color.white;
+                }
+                else
+                {
+                    spriteRenderer.color = new Color(0.32f, 0.32f, 0.32f, 0.4f);
+                }
             }
         }
 

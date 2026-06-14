@@ -333,7 +333,7 @@ namespace FateContinent
             }
             if (FateMapManager.Instance != null)
             {
-                FateMapManager.Instance.SetMapVisible(true);
+                FateMapManager.Instance.SetMapVisible(false);
             }
 
             if (DialogueSystem_Manager.Instance != null)
@@ -397,61 +397,75 @@ namespace FateContinent
                 
                 // Делаем плоскость достаточно огромной для стратегического обзора
                 oceanObj.transform.localScale = new Vector3(80f, 1f, 80f); 
+            }
 
-                // Настраиваем MeshRenderer для тайлинга текстуры
-                MeshRenderer mr = oceanObj.GetComponent<MeshRenderer>();
-                if (mr != null)
+            // Гарантируем правильную настройку материала, текстур и тайлинга при каждом запуске!
+            MeshRenderer mr = oceanObj.GetComponent<MeshRenderer>();
+            if (mr != null)
+            {
+                Material oceanMat = null;
+                
+                // Попытка найти уже настроенный в ассетах материал M_Ocean_Background, чтобы избежать сброса текстур
+                Material[] availableMats = Resources.FindObjectsOfTypeAll<Material>();
+                foreach (var m in availableMats)
                 {
-                    Material oceanMat = null;
-                    
-                    // Попытка найти уже настроенный в ассетах материал M_Ocean_Background, чтобы избежать сброса текстур
-                    Material[] availableMats = Resources.FindObjectsOfTypeAll<Material>();
-                    foreach (var m in availableMats)
+                    if (m != null && m.name == "M_Ocean_Background")
                     {
-                        if (m != null && m.name == "M_Ocean_Background")
+                        oceanMat = m;
+                        break;
+                    }
+                }
+
+                // Если материала нет, создаем его динамически с поддержкой Universal Render Pipeline
+                if (oceanMat == null)
+                {
+                    Shader urpShader = Shader.Find("Universal Render Pipeline/Lit");
+                    if (urpShader == null) urpShader = Shader.Find("URP/Lit");
+                    if (urpShader == null) urpShader = Shader.Find("Standard");
+                    
+                    oceanMat = new Material(urpShader);
+                    oceanMat.name = "M_Ocean_Background";
+                    
+                    // Цветовой оттенок темного космического океана
+                    oceanMat.color = new Color(0.02f, 0.05f, 0.12f, 1.0f);
+                    
+                    // Шероховатость и отражения
+                    if (oceanMat.HasProperty("_Glossiness")) oceanMat.SetFloat("_Glossiness", 0.7f);
+                    if (oceanMat.HasProperty("_Smoothness")) oceanMat.SetFloat("_Smoothness", 0.7f);
+                    if (oceanMat.HasProperty("_Metallic")) oceanMat.SetFloat("_Metallic", 0.1f);
+                }
+
+                // Восстанавливаем текстуру, если она пропала
+                if (oceanMat.mainTexture == null)
+                {
+                    Texture2D[] allTextures = Resources.FindObjectsOfTypeAll<Texture2D>();
+                    foreach (var tex in allTextures)
+                    {
+                        if (tex != null && (tex.name.ToLower().Contains("water") || tex.name.ToLower().Contains("ocean") || tex.name.ToLower().Contains("sea")))
                         {
-                            oceanMat = m;
+                            oceanMat.mainTexture = tex;
                             break;
                         }
                     }
-
-                    // Если материала нет, создаем его динамически с поддержкой Universal Render Pipeline
-                    if (oceanMat == null)
-                    {
-                        Shader urpShader = Shader.Find("Universal Render Pipeline/Lit");
-                        if (urpShader == null) urpShader = Shader.Find("URP/Lit");
-                        if (urpShader == null) urpShader = Shader.Find("Standard");
-                        
-                        oceanMat = new Material(urpShader);
-                        oceanMat.name = "M_Ocean_Background";
-                        
-                        // Цветовой оттенок темного космического океана
-                        oceanMat.color = new Color(0.02f, 0.05f, 0.12f, 1.0f);
-                        
-                        // Шероховатость и отражения
-                        if (oceanMat.HasProperty("_Glossiness")) oceanMat.SetFloat("_Glossiness", 0.7f);
-                        if (oceanMat.HasProperty("_Smoothness")) oceanMat.SetFloat("_Smoothness", 0.7f);
-                        if (oceanMat.HasProperty("_Metallic")) oceanMat.SetFloat("_Metallic", 0.1f);
-                    }
-
-                    // Принудительно задаем 40x40 тайлинг, чтобы 8K текстура воды не растягивалась мылом
-                    if (oceanMat.HasProperty("_BaseMap"))
-                    {
-                        oceanMat.SetTextureScale("_BaseMap", new Vector2(40f, 40f));
-                    }
-                    else if (oceanMat.HasProperty("_MainTex"))
-                    {
-                        oceanMat.SetTextureScale("_MainTex", new Vector2(40f, 40f));
-                    }
-
-                    mr.material = oceanMat;
                 }
 
+                // Принудительно задаем 40x40 тайлинг, чтобы 8K текстура воды не растягивалась мылом
+                if (oceanMat.HasProperty("_BaseMap"))
+                {
+                    oceanMat.SetTextureScale("_BaseMap", new Vector2(40f, 40f));
+                }
+                else if (oceanMat.HasProperty("_MainTex"))
+                {
+                    oceanMat.SetTextureScale("_MainTex", new Vector2(40f, 40f));
+                }
+
+                mr.material = oceanMat;
+                
                 // Отключаем тени, чтобы плоскость выглядела чисто
                 mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
                 mr.receiveShadows = true;
 
-                Debug.Log("<color=#00FFCC>[OCEAN GENERATOR]</color> Специфицировали красивую плоскость Fate_Ocean_Plane под континентом (Y = -0.6f, масштаб 80x80).");
+                Debug.Log("<color=#00FFCC>[OCEAN GENERATOR]</color> Успешно проверили и настроили материал Fate_Ocean_Plane (Y = -0.6f, масштаб 80x80).");
             }
         }
     }
