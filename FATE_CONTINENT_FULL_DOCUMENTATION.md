@@ -1,10 +1,10 @@
-# 📘 FATE CONTINENT: MASTER KNOWLEDGE BASE (v18.5.5)
+# 📘 FATE CONTINENT: MASTER KNOWLEDGE BASE (v18.11.15)
 
 > **TECHNICAL OVERVIEW:**
 > - **Engine:** Unity 6 (6000.3.10f1)
 > - **Genre:** Turn-based Strategy / RPG
 > - **Style:** Zenith Glassmorphism (8K)
-> - **Updates:** Triple Font Bridge (v18.5.5). Korean Hangul Support. Compiler Fix.
+> - **Updates:** RPG Skills & Turn-Based Castle Integration (v18.11.15). Custom Starting Attributes & Allocation Barriers.
 
 ---
 
@@ -15,13 +15,34 @@ Project uses a centralized management system:
 - `DataLoader`: Loads `races_data.json` and `items_data.json` using `JsonUtility`.
 - `GameManager`: Persists across scenes (`DontDestroyOnLoad`), manages gold and difficulty.
 
-## ⚔️ 2. BATTLE SYSTEM & FORMULAS
-- **CombatResolver**: Static class for calculating damage, crits, and dodge.
-- **Formulas**: Uses `defCurve = 50f` for smooth damage reduction.
-- **SkillDB**: Static cache for skills to avoid `Find()` overhead.
-- **AI Logic**: Behavior-based on HP thresholds (<50% triggers healing) and nearest target searching.
+## 🧬 2. RPG CLASS & STARTING ATTRIBUTE MECHANICS (v18.11.15)
+- **Class Baselining**: Supports three primary classes with distinct starting attributes configured on Slot-0 load inside `CharacterSelectionController.cs`:
+  - **Warrior**: STR 15, AGI 10, INT 4, STA 15.
+  - **Archer**: STR 10, AGI 14, INT 6, STA 11.
+  - **Mage**: STR 6, AGI 10, INT 10, STA 9.
+- **Difficulty Bonus Skills Pools**: Allocates bonus starter points based on selected level of difficulty on character creation:
+  - Novice: +30 points
+  - Easy: +20 points
+  - Normal: +10 points
+  - Hard: +5 points
+  - Nightmare: +0 points
+- **Clamped Manual Allocation (`FateCastleManager.cs`)**: Prevents reducing stats below their designated class baseline values using safety boundaries:
+  - `statValue > minValue`
+- **AI Autonomous Allocation**: Integrated `AutoAllocateAllPoints()` system distributes unused points according to weighted class specifications.
 
-## 🗺️ 3. WORLD & NAVIGATION
+## ⚔️ 3. HERO CLASS SKILLS GLOSSARY (v18.11.15)
+Displays and maintains unique character class passives and ultimate skills inside the Zenith HUD panel:
+- **Warrior**:
+  - *Passives*: IronSkin (+15% Armor Protection), Regen (+5 HP per turn), Threat (+10% threat aggro).
+  - *Ultimate*: TitanShield (Cooldown 4 turns, blocks 70% of incoming damage).
+- **Archer**:
+  - *Passives*: Crit Master (+15% Critical Chance), LongShot (+10% ranged damage), Evasion (+10% dodge).
+  - *Ultimate*: Death Rain (Cooldown 3 turns, x1.8 AoE field damage).
+- **Mage**:
+  - *Passives*: ManaFlow (+5 MP per turn), Elemental (+15% elemental magic damage), Resist (+15% spell defense).
+  - *Ultimate*: Time Rift (Cooldown 4 turns, slows enemies down for 2 turns).
+
+## 🗺️ 4. WORLD & NAVIGATION
 - **GridSystem**: Grid-based map (default 60x60) with terrain types (Plains, Forest, Mountains, Water).
 - **Pathfinding**: A* (A-Star) algorithm for unit movement, considering movement costs for "Heavy" units.
 - **CameraController**: Smooth 2.5D camera with WASD/Mouse support and `Mathf.SmoothStep`.
