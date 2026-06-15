@@ -427,12 +427,12 @@ namespace FateContinent
                     oceanMat.name = "M_Ocean_Background";
                     
                     // Цветовой оттенок темного космического океана
-                    oceanMat.color = new Color(0.02f, 0.05f, 0.12f, 1.0f);
+                    oceanMat.color = new Color(0.05f, 0.18f, 0.38f, 1.0f);
                     
                     // Шероховатость и отражения
-                    if (oceanMat.HasProperty("_Glossiness")) oceanMat.SetFloat("_Glossiness", 0.7f);
-                    if (oceanMat.HasProperty("_Smoothness")) oceanMat.SetFloat("_Smoothness", 0.7f);
-                    if (oceanMat.HasProperty("_Metallic")) oceanMat.SetFloat("_Metallic", 0.1f);
+                    if (oceanMat.HasProperty("_Glossiness")) oceanMat.SetFloat("_Glossiness", 0.75f);
+                    if (oceanMat.HasProperty("_Smoothness")) oceanMat.SetFloat("_Smoothness", 0.75f);
+                    if (oceanMat.HasProperty("_Metallic")) oceanMat.SetFloat("_Metallic", 0.4f);
                 }
 
                 // Восстанавливаем текстуру, если она пропала

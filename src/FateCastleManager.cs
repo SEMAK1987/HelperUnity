@@ -128,6 +128,8 @@ public class FateCastleManager : MonoBehaviour
     
     // UI states and trackers
     public bool isTownViewActive = false;
+    public bool isAutonomousStatsDistribution = false;
+    private bool showStatsPanel = false;
     private bool isDetailsOpen = false;
     private int activeDetailsIndex = -1;
     private string feedbackMessage = "";
@@ -287,7 +289,7 @@ public class FateCastleManager : MonoBehaviour
         }
         else if (instance != this)
         {
-            Destroy(gameObject);
+            Destroy(this);
             return;
         }
 
@@ -619,207 +621,233 @@ public class FateCastleManager : MonoBehaviour
             if (castleMat.HasProperty("_Smoothness")) castleMat.SetFloat("_Smoothness", 0.7f);
             if (castleMat.HasProperty("_Metallic")) castleMat.SetFloat("_Metallic", 0.45f);
 
-            // МОРФИНГ ФОРМ в зависимости от Уровня (1 - 6)
-            if (castle.level == 1)
+            // МОРФИНГ ФОРМ только для активного замка Игрока!
+            if (castle.owner == "Player")
             {
-                // LEVEL 1: Одиночный форпост (Один квадратный блок с малой башней)
-                GameObject fort = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                Destroy(fort.GetComponent<BoxCollider>());
-                fort.transform.SetParent(root.transform);
-                fort.transform.localPosition = new Vector3(0f, 0.8f, 0f);
-                fort.transform.localScale = new Vector3(1.1f, 1.6f, 1.1f);
-                fort.GetComponent<Renderer>().material = castleMat;
-
-                GameObject crown = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                Destroy(crown.GetComponent<BoxCollider>());
-                crown.transform.SetParent(root.transform);
-                crown.transform.localPosition = new Vector3(0f, 1.75f, 0f);
-                crown.transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
-                crown.GetComponent<Renderer>().material = castleMat;
-            }
-            else if (castle.level == 2)
-            {
-                // LEVEL 2: Укреплённый донжон (2 боковые стены и центральный шпиль)
-                GameObject keep = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                Destroy(keep.GetComponent<BoxCollider>());
-                keep.transform.SetParent(root.transform);
-                keep.transform.localPosition = new Vector3(0f, 1.4f, 0f);
-                keep.transform.localScale = new Vector3(1.4f, 2.8f, 1.4f);
-                keep.GetComponent<Renderer>().material = castleMat;
-
-                float offset = 0.75f;
-                for (float z = -offset; z <= offset; z += offset * 2)
+                if (castle.level == 1)
                 {
-                    GameObject w = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    Destroy(w.GetComponent<BoxCollider>());
-                    w.transform.SetParent(root.transform);
-                    w.transform.localPosition = new Vector3(0f, 0.7f, z);
-                    w.transform.localScale = new Vector3(0.5f, 1.4f, 0.5f);
-                    w.GetComponent<Renderer>().material = castleMat;
+                    // LEVEL 1: Одиночный форпост (Один квадратный блок с малой башней)
+                    GameObject fort = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    Destroy(fort.GetComponent<BoxCollider>());
+                    fort.transform.SetParent(root.transform);
+                    fort.transform.localPosition = new Vector3(0f, 0.8f, 0f);
+                    fort.transform.localScale = new Vector3(1.1f, 1.6f, 1.1f);
+                    fort.GetComponent<Renderer>().material = castleMat;
+
+                    GameObject crown = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    Destroy(crown.GetComponent<BoxCollider>());
+                    crown.transform.SetParent(root.transform);
+                    crown.transform.localPosition = new Vector3(0f, 1.75f, 0f);
+                    crown.transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
+                    crown.GetComponent<Renderer>().material = castleMat;
                 }
-            }
-            else if (castle.level == 3)
-            {
-                // LEVEL 3: Мифриловая крепость (Квадратный мощный бастион с угловыми башнями)
-                GameObject baseBlock = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                Destroy(baseBlock.GetComponent<BoxCollider>());
-                baseBlock.transform.SetParent(root.transform);
-                baseBlock.transform.localPosition = new Vector3(0f, 1.0f, 0f);
-                baseBlock.transform.localScale = new Vector3(2.1f, 2.0f, 2.1f);
-                baseBlock.GetComponent<Renderer>().material = castleMat;
-
-                float off = 0.95f;
-                for (float x = -off; x <= off; x += off * 2)
+                else if (castle.level == 2)
                 {
-                    for (float z = -off; z <= off; z += off * 2)
+                    // LEVEL 2: Укреплённый донжон (2 боковые стены и центральный шпиль)
+                    GameObject keep = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    Destroy(keep.GetComponent<BoxCollider>());
+                    keep.transform.SetParent(root.transform);
+                    keep.transform.localPosition = new Vector3(0f, 1.4f, 0f);
+                    keep.transform.localScale = new Vector3(1.4f, 2.8f, 1.4f);
+                    keep.GetComponent<Renderer>().material = castleMat;
+
+                    float offset = 0.75f;
+                    for (float z = -offset; z <= offset; z += offset * 2)
                     {
-                        GameObject colTower = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                        Destroy(colTower.GetComponent<BoxCollider>());
-                        colTower.transform.SetParent(root.transform);
-                        colTower.transform.localPosition = new Vector3(x, 1.5f, z);
-                        colTower.transform.localScale = new Vector3(0.5f, 3.0f, 0.5f);
-                        colTower.GetComponent<Renderer>().material = castleMat;
+                        GameObject w = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                        Destroy(w.GetComponent<BoxCollider>());
+                        w.transform.SetParent(root.transform);
+                        w.transform.localPosition = new Vector3(0f, 0.7f, z);
+                        w.transform.localScale = new Vector3(0.5f, 1.4f, 0.5f);
+                        w.GetComponent<Renderer>().material = castleMat;
                     }
                 }
-            }
-            else if (castle.level == 4)
-            {
-                // LEVEL 4: Облачный бастион (Двухъярусная цитадель, боковые пристройки и эммисионный энергетический кристалл)
-                GameObject bodyLower = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                Destroy(bodyLower.GetComponent<BoxCollider>());
-                bodyLower.transform.SetParent(root.transform);
-                bodyLower.transform.localPosition = new Vector3(0f, 1.2f, 0f);
-                bodyLower.transform.localScale = new Vector3(2.5f, 2.4f, 1.8f);
-                bodyLower.GetComponent<Renderer>().material = castleMat;
+                else if (castle.level == 3)
+                {
+                    // LEVEL 3: Мифриловая крепость (Квадратный мощный бастион с угловыми башнями)
+                    GameObject baseBlock = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    Destroy(baseBlock.GetComponent<BoxCollider>());
+                    baseBlock.transform.SetParent(root.transform);
+                    baseBlock.transform.localPosition = new Vector3(0f, 1.0f, 0f);
+                    baseBlock.transform.localScale = new Vector3(2.1f, 2.0f, 2.1f);
+                    baseBlock.GetComponent<Renderer>().material = castleMat;
 
-                GameObject coreTower = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                Destroy(coreTower.GetComponent<BoxCollider>());
-                coreTower.transform.SetParent(root.transform);
-                coreTower.transform.localPosition = new Vector3(0f, 3.2f, 0f);
-                coreTower.transform.localScale = new Vector3(1.1f, 2.2f, 1.1f);
-                coreTower.GetComponent<Renderer>().material = castleMat;
+                    float off = 0.95f;
+                    for (float x = -off; x <= off; x += off * 2)
+                    {
+                        for (float z = -off; z <= off; z += off * 2)
+                        {
+                            GameObject colTower = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                            Destroy(colTower.GetComponent<BoxCollider>());
+                            colTower.transform.SetParent(root.transform);
+                            colTower.transform.localPosition = new Vector3(x, 1.5f, z);
+                            colTower.transform.localScale = new Vector3(0.5f, 3.0f, 0.5f);
+                            colTower.GetComponent<Renderer>().material = castleMat;
+                        }
+                    }
+                }
+                else if (castle.level == 4)
+                {
+                    // LEVEL 4: Облачный бастион (Двухъярусная цитадель, боковые пристройки и эммисионный энергетический кристалл)
+                    GameObject bodyLower = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    Destroy(bodyLower.GetComponent<BoxCollider>());
+                    bodyLower.transform.SetParent(root.transform);
+                    bodyLower.transform.localPosition = new Vector3(0f, 1.2f, 0f);
+                    bodyLower.transform.localScale = new Vector3(2.5f, 2.4f, 1.8f);
+                    bodyLower.GetComponent<Renderer>().material = castleMat;
 
-                // Glowing core spire
-                Material glowingMat = new Material(urpShader);
-                glowingMat.color = castle.owner == "Player" ? new Color(0.1f, 0.9f, 1.0f, 1.0f) : new Color(1.0f, 0.2f, 0.1f, 1.0f);
-                if (glowingMat.HasProperty("_EmissionColor")) glowingMat.SetColor("_EmissionColor", glowingMat.color * 3.0f);
+                    GameObject coreTower = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    Destroy(coreTower.GetComponent<BoxCollider>());
+                    coreTower.transform.SetParent(root.transform);
+                    coreTower.transform.localPosition = new Vector3(0f, 3.2f, 0f);
+                    coreTower.transform.localScale = new Vector3(1.1f, 2.2f, 1.1f);
+                    coreTower.GetComponent<Renderer>().material = castleMat;
 
-                GameObject spireDiamond = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                spireDiamond.name = "SpireDiamond";
-                Destroy(spireDiamond.GetComponent<BoxCollider>());
-                spireDiamond.transform.SetParent(root.transform);
-                spireDiamond.transform.localPosition = new Vector3(0f, 4.5f, 0f);
-                spireDiamond.transform.localScale = new Vector3(0.4f, 0.7f, 0.4f);
-                spireDiamond.transform.localRotation = Quaternion.Euler(45f, 45f, 45f);
-                spireDiamond.GetComponent<Renderer>().material = glowingMat;
-            }
-            else if (castle.level == 5)
-            {
-                // LEVEL 5: Имперская твердыня (Парящие платформы, огромные донжоны, монументальные парапеты)
-                GameObject structure = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                Destroy(structure.GetComponent<BoxCollider>());
-                structure.transform.SetParent(root.transform);
-                structure.transform.localPosition = new Vector3(0f, 1.5f, 0f);
-                structure.transform.localScale = new Vector3(2.8f, 3.0f, 2.8f);
-                structure.GetComponent<Renderer>().material = castleMat;
+                    // Glowing core spire
+                    Material glowingMat = new Material(urpShader);
+                    glowingMat.color = castle.owner == "Player" ? new Color(0.1f, 0.9f, 1.0f, 1.0f) : new Color(1.0f, 0.2f, 0.1f, 1.0f);
+                    if (glowingMat.HasProperty("_EmissionColor")) glowingMat.SetColor("_EmissionColor", glowingMat.color * 3.0f);
 
-                GameObject highKeep = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                Destroy(highKeep.GetComponent<BoxCollider>());
-                highKeep.transform.SetParent(root.transform);
-                highKeep.transform.localPosition = new Vector3(0f, 4.1f, 0f);
-                highKeep.transform.localScale = new Vector3(1.3f, 2.5f, 1.3f);
-                highKeep.GetComponent<Renderer>().material = castleMat;
+                    GameObject spireDiamond = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    spireDiamond.name = "SpireDiamond";
+                    Destroy(spireDiamond.GetComponent<BoxCollider>());
+                    spireDiamond.transform.SetParent(root.transform);
+                    spireDiamond.transform.localPosition = new Vector3(0f, 4.5f, 0f);
+                    spireDiamond.transform.localScale = new Vector3(0.4f, 0.7f, 0.4f);
+                    spireDiamond.transform.localRotation = Quaternion.Euler(45f, 45f, 45f);
+                    spireDiamond.GetComponent<Renderer>().material = glowingMat;
+                }
+                else if (castle.level == 5)
+                {
+                    // LEVEL 5: Имперская твердыня (Парящие платформы, огромные донжоны, монументальные парапеты)
+                    GameObject structure = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    Destroy(structure.GetComponent<BoxCollider>());
+                    structure.transform.SetParent(root.transform);
+                    structure.transform.localPosition = new Vector3(0f, 1.5f, 0f);
+                    structure.transform.localScale = new Vector3(2.8f, 3.0f, 2.8f);
+                    structure.GetComponent<Renderer>().material = castleMat;
 
-                // Flanking barriers
-                float offset = 1.7f;
-                GameObject lWall = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                Destroy(lWall.GetComponent<BoxCollider>());
-                lWall.transform.SetParent(root.transform);
-                lWall.transform.localPosition = new Vector3(-offset, 1.0f, 0f);
-                lWall.transform.localScale = new Vector3(0.8f, 2.0f, 0.8f);
-                lWall.GetComponent<Renderer>().material = castleMat;
+                    GameObject highKeep = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    Destroy(highKeep.GetComponent<BoxCollider>());
+                    highKeep.transform.SetParent(root.transform);
+                    highKeep.transform.localPosition = new Vector3(0f, 4.1f, 0f);
+                    highKeep.transform.localScale = new Vector3(1.3f, 2.5f, 1.3f);
+                    highKeep.GetComponent<Renderer>().material = castleMat;
 
-                GameObject rWall = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                Destroy(rWall.GetComponent<BoxCollider>());
-                rWall.transform.SetParent(root.transform);
-                rWall.transform.localPosition = new Vector3(offset, 1.0f, 0f);
-                rWall.transform.localScale = new Vector3(0.8f, 2.0f, 0.8f);
-                rWall.GetComponent<Renderer>().material = castleMat;
+                    // Flanking barriers
+                    float offset = 1.7f;
+                    GameObject lWall = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    Destroy(lWall.GetComponent<BoxCollider>());
+                    lWall.transform.SetParent(root.transform);
+                    lWall.transform.localPosition = new Vector3(-offset, 1.0f, 0f);
+                    lWall.transform.localScale = new Vector3(0.8f, 2.0f, 0.8f);
+                    lWall.GetComponent<Renderer>().material = castleMat;
 
-                Material coreMat = new Material(urpShader);
-                coreMat.color = castle.owner == "Player" ? new Color(1.0f, 0.8f, 0.1f, 1.0f) : new Color(0.9f, 0.1f, 0.5f, 1.0f);
-                if (coreMat.HasProperty("_EmissionColor")) coreMat.SetColor("_EmissionColor", coreMat.color * 4.0f);
+                    GameObject rWall = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    Destroy(rWall.GetComponent<BoxCollider>());
+                    rWall.transform.SetParent(root.transform);
+                    rWall.transform.localPosition = new Vector3(offset, 1.0f, 0f);
+                    rWall.transform.localScale = new Vector3(0.8f, 2.0f, 0.8f);
+                    rWall.GetComponent<Renderer>().material = castleMat;
 
-                GameObject spireDiamond = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                spireDiamond.name = "SpireDiamond";
-                Destroy(spireDiamond.GetComponent<BoxCollider>());
-                spireDiamond.transform.SetParent(root.transform);
-                spireDiamond.transform.localPosition = new Vector3(0f, 5.6f, 0f);
-                spireDiamond.transform.localScale = new Vector3(0.5f, 0.9f, 0.5f);
-                spireDiamond.transform.localRotation = Quaternion.Euler(30f, 45f, 30f);
-                spireDiamond.GetComponent<Renderer>().material = coreMat;
+                    Material coreMat = new Material(urpShader);
+                    coreMat.color = castle.owner == "Player" ? new Color(1.0f, 0.8f, 0.1f, 1.0f) : new Color(0.9f, 0.1f, 0.5f, 1.0f);
+                    if (coreMat.HasProperty("_EmissionColor")) coreMat.SetColor("_EmissionColor", coreMat.color * 4.0f);
+
+                    GameObject spireDiamond = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    spireDiamond.name = "SpireDiamond";
+                    Destroy(spireDiamond.GetComponent<BoxCollider>());
+                    spireDiamond.transform.SetParent(root.transform);
+                    spireDiamond.transform.localPosition = new Vector3(0f, 5.6f, 0f);
+                    spireDiamond.transform.localScale = new Vector3(0.5f, 0.9f, 0.5f);
+                    spireDiamond.transform.localRotation = Quaternion.Euler(30f, 45f, 30f);
+                    spireDiamond.GetComponent<Renderer>().material = coreMat;
+                }
+                else
+                {
+                    // LEVEL 6: Легендарная Цитадель Зенита (Парящие защитные кольца, многоуровневая структура, супер-излучение)
+                    GameObject comp = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    Destroy(comp.GetComponent<BoxCollider>());
+                    comp.transform.SetParent(root.transform);
+                    comp.transform.localPosition = new Vector3(0f, 2.0f, 0f);
+                    comp.transform.localScale = new Vector3(3.2f, 4.0f, 3.2f);
+                    comp.GetComponent<Renderer>().material = castleMat;
+
+                    // Twin massive peak wings
+                    GameObject pk1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    Destroy(pk1.GetComponent<BoxCollider>());
+                    pk1.transform.SetParent(root.transform);
+                    pk1.transform.localPosition = new Vector3(-0.9f, 5.2f, 0f);
+                    pk1.transform.localScale = new Vector3(0.7f, 3.2f, 0.7f);
+                    pk1.GetComponent<Renderer>().material = castleMat;
+
+                    GameObject pk2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    Destroy(pk2.GetComponent<BoxCollider>());
+                    pk2.transform.SetParent(root.transform);
+                    pk2.transform.localPosition = new Vector3(0.9f, 5.2f, 0f);
+                    pk2.transform.localScale = new Vector3(0.7f, 3.2f, 0.7f);
+                    pk2.GetComponent<Renderer>().material = castleMat;
+
+                    // Zenith Protection Aegis Sphere
+                    GameObject zenithRing = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    zenithRing.name = "ZenithRing";
+                    Destroy(zenithRing.GetComponent<BoxCollider>());
+                    zenithRing.transform.SetParent(root.transform);
+                    zenithRing.transform.localPosition = new Vector3(0f, 7.2f, 0f);
+                    zenithRing.transform.localScale = new Vector3(2.4f, 0.2f, 2.4f);
+
+                    Material ringMat = new Material(urpShader);
+                    ringMat.color = castle.owner == "Player" ? new Color(0.1f, 1.0f, 1.0f, 1.0f) : new Color(1.0f, 0.1f, 0.4f, 1.0f);
+                    if (ringMat.HasProperty("_EmissionColor")) ringMat.SetColor("_EmissionColor", ringMat.color * 4.5f);
+                    zenithRing.GetComponent<Renderer>().material = ringMat;
+
+                    // Central high diamond
+                    GameObject spireDiamond = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    spireDiamond.name = "SpireDiamond";
+                    Destroy(spireDiamond.GetComponent<BoxCollider>());
+                    spireDiamond.transform.SetParent(root.transform);
+                    spireDiamond.transform.localPosition = new Vector3(0f, 7.2f, 0f);
+                    spireDiamond.transform.localScale = new Vector3(0.6f, 1.2f, 0.6f);
+                    spireDiamond.GetComponent<Renderer>().material = ringMat;
+
+                    // Flanking side-annex blocks for grandeur size
+                    GameObject leftA = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    Destroy(leftA.GetComponent<BoxCollider>());
+                    leftA.transform.SetParent(root.transform);
+                    leftA.transform.localPosition = new Vector3(-2.5f, 1.2f, 0f);
+                    leftA.transform.localScale = new Vector3(1.5f, 2.4f, 1.5f);
+                    leftA.GetComponent<Renderer>().material = castleMat;
+
+                    GameObject rightA = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    Destroy(rightA.GetComponent<BoxCollider>());
+                    rightA.transform.SetParent(root.transform);
+                    rightA.transform.localPosition = new Vector3(2.5f, 1.2f, 0f);
+                    rightA.transform.localScale = new Vector3(1.5f, 2.4f, 1.5f);
+                    rightA.GetComponent<Renderer>().material = castleMat;
+                }
             }
             else
             {
-                // LEVEL 6: Легендарная Цитадель Зенита (Парящие защитные кольца, многоуровневая структура, супер-излучение)
-                GameObject comp = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                Destroy(comp.GetComponent<BoxCollider>());
-                comp.transform.SetParent(root.transform);
-                comp.transform.localPosition = new Vector3(0f, 2.0f, 0f);
-                comp.transform.localScale = new Vector3(3.2f, 4.0f, 3.2f);
-                comp.GetComponent<Renderer>().material = castleMat;
+                // Для НЕ-игровых нейтральных замков выстраивается упрощённый аскетичный форт матового серого цвета
+                Material neutralMat = new Material(urpShader);
+                neutralMat.color = new Color(0.44f, 0.46f, 0.50f, 1.0f); // Красивый нейтральный матовый стальной цвет
+                if (neutralMat.HasProperty("_Glossiness")) neutralMat.SetFloat("_Glossiness", 0.45f);
+                if (neutralMat.HasProperty("_Smoothness")) neutralMat.SetFloat("_Smoothness", 0.45f);
+                if (neutralMat.HasProperty("_Metallic")) neutralMat.SetFloat("_Metallic", 0.3f);
 
-                // Twin massive peak wings
-                GameObject pk1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                Destroy(pk1.GetComponent<BoxCollider>());
-                pk1.transform.SetParent(root.transform);
-                pk1.transform.localPosition = new Vector3(-0.9f, 5.2f, 0f);
-                pk1.transform.localScale = new Vector3(0.7f, 3.2f, 0.7f);
-                pk1.GetComponent<Renderer>().material = castleMat;
+                GameObject tower = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                Destroy(tower.GetComponent<CapsuleCollider>());
+                tower.transform.SetParent(root.transform);
+                tower.transform.localPosition = new Vector3(0f, 1.2f, 0f);
+                tower.transform.localScale = new Vector3(1.1f, 2.4f, 1.1f);
+                tower.GetComponent<Renderer>().material = neutralMat;
 
-                GameObject pk2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                Destroy(pk2.GetComponent<BoxCollider>());
-                pk2.transform.SetParent(root.transform);
-                pk2.transform.localPosition = new Vector3(0.9f, 5.2f, 0f);
-                pk2.transform.localScale = new Vector3(0.7f, 3.2f, 0.7f);
-                pk2.GetComponent<Renderer>().material = castleMat;
-
-                // Zenith Protection Aegis Sphere
-                GameObject zenithRing = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                zenithRing.name = "ZenithRing";
-                Destroy(zenithRing.GetComponent<BoxCollider>());
-                zenithRing.transform.SetParent(root.transform);
-                zenithRing.transform.localPosition = new Vector3(0f, 7.2f, 0f);
-                zenithRing.transform.localScale = new Vector3(2.4f, 0.2f, 2.4f);
-
-                Material ringMat = new Material(urpShader);
-                ringMat.color = castle.owner == "Player" ? new Color(0.1f, 1.0f, 1.0f, 1.0f) : new Color(1.0f, 0.1f, 0.4f, 1.0f);
-                if (ringMat.HasProperty("_EmissionColor")) ringMat.SetColor("_EmissionColor", ringMat.color * 4.5f);
-                zenithRing.GetComponent<Renderer>().material = ringMat;
-
-                // Central high diamond
-                GameObject spireDiamond = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                spireDiamond.name = "SpireDiamond";
-                Destroy(spireDiamond.GetComponent<BoxCollider>());
-                spireDiamond.transform.SetParent(root.transform);
-                spireDiamond.transform.localPosition = new Vector3(0f, 7.2f, 0f);
-                spireDiamond.transform.localScale = new Vector3(0.6f, 1.2f, 0.6f);
-                spireDiamond.GetComponent<Renderer>().material = ringMat;
-
-                // Flanking side-annex blocks for grandeur size
-                GameObject leftA = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                Destroy(leftA.GetComponent<BoxCollider>());
-                leftA.transform.SetParent(root.transform);
-                leftA.transform.localPosition = new Vector3(-2.5f, 1.2f, 0f);
-                leftA.transform.localScale = new Vector3(1.5f, 2.4f, 1.5f);
-                leftA.GetComponent<Renderer>().material = castleMat;
-
-                GameObject rightA = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                Destroy(rightA.GetComponent<BoxCollider>());
-                rightA.transform.SetParent(root.transform);
-                rightA.transform.localPosition = new Vector3(2.5f, 1.2f, 0f);
-                rightA.transform.localScale = new Vector3(1.5f, 2.4f, 1.5f);
-                rightA.GetComponent<Renderer>().material = castleMat;
+                GameObject topRim = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Destroy(topRim.GetComponent<BoxCollider>());
+                topRim.transform.SetParent(root.transform);
+                topRim.transform.localPosition = new Vector3(0f, 2.3f, 0f);
+                topRim.transform.localScale = new Vector3(1.3f, 0.3f, 1.3f);
+                topRim.GetComponent<Renderer>().material = neutralMat;
             }
 
             castle.visualRoot = root;
@@ -971,6 +999,158 @@ public class FateCastleManager : MonoBehaviour
         messageTimer = 4.0f;
     }
 
+    // ==========================================
+    // HERO LEVELING & STATS SYSTEM (v18.11.15)
+    // ==========================================
+    public void GainXP(int amount)
+    {
+        SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
+        data.currentXP += amount;
+        int xpNeeded = data.playerLevel * 100;
+        
+        while (data.currentXP >= xpNeeded)
+        {
+            data.currentXP -= xpNeeded;
+            data.playerLevel++;
+            data.availableSkillPoints += 5; // Даем 5 очков характеристик за уровень!
+            
+            string levelMsg = Translator.LanguageID == 0 
+                ? $"✨ НОВЫЙ УРОВЕНЬ! Вы достигли Уровня {data.playerLevel}! (+5 очков характеристик)" 
+                : $"✨ LEVEL UP! You reached Level {data.playerLevel}! (+5 Stat Points)";
+            ShowFeedback(levelMsg);
+            
+            if (isAutonomousStatsDistribution)
+            {
+                AutoAllocateAllPoints();
+            }
+            xpNeeded = data.playerLevel * 100;
+        }
+        RecalculateStats();
+        PlayerPrefs.Save();
+    }
+
+    public void RecalculateStats()
+    {
+        SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
+        data.maxHealth = data.stamina * 10f;
+        if (data.currentHealth > data.maxHealth) data.currentHealth = data.maxHealth;
+        if (data.currentHealth <= 0f) data.currentHealth = data.maxHealth; // Воскрешение
+    }
+
+    public void AutoAllocateAllPoints()
+    {
+        SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
+        string cl = data.characterClass;
+        if (string.IsNullOrEmpty(cl)) cl = "Воин";
+
+        while (data.availableSkillPoints > 0)
+        {
+            if (cl.Contains("Воин") || cl.Contains("Paladin") || cl.Contains("Warrior") || cl.Contains("Паладин"))
+            {
+                // Воин: +3 Сила, +2 Выносливость, +1 Ловкость
+                if (data.availableSkillPoints >= 6)
+                {
+                    data.strength += 3;
+                    data.stamina += 2;
+                    data.agility += 1;
+                    data.availableSkillPoints -= 6;
+                }
+                else
+                {
+                    data.strength += data.availableSkillPoints;
+                    data.availableSkillPoints = 0;
+                }
+            }
+            else if (cl.Contains("Лук") || cl.Contains("Archer") || cl.Contains("Стрелок") || cl.Contains("Ranger") || cl.Contains("Охотник"))
+            {
+                // Лучник: +3 Ловкость, +2 Сила, +1 Выносливость
+                if (data.availableSkillPoints >= 6)
+                {
+                    data.agility += 3;
+                    data.strength += 2;
+                    data.stamina += 1;
+                    data.availableSkillPoints -= 6;
+                }
+                else
+                {
+                    data.agility += data.availableSkillPoints;
+                    data.availableSkillPoints = 0;
+                }
+            }
+            else
+            {
+                // Маг: +3 Интеллект, +2 Ловкость, +1 Выносливость
+                if (data.availableSkillPoints >= 6)
+                {
+                    data.intelligence += 3;
+                    data.agility += 2;
+                    data.stamina += 1;
+                    data.availableSkillPoints -= 6;
+                }
+                else
+                {
+                    data.agility += data.availableSkillPoints;
+                    data.availableSkillPoints = 0;
+                }
+            }
+        }
+        RecalculateStats();
+        PlayerPrefs.Save();
+    }
+
+    public void ResetPlayerStats()
+    {
+        SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
+        
+        // Определяем базовые исходные атрибуты в зависимости от класса героя
+        int startSTR = 10;
+        int startAGI = 10;
+        int startINT = 10;
+        int startSTA = 10;
+        
+        string cl = (data != null && !string.IsNullOrEmpty(data.characterClass)) ? data.characterClass.ToLower() : "воин";
+        if (cl.Contains("warrior") || cl.Contains("voin") || cl.Contains("paladin"))
+        {
+            startSTR = 15;
+            startAGI = 10;
+            startINT = 4;
+            startSTA = 15;
+        }
+        else if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow"))
+        {
+            startSTR = 10;
+            startAGI = 14;
+            startINT = 6;
+            startSTA = 11;
+        }
+        else if (cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff"))
+        {
+            startSTR = 6;
+            startAGI = 10;
+            startINT = 10;
+            startSTA = 9;
+        }
+
+        int spent = (data.strength - startSTR) + (data.agility - startAGI) + (data.intelligence - startINT) + (data.stamina - startSTA);
+        if (spent > 0)
+        {
+            data.availableSkillPoints += spent;
+        }
+        
+        data.strength = startSTR;
+        data.agility = startAGI;
+        data.intelligence = startINT;
+        data.stamina = startSTA;
+        
+        RecalculateStats();
+        PlayerPrefs.Save();
+        
+        string resetMsg = Translator.LanguageID == 0 
+            ? "♻️ Атрибуты сброшены к базовым значениям вашего класса!" 
+            : "♻️ Reverted stats back to your class baseline attributes!";
+        ShowFeedback(resetMsg);
+    }
+
     private void OnGUI()
     {
         // Не рисуем игровой HUD (кошелек, день, пропустить ход, новое наложение дня и информацию о замке), 
@@ -1031,6 +1211,9 @@ public class FateCastleManager : MonoBehaviour
         }
         GUI.backgroundColor = Color.white;
 
+        // 4. Отрисовка ГЕРОЯ И ЕГО ХАРАКТЕРИСТИК (HUD в верхнем левом углу)
+        DrawHeroHUD(curLang);
+
         // Overlay нового дня (ИИ отчеты)
         if (showNewDayOverlay)
         {
@@ -1041,6 +1224,447 @@ public class FateCastleManager : MonoBehaviour
         if (!isDetailsOpen || activeDetailsIndex < 0 || activeDetailsIndex >= castles.Count) return;
 
         DrawDetailsWindow(curLang);
+    }
+
+    private void DrawHeroHUD(int curLang)
+    {
+        SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
+        
+        // 1. СТИЛИ ГЕЙМПЛЕЯ HUD (Зенит Глассморфизм)
+        GUIStyle hudBgStyle = new GUIStyle(GUI.skin.box);
+        hudBgStyle.normal.background = null; // убираем стандартную заливку для кастомного цвета
+        
+        // Фон плашки: темно-синий глянцевый полупрозрачный
+        Texture2D hudTex = new Texture2D(1, 1);
+        hudTex.SetPixel(0, 0, new Color(0.04f, 0.08f, 0.22f, 0.90f));
+        hudTex.Apply();
+        hudBgStyle.normal.background = hudTex;
+        
+        // Рисуем базовую панель HUD в левом верхнем углу
+        Rect hudRect = new Rect(20f, 20f, 330f, 105f);
+        GUI.Box(hudRect, "", hudBgStyle);
+        
+        // Портрет-Кнопка героя на основе класса
+        string cl = data.characterClass;
+        if (string.IsNullOrEmpty(cl)) cl = "Воин";
+        
+        string avatarSymbol = "⚔️";
+        Color avatarGlowColor = Color.cyan;
+        if (cl.Contains("Лук") || cl.Contains("Archer") || cl.Contains("Стрелок"))
+        {
+            avatarSymbol = "🏹";
+            avatarGlowColor = new Color(0.2f, 0.9f, 0.3f);
+        }
+        else if (cl.Contains("Маг") || cl.Contains("Mage") || cl.Contains("Wizard") || cl.Contains("Sorcerer"))
+        {
+            avatarSymbol = "🔮";
+            avatarGlowColor = new Color(0.7f, 0.3f, 1.0f);
+        }
+
+        GUIStyle portraitBtnStyle = new GUIStyle(GUI.skin.button);
+        portraitBtnStyle.fontSize = 28;
+        portraitBtnStyle.alignment = TextAnchor.MiddleCenter;
+        portraitBtnStyle.normal.textColor = avatarGlowColor;
+        
+        // Кнопка аватара (при нажатии раскрывает меню распределения характеристик)
+        if (GUI.Button(new Rect(30f, 30f, 65f, 65f), avatarSymbol, portraitBtnStyle))
+        {
+            showStatsPanel = !showStatsPanel;
+            // Воспроизводим звук ховера/клика из диспетчера
+            if (SettingsManager.Instance != null)
+            {
+                SettingsManager.Instance.PlayHoverSound(0);
+            }
+        }
+        
+        // Имя и класс героя
+        GUIStyle labelStyle = new GUIStyle(GUI.skin.label);
+        labelStyle.fontSize = 13;
+        labelStyle.fontStyle = FontStyle.Bold;
+        labelStyle.normal.textColor = Color.white;
+        
+        string nameLabel = Translator.LanguageID == 0 ? "Герой: " : "Hero: ";
+        if (Translator.LanguageID == 8) nameLabel = "角色名称: ";
+        if (Translator.LanguageID == 7) nameLabel = "영웅: ";
+        
+        string classTranslated = cl;
+        if (Translator.LanguageID == 0)
+        {
+            if (cl.Contains("Warrior") || cl.Contains("Воин")) classTranslated = "Паладин";
+            else if (cl.Contains("Archer") || cl.Contains("Лучник") || cl.Contains("Стрелок")) classTranslated = "Следопыт";
+            else if (cl.Contains("Mage") || cl.Contains("Маг")) classTranslated = "Архимаг";
+        }
+        
+        string levelText = Translator.LanguageID == 0 ? "Ур." : "Lvl";
+        if (Translator.LanguageID == 8) levelText = "等级";
+        if (Translator.LanguageID == 7) levelText = "레벨";
+
+        GUI.Label(new Rect(110f, 26f, 230f, 20f), $"{nameLabel}{data.saveName} ({classTranslated})", labelStyle);
+        
+        // РИСОВАНИЕ БАРОВ ХАРАКТЕРИСТИК (ЗДОРОВЬЕ / МАНА / ОПЫТ)
+        // 1. Здоровье (Красный)
+        float maxHp = data.stamina * 10f;
+        if (data.currentHealth > maxHp) data.currentHealth = maxHp;
+        float hpPct = maxHp > 0f ? (data.currentHealth / maxHp) : 1f;
+        
+        GUIStyle barBgStyle = new GUIStyle(GUI.skin.box);
+        Texture2D barBgTex = new Texture2D(1, 1);
+        barBgTex.SetPixel(0, 0, new Color(0.1f, 0.1f, 0.15f, 0.6f));
+        barBgTex.Apply();
+        barBgStyle.normal.background = barBgTex;
+        
+        GUIStyle hpStyle = new GUIStyle(GUI.skin.box);
+        Texture2D hpTex = new Texture2D(1, 1);
+        hpTex.SetPixel(0, 0, new Color(0.85f, 0.15f, 0.2f, 1.0f));
+        hpTex.Apply();
+        hpStyle.normal.background = hpTex;
+        
+        GUI.Box(new Rect(110f, 48f, 230f, 13f), "", barBgStyle);
+        GUI.Box(new Rect(110f, 48f, 230f * hpPct, 13f), "", hpStyle);
+        
+        GUIStyle textOverBarStyle = new GUIStyle(GUI.skin.label);
+        textOverBarStyle.alignment = TextAnchor.MiddleCenter;
+        textOverBarStyle.fontSize = 9;
+        textOverBarStyle.fontStyle = FontStyle.Bold;
+        textOverBarStyle.normal.textColor = Color.white;
+        GUI.Label(new Rect(110f, 47f, 230f, 13f), $"HP: {Mathf.CeilToInt(data.currentHealth)} / {maxHp}", textOverBarStyle);
+        
+        // 2. Мана (Красивый сине-фиолетовый энергетический бар)
+        float maxMana = data.intelligence * 10f;
+        float manaPct = 1.0f; // Всегда полная мана для заклинаний
+        
+        GUIStyle mpStyle = new GUIStyle(GUI.skin.box);
+        Texture2D mpTex = new Texture2D(1, 1);
+        mpTex.SetPixel(0, 0, new Color(0.12f, 0.5f, 0.95f, 1.0f));
+        mpTex.Apply();
+        mpStyle.normal.background = mpTex;
+        
+        GUI.Box(new Rect(110f, 65f, 230f, 13f), "", barBgStyle);
+        GUI.Box(new Rect(110f, 65f, 230f * manaPct, 13f), "", mpStyle);
+        GUI.Label(new Rect(110f, 64f, 230f, 13f), $"MP: {maxMana} / {maxMana}", textOverBarStyle);
+        
+        // 3. Опыт (Яркий неоново-бирюзовый цвет)
+        int xpNeeded = data.playerLevel * 100;
+        float xpPct = xpNeeded > 0 ? Mathf.Clamp01((float)data.currentXP / xpNeeded) : 0f;
+        
+        GUIStyle xpStyle = new GUIStyle(GUI.skin.box);
+        Texture2D xpTex = new Texture2D(1, 1);
+        xpTex.SetPixel(0, 0, new Color(0.05f, 0.85f, 0.65f, 1.0f));
+        xpTex.Apply();
+        xpStyle.normal.background = xpTex;
+        
+        GUI.Box(new Rect(110f, 82f, 230f, 13f), "", barBgStyle);
+        GUI.Box(new Rect(110f, 82f, 230f * xpPct, 13f), "", xpStyle);
+        GUI.Label(new Rect(110f, 81f, 230f, 13f), $"{levelText}: {data.playerLevel} ({data.currentXP} / {xpNeeded} XP)", textOverBarStyle);
+        
+        // 4. ПАНЕЛЬ ХАРАКТЕРИСТИК (Если showStatsPanel = true)
+        if (showStatsPanel)
+        {
+            DrawStatsAllocationPanel(curLang, hudTex, barBgStyle);
+        }
+    }
+
+    private void DrawStatsAllocationPanel(int curLang, Texture2D winBgTex, GUIStyle barBgStyle)
+    {
+        SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
+        
+        // Определяем базовые стартовые характеристики в зависимости от веток
+        int startSTR = 10, startAGI = 10, startINT = 10, startSTA = 10;
+        string cl = (data != null && !string.IsNullOrEmpty(data.characterClass)) ? data.characterClass.ToLower() : "воин";
+        if (cl.Contains("warrior") || cl.Contains("voin") || cl.Contains("paladin"))
+        {
+            startSTR = 15; startAGI = 10; startINT = 4; startSTA = 15;
+        }
+        else if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow"))
+        {
+            startSTR = 10; startAGI = 14; startINT = 6; startSTA = 11;
+        }
+        else if (cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff"))
+        {
+            startSTR = 6; startAGI = 10; startINT = 10; startSTA = 9;
+        }
+
+        GUIStyle winStyle = new GUIStyle(GUI.skin.box);
+        winStyle.normal.background = winBgTex;
+        
+        // Увеличили высоту панели, чтобы добавить раздел скиллов и пассивок класса
+        Rect winRect = new Rect(20f, 130f, 330f, 575f);
+        GUI.Box(winRect, "", winStyle);
+        
+        GUILayout.BeginArea(winRect);
+        GUILayout.Space(12);
+        
+        // Заголовок панели
+        GUIStyle headerStyle = new GUIStyle(GUI.skin.label);
+        headerStyle.alignment = TextAnchor.MiddleCenter;
+        headerStyle.fontSize = 14;
+        headerStyle.fontStyle = FontStyle.Bold;
+        headerStyle.normal.textColor = Color.cyan;
+        
+        string headText = curLang == 0 ? "⚡ ХАРАКТЕРИСТИКИ ГЕРОЯ" : "⚡ HERO CHARACTERISTICS";
+        if (curLang == 8) headText = "⚡ 英雄属性星盘配点";
+        if (curLang == 7) headText = "⚡ 영웅 능력치 통계 제어";
+        GUILayout.Label(headText, headerStyle);
+        GUILayout.Space(8);
+        
+        // Переключатель автономного авто-распределения
+        bool oldAuto = isAutonomousStatsDistribution;
+        string autoLabel = curLang == 0 ? "🤖 Авто-распределение очков" : "🤖 Autonomous Allocation";
+        if (curLang == 8) autoLabel = "🤖 智能AI自动加配属性点";
+        if (curLang == 7) autoLabel = "🤖 인공지능 능력치 자동 배포";
+        
+        isAutonomousStatsDistribution = GUILayout.Toggle(isAutonomousStatsDistribution, "  " + autoLabel, GUILayout.Height(24));
+        if (isAutonomousStatsDistribution != oldAuto)
+        {
+            PlayerPrefs.SetInt("Player_Stats_Autonomous", isAutonomousStatsDistribution ? 1 : 0);
+            PlayerPrefs.Save();
+            if (isAutonomousStatsDistribution)
+            {
+                AutoAllocateAllPoints();
+            }
+        }
+        
+        GUILayout.Space(12);
+        
+        // Линии атрибутов с защитой от спуска характеристик ниже стартовых значений класса
+        DrawStatRow(curLang, "🔥", curLang == 0 ? "Сила (STR)" : "Strength (STR)", ref data.strength, ref data.availableSkillPoints, startSTR);
+        DrawStatRow(curLang, "⚡", curLang == 0 ? "Ловкость (AGI)" : "Agility (AGI)", ref data.agility, ref data.availableSkillPoints, startAGI);
+        DrawStatRow(curLang, "🔮", curLang == 0 ? "Интеллект (INT)" : "Intelligence (INT)", ref data.intelligence, ref data.availableSkillPoints, startINT);
+        DrawStatRow(curLang, "💚", curLang == 0 ? "Выносливость (STA)" : "Stamina (STA)", ref data.stamina, ref data.availableSkillPoints, startSTA);
+        
+        GUILayout.Space(8);
+        
+        // Свободные очки
+        GUIStyle pointsStyle = new GUIStyle(GUI.skin.label);
+        pointsStyle.alignment = TextAnchor.MiddleCenter;
+        pointsStyle.fontSize = 13;
+        pointsStyle.fontStyle = FontStyle.Bold;
+        pointsStyle.normal.textColor = data.availableSkillPoints > 0 ? new Color(1.0f, 0.64f, 0.0f) : Color.gray;
+        
+        string pointsLabel = curLang == 0 ? "Свободные очки: " : "Unassigned Points: ";
+        if (curLang == 8) pointsLabel = "未分配属性星能点: ";
+        if (curLang == 7) pointsLabel = "남은 속성 수치 점수: ";
+        GUILayout.Label($"{pointsLabel}{data.availableSkillPoints}", pointsStyle);
+        GUILayout.Space(6);
+        
+        // Вычисляемые боевые параметры
+        float combatAtk = data.strength * 2.5f + data.agility * 0.5f;
+        float combatDef = data.agility * 1.5f + data.strength * 0.5f;
+        float maxHp = data.stamina * 10f;
+        float maxMp = data.intelligence * 10f;
+        
+        GUIStyle derivedStyle = new GUIStyle(GUI.skin.box);
+        derivedStyle.normal.textColor = new Color(0.8f, 0.85f, 0.95f);
+        derivedStyle.fontSize = 11;
+        derivedStyle.alignment = TextAnchor.MiddleLeft;
+        derivedStyle.padding = new RectOffset(12, 12, 6, 6);
+        
+        string statsReport = curLang == 0 
+            ? $"⚔️ Базовая Атака: {combatAtk}\n🛡️ Защита брони: {combatDef}\n❤️ Макс. ОЗ (HP): {maxHp}\n🔮 Макс. ОМ (MP): {maxMp}"
+            : $"⚔️ Combat Damage: {combatAtk}\n🛡️ Armor Defense: {combatDef}\n❤️ Max Health (HP): {maxHp}\n🔮 Max Mana (MP): {maxMp}";
+            
+        GUILayout.Label(statsReport, derivedStyle);
+        GUILayout.Space(10);
+        
+        // 🧬 ДОПОЛНИТЕЛЬНЫЙ КЛАССОВЫЙ БЛОК НАВЫКОВ
+        GUIStyle skillsHeaderStyle = new GUIStyle(GUI.skin.label);
+        skillsHeaderStyle.alignment = TextAnchor.MiddleCenter;
+        skillsHeaderStyle.fontSize = 12;
+        skillsHeaderStyle.fontStyle = FontStyle.Bold;
+        skillsHeaderStyle.normal.textColor = Color.yellow;
+        
+        string skillsTitle = curLang == 0 ? "🧬 КЛАССОВЫЕ НАВЫКИ ГЕРОЯ" : "🧬 HERO CLASS SKILLS";
+        GUILayout.Label(skillsTitle, skillsHeaderStyle);
+        GUILayout.Space(4);
+        
+        string skillsBody = "";
+        if (cl.Contains("warrior") || cl.Contains("voin") || cl.Contains("paladin"))
+        {
+            skillsBody = curLang == 0
+                ? "<b>Пассивные</b>:\n • IronSkin (Прочная кожа: +15% Защиты)\n • Regen (Восстановление: +5 HP за ход)\n • Threat (Угроза: +10% аггро)\n<b>Суперудар</b>: TitanShield (Перезарядка: 4х, Сила: x0.3, снижение урона на 70%)"
+                : "<b>Passives</b>:\n • IronSkin (+15% Defense bonus)\n • Regen (+5 HP per turn gain)\n • Threat (+10% threat level)\n<b>Ultimate</b>: TitanShield (CD: 4t, Power: x0.3, blocks 70% of incoming damage)";
+        }
+        else if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow"))
+        {
+            skillsBody = curLang == 0
+                ? "<b>Пассивные</b>:\n • Крит-Мастер (+15% шанс крита)\n • LongShot (Дальний выстрел: +10% урона)\n • Evasion (Уклонение: +10% уворота)\n<b>Суперудар</b>: Ливень Смерти (Перезарядка: 3х, Сила: x1.8 по площади)"
+                : "<b>Passives</b>:\n • Crit Master (+15% Critical Chance)\n • LongShot (+10% damage over range)\n • Evasion (+10% dodge rate)\n<b>Ultimate</b>: Death Rain (CD: 3t, Power: x1.8 AoE damage)";
+        }
+        else if (cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff"))
+        {
+            skillsBody = curLang == 0
+                ? "<b>Пассивные</b>:\n • ManaFlow (Поток маны: +5 MP за ход)\n • Elemental (Стихии: +15% маг. урона)\n • Resist (Сопротивление: +15% маг. деф)\n<b>Суперудар</b>: TimeRift (Перезарядка: 4х, Сила: x0, замедляет врагов на 2 хода)"
+                : "<b>Passives</b>:\n • ManaFlow (+5 MP regain per turn)\n • Elemental (+15% elemental spell power)\n • Resist (+15% magic resist)\n<b>Ultimate</b>: Time Rift (CD: 4t, Power: x0, slows down enemies for 2 turns)";
+        }
+        else
+        {
+            skillsBody = curLang == 0 ? "Фирменные навыки вашего класса будут доступны на тактической арене." : "Signature skills for your character class are active on the tactical map.";
+        }
+        
+        GUIStyle skillsBodyStyle = new GUIStyle(GUI.skin.box);
+        skillsBodyStyle.normal.textColor = new Color(0.9f, 0.95f, 1.0f);
+        skillsBodyStyle.fontSize = 10;
+        skillsBodyStyle.alignment = TextAnchor.MiddleLeft;
+        skillsBodyStyle.padding = new RectOffset(10, 10, 6, 6);
+        
+        GUILayout.Label(skillsBody, skillsBodyStyle);
+        GUILayout.Space(8);
+        
+        // Панель управления (Сброс и Тестовые читы)
+        GUILayout.BeginHorizontal();
+        
+        GUI.backgroundColor = new Color(1.0f, 0.22f, 0.22f);
+        string resetBtnLabel = curLang == 0 ? "СБРОС" : "RESET";
+        if (GUILayout.Button($"♻️ {resetBtnLabel}", GUILayout.Height(30)))
+        {
+            ResetPlayerStats();
+        }
+        
+        GUI.backgroundColor = new Color(0.15f, 0.8f, 0.35f);
+        string addXpText = curLang == 0 ? "ОПЫТ +50" : "+50 XP";
+        if (GUILayout.Button($"✨ {addXpText}", GUILayout.Height(30)))
+        {
+            GainXP(50);
+        }
+        
+        GUI.backgroundColor = Color.white;
+        GUILayout.EndHorizontal();
+        
+        GUILayout.EndArea();
+    }xt = "⚡ 英雄属性星盘配点";
+        if (curLang == 7) headText = "⚡ 영웅 능력치 통계 제어";
+        GUILayout.Label(headText, headerStyle);
+        GUILayout.Space(8);
+        
+        // Переключатель автономного авто-распределения
+        bool oldAuto = isAutonomousStatsDistribution;
+        string autoLabel = curLang == 0 ? "🤖 Авто-распределение очков" : "🤖 Autonomous Allocation";
+        if (curLang == 8) autoLabel = "🤖 智能AI自动加配属性点";
+        if (curLang == 7) autoLabel = "🤖 인공지능 능력치 자동 배포";
+        
+        isAutonomousStatsDistribution = GUILayout.Toggle(isAutonomousStatsDistribution, "  " + autoLabel, GUILayout.Height(24));
+        if (isAutonomousStatsDistribution != oldAuto)
+        {
+            PlayerPrefs.SetInt("Player_Stats_Autonomous", isAutonomousStatsDistribution ? 1 : 0);
+            PlayerPrefs.Save();
+            if (isAutonomousStatsDistribution)
+            {
+                AutoAllocateAllPoints();
+            }
+        }
+        
+        GUILayout.Space(12);
+        
+        // Линии атрибутов
+        DrawStatRow(curLang, "🔥", curLang == 0 ? "Сила (STR)" : "Strength (STR)", ref data.strength, ref data.availableSkillPoints);
+        DrawStatRow(curLang, "⚡", curLang == 0 ? "Ловкость (AGI)" : "Agility (AGI)", ref data.agility, ref data.availableSkillPoints);
+        DrawStatRow(curLang, "🔮", curLang == 0 ? "Интеллект (INT)" : "Intelligence (INT)", ref data.intelligence, ref data.availableSkillPoints);
+        DrawStatRow(curLang, "💚", curLang == 0 ? "Выносливость (STA)" : "Stamina (STA)", ref data.stamina, ref data.availableSkillPoints);
+        
+        GUILayout.Space(8);
+        
+        // Свободные очки
+        GUIStyle pointsStyle = new GUIStyle(GUI.skin.label);
+        pointsStyle.alignment = TextAnchor.MiddleCenter;
+        pointsStyle.fontSize = 13;
+        pointsStyle.fontStyle = FontStyle.Bold;
+        pointsStyle.normal.textColor = data.availableSkillPoints > 0 ? new Color(1.0f, 0.64f, 0.0f) : Color.gray;
+        
+        string pointsLabel = curLang == 0 ? "Свободные очки: " : "Unassigned Points: ";
+        if (curLang == 8) pointsLabel = "未分配属性星能点: ";
+        if (curLang == 7) pointsLabel = "남은 속성 수치 점수: ";
+        GUILayout.Label($"{pointsLabel}{data.availableSkillPoints}", pointsStyle);
+        GUILayout.Space(6);
+        
+        // Вычисляемые боевые параметры
+        float combatAtk = data.strength * 2.5f + data.agility * 0.5f;
+        float combatDef = data.agility * 1.5f + data.strength * 0.5f;
+        float maxHp = data.stamina * 10f;
+        float maxMp = data.intelligence * 10f;
+        
+        GUIStyle derivedStyle = new GUIStyle(GUI.skin.box);
+        derivedStyle.normal.textColor = new Color(0.8f, 0.85f, 0.95f);
+        derivedStyle.fontSize = 11;
+        derivedStyle.alignment = TextAnchor.MiddleLeft;
+        derivedStyle.padding = new RectOffset(12, 12, 6, 6);
+        
+        string statsReport = curLang == 0 
+            ? $"⚔️ Базовая Атака: {combatAtk}\n🛡️ Защита брони: {combatDef}\n❤️ Макс. ОЗ (HP): {maxHp}\n🔮 Макс. ОМ (MP): {maxMp}"
+            : $"⚔️ Combat Damage: {combatAtk}\n🛡️ Armor Defense: {combatDef}\n❤️ Max Health (HP): {maxHp}\n🔮 Max Mana (MP): {maxMp}";
+            
+        GUILayout.Label(statsReport, derivedStyle);
+        GUILayout.Space(10);
+        
+        // Панель управления (Сброс и Тестовые читы)
+        GUILayout.BeginHorizontal();
+        
+        GUI.backgroundColor = new Color(1.0f, 0.22f, 0.22f);
+        string resetBtnLabel = curLang == 0 ? "СБРОС" : "RESET";
+        if (GUILayout.Button($"♻️ {resetBtnLabel}", GUILayout.Height(30)))
+        {
+            ResetPlayerStats();
+        }
+        
+        GUI.backgroundColor = new Color(0.15f, 0.8f, 0.35f);
+        string addXpText = curLang == 0 ? "ОПЫТ +50" : "+50 XP";
+        if (GUILayout.Button($"✨ {addXpText}", GUILayout.Height(30)))
+        {
+            GainXP(50);
+        }
+        
+        GUI.backgroundColor = Color.white;
+        GUILayout.EndHorizontal();
+        
+        GUILayout.EndArea();
+    }
+
+    private void DrawStatRow(int curLang, string emoji, string statName, ref int statValue, ref int availablePoints, int minValue)
+    {
+        GUILayout.BeginHorizontal();
+        GUILayout.Label($" {emoji} {statName}:", GUILayout.Width(150), GUILayout.Height(22));
+        GUILayout.Label($"{statValue}", GUILayout.Width(40), GUILayout.Height(22));
+        
+        // Ограничиваем не-автономным ручным распределением
+        if (!isAutonomousStatsDistribution)
+        {
+            // Кнопка Уменьшить (Если прокачали выше минимального базового значения для класса)
+            if (statValue > minValue)
+            {
+                if (GUILayout.Button("-", GUILayout.Width(32), GUILayout.Height(20)))
+                {
+                    statValue--;
+                    availablePoints++;
+                    RecalculateStats();
+                    PlayerPrefs.Save();
+                }
+            }
+            else
+            {
+                GUILayout.Space(36); // Пустышка для удержания сетки
+            }
+            
+            // Кнопка Увеличить (Если есть свободные очки)
+            if (availablePoints > 0)
+            {
+                if (GUILayout.Button("+", GUILayout.Width(32), GUILayout.Height(20)))
+                {
+                    statValue++;
+                    availablePoints--;
+                    RecalculateStats();
+                    PlayerPrefs.Save();
+                }
+            }
+            else
+            {
+                GUILayout.Space(36);
+            }
+        }
+        else
+        {
+            GUILayout.Label("🤖", GUILayout.Width(64), GUILayout.Height(22));
+        }
+        
+        GUILayout.EndHorizontal();
     }
 
     private void DrawNewDayOverlay(int curLang)

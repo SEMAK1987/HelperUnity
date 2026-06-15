@@ -1403,7 +1403,7 @@ namespace FateContinent
                 }
             }
 
-            if (speakerNameText != null)
+            if (speakerNameText != null && speakerNameText != leftSpeakerNameText && speakerNameText != rightSpeakerNameText)
             {
                 speakerNameText.text = activeSpeakerName;
             }

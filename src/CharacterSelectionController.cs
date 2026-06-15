@@ -503,7 +503,7 @@ namespace FateContinent
             {
                 switch (lang)
                 {
-                    case 0: return "Воин (Премиум)";
+                    case 0: return "Воин";
                     case 2: return "Krieger (Premium)";
                     case 3: return "Guerrier (Premium)";
                     case 4: return "Guerrero (Premium)";
@@ -511,14 +511,14 @@ namespace FateContinent
                     case 6: return "戦士 (プレミアム)";
                     case 7: return "전사 (프리미엄)";
                     case 8: return "战士 (豪华)";
-                    default: return "Warrior (Premium)";
+                    default: return "Warrior";
                 }
             }
             if (id == "archer_prem")
             {
                 switch (lang)
                 {
-                    case 0: return "Лучник (Премиум)";
+                    case 0: return "Стрелок";
                     case 2: return "Bogenschütze (Premium)";
                     case 3: return "Archer (Premium)";
                     case 4: return "Arquero (Premium)";
@@ -526,14 +526,14 @@ namespace FateContinent
                     case 6: return "射手 (プレミアム)";
                     case 7: return "궁수 (프리미엄)";
                     case 8: return "游侠 (豪华)";
-                    default: return "Archer (Premium)";
+                    default: return "Archer";
                 }
             }
             if (id == "mage_prem")
             {
                 switch (lang)
                 {
-                    case 0: return "Маг (Премиум)";
+                    case 0: return "Маг";
                     case 2: return "Magier (Premium)";
                     case 3: return "Mage (Premium)";
                     case 4: return "Mago (Premium)";
@@ -541,7 +541,7 @@ namespace FateContinent
                     case 6: return "魔術師 (プレミアム)";
                     case 7: return "마법사 (프리미엄)";
                     case 8: return "法师 (豪华)";
-                    default: return "Mage (Premium)";
+                    default: return "Mage";
                 }
             }
             return defaultName;
@@ -977,6 +977,53 @@ namespace FateContinent
             SaveGameSystem.CurrentData.currentHealth = heroData.HP;
             SaveGameSystem.CurrentData.maxHealth = heroData.HP;
             SaveGameSystem.CurrentData.selectedDifficulty = selectedDifficultyIndex; // Записываем сложность в сохранение!
+
+            // Присваиваем дефолтные атрибуты характеристик в зависимости от класса
+            int startingSTR = 10;
+            int startingAGI = 10;
+            int startingINT = 10;
+            int startingSTA = 10;
+
+            string hid = chosenPedestal.HeroID.ToLower();
+            if (hid.Contains("warrior") || hid.Contains("voin") || hid.Contains("paladin"))
+            {
+                startingSTR = 15;
+                startingAGI = 10;
+                startingINT = 4;
+                startingSTA = 15;
+            }
+            else if (hid.Contains("archer") || hid.Contains("strelok") || hid.Contains("ranger") || hid.Contains("bow"))
+            {
+                startingSTR = 10;
+                startingAGI = 14;
+                startingINT = 6;
+                startingSTA = 11;
+            }
+            else if (hid.Contains("mage") || hid.Contains("wizard") || hid.Contains("mag") || hid.Contains("staff"))
+            {
+                startingSTR = 6;
+                startingAGI = 10;
+                startingINT = 10;
+                startingSTA = 9;
+            }
+
+            SaveGameSystem.CurrentData.strength = startingSTR;
+            SaveGameSystem.CurrentData.agility = startingAGI;
+            SaveGameSystem.CurrentData.intelligence = startingINT;
+            SaveGameSystem.CurrentData.stamina = startingSTA;
+
+            // Расчет стартового пула свободных очков (difficulty bonus) в зависимости от уровня сложности:
+            // Новичок: +30, Легко: +20, Нормально: +10, Сложно: +5, Кошмар: +0
+            int difficultyBonusPoints = 10;
+            switch (selectedDifficultyIndex)
+            {
+                case 0: difficultyBonusPoints = 30; break; // Новичок (+30)
+                case 1: difficultyBonusPoints = 20; break; // Легко (+20)
+                case 2: difficultyBonusPoints = 10; break; // Нормально (+10)
+                case 3: difficultyBonusPoints = 5;  break; // Сложно (+5)
+                case 4: difficultyBonusPoints = 0;  break; // Кошмар (+0)
+            }
+            SaveGameSystem.CurrentData.availableSkillPoints = difficultyBonusPoints;
 
             // Сохраняем в Слот 0 (первичный слот новой игры)
             SaveGameSystem.Save(0);

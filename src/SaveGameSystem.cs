@@ -29,6 +29,10 @@ public static class SaveGameSystem
         public int gold = 100;
         public float currentHealth = 100f;
         public float maxHealth = 100f;
+        public int strength = 10;
+        public int agility = 10;
+        public int intelligence = 10;
+        public int stamina = 10;
         
         [Header("Weapon Levels & Skill Points (v18.11.15)")]
         public int swordLevel = 1;
