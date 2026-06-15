@@ -125,6 +125,12 @@ public class FateCastleManager : MonoBehaviour
     
     [Tooltip("Manual starting troop power boost for all opponent castles on campaign start")]
     public int manualAiStartingTroopPower = 15;
+
+    [Header("🎨 HERO GLASSMORPHIC SKILLS ICONS")]
+    public Texture2D iconSkillPassive1;
+    public Texture2D iconSkillPassive2;
+    public Texture2D iconSkillPassive3;
+    public Texture2D iconSkillUltimate;
     
     // UI states and trackers
     public bool isTownViewActive = false;
@@ -304,6 +310,7 @@ public class FateCastleManager : MonoBehaviour
         {
             SpawnAllCastles();
         }
+        LoadClassSkillsIcons();
     }
 
     public void EnableContinentGameplay()
@@ -1476,38 +1483,36 @@ public class FateCastleManager : MonoBehaviour
         string skillsTitle = curLang == 0 ? "🧬 КЛАССОВЫЕ НАВЫКИ ГЕРОЯ" : "🧬 HERO CLASS SKILLS";
         GUILayout.Label(skillsTitle, skillsHeaderStyle);
         GUILayout.Space(4);
-        
-        string skillsBody = "";
+
+        LoadClassSkillsIcons();
+
+        GUILayout.BeginVertical(GUI.skin.box);
         if (cl.Contains("warrior") || cl.Contains("voin") || cl.Contains("paladin"))
         {
-            skillsBody = curLang == 0
-                ? "<b>Пассивные</b>:\n • IronSkin (Прочная кожа: +15% Защиты)\n • Regen (Восстановление: +5 HP за ход)\n • Threat (Угроза: +10% аггро)\n<b>Суперудар</b>: TitanShield (Перезарядка: 4х, Сила: x0.3, снижение урона на 70%)"
-                : "<b>Passives</b>:\n • IronSkin (+15% Defense bonus)\n • Regen (+5 HP per turn gain)\n • Threat (+10% threat level)\n<b>Ultimate</b>: TitanShield (CD: 4t, Power: x0.3, blocks 70% of incoming damage)";
+            DrawSkillRow(curLang, iconSkillPassive1, "🛡️", "IronSkin", curLang == 0 ? "Прочная кожа: +15% Защиты" : "+15% Armor/Defense bonus");
+            DrawSkillRow(curLang, iconSkillPassive2, "❤️", "Regen", curLang == 0 ? "Регенерация: +5 ОЗ (HP) за ход" : "+5 HP recovery per turn");
+            DrawSkillRow(curLang, iconSkillPassive3, "👹", "Threat", curLang == 0 ? "Угроза: +10% накопления аггро боевого духа" : "+10% aggro multiplier bonus");
+            DrawSkillRow(curLang, iconSkillUltimate, "🔱", "<b>TitanShield</b>", curLang == 0 ? "Суперудар (CD 4х): Снижает входящий урон на 70%" : "Ultimate (CD 4t): Blocks 70% of incoming damage");
         }
         else if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow"))
         {
-            skillsBody = curLang == 0
-                ? "<b>Пассивные</b>:\n • Крит-Мастер (+15% шанс крита)\n • LongShot (Дальний выстрел: +10% урона)\n • Evasion (Уклонение: +10% уворота)\n<b>Суперудар</b>: Ливень Смерти (Перезарядка: 3х, Сила: x1.8 по площади)"
-                : "<b>Passives</b>:\n • Crit Master (+15% Critical Chance)\n • LongShot (+10% damage over range)\n • Evasion (+10% dodge rate)\n<b>Ultimate</b>: Death Rain (CD: 3t, Power: x1.8 AoE damage)";
+            DrawSkillRow(curLang, iconSkillPassive1, "🎯", "Крит-Мастер", curLang == 0 ? "+15% вероятность критического удара" : "+15% critical hit probability");
+            DrawSkillRow(curLang, iconSkillPassive2, "🏹", "LongShot", curLang == 0 ? "Дальний выстрел: +10% наносимого урона" : "+10% damage over wide distance range");
+            DrawSkillRow(curLang, iconSkillPassive3, "🍃", "Evasion", curLang == 0 ? "Поворотливость: +10% шанс полного уклонения" : "+10% complete dodge probability");
+            DrawSkillRow(curLang, iconSkillUltimate, "⛈️", "<b>Ливень Смерти</b>", curLang == 0 ? "Суперудар (CD 3х): АоЕ атака силой x1.8" : "Ultimate (CD 3t): AoE volley dealing massive x1.8 damage");
         }
         else if (cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff"))
         {
-            skillsBody = curLang == 0
-                ? "<b>Пассивные</b>:\n • ManaFlow (Поток маны: +5 MP за ход)\n • Elemental (Стихии: +15% маг. урона)\n • Resist (Сопротивление: +15% маг. деф)\n<b>Суперудар</b>: TimeRift (Перезарядка: 4х, Сила: x0, замедляет врагов на 2 хода)"
-                : "<b>Passives</b>:\n • ManaFlow (+5 MP regain per turn)\n • Elemental (+15% elemental spell power)\n • Resist (+15% magic resist)\n<b>Ultimate</b>: Time Rift (CD: 4t, Power: x0, slows down enemies for 2 turns)";
+            DrawSkillRow(curLang, iconSkillPassive1, "💧", "ManaFlow", curLang == 0 ? "Поток маны: +5 ОМ (MP) за ход" : "+5 mana points gain per turn");
+            DrawSkillRow(curLang, iconSkillPassive2, "🔥", "Elemental", curLang == 0 ? "Стихии: +15% разрушительной силы магии" : "+15% magic spell power booster");
+            DrawSkillRow(curLang, iconSkillPassive3, "🌌", "Resist", curLang == 0 ? "Сопротивление: +15% маг. защиты от чар" : "+15% spell resistance shield");
+            DrawSkillRow(curLang, iconSkillUltimate, "⏳", "<b>Time Rift</b>", curLang == 0 ? "Суперудар (CD 4х): Полное замедление оппонентов на 2 хода" : "Ultimate (CD 4t): Slows down all active enemy actions");
         }
         else
         {
-            skillsBody = curLang == 0 ? "Фирменные навыки вашего класса будут доступны на тактической арене." : "Signature skills for your character class are active on the tactical map.";
+            GUILayout.Label(curLang == 0 ? "Фирменные навыки будут доступны в бою." : "Signature skills are active inside battle arena.", GUI.skin.label);
         }
-        
-        GUIStyle skillsBodyStyle = new GUIStyle(GUI.skin.box);
-        skillsBodyStyle.normal.textColor = new Color(0.9f, 0.95f, 1.0f);
-        skillsBodyStyle.fontSize = 10;
-        skillsBodyStyle.alignment = TextAnchor.MiddleLeft;
-        skillsBodyStyle.padding = new RectOffset(10, 10, 6, 6);
-        
-        GUILayout.Label(skillsBody, skillsBodyStyle);
+        GUILayout.EndVertical();
         GUILayout.Space(8);
         
         // Панель управления (Сброс и Тестовые читы)
@@ -1531,91 +1536,54 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.EndHorizontal();
         
         GUILayout.EndArea();
-    }xt = "⚡ 英雄属性星盘配点";
-        if (curLang == 7) headText = "⚡ 영웅 능력치 통계 제어";
-        GUILayout.Label(headText, headerStyle);
-        GUILayout.Space(8);
-        
-        // Переключатель автономного авто-распределения
-        bool oldAuto = isAutonomousStatsDistribution;
-        string autoLabel = curLang == 0 ? "🤖 Авто-распределение очков" : "🤖 Autonomous Allocation";
-        if (curLang == 8) autoLabel = "🤖 智能AI自动加配属性点";
-        if (curLang == 7) autoLabel = "🤖 인공지능 능력치 자동 배포";
-        
-        isAutonomousStatsDistribution = GUILayout.Toggle(isAutonomousStatsDistribution, "  " + autoLabel, GUILayout.Height(24));
-        if (isAutonomousStatsDistribution != oldAuto)
-        {
-            PlayerPrefs.SetInt("Player_Stats_Autonomous", isAutonomousStatsDistribution ? 1 : 0);
-            PlayerPrefs.Save();
-            if (isAutonomousStatsDistribution)
-            {
-                AutoAllocateAllPoints();
-            }
-        }
-        
-        GUILayout.Space(12);
-        
-        // Линии атрибутов
-        DrawStatRow(curLang, "🔥", curLang == 0 ? "Сила (STR)" : "Strength (STR)", ref data.strength, ref data.availableSkillPoints);
-        DrawStatRow(curLang, "⚡", curLang == 0 ? "Ловкость (AGI)" : "Agility (AGI)", ref data.agility, ref data.availableSkillPoints);
-        DrawStatRow(curLang, "🔮", curLang == 0 ? "Интеллект (INT)" : "Intelligence (INT)", ref data.intelligence, ref data.availableSkillPoints);
-        DrawStatRow(curLang, "💚", curLang == 0 ? "Выносливость (STA)" : "Stamina (STA)", ref data.stamina, ref data.availableSkillPoints);
-        
-        GUILayout.Space(8);
-        
-        // Свободные очки
-        GUIStyle pointsStyle = new GUIStyle(GUI.skin.label);
-        pointsStyle.alignment = TextAnchor.MiddleCenter;
-        pointsStyle.fontSize = 13;
-        pointsStyle.fontStyle = FontStyle.Bold;
-        pointsStyle.normal.textColor = data.availableSkillPoints > 0 ? new Color(1.0f, 0.64f, 0.0f) : Color.gray;
-        
-        string pointsLabel = curLang == 0 ? "Свободные очки: " : "Unassigned Points: ";
-        if (curLang == 8) pointsLabel = "未分配属性星能点: ";
-        if (curLang == 7) pointsLabel = "남은 속성 수치 점수: ";
-        GUILayout.Label($"{pointsLabel}{data.availableSkillPoints}", pointsStyle);
-        GUILayout.Space(6);
-        
-        // Вычисляемые боевые параметры
-        float combatAtk = data.strength * 2.5f + data.agility * 0.5f;
-        float combatDef = data.agility * 1.5f + data.strength * 0.5f;
-        float maxHp = data.stamina * 10f;
-        float maxMp = data.intelligence * 10f;
-        
-        GUIStyle derivedStyle = new GUIStyle(GUI.skin.box);
-        derivedStyle.normal.textColor = new Color(0.8f, 0.85f, 0.95f);
-        derivedStyle.fontSize = 11;
-        derivedStyle.alignment = TextAnchor.MiddleLeft;
-        derivedStyle.padding = new RectOffset(12, 12, 6, 6);
-        
-        string statsReport = curLang == 0 
-            ? $"⚔️ Базовая Атака: {combatAtk}\n🛡️ Защита брони: {combatDef}\n❤️ Макс. ОЗ (HP): {maxHp}\n🔮 Макс. ОМ (MP): {maxMp}"
-            : $"⚔️ Combat Damage: {combatAtk}\n🛡️ Armor Defense: {combatDef}\n❤️ Max Health (HP): {maxHp}\n🔮 Max Mana (MP): {maxMp}";
+    }
+
+    private void LoadClassSkillsIcons()
+    {
+        string cl = SaveGameSystem.CurrentData != null && SaveGameSystem.CurrentData.characterClass != null 
+            ? SaveGameSystem.CurrentData.characterClass.ToLower() 
+            : "warrior";
             
-        GUILayout.Label(statsReport, derivedStyle);
-        GUILayout.Space(10);
-        
-        // Панель управления (Сброс и Тестовые читы)
+        string prefix = "Skills/Warrior/";
+        if (cl.Contains("archer") || cl.Contains("strelok"))
+        {
+            prefix = "Skills/Archer/";
+        }
+        else if (cl.Contains("mage") || cl.Contains("mag"))
+        {
+            prefix = "Skills/Mage/";
+        }
+
+        if (iconSkillPassive1 == null) iconSkillPassive1 = Resources.Load<Texture2D>(prefix + "passive1");
+        if (iconSkillPassive2 == null) iconSkillPassive2 = Resources.Load<Texture2D>(prefix + "passive2");
+        if (iconSkillPassive3 == null) iconSkillPassive3 = Resources.Load<Texture2D>(prefix + "passive3");
+        if (iconSkillUltimate == null) iconSkillUltimate = Resources.Load<Texture2D>(prefix + "ultimate");
+    }
+
+    private void DrawSkillRow(int curLang, Texture2D icon, string emoji, string header, string desc)
+    {
         GUILayout.BeginHorizontal();
-        
-        GUI.backgroundColor = new Color(1.0f, 0.22f, 0.22f);
-        string resetBtnLabel = curLang == 0 ? "СБРОС" : "RESET";
-        if (GUILayout.Button($"♻️ {resetBtnLabel}", GUILayout.Height(30)))
+        if (icon != null)
         {
-            ResetPlayerStats();
+            GUILayout.Label(icon, GUILayout.Width(24), GUILayout.Height(24));
         }
-        
-        GUI.backgroundColor = new Color(0.15f, 0.8f, 0.35f);
-        string addXpText = curLang == 0 ? "ОПЫТ +50" : "+50 XP";
-        if (GUILayout.Button($"✨ {addXpText}", GUILayout.Height(30)))
+        else
         {
-            GainXP(50);
+            GUIStyle fallbackEmojiStyle = new GUIStyle(GUI.skin.label);
+            fallbackEmojiStyle.alignment = TextAnchor.MiddleCenter;
+            fallbackEmojiStyle.fontSize = 14;
+            GUILayout.Label(emoji, fallbackEmojiStyle, GUILayout.Width(24), GUILayout.Height(24));
         }
-        
-        GUI.backgroundColor = Color.white;
+        GUILayout.Space(6);
+        string text = $"<b>{header}</b>: {desc}";
+        GUIStyle skStyle = new GUIStyle(GUI.skin.label);
+        skStyle.fontSize = 11;
+        skStyle.richText = true;
+        skStyle.wordWrap = true;
+        skStyle.normal.textColor = new Color(0.9f, 0.95f, 1.0f);
+        GUILayout.Label(text, skStyle);
         GUILayout.EndHorizontal();
-        
-        GUILayout.EndArea();
+        GUILayout.Space(4);
     }
 
     private void DrawStatRow(int curLang, string emoji, string statName, ref int statValue, ref int availablePoints, int minValue)

@@ -3,7 +3,7 @@
   "project_name": "Fate Continent",
   "project_path": "",
   "system_instruction": "You are Zenith Quantum Divine Assistant, guiding the Fate Continent world development and Unity/Blender workflows.",
-  "version": "18.11.11",
+  "version": "18.11.15",
   "modules": [
     {
       "name": "Localization & Fonts",
@@ -42,7 +42,11 @@
         "Zenith Landing Auto-Sync & Anchor Persistence v18.11.8: Implements full 4-zone automated selection, initializing four distinct landing points and automatically linking corresponding spawn anchors ('Wastes_SpawnPoint', 'Peak_SpawnPoint', 'Ruins_SpawnPoint', 'Crags_SpawnPoint') using hierarchy scans. Completely preserves physical spawn coordinates across sessions and editor runs with secure PlayerPrefs caching, hiding the 3D continent and characters during introductory dialogue panels to achieve ultimate scene purity.",
         "Zenith Input & Camera Calibration v18.11.9: Resolves New Input System 999+ Exception errors in StrategicCameraController.cs using smart preprocessor compilation flags. Rebalances camera minHeight/maxHeight limits and relocates the landing point cameraOffset from 15.0f to a pristine 2.5f to solve 'too high' camera elevation over the continent.",
         "Zenith 4-Zone Spawn Match & Map Sync v18.11.10: Formulates indices and Names of the 4 zones (matching Кровавые Пустоши -> Oasis_SpawnPoint, Ледяной Пик -> Outpost_SpawnPoint, Древние Руины -> Shore_SpawnPoint, Святилище Зенита -> Citadel_SpawnPoint) in LandingPositionManager.cs to sync correctly with customized terrain categories. Guarantees interactive Ring objects local Z render depth at -2.0f and companions/heroes at -2.05f to bypass overlapping or clipping behind any 3D continent elements.",
-        "Zenith Camera Bounds & Ocean Backdrop v18.11.11: Implements real-time strict clamping of camera values to prevent moving out of bounds. Automatically calibrates the map boundaries to the active bounds of New_Kontinent's mesh components with custom padding and real-time refresh. Integrates mouse Edge Scrolling and auto-generates a Fate_Ocean_Plane underneath the continent with pre-configured 40x40 UV tiling for seamless 8K ocean textures."
+        "Zenith Camera Bounds & Ocean Backdrop v18.11.11: Implements real-time strict clamping of camera values to prevent moving out of bounds. Automatically calibrates the map boundaries to the active bounds of New_Kontinent's mesh components with custom padding and real-time refresh. Integrates mouse Edge Scrolling and auto-generates a Fate_Ocean_Plane underneath the continent with pre-configured 40x40 UV tiling for seamless 8K ocean textures.",
+        "Zenith Dynamic Ocean Occlusion v18.11.12: Automates hiding the ocean backdrop plane during dialogue sequences in Start() and shows it dynamically on DispatchLanding() for scene aesthetics. Solves pink rendering in Universal Render Pipeline and adapts water metallic and gloss parameters based on PlayerPrefs graphics quality levels.",
+        "Zenith Ground-Focused Camera Clamping v18.11.13: Refactors camera clamping limits in StrategicCameraController.cs to restrict the projected ground focal center (Y=0) instead of raw camera coords, eliminating locks and enabling smooth panning.",
+        "Zenith Post-Landing Castle Progression v18.11.14: Implements persistent world map scale, multi-stage post-landing camera cinematic lock at DialogStep 8 through 12, spawns 3D neon castles for factions, and adds Castle details management (income, recruitment, and shop).",
+        "Zenith RPG Skills & Turn-Based Castle Morph v18.11.15: Fully integrates Warrior, Archer, and Mage baseline stats with select starting free point pools, blocks reducing attributes below class baselines, automates auto-allocation toggle, showcases a premium class skills grid inside the GUI stats panel, and handles turn-based castle gold ticking with majestic castle level morph loaders."
       ]
     },
     {

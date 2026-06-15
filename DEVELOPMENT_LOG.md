@@ -1,15 +1,32 @@
-# Development Log - Fate Continent (Континент Судьбы)
+# DEVELOPMENT LOG • Fate Continent (Континент Судьбы)
 
-## [v18.11.11] - 2026-06-12
-- **Real-Time Map Bounds Locking:** Added strict real-time clamping of coordinates inside `StrategicCameraController.cs`. Implemented an intelligent `AutoFitBounds()` method that finds `New_Kontinent` by hierarchy, calculates its total bounds size from mesh renderers, and applies safe pad-offsets to `xBounds` and `zBounds` dynamically.
-- **Edge Scrolling Support:** Configured the camera to pan horizontally and vertically when the mouse cursor drifts near the edges of the game window.
-- **Dynamic Background Ocean Plane Generator:** Added automated setup for the backdrop `Fate_Ocean_Plane` inside `LandingPositionManager.cs`. Placing a standard primitive plane under the continent (Y = -0.6f, scaling to 80x1x80), disabling shadow casting, setting up an exquisite material fallback with 40x40 tiling properties configured default for high resolution 8K seamless textures.
-- **AI Texture Prompts:** Formulated a complete suite of expert 8K texture prompt descriptors for generating tileable oceanic and cosmic canvases.
+## [v18.11.15] - 2026-06-15
+- **RPG Skills & Turn-Based Castle Morph**:
+  - Fully integrated Hero Class Base Attributes during character creation (Warrior: STR 15, AGI 10, INT 4, STA 15; Archer: STR 10, AGI 14, INT 6, STA 11; Mage: STR 6, AGI 10, INT 10, STA 9).
+  - Designed difficulty-dependent starting free stat point allocation pools matching screenshots (Novice: +30, Easy: +20, Normal: +10, Hard: +5, Nightmare: +0).
+  - Blocked stat reduction below custom class baseline limits.
+  - Implemented dynamic class skill blocks (passives & ultimates) with dual Texture2D loading and emoji fallback renders.
+  - Resolved compiler syntax error in inner allocation panels and restored clean C# scoping.
 
-## [v18.11.10] - 2026-06-12
-- **4-Zone Spawn Match & Map Sync:** Checked, synchronized, and locked the indices and names of zones to physical spawn anchors inside `LandingPositionManager.cs`.
-- **Render Depth Fix:** Shifted Ring interactive markers local Z render coordinate from `-1.0f` to `-2.0f` and companion/hero markers to `-2.05f`. This solves the issue of the selected "Кровавые Пустоши" (Crimson Wastes) interactive circle getting covered/clipped by the 3D map territory mesh texture at that point.
-- **Master Knowledge Alignment:** Fully updated files with the new version and features specification.
+## [v18.11.14] - 2026-06-14
+- **Post-Landing & Stronghold Sovereignty**:
+  - Integrated scale and offset persistence for the strategic 2D world map across loads.
+  - Scripted a beautiful multi-phase cinema scene during dialogue steps 8 to 12.
+  - Spawned 3D castles with neon visual highlights for players and enemies.
+  - Built direct Town and Castle management operations (with Barracks training courses, upgrades, and espionage).
 
-## [v18.11.9] - 2026-06-11
-- **Camera Calibration:** Fixed camera offset landing positions inside `StrategicCameraController.cs` using preprocessor directives and set ideal strategic min/max limits (0.6f / 8.0f) with height set to 2.5f default.
+## [v18.11.13] - 2026-06-13
+- **Focal Ground Calibrator**:
+  - Recalculated camera edge boundaries in `StrategicCameraController` by clamping ground center intersections instead of rigid camera coordinate limits, preventing elevated lock states.
+
+## [v18.11.12] - 2026-06-12
+- **Ocean Occlusion & Graphics Sync**:
+  - Automatically hid ocean backdrop during early pre-landing dialogue boards.
+  - Resolved pink shader materials inside standard URP assets using fallback compiling.
+  - Scaled water rendering shader metallic and roughness configurations using runtime quality levels.
+
+## [v18.11.11] - 2026-06-11
+- **Real-Time Limit Lockers & Infinite Water Planes**:
+  - Locked camera to mesh dimensions of `New_Kontinent` with padding offsets.
+  - Connected mouse-steerable border edge scrolling.
+  - Implemented the tiling `Fate_Ocean_Plane` background rendering matching 8K tiled maps.

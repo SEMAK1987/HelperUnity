@@ -199,7 +199,7 @@ function GameHelpView() {
              <BookOpen className="w-8 h-8 text-blue-500" />
              Помощь По Игре (Unity 6)
           </h2>
-          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v18.11.11</p>
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">Интерактивное руководство по разработке • v18.11.15</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -943,7 +943,7 @@ export default function App() {
 
   const [kb, setKb] = useState<KBData | null>(null);
   const [activeTab, setActiveTab] = useState<'chat' | 'dashboard' | 'project_info' | 'migration' | 'game_design' | 'game_help'>('chat');
-  const [appVersion, setAppVersion] = useState('18.11.11');
+  const [appVersion, setAppVersion] = useState('18.11.15');
 
   useEffect(() => {
     // Автоматическая синхронизация версии с сервером

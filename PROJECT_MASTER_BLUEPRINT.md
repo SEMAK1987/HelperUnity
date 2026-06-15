@@ -4,7 +4,7 @@
 
 ## 1. Общая информация
 - **Версия Помощника:** 18.11.15
-- **Описание:** Гибридный ИИ-помощник нового поколения (v18.11.15 - RPG Skills, Starting Baseline Attributes & Turn-Based Castle Integration) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Интеграция стартовых атрибутов классов, блокировки минимального уровня характеристик при сбросе, автоматического распределения очков, пошагового дохода замков и пошагового просчета дня.
+- **Описание:**  Гибридный ИИ-помощник нового поколения (v18.11.15 - RPG Skills & Turn-Based Castle Morph) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Интеграция адаптивного переключения ввода, калибровка зум-параметров при высадке, позиционирование маркеров по Z=-2.0f и сохранение прогресса.
 - **Путь проекта:** Не задан
 - **Локальное хранилище:** Не задано
 - **Версия Unity:** unknown
@@ -46,7 +46,7 @@ You are Zenith Quantum Divine Assistant, guiding the Fate Continent world develo
 ```
 
 
-## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.11.11 - Real-Time Bound Locking & Ocean Backdrop)
+## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.11.15 - RPG Skills & Castle Morph)
 ### Режимы работы и Архитектурные уровни
 - **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.
 - **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.

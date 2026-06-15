@@ -1,6 +1,6 @@
-// [ZENITH MAP & DIALOGUE BLUEPRINT SYNC v18.11.9]
+// [ZENITH RPG SKILLS & CASTLE MORPH SYNC v18.11.15]
 // Unity Connector for Quantum AI Assistant
-// Updated: 2026-06-07 (Synced with Stable v18.11.9)
+// Updated: 2026-06-15 (Synced with Stable v18.11.15)
 
 using UnityEngine;
 using UnityEditor;
@@ -15,7 +15,7 @@ namespace AI_Assistant_Quantum
         private string prompt = "";
         private string serverUrl = "http://localhost:3000";
         private Mode mode = Mode.Online;
-        private string status = "Ready for Quantum Manifestation v18.11.9";
+        private string status = "Ready for Quantum Manifestation v18.11.15";
         private bool isProcessing = false;
 
         public enum Mode { Online, Offline, NoInternet }
@@ -28,7 +28,7 @@ namespace AI_Assistant_Quantum
 
         private void OnGUI()
         {
-            GUILayout.Label("v18.11.9 - Zenith Map & Dialogue Blueprint Sync (Neural Link Active)", EditorStyles.boldLabel);
+            GUILayout.Label("v18.11.15 - Zenith RPG Skills & Turn-Based Castle Sync (Neural Link Active)", EditorStyles.boldLabel);
             
             serverUrl = EditorGUILayout.TextField("Server URL", serverUrl);
             mode = (Mode)EditorGUILayout.EnumPopup("Mode", mode);
