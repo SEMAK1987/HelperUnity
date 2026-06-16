@@ -126,11 +126,41 @@ public class FateCastleManager : MonoBehaviour
     [Tooltip("Manual starting troop power boost for all opponent castles on campaign start")]
     public int manualAiStartingTroopPower = 15;
 
-    [Header("🎨 HERO GLASSMORPHIC SKILLS ICONS")]
-    public Texture2D iconSkillPassive1;
-    public Texture2D iconSkillPassive2;
-    public Texture2D iconSkillPassive3;
-    public Texture2D iconSkillUltimate;
+    [Header("⚔️ WARRIOR GLASSMORPHIC SKILLS ICONS")]
+    [Tooltip("Passive 1: IronSkin Icon")]
+    public Texture2D warriorSkillPassive1;
+    [Tooltip("Passive 2: Regen Icon")]
+    public Texture2D warriorSkillPassive2;
+    [Tooltip("Passive 3: Threat Icon")]
+    public Texture2D warriorSkillPassive3;
+    [Tooltip("Ultimate: TitanShield Icon")]
+    public Texture2D warriorSkillUltimate;
+
+    [Header("🎯 ARCHER GLASSMORPHIC SKILLS ICONS")]
+    [Tooltip("Passive 1: Crit-Master Icon")]
+    public Texture2D archerSkillPassive1;
+    [Tooltip("Passive 2: LongShot Icon")]
+    public Texture2D archerSkillPassive2;
+    [Tooltip("Passive 3: Evasion Icon")]
+    public Texture2D archerSkillPassive3;
+    [Tooltip("Ultimate: Death Rain Icon")]
+    public Texture2D archerSkillUltimate;
+
+    [Header("🔮 MAGE GLASSMORPHIC SKILLS ICONS")]
+    [Tooltip("Passive 1: ManaFlow Icon")]
+    public Texture2D mageSkillPassive1;
+    [Tooltip("Passive 2: Elemental Icon")]
+    public Texture2D mageSkillPassive2;
+    [Tooltip("Passive 3: Resist Icon")]
+    public Texture2D mageSkillPassive3;
+    [Tooltip("Ultimate: Time Rift Icon")]
+    public Texture2D mageSkillUltimate;
+
+    // Active dynamic placeholders resolved on Load/Draw
+    private Texture2D activeSkillPassive1;
+    private Texture2D activeSkillPassive2;
+    private Texture2D activeSkillPassive3;
+    private Texture2D activeSkillUltimate;
     
     // UI states and trackers
     public bool isTownViewActive = false;
@@ -1489,24 +1519,24 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.BeginVertical(GUI.skin.box);
         if (cl.Contains("warrior") || cl.Contains("voin") || cl.Contains("paladin"))
         {
-            DrawSkillRow(curLang, iconSkillPassive1, "🛡️", "IronSkin", curLang == 0 ? "Прочная кожа: +15% Защиты" : "+15% Armor/Defense bonus");
-            DrawSkillRow(curLang, iconSkillPassive2, "❤️", "Regen", curLang == 0 ? "Регенерация: +5 ОЗ (HP) за ход" : "+5 HP recovery per turn");
-            DrawSkillRow(curLang, iconSkillPassive3, "👹", "Threat", curLang == 0 ? "Угроза: +10% накопления аггро боевого духа" : "+10% aggro multiplier bonus");
-            DrawSkillRow(curLang, iconSkillUltimate, "🔱", "<b>TitanShield</b>", curLang == 0 ? "Суперудар (CD 4х): Снижает входящий урон на 70%" : "Ultimate (CD 4t): Blocks 70% of incoming damage");
+            DrawSkillRow(curLang, activeSkillPassive1, "🛡️", "IronSkin", curLang == 0 ? "Прочная кожа: +15% Защиты" : "+15% Armor/Defense bonus");
+            DrawSkillRow(curLang, activeSkillPassive2, "❤️", "Regen", curLang == 0 ? "Регенерация: +5 ОЗ (HP) за ход" : "+5 HP recovery per turn");
+            DrawSkillRow(curLang, activeSkillPassive3, "👹", "Threat", curLang == 0 ? "Угроза: +10% накопления аггро боевого духа" : "+10% aggro multiplier bonus");
+            DrawSkillRow(curLang, activeSkillUltimate, "🔱", "<b>TitanShield</b>", curLang == 0 ? "Суперудар (CD 4х): Снижает входящий урон на 70%" : "Ultimate (CD 4t): Blocks 70% of incoming damage");
         }
         else if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow"))
         {
-            DrawSkillRow(curLang, iconSkillPassive1, "🎯", "Крит-Мастер", curLang == 0 ? "+15% вероятность критического удара" : "+15% critical hit probability");
-            DrawSkillRow(curLang, iconSkillPassive2, "🏹", "LongShot", curLang == 0 ? "Дальний выстрел: +10% наносимого урона" : "+10% damage over wide distance range");
-            DrawSkillRow(curLang, iconSkillPassive3, "🍃", "Evasion", curLang == 0 ? "Поворотливость: +10% шанс полного уклонения" : "+10% complete dodge probability");
-            DrawSkillRow(curLang, iconSkillUltimate, "⛈️", "<b>Ливень Смерти</b>", curLang == 0 ? "Суперудар (CD 3х): АоЕ атака силой x1.8" : "Ultimate (CD 3t): AoE volley dealing massive x1.8 damage");
+            DrawSkillRow(curLang, activeSkillPassive1, "🎯", "Крит-Мастер", curLang == 0 ? "+15% вероятность критического удара" : "+15% critical hit probability");
+            DrawSkillRow(curLang, activeSkillPassive2, "🏹", "LongShot", curLang == 0 ? "Дальний выстрел: +10% наносимого урона" : "+10% damage over wide distance range");
+            DrawSkillRow(curLang, activeSkillPassive3, "🍃", "Evasion", curLang == 0 ? "Поворотливость: +10% шанс полного уклонения" : "+10% complete dodge probability");
+            DrawSkillRow(curLang, activeSkillUltimate, "⛈️", "<b>Ливень Смерти</b>", curLang == 0 ? "Суперудар (CD 3х): АоЕ атака силой x1.8" : "Ultimate (CD 3t): AoE volley dealing massive x1.8 damage");
         }
         else if (cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff"))
         {
-            DrawSkillRow(curLang, iconSkillPassive1, "💧", "ManaFlow", curLang == 0 ? "Поток маны: +5 ОМ (MP) за ход" : "+5 mana points gain per turn");
-            DrawSkillRow(curLang, iconSkillPassive2, "🔥", "Elemental", curLang == 0 ? "Стихии: +15% разрушительной силы магии" : "+15% magic spell power booster");
-            DrawSkillRow(curLang, iconSkillPassive3, "🌌", "Resist", curLang == 0 ? "Сопротивление: +15% маг. защиты от чар" : "+15% spell resistance shield");
-            DrawSkillRow(curLang, iconSkillUltimate, "⏳", "<b>Time Rift</b>", curLang == 0 ? "Суперудар (CD 4х): Полное замедление оппонентов на 2 хода" : "Ultimate (CD 4t): Slows down all active enemy actions");
+            DrawSkillRow(curLang, activeSkillPassive1, "💧", "ManaFlow", curLang == 0 ? "Поток маны: +5 ОМ (MP) за ход" : "+5 mana points gain per turn");
+            DrawSkillRow(curLang, activeSkillPassive2, "🔥", "Elemental", curLang == 0 ? "Стихии: +15% разрушительной силы магии" : "+15% magic spell power booster");
+            DrawSkillRow(curLang, activeSkillPassive3, "🌌", "Resist", curLang == 0 ? "Сопротивление: +15% маг. защиты от чар" : "+15% spell resistance shield");
+            DrawSkillRow(curLang, activeSkillUltimate, "⏳", "<b>Time Rift</b>", curLang == 0 ? "Суперудар (CD 4х): Полное замедление оппонентов на 2 хода" : "Ultimate (CD 4t): Slows down all active enemy actions");
         }
         else
         {
@@ -1544,20 +1574,27 @@ public class FateCastleManager : MonoBehaviour
             ? SaveGameSystem.CurrentData.characterClass.ToLower() 
             : "warrior";
             
-        string prefix = "Skills/Warrior/";
-        if (cl.Contains("archer") || cl.Contains("strelok"))
+        if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow"))
         {
-            prefix = "Skills/Archer/";
+            activeSkillPassive1 = archerSkillPassive1 != null ? archerSkillPassive1 : Resources.Load<Texture2D>("Skills/Archer/passive1");
+            activeSkillPassive2 = archerSkillPassive2 != null ? archerSkillPassive2 : Resources.Load<Texture2D>("Skills/Archer/passive2");
+            activeSkillPassive3 = archerSkillPassive3 != null ? archerSkillPassive3 : Resources.Load<Texture2D>("Skills/Archer/passive3");
+            activeSkillUltimate = archerSkillUltimate != null ? archerSkillUltimate : Resources.Load<Texture2D>("Skills/Archer/ultimate");
         }
-        else if (cl.Contains("mage") || cl.Contains("mag"))
+        else if (cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff"))
         {
-            prefix = "Skills/Mage/";
+            activeSkillPassive1 = mageSkillPassive1 != null ? mageSkillPassive1 : Resources.Load<Texture2D>("Skills/Mage/passive1");
+            activeSkillPassive2 = mageSkillPassive2 != null ? mageSkillPassive2 : Resources.Load<Texture2D>("Skills/Mage/passive2");
+            activeSkillPassive3 = mageSkillPassive3 != null ? mageSkillPassive3 : Resources.Load<Texture2D>("Skills/Mage/passive3");
+            activeSkillUltimate = mageSkillUltimate != null ? mageSkillUltimate : Resources.Load<Texture2D>("Skills/Mage/ultimate");
         }
-
-        if (iconSkillPassive1 == null) iconSkillPassive1 = Resources.Load<Texture2D>(prefix + "passive1");
-        if (iconSkillPassive2 == null) iconSkillPassive2 = Resources.Load<Texture2D>(prefix + "passive2");
-        if (iconSkillPassive3 == null) iconSkillPassive3 = Resources.Load<Texture2D>(prefix + "passive3");
-        if (iconSkillUltimate == null) iconSkillUltimate = Resources.Load<Texture2D>(prefix + "ultimate");
+        else
+        {
+            activeSkillPassive1 = warriorSkillPassive1 != null ? warriorSkillPassive1 : Resources.Load<Texture2D>("Skills/Warrior/passive1");
+            activeSkillPassive2 = warriorSkillPassive2 != null ? warriorSkillPassive2 : Resources.Load<Texture2D>("Skills/Warrior/passive2");
+            activeSkillPassive3 = warriorSkillPassive3 != null ? warriorSkillPassive3 : Resources.Load<Texture2D>("Skills/Warrior/passive3");
+            activeSkillUltimate = warriorSkillUltimate != null ? warriorSkillUltimate : Resources.Load<Texture2D>("Skills/Warrior/ultimate");
+        }
     }
 
     private void DrawSkillRow(int curLang, Texture2D icon, string emoji, string header, string desc)
