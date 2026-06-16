@@ -3,7 +3,7 @@
   "project_name": "Fate Continent",
   "project_path": "",
   "system_instruction": "You are Zenith Quantum Divine Assistant, guiding the Fate Continent world development and Unity/Blender workflows.",
-  "version": "18.11.15",
+  "version": "18.11.16",
   "modules": [
     {
       "name": "Localization & Fonts",
@@ -46,7 +46,8 @@
         "Zenith Dynamic Ocean Occlusion v18.11.12: Automates hiding the ocean backdrop plane during dialogue sequences in Start() and shows it dynamically on DispatchLanding() for scene aesthetics. Solves pink rendering in Universal Render Pipeline and adapts water metallic and gloss parameters based on PlayerPrefs graphics quality levels.",
         "Zenith Ground-Focused Camera Clamping v18.11.13: Refactors camera clamping limits in StrategicCameraController.cs to restrict the projected ground focal center (Y=0) instead of raw camera coords, eliminating locks and enabling smooth panning.",
         "Zenith Post-Landing Castle Progression v18.11.14: Implements persistent world map scale, multi-stage post-landing camera cinematic lock at DialogStep 8 through 12, spawns 3D neon castles for factions, and adds Castle details management (income, recruitment, and shop).",
-        "Zenith RPG Skills & Turn-Based Castle Morph v18.11.15: Fully integrates Warrior, Archer, and Mage baseline stats with select starting free point pools, blocks reducing attributes below class baselines, automates auto-allocation toggle, showcases a premium class skills grid inside the GUI stats panel, and handles turn-based castle gold ticking with majestic castle level morph loaders."
+        "Zenith RPG Skills & Turn-Based Castle Morph v18.11.15: Fully integrates Warrior, Archer, and Mage baseline stats with select starting free point pools, blocks reducing attributes below class baselines, automates auto-allocation toggle, showcases a premium class skills grid inside the GUI stats panel, and handles turn-based castle gold ticking with majestic castle level morph loaders.",
+        "Zenith GPU Anti-Overheat Protection & Resolution Universal Sync v18.11.16: Guards computer hardware performance during testing by capping target frame rate (30 FPS/60 FPS/120 FPS capped) according to chosen graphics level, dampening post-process volumes down to 15% on low settings, and fully synchronizes and restores screen resolution/fullscreen choices across all scene loading cycles."
       ]
     },
     {

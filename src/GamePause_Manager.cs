@@ -197,6 +197,13 @@ namespace FateContinent
                     return;
                 }
 
+                // Запрещаем ESC во время открытого профиля героя
+                if (FateCastleManager.Instance != null && FateCastleManager.Instance.IsHeroProfileOpen)
+                {
+                    Debug.Log("[FATE PAUSE] ESC заблокирован: открыто меню героя!");
+                    return;
+                }
+
                 // Проверяем ограничение сцен: "в других сценах в начальной и в сцене битвы что бы она была не активна только в этой сцене"
                 string activeScene = SceneManager.GetActiveScene().name.ToLower();
                 if (activeScene.Contains("menu") || 

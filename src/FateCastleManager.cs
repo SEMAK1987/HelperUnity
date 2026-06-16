@@ -182,6 +182,12 @@ public class FateCastleManager : MonoBehaviour
     private Vector2 barracksScroll = Vector2.zero;
     private Vector2 forgeScroll = Vector2.zero;
     private Vector2 academyScroll = Vector2.zero;
+    private Vector2 statsScroll = Vector2.zero;
+
+    public bool IsHeroProfileOpen
+    {
+        get { return showStatsPanel; }
+    }
 
     // ==========================================
     // HELPER METHODS FOR GARRISON & ESPIONAGE (v18.11.15)
@@ -1307,6 +1313,9 @@ public class FateCastleManager : MonoBehaviour
         if (GUI.Button(new Rect(30f, 30f, 65f, 65f), avatarSymbol, portraitBtnStyle))
         {
             showStatsPanel = !showStatsPanel;
+            // Управляем шкалой времени Unity (замораживаем игру при открытии профиля)
+            Time.timeScale = showStatsPanel ? 0f : 1f;
+
             // Воспроизводим звук ховера/клика из диспетчера
             if (SettingsManager.Instance != null)
             {
@@ -1424,14 +1433,19 @@ public class FateCastleManager : MonoBehaviour
         GUIStyle winStyle = new GUIStyle(GUI.skin.box);
         winStyle.normal.background = winBgTex;
         
-        // Увеличили высоту панели, чтобы добавить раздел скиллов и пассивок класса
-        Rect winRect = new Rect(20f, 130f, 330f, 575f);
+        // Расчет высоты и ширины Zenith UI адаптивно к разрешению экрана пользователя
+        float actualWidth = 330f;
+        float actualHeight = Mathf.Clamp(Screen.height - 180f, 360f, 650f);
+        Rect winRect = new Rect(20f, 130f, actualWidth, actualHeight);
         GUI.Box(winRect, "", winStyle);
         
         GUILayout.BeginArea(winRect);
         GUILayout.Space(12);
         
-        // Заголовок панели
+        // Контейнер заголовка и кнопки "X" закрытия
+        GUILayout.BeginHorizontal();
+        GUILayout.Space(24); // компенсатор ширины кнопки, чтобы центрировать заголовок
+        
         GUIStyle headerStyle = new GUIStyle(GUI.skin.label);
         headerStyle.alignment = TextAnchor.MiddleCenter;
         headerStyle.fontSize = 14;
@@ -1442,7 +1456,23 @@ public class FateCastleManager : MonoBehaviour
         if (curLang == 8) headText = "⚡ 英雄属性星盘配点";
         if (curLang == 7) headText = "⚡ 영웅 능력치 통계 제어";
         GUILayout.Label(headText, headerStyle);
+        
+        GUI.backgroundColor = new Color(1.0f, 0.22f, 0.22f, 0.85f);
+        if (GUILayout.Button("<b>X</b>", GUILayout.Width(26), GUILayout.Height(24)))
+        {
+            showStatsPanel = false;
+            Time.timeScale = 1f; // Размораживаем время игры!
+            if (SettingsManager.Instance != null)
+            {
+                SettingsManager.Instance.PlayHoverSound(0);
+            }
+        }
+        GUI.backgroundColor = Color.white;
+        GUILayout.EndHorizontal();
         GUILayout.Space(8);
+
+        // Включение адаптивного скролл-бара для любой карточки экрана
+        statsScroll = GUILayout.BeginScrollView(statsScroll, GUILayout.Width(winRect.width - 15f), GUILayout.Height(winRect.height - 50f));
         
         // Переключатель автономного авто-распределения
         bool oldAuto = isAutonomousStatsDistribution;
@@ -1565,6 +1595,7 @@ public class FateCastleManager : MonoBehaviour
         GUI.backgroundColor = Color.white;
         GUILayout.EndHorizontal();
         
+        GUILayout.EndScrollView(); // Конец прокрутки Zenith UI
         GUILayout.EndArea();
     }
 

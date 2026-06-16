@@ -1371,6 +1371,25 @@ namespace FateContinent
                 rightSpeakerNameText.text = playerDisplayName;
             }
 
+            // [ZENITH SAFETY OVERWRITE] Навеки убираем наложение "Аэлисса" на имя игрока/класса на правом портрете!
+            if (dialogPanel != null)
+            {
+                TextMeshProUGUI[] panelTmps = dialogPanel.GetComponentsInChildren<TextMeshProUGUI>(true);
+                foreach (var pTmp in panelTmps)
+                {
+                    if (pTmp == null) continue;
+                    RectTransform rt = pTmp.GetComponent<RectTransform>();
+                    if (rt != null && rt.anchoredPosition.x > 100f && pTmp != dialogueBodyText && pTmp != speakerNameText)
+                    {
+                        // Если этот компонент находится в правой части и это не наше официальное rightSpeakerNameText, ПРЯЧЕМ его!
+                        if (pTmp != rightSpeakerNameText)
+                        {
+                            pTmp.gameObject.SetActive(false);
+                        }
+                    }
+                }
+            }
+
             // Вычисляем, кто говорит на текущем шаге
             string rawSpeaker = currentLine.characterName;
             bool speaking = false;

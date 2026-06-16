@@ -143,11 +143,11 @@ namespace FateContinent
                 castleGov.AddComponent<FateCastleManager>();
             }
 
-            // Автоматически увеличиваем базовый масштаб карты, если он был слишком маленьким по умолчанию
+            // Автоматически настраиваем базовый масштаб карты, если он был не задан или равен нулю
             if (mapScale <= 0.1f)
             {
-                mapScale = 1.6f;
-                Debug.Log("<color=#00FFCC>[FATE CONTINENT CALIBRATION]</color> Автоматически увеличили масштаб тактической карты до 1.6f для величественного полноэкранного обзора.");
+                mapScale = 1.2f;
+                Debug.Log("<color=#00FFCC>[FATE CONTINENT CALIBRATION]</color> Автоматически откалибровали базовый масштаб тактической карты до 1.2f.");
             }
 
             InitializeMap(activeMapIndex);

@@ -1,9 +1,10 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.11.15)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.11.16)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** 18.11.15
+- **Version:** 18.11.16
 - **Engine:** Unity 6 (6000.3.10f1)
+- **v18.11.16 Update:** GPU Anti-Overheat Protection & Resolution Universal Sync - Implements a hardware performance safeguard within SettingsManager.cs. Disables infinite framerates in Unity; clamps Target Frame Rate to 30 FPS on low presets to minimize GPU load and avoid "Unity Bug Reporter" crashes during long testing sessions, 60 FPS on medium/high, and 120 FPS on ultra. Automatically manages standard Post-Processing Volume weights (Bloom/Postprocess is scaled down to 15% on low settings). Ensures persistent Screen Resolution and Fullscreen Mode are dynamically synchronized and automatically restored across all strategic scenes, loading processes, and gameplay transitions.
 - **v18.11.15 Update:** RPG Skills & Turn-Based Castle - Fully integrates class base attributes (Warrior: STR 15, AGI 10, INT 4, STA 15; Archer: STR 10, AGI 14, INT 6, STA 11; Mage: STR 6, AGI 10, INT 10, STA 9) and difficulty-dependent starting free stat pools (from 0 to 30 points) during new game character initialization. Prevents reduction below base stats, implements autonomous auto-allocation, and displays a glossy glassmorphic class skills glossary (passives & ultimate abilities) inside the castle manager GUI panel. Replaced per-second gold accumulation with turn-based castle income ticking and Castle Level 1 -> Level 2 majestic visual shape-shifting morph builders!
 - **v18.11.14 Update:** Post-Landing Narrative & Castle Progression System - Implements scale and offset persistence for the tactical world map preventing reset on play. Adds a multi-phase post-landing narrative briefing starting at DialogStep 8 through 12, focusing the camera on the player castle, locking movement and pausing. Programmatically spawns four majestic 3D castles (emerald neon for player, ruby neon for enemy built using Standard/URP-compatible materials) and establishes the interactive Castle Management logic featuring Zenith Glassmorphism UI, passive gold income tick system, military recruitment, shop equipment and espionage.
 - **v18.11.13 Update:** Ground-Focused Camera Clamping - Refactors camera coordinates clamping in StrategicCameraController.cs to mathematically limit the screen's visual center focal point projected on the ground (Y = 0) rather than restricting raw camera coordinates. This solves physical camera locks at high elevations and allows manual limits to perfectly match visual map coordinate dimensions.
@@ -33,7 +34,7 @@
 - **Audio Rule (CRITICAL):** Используйте только `SettingsManager.cs` для управления звуком и музыкой (включая hover-эффекты и списки воспроизведения). Скрипты `AudioHandler` и `AudioManager` должны быть полностью удалены для чистоты проекта. Музыкальные клипы продлеваются через Suno/Udio и настраиваются на бесшовное зацикливание (`loop = true`). Звуковые файлы берем с Pixabay/Freesound по CC0-лицензии и подключаем напрямую к SettingsManager или через AudioMixer.
 
 ## 🚀 Протокол «Пошаговое Мастерство» (Step-by-Step Mastery)
-1. **Отслеживание прогресса:** Текущая версия v18.11.13 (Ground-Focused Camera Clamping, v18.11.13).
+1. **Отслеживание прогресса:** Текущая версия v18.11.16 (GPU Anti-Overheat Protection & Resolution Universal Sync, v18.11.16).
 2. **Инструкции Настройки Компонентов (Verified Inspector Settings):**
    - **FateMapManager (FATE_WORLD_MAP):**
      - *Maps List:* [+] Слот для глобальной карты (Map Name = "Континент Судьбы", Map Background = фоновый спрайт карты).
@@ -53,4 +54,4 @@
 5. **ОЧИСТКА:** Используйте только `SettingsManager.cs` для аудио. Удалите `AudioHandler` и `AudioManager` скрипты. Не использовать ElevenLabs.
 
 ---
-*Ядро AI пересинхронизировано (v18.11.9). Авто-апдейтер активен.*
+*Ядро AI пересинхронизировано (v18.11.16). Авто-апдейтер активен.*

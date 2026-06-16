@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.15. Turn-Based Day Income system, next-gen level-based castle geometric shape upgrades, and persistent map scales.",
+  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.16. GPU Anti-Overheat Protection Framerate Limiting, Resolution Universal Sync, Turn-Based Day Income, and next-gen castle visual shape-shifting upgrades.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

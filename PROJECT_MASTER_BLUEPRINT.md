@@ -1,17 +1,17 @@
 # PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Total Knowledge Archive Edition)
 
-> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.11.15.
+> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.11.16.
 
 ## 1. Общая информация
-- **Версия Помощника:** 18.11.15
-- **Описание:**  Гибридный ИИ-помощник нового поколения (v18.11.15 - RPG Skills & Turn-Based Castle Morph) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Интеграция адаптивного переключения ввода, калибровка зум-параметров при высадке, позиционирование маркеров по Z=-2.0f и сохранение прогресса.
+- **Версия Помощника:** 18.11.16
+- **Описание:** Гибридный ИИ-помощник нового поколения (v18.11.16 - GPU Anti-Overheat Protection & Resolution Universal Sync) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Интеграция адаптивного переключения ввода, калибровка зум-параметров при высадке, позиционирование маркеров по Z=-2.0f, сохранение прогресса и защита GPU от перегрева подсистем.
 - **Путь проекта:** Не задан
 - **Локальное хранилище:** Не задано
 - **Версия Unity:** unknown
 - **Версия Blender:** unknown
 - **Версия GIMP:** unknown
 - **Версия Redot:** unknown
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_11_15_FATE_MASTER]
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_11_16_FATE_MASTER]
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -46,7 +46,7 @@ You are Zenith Quantum Divine Assistant, guiding the Fate Continent world develo
 ```
 
 
-## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.11.15 - RPG Skills & Castle Morph)
+## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.11.11 - Real-Time Bound Locking & Ocean Backdrop)
 ### Режимы работы и Архитектурные уровни
 - **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.
 - **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.
@@ -293,7 +293,16 @@ Freesound содержит миллионы звуков от инди-разр�
 - **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.
 - **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.
 
-## 13. История изменений (v18.11.7)
+## 13. История изменений (v18.11.16)
+- **v18.11.16:** GPU Anti-Overheat Protection & Resolution Universal Sync • Implements smart target frame rate capping matching quality options (30 FPS/60 FPS/120 FPS capped) to stop performance overconsumption on testers' modern graphics cards. Performs full graphics sync on startup/scene loaded.
+- **v18.11.15:** RPG Skills & Turn-Based Castle • Integrates class-wide base stats (Warrior, Archer, Mage) and difficulty stats pools, with interactive glassy skills panel list. Replaces per-second gold accumulation with turn-based ticking and morphing castle structures.
+- **v18.11.14:** Post-Landing Narrative & Castle Progression System • Preserves world scales and positions. Introduces post-landing briefing on Steps 8 to 12. Implements 4 spawned 3D castles and Zenith Castle control panel, gold ticketing, recruitment, and spying.
+- **v18.11.13:** Ground-Focused Camera Clamping • Restricts screen focus focal coordinate projection (Y=0) rather than brute-forcing absolute camera limits on high zoom levels.
+- **v18.11.12:** Dynamic Ocean Occlusion & Quality Synchronization • Hides ocean on start and reveals on landing dispatch. Syncs metallic and roughness water parameters using PlayerPrefs settings.
+- **v18.11.11:** Real-Time Bounds Locking, Edge Scrolling & Ocean Backdrop • Adds StrategicCameraController boundary clamping Mesh auto-fit logic and mouse screen scrolling. Instantiates tiled high-resolution Ocean plane.
+- **v18.11.10:** 4-Zone Spawn Match & Map Sync • Corrects ring indexing for zoning. Places markers on precise Z coordinates -2.0f and -2.05f to overlay continent texture maps correctly.
+- **v18.11.9:** Input System Auto-Switch & Camera Rig Calibration • Handles New Input System compile errors. Standardizes camera height starting offsets to 2.5f and zooms boundary to 0.6f / 8.0f.
+- **v18.11.8:** 4-Zone Landing Auto-Sync & Anchor Persistence • Registers landing zones and serializes user choices locally across sessions.
 - **v18.11.7:** Selective Dialogue Map Dismissal & Hidden Faction Markers • Solves critical scene-cleanup issue where the map background, tactical landing rings, and companion marker coordinates stayed visible after clicking 'End Dialogue' or ending conversation. Directs DialogueSystem_Manager to hide active map and overlay modules dynamically on non-interactive dialogue steps, and completely hides flat white redundant faction reference circles (`Faction_Marker_Aelyssa`/class markers) from the tactical world map view and during the interactive landing phase.
 - **v18.11.6:** Synchronized Map & Marker Dismissal • Automatically caches Faction_Marker_Aelyssa and player class markers on startup to properly control their visibility in sync with the tactical world map. Directs DialogueSystem_Manager to dismiss map visibility when ending dialogue (clicking "Завершить диалог"), completely cleaning up map background sprites, active landing point rings, and the companion companion/faction markers from the viewport upon conversation exit.
 - **v18.11.5:** Single Ring Visibility & Pure Coordinates Preservation • Dynamically disables other rings at runtime, displaying ONLY the single chosen landing point ring. Preserves user-entered Inspector coordinates at runtime by establishing your exact manually fine-tuned layout coordinates as hardcoded default variable parameters in C# and removing the runtime scene-sync overwrite block, completely resolving coordinate resets or values "jumping" to zero on play start.

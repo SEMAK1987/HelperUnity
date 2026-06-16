@@ -144,6 +144,7 @@ public class SettingsManager : MonoBehaviour
         if (Instance == this)
         {
             BindLoadedUIElements();
+            ApplyGlobalSyncOnSceneStart();
         }
     }
 
@@ -152,6 +153,7 @@ public class SettingsManager : MonoBehaviour
         if (Instance == this)
         {
             BindLoadedUIElements();
+            ApplyGlobalSyncOnSceneStart();
         }
     }
 
@@ -168,6 +170,17 @@ public class SettingsManager : MonoBehaviour
         target.bypassEffects = source.bypassEffects;
         target.bypassListenerEffects = source.bypassListenerEffects;
         target.bypassReverbZones = source.bypassReverbZones;
+    }
+
+    /// <summary>
+    /// Полная синхронизация графики, разрешения и сдерживания перегрузок в любой сцене игры.
+    /// </summary>
+    public void ApplyGlobalSyncOnSceneStart()
+    {
+        int savedQuality = PlayerPrefs.GetInt("QualityLevel", QualitySettings.GetQualityLevel());
+        ApplyOceanQuality(savedQuality);
+        ApplyGlobalPerformanceThrottle(savedQuality);
+        ApplyLoadedResolutionAndFullscreen();
     }
 
     public void BindLoadedUIElements()
@@ -232,8 +245,10 @@ public class SettingsManager : MonoBehaviour
             }
             resolutionDropdown.AddOptions(options);
             resolutionDropdown.value = PlayerPrefs.GetInt("Resolution", currentResIndex);
+            resolutionDropdown.onValueChanged.RemoveAllListeners();
+            resolutionDropdown.onValueChanged.AddListener(SetResolution);
             resolutionDropdown.RefreshShownValue();
-            Debug.Log("[FATE SETTINGS] resolutionDropdown успешно привязан.");
+            Debug.Log("[FATE SETTINGS] resolutionDropdown успешно привязан с активным слушателем.");
         }
 
         if (fullscreenToggle != null) {
@@ -256,9 +271,11 @@ public class SettingsManager : MonoBehaviour
             Debug.Log("[FATE SETTINGS] fullscreenToggle успешно привязан.");
         }
 
-        // Гарантируем, что качество океана привязывается к сохраненным настройкам PlayerPrefs при старте/загрузке сцены
+        // Применяем сохраненные настройки сразу при привязке элементов
         int savedQuality = PlayerPrefs.GetInt("QualityLevel", QualitySettings.GetQualityLevel());
         ApplyOceanQuality(savedQuality);
+        ApplyGlobalPerformanceThrottle(savedQuality);
+        ApplyLoadedResolutionAndFullscreen();
     }
 
     // Воспроизведение звука наведения по индексу (0-9)
@@ -394,6 +411,110 @@ public class SettingsManager : MonoBehaviour
         QualitySettings.SetQualityLevel(index);
         PlayerPrefs.SetInt("QualityLevel", index);
         ApplyOceanQuality(index);
+        ApplyGlobalPerformanceThrottle(index);
+    }
+
+    /// <summary>
+    /// Глобальный подавитель перегрева GPU и вылетов.
+    /// </summary>
+    public void ApplyGlobalPerformanceThrottle(int index)
+    {
+        // Предотвращаем рендеринг сотен кадров в секунду, от которых греется видеокарта:
+        if (index <= 1)
+        {
+            // Очень низкие / Низкие: идеальный режим для долгосрочного тестирования и слабых GPU
+            Application.targetFrameRate = 30; 
+            QualitySettings.vSyncCount = 0;
+            QualitySettings.shadowDistance = 15f;
+            QualitySettings.shadowCascades = 0;
+            QualitySettings.pixelLightCount = 1;
+            QualitySettings.antiAliasing = 0;
+        }
+        else if (index <= 3)
+        {
+            // Средние / Высокие: стабильные 60 FPS для комфортного геймплея
+            Application.targetFrameRate = 60;
+            QualitySettings.vSyncCount = 1;
+            QualitySettings.shadowDistance = 60f;
+            QualitySettings.shadowCascades = 2;
+            QualitySettings.pixelLightCount = 2;
+            QualitySettings.antiAliasing = 2;
+        }
+        else
+        {
+            // Ультра настройки: максимальный FPS и качество
+            Application.targetFrameRate = 120; // Ограничиваем разумным максимумом, а не бесконечностью!
+            QualitySettings.vSyncCount = 1;
+            QualitySettings.shadowDistance = 150f;
+            QualitySettings.shadowCascades = 4;
+            QualitySettings.pixelLightCount = 4;
+            QualitySettings.antiAliasing = 4;
+        }
+
+        // Автоматически находим источники тяжелых постобработок (Volume/Bloom) и снижаем их влияние
+#if UNITY_2023_1_OR_NEWER
+        var volumes = FindObjectsByType<UnityEngine.Rendering.Volume>(FindObjectsSortMode.None);
+#else
+        var volumes = FindObjectsOfType<UnityEngine.Rendering.Volume>();
+#endif
+        foreach (var volume in volumes)
+        {
+            if (volume != null)
+            {
+                // На низких настройках веса постобработки уменьшаются до минимума для снижения нагрузки на GPU
+                if (index <= 1)
+                {
+                    volume.weight = 0.15f; 
+                }
+                else
+                {
+                    volume.weight = 1.0f;
+                }
+            }
+        }
+
+        Debug.Log($"<color=#00FFCC>[FATE PERFORMANCE]</color> Применен профиль оптимизации #{index}. Таргет FPS: {Application.targetFrameRate}, Качество океана и постобработки откалибровано.");
+    }
+
+    /// <summary>
+    /// Автоматически восстанавливает сохраненное разрешение экрана и режим полного экрана во всех сценах.
+    /// </summary>
+    public void ApplyLoadedResolutionAndFullscreen()
+    {
+        int savedRes = PlayerPrefs.GetInt("Resolution", -1);
+        int savedFullscreen = PlayerPrefs.GetInt("Fullscreen", -1);
+        bool isFull = Screen.fullScreen;
+        
+        if (savedFullscreen >= 0)
+        {
+            isFull = (savedFullscreen == 1);
+            Screen.fullScreen = isFull;
+        }
+        
+        // Получаем уникальный список всех поддерживаемых видеокартой разрешений
+        Resolution[] allResolutions = Screen.resolutions;
+        List<Resolution> uniqueResolutions = new List<Resolution>();
+        List<string> options = new List<string>();
+        
+        for (int i = 0; i < allResolutions.Length; i++) {
+            string option = allResolutions[i].width + " x " + allResolutions[i].height;
+            if (!options.Contains(option)) {
+                options.Add(option);
+                uniqueResolutions.Add(allResolutions[i]);
+            }
+        }
+
+        if (savedRes >= 0 && savedRes < uniqueResolutions.Count)
+        {
+            Resolution res = uniqueResolutions[savedRes];
+            Screen.SetResolution(res.width, res.height, isFull);
+            Debug.Log($"<color=#00FFCC>[FATE RES SYNC]</color> Применено сохраненное разрешение экрана: {res.width} x {res.height}, Весь экран: {isFull}");
+        }
+        else
+        {
+            // Если сохраненного индекса нет (или запуск в первый раз), устанавливаем текущее системное окно
+            Screen.SetResolution(Screen.width, Screen.height, isFull);
+        }
     }
 
     /// <summary>
@@ -437,6 +558,9 @@ public class SettingsManager : MonoBehaviour
     public void SetFullscreen(bool isFullscreen)
     {
         Screen.fullScreen = isFullscreen;
+        PlayerPrefs.SetInt("Fullscreen", isFullscreen ? 1 : 0);
+        PlayerPrefs.Save();
+        Debug.Log($"[FATE SETTINGS] Режим экрана переключен: {(isFullscreen ? "Полный" : "Оконный")}");
     }
 
     public void SetResolution(int index)
@@ -456,8 +580,11 @@ public class SettingsManager : MonoBehaviour
         if (index < uniqueResolutions.Count)
         {
             Resolution res = uniqueResolutions[index];
-            Screen.SetResolution(res.width, res.height, Screen.fullScreen);
+            bool isFull = (PlayerPrefs.GetInt("Fullscreen", Screen.fullScreen ? 1 : 0) == 1);
+            Screen.SetResolution(res.width, res.height, isFull);
             PlayerPrefs.SetInt("Resolution", index);
+            PlayerPrefs.Save();
+            Debug.Log($"[FATE SETTINGS] Установлено новое разрешение: {res.width}x{res.height}");
         }
     }
 
