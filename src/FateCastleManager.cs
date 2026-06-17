@@ -589,14 +589,19 @@ public class FateCastleManager : MonoBehaviour
         {
             CastleInstance castle = castles[i];
             
-            // Синхронизация роли
+            // Синхронизация роли: 1 Игрок, 1 Противник ИИ, 2 Нейтральных замка (напр. Оазис/Пик/Древние Руины/Зенит)
+            int enemyZone = 3 - playerZone; // Противоположная по балансу зона для ИИ (0<->3, 1<->2)
             if (i == playerZone)
             {
                 castle.owner = "Player";
             }
-            else
+            else if (i == enemyZone)
             {
                 castle.owner = "Enemy";
+            }
+            else
+            {
+                castle.owner = "Neutral";
             }
             PlayerPrefs.SetString("Castle_Owner_" + i, castle.owner);
             PlayerPrefs.Save();
@@ -664,8 +669,8 @@ public class FateCastleManager : MonoBehaviour
             if (castleMat.HasProperty("_Smoothness")) castleMat.SetFloat("_Smoothness", 0.7f);
             if (castleMat.HasProperty("_Metallic")) castleMat.SetFloat("_Metallic", 0.45f);
 
-            // МОРФИНГ ФОРМ только для активного замка Игрока!
-            if (castle.owner == "Player")
+            // МОРФИНГ ФОРМ для активных замков Игрока и Компьютера противника!
+            if (castle.owner == "Player" || castle.owner == "Enemy")
             {
                 if (castle.level == 1)
                 {

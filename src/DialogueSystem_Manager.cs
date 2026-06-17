@@ -1371,20 +1371,46 @@ namespace FateContinent
                 rightSpeakerNameText.text = playerDisplayName;
             }
 
-            // [ZENITH SAFETY OVERWRITE] Навеки убираем наложение "Аэлисса" на имя игрока/класса на правом портрете!
+            // [ZENITH SAFETY OVERWRITE] Навеки убираем наложения на имена левого компаньона и правого героя!
             if (dialogPanel != null)
             {
                 TextMeshProUGUI[] panelTmps = dialogPanel.GetComponentsInChildren<TextMeshProUGUI>(true);
                 foreach (var pTmp in panelTmps)
                 {
                     if (pTmp == null) continue;
-                    RectTransform rt = pTmp.GetComponent<RectTransform>();
-                    if (rt != null && rt.anchoredPosition.x > 100f && pTmp != dialogueBodyText && pTmp != speakerNameText)
+                    
+                    // Блокируем ЛЮБЫЕ наложения внутри портрета игрока
+                    if (playerPortraitImage != null && pTmp.transform.IsChildOf(playerPortraitImage.transform))
                     {
-                        // Если этот компонент находится в правой части и это не наше официальное rightSpeakerNameText, ПРЯЧЕМ его!
                         if (pTmp != rightSpeakerNameText)
                         {
                             pTmp.gameObject.SetActive(false);
+                            continue;
+                        }
+                    }
+
+                    // Блокируем ЛЮБЫЕ наложения внутри портрета компаньона
+                    if (companionPortraitImage != null && pTmp.transform.IsChildOf(companionPortraitImage.transform))
+                    {
+                        if (pTmp != leftSpeakerNameText)
+                        {
+                            pTmp.gameObject.SetActive(false);
+                            continue;
+                        }
+                    }
+
+                    RectTransform rt = pTmp.GetComponent<RectTransform>();
+                    if (rt != null && pTmp != dialogueBodyText && pTmp != speakerNameText)
+                    {
+                        // Если этот компонент находится на правой стороне по мировым или локальным смещениям,
+                        // и это не наше официальное rightSpeakerNameText, деактивируем его!
+                        float localX = rt.anchoredPosition.x;
+                        if (localX > 100f || pTmp.gameObject.name.Contains("Player") || pTmp.gameObject.name.Contains("Voin") || pTmp.gameObject.name.Contains("Warrior"))
+                        {
+                            if (pTmp != rightSpeakerNameText)
+                            {
+                                pTmp.gameObject.SetActive(false);
+                            }
                         }
                     }
                 }

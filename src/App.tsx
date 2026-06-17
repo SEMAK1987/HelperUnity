@@ -1606,6 +1606,7 @@ export default function App() {
   const [aiIncomeMult, setAiIncomeMult] = useState<number>(1.35);
   const [aiStartingPower, setAiStartingPower] = useState<number>(15);
   const [useManualConfig, setUseManualConfig] = useState<boolean>(false);
+  const [selectedLandingSlot, setSelectedLandingSlot] = useState<number>(0);
 
   // Weapon Skill Stats Leveling (v18.11.15)
   const [swordLevel, setSwordLevel] = useState<number>(1);
@@ -1640,6 +1641,16 @@ export default function App() {
     boots: { name: 'Кованые латные сапоги', bonus: '+10 Скор.', icon: '👢' },
     ring: { name: 'Перстень Кристалла', bonus: '+35 Мана', icon: '💍' },
   });
+
+  // Dynamic high-performance state variables for Citadel Interiors (v18.11.16)
+  const [activeCastleBuildingTab, setActiveCastleBuildingTab] = useState<'barracks' | 'forge_shop' | 'academy_arena'>('barracks');
+  const [customImages, setCustomImages] = useState<Record<string, string>>({});
+  const [trainedHeroLvl, setTrainedHeroLvl] = useState<number>(5);
+  const [trainedHeroXp, setTrainedHeroXp] = useState<number>(350);
+  const [trainedWarriorsLvl, setTrainedWarriorsLvl] = useState<number>(2);
+  const [trainedWarriorsXp, setTrainedWarriorsXp] = useState<number>(120);
+  const [heroTrainingCooldownDay, setHeroTrainingCooldownDay] = useState<number>(0);
+  const [warriorTrainingCooldownDay, setWarriorTrainingCooldownDay] = useState<number>(0);
 
   const [activeSpellPrompt, setActiveSpellPrompt] = useState<{ name: string; cost: number; desc: string; command: string } | null>(null);
   const [activeTransferPrompt, setActiveTransferPrompt] = useState<boolean>(false);
@@ -6165,6 +6176,9 @@ export default function App() {
                                         onClick={() => {
                                           // Increment turn day
                                           setGameDayCount(prev => prev + 1);
+                                          // Decrement training parade cooldown days
+                                          setHeroTrainingCooldownDay(prev => Math.max(0, prev - 1));
+                                          setWarriorTrainingCooldownDay(prev => Math.max(0, prev - 1));
                                           // Add Passive income matching castle level
                                           const income = simCastleLevel === 1 ? 25 : 75;
                                           setPlayerGold(prev => prev + income);
@@ -6635,180 +6649,480 @@ export default function App() {
                                           <div>
                                             <div className="flex border-b border-white/5 pb-2 mb-3">
                                               <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
-                                                💒 Внутренняя структура Цитадели • Подробный перечень
+                                                💒 Внутренняя структура Цитадели • Подробный перечень (Интерфейс v18.11.17)
                                               </span>
                                             </div>
 
-                                            {/* Grid of the 3 Buildings */}
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                              {/* 1. Military Barracks */}
-                                              <div className="bg-slate-950 p-3 rounded-2xl border border-white/5 flex flex-col justify-between space-y-2">
-                                                <div>
-                                                  <div className="text-[9.5px] font-black text-amber-400 uppercase tracking-tight">🏰 КАЗАРМЫ</div>
-                                                  <span className="text-[7.5px] font-mono text-slate-500 block mb-1">GameObject: Troops_Barracks</span>
-                                                  <p className="text-[9px] text-slate-400 leading-tight">
-                                                    Нанимайте воинов для зачистки. Лимит: максимум 50 бойцов в гарнизоне.
-                                                  </p>
-                                                </div>
-                                                <div className="pt-2 border-t border-white/5">
-                                                  <div className="flex justify-between text-[9px] mb-1 font-mono">
-                                                    <span>Отряд:</span>
-                                                    <span className="text-white">{recruitedTroops} / 50 👥</span>
-                                                  </div>
-                                                  <button
-                                                    onClick={() => {
-                                                      if (recruitedTroops >= 50) {
-                                                        showNotification("❌ Достигнут жесткий лимит на бойцов (50 единиц) на одного героя!", "error");
-                                                        return;
-                                                      }
-                                                      if (playerGold >= 75) {
-                                                        setPlayerGold(prev => prev - 75);
-                                                        setRecruitedTroops(prev => Math.min(50, prev + 5));
-                                                        try {
-                                                          const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-                                                          const osc = ctx.createOscillator();
-                                                          const g = ctx.createGain();
-                                                          osc.frequency.setValueAtTime(220, ctx.currentTime);
-                                                          osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.15);
-                                                          g.gain.setValueAtTime(0.12, ctx.currentTime);
-                                                          osc.connect(g); g.connect(ctx.destination);
-                                                          osc.start(); osc.stop(ctx.currentTime + 0.15);
-                                                        } catch(e){}
-                                                        showNotification("👥 Успешно нанято +5 воинов за 75 золота!", "success");
-                                                      } else {
-                                                        showNotification("❌ Недостаточно монет! Пропустите ход для пассивного притока.", "error");
-                                                      }
-                                                    }}
-                                                    className="w-full py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[8.5px] font-black uppercase tracking-tight transition-all"
-                                                  >
-                                                    Нанять (+5 за 75)
-                                                  </button>
-                                                </div>
-                                              </div>
-
-                                              {/* 2. Armory Shop */}
-                                              <div className="bg-slate-950 p-3 rounded-2xl border border-white/5 flex flex-col justify-between space-y-2">
-                                                <div>
-                                                  <div className="text-[9.5px] font-black text-[#22d3ee] uppercase tracking-tight">🗡️ ОРУЖЕЙНАЯ</div>
-                                                  <span className="text-[7.5px] font-mono text-slate-500 block mb-1">GameObject: Armory_Shop</span>
-                                                  <p className="text-[9px] text-slate-400 leading-tight">
-                                                    Приобрести обмундирование. При покупке вещь моментально перемещается в ячейку.
-                                                  </p>
-                                                </div>
-                                                <div className="pt-2 border-t border-white/5 space-y-2">
-                                                  {/* Swords & Platetails */}
-                                                  <span className="text-[7px] text-slate-500 block uppercase font-bold text-center">Купить Снаряжение</span>
-                                                  <button
-                                                    onClick={() => {
-                                                      if (playerGold >= 150) {
-                                                        setPlayerGold(prev => prev - 150);
-                                                        setEquippedItems(prev => ({
-                                                          ...prev,
-                                                          armor: { name: 'Железный латный доспех', bonus: '+25 Броня', icon: '👕' }
-                                                        }));
-                                                        try {
-                                                          const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-                                                          const osc = ctx.createOscillator();
-                                                          const g = ctx.createGain();
-                                                          osc.type = 'sawtooth';
-                                                          osc.frequency.setValueAtTime(150, ctx.currentTime);
-                                                          osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.12);
-                                                          g.gain.setValueAtTime(0.12, ctx.currentTime);
-                                                          osc.connect(g); g.connect(ctx.destination);
-                                                          osc.start(); osc.stop(ctx.currentTime + 0.12);
-                                                        } catch(e){}
-                                                        showNotification("👕 Куплен и успешно надет доспех (+25 Броня)!", "success");
-                                                      } else {
-                                                        showNotification("❌ Недостаточно золота для покупки панциря (150)!", "error");
-                                                      }
-                                                    }}
-                                                    className="w-full py-1 bg-[#22d3ee]/20 hover:bg-[#22d3ee]/30 text-[#22d3ee] border border-[#22d3ee]/30 rounded text-[7.5px] font-bold uppercase transition-all"
-                                                  >
-                                                    🛡️ Панцирь (150 за)
-                                                  </button>
-                                                  <button
-                                                    onClick={() => {
-                                                      if (playerGold >= 200) {
-                                                        setPlayerGold(prev => prev - 200);
-                                                        setEquippedItems(prev => ({
-                                                          ...prev,
-                                                          weapon: { name: 'Эльфийский Огненный Скимитар', bonus: '+45 Сила', icon: '🗡️' }
-                                                        }));
-                                                        try {
-                                                          const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-                                                          const osc = ctx.createOscillator();
-                                                          const g = ctx.createGain();
-                                                          osc.type = 'triangle';
-                                                          osc.frequency.setValueAtTime(400, ctx.currentTime);
-                                                          osc.frequency.exponentialRampToValueAtTime(900, ctx.currentTime + 0.15);
-                                                          g.gain.setValueAtTime(0.1, ctx.currentTime);
-                                                          osc.connect(g); g.connect(ctx.destination);
-                                                          osc.start(); osc.stop(ctx.currentTime + 0.15);
-                                                        } catch(e){}
-                                                        showNotification("🗡️ Куплен Легендарный Скимитар (+45 Сила)!", "success");
-                                                      } else {
-                                                        showNotification("❌ Недостаточно денег на Огненный клинок (200)!", "error");
-                                                      }
-                                                    }}
-                                                    className="w-full py-1 bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/30 rounded text-[7.5px] font-bold uppercase transition-all"
-                                                  >
-                                                    ⚔️ Скимитар (200 за)
-                                                  </button>
-                                                </div>
-                                              </div>
-
-                                              {/* 3. Espionage Lodge with manual settings sliders! */}
-                                              <div className="bg-slate-950 p-3 rounded-2xl border border-white/5 flex flex-col justify-between space-y-2 col-span-1">
-                                                <div>
-                                                  <div className="text-[9px] font-black text-rose-400 flex justify-between items-center uppercase tracking-tight">
-                                                    <span>👁️ ШПИОНАЖ ИИ</span>
-                                                    <span className="px-1 bg-red-500/20 rounded text-[6px] text-red-400 font-mono">OPPONENT</span>
-                                                  </div>
-                                                  <span className="text-[7px] font-mono text-slate-500 block mb-1">GameObject: Spy_Lodge</span>
-                                                  <p className="text-[9px] text-slate-400 leading-tight">
-                                                    Тонкая калибровка ходов AI оппонента для ручной настройки замков на карте:
-                                                  </p>
-                                                </div>
-                                                <div className="pt-2 border-t border-white/5 space-y-1">
-                                                  {/* Interactive toggles and configs */}
-                                                  <div className="space-y-1">
-                                                    <label className="text-[7px] font-bold text-slate-400 uppercase flex justify-between">
-                                                      <span>AI Замки Апгрейд (Chance)</span>
-                                                      <span className="text-rose-400">{(aiUpgradeProb * 100).toFixed(0)}%</span>
-                                                    </label>
-                                                    <input 
-                                                      type="range" min="0" max="1" step="0.05"
-                                                      value={aiUpgradeProb} onChange={(e) => setAiUpgradeProb(parseFloat(e.target.value))}
-                                                      className="w-full h-1 bg-slate-800 accent-rose-500 rounded cursor-pointer"
-                                                    />
-                                                  </div>
-
-                                                  <div className="space-y-1">
-                                                    <label className="text-[7px] font-bold text-slate-400 uppercase flex justify-between">
-                                                      <span>AI Наём Воинства (Chance)</span>
-                                                      <span className="text-rose-400">{(aiRecruitProb * 100).toFixed(0)}%</span>
-                                                    </label>
-                                                    <input 
-                                                      type="range" min="0" max="1" step="0.05"
-                                                      value={aiRecruitProb} onChange={(e) => setAiRecruitProb(parseFloat(e.target.value))}
-                                                      className="w-full h-1 bg-slate-800 accent-rose-500 rounded cursor-pointer"
-                                                    />
-                                                  </div>
-
-                                                  <div className="space-y-1">
-                                                    <label className="text-[7px] font-bold text-slate-400 uppercase flex justify-between">
-                                                      <span>Золото Множитель ИИ</span>
-                                                      <span className="text-rose-400">x{aiIncomeMult}</span>
-                                                    </label>
-                                                    <input 
-                                                      type="range" min="1.0" max="3.0" step="0.05"
-                                                      value={aiIncomeMult} onChange={(e) => setAiIncomeMult(parseFloat(e.target.value))}
-                                                      className="w-full h-1 bg-slate-800 accent-rose-500 rounded cursor-pointer"
-                                                    />
-                                                  </div>
-                                                </div>
-                                              </div>
+                                            {/* Tab Navigation header */}
+                                            <div className="flex gap-2 p-1 bg-slate-950 border border-white/5 rounded-2xl mb-4">
+                                              <button
+                                                onClick={() => {
+                                                  setActiveCastleBuildingTab('barracks');
+                                                  try {
+                                                    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                                    const osc = ctx.createOscillator();
+                                                    const g = ctx.createGain();
+                                                    osc.frequency.setValueAtTime(350, ctx.currentTime);
+                                                    g.gain.setValueAtTime(0.05, ctx.currentTime);
+                                                    osc.connect(g); g.connect(ctx.destination);
+                                                    osc.start(); osc.stop(ctx.currentTime + 0.1);
+                                                  } catch(e){}
+                                                }}
+                                                className={`flex-1 py-1.5 rounded-xl text-[8.5px] lg:text-[9.5px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+                                                  activeCastleBuildingTab === 'barracks'
+                                                    ? 'bg-gradient-to-r from-emerald-600 to-indigo-600 text-white shadow-lg shadow-emerald-500/10'
+                                                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                                }`}
+                                              >
+                                                🛡️ Гарнизон & Шпионаж
+                                              </button>
+                                              <button
+                                                onClick={() => {
+                                                  setActiveCastleBuildingTab('forge_shop');
+                                                  try {
+                                                    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                                    const osc = ctx.createOscillator();
+                                                    const g = ctx.createGain();
+                                                    osc.frequency.setValueAtTime(400, ctx.currentTime);
+                                                    g.gain.setValueAtTime(0.05, ctx.currentTime);
+                                                    osc.connect(g); g.connect(ctx.destination);
+                                                    osc.start(); osc.stop(ctx.currentTime + 0.1);
+                                                  } catch(e){}
+                                                }}
+                                                className={`flex-1 py-1.5 rounded-xl text-[8.5px] lg:text-[9.5px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+                                                  activeCastleBuildingTab === 'forge_shop'
+                                                    ? 'bg-gradient-to-r from-emerald-600 to-indigo-600 text-white shadow-lg shadow-emerald-500/10'
+                                                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                                }`}
+                                              >
+                                                🧪 Кузница & Алхимия
+                                              </button>
+                                              <button
+                                                onClick={() => {
+                                                  setActiveCastleBuildingTab('academy_arena');
+                                                  try {
+                                                    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                                    const osc = ctx.createOscillator();
+                                                    const g = ctx.createGain();
+                                                    osc.frequency.setValueAtTime(450, ctx.currentTime);
+                                                    g.gain.setValueAtTime(0.05, ctx.currentTime);
+                                                    osc.connect(g); g.connect(ctx.destination);
+                                                    osc.start(); osc.stop(ctx.currentTime + 0.1);
+                                                  } catch(e){}
+                                                }}
+                                                className={`flex-1 py-1.5 rounded-xl text-[8.5px] lg:text-[9.5px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+                                                  activeCastleBuildingTab === 'academy_arena'
+                                                    ? 'bg-gradient-to-r from-emerald-600 to-indigo-600 text-white shadow-lg shadow-emerald-500/10'
+                                                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                                }`}
+                                              >
+                                                🎯 Тренировочный Плац
+                                              </button>
                                             </div>
+
+                                            {/* RENDER ACTIVE TAB */}
+                                            {activeCastleBuildingTab === 'barracks' && (
+                                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                {/* 1. Military Barracks */}
+                                                <div className="bg-slate-950 p-4 rounded-2xl border border-white/5 flex flex-col justify-between space-y-3">
+                                                  <div>
+                                                    <div className="text-[10px] font-black text-emerald-400 uppercase tracking-tight flex items-center gap-1">
+                                                      <span>🏰 КАЗАРМЫ ГАРНИЗОНА</span>
+                                                      <span className="text-[8px] bg-emerald-500/10 text-emerald-300 px-1 py-0.5 rounded font-mono">ON</span>
+                                                    </div>
+                                                    <span className="text-[7px] font-mono text-slate-500 block mb-1">GameObject: Troops_Barracks</span>
+                                                    <p className="text-[9.5px] text-slate-400 leading-relaxed">
+                                                      Нанимайте закаленных воинов для пополнения гарнизона. Пройденные тренировки увеличат силу новобранцев.
+                                                    </p>
+                                                  </div>
+                                                  <div className="pt-2 border-t border-white/5">
+                                                    <div className="flex justify-between text-[10px] mb-2 font-mono">
+                                                      <span>Боевой отряд:</span>
+                                                      <span className="text-white font-black">{recruitedTroops} / 50 👥</span>
+                                                    </div>
+                                                    <button
+                                                      onClick={() => {
+                                                        if (recruitedTroops >= 50) {
+                                                          showNotification("❌ Достигнут жесткий лимит на бойцов (50 единиц) на одного героя!", "error");
+                                                          return;
+                                                        }
+                                                        if (playerGold >= 75) {
+                                                          setPlayerGold(prev => prev - 75);
+                                                          setRecruitedTroops(prev => Math.min(50, prev + 5));
+                                                          try {
+                                                            const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                                            const osc = ctx.createOscillator();
+                                                            const g = ctx.createGain();
+                                                            osc.frequency.setValueAtTime(220, ctx.currentTime);
+                                                            osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.15);
+                                                            g.gain.setValueAtTime(0.12, ctx.currentTime);
+                                                            osc.connect(g); g.connect(ctx.destination);
+                                                            osc.start(); osc.stop(ctx.currentTime + 0.15);
+                                                          } catch(e){}
+                                                          showNotification("👥 Успешно нанято +5 воинов за 75 золота!", "success");
+                                                        } else {
+                                                          showNotification("❌ Недостаточно монет! Пропустите ход для пассивного притока.", "error");
+                                                        }
+                                                      }}
+                                                      className="w-full py-2 bg-gradient-to-r from-emerald-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white rounded-lg text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer"
+                                                    >
+                                                      Нанять отряд (+5 за 75 🪙)
+                                                    </button>
+                                                  </div>
+                                                </div>
+
+                                                {/* 3. Espionage Lodge with manual settings sliders! */}
+                                                <div className="bg-slate-950 p-4 rounded-2xl border border-white/5 flex flex-col justify-between space-y-3">
+                                                  <div>
+                                                    <div className="text-[10px] font-black text-rose-400 flex justify-between items-center uppercase tracking-tight">
+                                                      <span>👁️ ШПИОНАЖ И КАЛИБРОВКА ИИ</span>
+                                                      <span className="px-1.5 bg-red-500/20 rounded text-[7px] text-red-300 font-mono">OPPONENT</span>
+                                                    </div>
+                                                    <span className="text-[7px] font-mono text-slate-500 block mb-1">GameObject: Spy_Lodge</span>
+                                                    <p className="text-[9.5px] text-slate-400 leading-relaxed">
+                                                      Тонкая настройка вероятностей действий оппонента для адаптивного балансирования сложности вашей сессии:
+                                                    </p>
+                                                  </div>
+                                                  <div className="pt-2 border-t border-white/5 space-y-2">
+                                                    <div className="space-y-1">
+                                                      <label className="text-[8px] font-bold text-slate-400 uppercase flex justify-between">
+                                                        <span>AI Апгрейд Замка:</span>
+                                                        <span className="text-rose-400 font-mono font-bold">{(aiUpgradeProb * 100).toFixed(0)}%</span>
+                                                      </label>
+                                                      <input 
+                                                        type="range" min="0" max="1" step="0.05"
+                                                        value={aiUpgradeProb} onChange={(e) => setAiUpgradeProb(parseFloat(e.target.value))}
+                                                        className="w-full h-1 bg-slate-800 accent-rose-500 rounded cursor-pointer"
+                                                      />
+                                                    </div>
+
+                                                    <div className="space-y-1">
+                                                      <label className="text-[8px] font-bold text-slate-400 uppercase flex justify-between">
+                                                        <span>AI Наем Отрядов:</span>
+                                                        <span className="text-rose-400 font-mono font-bold">{(aiRecruitProb * 100).toFixed(0)}%</span>
+                                                      </label>
+                                                      <input 
+                                                        type="range" min="0" max="1" step="0.05"
+                                                        value={aiRecruitProb} onChange={(e) => setAiRecruitProb(parseFloat(e.target.value))}
+                                                        className="w-full h-1 bg-slate-800 accent-rose-500 rounded cursor-pointer"
+                                                      />
+                                                    </div>
+
+                                                    <div className="space-y-1">
+                                                      <label className="text-[8px] font-bold text-slate-400 uppercase flex justify-between">
+                                                        <span>Золото Множитель ИИ:</span>
+                                                        <span className="text-rose-400 font-mono font-bold">x{aiIncomeMult}</span>
+                                                      </label>
+                                                      <input 
+                                                        type="range" min="1.0" max="3.0" step="0.05"
+                                                        value={aiIncomeMult} onChange={(e) => setAiIncomeMult(parseFloat(e.target.value))}
+                                                        className="w-full h-1 bg-slate-800 accent-rose-500 rounded cursor-pointer"
+                                                      />
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            )}
+
+                                            {activeCastleBuildingTab === 'forge_shop' && (
+                                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                {/* Blacksmith Forge */}
+                                                <div className="bg-slate-950 p-4 rounded-2xl border border-white/5 flex flex-col justify-between space-y-3">
+                                                  <div>
+                                                    <div className="text-[10px] font-black text-cyan-400 uppercase tracking-tight flex items-center gap-1">
+                                                      <span>🛡️ КУЗНИЦА ДОСПЕХОВ И ОРУЖИЯ</span>
+                                                      <span className="text-[8px] bg-cyan-500/10 text-cyan-300 px-1 py-0.5 rounded font-mono">FORGE</span>
+                                                    </div>
+                                                    <span className="text-[7px] font-mono text-slate-500 block mb-1">GameObject: Armory_Shop</span>
+                                                    <p className="text-[9.5px] text-slate-400 leading-relaxed">
+                                                      Выкуйте прочную экипировку и легендарные мечи для вашего персонажа. Изменения характеристик моментально вступят в силу.
+                                                    </p>
+                                                  </div>
+                                                  <div className="pt-2 border-t border-white/5 space-y-2">
+                                                    <button
+                                                      onClick={() => {
+                                                        if (playerGold >= 150) {
+                                                          setPlayerGold(prev => prev - 150);
+                                                          setEquippedItems(prev => ({
+                                                            ...prev,
+                                                            armor: { name: 'Железный латный доспех', bonus: '+25 Броня', icon: '👕' }
+                                                          }));
+                                                          try {
+                                                            const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                                            const osc = ctx.createOscillator();
+                                                            const g = ctx.createGain();
+                                                            osc.type = 'sawtooth';
+                                                            osc.frequency.setValueAtTime(150, ctx.currentTime);
+                                                            osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.12);
+                                                            g.gain.setValueAtTime(0.12, ctx.currentTime);
+                                                            osc.connect(g); g.connect(ctx.destination);
+                                                            osc.start(); osc.stop(ctx.currentTime + 0.12);
+                                                          } catch(e){}
+                                                          showNotification("👕 Куплен и успешно надет доспех (+25 Броня)!", "success");
+                                                        } else {
+                                                          showNotification("❌ Недостаточно золота для покупки панциря (150)!", "error");
+                                                        }
+                                                      }}
+                                                      className="w-full py-2 bg-cyan-600/10 hover:bg-cyan-600/20 text-cyan-300 border border-cyan-500/30 rounded-lg text-[8px] font-black uppercase tracking-wider transition-all cursor-pointer"
+                                                    >
+                                                      🌐 Выковать Стальной Панцирь (150 🪙)
+                                                    </button>
+                                                    <button
+                                                      onClick={() => {
+                                                        if (playerGold >= 200) {
+                                                          setPlayerGold(prev => prev - 200);
+                                                          setEquippedItems(prev => ({
+                                                            ...prev,
+                                                            weapon: { name: 'Эльфийский Огненный Скимитар', bonus: '+45 Сила', icon: '🗡️' }
+                                                          }));
+                                                          try {
+                                                            const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                                            const osc = ctx.createOscillator();
+                                                            const g = ctx.createGain();
+                                                            osc.type = 'triangle';
+                                                            osc.frequency.setValueAtTime(400, ctx.currentTime);
+                                                            osc.frequency.exponentialRampToValueAtTime(900, ctx.currentTime + 0.15);
+                                                            g.gain.setValueAtTime(0.1, ctx.currentTime);
+                                                            osc.connect(g); g.connect(ctx.destination);
+                                                            osc.start(); osc.stop(ctx.currentTime + 0.15);
+                                                          } catch(e){}
+                                                          showNotification("🗡️ Куплен Легендарный Скимитар (+45 Сила)!", "success");
+                                                        } else {
+                                                          showNotification("❌ Недостаточно денег на Огненный клинок (200)!", "error");
+                                                        }
+                                                      }}
+                                                      className="w-full py-2 bg-amber-600/10 hover:bg-amber-600/20 text-amber-300 border border-amber-500/30 rounded-lg text-[8px] font-black uppercase tracking-wider transition-all cursor-pointer"
+                                                    >
+                                                      🔥 Скимитар Рока (+45 Сила) (200 🪙)
+                                                    </button>
+                                                  </div>
+                                                </div>
+
+                                                {/* Alchemy Lab */}
+                                                <div className="bg-slate-950 p-4 rounded-2xl border border-white/5 flex flex-col justify-between space-y-3">
+                                                  <div>
+                                                    <div className="text-[10px] font-black text-purple-400 uppercase tracking-tight flex items-center gap-1">
+                                                      <span>🧪 АЛХИМИЧЕСКИЙ РЕАКТОР</span>
+                                                      <span className="text-[8px] bg-purple-500/10 text-purple-300 px-1 py-0.5 rounded font-mono">CHEMISTRY</span>
+                                                    </div>
+                                                    <span className="text-[7px] font-mono text-slate-500 block mb-1">GameObject: Alchemy_Lab</span>
+                                                    <p className="text-[9.5px] text-slate-400 leading-relaxed">
+                                                      Варите зелья маны и эликсиры древних на основе кристаллического сияния Зенита для мгновенного восстановления сил!
+                                                    </p>
+                                                  </div>
+                                                  <div className="pt-2 border-t border-white/5 space-y-2">
+                                                    <button
+                                                      onClick={() => {
+                                                        if (playerGold >= 60) {
+                                                          setPlayerGold(prev => prev - 60);
+                                                          setSimHeroMana(prev => prev + 50);
+                                                          try {
+                                                            const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                                            const osc = ctx.createOscillator();
+                                                            const g = ctx.createGain();
+                                                            osc.type = 'sine';
+                                                            osc.frequency.setValueAtTime(320, ctx.currentTime);
+                                                            osc.frequency.exponentialRampToValueAtTime(980, ctx.currentTime + 0.3);
+                                                            g.gain.setValueAtTime(0.08, ctx.currentTime);
+                                                            osc.connect(g); g.connect(ctx.destination);
+                                                            osc.start(); osc.stop(ctx.currentTime + 0.3);
+                                                          } catch(e){}
+                                                          showNotification("🧪 Сварено Зелье Маны: Мана героя увеличена на +50 ед.!", "success");
+                                                        } else {
+                                                          showNotification("❌ Недостаточно золота для варки Зелья Маны (60)!", "error");
+                                                        }
+                                                      }}
+                                                      className="w-full py-2 bg-purple-600/10 hover:bg-purple-600/20 text-purple-300 border border-purple-500/30 rounded-lg text-[8px] font-black uppercase tracking-wider transition-all cursor-pointer"
+                                                    >
+                                                      💧 Сварить Концентрат Маны (+50 Мана) (60 🪙)
+                                                    </button>
+                                                    <button
+                                                      onClick={() => {
+                                                        if (playerGold >= 100) {
+                                                          setPlayerGold(prev => prev - 100);
+                                                          setSimHeroXp(prev => prev + 250);
+                                                          try {
+                                                            const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                                            const osc = ctx.createOscillator();
+                                                            const g = ctx.createGain();
+                                                            osc.type = 'triangle';
+                                                            osc.frequency.setValueAtTime(500, ctx.currentTime);
+                                                            osc.frequency.exponentialRampToValueAtTime(1500, ctx.currentTime + 0.45);
+                                                            g.gain.setValueAtTime(0.1, ctx.currentTime);
+                                                            osc.connect(g); g.connect(ctx.destination);
+                                                            osc.start(); osc.stop(ctx.currentTime + 0.45);
+                                                          } catch(e){}
+                                                          showNotification("💫 Сварен Эликсир Бессмертия: Персонажу начислено +250 XP!", "success");
+                                                        } else {
+                                                          showNotification("❌ Недостаточно золота для варки Эликсира Бессмертия (100)!", "error");
+                                                        }
+                                                      }}
+                                                      className="w-full py-2 bg-pink-600/10 hover:bg-pink-600/20 text-pink-300 border border-pink-500/30 rounded-lg text-[8px] font-black uppercase tracking-wider transition-all cursor-pointer"
+                                                    >
+                                                      🔮 Эликсир Бессмертия (+250 XP) (100 🪙)
+                                                    </button>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            )}
+
+                                            {activeCastleBuildingTab === 'academy_arena' && (
+                                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                {/* Hero Combat Academy */}
+                                                <div className="bg-slate-950 p-4 rounded-2xl border border-white/5 flex flex-col justify-between space-y-3">
+                                                  <div>
+                                                    <div className="text-[10px] font-black text-amber-400 uppercase tracking-tight flex items-center justify-between">
+                                                      <span>⚔️ АКАДЕМИЯ ГЕРОЕВ</span>
+                                                      {heroTrainingCooldownDay > 0 ? (
+                                                        <span className="px-1.5 py-0.5 bg-rose-500/20 rounded text-[7px] text-rose-300 font-mono">
+                                                          🕒 ПЕРЕЗАРЯДКА: {heroTrainingCooldownDay} дня
+                                                        </span>
+                                                      ) : (
+                                                        <span className="px-1.5 py-0.5 bg-emerald-500/10 rounded text-[7px] text-emerald-400 font-mono">БАТАЛИЯ: ГОТОВ</span>
+                                                      )}
+                                                    </div>
+                                                    <span className="text-[7px] font-mono text-slate-500 block mb-1">GameObject: Hero_Academy_Field</span>
+                                                    <p className="text-[9.5px] text-slate-400 leading-relaxed">
+                                                      Тренируйте Локала-Полководца для постоянного повышения его характеристик. Каждая сессия дает опыт и отправляет плац на перезарядку.
+                                                    </p>
+                                                  </div>
+                                                  <div className="pt-2 border-t border-white/5 space-y-3">
+                                                    <div className="space-y-1">
+                                                      <div className="flex justify-between text-[9px] font-mono text-slate-400">
+                                                        <span>Уровень Героя Академии:</span>
+                                                        <span className="text-white font-bold font-mono">Ур. {trainedHeroLvl}</span>
+                                                      </div>
+                                                      <div className="flex justify-between text-[9px] font-mono text-slate-400">
+                                                        <span>Накопленный опыт:</span>
+                                                        <span className="text-amber-400 font-bold font-mono">{trainedHeroXp} / 500 XP</span>
+                                                      </div>
+                                                      <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
+                                                        <div className="h-full bg-amber-400 transition-all duration-300" style={{ width: `${(trainedHeroXp / 500) * 100}%` }} />
+                                                      </div>
+                                                    </div>
+                                                    <button
+                                                      onClick={() => {
+                                                        if (heroTrainingCooldownDay > 0) {
+                                                          showNotification(`❌ Тренировочное поле на перезарядке! Подождите еще дней: ${heroTrainingCooldownDay} (сделайте пропуски ходов).`, "error");
+                                                          return;
+                                                        }
+                                                        if (playerGold >= 50) {
+                                                          setPlayerGold(prev => prev - 50);
+                                                          setHeroTrainingCooldownDay(2);
+                                                          const newXp = trainedHeroXp + 150;
+                                                          if (newXp >= 500) {
+                                                            setTrainedHeroLvl(prev => prev + 1);
+                                                            setTrainedHeroXp(newXp - 500);
+                                                            showNotification("🏆 ПОВЫШЕНИЕ! Герой Академии поднялся на новый уровень!", "success");
+                                                          } else {
+                                                            setTrainedHeroXp(newXp);
+                                                            showNotification("🏋️‍♂️ Тренировка завершена! Герой получил +150 опыта.", "success");
+                                                          }
+                                                          try {
+                                                            const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                                            const osc = ctx.createOscillator();
+                                                            const g = ctx.createGain();
+                                                            osc.type = 'sawtooth';
+                                                            osc.frequency.setValueAtTime(180, ctx.currentTime);
+                                                            osc.frequency.exponentialRampToValueAtTime(720, ctx.currentTime + 0.3);
+                                                            g.gain.setValueAtTime(0.12, ctx.currentTime);
+                                                            osc.connect(g); g.connect(ctx.destination);
+                                                            osc.start(); osc.stop(ctx.currentTime + 0.3);
+                                                          } catch(e){}
+                                                        } else {
+                                                          showNotification("❌ Недостаточно золота для проведения тренировки (50)!", "error");
+                                                        }
+                                                      }}
+                                                      disabled={heroTrainingCooldownDay > 0}
+                                                      className={`w-full py-2 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+                                                        heroTrainingCooldownDay > 0 
+                                                          ? 'bg-slate-900 border border-rose-500/20 text-rose-400/50 cursor-not-allowed'
+                                                          : 'bg-gradient-to-r from-amber-600 to-amber-500 text-white hover:scale-[1.02]'
+                                                      }`}
+                                                    >
+                                                      🏋️‍♂️ Начать Курс Боя (50 🪙)
+                                                    </button>
+                                                  </div>
+                                                </div>
+
+                                                {/* Recruit Training */}
+                                                <div className="bg-slate-950 p-4 rounded-2xl border border-white/5 flex flex-col justify-between space-y-3">
+                                                  <div>
+                                                    <div className="text-[10px] font-black text-emerald-400 uppercase tracking-tight flex items-center justify-between">
+                                                      <span>👥 ПЛАЦ НАВОБРАНЦЕВ</span>
+                                                      {warriorTrainingCooldownDay > 0 ? (
+                                                        <span className="px-1.5 py-0.5 bg-rose-500/20 rounded text-[7px] text-rose-300 font-mono">
+                                                          🕒 ПЕРЕЗАРЯДКА: {warriorTrainingCooldownDay} дня
+                                                        </span>
+                                                      ) : (
+                                                        <span className="px-1.5 py-0.5 bg-emerald-500/10 rounded text-[7px] text-emerald-400 font-mono">СТУПЕНЬ: ГОТОВ</span>
+                                                      )}
+                                                    </div>
+                                                    <span className="text-[7px] font-mono text-slate-500 block mb-1">GameObject: Troops_Training_Parade</span>
+                                                    <p className="text-[9.5px] text-slate-400 leading-relaxed">
+                                                      Муштруйте рядовых бойцов и копейщиков. Повышение ранга повышает их выживаемость в зачистках руин Континента.
+                                                    </p>
+                                                  </div>
+                                                  <div className="pt-2 border-t border-white/5 space-y-3">
+                                                    <div className="space-y-1">
+                                                      <div className="flex justify-between text-[9px] font-mono text-slate-400">
+                                                        <span>Ранг Бойцов Гарнизона:</span>
+                                                        <span className="text-white font-bold font-mono">Ранг {trainedWarriorsLvl}</span>
+                                                      </div>
+                                                      <div className="flex justify-between text-[9px] font-mono text-slate-400">
+                                                        <span>Опыт подразделения:</span>
+                                                        <span className="text-emerald-400 font-bold font-mono">{trainedWarriorsXp} / 200 XP</span>
+                                                      </div>
+                                                      <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
+                                                        <div className="h-full bg-emerald-400 transition-all duration-300" style={{ width: `${(trainedWarriorsXp / 200) * 100}%` }} />
+                                                      </div>
+                                                    </div>
+                                                    <button
+                                                      onClick={() => {
+                                                        if (warriorTrainingCooldownDay > 0) {
+                                                          showNotification(`❌ Подразделения восстанавливают выносливость! Подождите еще дней: ${warriorTrainingCooldownDay}`, "error");
+                                                          return;
+                                                        }
+                                                        if (playerGold >= 30) {
+                                                          setPlayerGold(prev => prev - 30);
+                                                          setWarriorTrainingCooldownDay(1);
+                                                          const newXp = trainedWarriorsXp + 60;
+                                                          if (newXp >= 200) {
+                                                            setTrainedWarriorsLvl(prev => prev + 1);
+                                                            setTrainedWarriorsXp(newXp - 200);
+                                                            showNotification("🎖️ ВЫШЕ РАНГ! Гарнизон получил улучшение боевого построения!", "success");
+                                                          } else {
+                                                            setTrainedWarriorsXp(newXp);
+                                                            showNotification("⚔️ Спарринги завершены! Воины получили +60 опыта муштры.", "success");
+                                                          }
+                                                          try {
+                                                            const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                                            const osc = ctx.createOscillator();
+                                                            const g = ctx.createGain();
+                                                            osc.type = 'triangle';
+                                                            osc.frequency.setValueAtTime(200, ctx.currentTime);
+                                                            osc.frequency.setValueAtTime(100, ctx.currentTime + 0.15);
+                                                            g.gain.setValueAtTime(0.12, ctx.currentTime);
+                                                            osc.connect(g); g.connect(ctx.destination);
+                                                            osc.start(); osc.stop(ctx.currentTime + 0.35);
+                                                          } catch(e){}
+                                                        } else {
+                                                          showNotification("❌ Недостаточно золота для симуляции муштры (30)!", "error");
+                                                        }
+                                                      }}
+                                                      disabled={warriorTrainingCooldownDay > 0}
+                                                      className={`w-full py-2 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+                                                        warriorTrainingCooldownDay > 0 
+                                                          ? 'bg-slate-900 border border-rose-500/20 text-rose-400/50 cursor-not-allowed'
+                                                          : 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:scale-[1.02]'
+                                                      }`}
+                                                    >
+                                                      ⚔️ Объявить Марш-Бросок (30 🪙)
+                                                    </button>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            )}
 
                                             {/* AI Simulation Logs to let the player track how opponents play when skipping turns */}
                                             <div className="mt-4 bg-slate-950 p-3 rounded-2xl border border-white/5 space-y-2">
@@ -6879,11 +7193,7 @@ export default function App() {
                             
                             {/* LEFT COLUMN: COMPANION (AELYSSA) INSIDE SMALL FRAME */}
                             <div className="lg:col-span-1 flex flex-col items-center space-y-3 relative group">
-                              {/* Overlay Instruction Label Pointing to Companion Frame */}
-                              <div className="absolute -top-12 bg-indigo-950/90 border border-indigo-400 text-cyan-400 px-3 py-1.5 rounded-xl text-[9.5px] font-bold text-center z-30 max-w-xs shadow-xl animate-bounce pointer-events-none">
-                                <span className="block font-black uppercase text-white mb-0.5">Портрет-компаньон</span>
-                                Перетащите сюда Aelyssa.png
-                              </div>
+                              {/* Dynamic Mentor Indicator (No overlaps) */}
 
                               {/* Dialogue Companion Header Prefab Badge Slots "ШАПКА ДИАЛОГА" */}
                               <div className="w-full bg-slate-900/95 border-2 border-indigo-500/40 rounded-2xl px-3 py-2 text-center text-[10px] font-black uppercase text-cyan-400 tracking-wider shadow-[0_0_20px_rgba(99,102,241,0.35)] relative overflow-hidden group hover:scale-[1.02] transition-transform" id="Dialogue_Header_Companion_Plaque">
@@ -7361,9 +7671,49 @@ export default function App() {
                                                 const height_rect = 57;
                                                 const isHovered = hoveredTileIndex === tile.index;
 
+                                                // Dynamically override tile type and colors to show other landing spots as neutral gray (v18.11.16)
+                                                let finalType = tile.type;
+                                                let finalColor = tile.color;
+                                                let finalEmoji = tile.emoji;
+                                                let finalName = tile.name;
+                                                let finalDesc = tile.desc;
+
+                                                if (simDialogueStep >= 4 && tile.type === 'hero') {
+                                                  const enemySlot = 3 - selectedLandingSlot;
+                                                  if (tile.heroSlot === selectedLandingSlot) {
+                                                    finalType = 'player';
+                                                    finalColor = '#2ecc71';
+                                                    finalEmoji = '🏰';
+                                                  } else if (tile.heroSlot === enemySlot) {
+                                                    finalType = 'enemy';
+                                                    finalColor = '#e74c3c';
+                                                    finalEmoji = '🔥';
+                                                    finalName = {
+                                                      RU: `${tile.name.RU.split(' — ')[0]} (Враг)`,
+                                                      EN: `${tile.name.EN.split(' - ')[0]} (Enemy)`,
+                                                      CH: `${tile.name.CH.split(' - ')[0]} (敌)`,
+                                                      KR: `${tile.name.KR.split(' - ')[0]} (적)`
+                                                    };
+                                                  } else {
+                                                  finalType = 'neutral';
+                                                  finalColor = '#95a5a6';
+                                                  finalEmoji = '🪙';
+                                                  finalName = {
+                                                    RU: `${tile.name.RU.split(' — ')[0]} (Нейтраль)`,
+                                                    EN: `${tile.name.EN.split(' - ')[0]} (Neutral Sector)`,
+                                                    CH: `${tile.name.CH.split(' - ')[0]} (中立区)`,
+                                                    KR: `${tile.name.KR.split(' - ')[0]} (중립 구역)`
+                                                  };
+                                                  finalDesc = {
+                                                    RU: 'Территория передана вольным наместникам и торговцам Альянса на Континенте Судьбы.',
+                                                    EN: 'Territory handed over to the Alliance merchant league on the Fate Continent.',
+                                                    CH: '领地已移交给联盟商人联盟。',
+                                                    KR: '동맹 상인 기지에 영토가 이양되었습니다.'
+                                                  };
+                                                } }
+
                                                 // Color assignments based on user's exact HEX rules
-                                                const colorMain = tile.color; // #3498db (Blue), #e74c3c (Red), #2ecc71 (Green), #95a5a6 (Gray)
-                                                let fillOpacity = isHovered ? '0.45' : '0.15';
+                                                const colorMain = finalColor; // #3498db (Blue), #e74c3c (Red), #2ecc71 (Green), #95a5a6 (Gray)
                                                 let strokeColor = isHovered ? colorMain : colorMain + 'bb';
                                                 let strokeWidth = isHovered ? 3.5 : 1.5;
 
@@ -7393,15 +7743,16 @@ export default function App() {
                                                       height={height_rect} 
                                                       rx="10" 
                                                       ry="10" 
-                                                      fill={isHovered ? `rgba(${tile.type === 'hero' ? '52,152,219' : tile.type === 'bandit' ? '231,76,60' : tile.type === 'forest' ? '46,204,113' : '149,165,166'}, 0.42)` : `rgba(${tile.type === 'hero' ? '52,152,219' : tile.type === 'bandit' ? '231,76,60' : tile.type === 'forest' ? '46,204,113' : '149,165,166'}, 0.15)`}
+                                                      fill={isHovered ? `rgba(${finalType === 'hero' ? '52,152,219' : finalType === 'bandit' ? '231,76,60' : finalType === 'forest' ? '46,204,113' : '149,165,166'}, 0.42)` : `rgba(${finalType === 'hero' ? '52,152,219' : finalType === 'bandit' ? '231,76,60' : finalType === 'forest' ? '46,204,113' : '149,165,166'}, 0.15)`}
                                                       stroke={strokeColor}
                                                       strokeWidth={strokeWidth}
-                                                      className={`transition-all duration-300 ${tile.type === 'hero' ? 'cursor-pointer' : 'cursor-default'}`}
+                                                      className={`transition-all duration-300 ${finalType === 'hero' ? 'cursor-pointer' : 'cursor-default'}`}
                                                       onMouseEnter={() => setHoveredRegion('tile_' + tile.index)}
                                                       onMouseLeave={() => setHoveredRegion(null)}
                                                       onClick={() => {
-                                                        if (tile.type === 'hero') {
+                                                        if (finalType === 'hero') {
                                                           const nextStep = tile.heroSlot === 0 ? 4 : tile.heroSlot === 1 ? 5 : tile.heroSlot === 2 ? 6 : 7;
+                                                          setSelectedLandingSlot(tile.heroSlot || 0);
                                                           setSimDialogueStep(nextStep);
                                                           showNotification(`${simDialogueLang === 'RU' ? 'Координаты высадки приняты: ' : 'Vanguard landing approved: '} ${tile.name[simDialogueLang]}!`, "success");
                                                         } else {
@@ -7423,7 +7774,7 @@ export default function App() {
                                                       textAnchor="middle"
                                                       className="pointer-events-none select-none filter drop-shadow"
                                                     >
-                                                      {tile.emoji}
+                                                      {finalEmoji}
                                                     </text>
 
                                                     {/* Mini short caption inside tile */}
@@ -7617,17 +7968,14 @@ export default function App() {
                             </div>
 
                             {/* RIGHT COLUMN: PLAYER HERO AVATAR IN DUAL LAYOUT */}
-                            <div className="w-full bg-slate-900/95 border-2 border-amber-500/40 rounded-2xl px-3 py-2 text-center text-[10px] font-black uppercase text-amber-400 tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.25)] relative overflow-hidden group hover:scale-[1.02] transition-transform z-20" id="Dialogue_Header_Player_Plaque">
-                              <span className="text-[6px] text-slate-500 font-mono block mb-0.5">GameObject: Dialogue_Header_Prefab_Slot (Right)</span>
-                              🛡️ {simDialogueHero === 'warrior' ? (simDialogueLang === 'RU' ? 'РЭГНАР (ВОИН)' : 'RAGNAR (WARRIOR)')
-                                  : simDialogueHero === 'archer' ? (simDialogueLang === 'RU' ? 'АЛАРИК (СТРЕЛОК)' : 'ALARIC (ARCHER)')
-                                  : (simDialogueLang === 'RU' ? 'ЭЛИЗИУС (МАГ)' : 'ELYSIUS (MAGE)')}
-                            </div>
                             <div className="lg:col-span-1 flex flex-col items-center space-y-3 relative group">
-                              <div className="absolute -top-12 bg-indigo-950/90 border border-indigo-400 text-yellow-400 px-3 py-1.5 rounded-xl text-[9.5px] font-bold text-center z-30 max-w-xs shadow-xl animate-bounce pointer-events-none font-sans">
-                                <span className="block font-black uppercase text-white mb-0.5">Класс Игрока</span>
-                                Выбранный герой: {simDialogueHero === 'warrior' ? 'Воин' : simDialogueHero === 'archer' ? 'Лучник' : 'Маг'}
+                              <div className="w-full bg-slate-900/95 border-2 border-amber-500/40 rounded-2xl px-3 py-2 text-center text-[10px] font-black uppercase text-amber-400 tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.25)] relative overflow-hidden group hover:scale-[1.02] transition-transform z-20" id="Dialogue_Header_Player_Plaque">
+                                <span className="text-[6px] text-slate-500 font-mono block mb-0.5">GameObject: Dialogue_Header_Prefab_Slot (Right)</span>
+                                🛡️ {simDialogueHero === 'warrior' ? (simDialogueLang === 'RU' ? 'РЭГНАР (ВОИН)' : 'RAGNAR (WARRIOR)')
+                                    : simDialogueHero === 'archer' ? (simDialogueLang === 'RU' ? 'АЛАРИК (СТРЕЛОК)' : 'ALARIC (ARCHER)')
+                                    : (simDialogueLang === 'RU' ? 'ЭЛИЗИУС (МАГ)' : 'ELYSIUS (MAGE)')}
                               </div>
+                              {/* Dynamic Class Indicator (No overlaps) */}
 
                               <div className="w-32 h-32 md:w-40 md:h-40 rounded-[2.5rem] bg-indigo-950/60 border-2 border-amber-500 shadow-[0_0_30px_rgba(245,158,11,0.25)] relative overflow-hidden transition-all duration-300 ring-4 ring-amber-500/10 hover:scale-105">
                                 {simDialogueHero === 'warrior' ? (
