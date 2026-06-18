@@ -15,7 +15,7 @@
     "scripts_count": 32,
     "prefabs_count": 0,
     "videos_count": 0,
-    "total_files": 65,
+    "total_files": 67,
     "video_list": [],
     "script_list": [
       "FactionMapMarker.cs",
@@ -52,5 +52,5 @@
       "src/UnitBase.cs"
     ]
   },
-  "last_scan": "2026-06-14T08:35:59.209Z"
+  "last_scan": "2026-06-18T15:14:00.398Z"
 }

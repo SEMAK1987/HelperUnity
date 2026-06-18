@@ -863,6 +863,11 @@ namespace FateContinent
                 PlayerPrefs.SetString("LandedZoneName", factionName);
                 PlayerPrefs.Save();
                 Debug.Log($"[DIALOGUE SYSTEM] Сохранено в PlayerPrefs: LandedZoneIndex={selectedZoneIndex}, LandedZoneName={factionName}");
+                
+                if (FateCastleManager.Instance != null)
+                {
+                    FateCastleManager.Instance.SpawnAllCastles();
+                }
             }
 
             if (currentLine.nextLineIndexes != null && choiceIndex < currentLine.nextLineIndexes.Length)

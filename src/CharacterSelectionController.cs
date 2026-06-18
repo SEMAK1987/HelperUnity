@@ -1026,6 +1026,8 @@ namespace FateContinent
             SaveGameSystem.CurrentData.availableSkillPoints = difficultyBonusPoints;
 
             // Сохраняем в Слот 0 (первичный слот новой игры)
+            PlayerPrefs.SetInt("Active_Save_Slot", 0);
+            PlayerPrefs.Save();
             SaveGameSystem.Save(0);
 
             Debug.Log($"[FATE START] Выбран герой {heroData.Name}. Уровень сложности: {balanceConfig.Difficulties[selectedDifficultyIndex].LevelName}. Готовим переход на игровую сцену.");

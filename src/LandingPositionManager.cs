@@ -239,6 +239,9 @@ namespace FateContinent
                 Debug.Log("<color=#00FFCC>[LANDING SYS]</color> Активируем 3D-модель Континента!");
             }
 
+            // Перекрашиваем регионы высадки: выбранный оставляем цветным, невыбранные делаем серыми
+            RepaintRegionsBasedOnLanding(zoneIndex);
+
             if (playerTransform != null)
             {
                 playerTransform.gameObject.SetActive(true);
@@ -466,6 +469,76 @@ namespace FateContinent
                 mr.receiveShadows = true;
 
                 Debug.Log("<color=#00FFCC>[OCEAN GENERATOR]</color> Успешно проверили и настроили материал Fate_Ocean_Plane (Y = -0.6f, масштаб 80x80).");
+            }
+        }
+
+        /// <summary>
+        /// Перекрашивает неактивные точки высадки (3, 6, 8, 11) в серый матовый цвет, а выбранную — в цвет фракции
+        /// </summary>
+        public void RepaintRegionsBasedOnLanding(int activeZoneIndex)
+        {
+            string[] regionNames = new string[] { "Region_03", "Region_06", "Region_08", "Region_11" };
+            Color[] activeColors = new Color[] {
+                new Color(0.92f, 0.12f, 0.28f, 1.0f), // Crimson red for Wastes (Region_03)
+                new Color(0.11f, 0.64f, 0.92f, 1.0f), // Ice blue for Peak (Region_06)
+                new Color(0.12f, 0.15f, 0.88f, 1.0f), // Sapphire blue for Ruins (Region_08)
+                new Color(0.12f, 0.88f, 0.45f, 1.0f)  // Emerald neon/zenith green for Sanctuary (Region_11)
+            };
+
+            GameObject continent = GameObject.Find("New_Kontinent");
+            if (continent == null)
+            {
+                continent = GameObject.Find("/New_Kontinent");
+            }
+
+            if (continent != null)
+            {
+                Shader urpShader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("URP/Lit") ?? Shader.Find("Standard");
+
+                for (int i = 0; i < regionNames.Length; i++)
+                {
+                    Transform regionTrans = continent.transform.Find(regionNames[i]);
+                    if (regionTrans == null)
+                    {
+                        foreach (Transform child in continent.GetComponentsInChildren<Transform>(true))
+                        {
+                            if (child.name == regionNames[i])
+                            {
+                                regionTrans = child;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (regionTrans != null)
+                    {
+                        MeshRenderer mr = regionTrans.GetComponent<MeshRenderer>();
+                        if (mr != null)
+                        {
+                            Material dynamicMat = new Material(urpShader);
+                            if (i == activeZoneIndex)
+                            {
+                                dynamicMat.color = activeColors[i];
+                                if (dynamicMat.HasProperty("_Glossiness")) dynamicMat.SetFloat("_Glossiness", 0.75f);
+                                if (dynamicMat.HasProperty("_Smoothness")) dynamicMat.SetFloat("_Smoothness", 0.75f);
+                                if (dynamicMat.HasProperty("_Metallic")) dynamicMat.SetFloat("_Metallic", 0.3f);
+                                if (dynamicMat.HasProperty("_EmissionColor"))
+                                {
+                                    dynamicMat.SetColor("_EmissionColor", activeColors[i] * 0.35f);
+                                }
+                                Debug.Log($"[LANDING SYS] Активный регион {regionNames[i]} окрашен в цвет фракции: {activeColors[i]}");
+                            }
+                            else
+                            {
+                                dynamicMat.color = new Color(0.38f, 0.42f, 0.45f, 1.0f); // Нейтральный серый
+                                if (dynamicMat.HasProperty("_Glossiness")) dynamicMat.SetFloat("_Glossiness", 0.15f);
+                                if (dynamicMat.HasProperty("_Smoothness")) dynamicMat.SetFloat("_Smoothness", 0.15f);
+                                if (dynamicMat.HasProperty("_Metallic")) dynamicMat.SetFloat("_Metallic", 0.05f);
+                            }
+                            mr.material = dynamicMat;
+                        }
+                    }
+                }
             }
         }
     }

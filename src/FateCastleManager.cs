@@ -35,6 +35,60 @@ public class FateCastleManager : MonoBehaviour
     }
     private static FateCastleManager instance;
 
+    // Drifting fields for autonomous castle movement
+    private float driftTimer = 0f;
+    private bool makeCastlesDriftAutonomously = false;
+
+    // Cached Texture2D objects to optimize RAM and completely stop memory leaks in OnGUI
+    private Texture2D hudTex;
+    private Texture2D barBgTex;
+    private Texture2D hpTex;
+    private Texture2D mpTex;
+    private Texture2D xpTex;
+
+    private void InitializeCachedTextures()
+    {
+        if (hudTex == null)
+        {
+            hudTex = new Texture2D(1, 1);
+            hudTex.SetPixel(0, 0, new Color(0.04f, 0.08f, 0.22f, 0.90f));
+            hudTex.Apply();
+        }
+        if (barBgTex == null)
+        {
+            barBgTex = new Texture2D(1, 1);
+            barBgTex.SetPixel(0, 0, new Color(0.1f, 0.1f, 0.15f, 0.6f));
+            barBgTex.Apply();
+        }
+        if (hpTex == null)
+        {
+            hpTex = new Texture2D(1, 1);
+            hpTex.SetPixel(0, 0, new Color(0.85f, 0.15f, 0.2f, 1.0f));
+            hpTex.Apply();
+        }
+        if (mpTex == null)
+        {
+            mpTex = new Texture2D(1, 1);
+            mpTex.SetPixel(0, 0, new Color(0.12f, 0.5f, 0.95f, 1.0f));
+            mpTex.Apply();
+        }
+        if (xpTex == null)
+        {
+            xpTex = new Texture2D(1, 1);
+            xpTex.SetPixel(0, 0, new Color(0.05f, 0.85f, 0.65f, 1.0f));
+            xpTex.Apply();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (hudTex != null) { Destroy(hudTex); hudTex = null; }
+        if (barBgTex != null) { Destroy(barBgTex); barBgTex = null; }
+        if (hpTex != null) { Destroy(hpTex); hpTex = null; }
+        if (mpTex != null) { Destroy(mpTex); mpTex = null; }
+        if (xpTex != null) { Destroy(xpTex); xpTex = null; }
+    }
+
     [System.Serializable]
     public class CastleInstance
     {
@@ -407,6 +461,22 @@ public class FateCastleManager : MonoBehaviour
 
         // High gloss rotations on active landmarks
         RotateCastleGems();
+
+        // Apply autonomous patrol movement to spawned castles in Unity!
+        if (makeCastlesDriftAutonomously && useManualCastlePositions && (castles != null))
+        {
+            driftTimer += Time.deltaTime * 0.4f;
+            for (int i = 0; i < castles.Count; i++)
+            {
+                if (castles[i] != null && castles[i].visualRoot != null && i < customCastlePositions.Length)
+                {
+                    Vector3 basePos = customCastlePositions[i];
+                    float offsetX = Mathf.Sin(driftTimer + i * 1.8f) * 1.5f;
+                    float offsetZ = Mathf.Cos(driftTimer * 0.7f + i * 1.2f) * 1.5f;
+                    castles[i].visualRoot.transform.position = basePos + new Vector3(offsetX, 0f, offsetZ);
+                }
+            }
+        }
     }
 
     private Vector2 GetMousePosition()
@@ -568,6 +638,29 @@ public class FateCastleManager : MonoBehaviour
     /// </summary>
     public void SpawnAllCastles()
     {
+        // Считываем настройки ручного/автоматического скоординированного размещения из PlayerPrefs
+        if (PlayerPrefs.HasKey("Castle_Placement_Manual"))
+        {
+            useManualCastlePositions = PlayerPrefs.GetInt("Castle_Placement_Manual") == 1;
+        }
+        if (PlayerPrefs.HasKey("Castle_Drift_Autonomous"))
+        {
+            makeCastlesDriftAutonomously = PlayerPrefs.GetInt("Castle_Drift_Autonomous") == 1;
+        }
+
+        for (int i = 0; i < 4; i++)
+        {
+            if (PlayerPrefs.HasKey("Castle_PosX_" + i))
+            {
+                if (customCastlePositions != null && i < customCastlePositions.Length)
+                {
+                    customCastlePositions[i].x = PlayerPrefs.GetFloat("Castle_PosX_" + i);
+                    customCastlePositions[i].y = PlayerPrefs.GetFloat("Castle_PosY_" + i);
+                    customCastlePositions[i].z = PlayerPrefs.GetFloat("Castle_PosZ_" + i);
+                }
+            }
+        }
+
         int playerZone = PlayerPrefs.GetInt("LandedZoneIndex", 0);
         if (DialogueSystem_Manager.Instance != null)
         {
@@ -1205,6 +1298,8 @@ public class FateCastleManager : MonoBehaviour
         // пока игрок полностью не завершил 2-й диалог-инструктаж с Аэлиссой!
         if (!isContinentGameplayActive) return;
 
+        InitializeCachedTextures();
+
         int curLang = Translator.LanguageID;
 
         // Если активен 2D вид города, рисуем его во весь экран
@@ -1280,12 +1375,6 @@ public class FateCastleManager : MonoBehaviour
         
         // 1. СТИЛИ ГЕЙМПЛЕЯ HUD (Зенит Глассморфизм)
         GUIStyle hudBgStyle = new GUIStyle(GUI.skin.box);
-        hudBgStyle.normal.background = null; // убираем стандартную заливку для кастомного цвета
-        
-        // Фон плашки: темно-синий глянцевый полупрозрачный
-        Texture2D hudTex = new Texture2D(1, 1);
-        hudTex.SetPixel(0, 0, new Color(0.04f, 0.08f, 0.22f, 0.90f));
-        hudTex.Apply();
         hudBgStyle.normal.background = hudTex;
         
         // Рисуем базовую панель HUD в левом верхнем углу
@@ -1359,15 +1448,9 @@ public class FateCastleManager : MonoBehaviour
         float hpPct = maxHp > 0f ? (data.currentHealth / maxHp) : 1f;
         
         GUIStyle barBgStyle = new GUIStyle(GUI.skin.box);
-        Texture2D barBgTex = new Texture2D(1, 1);
-        barBgTex.SetPixel(0, 0, new Color(0.1f, 0.1f, 0.15f, 0.6f));
-        barBgTex.Apply();
         barBgStyle.normal.background = barBgTex;
         
         GUIStyle hpStyle = new GUIStyle(GUI.skin.box);
-        Texture2D hpTex = new Texture2D(1, 1);
-        hpTex.SetPixel(0, 0, new Color(0.85f, 0.15f, 0.2f, 1.0f));
-        hpTex.Apply();
         hpStyle.normal.background = hpTex;
         
         GUI.Box(new Rect(110f, 48f, 230f, 13f), "", barBgStyle);
@@ -1385,9 +1468,6 @@ public class FateCastleManager : MonoBehaviour
         float manaPct = 1.0f; // Всегда полная мана для заклинаний
         
         GUIStyle mpStyle = new GUIStyle(GUI.skin.box);
-        Texture2D mpTex = new Texture2D(1, 1);
-        mpTex.SetPixel(0, 0, new Color(0.12f, 0.5f, 0.95f, 1.0f));
-        mpTex.Apply();
         mpStyle.normal.background = mpTex;
         
         GUI.Box(new Rect(110f, 65f, 230f, 13f), "", barBgStyle);
@@ -1399,9 +1479,6 @@ public class FateCastleManager : MonoBehaviour
         float xpPct = xpNeeded > 0 ? Mathf.Clamp01((float)data.currentXP / xpNeeded) : 0f;
         
         GUIStyle xpStyle = new GUIStyle(GUI.skin.box);
-        Texture2D xpTex = new Texture2D(1, 1);
-        xpTex.SetPixel(0, 0, new Color(0.05f, 0.85f, 0.65f, 1.0f));
-        xpTex.Apply();
         xpStyle.normal.background = xpTex;
         
         GUI.Box(new Rect(110f, 82f, 230f, 13f), "", barBgStyle);

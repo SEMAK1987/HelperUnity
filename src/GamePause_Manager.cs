@@ -362,6 +362,10 @@ namespace FateContinent
         {
             try
             {
+                // Настраиваем активный слот перед записью
+                PlayerPrefs.SetInt("Active_Save_Slot", slotIndex);
+                PlayerPrefs.Save();
+
                 // Вызываем сохранение через глобальный SaveGameSystem
                 SaveGameSystem.Save(slotIndex);
 
@@ -384,6 +388,10 @@ namespace FateContinent
             // Автосохранение записывается в 4-й слот (индекс 3)
             try
             {
+                // Настраиваем активный слот на 3 (слот автосохранения)
+                PlayerPrefs.SetInt("Active_Save_Slot", 3);
+                PlayerPrefs.Save();
+
                 SaveGameSystem.Save(3);
 
                 if (SettingsManager.Instance != null)

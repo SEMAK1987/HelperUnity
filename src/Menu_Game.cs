@@ -384,6 +384,10 @@ public class Menu_Game : MonoBehaviour
         {
             Debug.Log("[FATE CORE] Загрузка игры из сохраненного слота " + slotIndex);
             
+            // Фиксируем активный слот для нашей HUD системы
+            PlayerPrefs.SetInt("Active_Save_Slot", slotIndex);
+            PlayerPrefs.Save();
+            
             bool loadSuccess = SaveGameSystem.Load(slotIndex);
             if (!loadSuccess)
             {

@@ -40,12 +40,12 @@
   "pdfs": [],
   "videos": [],
   "others": [],
-  "total_files": 65,
+  "total_files": 67,
   "analysis": {
     "audit_issues": [],
     "todos": [],
     "asset_stats": {
-      "total_size": 1628803,
+      "total_size": 2269543,
       "large_files": []
     },
     "dependencies": {
@@ -221,5 +221,5 @@
       ]
     }
   },
-  "last_updated": "2026-06-14T08:36:02.294Z"
+  "last_updated": "2026-06-18T15:14:00.398Z"
 }
