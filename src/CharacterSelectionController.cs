@@ -973,7 +973,16 @@ namespace FateContinent
             SaveGameSystem.CurrentData.characterClass = chosenPedestal.HeroID;
             SaveGameSystem.CurrentData.playerLevel = 1;
             SaveGameSystem.CurrentData.currentXP = 0;
-            SaveGameSystem.CurrentData.gold = 150; // Стартовое золото игрока
+            int difficultyStartingGold = 150;
+            switch (selectedDifficultyIndex)
+            {
+                case 0: difficultyStartingGold = 1000; break; // Новичок
+                case 1: difficultyStartingGold = 500;  break; // Легко
+                case 2: difficultyStartingGold = 300;  break; // Нормально
+                case 3: difficultyStartingGold = 200;  break; // Сложно
+                case 4: difficultyStartingGold = 100;  break; // Кошмар (Самый сложный)
+            }
+            SaveGameSystem.CurrentData.gold = difficultyStartingGold;
             SaveGameSystem.CurrentData.currentHealth = heroData.HP;
             SaveGameSystem.CurrentData.maxHealth = heroData.HP;
             SaveGameSystem.CurrentData.selectedDifficulty = selectedDifficultyIndex; // Записываем сложность в сохранение!

@@ -56,8 +56,243 @@ namespace FateContinent
 
         private void Start()
         {
-            // По умолчанию включаем главное меню Hub и выключаем другие вкладки под Unity 6
+            // По умолчанию сбрасываем состояние панелей на главное меню Hub
             ShowHub();
+
+            // Автоматически программируем события на кнопках при старте, чтобы избавить вас от ручной рутины в Инспекторе!
+            AutoBindAllButtons();
+        }
+
+        private void Update()
+        {
+            FateCastleManager cm = FateCastleManager.Instance;
+            if (cm != null)
+            {
+                // Наша панель должна быть выключена всю игру до входа в замок (isTownViewActive == true)
+                bool shouldBeActive = cm.isTownViewActive;
+                
+                // Сверхважно: если открыт диалог, она тоже должна быть строго выключена!
+                if (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.IsDialogueActive)
+                {
+                    shouldBeActive = false;
+                }
+
+                GameObject root = castleFacilitiesRoot != null ? castleFacilitiesRoot : gameObject;
+                if (root.activeSelf != shouldBeActive)
+                {
+                    root.SetActive(shouldBeActive);
+                    Debug.Log($"[CASTLE HUD] Синхронизировали активность панели: {shouldBeActive}");
+                    if (shouldBeActive)
+                    {
+                        ShowHub(); // Возвращаем на хаб при входе
+                    }
+                }
+            }
+            else
+            {
+                // Если менеджера замка нет на сцене, скрываем панель для безопасности
+                GameObject root = castleFacilitiesRoot != null ? castleFacilitiesRoot : gameObject;
+                if (root.activeSelf)
+                {
+                    root.SetActive(false);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Сканирует иерархию и автоматически вешает onClick-события на все кнопки, чтобы избавить вас от ручной рутины в Инспекторе!
+        /// </summary>
+        public void AutoBindAllButtons()
+        {
+            Debug.Log("[CASTLE HUD] Начинаем авто-привязку UI-кнопок...");
+
+            GameObject root = castleFacilitiesRoot != null ? castleFacilitiesRoot : gameObject;
+
+            // Ищем кнопки в главном хабе Panel_Hub_Selection
+            if (panelHubSelection != null)
+            {
+                Button[] buttons = panelHubSelection.GetComponentsInChildren<Button>(true);
+                foreach (Button btn in buttons)
+                {
+                    string nameLower = btn.name.ToLower();
+                    btn.onClick.RemoveAllListeners();
+
+                    if (nameLower.Contains("barrack") || nameLower.Contains("казарм") || nameLower.Contains("войск") || nameLower.Contains("troop"))
+                    {
+                        btn.onClick.AddListener(ShowBarracks);
+                        Debug.Log($"[CASTLE HUD] Успешно связана кнопка Казарм: {btn.name}");
+                    }
+                    else if (nameLower.Contains("forge") || nameLower.Contains("кузниц") || nameLower.Contains("экипиров") || nameLower.Contains("armor"))
+                    {
+                        btn.onClick.AddListener(ShowForge);
+                        Debug.Log($"[CASTLE HUD] Успешно связана кнопка Кузницы: {btn.name}");
+                    }
+                    else if (nameLower.Contains("academy") || nameLower.Contains("академ") || nameLower.Contains("арен") || nameLower.Contains("hero"))
+                    {
+                        btn.onClick.AddListener(ShowAcademy);
+                        Debug.Log($"[CASTLE HUD] Успешно связана кнопка Академии: {btn.name}");
+                    }
+                }
+            }
+
+            // Ищем кнопки "Назад" во всех внутренних окнах
+            GameObject[] subPanels = new GameObject[] { panelBarracks, panelForge, panelAcademy };
+            foreach (GameObject panel in subPanels)
+            {
+                if (panel == null) continue;
+                Button[] buttons = panel.GetComponentsInChildren<Button>(true);
+                foreach (Button btn in buttons)
+                {
+                    string nameLower = btn.name.ToLower();
+
+                    // Если имя кнопки содержит "назад", "back" или "hub" - вешаем возврат
+                    if (nameLower.Contains("back") || nameLower.Contains("назад") || nameLower.Contains("hub") || nameLower.Contains("close") || nameLower.Contains("закрыт"))
+                    {
+                        btn.onClick.RemoveAllListeners();
+                        btn.onClick.AddListener(ShowHub);
+                        Debug.Log($"[CASTLE HUD] Авто-связали кнопку НАЗАД на панели {panel.name}: {btn.name}");
+                    }
+                }
+            }
+
+            // Автоматическая привязка функционала (Наем, Улучшение, Тренировка) по именам и тексту:
+            // 1. Barracks - Наем воинов
+            if (panelBarracks != null)
+            {
+                Button[] buttons = panelBarracks.GetComponentsInChildren<Button>(true);
+                foreach (Button btn in buttons)
+                {
+                    string nameLower = btn.name.ToLower();
+                    if (nameLower.Contains("buy") || nameLower.Contains("hire") || nameLower.Contains("нанять") || nameLower.Contains("производ") || nameLower.Contains("btn_") || nameLower.Contains("button"))
+                    {
+                        // Пропускаем кнопку "Назад", которая уже привязана выше
+                        if (nameLower.Contains("back") || nameLower.Contains("назад") || nameLower.Contains("hub")) continue;
+
+                        btn.onClick.RemoveAllListeners();
+                        
+                        string troopId = "Paladin";
+                        int cost = 50;
+
+                        // Пытаемся автоматически распознать тип воина по имени кнопки или тексту
+                        Text textComponent = btn.GetComponentInChildren<Text>();
+                        string btnText = textComponent != null ? textComponent.text.ToLower() : "";
+
+                        if (nameLower.Contains("archer") || nameLower.Contains("лук") || nameLower.Contains("стрел") || btnText.Contains("лук") || btnText.Contains("archer") || btnText.Contains("стрел"))
+                        {
+                            troopId = "Archer";
+                            cost = 40;
+                        }
+                        else if (nameLower.Contains("mage") || nameLower.Contains("wizard") || nameLower.Contains("маг") || btnText.Contains("маг") || btnText.Contains("mage") || btnText.Contains("wizard"))
+                        {
+                            troopId = "Mage";
+                            cost = 60;
+                        }
+                        else if (nameLower.Contains("warrior") || nameLower.Contains("paladin") || nameLower.Contains("воин") || btnText.Contains("воин") || btnText.Contains("рыцар") || btnText.Contains("paladin"))
+                        {
+                            troopId = "Warrior";
+                            cost = 50;
+                        }
+
+                        string finalTroop = troopId;
+                        int finalCost = cost;
+                        btn.onClick.AddListener(() => BuyTroop(finalTroop, finalCost));
+                        Debug.Log($"[CASTLE HUD] Авто-связали кнопку воина: {btn.name} -> BuyTroop(\"{finalTroop}\", {finalCost})");
+                    }
+                }
+            }
+
+            // 2. Forge - Улучшение брони
+            if (panelForge != null)
+            {
+                Button[] buttons = panelForge.GetComponentsInChildren<Button>(true);
+                foreach (Button btn in buttons)
+                {
+                    string nameLower = btn.name.ToLower();
+                    if (nameLower.Contains("upgrade") || nameLower.Contains("улучшить") || nameLower.Contains("armor") || nameLower.Contains("экипиров") || nameLower.Contains("button_"))
+                    {
+                        if (nameLower.Contains("back") || nameLower.Contains("назад") || nameLower.Contains("hub")) continue;
+
+                        btn.onClick.RemoveAllListeners();
+                        btn.onClick.AddListener(() => UpgradeArmor(40));
+                        Debug.Log($"[CASTLE HUD] Связали кнопку Улучшения Брони: {btn.name} -> UpgradeArmor(40)");
+                    }
+                }
+            }
+
+            // 3. Academy - Тренировка героя
+            if (panelAcademy != null)
+            {
+                Button[] buttons = panelAcademy.GetComponentsInChildren<Button>(true);
+                foreach (Button btn in buttons)
+                {
+                    string nameLower = btn.name.ToLower();
+                    if (nameLower.Contains("train") || nameLower.Contains("трениров") || nameLower.Contains("arena") || nameLower.Contains("прокач") || nameLower.Contains("xp") || nameLower.Contains("button_"))
+                    {
+                        if (nameLower.Contains("back") || nameLower.Contains("назад") || nameLower.Contains("hub")) continue;
+
+                        btn.onClick.RemoveAllListeners();
+                        btn.onClick.AddListener(() => TrainHero(60, 50));
+                        Debug.Log($"[CASTLE HUD] Связали кнопку Тренировки Героя: {btn.name} -> TrainHero(60, 50)");
+                    }
+                }
+            }
+
+            // Авто-привязываем клики по иконкам пассивных навыков и суперудара
+            BindSkillToButton(iconSkillPassive1, 0);
+            BindSkillToButton(iconSkillPassive2, 1);
+            BindSkillToButton(iconSkillPassive3, 2);
+            BindSkillToButton(iconSkillUltimate, 3);
+        }
+
+        private void BindSkillToButton(Image img, int index)
+        {
+            if (img == null) return;
+            Button btn = img.GetComponent<Button>();
+            if (btn == null)
+            {
+                btn = img.gameObject.AddComponent<Button>();
+            }
+            btn.onClick.RemoveAllListeners();
+            btn.onClick.AddListener(() => OnSkillClicked(index));
+            Debug.Log($"[CASTLE HUD] Авто-привязали клик по иконке навыка {index} на объекте {img.name}");
+        }
+
+        public void OnSkillClicked(int index)
+        {
+            FateCastleManager cm = FateCastleManager.Instance;
+            if (cm == null) return;
+
+            int language = PlayerPrefs.GetInt("SelectedLanguage", 0);
+            int heroClass = PlayerPrefs.GetInt("SelectedClassIndex", 0);
+
+            string sName = "";
+            string sDesc = "";
+            Texture2D icon = null;
+            string skillType = "Passive";
+
+            if (heroClass == 1) // Archer
+            {
+                if (index == 0) { sName = language == 0 ? "Крит-Мастер" : "Crit-Master"; sDesc = language == 0 ? "Повышает вероятность нанесения критического урона на 15%" : "+15% critical hit probability"; icon = cm.archerSkillPassive1; }
+                else if (index == 1) { sName = "LongShot"; sDesc = language == 0 ? "Дальний выстрел: Усиливает урон на расстоянии на 10%" : "+10% damage over wide distance range"; icon = cm.archerSkillPassive2; }
+                else if (index == 2) { sName = "Evasion"; sDesc = language == 0 ? "Поворотливость: Дарует 10% шанс полного уклонения от вражеских атак" : "+10% complete dodge probability"; icon = cm.archerSkillPassive3; }
+                else if (index == 3) { sName = language == 0 ? "Ливень Смерти" : "Death Rain"; sDesc = language == 0 ? "Суперудар (CD 3х): Смертоносный град стрел наносит масштабный урон 1.8х по всем врагам в зоне" : "Ultimate (CD 3t): AoE volley dealing massive x1.8 damage to enemies"; icon = cm.archerSkillUltimate; skillType = "Ultimate"; }
+            }
+            else if (heroClass == 2) // Mage
+            {
+                if (index == 0) { sName = "ManaFlow"; sDesc = language == 0 ? "Поток маны: Позволяет восстанавливать 5 очков маны за каждый совершённый ход" : "+5 mana points gain per turn"; icon = cm.mageSkillPassive1; }
+                else if (index == 1) { sName = "Elemental"; sDesc = language == 0 ? "Сила стихий: Усиливает разрушительный потенциал ваших заклинаний на 15%" : "+15% magic spell power booster"; icon = cm.mageSkillPassive2; }
+                else if (index == 2) { sName = "Resist"; sDesc = language == 0 ? "Сопротивление: Наделяет мистическим барьером, поглощающим 15% магического урона" : "+15% spell resistance shield"; icon = cm.mageSkillPassive3; }
+                else if (index == 3) { sName = "Time Rift"; sDesc = language == 0 ? "Суперудар (CD 4х): Изменяет пространственно-временной континуум, полностью замедляя противников на 2 хода" : "Ultimate (CD 4t): Slows down all active enemy actions for 2 turns"; icon = cm.mageSkillUltimate; skillType = "Ultimate"; }
+            }
+            else // Warrior
+            {
+                if (index == 0) { sName = "IronSkin"; sDesc = language == 0 ? "Прочная кожа: Успешно увеличивает показатель защиты и стойкости на 15%" : "+15% Armor/Defense bonus"; icon = cm.warriorSkillPassive1; }
+                else if (index == 1) { sName = "Regen"; sDesc = language == 0 ? "Регенерация: Обеспечивает исцеление вашего героя на 5 ОЗ каждый игровой ход" : "+5 HP recovery per turn"; icon = cm.warriorSkillPassive2; }
+                else if (index == 2) { sName = "Threat"; sDesc = language == 0 ? "Угроза: Ускоряет накопление боевого духа и провокацию на 10%" : "+10% aggro multiplier bonus"; icon = cm.warriorSkillPassive3; }
+                else if (index == 3) { sName = "TitanShield"; sDesc = language == 0 ? "Суперудар (CD 4х): Активирует нерушимый щит Титанов, снижая входящий физический урон на 70%" : "Ultimate (CD 4t): Blocks 70% of incoming physical damage"; icon = cm.warriorSkillUltimate; skillType = "Ultimate"; }
+            }
+
+            cm.OpenSkillDetailPopup(sName, sDesc, icon, skillType);
         }
 
         /// <summary>

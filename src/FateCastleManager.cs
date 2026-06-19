@@ -115,6 +115,9 @@ public class FateCastleManager : MonoBehaviour
     [Tooltip("If checked, the script will use the custom manual positions specified below instead of landing point anchors")]
     public bool useManualCastlePositions = true;
     
+    [Tooltip("If checked, the script will strictly load customCastlePositions from the C# code, ignoring PlayerPrefs local registry configurations.")]
+    public bool preferScriptCoordinates = true;
+    
     [Tooltip("Manual 3D positions for the 4 castles (0: Wastes, 1: Peak, 2: Ruins, 3: Zenith). Default is matched to continent aesthetics")]
     public Vector3[] customCastlePositions = new Vector3[4]
     {
@@ -231,6 +234,16 @@ public class FateCastleManager : MonoBehaviour
     private List<string> aiLogs = new List<string>();
     private bool showNewDayOverlay = false;
     private float overlayTimer = 0f;
+
+    // Специфические поля для всплывающих окон описания навыков и интерактивной калибровки координат (v18.11.16)
+    private bool showSkillDetailPopup = false;
+    private string selectedSkillName = "";
+    private string selectedSkillDesc = "";
+    private Texture2D selectedSkillIcon = null;
+    private string selectedSkillType = "";
+
+    private bool showCastleCalibrationPanel = false;
+    private int selectedCalibCastleIdx = 0;
 
     // Scroll vectors for columns
     private Vector2 barracksScroll = Vector2.zero;
@@ -638,6 +651,14 @@ public class FateCastleManager : MonoBehaviour
     /// </summary>
     public void SpawnAllCastles()
     {
+        // Если геймплей на континенте еще не активен и идет стартовый диалог,
+        // мы НЕ должны спавнить 3D-замки на сцене!
+        if (!isContinentGameplayActive && DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.IsDialogueActive)
+        {
+            Debug.Log("[CASTLE MGR] Пропуск спавна 3D-замков: Геймплей на континенте еще не активен (идет диалог).");
+            return;
+        }
+
         // Считываем настройки ручного/автоматического скоординированного размещения из PlayerPrefs
         if (PlayerPrefs.HasKey("Castle_Placement_Manual"))
         {
@@ -648,15 +669,18 @@ public class FateCastleManager : MonoBehaviour
             makeCastlesDriftAutonomously = PlayerPrefs.GetInt("Castle_Drift_Autonomous") == 1;
         }
 
-        for (int i = 0; i < 4; i++)
+        if (!preferScriptCoordinates)
         {
-            if (PlayerPrefs.HasKey("Castle_PosX_" + i))
+            for (int i = 0; i < 4; i++)
             {
-                if (customCastlePositions != null && i < customCastlePositions.Length)
+                if (PlayerPrefs.HasKey("Castle_PosX_" + i))
                 {
-                    customCastlePositions[i].x = PlayerPrefs.GetFloat("Castle_PosX_" + i);
-                    customCastlePositions[i].y = PlayerPrefs.GetFloat("Castle_PosY_" + i);
-                    customCastlePositions[i].z = PlayerPrefs.GetFloat("Castle_PosZ_" + i);
+                    if (customCastlePositions != null && i < customCastlePositions.Length)
+                    {
+                        customCastlePositions[i].x = PlayerPrefs.GetFloat("Castle_PosX_" + i);
+                        customCastlePositions[i].y = PlayerPrefs.GetFloat("Castle_PosY_" + i);
+                        customCastlePositions[i].z = PlayerPrefs.GetFloat("Castle_PosZ_" + i);
+                    }
                 }
             }
         }
@@ -734,7 +758,7 @@ public class FateCastleManager : MonoBehaviour
             }
 
             // Проецирование на террейн заземленно
-            if (snapCastlesToTerrain)
+            if (snapCastlesToTerrain && !useManualCastlePositions)
             {
                 RaycastHit hit;
                 if (Physics.Raycast(spawnPos + Vector3.up * 50f, Vector3.down, out hit, 100f))
@@ -1250,21 +1274,21 @@ public class FateCastleManager : MonoBehaviour
         int startSTA = 10;
         
         string cl = (data != null && !string.IsNullOrEmpty(data.characterClass)) ? data.characterClass.ToLower() : "воин";
-        if (cl.Contains("warrior") || cl.Contains("voin") || cl.Contains("paladin"))
+        if (cl.Contains("warrior") || cl.Contains("voin") || cl.Contains("paladin") || cl.Contains("воин") || cl.Contains("паладин") || cl.Contains("рыцар"))
         {
             startSTR = 15;
             startAGI = 10;
             startINT = 4;
             startSTA = 15;
         }
-        else if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow"))
+        else if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow") || cl.Contains("лучник") || cl.Contains("стрел") || cl.Contains("охотн"))
         {
             startSTR = 10;
             startAGI = 14;
             startINT = 6;
             startSTA = 11;
         }
-        else if (cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff"))
+        else if (cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff") || cl.Contains("маг") || cl.Contains("колдун") || cl.Contains("волшеб"))
         {
             startSTR = 6;
             startAGI = 10;
@@ -1354,6 +1378,19 @@ public class FateCastleManager : MonoBehaviour
         }
         GUI.backgroundColor = Color.white;
 
+        // Кнопка переключения калибровки замков (v18.11.16)
+        GUI.backgroundColor = new Color(0.15f, 0.85f, 0.61f, 1.0f);
+        string calibLabel = curLang == 0 ? "🔧 КАЛИБРОВКА ЗАМКОВ" : "🔧 CALIBRATE CASTLES";
+        if (GUI.Button(new Rect(Screen.width - 240f, 155f, 220f, 38f), calibLabel, nextDayStyle))
+        {
+            showCastleCalibrationPanel = !showCastleCalibrationPanel;
+            if (SettingsManager.Instance != null)
+            {
+                SettingsManager.Instance.PlayHoverSound(0);
+            }
+        }
+        GUI.backgroundColor = Color.white;
+
         // 4. Отрисовка ГЕРОЯ И ЕГО ХАРАКТЕРИСТИК (HUD в верхнем левом углу)
         DrawHeroHUD(curLang);
 
@@ -1361,6 +1398,17 @@ public class FateCastleManager : MonoBehaviour
         if (showNewDayOverlay)
         {
             DrawNewDayOverlay(curLang);
+        }
+
+        // Всплывающие окна деталей (v18.11.16)
+        if (showCastleCalibrationPanel)
+        {
+            DrawCastleCalibrationPanel(curLang);
+        }
+
+        if (showSkillDetailPopup)
+        {
+            DrawSkillDetailPopup(curLang);
         }
 
         // Окно настроек деталей
@@ -1499,15 +1547,15 @@ public class FateCastleManager : MonoBehaviour
         // Определяем базовые стартовые характеристики в зависимости от веток
         int startSTR = 10, startAGI = 10, startINT = 10, startSTA = 10;
         string cl = (data != null && !string.IsNullOrEmpty(data.characterClass)) ? data.characterClass.ToLower() : "воин";
-        if (cl.Contains("warrior") || cl.Contains("voin") || cl.Contains("paladin"))
+        if (cl.Contains("warrior") || cl.Contains("voin") || cl.Contains("paladin") || cl.Contains("воин") || cl.Contains("паладин") || cl.Contains("рыцар"))
         {
             startSTR = 15; startAGI = 10; startINT = 4; startSTA = 15;
         }
-        else if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow"))
+        else if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow") || cl.Contains("лучник") || cl.Contains("стрел") || cl.Contains("охотн"))
         {
             startSTR = 10; startAGI = 14; startINT = 6; startSTA = 11;
         }
-        else if (cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff"))
+        else if (cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff") || cl.Contains("маг") || cl.Contains("колдун") || cl.Contains("волшеб"))
         {
             startSTR = 6; startAGI = 10; startINT = 10; startSTA = 9;
         }
@@ -1629,26 +1677,26 @@ public class FateCastleManager : MonoBehaviour
         LoadClassSkillsIcons();
 
         GUILayout.BeginVertical(GUI.skin.box);
-        if (cl.Contains("warrior") || cl.Contains("voin") || cl.Contains("paladin"))
+        if (cl.Contains("warrior") || cl.Contains("voin") || cl.Contains("paladin") || cl.Contains("воин") || cl.Contains("паладин") || cl.Contains("рыцар"))
         {
-            DrawSkillRow(curLang, activeSkillPassive1, "🛡️", "IronSkin", curLang == 0 ? "Прочная кожа: +15% Защиты" : "+15% Armor/Defense bonus");
-            DrawSkillRow(curLang, activeSkillPassive2, "❤️", "Regen", curLang == 0 ? "Регенерация: +5 ОЗ (HP) за ход" : "+5 HP recovery per turn");
-            DrawSkillRow(curLang, activeSkillPassive3, "👹", "Threat", curLang == 0 ? "Угроза: +10% накопления аггро боевого духа" : "+10% aggro multiplier bonus");
-            DrawSkillRow(curLang, activeSkillUltimate, "🔱", "<b>TitanShield</b>", curLang == 0 ? "Суперудар (CD 4х): Снижает входящий урон на 70%" : "Ultimate (CD 4t): Blocks 70% of incoming damage");
+            DrawSkillRow(curLang, activeSkillPassive1, "🛡️", "IronSkin", curLang == 0 ? "Прочная кожа: +15% Защиты" : "+15% Armor/Defense bonus", "Passive");
+            DrawSkillRow(curLang, activeSkillPassive2, "❤️", "Regen", curLang == 0 ? "Регенерация: +5 ОЗ (HP) за ход" : "+5 HP recovery per turn", "Passive");
+            DrawSkillRow(curLang, activeSkillPassive3, "👹", "Threat", curLang == 0 ? "Угроза: +10% накопления аггро боевого духа" : "+10% aggro multiplier bonus", "Passive");
+            DrawSkillRow(curLang, activeSkillUltimate, "🔱", "<b>TitanShield</b>", curLang == 0 ? "Суперудар (CD 4х): Снижает входящий урон на 70%" : "Ultimate (CD 4t): Blocks 70% of incoming damage", "Ultimate");
         }
-        else if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow"))
+        else if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow") || cl.Contains("лучник") || cl.Contains("стрел") || cl.Contains("охотн"))
         {
-            DrawSkillRow(curLang, activeSkillPassive1, "🎯", "Крит-Мастер", curLang == 0 ? "+15% вероятность критического удара" : "+15% critical hit probability");
-            DrawSkillRow(curLang, activeSkillPassive2, "🏹", "LongShot", curLang == 0 ? "Дальний выстрел: +10% наносимого урона" : "+10% damage over wide distance range");
-            DrawSkillRow(curLang, activeSkillPassive3, "🍃", "Evasion", curLang == 0 ? "Поворотливость: +10% шанс полного уклонения" : "+10% complete dodge probability");
-            DrawSkillRow(curLang, activeSkillUltimate, "⛈️", "<b>Ливень Смерти</b>", curLang == 0 ? "Суперудар (CD 3х): АоЕ атака силой x1.8" : "Ultimate (CD 3t): AoE volley dealing massive x1.8 damage");
+            DrawSkillRow(curLang, activeSkillPassive1, "🎯", "Крит-Мастер", curLang == 0 ? "+15% вероятность критического удара" : "+15% critical hit probability", "Passive");
+            DrawSkillRow(curLang, activeSkillPassive2, "🏹", "LongShot", curLang == 0 ? "Дальний выстрел: +10% наносимого урона" : "+10% damage over wide distance range", "Passive");
+            DrawSkillRow(curLang, activeSkillPassive3, "🍃", "Evasion", curLang == 0 ? "Поворотливость: +10% шанс полного уклонения" : "+10% complete dodge probability", "Passive");
+            DrawSkillRow(curLang, activeSkillUltimate, "⛈️", "<b>Ливень Смерти</b>", curLang == 0 ? "Суперудар (CD 3х): АоЕ атака силой x1.8" : "Ultimate (CD 3t): AoE volley dealing massive x1.8 damage", "Ultimate");
         }
-        else if (cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff"))
+        else if (cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff") || cl.Contains("маг") || cl.Contains("колдун") || cl.Contains("волшеб"))
         {
-            DrawSkillRow(curLang, activeSkillPassive1, "💧", "ManaFlow", curLang == 0 ? "Поток маны: +5 ОМ (MP) за ход" : "+5 mana points gain per turn");
-            DrawSkillRow(curLang, activeSkillPassive2, "🔥", "Elemental", curLang == 0 ? "Стихии: +15% разрушительной силы магии" : "+15% magic spell power booster");
-            DrawSkillRow(curLang, activeSkillPassive3, "🌌", "Resist", curLang == 0 ? "Сопротивление: +15% маг. защиты от чар" : "+15% spell resistance shield");
-            DrawSkillRow(curLang, activeSkillUltimate, "⏳", "<b>Time Rift</b>", curLang == 0 ? "Суперудар (CD 4х): Полное замедление оппонентов на 2 хода" : "Ultimate (CD 4t): Slows down all active enemy actions");
+            DrawSkillRow(curLang, activeSkillPassive1, "💧", "ManaFlow", curLang == 0 ? "Поток маны: +5 ОМ (MP) за ход" : "+5 mana points gain per turn", "Passive");
+            DrawSkillRow(curLang, activeSkillPassive2, "🔥", "Elemental", curLang == 0 ? "Стихии: +15% разрушительной силы магии" : "+15% magic spell power booster", "Passive");
+            DrawSkillRow(curLang, activeSkillPassive3, "🌌", "Resist", curLang == 0 ? "Сопротивление: +15% маг. защиты от чар" : "+15% spell resistance shield", "Passive");
+            DrawSkillRow(curLang, activeSkillUltimate, "⏳", "<b>Time Rift</b>", curLang == 0 ? "Суперудар (CD 4х): Полное замедление оппонентов на 2 хода" : "Ultimate (CD 4t): Slows down all active enemy actions", "Ultimate");
         }
         else
         {
@@ -1710,7 +1758,7 @@ public class FateCastleManager : MonoBehaviour
         }
     }
 
-    private void DrawSkillRow(int curLang, Texture2D icon, string emoji, string header, string desc)
+    private void DrawSkillRow(int curLang, Texture2D icon, string emoji, string header, string desc, string skillType)
     {
         GUILayout.BeginHorizontal();
         if (icon != null)
@@ -1726,14 +1774,235 @@ public class FateCastleManager : MonoBehaviour
         }
         GUILayout.Space(6);
         string text = $"<b>{header}</b>: {desc}";
-        GUIStyle skStyle = new GUIStyle(GUI.skin.label);
+        
+        GUIStyle skStyle = new GUIStyle(GUI.skin.button);
         skStyle.fontSize = 11;
         skStyle.richText = true;
         skStyle.wordWrap = true;
+        skStyle.alignment = TextAnchor.MiddleLeft;
         skStyle.normal.textColor = new Color(0.9f, 0.95f, 1.0f);
-        GUILayout.Label(text, skStyle);
+        skStyle.hover.textColor = Color.yellow;
+        skStyle.padding = new RectOffset(4, 4, 2, 2);
+
+        if (GUILayout.Button(text, skStyle, GUILayout.MinHeight(26)))
+        {
+            selectedSkillName = header;
+            selectedSkillDesc = desc;
+            selectedSkillIcon = icon;
+            selectedSkillType = skillType;
+            showSkillDetailPopup = true;
+            if (SettingsManager.Instance != null)
+            {
+                SettingsManager.Instance.PlayHoverSound(0);
+            }
+        }
         GUILayout.EndHorizontal();
         GUILayout.Space(4);
+    }
+
+    public void OpenSkillDetailPopup(string skillName, string skillDesc, Texture2D skillIcon, string skillType)
+    {
+        selectedSkillName = skillName;
+        selectedSkillDesc = skillDesc;
+        selectedSkillIcon = skillIcon;
+        selectedSkillType = skillType;
+        showSkillDetailPopup = true;
+        if (SettingsManager.Instance != null)
+        {
+            SettingsManager.Instance.PlayHoverSound(0);
+        }
+    }
+
+    private void DrawSkillDetailPopup(int curLang)
+    {
+        GUIStyle winStyle = new GUIStyle(GUI.skin.box);
+        winStyle.normal.background = hudTex;
+
+        float winWidth = 340f;
+        float winHeight = 280f;
+        Rect winRect = new Rect((Screen.width - winWidth) / 2f, (Screen.height - winHeight) / 2f, winWidth, winHeight);
+        GUI.Box(winRect, "", winStyle);
+
+        GUILayout.BeginArea(winRect);
+        GUILayout.Space(12);
+
+        GUIStyle titleStyle = new GUIStyle(GUI.skin.label);
+        titleStyle.alignment = TextAnchor.MiddleCenter;
+        titleStyle.fontStyle = FontStyle.Bold;
+        titleStyle.fontSize = 14;
+        titleStyle.normal.textColor = Color.cyan;
+        GUILayout.Label($"🧬 {selectedSkillName.ToUpper()}", titleStyle);
+        GUILayout.Space(6);
+
+        GUIStyle typeStyle = new GUIStyle(GUI.skin.label);
+        typeStyle.alignment = TextAnchor.MiddleCenter;
+        typeStyle.fontStyle = FontStyle.Italic;
+        typeStyle.fontSize = 11;
+        typeStyle.normal.textColor = Color.yellow;
+        string typeLabel = selectedSkillType == "Ultimate" ? (curLang == 0 ? "Суперудар (Активный)" : "Ultimate Skill (Active)") : (curLang == 0 ? "Пассивный Навык" : "Passive Skill");
+        GUILayout.Label(typeLabel, typeStyle);
+        GUILayout.Space(12);
+
+        // Слот под фото (окошко под навык!) - "окошки под них и я туда от них кину фото"
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        if (selectedSkillIcon != null)
+        {
+            GUILayout.Label(selectedSkillIcon, GUILayout.Width(64), GUILayout.Height(64));
+        }
+        else
+        {
+            GUIStyle fallbackEmojiStyle = new GUIStyle(GUI.skin.label);
+            fallbackEmojiStyle.alignment = TextAnchor.MiddleCenter;
+            fallbackEmojiStyle.fontSize = 28;
+            string emoji = selectedSkillType == "Ultimate" ? "🔱" : "🛡️";
+            GUILayout.Label(emoji, fallbackEmojiStyle, GUILayout.Width(64), GUILayout.Height(64));
+        }
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+        GUILayout.Space(12);
+
+        // Описание навыка
+        GUIStyle descStyle = new GUIStyle(GUI.skin.label);
+        descStyle.alignment = TextAnchor.MiddleCenter;
+        descStyle.fontSize = 12;
+        descStyle.wordWrap = true;
+        descStyle.normal.textColor = new Color(0.9f, 0.95f, 1.0f);
+        GUILayout.Label(selectedSkillDesc, descStyle);
+        
+        GUILayout.Space(16);
+
+        GUI.backgroundColor = new Color(0.1f, 0.8f, 0.4f);
+        string closeBtn = curLang == 0 ? "ОТЛИЧНО" : "CLOSE";
+        if (GUILayout.Button(closeBtn, GUILayout.Height(36)))
+        {
+            showSkillDetailPopup = false;
+        }
+        GUI.backgroundColor = Color.white;
+
+        GUILayout.EndArea();
+    }
+
+    private void DrawCastleCalibrationPanel(int curLang)
+    {
+        GUIStyle winStyle = new GUIStyle(GUI.skin.box);
+        winStyle.normal.background = hudTex;
+
+        float winWidth = 320f;
+        float winHeight = 340f;
+        Rect winRect = new Rect(Screen.width - 340f, 200f, winWidth, winHeight);
+        GUI.Box(winRect, "", winStyle);
+
+        GUILayout.BeginArea(winRect);
+        GUILayout.Space(10);
+        
+        GUIStyle titleStyle = new GUIStyle(GUI.skin.label);
+        titleStyle.alignment = TextAnchor.MiddleCenter;
+        titleStyle.fontStyle = FontStyle.Bold;
+        titleStyle.fontSize = 13;
+        titleStyle.normal.textColor = Color.yellow;
+        GUILayout.Label("🏰 КАЛИБРОВКА КООРДИНАТ", titleStyle);
+        GUILayout.Space(8);
+
+        // Переключатель замков
+        GUILayout.BeginHorizontal();
+        for (int i = 0; i < 4; i++)
+        {
+            GUI.backgroundColor = (selectedCalibCastleIdx == i) ? Color.cyan : Color.white;
+            string label = i.ToString();
+            if (GUILayout.Button(label, GUILayout.Width(64)))
+            {
+                selectedCalibCastleIdx = i;
+            }
+        }
+        GUI.backgroundColor = Color.white;
+        GUILayout.EndHorizontal();
+        GUILayout.Space(8);
+
+        if (selectedCalibCastleIdx >= 0 && selectedCalibCastleIdx < castles.Count && selectedCalibCastleIdx < customCastlePositions.Length)
+        {
+            CastleInstance castle = castles[selectedCalibCastleIdx];
+            Vector3 pos = customCastlePositions[selectedCalibCastleIdx];
+            
+            GUILayout.Label($"<b>Замок {selectedCalibCastleIdx}</b>: {castle.nameRU}", GUI.skin.label);
+            GUILayout.Space(4);
+
+            // Слайдеры для координат X, Y, Z
+            GUILayout.BeginHorizontal();
+            GUILayout.Label($"X: {pos.x:F1}", GUILayout.Width(70));
+            pos.x = GUILayout.HorizontalSlider(pos.x, -50f, 50f);
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label($"Y: {pos.y:F1}", GUILayout.Width(70));
+            pos.y = GUILayout.HorizontalSlider(pos.y, -15f, 15f);
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label($"Z: {pos.z:F1}", GUILayout.Width(70));
+            pos.z = GUILayout.HorizontalSlider(pos.z, -50f, 50f);
+            GUILayout.EndHorizontal();
+
+            // Применяем временное смещение в реальном времени, чтобы разработчик видел результат на сцене глазами!
+            customCastlePositions[selectedCalibCastleIdx] = pos;
+            if (castle != null && castle.visualRoot != null)
+            {
+                castle.visualRoot.transform.position = pos;
+            }
+
+            GUILayout.Space(12);
+
+            // Кнопки Сохранить / Сбросить
+            GUILayout.BeginHorizontal();
+            
+            GUI.backgroundColor = new Color(0.2f, 0.82f, 0.2f);
+            if (GUILayout.Button("ЗАПОМНИТЬ", GUILayout.Height(30)))
+            {
+                PlayerPrefs.SetFloat("Castle_PosX_" + selectedCalibCastleIdx, pos.x);
+                PlayerPrefs.SetFloat("Castle_PosY_" + selectedCalibCastleIdx, pos.y);
+                PlayerPrefs.SetFloat("Castle_PosZ_" + selectedCalibCastleIdx, pos.z);
+                PlayerPrefs.SetInt("Castle_Placement_Manual", 1);
+                PlayerPrefs.Save();
+                useManualCastlePositions = true;
+                Debug.Log($"[CASTLE MGR] Координаты замка {selectedCalibCastleIdx} сохранены: {pos}");
+            }
+
+            GUI.backgroundColor = new Color(0.85f, 0.22f, 0.22f);
+            if (GUILayout.Button("ОЧИСТИТЬ", GUILayout.Height(30)))
+            {
+                PlayerPrefs.DeleteKey("Castle_PosX_" + selectedCalibCastleIdx);
+                PlayerPrefs.DeleteKey("Castle_PosY_" + selectedCalibCastleIdx);
+                PlayerPrefs.DeleteKey("Castle_PosZ_" + selectedCalibCastleIdx);
+                PlayerPrefs.Save();
+
+                // Сброс до начальных дефолтов
+                Vector3[] defaults = new Vector3[4]
+                {
+                    new Vector3(-5.3f, -0.4f, 4.2f),   // Кровавые Пустоши
+                    new Vector3(14.8f, 1.2f, 12.5f),   // Ледяной Пик
+                    new Vector3(-12.4f, -0.3f, -10.2f), // Древние Руины
+                    new Vector3(6.5f, 0.8f, -4.5f)     // Святилище Зенита
+                };
+                customCastlePositions[selectedCalibCastleIdx] = defaults[selectedCalibCastleIdx];
+                if (castle != null && castle.visualRoot != null)
+                {
+                    castle.visualRoot.transform.position = defaults[selectedCalibCastleIdx];
+                }
+                Debug.Log($"[CASTLE MGR] Координаты замка {selectedCalibCastleIdx} сброшены на дефолты!");
+            }
+            GUI.backgroundColor = Color.white;
+            GUILayout.EndHorizontal();
+        }
+
+        GUILayout.Space(10);
+        GUI.backgroundColor = new Color(0.85f, 0.15f, 0.15f);
+        if (GUILayout.Button("ЗАКРЫТЬ", GUILayout.Height(28)))
+        {
+            showCastleCalibrationPanel = false;
+        }
+        GUI.backgroundColor = Color.white;
+
+        GUILayout.EndArea();
     }
 
     private void DrawStatRow(int curLang, string emoji, string statName, ref int statValue, ref int availablePoints, int minValue)

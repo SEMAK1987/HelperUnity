@@ -204,6 +204,9 @@ namespace FateContinent
 
         private void Start()
         {
+            // СВЕРХВАЖНО: Кэшируем оригинальные красивые материалы регионов перед их деактивацией или перекраской!
+            CacheOriginalMaterials();
+
             // СВЕРХВАЖНО: Изначально полностью выключаем 3D-карту, океан и героя, чтобы они не лезли на задний план вступительных диалогов Аэлиссы!
             if (continentObject != null)
             {
@@ -472,23 +475,62 @@ namespace FateContinent
             }
         }
 
+        private System.Collections.Generic.Dictionary<string, Material> originalRegionMaterials = new System.Collections.Generic.Dictionary<string, Material>();
+
         /// <summary>
-        /// Перекрашивает неактивные точки высадки (3, 6, 8, 11) в серый матовый цвет, а выбранную — в цвет фракции
+        /// Кэширует изначальные оригинальные материалы регионов, чтобы сохранить их текстуры и шейдеры безупречно
+        /// </summary>
+        public void CacheOriginalMaterials()
+        {
+            GameObject continent = GameObject.Find("New_Kontinent") ?? GameObject.Find("/New_Kontinent");
+            if (continent == null && continentObject != null)
+            {
+                continent = continentObject;
+            }
+
+            if (continent != null)
+            {
+                string[] regionNames = new string[] { "Region_03", "Region_06", "Region_08", "Region_11" };
+                foreach (string name in regionNames)
+                {
+                    Transform regionTrans = continent.transform.Find(name);
+                    if (regionTrans == null)
+                    {
+                        foreach (Transform child in continent.GetComponentsInChildren<Transform>(true))
+                        {
+                            if (child.name == name)
+                            {
+                                regionTrans = child;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (regionTrans != null)
+                    {
+                        MeshRenderer mr = regionTrans.GetComponent<MeshRenderer>();
+                        if (mr != null && mr.sharedMaterial != null)
+                        {
+                            // Сохраняем ссылку на оригинальный материал
+                            originalRegionMaterials[name] = mr.sharedMaterial;
+                            Debug.Log($"[LANDING SYS] Успешно закеширован оригинальный материал для {name}: {mr.sharedMaterial.name}");
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Восстанавливает оригинальный красивый материал под игроком, а остальные невыбранные делает нейтрально серыми
         /// </summary>
         public void RepaintRegionsBasedOnLanding(int activeZoneIndex)
         {
             string[] regionNames = new string[] { "Region_03", "Region_06", "Region_08", "Region_11" };
-            Color[] activeColors = new Color[] {
-                new Color(0.92f, 0.12f, 0.28f, 1.0f), // Crimson red for Wastes (Region_03)
-                new Color(0.11f, 0.64f, 0.92f, 1.0f), // Ice blue for Peak (Region_06)
-                new Color(0.12f, 0.15f, 0.88f, 1.0f), // Sapphire blue for Ruins (Region_08)
-                new Color(0.12f, 0.88f, 0.45f, 1.0f)  // Emerald neon/zenith green for Sanctuary (Region_11)
-            };
 
-            GameObject continent = GameObject.Find("New_Kontinent");
-            if (continent == null)
+            GameObject continent = GameObject.Find("New_Kontinent") ?? GameObject.Find("/New_Kontinent");
+            if (continent == null && continentObject != null)
             {
-                continent = GameObject.Find("/New_Kontinent");
+                continent = continentObject;
             }
 
             if (continent != null)
@@ -497,12 +539,13 @@ namespace FateContinent
 
                 for (int i = 0; i < regionNames.Length; i++)
                 {
-                    Transform regionTrans = continent.transform.Find(regionNames[i]);
+                    string name = regionNames[i];
+                    Transform regionTrans = continent.transform.Find(name);
                     if (regionTrans == null)
                     {
                         foreach (Transform child in continent.GetComponentsInChildren<Transform>(true))
                         {
-                            if (child.name == regionNames[i])
+                            if (child.name == name)
                             {
                                 regionTrans = child;
                                 break;
@@ -515,27 +558,42 @@ namespace FateContinent
                         MeshRenderer mr = regionTrans.GetComponent<MeshRenderer>();
                         if (mr != null)
                         {
-                            Material dynamicMat = new Material(urpShader);
                             if (i == activeZoneIndex)
                             {
-                                dynamicMat.color = activeColors[i];
-                                if (dynamicMat.HasProperty("_Glossiness")) dynamicMat.SetFloat("_Glossiness", 0.75f);
-                                if (dynamicMat.HasProperty("_Smoothness")) dynamicMat.SetFloat("_Smoothness", 0.75f);
-                                if (dynamicMat.HasProperty("_Metallic")) dynamicMat.SetFloat("_Metallic", 0.3f);
-                                if (dynamicMat.HasProperty("_EmissionColor"))
+                                // Под игроком должен быть красивый оригинальный цвет с картами текстур, который был изначально!
+                                if (originalRegionMaterials.ContainsKey(name) && originalRegionMaterials[name] != null)
                                 {
-                                    dynamicMat.SetColor("_EmissionColor", activeColors[i] * 0.35f);
+                                    mr.material = originalRegionMaterials[name];
+                                    Debug.Log($"[LANDING SYS] Восстановлен оригинальный материал '{originalRegionMaterials[name].name}' для выбранного игроком региона {name}");
                                 }
-                                Debug.Log($"[LANDING SYS] Активный регион {regionNames[i]} окрашен в цвет фракции: {activeColors[i]}");
+                                else
+                                {
+                                    // Резервный красивый цвет, если сцена грузится заново в обход Start кэширования
+                                    Color[] activeColors = new Color[] {
+                                        new Color(0.92f, 0.12f, 0.28f, 1.0f), // Crimson red
+                                        new Color(0.11f, 0.64f, 0.92f, 1.0f), // Ice blue
+                                        new Color(0.12f, 0.15f, 0.88f, 1.0f), // Sapphire blue
+                                        new Color(0.12f, 0.88f, 0.45f, 1.0f)  // Emerald green
+                                    };
+                                    Material dynamicMat = new Material(urpShader);
+                                    dynamicMat.color = activeColors[i];
+                                    if (dynamicMat.HasProperty("_Glossiness")) dynamicMat.SetFloat("_Glossiness", 0.75f);
+                                    if (dynamicMat.HasProperty("_Smoothness")) dynamicMat.SetFloat("_Smoothness", 0.75f);
+                                    if (dynamicMat.HasProperty("_Metallic")) dynamicMat.SetFloat("_Metallic", 0.3f);
+                                    mr.material = dynamicMat;
+                                }
                             }
                             else
                             {
-                                dynamicMat.color = new Color(0.38f, 0.42f, 0.45f, 1.0f); // Нейтральный серый
+                                // Точки, которые игрок НЕ выбрал при выборе высадки, становятся серыми и матовыми
+                                Material dynamicMat = new Material(urpShader);
+                                dynamicMat.color = new Color(0.38f, 0.42f, 0.45f, 1.0f); // Нейтрально глубокий серый
                                 if (dynamicMat.HasProperty("_Glossiness")) dynamicMat.SetFloat("_Glossiness", 0.15f);
                                 if (dynamicMat.HasProperty("_Smoothness")) dynamicMat.SetFloat("_Smoothness", 0.15f);
                                 if (dynamicMat.HasProperty("_Metallic")) dynamicMat.SetFloat("_Metallic", 0.05f);
+                                mr.material = dynamicMat;
+                                Debug.Log($"[LANDING SYS] Успешно затемнен невыбранный игроком регион: {name}");
                             }
-                            mr.material = dynamicMat;
                         }
                     }
                 }
