@@ -7,6 +7,7 @@
     "UnitySystems.cs",
     "UnityWorldSync.cs",
     "src/BalanceConfig.cs",
+    "src/CastleFacilitiesHUD.cs",
     "src/CharacterSelectionController.cs",
     "src/DialogueSystem_Manager.cs",
     "src/EventHub.cs",
@@ -40,12 +41,12 @@
   "pdfs": [],
   "videos": [],
   "others": [],
-  "total_files": 67,
+  "total_files": 69,
   "analysis": {
     "audit_issues": [],
     "todos": [],
     "asset_stats": {
-      "total_size": 2269543,
+      "total_size": 2252441,
       "large_files": []
     },
     "dependencies": {
@@ -78,6 +79,11 @@
         "UnityEngine",
         "System",
         "System.Collections.Generic"
+      ],
+      "CastleFacilitiesHUD": [
+        "UnityEngine",
+        "UnityEngine.UI",
+        "System.Collections"
       ],
       "CharacterSelectionController": [
         "UnityEngine",
@@ -221,5 +227,5 @@
       ]
     }
   },
-  "last_updated": "2026-06-18T15:14:00.398Z"
+  "last_updated": "2026-06-19T18:41:43.881Z"
 }
