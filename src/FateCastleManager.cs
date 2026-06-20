@@ -118,13 +118,21 @@ public class FateCastleManager : MonoBehaviour
     [Tooltip("If checked, the script will strictly load customCastlePositions from the C# code, ignoring PlayerPrefs local registry configurations.")]
     public bool preferScriptCoordinates = true;
     
-    [Tooltip("Manual 3D positions for the 4 castles (0: Wastes, 1: Peak, 2: Ruins, 3: Zenith). Default is matched to continent aesthetics")]
-    public Vector3[] customCastlePositions = new Vector3[4]
+    [Tooltip("Manual 3D positions for the 12 castles (matched to the 12 region cells of New_Kontinent)")]
+    public Vector3[] customCastlePositions = new Vector3[12]
     {
-        new Vector3(-5.3f, -0.4f, 4.2f),   // Кровавые Пустоши
-        new Vector3(14.8f, 1.2f, 12.5f),   // Ледяной Пик
-        new Vector3(-12.4f, -0.3f, -10.2f), // Древние Руины
-        new Vector3(9.9f, 0.8f, -4.5f)     // Святилище Зенита
+        new Vector3(-15f, 0f, 10f),    // Region_00
+        new Vector3(-5f, 0f, 10f),     // Region_01
+        new Vector3(5f, 0f, 10f),      // Region_02
+        new Vector3(-5.3f, -0.4f, 4.2f), // Region_03 (Кровавые Пустоши)
+        new Vector3(-15f, 0f, 0f),     // Region_04
+        new Vector3(-5f, 0f, 0f),      // Region_05
+        new Vector3(14.8f, 1.2f, 12.5f), // Region_06 (Ледяной Пик)
+        new Vector3(15f, 0f, 0f),      // Region_07
+        new Vector3(-12.4f, -0.3f, -10.2f), // Region_08 (Древние Руины)
+        new Vector3(-5f, 0f, -10f),    // Region_09
+        new Vector3(5f, 0f, -10f),     // Region_10
+        new Vector3(9.9f, 0.8f, -4.5f) // Region_11 (Святилище Зенита)
     };
 
     [Tooltip("Manual offset added to the spawn anchor of each landing point if not using customCastlePositions")]
@@ -264,8 +272,8 @@ public class FateCastleManager : MonoBehaviour
     private string selectedTroopId = "";
 
     public bool isAutonomousStatsDistribution = false;
-    private bool showStatsPanel = false;
-    private bool isDetailsOpen = false;
+    public bool showStatsPanel = false;
+    public bool isDetailsOpen = false;
     private int activeDetailsIndex = -1;
     private string feedbackMessage = "";
     private float messageTimer = 0f;
@@ -476,7 +484,27 @@ public class FateCastleManager : MonoBehaviour
         PlayerPrefs.SetInt("Fate_Current_Day", initialDaySetting);
         currentDay = initialDaySetting;
         
-        SaveGameSystem.CurrentData.gold = initialGoldSetting;
+        // Динамический расчет стартового золота на основе сохраненной сложности (Difficulty Gold Bonus)
+        int selectedDifficulty = 2; // По умолчанию Нормально
+        if (SaveGameSystem.CurrentData != null)
+        {
+            selectedDifficulty = SaveGameSystem.CurrentData.selectedDifficulty;
+        }
+
+        int difficultyStartingGold = 300;
+        switch (selectedDifficulty)
+        {
+            case 0: difficultyStartingGold = 1000; break; // Новичок
+            case 1: difficultyStartingGold = 500;  break; // Легко
+            case 2: difficultyStartingGold = 300;  break; // Нормально
+            case 3: difficultyStartingGold = 200;  break; // Сложно
+            case 4: difficultyStartingGold = 100;  break; // Кошмар
+            default: difficultyStartingGold = 300; break;
+        }
+
+        SaveGameSystem.CurrentData.gold = difficultyStartingGold;
+        PlayerPrefs.SetInt("Player_Current_Gold", difficultyStartingGold);
+        PlayerPrefs.Save();
 
         // Remove spawned castles if any
         for (int i = 0; i < castles.Count; i++)
@@ -558,8 +586,8 @@ public class FateCastleManager : MonoBehaviour
 
     private void HandleCastleClicks()
     {
-        // Avoid clicking 3D structures if continent gameplay is not fully active, town view is active, or day overlay is showing
-        if (!isContinentGameplayActive || isTownViewActive || showNewDayOverlay) return;
+        // Avoid clicking 3D structures if continent gameplay is not fully active, town view is active, day overlay is showing, or stats panel is open
+        if (!isContinentGameplayActive || isTownViewActive || showNewDayOverlay || showStatsPanel) return;
 
         if (WasLeftMouseButtonClicked())
         {
@@ -657,13 +685,34 @@ public class FateCastleManager : MonoBehaviour
         castles.Clear();
         currentDay = PlayerPrefs.GetInt("Fate_Current_Day", 1);
 
-        string[] zonesRU = { "Кровавые Пустоши", "Ледяной Пик", "Древние Руины", "Святилище Зенита" };
-        string[] zonesEN = { "Crimson Wastes", "Ice-Bound Peak", "Ancient Ruins", "Zenith Sanctuary" };
-        string[] zonesCH = { "血红荒原", "冰封之巅", "古代废墟", "巅峰避难所" };
-        string[] zonesKR = { "붉은 황무지", "얼음 봉우리", "고대 유적지", "제니스 성소" };
+        string[] zonesRU = { 
+            "Южные Водные Врата", "Шепчущие Дюны", "Ветряные Каньоны", "Кровавые Пустоши",
+            "Земли Спокойных Душ", "Изумрудные Поймы", "Ледяной Пик", "Забытые Кряжи",
+            "Древние Руины", "Сумрачная Чаща", "Золотой Перевал", "Святилище Зенита"
+        };
+        string[] zonesEN = { 
+            "Southern Water Gates", "Whispering Dunes", "Windy Canyons", "Crimson Wastes",
+            "Ashen Soulfields", "Emerald Marshes", "Ice-Bound Peak", "Forgotten Ridges",
+            "Ancient Ruins", "Gloomwood Forest", "Golden Pass", "Zenith Sanctuary"
+        };
+        string[] zonesCH = { 
+            "南部水门", "低语沙丘", "狂风峡谷", "血红荒原",
+            "灰烬魂之原", "翡翠沼泽", "冰封之巅", "被遗忘的山脊",
+            "古代废墟", "暗影幽林", "黄金山口", "巅峰避难所"
+        };
+        string[] zonesKR = { 
+            "남부 수문", "속삭이는 모래언덕", "바람돌이 협곡", "붉은 황무지",
+            "잿빛 영혼의 들판", "에메랄드 습지", "얼음 봉우리", "잊혀진 산맥",
+            "고대 유적지", "흐린나무 숲", "황금 고개", "제니스 성소"
+        };
 
-        for (int i = 0; i < 4; i++)
+        int playerZone = PlayerPrefs.GetInt("LandedZoneIndex", 0);
+
+        for (int i = 0; i < 12; i++)
         {
+            // Определяем владельца по умолчанию: 1 замок игрока в зависимости от высадки героя, и 11 вражеских замков
+            string ownerStyle = (i == playerZone) ? "Player" : "Enemy";
+
             CastleInstance castle = new CastleInstance
             {
                 zoneIndex = i,
@@ -672,7 +721,7 @@ public class FateCastleManager : MonoBehaviour
                 nameCH = zonesCH[i],
                 nameKR = zonesKR[i],
                 level = PlayerPrefs.GetInt("Castle_Level_" + i, 1),
-                owner = PlayerPrefs.GetString("Castle_Owner_" + i, i == 0 ? "Player" : "Enemy") // Auto start Player in first zone
+                owner = PlayerPrefs.GetString("Castle_Owner_" + i, ownerStyle)
             };
             
             // Re-load opponent simulated progression
@@ -713,7 +762,7 @@ public class FateCastleManager : MonoBehaviour
 
         if (!preferScriptCoordinates)
         {
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 12; i++)
             {
                 if (PlayerPrefs.HasKey("Castle_PosX_" + i))
                 {
@@ -744,24 +793,36 @@ public class FateCastleManager : MonoBehaviour
             return;
         }
 
+        // Автоматически находим New_Kontinent и вешаем MeshCollider на все дочерние зоны, если их еще нет,
+        // чтобы блокировать прохождение кликов (блокируем клик "в землю")!
+        GameObject newContinent = GameObject.Find("New_Kontinent") ?? GameObject.Find("/New_Kontinent");
+        if (newContinent != null)
+        {
+            foreach (Transform rTrans in newContinent.GetComponentsInChildren<Transform>(true))
+            {
+                if (rTrans.name.StartsWith("Region_"))
+                {
+                    MeshFilter mf = rTrans.GetComponent<MeshFilter>();
+                    if (mf != null && mf.sharedMesh != null)
+                    {
+                        MeshCollider mc = rTrans.GetComponent<MeshCollider>();
+                        if (mc == null)
+                        {
+                            mc = rTrans.gameObject.AddComponent<MeshCollider>();
+                            mc.sharedMesh = mf.sharedMesh;
+                        }
+                    }
+                }
+            }
+        }
+
         for (int i = 0; i < castles.Count; i++)
         {
             CastleInstance castle = castles[i];
             
-            // Синхронизация роли: 1 Игрок, 1 Противник ИИ, 2 Нейтральных замка (напр. Оазис/Пик/Древние Руины/Зенит)
-            int enemyZone = 3 - playerZone; // Противоположная по балансу зона для ИИ (0<->3, 1<->2)
-            if (i == playerZone)
-            {
-                castle.owner = "Player";
-            }
-            else if (i == enemyZone)
-            {
-                castle.owner = "Enemy";
-            }
-            else
-            {
-                castle.owner = "Neutral";
-            }
+            // Синхронизация роли: 1 замок игрока в зависимости от высадки героя, остальные 11 другие
+            string initialOwner = (i == playerZone) ? "Player" : "Enemy";
+            castle.owner = PlayerPrefs.GetString("Castle_Owner_" + i, initialOwner);
             PlayerPrefs.SetString("Castle_Owner_" + i, castle.owner);
             PlayerPrefs.Save();
 
@@ -770,37 +831,60 @@ public class FateCastleManager : MonoBehaviour
                 Destroy(castle.visualRoot);
             }
 
-            Vector3 spawnPos;
-            if (useManualCastlePositions)
+            Vector3 spawnPos = Vector3.zero;
+            bool foundRegionPos = false;
+            if (newContinent != null)
             {
-                if (customCastlePositions != null && i < customCastlePositions.Length)
+                string regionName = "Region_" + i.ToString("D2"); // Region_00, Region_01, etc.
+                Transform regTrans = newContinent.transform.Find(regionName);
+                if (regTrans != null)
                 {
-                    spawnPos = customCastlePositions[i];
-                }
-                else
-                {
-                    spawnPos = new Vector3((i - 1.5f) * 15f, 0f, 0f);
-                }
-            }
-            else
-            {
-                if (i < lpm.landingPoints.Length && lpm.landingPoints[i].spawnAnchor != null)
-                {
-                    Transform anchor = lpm.landingPoints[i].spawnAnchor;
-                    Vector3 offset = (castleManualOffsets != null && i < castleManualOffsets.Length) ? castleManualOffsets[i] : new Vector3(3.2f, 0f, 3.2f);
-                    spawnPos = anchor.position + offset;
-                }
-                else
-                {
-                    // НАДЁЖНЫЙ РЕЗЕРВНЫЙ ФОЛЛБЕК: Если физический анкер стёрт или отсутствует в иерархии Unity,
-                    // мы выставляем безопасные 3D-координаты. Замки НИКОГДА больше не пропадают после пропуска хода (AdvanceDay)!
-                    spawnPos = new Vector3((i - 1.5f) * 18f, 1.2f, (i % 2 == 0 ? 8f : -8f));
-                    Debug.LogWarning($"[CASTLE MGR] Точка привязки для замка '{castle.nameRU}' не задана. Использована резервная 3D координата: {spawnPos}");
+                    Renderer regRend = regTrans.GetComponent<Renderer>();
+                    if (regRend != null)
+                    {
+                        spawnPos = regRend.bounds.center;
+                        foundRegionPos = true;
+                    }
+                    else
+                    {
+                        spawnPos = regTrans.position;
+                        foundRegionPos = true;
+                    }
+                    // Приподнимаем на 0.2f для красоты размещения
+                    spawnPos.y += 0.2f;
                 }
             }
 
-            // Проецирование на террейн заземленно
-            if (snapCastlesToTerrain && !useManualCastlePositions)
+            if (!foundRegionPos)
+            {
+                if (useManualCastlePositions || preferScriptCoordinates)
+                {
+                    if (customCastlePositions != null && i < customCastlePositions.Length)
+                    {
+                        spawnPos = customCastlePositions[i];
+                    }
+                    else
+                    {
+                        spawnPos = new Vector3((i - 5.5f) * 12f, 0.5f, (i % 2 == 0 ? 5f : -5f));
+                    }
+                }
+                else
+                {
+                    if (i < 4 && i < lpm.landingPoints.Length && lpm.landingPoints[i].spawnAnchor != null)
+                    {
+                        Transform anchor = lpm.landingPoints[i].spawnAnchor;
+                        Vector3 offset = (castleManualOffsets != null && i < castleManualOffsets.Length) ? castleManualOffsets[i] : new Vector3(3.2f, 0f, 3.2f);
+                        spawnPos = anchor.position + offset;
+                    }
+                    else
+                    {
+                        spawnPos = new Vector3((i - 5.5f) * 12f, 1.2f, (i % 2 == 0 ? 5f : -5f));
+                    }
+                }
+            }
+
+            // Проецирование на террейн заземленно (если не ручные координаты)
+            if (snapCastlesToTerrain && !useManualCastlePositions && !foundRegionPos)
             {
                 RaycastHit hit;
                 if (Physics.Raycast(spawnPos + Vector3.up * 50f, Vector3.down, out hit, 100f))
@@ -817,8 +901,8 @@ public class FateCastleManager : MonoBehaviour
             ic.zoneIndex = i;
 
             BoxCollider col = root.AddComponent<BoxCollider>();
-            col.center = new Vector3(0f, 2.5f, 0f);
-            col.size = new Vector3(4.5f, 6.0f, 4.5f);
+            col.center = new Vector3(0f, 1.5f, 0f);
+            col.size = new Vector3(2.5f, 3.5f, 2.5f);
 
             Shader urpShader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("URP/Lit") ?? Shader.Find("Standard");
             Material castleMat = new Material(urpShader);
@@ -2686,6 +2770,7 @@ public class FateCastleManager : MonoBehaviour
             if (GUILayout.Button(townBtnLabel, GUILayout.Height(46)))
             {
                 isTownViewActive = true;
+                currentTownSubPanel = 0; // Начинаем всегда с основных Обзор города
                 isDetailsOpen = false;
                 ShowFeedback("");
             }
@@ -2853,68 +2938,181 @@ public class FateCastleManager : MonoBehaviour
         
         GUILayout.Label(subLabel, subSt);
 
-        GUILayout.Space(12);
+        GUILayout.Space(6);
 
-        // TABS FOR PRECISE MODULE SELECTION (v18.11.16)
-        GUILayout.BeginHorizontal();
-        GUILayout.FlexibleSpace();
-        
-        GUIStyle tabStyle = new GUIStyle(GUI.skin.button);
-        tabStyle.fontSize = 12;
-        tabStyle.fontStyle = FontStyle.Bold;
-        
-        GUI.backgroundColor = (currentTownSubPanel == 0) ? Color.cyan : Color.white;
-        if (GUILayout.Button(curLang == 0 ? "📋 ОБЗОР ГОРОДА" : "📋 TOWN OVERVIEW", tabStyle, GUILayout.Height(32), GUILayout.Width(wWidth / 4.4f)))
+        // КНОПКА ВОЗВРАТА В ОБЗОР ГОРОДА (ПОКАЗЫВАЕТСЯ ТОЛЬКО ВНУТРИ ВДРУГ ВЫБРАННЫХ ВЛАДОК)
+        if (currentTownSubPanel != 0)
         {
-            currentTownSubPanel = 0;
-            feedbackMessage = "";
+            GUI.backgroundColor = new Color(0.15f, 0.65f, 0.95f, 1.0f);
+            if (GUILayout.Button(curLang == 0 ? "◀ ВЕРНУТЬСЯ В ОБЗОР ГОРОДА" : "◀ RETURN TO TOWN OVERVIEW", GUILayout.Height(36)))
+            {
+                currentTownSubPanel = 0;
+                feedbackMessage = "";
+            }
+            GUI.backgroundColor = Color.white;
+            GUILayout.Space(8);
         }
-        
-        GUI.backgroundColor = (currentTownSubPanel == 1) ? new Color(0.2f, 1.0f, 0.6f) : Color.white;
-        if (GUILayout.Button(curLang == 0 ? "⚔️ КАЗАРМЫ (Найм)" : "⚔️ BARRACKS (Recruit)", tabStyle, GUILayout.Height(32), GUILayout.Width(wWidth / 4.4f)))
-        {
-            currentTownSubPanel = 1;
-            feedbackMessage = "";
-        }
-        
-        GUI.backgroundColor = (currentTownSubPanel == 2) ? new Color(1.0f, 0.7f, 0.15f) : Color.white;
-        if (GUILayout.Button(curLang == 0 ? "🧪 КУЗНИЦА И ЛАВКА" : "🧪 FORGE & MERCHANTS", tabStyle, GUILayout.Height(32), GUILayout.Width(wWidth / 4.4f)))
-        {
-            currentTownSubPanel = 2;
-            feedbackMessage = "";
-        }
-        
-        GUI.backgroundColor = (currentTownSubPanel == 3) ? new Color(0.85f, 0.45f, 0.95f) : Color.white;
-        if (GUILayout.Button(curLang == 0 ? "🎓 АКАДЕМИЯ И АРЕНА" : "🎓 ACADEMY & ARENA", tabStyle, GUILayout.Height(32), GUILayout.Width(wWidth / 4.4f)))
-        {
-            currentTownSubPanel = 3;
-            feedbackMessage = "";
-        }
-        
-        GUI.backgroundColor = Color.white;
-        GUILayout.FlexibleSpace();
-        GUILayout.EndHorizontal();
-
-        GUILayout.Space(10);
 
         // Render sections inside selected layout mode
-        GUILayout.BeginHorizontal();
-
-        // --- Column 1: BARRACKS ---
-        if (currentTownSubPanel == 0 || currentTownSubPanel == 1)
+        if (currentTownSubPanel == 0)
         {
-            float colWidth = (currentTownSubPanel == 1) ? (wWidth - 24) : (wWidth / 3.12f);
-            GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(colWidth));
+            // --- ГЛАВНЫЙ ОБЗОР ГОРОДА (3 КРАСИВЫХ ИНТЕРАКТИВНЫХ ВЫБОРА) ---
+            GUILayout.BeginHorizontal();
+
+            float colWidth = wWidth / 3.12f;
+            GUIStyle cardStyle = new GUIStyle(GUI.skin.box);
+            cardStyle.padding = new RectOffset(16, 16, 16, 16);
+
+            // --- КАЗАРМЫ ---
+            GUILayout.BeginVertical(cardStyle, GUILayout.Width(colWidth), GUILayout.Height(wHeight * 0.68f));
             
-            GUIStyle colHeader1 = new GUIStyle(GUI.skin.button);
-            colHeader1.alignment = TextAnchor.MiddleCenter;
-            colHeader1.fontSize = 17;
-            colHeader1.fontStyle = FontStyle.Bold;
-            colHeader1.normal.textColor = new Color(0.2f, 1.0f, 0.6f);
-            if (GUILayout.Button("⚔️ КАЗАРМЫ [Казармы]", colHeader1, GUILayout.Height(36)))
+            GUIStyle colTitle = new GUIStyle(GUI.skin.label);
+            colTitle.alignment = TextAnchor.MiddleCenter;
+            colTitle.fontSize = 18;
+            colTitle.fontStyle = FontStyle.Bold;
+            colTitle.normal.textColor = new Color(0.2f, 1.0f, 0.6f);
+            
+            GUILayout.Label("⚔️ КАЗАРМЫ", colTitle);
+            GUILayout.Label(curLang == 0 ? "Найм когерт легиона и войск" : "Legion cohort recruitment", subSt);
+            
+            GUILayout.FlexibleSpace();
+            
+            // Mini Castle / Barracks ASCII art
+            GUIStyle artStyle = new GUIStyle(GUI.skin.box);
+            artStyle.alignment = TextAnchor.MiddleCenter;
+            artStyle.fontStyle = FontStyle.Bold;
+            artStyle.fontSize = 11;
+            artStyle.normal.textColor = new Color(0.4f, 0.95f, 0.55f);
+            
+            string barracksArt = 
+                "       [⚔️]\n" +
+                "     ===|===\n" +
+                "    [| o o |]\n" +
+                "   /_|__-__|_\\\n" +
+                "  [___________]\n" +
+                "   ||  [ ]  ||\n" +
+                "==============#";
+            GUILayout.Label(barracksArt, artStyle, GUILayout.Height(125));
+            
+            GUILayout.FlexibleSpace();
+            
+            GUIStyle enterBtnStyle = new GUIStyle(GUI.skin.button);
+            enterBtnStyle.fontSize = 13;
+            enterBtnStyle.fontStyle = FontStyle.Bold;
+            enterBtnStyle.normal.textColor = Color.white;
+            
+            GUI.backgroundColor = new Color(0.12f, 0.72f, 0.42f);
+            if (GUILayout.Button(curLang == 0 ? "ВОЙТИ В КАЗАРМЫ" : "ENTER BARRACKS", enterBtnStyle, GUILayout.Height(45)))
             {
                 currentTownSubPanel = 1;
+                feedbackMessage = "";
             }
+            GUI.backgroundColor = Color.white;
+            GUILayout.EndVertical();
+
+            // --- КУЗНИЦА И ЛАВКА ---
+            GUILayout.BeginVertical(cardStyle, GUILayout.Width(colWidth), GUILayout.Height(wHeight * 0.68f));
+            
+            GUIStyle colTitle2 = new GUIStyle(GUI.skin.label);
+            colTitle2.alignment = TextAnchor.MiddleCenter;
+            colTitle2.fontSize = 18;
+            colTitle2.fontStyle = FontStyle.Bold;
+            colTitle2.normal.textColor = new Color(1.0f, 0.7f, 0.15f);
+            
+            GUILayout.Label("🧪 КУЗНИЦА И ЛАВКА", colTitle2);
+            GUILayout.Label(curLang == 0 ? "Торговля, снаряжение и зелья" : "Elixirs & blacksmith forging", subSt);
+            
+            GUILayout.FlexibleSpace();
+            
+            // Mini Forge with Lock ASCII art
+            GUIStyle artStyle2 = new GUIStyle(GUI.skin.box);
+            artStyle2.alignment = TextAnchor.MiddleCenter;
+            artStyle2.fontStyle = FontStyle.Bold;
+            artStyle2.fontSize = 11;
+            artStyle2.normal.textColor = new Color(1.0f, 0.76f, 0.35f);
+            
+            string forgeArt = 
+                "       [🧪]\n" +
+                "     ===|===\n" +
+                "    [| 🔒  |]\n" +
+                "   /_|_ANVIL_|_\\\n" +
+                "  [___________]\n" +
+                "   ||       ||\n" +
+                "==============#";
+            GUILayout.Label(forgeArt, artStyle2, GUILayout.Height(125));
+            
+            GUILayout.FlexibleSpace();
+            
+            GUI.backgroundColor = new Color(0.88f, 0.58f, 0.12f);
+            if (GUILayout.Button(curLang == 0 ? "ОТКРЫТЬ КУЗНИЦУ" : "OPEN FORGE & SHOP", enterBtnStyle, GUILayout.Height(45)))
+            {
+                currentTownSubPanel = 2;
+                feedbackMessage = "";
+            }
+            GUI.backgroundColor = Color.white;
+            GUILayout.EndVertical();
+
+            // --- АКАДЕМИЯ И АРЕНА ---
+            GUILayout.BeginVertical(cardStyle, GUILayout.Width(colWidth), GUILayout.Height(wHeight * 0.68f));
+            
+            GUIStyle colTitle3 = new GUIStyle(GUI.skin.label);
+            colTitle3.alignment = TextAnchor.MiddleCenter;
+            colTitle3.fontSize = 18;
+            colTitle3.fontStyle = FontStyle.Bold;
+            colTitle3.normal.textColor = new Color(0.85f, 0.45f, 0.95f);
+            
+            GUILayout.Label("🎓 АКАДЕМИЯ И АРЕНА", colTitle3);
+            GUILayout.Label(curLang == 0 ? "Прокачка героев и ранги армии" : "Workout drills & army promotion", subSt);
+            
+            GUILayout.FlexibleSpace();
+            
+            // Mini Academic Castle ASCII art
+            GUIStyle artStyle3 = new GUIStyle(GUI.skin.box);
+            artStyle3.alignment = TextAnchor.MiddleCenter;
+            artStyle3.fontStyle = FontStyle.Bold;
+            artStyle3.fontSize = 11;
+            artStyle3.normal.textColor = new Color(0.82f, 0.58f, 0.95f);
+            
+            string academyArt = 
+                "       [🎓]\n" +
+                "     ===|===\n" +
+                "    [| 🏛️  |]\n" +
+                "   /_|_ARENA_|_\\\n" +
+                "  [___________]\n" +
+                "   ||  | |  ||\n" +
+                "==============#";
+            GUILayout.Label(academyArt, artStyle3, GUILayout.Height(125));
+            
+            GUILayout.FlexibleSpace();
+            
+            GUI.backgroundColor = new Color(0.68f, 0.28f, 0.85f);
+            if (GUILayout.Button(curLang == 0 ? "ВОЙТИ В АКАДЕМИЮ" : "ENTER ACADEMY", enterBtnStyle, GUILayout.Height(45)))
+            {
+                currentTownSubPanel = 3;
+                feedbackMessage = "";
+            }
+            GUI.backgroundColor = Color.white;
+            GUILayout.EndVertical();
+
+            GUILayout.EndHorizontal();
+        }
+        else
+        {
+            // Render active section
+            GUILayout.BeginHorizontal();
+
+            // --- Column 1: BARRACKS ---
+            if (currentTownSubPanel == 1)
+            {
+                float colWidth = wWidth - 24;
+                GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(colWidth));
+                
+                GUIStyle colHeader1 = new GUIStyle(GUI.skin.box);
+                colHeader1.alignment = TextAnchor.MiddleCenter;
+                colHeader1.fontSize = 17;
+                colHeader1.fontStyle = FontStyle.Bold;
+                colHeader1.normal.textColor = new Color(0.2f, 1.0f, 0.6f);
+                GUILayout.Label("⚔️ КАЗАРМЫ", colHeader1, GUILayout.Height(36));
             
             string bDesc = curLang == 0 ? "Найм войск в армию согласно уровню замка" : "Troop recruitment matching castle tier";
             GUILayout.Label(bDesc, subSt);
@@ -2947,15 +3145,12 @@ public class FateCastleManager : MonoBehaviour
             float colWidth = (currentTownSubPanel == 2) ? (wWidth - 24) : (wWidth / 3.12f);
             GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(colWidth));
             
-            GUIStyle colHeader2 = new GUIStyle(GUI.skin.button);
+            GUIStyle colHeader2 = new GUIStyle(GUI.skin.box);
             colHeader2.alignment = TextAnchor.MiddleCenter;
             colHeader2.fontSize = 17;
             colHeader2.fontStyle = FontStyle.Bold;
             colHeader2.normal.textColor = new Color(1.0f, 0.7f, 0.15f);
-            if (GUILayout.Button("🧪 КУЗНИЦА И ЛАВКА [Магазин]", colHeader2, GUILayout.Height(36)))
-            {
-                currentTownSubPanel = 2;
-            }
+            GUILayout.Label("🧪 КУЗНИЦА И ЛАВКА", colHeader2, GUILayout.Height(36));
             
             string fDesc = curLang == 0 ? "Покупка зелий разного уровня и 6 тиров доспехов" : "Purchase elixirs & progressive 6 tiers armor gear";
             GUILayout.Label(fDesc, subSt);
@@ -3031,15 +3226,12 @@ public class FateCastleManager : MonoBehaviour
             float colWidth = (currentTownSubPanel == 3) ? (wWidth - 24) : (wWidth / 3.12f);
             GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(colWidth));
             
-            GUIStyle colHeader3 = new GUIStyle(GUI.skin.button);
+            GUIStyle colHeader3 = new GUIStyle(GUI.skin.box);
             colHeader3.alignment = TextAnchor.MiddleCenter;
             colHeader3.fontSize = 17;
             colHeader3.fontStyle = FontStyle.Bold;
             colHeader3.normal.textColor = new Color(0.85f, 0.45f, 0.95f);
-            if (GUILayout.Button("🎓 АКАДЕМИЯ И АРЕНА [Арена]", colHeader3, GUILayout.Height(36)))
-            {
-                currentTownSubPanel = 3;
-            }
+            GUILayout.Label("🎓 АКАДЕМИЯ И АРЕНА", colHeader3, GUILayout.Height(36));
             
             string aDesc = curLang == 0 ? "Тренировки героев, прокачка XP и ранги воинов" : "Hero workouts, dynamic XP drills & troop promotions";
             GUILayout.Label(aDesc, subSt);
@@ -3225,6 +3417,7 @@ public class FateCastleManager : MonoBehaviour
         }
 
         GUILayout.EndHorizontal();
+    }
 
         GUILayout.FlexibleSpace();
 
@@ -3249,6 +3442,7 @@ public class FateCastleManager : MonoBehaviour
         if (GUILayout.Button(leaveLabel, GUILayout.Height(45)))
         {
             isTownViewActive = false;
+            currentTownSubPanel = 0; // Сверхнадежно сбрасываем при выходе в обзор города
         }
         GUI.backgroundColor = Color.white;
 

@@ -710,6 +710,12 @@ namespace FateContinent
                 {
                     FateCastleManager.Instance.ResetToInitialSettings();
                 }
+                
+                // [BACKGROUND SYNC] Показываем мистический фон Zenith при входе в стартовый диалог выбора
+                if (FateDialogueBackgroundController.Instance != null)
+                {
+                    FateDialogueBackgroundController.Instance.ShowBackground(1.0f);
+                }
             }
 
             isDialogueActive = true;
@@ -1059,6 +1065,12 @@ namespace FateContinent
                 dialogPanel.SetActive(false);
             }
             
+            // [BACKGROUND SYNC] Увядаем и отключаем фон Zenith перед десантированием на 3D карту континента
+            if (FateDialogueBackgroundController.Instance != null)
+            {
+                FateDialogueBackgroundController.Instance.HideBackground(1.5f);
+            }
+            
             // После завершения диалога скрываем интерактивную тактическую карту и маркеры, чтобы они не засоряли экран!
             if (FateMapManager.Instance != null)
             {
@@ -1323,6 +1335,43 @@ namespace FateContinent
                     .Replace("Снайпер", "Лучник")
                     .Replace("Стрелок", "Лучник")
                     .Trim();
+            }
+
+            // [ZENITH PROTECTIVE CHECK] Enforce companion and player portraits are distinct and separated
+            if (companionPortraitImage != null && companionPortraitImage == playerPortraitImage)
+            {
+                if (dialogPanel != null)
+                {
+                    Image[] allImgs = dialogPanel.GetComponentsInChildren<Image>(true);
+                    Image leftImg = null;
+                    Image rightImg = null;
+                    float minX = 9999f;
+                    float maxX = -9999f;
+                    foreach (var img in allImgs)
+                    {
+                        RectTransform rt = img.GetComponent<RectTransform>();
+                        if (rt != null && rt.rect.width > 20f && rt.rect.height > 20f)
+                        {
+                            float x = rt.anchoredPosition.x;
+                            if (x < minX) { minX = x; leftImg = img; }
+                            if (x > maxX) { maxX = x; rightImg = img; }
+                        }
+                    }
+                    if (leftImg != null) companionPortraitImage = leftImg;
+                    if (rightImg != null && rightImg != leftImg) playerPortraitImage = rightImg;
+                }
+            }
+
+            // Навеки зачищаем некорректно созданные динамические имена по взаимному пересечению под портретами
+            if (companionPortraitImage != null)
+            {
+                Transform wrongPlayerName = companionPortraitImage.transform.Find("Txt_PlayerName_Dynamic");
+                if (wrongPlayerName != null) DestroyImmediate(wrongPlayerName.gameObject);
+            }
+            if (playerPortraitImage != null)
+            {
+                Transform wrongCompName = playerPortraitImage.transform.Find("Txt_CompanionName_Dynamic");
+                if (wrongCompName != null) DestroyImmediate(wrongCompName.gameObject);
             }
 
             // Наличие и чистота надписей имен в стиле Zenith

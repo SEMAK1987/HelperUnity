@@ -234,6 +234,7 @@ namespace FateContinent
         void OnMouseEnter()
         {
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return; // Проверка на перекрытие интерфейсом
+            if (FateCastleManager.Instance != null && (FateCastleManager.Instance.showStatsPanel || FateCastleManager.Instance.isDetailsOpen || FateCastleManager.Instance.isTownViewActive)) return;
             if (isHighlightedChoice) return;
 
             isHovered = true;
@@ -245,14 +246,15 @@ namespace FateContinent
 
         void OnMouseExit()
         {
-            if (isHighlightedChoice) return;
             isHovered = false;
+            if (isHighlightedChoice) return;
             SetGlowColor(normalGlowColor);
         }
 
         void OnMouseDown()
         {
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+            if (FateCastleManager.Instance != null && (FateCastleManager.Instance.showStatsPanel || FateCastleManager.Instance.isDetailsOpen || FateCastleManager.Instance.isTownViewActive)) return;
 
             // Мягко сжимаем размер при нажатии
             transform.localScale = baseScale * (hoverScaleMultiplier * 0.9f);

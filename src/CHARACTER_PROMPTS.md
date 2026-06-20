@@ -193,4 +193,46 @@ Bust headshot portrait of a powerful Cosmic Magician hero from Fate Continent, l
      - Поставьте галочку на **Enable Scale Pulsing** (чтобы маска слегка дышала в размере), **Min Scale** = `0.98`, **Max Scale** = `1.02`, **Scale Speed** = `1.2`.
    - По завершении настроек в коде запуска сцены, при наведении на кнопку или выборе персонажа, просто активируйте объект маски с помощью `gameObject.SetActive(true)` — и регион начнет плавно и невероятно красиво манить игрока своим зацикленным живым неоновым свечением!
 
+---
+
+## 🎭 РАЗДЕЛ 10: Промпты для 1:1 Квадратных Аватаров Героев (Warrior, Archer, Mage Portrait Assets)
+
+*Эти художественные промпты специально составлены в **пропорции 1:1 (--ar 1:1)** и сфокусированы **исключительно на лицах героев (face close-up portrait)**, обеспечивая идеальное размещение в квадратных слотах интерфейса Unity.*
+
+### 🛡️ 1. Аватар Воина (Warrior Face Portrait)
+*Мужественное, покрытое боевыми шрамами лицо воина с волевым взглядом и платиновыми волосами в тяжелой чешуйчатой броне.*
+> **Prompt:** Close-up photorealistic 1:1 face portrait of a heroic young male warrior, noble expression, bright determined amber eyes, slight chin scar, short platinum blonde messy hair, wearing intricately detailed dark-iron scale armor with glowing neon emerald-green etching. Tight close-up shot focused strictly on the face, dark moody fantasy tavern background with warm candle bokeh. Gorgeous cinematic soft lighting, gritty illustration style matching Witcher 3, extremely detailed 8k render --no cartoon, anime, childish, safe, soft, full body, weapon, shield, frame, border --ar 1:1 --v 6.0
+
+### 🏹 2. Авать Стрелка (Archer Face Portrait)
+*Благородное, утонченное лицо эльфийского следопыта с острыми лиственными узорами на капюшоне и зорким изумрудным взглядом.*
+> **Prompt:** Tight 1:1 face portrait close-up of a graceful female elven forest archer, sharp focused emerald eyes, light silver braided hair, soft elegant facial features, wearing a dark green leather ranger cowl with delicate gold leaf embroidery accents. Focused purely on the face and head, natural mossy forest background with golden morning light filtering through leaves. High fantasy realism, photorealistic leather texture, stunning depth of field, masterpiece 8k --no cartoon, casual, mobile, ugly, full body, bow, arrows, hands --ar 1:1 --v 6.0
+
+### 🔮 3. Аватар Мага (Mage Face Portrait)
+*Аристократичное лицо боевого чародея с мерцающими фиолетовыми руническими татуировками на скулах и глазами, полными энергии Бездны.*
+> **Prompt:** Mystical close-up 1:1 face portrait of a young male sorcerer of the Void, brilliant glowing amethyst-purple eyes, sleek dark purple hair, elegant violet magical rune decals glowing on his cheekbones, wearing a high-collared velvet wizard cloak with starry silver runes. Strict face focus, misty ethereal cosmic background with faint nebulae and magical particle dust. Dramatic rim light, dark fantasy atmospheric lighting, volumetric depth, photorealistic, 8k --no cartoon, low-poly, 3D render look, beard, elderly, full body, magic staff, magic spell, framing --ar 1:1 --v 6.0
+
+
+---
+
+## 🌌 7. МИСТИЧЕСКИЕ ФОНЫ ДЛЯ ЗАДНЕГО ПЛАНА КАРТЫ (Tactical Continent Map Backdrops)
+*Промпты для создания глубоких, атмосферных подложек заднего фона, которые отображаются позади 3D континента. Они обеспечивают аккуратный градиентный переход, благодаря чему модель континента выглядит целостно и "парит" над красивой бездной, а не кажется вырванным пятном.*
+
+### Option 1: 🌌 Космическая Туманность Зенита (The Astral Nebula Horizon)
+> **Prompt:** Deep-space galaxy background for fantasy game map, cosmic dark blue and velvet purple nebula swirls, subtle glowing golden stardust, distant faint astronomical constellations, cinematic ambient overhead lighting, dark fantasy gaming atmosphere, extreme background depth, beautiful smooth color gradients, 8k resolution --no planet, ground, continent, continent boundary, map lines, HUD, UI --ar 16:9
+
+### Option 2: 📜 Древний Пергамент Картографа (The Ancient Parchment Grid)
+> **Prompt:** Authentic dark vintage cartography texture of weathered medieval leather parchment, dark sepia and charcoal gradients page corners, faint golden geographic coordinate grids and old compass wind roses engraved into the background, soft warm volumetric fog overlay, high-fidelity antique material, Witcher 3 map style realism, 8k --no continent, islands, lands, ocean, colored ink, drawing --ar 16:9
+
+### Option 3: 🌊 Глубокие Океанические Волны (The Abyssal Deep Currents)
+> **Prompt:** Atmospheric deep-sea ocean currents from extreme high altitude, dark navy-blue and dark teal water texture, smooth slow swirling waves, subtle bioluminescent marine currents glowing with soft amber and blue below the surface, stormy misty clouds hanging low over the sea, dramatic dark fantasy wave foam, photorealistic 8k --no landmass, continent, graphics, text, grid --ar 16:9
+
+### Option 4: 🏛️ Небесный Рунический Алтарь (The Celestial Runic Mirror)
+> **Prompt:** Mystical dark monolith stone platform floor visible in the deep background, etched with huge faint circular runic inscriptions glowing with soft golden and cyan luminescence, engulfed in mystical wispy grey fog, deep shadows, cinematic fantasy HUD backdrop asset, perfectly balanced dark values, 8k --no bright spots, center icons, landmass, text --ar 16:9
+
+### Option 5: 🌫️ Вулканический Туман Войны (The Volumetric Fog of War)
+> **Prompt:** Smooth dark charcoal and dark grey smoke atmosphere, atmospheric low-hanging volumetric dust, dim reddish embers glowing from volcanic cracks far below, magical indigo fog patterns shifting slowly, epic high contrast backdrop texture, moody fantasy game splash background, 8k --no bright lights, objects, cartoon --ar 16:9
+
+### Option 6: 🪨 Драконья Обсидиановая Плита (Obsidian Dragon Scale Backdrop)
+> **Prompt:** Brutalist fantasy background texture of overlapping massive dark obsidian mineral basalt plates, thin glowing gold and warm amber molten lava cracks weaving through the crevices, rough crystalline dark stone material, moody dramatic soft overhead shadows, photorealistic 8k micro-detail --no flat colors, continent, text, GUI --ar 16:9
+
 
