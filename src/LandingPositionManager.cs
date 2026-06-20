@@ -200,6 +200,9 @@ namespace FateContinent
                     Debug.Log("<color=#00FFCC>[LANDING SYS]</color> Скрипт автоматически нашел Player_Placeholder.");
                 }
             }
+
+            // Кэшируем оригинальные красивые материалы регионов в самом начале, пока сцена полностью активна
+            CacheOriginalMaterials();
         }
 
         private void Start()
@@ -482,6 +485,12 @@ namespace FateContinent
         /// </summary>
         public void CacheOriginalMaterials()
         {
+            // СВЕРХВАЖНО: предотвращаем перезапись красивых оригинальных материалов!
+            if (originalRegionMaterials.Count > 0)
+            {
+                return;
+            }
+
             GameObject continent = GameObject.Find("New_Kontinent") ?? GameObject.Find("/New_Kontinent");
             if (continent == null && continentObject != null)
             {

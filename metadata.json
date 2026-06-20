@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.17. Multi-Structure Castle Interiors (Barracks, forge & alchemy, training parade cooldowns) & dynamic strategic map neutralization.",
+  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.18. Dynamic Army Units, Character Prompts Book Integration & High-Density UI.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

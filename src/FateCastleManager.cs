@@ -1697,6 +1697,90 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.Label(statsReport, derivedStyle);
         GUILayout.Space(10);
         
+        // 🛡️ СНАРЯЖЕНИЕ ПЕРСОНАЖА (EQUIPMENT MANNEQUIN - v18.11.18)
+        GUIStyle eqHeaderStyle = new GUIStyle(GUI.skin.label);
+        eqHeaderStyle.alignment = TextAnchor.MiddleCenter;
+        eqHeaderStyle.fontSize = 12;
+        eqHeaderStyle.fontStyle = FontStyle.Bold;
+        eqHeaderStyle.normal.textColor = new Color(0.12f, 0.88f, 1.0f);
+        
+        string eqTitle = curLang == 0 ? "🛡️ СНАРЯЖЕНИЕ ПЕРСОНАЖА" : "🛡️ HERO EQUIPMENT SLOTS";
+        GUILayout.Label(eqTitle, eqHeaderStyle);
+        GUILayout.Space(4);
+
+        GUILayout.BeginHorizontal(GUI.skin.box);
+        
+        GUIStyle slotLabelStyle = new GUIStyle(GUI.skin.label);
+        slotLabelStyle.alignment = TextAnchor.MiddleCenter;
+        slotLabelStyle.fontSize = 11;
+        slotLabelStyle.normal.textColor = Color.gray;
+
+        // LEFT COLUMN (Slot 8: Weapon / Shield)
+        GUILayout.BeginVertical(GUILayout.Width(76));
+        GUILayout.Label(curLang == 0 ? "⚔️ Слот 8" : "⚔️ Slot 8", slotLabelStyle);
+        GUI.backgroundColor = new Color(0.12f, 0.75f, 0.95f, 0.35f);
+        if (GUILayout.Button(curLang == 0 ? "[ SLOT 8 ]\n\n⚔️\n\nОружие\nWeapon\n(Пусто)" : "[ SLOT 8 ]\n\n⚔️\n\nWeapon\nShield\n(Empty)", GUILayout.Height(175), GUILayout.Width(70)))
+        {
+            ShowFeedback(curLang == 0 ? "Слот оружия пуст. Приобретите клинок в Кузнице!" : "Weapon slot is empty. Forge or buy equipment to slot!");
+        }
+        GUI.backgroundColor = Color.white;
+        GUILayout.EndVertical();
+
+        // CENTER COLUMN (Silhouette Mannequin: Head [1], Neck [2], Chest [4], Belt [6], Boots [7])
+        GUILayout.BeginVertical(GUILayout.Width(110));
+        
+        // Slot 1: Head
+        GUI.backgroundColor = new Color(0.12f, 0.75f, 0.95f, 0.35f);
+        if (GUILayout.Button("[ 1 ] 👑\nГолова", GUILayout.Width(100), GUILayout.Height(33))) {
+            ShowFeedback(curLang == 0 ? "Шлем не экипирован." : "No helmet equipped.");
+        }
+        
+        // Slot 2: Neck
+        if (GUILayout.Button("[ 2 ] 📿\nШея / Амулет", GUILayout.Width(100), GUILayout.Height(33))) {
+            ShowFeedback(curLang == 0 ? "Амулет не экипирован." : "No necklace equipped.");
+        }
+
+        // Slot 4: Torso / Chest
+        if (GUILayout.Button("[ 4 ] 👕\nДоспех / Chest", GUILayout.Width(100), GUILayout.Height(36))) {
+            ShowFeedback(curLang == 0 ? "Броня не экипирована." : "No heavy chestplate equipped.");
+        }
+
+        // Slot 6: Belt
+        if (GUILayout.Button("[ 6 ] 🎗️\nПояс", GUILayout.Width(100), GUILayout.Height(30))) {
+            ShowFeedback(curLang == 0 ? "Ремень не экипирован." : "No leather belt equipped.");
+        }
+
+        // Slot 7: Boots
+        if (GUILayout.Button("[ 7 ] 🥾\nОбувь", GUILayout.Width(100), GUILayout.Height(33))) {
+            ShowFeedback(curLang == 0 ? "Сапоги не экипированы." : "No steel boots equipped.");
+        }
+        GUI.backgroundColor = Color.white;
+
+        GUILayout.EndVertical();
+
+        // RIGHT COLUMN (Slot 3: Shoulders, Slot 5: Rings)
+        GUILayout.BeginVertical(GUILayout.Width(76));
+        GUILayout.Label(curLang == 0 ? "🛡️ Доспехи" : "🛡️ Armor", slotLabelStyle);
+        
+        // Slot 3: Shoulders
+        GUI.backgroundColor = new Color(0.12f, 0.75f, 0.95f, 0.35f);
+        if (GUILayout.Button("[ 3 ] 🦾\nПлечи\nShoulders", GUILayout.Height(84), GUILayout.Width(70))) {
+            ShowFeedback(curLang == 0 ? "Наплечники не экипированы." : "No shoulders armed.");
+        }
+        
+        GUILayout.Space(6);
+        
+        // Slot 5: Rings
+        if (GUILayout.Button("[ 5 ] 💍\nКольцо\nRing", GUILayout.Height(84), GUILayout.Width(70))) {
+            ShowFeedback(curLang == 0 ? "Кольцо не экипировано." : "No ring equipped.");
+        }
+        GUI.backgroundColor = Color.white;
+        
+        GUILayout.EndVertical();
+
+        GUILayout.EndHorizontal();
+        GUILayout.Space(10);
+        
         // 🧬 ДОПОЛНИТЕЛЬНЫЙ КЛАССОВЫЙ БЛОК НАВЫКОВ
         GUIStyle skillsHeaderStyle = new GUIStyle(GUI.skin.label);
         skillsHeaderStyle.alignment = TextAnchor.MiddleCenter;
@@ -2056,6 +2140,26 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.Label($"⚔️ Атака (ATK): {atk}", statStyle);
         GUILayout.Label($"🛡️ Защита (DEF): {def}", statStyle);
         GUILayout.Label($"⚡ Скорость (SPD): {spd}", statStyle);
+
+        if (isComrade)
+        {
+            int currentLevel = PlayerPrefs.GetInt("Companion_Lvl_" + selectedTroopId, 1);
+            int compSTR = GetCompanionStat(selectedTroopId, "strength", currentLevel);
+            int compAGI = GetCompanionStat(selectedTroopId, "agility", currentLevel);
+            int compINT = GetCompanionStat(selectedTroopId, "intelligence", currentLevel);
+            int compSTA = GetCompanionStat(selectedTroopId, "stamina", currentLevel);
+
+            GUILayout.Space(4);
+            GUIStyle attrHeaderStyle = new GUIStyle(GUI.skin.label);
+            attrHeaderStyle.fontStyle = FontStyle.Bold;
+            attrHeaderStyle.fontSize = 11;
+            attrHeaderStyle.normal.textColor = Color.yellow;
+            GUILayout.Label(curLang == 0 ? "🔥 Базовые параметры:" : "🔥 Base Stats:", attrHeaderStyle);
+            GUILayout.Label($"🔥 Сила (STR): {compSTR}", statStyle);
+            GUILayout.Label($"⚡ Ловкость (AGI): {compAGI}", statStyle);
+            GUILayout.Label($"🔮 Интеллект (INT): {compINT}", statStyle);
+            GUILayout.Label($"💚 Выносливость (STA): {compSTA}", statStyle);
+        }
         GUILayout.EndVertical();
 
         GUILayout.EndHorizontal();
@@ -3732,24 +3836,38 @@ public class FateCastleManager : MonoBehaviour
 
     public int GetCompanionStat(string classKey, string statName, int level)
     {
+        int str = 10, agi = 10, intel = 10, sta = 10;
         if (classKey == "WarriorHero")
         {
-            if (statName == "hp") return 150 + level * 25;
-            if (statName == "atk") return 15 + level * 3;
-            if (statName == "def") return 12 + level * 2;
+            str = 15 + (level - 1) * 3;
+            agi = 10 + (level - 1) * 1;
+            intel = 4 + (level - 1) * 1;
+            sta = 15 + (level - 1) * 3;
         }
         else if (classKey == "ArcherHero")
         {
-            if (statName == "hp") return 110 + level * 15;
-            if (statName == "atk") return 20 + level * 4;
-            if (statName == "def") return 6 + level * 1;
+            str = 10 + (level - 1) * 1;
+            agi = 14 + (level - 1) * 3;
+            intel = 6 + (level - 1) * 1;
+            sta = 11 + (level - 1) * 2;
         }
         else // MageHero
         {
-            if (statName == "hp") return 95 + level * 12;
-            if (statName == "atk") return 25 + level * 5;
-            if (statName == "def") return 4 + level * 1;
+            str = 6 + (level - 1) * 1;
+            agi = 10 + (level - 1) * 1;
+            intel = 10 + (level - 1) * 4;
+            sta = 9 + (level - 1) * 1;
         }
+
+        if (statName == "strength") return str;
+        if (statName == "agility") return agi;
+        if (statName == "intelligence") return intel;
+        if (statName == "stamina") return sta;
+
+        if (statName == "hp") return sta * 10;
+        if (statName == "atk") return Mathf.RoundToInt(str * 2.5f + agi * 0.5f);
+        if (statName == "def") return Mathf.RoundToInt(agi * 1.5f + str * 0.5f);
+
         return 10;
     }
 }
