@@ -533,22 +533,25 @@ public class SettingsManager : MonoBehaviour
                 if (index <= 1)
                 {
                     // Оптимизация под слабые ПК: убираем отражения и отключаем тени на плоскости
-                    mr.material.SetFloat("_Glossiness", 0.1f);
-                    mr.material.SetFloat("_Metallic", 0.0f);
+                    if (mr.material.HasProperty("_Glossiness")) mr.material.SetFloat("_Glossiness", 0.1f);
+                    if (mr.material.HasProperty("_Smoothness")) mr.material.SetFloat("_Smoothness", 0.1f);
+                    if (mr.material.HasProperty("_Metallic")) mr.material.SetFloat("_Metallic", 0.0f);
                     mr.receiveShadows = false;
                 }
                 else if (index <= 3)
                 {
                     // Баланс качества и производительности
-                    mr.material.SetFloat("_Glossiness", 0.5f);
-                    mr.material.SetFloat("_Metallic", 0.1f);
+                    if (mr.material.HasProperty("_Glossiness")) mr.material.SetFloat("_Glossiness", 0.5f);
+                    if (mr.material.HasProperty("_Smoothness")) mr.material.SetFloat("_Smoothness", 0.5f);
+                    if (mr.material.HasProperty("_Metallic")) mr.material.SetFloat("_Metallic", 0.15f);
                     mr.receiveShadows = true;
                 }
                 else
                 {
                     // Ультра-настройки: включаем полный шейдерный блеск, блики и отражения
-                    mr.material.SetFloat("_Glossiness", 0.85f);
-                    mr.material.SetFloat("_Metallic", 0.3f);
+                    if (mr.material.HasProperty("_Glossiness")) mr.material.SetFloat("_Glossiness", 0.85f);
+                    if (mr.material.HasProperty("_Smoothness")) mr.material.SetFloat("_Smoothness", 0.85f);
+                    if (mr.material.HasProperty("_Metallic")) mr.material.SetFloat("_Metallic", 0.35f);
                     mr.receiveShadows = true;
                 }
             }

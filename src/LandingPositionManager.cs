@@ -238,6 +238,13 @@ namespace FateContinent
         /// <param name="zoneIndex">Индекс выбранной зоны (0: Кровавые Пустоши, 1: Ледяной Пик, 2: Древние Руины, 3: Грозовые Кряжи)</param>
         public void DispatchLanding(int zoneIndex)
         {
+            // Скрываем полноэкранный фоновый канвас высадки Аэлиссы, чтобы он не перекрывал карты в момент высадки
+            if (FateDialogueBackgroundController.Instance != null)
+            {
+                FateDialogueBackgroundController.Instance.HideBackground();
+                Debug.Log("<color=#00FFCC>[LANDING SYS]</color> Досрочно скрываем полноэкранный диалоговый фон перед полетом камеры!");
+            }
+
             // Включаем 3D-карту и героя обратно при начале перемещения камеры
             if (continentObject != null)
             {
@@ -414,14 +421,23 @@ namespace FateContinent
             {
                 Material oceanMat = null;
                 
-                // Попытка найти уже настроенный в ассетах материал M_Ocean_Background, чтобы избежать сброса текстур
-                Material[] availableMats = Resources.FindObjectsOfTypeAll<Material>();
-                foreach (var m in availableMats)
+                // Сначала проверяем, назначен ли уже материал M_Ocean_Background непосредственно на плоскости
+                if (mr.sharedMaterial != null && mr.sharedMaterial.name.Contains("M_Ocean_Background"))
                 {
-                    if (m != null && m.name == "M_Ocean_Background")
+                    oceanMat = mr.sharedMaterial;
+                }
+                
+                // Попытка найти уже настроенный в ассетах материал M_Ocean_Background, чтобы избежать сброса текстур
+                if (oceanMat == null)
+                {
+                    Material[] availableMats = Resources.FindObjectsOfTypeAll<Material>();
+                    foreach (var m in availableMats)
                     {
-                        oceanMat = m;
-                        break;
+                        if (m != null && m.name == "M_Ocean_Background")
+                        {
+                            oceanMat = m;
+                            break;
+                        }
                     }
                 }
 
@@ -444,7 +460,7 @@ namespace FateContinent
                     if (oceanMat.HasProperty("_Metallic")) oceanMat.SetFloat("_Metallic", 0.4f);
                 }
 
-                // Восстанавливаем текстуру, если она пропала
+                // Восстанавливаем текстуру, только если она действительно пуста
                 if (oceanMat.mainTexture == null)
                 {
                     Texture2D[] allTextures = Resources.FindObjectsOfTypeAll<Texture2D>();
@@ -452,6 +468,10 @@ namespace FateContinent
                     {
                         if (tex != null && (tex.name.ToLower().Contains("water") || tex.name.ToLower().Contains("ocean") || tex.name.ToLower().Contains("sea")))
                         {
+                            // Избегаем случайного назначения текстур нормалей (bump maps, normal maps)
+                            if (tex.name.ToLower().Contains("normal") || tex.name.ToLower().Contains("bump"))
+                                continue;
+
                             oceanMat.mainTexture = tex;
                             break;
                         }
@@ -530,11 +550,16 @@ namespace FateContinent
         }
 
         /// <summary>
-        /// Восстанавливает оригинальный красивый материал под игроком, а остальные невыбранные делает нейтрально серыми
+        /// Восстанавливает оригинальный красивый материал под игроком, а остальные делает нейтрально серыми,
+        /// с поддержкой ручной настройки цвета каждого из 12 регионов при калибровке!
         /// </summary>
         public void RepaintRegionsBasedOnLanding(int activeZoneIndex)
         {
-            string[] regionNames = new string[] { "Region_03", "Region_06", "Region_08", "Region_11" };
+            string[] regionNames = new string[12];
+            for (int r = 0; r < 12; r++)
+            {
+                regionNames[r] = "Region_" + r.ToString("D2");
+            }
 
             GameObject continent = GameObject.Find("New_Kontinent") ?? GameObject.Find("/New_Kontinent");
             if (continent == null && continentObject != null)
@@ -546,7 +571,7 @@ namespace FateContinent
             {
                 Shader urpShader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("URP/Lit") ?? Shader.Find("Standard");
 
-                for (int i = 0; i < regionNames.Length; i++)
+                for (int i = 0; i < 12; i++)
                 {
                     string name = regionNames[i];
                     Transform regionTrans = continent.transform.Find(name);
@@ -567,42 +592,72 @@ namespace FateContinent
                         MeshRenderer mr = regionTrans.GetComponent<MeshRenderer>();
                         if (mr != null)
                         {
-                            if (i == activeZoneIndex)
+                            // Определяем владельца замка 'i'
+                            string owner = "Enemy";
+                            if (FateCastleManager.Instance != null && i < FateCastleManager.Instance.castles.Count)
                             {
-                                // Под игроком должен быть красивый оригинальный цвет с картами текстур, который был изначально!
-                                if (originalRegionMaterials.ContainsKey(name) && originalRegionMaterials[name] != null)
-                                {
-                                    mr.material = originalRegionMaterials[name];
-                                    Debug.Log($"[LANDING SYS] Восстановлен оригинальный материал '{originalRegionMaterials[name].name}' для выбранного игроком региона {name}");
-                                }
-                                else
-                                {
-                                    // Резервный красивый цвет, если сцена грузится заново в обход Start кэширования
-                                    Color[] activeColors = new Color[] {
-                                        new Color(0.92f, 0.12f, 0.28f, 1.0f), // Crimson red
-                                        new Color(0.11f, 0.64f, 0.92f, 1.0f), // Ice blue
-                                        new Color(0.12f, 0.15f, 0.88f, 1.0f), // Sapphire blue
-                                        new Color(0.12f, 0.88f, 0.45f, 1.0f)  // Emerald green
-                                    };
-                                    Material dynamicMat = new Material(urpShader);
-                                    dynamicMat.color = activeColors[i];
-                                    if (dynamicMat.HasProperty("_Glossiness")) dynamicMat.SetFloat("_Glossiness", 0.75f);
-                                    if (dynamicMat.HasProperty("_Smoothness")) dynamicMat.SetFloat("_Smoothness", 0.75f);
-                                    if (dynamicMat.HasProperty("_Metallic")) dynamicMat.SetFloat("_Metallic", 0.3f);
-                                    mr.material = dynamicMat;
-                                }
+                                owner = FateCastleManager.Instance.castles[i].owner;
                             }
                             else
                             {
-                                // Точки, которые игрок НЕ выбрал при выборе высадки, становятся серыми и матовыми
-                                Material dynamicMat = new Material(urpShader);
-                                dynamicMat.color = new Color(0.38f, 0.42f, 0.45f, 1.0f); // Нейтрально глубокий серый
-                                if (dynamicMat.HasProperty("_Glossiness")) dynamicMat.SetFloat("_Glossiness", 0.15f);
-                                if (dynamicMat.HasProperty("_Smoothness")) dynamicMat.SetFloat("_Smoothness", 0.15f);
-                                if (dynamicMat.HasProperty("_Metallic")) dynamicMat.SetFloat("_Metallic", 0.05f);
-                                mr.material = dynamicMat;
-                                Debug.Log($"[LANDING SYS] Успешно затемнен невыбранный игроком регион: {name}");
+                                int tempLanded = PlayerPrefs.GetInt("LandedZoneIndex", 0);
+                                int actReg = FateCastleManager.GetActualRegionIndexFromLanding(tempLanded);
+                                owner = (i == actReg) ? "Player" : "Enemy";
                             }
+
+                            // Определяем целевой цвет региона
+                            Color targetColor;
+                            if (owner == "Player")
+                            {
+                                // Регион игрока: Красивый неоновый сине-голубой Zenith Neon Blue!
+                                targetColor = new Color(0.12f, 0.58f, 0.95f, 1.0f);
+                            }
+                            else
+                            {
+                                // Регион врагов или нейтралов:
+                                // Проверяем, есть ли сохраненный пользователем вручную цвет для этого региона (Level Editor)
+                                if (PlayerPrefs.HasKey("Region_ColorR_" + i))
+                                {
+                                    float rVal = PlayerPrefs.GetFloat("Region_ColorR_" + i);
+                                    float gVal = PlayerPrefs.GetFloat("Region_ColorG_" + i);
+                                    float bVal = PlayerPrefs.GetFloat("Region_ColorB_" + i);
+                                    targetColor = new Color(rVal, gVal, bVal, 1.0f);
+                                }
+                                else
+                                {
+                                    // Цветовая палитра фракций по умолчанию для закрытых туманов войны
+                                    if (i == 2 || i == 10) targetColor = new Color(0.48f, 0.52f, 0.55f, 1.0f); // Slate Neutrals
+                                    else if (i == 1 || i == 7) targetColor = new Color(0.9f, 0.2f, 0.3f, 1.0f); // Bandit Crimson
+                                    else if (i == 0 || i == 4 || i == 5 || i == 9) targetColor = new Color(0.15f, 0.72f, 0.28f, 1.0f); // Elven Green
+                                    else targetColor = new Color(0.45f, 0.35f, 0.65f, 1.0f); // Dark Violet Void
+                                }
+                            }
+
+                            // Если это активный регион под ГЕРОЕМ, подсвечиваем его дополнительной яркостью!
+                            int landedZone = PlayerPrefs.GetInt("LandedZoneIndex", activeZoneIndex);
+                            int actualPlayerRegion = FateCastleManager.GetActualRegionIndexFromLanding(landedZone);
+                            if (i == actualPlayerRegion)
+                            {
+                                // Смешиваем на 35% с ярким цветом морской волны для подсветки активного региона под героем!
+                                targetColor = Color.Lerp(targetColor, Color.cyan, 0.35f);
+                            }
+
+                            // Создаем оригинальный материал
+                            Material dynamicMat = new Material(urpShader);
+                            dynamicMat.color = targetColor;
+                            
+                            // Сохраняем исходную текстуру, если она была на оригинальном материале
+                            if (originalRegionMaterials.ContainsKey(name) && originalRegionMaterials[name] != null)
+                            {
+                                dynamicMat.mainTexture = originalRegionMaterials[name].mainTexture;
+                            }
+
+                            // Настройка шейдера и отражений
+                            if (dynamicMat.HasProperty("_Glossiness")) dynamicMat.SetFloat("_Glossiness", (i == actualPlayerRegion) ? 0.75f : 0.4f);
+                            if (dynamicMat.HasProperty("_Smoothness")) dynamicMat.SetFloat("_Smoothness", (i == actualPlayerRegion) ? 0.75f : 0.4f);
+                            if (dynamicMat.HasProperty("_Metallic")) dynamicMat.SetFloat("_Metallic", (i == actualPlayerRegion) ? 0.25f : 0.12f);
+
+                            mr.material = dynamicMat;
                         }
                     }
                 }

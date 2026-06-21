@@ -343,15 +343,20 @@ export const CastleFacilities: React.FC<CastleFacilitiesProps> = ({
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5" id="Barracks_Roster_Layout">
             
-            {/* LEFT SIDE: List of 10 soldiers (3 cols) */}
-            <div className="lg:col-span-4 flex flex-col space-y-2 max-h-[580px] overflow-y-auto pr-1 text-left scrollbar-thin">
+            {/* LEFT SIDE: List of 10 soldiers (5 cols) */}
+            <div className="lg:col-span-5 flex flex-col space-y-2.5 max-h-[580px] overflow-y-auto pr-1 text-left scrollbar-thin">
               <span className="text-[8px] font-bold tracking-widest text-emerald-500 uppercase px-1">
-                👥 Реестр Дивизий (Найм и Прокачка):
+                👥 Реестр Дивизий (Найм, Характеристики и Навыки):
               </span>
               {ALL_TROOPS_ROSTER.map(troop => {
                 const prog = troopProgress[troop.id] || { lvl: 1, xp: 0 };
                 const isSelected = selectedTroopId === troop.id;
                 const userImg = customImages[`troop_${troop.id}`];
+
+                // Dynamically scale characteristics for the list card representation
+                const hp = troop.baseHp + (prog.lvl - 1) * troop.hpPerLvl;
+                const dmg = troop.baseDmg + (prog.lvl - 1) * troop.dmgPerLvl;
+                const arm = troop.baseArm + (prog.lvl - 1) * troop.armPerLvl;
 
                 return (
                   <button
@@ -360,32 +365,54 @@ export const CastleFacilities: React.FC<CastleFacilitiesProps> = ({
                       playClickSfx(400 + troop.cost / 2, 0.1);
                       setSelectedTroopId(troop.id);
                     }}
-                    className={`w-full p-2.5 rounded-xl border flex items-center justify-between text-left transition-all ${
+                    className={`w-full p-3 rounded-2xl border flex flex-col gap-2 text-left transition-all ${
                       isSelected 
-                        ? 'bg-gradient-to-r from-emerald-950/80 to-slate-900 border-emerald-500 text-white shadow-[0_0_12px_rgba(16,185,129,0.15)] scale-[1.01]' 
-                        : 'bg-slate-950/70 border-white/5 text-slate-400 hover:text-white hover:bg-slate-900/60 hover:border-white/10'
+                        ? 'bg-gradient-to-br from-emerald-950/90 via-slate-900 to-slate-950 border-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.2)] scale-[1.01]' 
+                        : 'bg-slate-950/70 border-white/5 text-slate-300 hover:text-white hover:bg-slate-900/60 hover:border-white/10'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
-                      {/* Round indicator with image or icon */}
-                      <div className="w-9 h-9 rounded-lg bg-slate-900 border border-white/10 flex items-center justify-center overflow-hidden relative">
-                        {userImg ? (
-                          <img src={userImg} className="w-full h-full object-cover" alt="" referrerPolicy="no-referrer" />
-                        ) : (
-                          <span className="text-base">{troop.icon}</span>
-                        )}
-                      </div>
-                      <div>
-                        <div className="text-[10px] font-black tracking-tight">{troop.name}</div>
-                        <div className="text-[7.5px] text-slate-500 uppercase tracking-wider">
-                          {troop.rarity} • {troop.classType}
+                    {/* Top Row: Icon + Name on left, Lvl + Cost on right */}
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-lg bg-slate-900 border border-white/10 flex items-center justify-center overflow-hidden relative shrink-0">
+                          {userImg ? (
+                            <img src={userImg} className="w-full h-full object-cover" alt="" referrerPolicy="no-referrer" />
+                          ) : (
+                            <span className="text-sm">{troop.icon}</span>
+                          )}
+                        </div>
+                        <div>
+                          <div className="text-[10.5px] font-black tracking-tight leading-tight">{troop.name}</div>
+                          <div className="text-[7px] text-slate-400 uppercase tracking-widest mt-0.5">
+                            {troop.rarity} • {troop.classType}
+                          </div>
                         </div>
                       </div>
+
+                      {/* Right Purchase Info */}
+                      <div className="text-right shrink-0">
+                        <div className="text-[9px] font-mono text-emerald-400 font-bold">Ур. {prog.lvl}</div>
+                        <div className="text-[7.5px] text-amber-400 font-mono font-bold">{troop.cost} 🪙</div>
+                      </div>
                     </div>
-                    
-                    <div className="text-right">
-                      <div className="text-[9.5px] font-mono text-emerald-400 font-bold">Ур. {prog.lvl}</div>
-                      <div className="text-[7.5px] text-slate-500 font-mono">Cost: {troop.cost} 🪙</div>
+
+                    {/* Middle Row: Characteristics shifted down */}
+                    <div className="grid grid-cols-3 gap-1 bg-slate-900/50 p-1 rounded-md border border-white/5 text-[7px] font-mono text-slate-300">
+                      <div className="text-center">❤️ {hp} HP</div>
+                      <div className="text-center">⚔️ {dmg} DMG</div>
+                      <div className="text-center">🛡️ {arm} ARM</div>
+                    </div>
+
+                    {/* Bottom Row: Skills list */}
+                    <div className="space-y-0.5 text-[7px] leading-tight text-slate-400 px-0.5 border-t border-white/5 pt-1">
+                      <div className="flex items-center gap-1.5 overflow-hidden text-ellipsis whitespace-nowrap">
+                        <span className="text-[6px] bg-emerald-500/10 text-emerald-400 px-1 py-0.2 rounded shrink-0 font-bold uppercase">ПАСС</span>
+                        <span className="font-medium text-slate-300 truncate">{troop.passives.map(p => p.name).join(' & ')}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 overflow-hidden text-ellipsis whitespace-nowrap">
+                        <span className="text-[6px] bg-amber-500/10 text-amber-400 px-1 py-0.2 rounded shrink-0 font-bold uppercase">АКТИВ</span>
+                        <span className="font-medium text-slate-300 truncate">{troop.actives.map(a => a.name).join(' & ')}</span>
+                      </div>
                     </div>
                   </button>
                 );
@@ -393,8 +420,8 @@ export const CastleFacilities: React.FC<CastleFacilitiesProps> = ({
             </div>
 
 
-            {/* RIGHT SIDE: Detail Sheet & Leonardo Prompts / Image custom uploads (8 cols) */}
-            <div className="lg:col-span-8 bg-slate-950/90 border border-white/5 p-5 rounded-2xl flex flex-col justify-between space-y-4 text-left">
+            {/* RIGHT SIDE: Detail Sheet & Leonardo Prompts / Image custom uploads (7 cols) */}
+            <div className="lg:col-span-7 bg-slate-950/90 border border-white/5 p-5 rounded-2xl flex flex-col justify-between space-y-4 text-left">
               
               {/* Unit Hero Showcase */}
               <div>

@@ -1027,6 +1027,12 @@ namespace FateContinent
                     dialogPanel.SetActive(false);
                 }
                 
+                // [BACKGROUND SYNC] Скрываем фон при окончании пост-десантирования
+                if (FateDialogueBackgroundController.Instance != null)
+                {
+                    FateDialogueBackgroundController.Instance.HideBackground(1.2f);
+                }
+                
                 // Активируем полнофункциональный HUD и 3D спавн замков кампании Континента
                 if (FateCastleManager.Instance != null)
                 {

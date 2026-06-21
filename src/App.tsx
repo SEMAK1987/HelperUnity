@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { CastleFacilities } from "./components/CastleFacilities";
+import { ExternalSkillsDBView } from "./components/ExternalSkillsDBView";
 import {
   Cpu,
   Code,
@@ -1899,6 +1900,7 @@ export default function App() {
     | "migration"
     | "game_design"
     | "game_help"
+    | "external_skills_db"
   >("chat");
   const [appVersion, setAppVersion] = useState("18.11.15");
 
@@ -4677,6 +4679,16 @@ export default function App() {
                 Маркеров
               </button>
               <button
+                onClick={() => setActiveTab("external_skills_db")}
+                className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 ${
+                  activeTab === "external_skills_db"
+                    ? "bg-blue-600 text-white shadow-lg shadow-blue-600/40"
+                    : "text-blue-400 hover:bg-blue-600/10 border border-blue-500/20"
+                } hover:scale-105 active:scale-100 duration-300`}
+              >
+                <BrainCircuit className="w-3.5 h-3.5" /> База Знаний ИИ
+              </button>
+              <button
                 onClick={() => setActiveTab("game_design")}
                 className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 ${
                   activeTab === "game_design"
@@ -5366,6 +5378,8 @@ export default function App() {
                     </div>
                   </div>
                 </div>
+              ) : activeTab === "external_skills_db" ? (
+                <ExternalSkillsDBView />
               ) : activeTab === "game_help" ? (
                 <GameHelpView />
               ) : activeTab === "game_design" ? (
@@ -11609,8 +11623,8 @@ export default function App() {
                                         {/* Speaker Name label in bold */}
                                         <div className="text-[11px] font-black text-amber-400 uppercase tracking-widest mt-1">
                                           {simDialogueLang === "RU"
-                                            ? "Аэлисса, Хранительница Кристалла"
-                                            : "Aelyssa, Keeper of Crystal"}
+                                            ? "Аэлисса"
+                                            : "Aelyssa"}
                                         </div>
 
                                         {/* Dialogue message itself inside standard styling */}

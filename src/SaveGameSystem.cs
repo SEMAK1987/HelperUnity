@@ -91,7 +91,7 @@ public static class SaveGameSystem
     /// Полная загрузка игры из слота.
     /// Возвращает true, если слот успешно загружен.
     /// </summary>
-    public static bool Load(int slotIndex)
+    public static bool Load(int slotIndex, bool loadScene = true)
     {
         if (!PlayerPrefs.HasKey("Save_Slot_" + slotIndex))
         {
@@ -111,6 +111,12 @@ public static class SaveGameSystem
 
         // Синхронизируем уровень сложности в PlayerPrefs, чтобы геймплей его подхватил
         PlayerPrefs.SetInt("Difficulty", CurrentData.selectedDifficulty);
+
+        if (!loadScene)
+        {
+            Debug.Log($"[FATE SAVE] Данные прогресса успешно загружены в память из Слота {slotIndex} (без загрузки сцены).");
+            return true;
+        }
 
         // 2. Загружаем сцену, на которой остановился игрок
         int targetScene = PlayerPrefs.GetInt("Save_Slot_" + slotIndex + "_Scene", 1);

@@ -50,13 +50,13 @@ namespace FateContinent
             targetCanvas = GetComponent<Canvas>();
             if (targetCanvas != null)
             {
-                // Принудительно устанавливаем режим отрисовки в Screen Space - Overlay
-                targetCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                // Принудительно устанавливаем режим отрисовки в Screen Space - Overlay (КОММЕНТИРУЕМ ДЛЯ ПРЕДОТВРАЩЕНИЯ ПЕРЕКРЫТИЯ КАМЕРЫ!)
+                // targetCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
                 
                 // [CRITICAL EXPLICIT RULE] Устанавливаем самый нижний порядок отрисовки, гарантирующий подложку
                 targetCanvas.sortingOrder = -100;
                 
-                Debug.Log("<color=#00FF99>[FATE BACKGROUND]</color> Canvas настроен в Overlay с Sorting Order = -100.");
+                Debug.Log("<color=#00FF99>[FATE BACKGROUND]</color> Canvas настроен со значением Sorting Order = -100. Метод отрисовки сохранен из инспектора.");
             }
 
             // Получаем или добавляем CanvasScaler для Universal Resolution Sync
@@ -160,7 +160,18 @@ namespace FateContinent
         {
             float targetDuration = duration >= 0f ? duration : defaultFadeDuration;
 
-            if (activeFadeRoutine != null) StopCoroutine(activeFadeRoutine);
+            if (activeFadeRoutine != null) 
+            {
+                StopCoroutine(activeFadeRoutine);
+                activeFadeRoutine = null;
+            }
+
+            // Если фоновый GameObject уже деактивирован, просто сбрасываем параметры и выходим
+            if (!gameObject.activeInHierarchy)
+            {
+                if (canvasGroup != null) canvasGroup.alpha = 0f;
+                return;
+            }
 
             if (targetDuration <= 0f)
             {
@@ -172,7 +183,7 @@ namespace FateContinent
                 activeFadeRoutine = StartCoroutine(FadeRoutine(0f, targetDuration, true));
             }
 
-            Debug.Log("<color=#FF6600>[FATE BACKGROUND]</color> Увядание фона запущено перед 3D десантированием на " + targetDuration + " сек.");
+            Debug.Log("<color=#FF6600>[FATE BACKGROUND]</color> Увядание фона выполнено/запущено перед 3D десантированием на " + targetDuration + " сек.");
         }
 
         private IEnumerator FadeRoutine(float targetAlpha, float duration, bool disableOnEnd = false)
