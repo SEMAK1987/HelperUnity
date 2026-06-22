@@ -210,25 +210,102 @@ namespace FateContinent
             // СВЕРХВАЖНО: Кэшируем оригинальные красивые материалы регионов перед их деактивацией или перекраской!
             CacheOriginalMaterials();
 
-            // СВЕРХВАЖНО: Изначально полностью выключаем 3D-карту, океан и героя, чтобы они не лезли на задний план вступительных диалогов Аэлиссы!
-            if (continentObject != null)
-            {
-                continentObject.SetActive(false);
-                Debug.Log("[LANDING SYS] Изначально деактивировали 3D Континент, чтобы очистить задний план диалога.");
-            }
+            bool isGameplayActive = PlayerPrefs.GetInt("ContinentGameplayActive", 0) == 1;
 
-            if (playerTransform != null)
+            if (isGameplayActive)
             {
-                playerTransform.gameObject.SetActive(false);
-                Debug.Log("[LANDING SYS] Изначально деактивировали Player_Placeholder.");
-            }
+                // Если геймплей на континенте уже активен (загрузка сохранения / возвращение из битвы)
+                if (continentObject != null)
+                {
+                    continentObject.SetActive(true);
+                    Debug.Log("[LANDING SYS] Геймплей активен: Включили 3D Континент.");
+                }
 
-            // Изначально скрываем океан, чтобы не мешал во время разговора
-            GameObject oceanObj = GameObject.Find("Fate_Ocean_Plane");
-            if (oceanObj != null)
+                // Активируем океан обратно
+                GameObject oceanObj = null;
+                foreach (var go in Resources.FindObjectsOfTypeAll<GameObject>())
+                {
+                    if (go.name == "Fate_Ocean_Plane" && go.scene.isLoaded)
+                    {
+                        oceanObj = go;
+                        break;
+                    }
+                }
+                if (oceanObj != null)
+                {
+                    oceanObj.SetActive(true);
+                    Debug.Log("[LANDING SYS] Геймплей активен: Включили океан Fate_Ocean_Plane.");
+                }
+
+                // Восстанавливаем сохраненную точку высадки
+                int landedZone = PlayerPrefs.GetInt("LandedZoneIndex", 0);
+                RepaintRegionsBasedOnLanding(landedZone);
+
+                // Позиционируем игрока на выбранную точку высадки с учетом кастомных смещений
+                if (playerTransform != null)
+                {
+                    playerTransform.gameObject.SetActive(true);
+
+                    if (landingPoints != null && landingPoints.Length > 0)
+                    {
+                        int targetIndex = Mathf.Clamp(landedZone, 0, landingPoints.Length - 1);
+                        LandingPoint point = landingPoints[targetIndex];
+                        if (point.spawnAnchor != null)
+                        {
+                            float ox = PlayerPrefs.GetFloat($"PlayerOffset_X_{landedZone}", 0f);
+                            float oy = PlayerPrefs.GetFloat($"PlayerOffset_Y_{landedZone}", 0.8f); // По умолчанию приподнят на 0.8 метра, чтобы не утонуть в замке!
+                            float oz = PlayerPrefs.GetFloat($"PlayerOffset_Z_{landedZone}", 0f);
+
+                            playerTransform.position = point.spawnAnchor.position + new Vector3(ox, oy, oz);
+                            playerTransform.rotation = point.spawnAnchor.rotation;
+                            Debug.Log($"[LANDING SYS] Геймплей активен: Игрок успешно восстановлен по координатам с оффсетом {new Vector3(ox, oy, oz)}: {playerTransform.position}");
+
+                            // Направляем и фокусируем камеру на этой точке
+                            if (mainCameraTransform != null)
+                            {
+                                mainCameraTransform.position = point.spawnAnchor.position + cameraOffset;
+                                mainCameraTransform.LookAt(point.spawnAnchor.position);
+                            }
+                        }
+                    }
+                }
+
+                // Разрешаем свободное управление камерой
+                if (StrategicCameraController.Instance != null)
+                {
+                    StrategicCameraController.Instance.isControlEnabled = true;
+                }
+            }
+            else
             {
-                oceanObj.SetActive(false);
-                Debug.Log("[LANDING SYS] Изначально деактивировали океан Fate_Ocean_Plane.");
+                // Изначально полностью выключаем 3D-карту, океан и героя, чтобы они не лезли на задний план вступительных диалогов Аэлиссы!
+                if (continentObject != null)
+                {
+                    continentObject.SetActive(false);
+                    Debug.Log("[LANDING SYS] Изначально деактивировали 3D Континент, чтобы очистить задний план диалога.");
+                }
+
+                if (playerTransform != null)
+                {
+                    playerTransform.gameObject.SetActive(false);
+                    Debug.Log("[LANDING SYS] Изначально деактивировали Player_Placeholder.");
+                }
+
+                // Изначально скрываем океан, чтобы не мешал во время разговора
+                GameObject oceanObj = null;
+                foreach (var go in Resources.FindObjectsOfTypeAll<GameObject>())
+                {
+                    if (go.name == "Fate_Ocean_Plane" && go.scene.isLoaded)
+                    {
+                        oceanObj = go;
+                        break;
+                    }
+                }
+                if (oceanObj != null)
+                {
+                    oceanObj.SetActive(false);
+                    Debug.Log("[LANDING SYS] Изначально деактивировали океан Fate_Ocean_Plane.");
+                }
             }
         }
 
@@ -298,14 +375,18 @@ namespace FateContinent
                 }
             }
 
-            // 2. Телепортируем игрока на физические координаты 3D Континента
+            // 2. Телепортируем игрока на физические координаты 3D Континента с учетом оффсетов
             if (point.spawnAnchor != null)
             {
                 if (playerTransform != null)
                 {
-                    playerTransform.position = point.spawnAnchor.position;
+                    float ox = PlayerPrefs.GetFloat($"PlayerOffset_X_{zoneIndex}", 0f);
+                    float oy = PlayerPrefs.GetFloat($"PlayerOffset_Y_{zoneIndex}", 0.8f); // По умолчанию приподнят на 0.8 метра, чтобы не утонуть в замке!
+                    float oz = PlayerPrefs.GetFloat($"PlayerOffset_Z_{zoneIndex}", 0f);
+
+                    playerTransform.position = point.spawnAnchor.position + new Vector3(ox, oy, oz);
                     playerTransform.rotation = point.spawnAnchor.rotation;
-                    Debug.Log($"[LANDING SYS] Игрок успешно перенесен в 3D координаты: {point.spawnAnchor.position}");
+                    Debug.Log($"[LANDING SYS] Игрок успешно перенесен в 3D координаты с оффсетом {new Vector3(ox, oy, oz)}: {playerTransform.position}");
                 }
 
                 // Блокируем свободное перемещение камеры на время полета
@@ -673,6 +754,39 @@ namespace FateContinent
 
                             mr.material = dynamicMat;
                         }
+                    }
+                }
+            }
+        }
+
+        private void Update()
+        {
+            bool isGameplayActive = PlayerPrefs.GetInt("ContinentGameplayActive", 0) == 1;
+            if (isGameplayActive && playerTransform != null && landingPoints != null && landingPoints.Length > 0)
+            {
+                int landedZone = PlayerPrefs.GetInt("LandedZoneIndex", 0);
+                int targetIndex = Mathf.Clamp(landedZone, 0, landingPoints.Length - 1);
+                LandingPoint point = landingPoints[targetIndex];
+                if (point.spawnAnchor != null && playerTransform.gameObject.activeInHierarchy)
+                {
+                    Vector3 currentPos = playerTransform.position;
+                    Vector3 anchorPos = point.spawnAnchor.position;
+                    Vector3 currentOffset = currentPos - anchorPos;
+
+                    float savedOx = PlayerPrefs.GetFloat($"PlayerOffset_X_{landedZone}", 0f);
+                    float savedOy = PlayerPrefs.GetFloat($"PlayerOffset_Y_{landedZone}", 0.8f); // По умолчанию приподнят на 0.8 метра
+                    float savedOz = PlayerPrefs.GetFloat($"PlayerOffset_Z_{landedZone}", 0f);
+
+                    // Если положение было изменено вручную в редакторе (порог 0.01м), автоматически сохраняем его!
+                    if (Mathf.Abs(currentOffset.x - savedOx) > 0.01f ||
+                        Mathf.Abs(currentOffset.y - savedOy) > 0.01f ||
+                        Mathf.Abs(currentOffset.z - savedOz) > 0.01f)
+                    {
+                        PlayerPrefs.SetFloat($"PlayerOffset_X_{landedZone}", currentOffset.x);
+                        PlayerPrefs.SetFloat($"PlayerOffset_Y_{landedZone}", currentOffset.y);
+                        PlayerPrefs.SetFloat($"PlayerOffset_Z_{landedZone}", currentOffset.z);
+                        PlayerPrefs.Save();
+                        Debug.Log($"[LANDING SYS] Автоматически обнаружено ручное изменение положения игрока в Play Mode! Сохранён новый кастомный оффсет для зоны {landedZone}: {currentOffset}");
                     }
                 }
             }

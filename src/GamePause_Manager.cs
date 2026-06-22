@@ -204,6 +204,13 @@ namespace FateContinent
                     return;
                 }
 
+                // Запрещаем ESC во время открытых окон замка или 2D города-замка
+                if (FateCastleManager.Instance != null && (FateCastleManager.Instance.isDetailsOpen || FateCastleManager.Instance.isTownViewActive))
+                {
+                    Debug.Log("[FATE PAUSE] ESC заблокирован: открыты меню/город замка!");
+                    return;
+                }
+
                 // Проверяем ограничение сцен: "в других сценах в начальной и в сцене битвы что бы она была не активна только в этой сцене"
                 string activeScene = SceneManager.GetActiveScene().name.ToLower();
                 if (activeScene.Contains("menu") || 

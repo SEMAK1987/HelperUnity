@@ -966,11 +966,11 @@ public class FateCastleManager : MonoBehaviour
                 if (isDetailsOpen)
                 {
                     // GUI coordinates are Y-down, but screen coordinates are Y-up.
-                    // Keep clicking robust: if click is in the lower/upper right pane or middle details rect, ignore 3D raycast.
-                    float panelWidth = 360f;
-                    float panelHeight = 520f;
-                    float px = Screen.width - panelWidth - 30f;
-                    float py = 30f; // from top
+                    CastleInstance castle = castles[activeDetailsIndex];
+                    float panelWidth = 485f;
+                    float panelHeight = (castle.owner == "Player") ? 550f : 620f;
+                    float px = (Screen.width - panelWidth) / 2f;
+                    float py = (Screen.height - panelHeight) / 2f;
                     Rect guiRect = new Rect(px, py, panelWidth, panelHeight);
                     // Match screen pos (Y up) to GUI pos (Y down)
                     Vector2 guiMouse = new Vector2(mousePos.x, Screen.height - mousePos.y);
@@ -2050,31 +2050,15 @@ public class FateCastleManager : MonoBehaviour
         nextDayStyle.normal.textColor = Color.white;
         nextDayStyle.alignment = TextAnchor.MiddleCenter;
 
-        GUI.backgroundColor = new Color(0.1f, 0.65f, 0.95f, 1.0f);
-        if (GUI.Button(new Rect(Screen.width - 240f, 107f, 220f, 44f), $"▶ {nextDayBtnText}", nextDayStyle))
+        if (!isDetailsOpen)
         {
-            AdvanceDay();
+            GUI.backgroundColor = new Color(0.1f, 0.65f, 0.95f, 1.0f);
+            if (GUI.Button(new Rect(Screen.width - 240f, 107f, 220f, 44f), $"▶ {nextDayBtnText}", nextDayStyle))
+            {
+                AdvanceDay();
+            }
+            GUI.backgroundColor = Color.white;
         }
-        GUI.backgroundColor = Color.white;
-
-        // 3b. Кнопка "Редактор/Калибровка Замков" (v18.11.18)
-        string calibToggleTxt = curLang == 0 ? "⚙️ КАЛИБРОВКА КАРТЫ" : "⚙️ MAP CALIBRATION";
-        if (curLang == 8) calibToggleTxt = "⚙️ 地图调试校准";
-        if (curLang == 7) calibToggleTxt = "⚙️ 지도 캘리브레이션";
-
-        GUIStyle calibBtnStyle = new GUIStyle(GUI.skin.button);
-        calibBtnStyle.fontSize = 12;
-        calibBtnStyle.fontStyle = FontStyle.Bold;
-        calibBtnStyle.normal.textColor = Color.white;
-        calibBtnStyle.alignment = TextAnchor.MiddleCenter;
-
-        GUI.backgroundColor = showCastleCalibrationPanel ? new Color(1.0f, 0.45f, 0.0f, 1.0f) : new Color(0.3f, 0.35f, 0.4f, 1.0f);
-        if (GUI.Button(new Rect(Screen.width - 240f, 156f, 220f, 36f), calibToggleTxt, calibBtnStyle))
-        {
-            showCastleCalibrationPanel = !showCastleCalibrationPanel;
-            if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
-        }
-        GUI.backgroundColor = Color.white;
 
         // 4. Отрисовка ГЕРОЯ И ЕГО ХАРАКТЕРИСТИК (HUD в верхнем левом углу)
         DrawHeroHUD(curLang);
@@ -3327,7 +3311,7 @@ public class FateCastleManager : MonoBehaviour
         CastleInstance castle = castles[activeDetailsIndex];
 
         float panelWidth = 485f;
-        float panelHeight = 540f;
+        float panelHeight = (castle.owner == "Player") ? 550f : 620f;
         float px = (Screen.width - panelWidth) / 2f;
         float py = (Screen.height - panelHeight) / 2f;
 
@@ -3716,9 +3700,9 @@ public class FateCastleManager : MonoBehaviour
 
         GUILayout.Space(12);
         GUI.backgroundColor = new Color(0.9f, 0.2f, 0.2f, 1.0f);
-        string closeBtnTxt = curLang == 0 ? "✖ ЗАКРЫТЬ ОКНО" : "✖ CLOSE PANEL";
-        if (curLang == 8) closeBtnTxt = "✖ 关闭内政面板";
-        if (curLang == 7) closeBtnTxt = "✖ 패널 닫기";
+        string closeBtnTxt = curLang == 0 ? "✖ ВЫХОД ИЗ ЗАМКА" : "✖ EXIT CASTLE";
+        if (curLang == 8) closeBtnTxt = "✖ 退出城堡";
+        if (curLang == 7) closeBtnTxt = "✖ 성채 퇴성";
         if (GUILayout.Button(closeBtnTxt, GUILayout.Height(36)))
         {
             isDetailsOpen = false;
