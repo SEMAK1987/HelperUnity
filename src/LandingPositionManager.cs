@@ -607,10 +607,13 @@ namespace FateContinent
 
                             // Определяем целевой цвет региона
                             Color targetColor;
-                            if (owner == "Player")
+                            int landedZone = PlayerPrefs.GetInt("LandedZoneIndex", activeZoneIndex);
+                            int actualPlayerRegion = FateCastleManager.GetActualRegionIndexFromLanding(landedZone);
+
+                            if (i == actualPlayerRegion)
                             {
-                                // Регион игрока: Красивый неоновый сине-голубой Zenith Neon Blue!
-                                targetColor = new Color(0.12f, 0.58f, 0.95f, 1.0f);
+                                // Регион игрока: 00008B (Dark Blue)
+                                targetColor = new Color(0.0f, 0.0f, 0.545f, 1.0f);
                             }
                             else
                             {
@@ -625,21 +628,32 @@ namespace FateContinent
                                 }
                                 else
                                 {
-                                    // Цветовая палитра фракций по умолчанию для закрытых туманов войны
-                                    if (i == 2 || i == 10) targetColor = new Color(0.48f, 0.52f, 0.55f, 1.0f); // Slate Neutrals
-                                    else if (i == 1 || i == 7) targetColor = new Color(0.9f, 0.2f, 0.3f, 1.0f); // Bandit Crimson
-                                    else if (i == 0 || i == 4 || i == 5 || i == 9) targetColor = new Color(0.15f, 0.72f, 0.28f, 1.0f); // Elven Green
-                                    else targetColor = new Color(0.45f, 0.35f, 0.65f, 1.0f); // Dark Violet Void
+                                    // Цветовая палитра фракций по умолчанию согласно бизнес-требованиям Континента Судьбы
+                                    if (i == 2 || i == 10) 
+                                    {
+                                        targetColor = new Color(0.584f, 0.647f, 0.651f, 1.0f); // Slate Neutrals (цвет 95A5A6)
+                                    }
+                                    else if (i == 1 || i == 7) 
+                                    {
+                                        targetColor = new Color(0.906f, 0.298f, 0.235f, 1.0f); // Bandit Crimson (цвет E74C3C)
+                                    }
+                                    else if (i == 0 || i == 4 || i == 5 || i == 9) 
+                                    {
+                                        targetColor = new Color(0.180f, 0.800f, 0.443f, 1.0f); // Forest Dwellers Green (цвет 2ECC71)
+                                    }
+                                    else 
+                                    {
+                                        // Остальные 3 потенциальных региона высадки игрока становятся нейтральной территорией! (цвет 95A5A6)
+                                        targetColor = new Color(0.584f, 0.647f, 0.651f, 1.0f); 
+                                    }
                                 }
                             }
 
-                            // Если это активный регион под ГЕРОЕМ, подсвечиваем его дополнительной яркостью!
-                            int landedZone = PlayerPrefs.GetInt("LandedZoneIndex", activeZoneIndex);
-                            int actualPlayerRegion = FateCastleManager.GetActualRegionIndexFromLanding(landedZone);
+                            // Если это активный регион под ГЕРОЕМ, подсвечиваем его дополнительной яркостью с мягким блендом!
                             if (i == actualPlayerRegion)
                             {
-                                // Смешиваем на 35% с ярким цветом морской волны для подсветки активного региона под героем!
-                                targetColor = Color.Lerp(targetColor, Color.cyan, 0.35f);
+                                // Мягкая подсветка активного заземленного региона под героем
+                                targetColor = Color.Lerp(targetColor, Color.cyan, 0.2f);
                             }
 
                             // Создаем оригинальный материал

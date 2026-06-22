@@ -348,7 +348,8 @@ public class FateCastleManager : MonoBehaviour
         int count = 0;
         // Main hero is present in player's active landed zone (or if activeDetailsIndex matches)
         int landedZone = PlayerPrefs.GetInt("LandedZoneIndex", 0);
-        if (landedZone == zoneIndex)
+        int actualPlayerRegion = GetActualRegionIndexFromLanding(landedZone);
+        if (actualPlayerRegion == zoneIndex)
         {
             count += 1; // Protagonist
         }
@@ -414,7 +415,7 @@ public class FateCastleManager : MonoBehaviour
         if (!PlayerPrefs.HasKey(zoneKey))
         {
             int oldVal = PlayerPrefs.GetInt("Player_HiredCount_" + key, 0);
-            int mainZone = PlayerPrefs.GetInt("LandedZoneIndex", 0);
+            int mainZone = GetActualRegionIndexFromLanding(PlayerPrefs.GetInt("LandedZoneIndex", 0));
             if (zoneIndex == mainZone)
             {
                 PlayerPrefs.SetInt(zoneKey, oldVal);
@@ -442,7 +443,7 @@ public class FateCastleManager : MonoBehaviour
         if (!PlayerPrefs.HasKey(zoneKey))
         {
             int oldVal = PlayerPrefs.GetInt("Player_Unit_" + id, 0);
-            int mainZone = PlayerPrefs.GetInt("LandedZoneIndex", 0);
+            int mainZone = GetActualRegionIndexFromLanding(PlayerPrefs.GetInt("LandedZoneIndex", 0));
             if (zoneIndex == mainZone)
             {
                 PlayerPrefs.SetInt(zoneKey, oldVal);
@@ -673,53 +674,53 @@ public class FateCastleManager : MonoBehaviour
         if (customCastlePositions == null || customCastlePositions.Length != 12)
         {
             System.Array.Resize(ref customCastlePositions, 12);
-            if (customCastlePositions[0] == Vector3.zero) customCastlePositions[0] = new Vector3(-15f, 0f, 10f);
-            if (customCastlePositions[1] == Vector3.zero) customCastlePositions[1] = new Vector3(-5f, 0f, 10f);
-            if (customCastlePositions[2] == Vector3.zero) customCastlePositions[2] = new Vector3(5f, 0f, 10f);
-            if (customCastlePositions[3] == Vector3.zero) customCastlePositions[3] = new Vector3(-5.3f, -0.4f, 4.2f);
-            if (customCastlePositions[4] == Vector3.zero) customCastlePositions[4] = new Vector3(-15f, 0f, 0f);
-            if (customCastlePositions[5] == Vector3.zero) customCastlePositions[5] = new Vector3(-5f, 0f, 0f);
-            if (customCastlePositions[6] == Vector3.zero) customCastlePositions[6] = new Vector3(14.8f, 1.2f, 12.5f);
-            if (customCastlePositions[7] == Vector3.zero) customCastlePositions[7] = new Vector3(15f, 0f, 0f);
-            if (customCastlePositions[8] == Vector3.zero) customCastlePositions[8] = new Vector3(-12.4f, -0.3f, -10.2f);
-            if (customCastlePositions[9] == Vector3.zero) customCastlePositions[9] = new Vector3(-5f, 0f, -10f);
-            if (customCastlePositions[10] == Vector3.zero) customCastlePositions[10] = new Vector3(5f, 0f, -10f);
-            if (customCastlePositions[11] == Vector3.zero) customCastlePositions[11] = new Vector3(9.9f, 0.8f, -4.5f);
         }
+        if (customCastlePositions[0] == Vector3.zero) customCastlePositions[0] = new Vector3(-15f, 0f, 10f);
+        if (customCastlePositions[1] == Vector3.zero) customCastlePositions[1] = new Vector3(-5f, 0f, 10f);
+        if (customCastlePositions[2] == Vector3.zero) customCastlePositions[2] = new Vector3(5f, 0f, 10f);
+        if (customCastlePositions[3] == Vector3.zero) customCastlePositions[3] = new Vector3(-5.3f, -0.4f, 4.2f);
+        if (customCastlePositions[4] == Vector3.zero) customCastlePositions[4] = new Vector3(-15f, 0f, 0f);
+        if (customCastlePositions[5] == Vector3.zero) customCastlePositions[5] = new Vector3(-5f, 0f, 0f);
+        if (customCastlePositions[6] == Vector3.zero) customCastlePositions[6] = new Vector3(14.8f, 1.2f, 12.5f);
+        if (customCastlePositions[7] == Vector3.zero) customCastlePositions[7] = new Vector3(15f, 0f, 0f);
+        if (customCastlePositions[8] == Vector3.zero) customCastlePositions[8] = new Vector3(-12.4f, -0.3f, -10.2f);
+        if (customCastlePositions[9] == Vector3.zero) customCastlePositions[9] = new Vector3(-5f, 0f, -10f);
+        if (customCastlePositions[10] == Vector3.zero) customCastlePositions[10] = new Vector3(5f, 0f, -10f);
+        if (customCastlePositions[11] == Vector3.zero) customCastlePositions[11] = new Vector3(9.9f, 0.8f, -4.5f);
         
         if (castleManualOffsets == null || castleManualOffsets.Length != 12)
         {
             System.Array.Resize(ref castleManualOffsets, 12);
-            for (int i = 0; i < 12; i++)
+        }
+        for (int i = 0; i < 12; i++)
+        {
+            if (castleManualOffsets[i] == Vector3.zero)
             {
-                if (castleManualOffsets[i] == Vector3.zero)
-                {
-                    castleManualOffsets[i] = new Vector3(3.2f, 0f, 3.2f);
-                }
+                castleManualOffsets[i] = new Vector3(3.2f, 0f, 3.2f);
             }
         }
 
         if (castleColliderSizes == null || castleColliderSizes.Length != 12)
         {
             System.Array.Resize(ref castleColliderSizes, 12);
-            for (int i = 0; i < 12; i++)
+        }
+        for (int i = 0; i < 12; i++)
+        {
+            if (castleColliderSizes[i] == Vector3.zero)
             {
-                if (castleColliderSizes[i] == Vector3.zero)
-                {
-                    castleColliderSizes[i] = new Vector3(2.5f, 3.5f, 2.5f);
-                }
+                castleColliderSizes[i] = new Vector3(2.5f, 3.5f, 2.5f);
             }
         }
 
         if (castleColliderCenters == null || castleColliderCenters.Length != 12)
         {
             System.Array.Resize(ref castleColliderCenters, 12);
-            for (int i = 0; i < 12; i++)
+        }
+        for (int i = 0; i < 12; i++)
+        {
+            if (castleColliderCenters[i] == Vector3.zero)
             {
-                if (castleColliderCenters[i] == Vector3.zero)
-                {
-                    castleColliderCenters[i] = new Vector3(0f, 1.5f, 0f);
-                }
+                castleColliderCenters[i] = new Vector3(0f, 1.5f, 0f);
             }
         }
     }
@@ -729,53 +730,53 @@ public class FateCastleManager : MonoBehaviour
         if (customCastlePositions == null || customCastlePositions.Length != 12)
         {
             System.Array.Resize(ref customCastlePositions, 12);
-            if (customCastlePositions[0] == Vector3.zero) customCastlePositions[0] = new Vector3(-15f, 0f, 10f);
-            if (customCastlePositions[1] == Vector3.zero) customCastlePositions[1] = new Vector3(-5f, 0f, 10f);
-            if (customCastlePositions[2] == Vector3.zero) customCastlePositions[2] = new Vector3(5f, 0f, 10f);
-            if (customCastlePositions[3] == Vector3.zero) customCastlePositions[3] = new Vector3(-5.3f, -0.4f, 4.2f);
-            if (customCastlePositions[4] == Vector3.zero) customCastlePositions[4] = new Vector3(-15f, 0f, 0f);
-            if (customCastlePositions[5] == Vector3.zero) customCastlePositions[5] = new Vector3(-5f, 0f, 0f);
-            if (customCastlePositions[6] == Vector3.zero) customCastlePositions[6] = new Vector3(14.8f, 1.2f, 12.5f);
-            if (customCastlePositions[7] == Vector3.zero) customCastlePositions[7] = new Vector3(15f, 0f, 0f);
-            if (customCastlePositions[8] == Vector3.zero) customCastlePositions[8] = new Vector3(-12.4f, -0.3f, -10.2f);
-            if (customCastlePositions[9] == Vector3.zero) customCastlePositions[9] = new Vector3(-5f, 0f, -10f);
-            if (customCastlePositions[10] == Vector3.zero) customCastlePositions[10] = new Vector3(5f, 0f, -10f);
-            if (customCastlePositions[11] == Vector3.zero) customCastlePositions[11] = new Vector3(9.9f, 0.8f, -4.5f);
         }
+        if (customCastlePositions[0] == Vector3.zero) customCastlePositions[0] = new Vector3(-15f, 0f, 10f);
+        if (customCastlePositions[1] == Vector3.zero) customCastlePositions[1] = new Vector3(-5f, 0f, 10f);
+        if (customCastlePositions[2] == Vector3.zero) customCastlePositions[2] = new Vector3(5f, 0f, 10f);
+        if (customCastlePositions[3] == Vector3.zero) customCastlePositions[3] = new Vector3(-5.3f, -0.4f, 4.2f);
+        if (customCastlePositions[4] == Vector3.zero) customCastlePositions[4] = new Vector3(-15f, 0f, 0f);
+        if (customCastlePositions[5] == Vector3.zero) customCastlePositions[5] = new Vector3(-5f, 0f, 0f);
+        if (customCastlePositions[6] == Vector3.zero) customCastlePositions[6] = new Vector3(14.8f, 1.2f, 12.5f);
+        if (customCastlePositions[7] == Vector3.zero) customCastlePositions[7] = new Vector3(15f, 0f, 0f);
+        if (customCastlePositions[8] == Vector3.zero) customCastlePositions[8] = new Vector3(-12.4f, -0.3f, -10.2f);
+        if (customCastlePositions[9] == Vector3.zero) customCastlePositions[9] = new Vector3(-5f, 0f, -10f);
+        if (customCastlePositions[10] == Vector3.zero) customCastlePositions[10] = new Vector3(5f, 0f, -10f);
+        if (customCastlePositions[11] == Vector3.zero) customCastlePositions[11] = new Vector3(9.9f, 0.8f, -4.5f);
         
         if (castleManualOffsets == null || castleManualOffsets.Length != 12)
         {
             System.Array.Resize(ref castleManualOffsets, 12);
-            for (int i = 0; i < 12; i++)
+        }
+        for (int i = 0; i < 12; i++)
+        {
+            if (castleManualOffsets[i] == Vector3.zero)
             {
-                if (castleManualOffsets[i] == Vector3.zero)
-                {
-                    castleManualOffsets[i] = new Vector3(3.2f, 0f, 3.2f);
-                }
+                castleManualOffsets[i] = new Vector3(3.2f, 0f, 3.2f);
             }
         }
 
         if (castleColliderSizes == null || castleColliderSizes.Length != 12)
         {
             System.Array.Resize(ref castleColliderSizes, 12);
-            for (int i = 0; i < 12; i++)
+        }
+        for (int i = 0; i < 12; i++)
+        {
+            if (castleColliderSizes[i] == Vector3.zero)
             {
-                if (castleColliderSizes[i] == Vector3.zero)
-                {
-                    castleColliderSizes[i] = new Vector3(2.5f, 3.5f, 2.5f);
-                }
+                castleColliderSizes[i] = new Vector3(2.5f, 3.5f, 2.5f);
             }
         }
 
         if (castleColliderCenters == null || castleColliderCenters.Length != 12)
         {
             System.Array.Resize(ref castleColliderCenters, 12);
-            for (int i = 0; i < 12; i++)
+        }
+        for (int i = 0; i < 12; i++)
+        {
+            if (castleColliderCenters[i] == Vector3.zero)
             {
-                if (castleColliderCenters[i] == Vector3.zero)
-                {
-                    castleColliderCenters[i] = new Vector3(0f, 1.5f, 0f);
-                }
+                castleColliderCenters[i] = new Vector3(0f, 1.5f, 0f);
             }
         }
 
@@ -1051,45 +1052,135 @@ public class FateCastleManager : MonoBehaviour
         }
     }
 
+    private static string GetLandingBaseNameRU(int i)
+    {
+        switch (i)
+        {
+            case 3: return "Кровавые Пустоши";
+            case 6: return "Ледяной Пик";
+            case 8: return "Древние Руины";
+            case 11: return "Святилище Зенита";
+            default: return "Военный Форпост";
+        }
+    }
+
+    private static string GetLandingBaseNameEN(int i)
+    {
+        switch (i)
+        {
+            case 3: return "Crimson Wastes";
+            case 6: return "Ice-Bound Peak";
+            case 8: return "Ancient Ruins";
+            case 11: return "Zenith Sanctuary";
+            default: return "Military Outpost";
+        }
+    }
+
+    private static string GetLandingBaseNameCH(int i)
+    {
+        switch (i)
+        {
+            case 3: return "深红荒野";
+            case 6: return "冰封山顶";
+            case 8: return "古代遗迹";
+            case 11: return "极星圣所";
+            default: return "军事前哨";
+        }
+    }
+
+    private static string GetLandingBaseNameKR(int i)
+    {
+        switch (i)
+        {
+            case 3: return "붉은 황무지";
+            case 6: return "얼음 봉우리";
+            case 8: return "고대 유적지";
+            case 11: return "제니스 성소";
+            default: return "군사 전초기지";
+        }
+    }
+
     private void InitializeCastleStates()
     {
         castles.Clear();
         currentDay = PlayerPrefs.GetInt("Fate_Current_Day", 1);
 
-        // Распределение регионов согласно бизнес-логике:
-        // 2, 10 - Нейтралы
-        // 1, 7 - Бандиты (Агрессивные)
-        // 0, 4, 5, 9 - Лесные жители
-        // 3, 6, 8, 11 - Высадка игрока
-        string[] zonesRU = { 
-            "Сумрачный Лес (Лесные жители)", "Убежище Разбойников (Бандиты)", "Нейтральное Межгорье (Нейтралы)", "Кровавые Пустоши (Орден Зенита)",
-            "Лесные Топи (Лесные жители)", "Изумрудный Сад (Лесные жители)", "Ледяной Пик (Орден Зенита)", "Притон Грабителей (Бандиты)",
-            "Древние Руины (Орден Зенита)", "Магическая Роща (Лесные жители)", "Тихое Перепутье (Нейтралы)", "Святилище Зенита (Орден Зенита)"
-        };
-        string[] zonesEN = { 
-            "Gloomwood Forest (Forest Dwellers)", "Rogue Cave (Bandits)", "Neutral Gateway (Neutrals)", "Crimson Wastes (Zenith Order)",
-            "Forest Swamps (Forest Dwellers)", "Emerald Garden (Forest Dwellers)", "Ice-Bound Peak (Zenith Order)", "Robber Hideout (Bandits)",
-            "Ancient Ruins (Zenith Order)", "Spiritual Grove (Forest Dwellers)", "Quiet Crossroads (Neutrals)", "Zenith Sanctuary (Zenith Order)"
-        };
-        string[] zonesCH = { 
-            "幽暗密林 (森林居民)", "强盗洞穴 (强盗)", "中立关卡 (中立方)", "深红荒野 (天顶星秩序)",
-            "森林沼泽 (森林居民)", "翡翠花园 (森林居民)", "冰封山顶 (天顶星秩序)", "劫匪藏身处 (强盗)",
-            "古代遗迹 (天顶星秩序)", "灵能树林 (森林居民)", "寂静十字路口 (中立方)", "极星圣所 (天顶星秩序)"
-        };
-        string[] zonesKR = { 
-            "어둠의 숲 (숲의 주민)", "도적의 동굴 (도적단)", "중립의 통로 (중립국)", "붉은 황무지 (제니스 교단)",
-            "숲의 늪지 (숲의 주민)", "에메랄드 정원 (숲의 주민)", "얼음 봉우리 (제니스 교단)", "강도 은신처 (도적단)",
-            "고대 유적지 (제니스 교단)", "영적인 숲 (숲의 주민)", "조용한 교차로 (중립국)", "제니스 성소 (제니스 교단)"
-        };
-
         int playerDialogueIndex = PlayerPrefs.GetInt("LandedZoneIndex", 0);
         int actualPlayerRegion = GetActualRegionIndexFromLanding(playerDialogueIndex);
 
+        // Динамическое распределение имен регионов согласно бизнес-логике:
+        // 2, 10 - Нейтралы
+        // 1, 7 - Бандиты (Агрессивные)
+        // 0, 4, 5, 9 - Лесные жители
+        // 3, 6, 8, 11 - Потенциальная высадка игрока
+        string[] zonesRU = new string[12];
+        string[] zonesEN = new string[12];
+        string[] zonesCH = new string[12];
+        string[] zonesKR = new string[12];
+
         for (int i = 0; i < 12; i++)
         {
-            // Игрок стартово контролирует РЕАЛЬНЫЙ регион высадки, соответствующий его выбору.
-            // Остальные 11 регионов управляются ИИ компьютера для поддержания геймплейных симуляций.
+            if (i == actualPlayerRegion)
+            {
+                zonesRU[i] = GetLandingBaseNameRU(i) + " (Альянс Игрока)";
+                zonesEN[i] = GetLandingBaseNameEN(i) + " (Player Alliance)";
+                zonesCH[i] = GetLandingBaseNameCH(i) + " (玩家同盟)";
+                zonesKR[i] = GetLandingBaseNameKR(i) + " (플레이어 동맹)";
+            }
+            else if (i == 3 || i == 6 || i == 8 || i == 11)
+            {
+                zonesRU[i] = GetLandingBaseNameRU(i) + " (Нейтралы)";
+                zonesEN[i] = GetLandingBaseNameEN(i) + " (Neutrals)";
+                zonesCH[i] = GetLandingBaseNameCH(i) + " (中立方)";
+                zonesKR[i] = GetLandingBaseNameKR(i) + " (중립국)";
+            }
+            else if (i == 1 || i == 7)
+            {
+                zonesRU[i] = i == 1 ? "Убежище Разбойников (Бандиты)" : "Притон Грабителей (Бандиты)";
+                zonesEN[i] = i == 1 ? "Rogue Cave (Bandits)" : "Robber Hideout (Bandits)";
+                zonesCH[i] = i == 1 ? "强盗洞穴 (强盗)" : "劫匪藏身处 (强盗)";
+                zonesKR[i] = i == 1 ? "도적의 동굴 (도적단)" : "강도 은신처 (도적단)";
+            }
+            else if (i == 2 || i == 10)
+            {
+                zonesRU[i] = i == 2 ? "Нейтральное Межгорье (Нейтралы)" : "Тихое Перепутье (Нейтралы)";
+                zonesEN[i] = i == 2 ? "Neutral Gateway (Neutrals)" : "Quiet Crossroads (Neutrals)";
+                zonesCH[i] = i == 2 ? "中立关卡 (中立方)" : "寂静十字路口 (中立方)";
+                zonesKR[i] = i == 2 ? "중립의 통로 (중립국)" : "조용한 교차로 (중립국)";
+            }
+            else // 0, 4, 5, 9
+            {
+                string baseRU = "Сумрачный Лес";
+                string baseEN = "Gloomwood Forest";
+                string baseCH = "幽暗密林";
+                string baseKR = "어둠의 숲";
+
+                if (i == 4) { baseRU = "Лесные Топи"; baseEN = "Forest Swamps"; baseCH = "森林沼泽"; baseKR = "숲의 늪지"; }
+                else if (i == 5) { baseRU = "Изумрудный Сад"; baseEN = "Emerald Garden"; baseCH = "翡翠花园"; baseKR = "에메랄드 정원"; }
+                else if (i == 9) { baseRU = "Магическая Роща"; baseEN = "Spiritual Grove"; baseCH = "灵能树林"; baseKR = "영적인 숲"; }
+
+                zonesRU[i] = baseRU + " (Лесные Жители)";
+                zonesEN[i] = baseEN + " (Forest Dwellers)";
+                zonesCH[i] = baseCH + " (森林居民)";
+                zonesKR[i] = baseKR + " (숲의 주민)";
+            }
+        }
+
+        for (int i = 0; i < 12; i++)
+        {
             string ownerStyle = (i == actualPlayerRegion) ? "Player" : "Enemy";
+
+            // СВЕРХВАЖНО: Гарантируем, что замок игрока ТОЛЬКО один и находится строго на его точке высадки!
+            string savedOwner = PlayerPrefs.GetString("Castle_Owner_" + i, ownerStyle);
+            if (i == actualPlayerRegion)
+            {
+                savedOwner = "Player";
+            }
+            else if (savedOwner == "Player")
+            {
+                savedOwner = "Enemy";
+            }
+            PlayerPrefs.SetString("Castle_Owner_" + i, savedOwner);
 
             CastleInstance castle = new CastleInstance
             {
@@ -1099,7 +1190,7 @@ public class FateCastleManager : MonoBehaviour
                 nameCH = zonesCH[i],
                 nameKR = zonesKR[i],
                 level = PlayerPrefs.GetInt("Castle_Level_" + i, 1),
-                owner = PlayerPrefs.GetString("Castle_Owner_" + i, ownerStyle)
+                owner = savedOwner
             };
             
             // Re-load opponent simulated progression
@@ -1309,9 +1400,10 @@ public class FateCastleManager : MonoBehaviour
             BoxCollider col = root.AddComponent<BoxCollider>();
             
             // Загружаем настройки родительского триггера (BoxCollider) на основе инспектора или PlayerPrefs
-            float colCentX = (castleColliderCenters != null && i < castleColliderCenters.Length) ? castleColliderCenters[i].x : 0f;
-            float colCentY = (castleColliderCenters != null && i < castleColliderCenters.Length) ? castleColliderCenters[i].y : 1.5f;
-            float colCentZ = (castleColliderCenters != null && i < castleColliderCenters.Length) ? castleColliderCenters[i].z : 0f;
+            Vector3 cct = (castleColliderCenters != null && i < castleColliderCenters.Length && castleColliderCenters[i] != Vector3.zero) ? castleColliderCenters[i] : new Vector3(0f, 1.5f, 0f);
+            float colCentX = cct.x;
+            float colCentY = cct.y;
+            float colCentZ = cct.z;
             
             if (!preferScriptCoordinates && PlayerPrefs.HasKey("Castle_ColCentX_" + i))
             {
@@ -1321,9 +1413,10 @@ public class FateCastleManager : MonoBehaviour
             }
             col.center = new Vector3(colCentX, colCentY, colCentZ);
 
-            float colSizeX = (castleColliderSizes != null && i < castleColliderSizes.Length) ? castleColliderSizes[i].x : 2.5f;
-            float colSizeY = (castleColliderSizes != null && i < castleColliderSizes.Length) ? castleColliderSizes[i].y : 3.5f;
-            float colSizeZ = (castleColliderSizes != null && i < castleColliderSizes.Length) ? castleColliderSizes[i].z : 2.5f;
+            Vector3 csz = (castleColliderSizes != null && i < castleColliderSizes.Length && castleColliderSizes[i] != Vector3.zero) ? castleColliderSizes[i] : new Vector3(2.5f, 3.5f, 2.5f);
+            float colSizeX = csz.x;
+            float colSizeY = csz.y;
+            float colSizeZ = csz.z;
             
             if (!preferScriptCoordinates && PlayerPrefs.HasKey("Castle_ColSizeX_" + i))
             {
