@@ -164,10 +164,10 @@ namespace FateContinent
                 }
             }
 
-            if (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.IsDialogueActive)
-            {
-                SetMapVisible(false);
-            }
+            // [ANTI-FLASH DEFENSE] По умолчанию тактическая 2D-карта и все её интерактивные элементы ВСЕГДА скрыты на старте.
+            // Они будут явно активированы на Шаге 3 вступительного диалога для выбора региона высадки игроком.
+            SetMapVisible(false);
+            Debug.Log("[FATE MAP] Тактическая 2D-карта и маркеры переведены в скрытый режим ожидания диалога.");
         }
 
         public void SetMapVisible(bool visible)

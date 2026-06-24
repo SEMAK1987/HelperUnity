@@ -347,7 +347,7 @@ public class FateCastleManager : MonoBehaviour
     {
         int count = 0;
         // Main hero is present in player's active landed zone (or if activeDetailsIndex matches)
-        int landedZone = PlayerPrefs.GetInt("LandedZoneIndex", 0);
+        int landedZone = PlayerPrefs.GetInt("LandedZoneIndex", -1);
         int actualPlayerRegion = GetActualRegionIndexFromLanding(landedZone);
         if (actualPlayerRegion == zoneIndex)
         {
@@ -415,7 +415,7 @@ public class FateCastleManager : MonoBehaviour
         if (!PlayerPrefs.HasKey(zoneKey))
         {
             int oldVal = PlayerPrefs.GetInt("Player_HiredCount_" + key, 0);
-            int mainZone = GetActualRegionIndexFromLanding(PlayerPrefs.GetInt("LandedZoneIndex", 0));
+            int mainZone = GetActualRegionIndexFromLanding(PlayerPrefs.GetInt("LandedZoneIndex", -1));
             if (zoneIndex == mainZone)
             {
                 PlayerPrefs.SetInt(zoneKey, oldVal);
@@ -443,7 +443,7 @@ public class FateCastleManager : MonoBehaviour
         if (!PlayerPrefs.HasKey(zoneKey))
         {
             int oldVal = PlayerPrefs.GetInt("Player_Unit_" + id, 0);
-            int mainZone = GetActualRegionIndexFromLanding(PlayerPrefs.GetInt("LandedZoneIndex", 0));
+            int mainZone = GetActualRegionIndexFromLanding(PlayerPrefs.GetInt("LandedZoneIndex", -1));
             if (zoneIndex == mainZone)
             {
                 PlayerPrefs.SetInt(zoneKey, oldVal);
@@ -795,10 +795,125 @@ public class FateCastleManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Преобразует индекс зоны высадки из диалогов (0-3) в реальный индекс региона на континенте (3, 6, 8, 11)
+    /// Находит индекс региона (0-11) на тактической 3D-карте, который физически ближе всего к переданной позиции
+    /// </summary>
+    public static int FindClosestRegionToPosition(Vector3 position)
+    {
+        GameObject newContinent = GameObject.Find("New_Kontinent");
+        if (newContinent == null)
+        {
+            newContinent = GameObject.Find("Континент");
+        }
+        if (newContinent == null)
+        {
+            foreach (var go in Resources.FindObjectsOfTypeAll<GameObject>())
+            {
+                if ((go.name.Contains("New_Kontinent") || go.name == "Континент") && go.scene.isLoaded)
+                {
+                    newContinent = go;
+                    break;
+                }
+            }
+        }
+
+        if (newContinent == null)
+        {
+            return 3; // Возврат по умолчанию
+        }
+
+        int closestIndex = 3;
+        float minDistance = float.MaxValue;
+
+        for (int i = 0; i < 12; i++)
+        {
+            string regionName = "Region_" + i.ToString("D2");
+            Transform regTrans = newContinent.transform.Find(regionName);
+            if (regTrans == null)
+            {
+                foreach (Transform child in newContinent.GetComponentsInChildren<Transform>(true))
+                {
+                    if (child.name == regionName)
+                    {
+                        regTrans = child;
+                        break;
+                    }
+                }
+            }
+
+            if (regTrans != null)
+            {
+                Vector3 regionPos = regTrans.position;
+                Renderer r = regTrans.GetComponent<Renderer>();
+                if (r != null)
+                {
+                    regionPos = r.bounds.center;
+                }
+
+                // Измеряем 2D расстояние (без учета высоты Y) для максимальной точности на тактическом поле
+                Vector2 pos2D = new Vector2(position.x, position.z);
+                Vector2 reg2D = new Vector2(regionPos.x, regionPos.z);
+                float dist = Vector2.Distance(pos2D, reg2D);
+                if (dist < minDistance)
+                {
+                    minDistance = dist;
+                    closestIndex = i;
+                }
+            }
+        }
+
+        return closestIndex;
+    }
+
+    /// <summary>
+    /// Преобразует индекс зоны высадки из диалогов (0-3) в реальный индекс региона на континенте (0-11)
     /// </summary>
     public static int GetActualRegionIndexFromLanding(int landedZoneIndex)
     {
+        if (landedZoneIndex < 0)
+        {
+            return -1;
+        }
+
+        // 1. Попытка динамически связать через Proximity (близость) к спавн-анкорам из LandingPositionManager
+        if (LandingPositionManager.Instance != null && LandingPositionManager.Instance.landingPoints != null)
+        {
+            int idx = Mathf.Clamp(landedZoneIndex, 0, LandingPositionManager.Instance.landingPoints.Length - 1);
+            var pt = LandingPositionManager.Instance.landingPoints[idx];
+            if (pt != null && pt.spawnAnchor != null)
+            {
+                int closest = FindClosestRegionToPosition(pt.spawnAnchor.position);
+                Debug.Log($"[CASTLE MGR PROXIMITY] Динамически сопоставили landedZoneIndex={landedZoneIndex} с ближайшим регионом Region_{closest:D2} у точки {pt.spawnAnchor.name}");
+                return closest;
+            }
+        }
+
+        // 2. Если LandingPositionManager еще не готов, пробуем найти пустышки-анкоры в сцене по именам напрямую
+        string[] defaultAnchorNames = new string[] { 
+            "Oasis_SpawnPoint", 
+            "Outpost_SpawnPoint", 
+            "Shore_SpawnPoint", 
+            "Citadel_SpawnPoint" 
+        };
+        int safeIdx = Mathf.Clamp(landedZoneIndex, 0, defaultAnchorNames.Length - 1);
+        string targetName = defaultAnchorNames[safeIdx];
+        GameObject foundObj = GameObject.Find(targetName);
+        if (foundObj == null)
+        {
+            // Также проверим старые или альтернативные имена для совместимости
+            string altName = landedZoneIndex == 0 ? "Wastes_SpawnPoint" :
+                             landedZoneIndex == 1 ? "Peak_SpawnPoint" :
+                             landedZoneIndex == 2 ? "Ruins_SpawnPoint" : "Crags_SpawnPoint";
+            foundObj = GameObject.Find(altName);
+        }
+
+        if (foundObj != null)
+        {
+            int closest = FindClosestRegionToPosition(foundObj.transform.position);
+            Debug.Log($"[CASTLE MGR PROXIMITY] Динамически сопоставили по имени объекта {foundObj.name} к ближайшему региону Region_{closest:D2}");
+            return closest;
+        }
+
+        // 3. Скорректированный статический фолбек на случай полного отсутствия объектов спавна в сцене
         switch (landedZoneIndex)
         {
             case 0: return 11;  // Кровавые Пустоши (Region_11)
@@ -838,10 +953,22 @@ public class FateCastleManager : MonoBehaviour
     {
         PlayerPrefs.SetInt("ContinentGameplayActive", 0);
         isContinentGameplayActive = false;
+        PlayerPrefs.SetInt("LandedZoneIndex", -1);
         
         PlayerPrefs.SetInt("Fate_Current_Day", initialDaySetting);
         currentDay = initialDaySetting;
         
+        // Сбрасываем все PlayerPrefs для всех 12 замков, чтобы гарантировать чистоту новой кампании
+        for (int i = 0; i < 12; i++)
+        {
+            PlayerPrefs.DeleteKey("Castle_Owner_" + i);
+            PlayerPrefs.DeleteKey("Castle_Level_" + i);
+            PlayerPrefs.DeleteKey("Castle_AI_CommanderLvl_" + i);
+            PlayerPrefs.DeleteKey("Castle_AI_Troops_" + i);
+            PlayerPrefs.DeleteKey("Castle_AI_Armor_" + i);
+            PlayerPrefs.DeleteKey("Castle_AI_Potions_" + i);
+        }
+
         // Динамический расчет стартового золота на основе сохраненной в Slot 0 / активном слоте сложности
         int activeSlot = PlayerPrefs.GetInt("Active_Save_Slot", 0);
         SaveGameSystem.Load(activeSlot, false);
@@ -954,8 +1081,8 @@ public class FateCastleManager : MonoBehaviour
 
     private void HandleCastleClicks()
     {
-        // Avoid clicking 3D structures if continent gameplay is not fully active, town view is active, day overlay is showing, or stats panel is open
-        if (!isContinentGameplayActive || isTownViewActive || showNewDayOverlay || showStatsPanel) return;
+        // Avoid clicking 3D structures if continent gameplay is not fully active, town view is active, day overlay is showing, or stats panel/details/popups are open
+        if (!isContinentGameplayActive || isTownViewActive || showNewDayOverlay || showStatsPanel || isDetailsOpen || showTroopDetailPopup || showCastleCalibrationPanel) return;
 
         if (WasLeftMouseButtonClicked())
         {
@@ -979,8 +1106,7 @@ public class FateCastleManager : MonoBehaviour
                         return; // Clicked inside Details panel, ignore raycast
                     }
 
-                    // Clicked outside Details panel: Close details window and consume/absorb the click event completely!
-                    isDetailsOpen = false;
+                    // Clicked outside Details panel: Do NOT close, but consume/absorb the click event completely so we don't raycast or click on anything else!
                     return;
                 }
 
@@ -1105,7 +1231,7 @@ public class FateCastleManager : MonoBehaviour
         castles.Clear();
         currentDay = PlayerPrefs.GetInt("Fate_Current_Day", 1);
 
-        int playerDialogueIndex = PlayerPrefs.GetInt("LandedZoneIndex", 0);
+        int playerDialogueIndex = PlayerPrefs.GetInt("LandedZoneIndex", -1);
         int actualPlayerRegion = GetActualRegionIndexFromLanding(playerDialogueIndex);
 
         // Динамическое распределение имен регионов согласно бизнес-логике:
@@ -1219,6 +1345,9 @@ public class FateCastleManager : MonoBehaviour
             return;
         }
 
+        // ПОЛНАЯ ПЕРЕИНИЦИАЛИЗАЦИЯ ИМЕН И СОСТОЯНИЙ ЗАМКОВ СОГЛАСНО ВЫБРАННОЙ ТОЧКЕ ВЫСАДКИ
+        InitializeCastleStates();
+
         // Считываем настройки ручного/автоматического скоординированного размещения из PlayerPrefs
         if (PlayerPrefs.HasKey("Castle_Placement_Manual"))
         {
@@ -1272,7 +1401,7 @@ public class FateCastleManager : MonoBehaviour
             }
         }
 
-        int playerZone = PlayerPrefs.GetInt("LandedZoneIndex", 0);
+        int playerZone = PlayerPrefs.GetInt("LandedZoneIndex", -1);
         if (DialogueSystem_Manager.Instance != null)
         {
             int selected = DialogueSystem_Manager.Instance.SelectedZoneIndex;

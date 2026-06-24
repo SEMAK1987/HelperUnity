@@ -71,8 +71,8 @@ namespace FateContinent
         public TextAlignmentOptions bodyTextAlignment = TextAlignmentOptions.TopLeft;
 
         [Header("Панель кнопок выбора (Choice Container Panel)")]
-        public Vector2 choiceContainerPosition = new Vector2(0f, 40f); // Приподнимайте по Y, чтобы не срезались кнопки!
-        public Vector2 choiceContainerSizeDelta = new Vector2(-150f, 60f); // Ширина и высота панели кнопок
+        public Vector2 choiceContainerPosition = new Vector2(0f, -15f); // Сдвинуто вниз, чтобы кнопки не накладывались на текст и лица!
+        public Vector2 choiceContainerSizeDelta = new Vector2(-120f, 44f); // Оптимальная ширина и высота панели кнопок
 
         [Header("Кнопки выбора (Choice Buttons Style)")]
         public float choiceButtonFontSize = 13f;
@@ -207,6 +207,7 @@ namespace FateContinent
 
             // Загружаем сохраненный индекс высадки игрока, чтобы избежать сброса в 0 при обновлении или переходе
             selectedZoneIndex = PlayerPrefs.GetInt("LandedZoneIndex", 0);
+            if (selectedZoneIndex < 0) selectedZoneIndex = 0;
             Debug.Log($"[DIALOGUE SYSTEM] Восстановлен LandedZoneIndex из PlayerPrefs: {selectedZoneIndex}");
         }
 
@@ -289,8 +290,8 @@ namespace FateContinent
                     
                     if (currentLineIndex == 3)
                     {
-                        rt.anchoredPosition = new Vector2(0f, 62f);
-                        rt.sizeDelta = new Vector2(-40f, 52f);
+                        rt.anchoredPosition = new Vector2(0f, -20f);
+                        rt.sizeDelta = new Vector2(-120f, 44f);
                     }
                     else
                     {

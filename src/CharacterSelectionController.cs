@@ -1037,6 +1037,7 @@ namespace FateContinent
             // Сохраняем в Слот 0 (первичный слот новой игры) и сбрасываем состояние тактической кампании в PlayerPrefs
             PlayerPrefs.SetInt("Active_Save_Slot", 0);
             PlayerPrefs.SetInt("ContinentGameplayActive", 0);
+            PlayerPrefs.SetInt("LandedZoneIndex", -1);
             PlayerPrefs.SetInt("Fate_Current_Day", 1);
             PlayerPrefs.SetInt("Player_Current_Gold", difficultyStartingGold);
             PlayerPrefs.SetInt("Player_Gold_Reserve", difficultyStartingGold);

@@ -1,6 +1,6 @@
-// [ZENITH DYNAMIC ARMY UNITS SYNC v18.11.18]
+// [ZENITH DIALOGUE CHOICE POSITIONING SYNC v18.11.19]
 // Unity Connector for Quantum AI Assistant
-// Updated: 2026-06-20 (Synced with Stable v18.11.18)
+// Updated: 2026-06-24 (Synced with Stable v18.11.19)
 
 using UnityEngine;
 using UnityEditor;
@@ -15,7 +15,7 @@ namespace AI_Assistant_Quantum
         private string prompt = "";
         private string serverUrl = "http://localhost:3000";
         private Mode mode = Mode.Online;
-        private string status = "Ready for Quantum Manifestation v18.11.18";
+        private string status = "Ready for Quantum Manifestation v18.11.19";
         private bool isProcessing = false;
 
         public enum Mode { Online, Offline, NoInternet }
@@ -28,7 +28,7 @@ namespace AI_Assistant_Quantum
 
         private void OnGUI()
         {
-            GUILayout.Label("v18.11.18 - Dynamic Army Units & High-Density UI (Neural Link Active)", EditorStyles.boldLabel);
+            GUILayout.Label("v18.11.19 - Dialogue Choice Positioning & High-Density Layout", EditorStyles.boldLabel);
             
             serverUrl = EditorGUILayout.TextField("Server URL", serverUrl);
             mode = (Mode)EditorGUILayout.EnumPopup("Mode", mode);

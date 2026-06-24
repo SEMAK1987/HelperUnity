@@ -161,10 +161,15 @@ namespace FateContinent
                 continentObject = GameObject.Find("Континент");
                 if (continentObject == null)
                 {
+                    continentObject = GameObject.Find("New_Kontinent");
+                }
+
+                if (continentObject == null)
+                {
                     // Ищем по части имени
                     foreach (var go in Resources.FindObjectsOfTypeAll<GameObject>())
                     {
-                        if (go.name.Contains("Континент") && go.scene.isLoaded)
+                        if ((go.name.Contains("Континент") || go.name.Contains("New_Kontinent") || go.name.Contains("Continent")) && go.scene.isLoaded)
                         {
                             continentObject = go;
                             break;
@@ -174,7 +179,7 @@ namespace FateContinent
 
                 if (continentObject != null)
                 {
-                    Debug.Log("<color=#00FFCC>[LANDING SYS]</color> Скрипт автоматически нашел 3D-модель Континента.");
+                    Debug.Log("<color=#00FFCC>[LANDING SYS]</color> Скрипт автоматически нашел 3D-модель Континента: " + continentObject.name);
                 }
             }
 
