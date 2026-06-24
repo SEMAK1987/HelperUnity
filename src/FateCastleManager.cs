@@ -124,7 +124,7 @@ public class FateCastleManager : MonoBehaviour
         new Vector3(-15f, 0f, 10f),    // Region_00
         new Vector3(-5f, 0f, 10f),     // Region_01
         new Vector3(5f, 0f, 10f),      // Region_02
-        new Vector3(-5.3f, -0.4f, 4.2f), // Region_03 (Кровавые Пустоши)
+        new Vector3(-5.3f, -0.4f, 4.2f), // Region_03 (Святилище Зенита)
         new Vector3(-15f, 0f, 0f),     // Region_04
         new Vector3(-5f, 0f, 0f),      // Region_05
         new Vector3(14.8f, 1.2f, 12.5f), // Region_06 (Ледяной Пик)
@@ -132,7 +132,7 @@ public class FateCastleManager : MonoBehaviour
         new Vector3(-12.4f, -0.3f, -10.2f), // Region_08 (Древние Руины)
         new Vector3(-5f, 0f, -10f),    // Region_09
         new Vector3(5f, 0f, -10f),     // Region_10
-        new Vector3(9.9f, 0.8f, -4.5f) // Region_11 (Святилище Зенита)
+        new Vector3(9.9f, 0.8f, -4.5f) // Region_11 (Кровавые Пустоши)
     };
 
     [Tooltip("Manual offset added to the spawn anchor of each landing point if not using customCastlePositions")]
@@ -396,13 +396,13 @@ public class FateCastleManager : MonoBehaviour
             case 10:
                 return lang == 0 ? "Свободные Нейтральные Торговцы" : "Free Neutral Merchants";
             case 3:
-                return lang == 0 ? "Племена Орков Кровавых Пустошей" : "Wasteland Blood Orcs";
+                return lang == 0 ? "Небожители Сакрального Зенита" : "Sacred Zenith Celestials";
             case 6:
                 return lang == 0 ? "Владыки Ледяного Пика" : "Frostbound High Overlords";
             case 8:
                 return lang == 0 ? "Дикари Древнейших Руин" : "Ancient Ruins Barbarians";
             case 11:
-                return lang == 0 ? "Небожители Сакрального Зенита" : "Sacred Zenith Celestials";
+                return lang == 0 ? "Племена Орков Кровавых Пустошей" : "Wasteland Blood Orcs";
             default:
                 return lang == 0 ? "Теневой Синдикат Пустоты" : "Void Shadow Syndicate";
         }
@@ -801,10 +801,10 @@ public class FateCastleManager : MonoBehaviour
     {
         switch (landedZoneIndex)
         {
-            case 0: return 3;   // Кровавые Пустоши (Region_03)
+            case 0: return 11;  // Кровавые Пустоши (Region_11)
             case 1: return 6;   // Ледяной Пик (Region_06)
             case 2: return 8;   // Древние Руины (Region_08)
-            case 3: return 11;  // Святилище Зенита / Грозовые Кряжи (Region_11)
+            case 3: return 3;   // Святилище Зенита / Грозовые Кряжи (Region_03)
             default: return 3;
         }
     }
@@ -1056,10 +1056,10 @@ public class FateCastleManager : MonoBehaviour
     {
         switch (i)
         {
-            case 3: return "Кровавые Пустоши";
+            case 3: return "Святилище Зенита";
             case 6: return "Ледяной Пик";
             case 8: return "Древние Руины";
-            case 11: return "Святилище Зенита";
+            case 11: return "Кровавые Пустоши";
             default: return "Военный Форпост";
         }
     }
@@ -1068,10 +1068,10 @@ public class FateCastleManager : MonoBehaviour
     {
         switch (i)
         {
-            case 3: return "Crimson Wastes";
+            case 3: return "Zenith Sanctuary";
             case 6: return "Ice-Bound Peak";
             case 8: return "Ancient Ruins";
-            case 11: return "Zenith Sanctuary";
+            case 11: return "Crimson Wastes";
             default: return "Military Outpost";
         }
     }
@@ -1080,10 +1080,10 @@ public class FateCastleManager : MonoBehaviour
     {
         switch (i)
         {
-            case 3: return "深红荒野";
+            case 3: return "极星圣所";
             case 6: return "冰封山顶";
             case 8: return "古代遗迹";
-            case 11: return "极星圣所";
+            case 11: return "深红荒野";
             default: return "军事前哨";
         }
     }
@@ -1092,10 +1092,10 @@ public class FateCastleManager : MonoBehaviour
     {
         switch (i)
         {
-            case 3: return "붉은 황무지";
+            case 3: return "제니스 성소";
             case 6: return "얼음 봉우리";
             case 8: return "고대 유적지";
-            case 11: return "제니스 성소";
+            case 11: return "붉은 황무지";
             default: return "군사 전초기지";
         }
     }
@@ -3127,7 +3127,7 @@ public class FateCastleManager : MonoBehaviour
                     new Vector3(-15f, 0f, 10f),    // Region_00
                     new Vector3(-5f, 0f, 10f),     // Region_01
                     new Vector3(5f, 0f, 10f),      // Region_02
-                    new Vector3(-5.3f, -0.4f, 4.2f), // Region_03 (Кровавые Пустоши)
+                    new Vector3(-5.3f, -0.4f, 4.2f), // Region_03 (Святилище Зенита)
                     new Vector3(-15f, 0f, 0f),     // Region_04
                     new Vector3(-5f, 0f, 0f),      // Region_05
                     new Vector3(14.8f, 1.2f, 12.5f), // Region_06 (Ледяной Пик)
@@ -3135,7 +3135,7 @@ public class FateCastleManager : MonoBehaviour
                     new Vector3(-12.4f, -0.3f, -10.2f), // Region_08 (Древние Руины)
                     new Vector3(-5f, 0f, -10f),    // Region_09
                     new Vector3(5f, 0f, -10f),     // Region_10
-                    new Vector3(9.9f, 0.8f, -4.5f) // Region_11 (Святилище Зенита)
+                    new Vector3(9.9f, 0.8f, -4.5f) // Region_11 (Кровавые Пустоши)
                 };
                 customCastlePositions[selectedCalibCastleIdx] = defaults[selectedCalibCastleIdx];
                 if (castle != null && castle.visualRoot != null)
@@ -3458,8 +3458,8 @@ public class FateCastleManager : MonoBehaviour
 
         if (castle.owner == "Player")
         {
-            // Upgrade button logic
-            if (castle.level < 6)
+            // Upgrade button logic: limit to Tier 3 on the first continent
+            if (castle.level < 3)
             {
                 int nextLvl = castle.level + 1;
                 int cost = GetUpgradeCost(castle.level);
@@ -3502,7 +3502,22 @@ public class FateCastleManager : MonoBehaviour
                 maxS.alignment = TextAnchor.MiddleCenter;
                 maxS.fontStyle = FontStyle.Bold;
                 maxS.normal.textColor = new Color(0.2f, 1.0f, 0.95f, 1.0f);
-                GUILayout.Label(curLang == 0 ? "👑 ДОСТИГНУТ ЛЕГЕНДАРНЫЙ УРОВЕНЬ ЦИТАДЕЛИ" : "👑 LEGENDARY ZENITH OUTPOST FULLY EXPANDED", maxS);
+
+                string maxLabel = curLang == 0 ? "👑 ДОСТИГНУТ ЛИМИТ 3 УРОВНЯ НА 1-м КОНТИНЕНТЕ!" : "👑 TIER 3 LIMIT REACHED ON THE 1st CONTINENT!";
+                if (curLang == 8) maxLabel = "👑 已达到第一大陆的3级上限！";
+                if (curLang == 7) maxLabel = "👑 제1대륙 3단계 한계 도달!";
+
+                string subLabel = curLang == 0 ? "Дальнейшее развитие возможно на других континентах." : "Further upgrades are available on other continents.";
+                if (curLang == 8) subLabel = "后续升级可在其他大陆进行。";
+                if (curLang == 7) subLabel = "추가 확장은 다른 대륙에서 가능합니다.";
+
+                GUILayout.Label(maxLabel, maxS);
+
+                GUIStyle subS = new GUIStyle(GUI.skin.label);
+                subS.alignment = TextAnchor.MiddleCenter;
+                subS.fontSize = 11;
+                subS.normal.textColor = Color.gray;
+                GUILayout.Label(subLabel, subS);
             }
 
             GUILayout.Space(10);
