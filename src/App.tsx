@@ -204,7 +204,7 @@ function GameHelpView() {
             Помощь По Игре (Unity 6)
           </h2>
           <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">
-            Интерактивное руководство по разработке • v18.11.19
+            Интерактивное руководство по разработке • v18.11.20
           </p>
         </div>
         <div className="flex items-center gap-4">
@@ -1902,7 +1902,7 @@ export default function App() {
     | "game_help"
     | "external_skills_db"
   >("chat");
-  const [appVersion, setAppVersion] = useState("18.11.15");
+  const [appVersion, setAppVersion] = useState("18.11.20");
 
   useEffect(() => {
     // Автоматическая синхронизация версии с сервером
@@ -9245,8 +9245,8 @@ export default function App() {
                                     <div className="pt-4 border-t border-white/5 text-center">
                                       <span className="text-[8px] text-slate-400 block mb-1">
                                         {simDialogueLang === "RU"
-                                          ? "Fate Continent • Версия 18.11.15"
-                                          : "Fate Continent • Lvl 18.11.15"}
+                                          ? "Fate Continent • Версия 18.11.20"
+                                          : "Fate Continent • Lvl 18.11.20"}
                                       </span>
                                       <span className="text-[6.5px] text-slate-600 block leading-tight">
                                         {simDialogueLang === "RU"

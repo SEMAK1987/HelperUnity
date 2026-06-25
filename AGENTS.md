@@ -1,9 +1,10 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.11.19)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.11.20)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** 18.11.19
+- **Version:** 18.11.20
 - **Engine:** Unity 6 (6000.3.10f1)
+- **v18.11.20 Update:** Fullscreen Character Panel & Advanced Inventory Grid - Integrates a fullscreen 3-column Zenith Hero Control Panel in FateCastleManager.cs to solve the small parameters view. Implements a local-persistent, secure 36-slot inventory grid supporting stacking items (potions) and gear. Formulates a dynamic 8-slot equipment mannequin with attributes calculations (+STR, +AGI, +INT, +STA), larger passive/ultimate skill cards, and links potion merchants and forge slot selections directly to the player inventory database.
 - **v18.11.19 Update:** Dynamic Dialogue Choice Positioning & Clean High-Density Layout - Solves overlapping of dialogue choice buttons with portraits and dialogue text by lowering the layout positions (anchoredPosition Y=-20f, sizeDelta=-120f, 44f) to hang beautifully below the dialogue panel. This provides a pristine visual hierarchy during point selection and normal dialogue steps.
 - **v18.11.18 Update:** Dynamic Army Units, Character Prompts Book Integration & High-Density UI - Resolves dangling brackets, misplaced column alignment and duplicate UI panels within FateCastleManager.cs. Details 14 diverse cohort troop definitions (such as Боец Фракции, Паладин Света, Кентавр Степей, Легендарный Дракон Пустоты, etc.) with strict limit parameters for skill quantities, and connects editable Texture2D slots to easily assign troop portraits right inside the inspector. Formulates guidelines detailing where the default class prompts (Warrior, Archer, Mage) are located inside CHARACTER_PROMPTS.md.
 - **v18.11.16 Update:** GPU Anti-Overheat Protection & Resolution Universal Sync - Implements a hardware performance safeguard within SettingsManager.cs. Disables infinite framerates in Unity; clamps Target Frame Rate to 30 FPS on low presets to minimize GPU load and avoid "Unity Bug Reporter" crashes during long testing sessions, 60 FPS on medium/high, and 120 FPS on ultra. Automatically manages standard Post-Processing Volume weights (Bloom/Postprocess is scaled down to 15% on low settings). Ensures persistent Screen Resolution and Fullscreen Mode are dynamically synchronized and automatically restored across all strategic scenes, loading processes, and gameplay transitions.
@@ -36,7 +37,7 @@
 - **Audio Rule (CRITICAL):** Используйте только `SettingsManager.cs` для управления звуком и музыкой (включая hover-эффекты и списки воспроизведения). Скрипты `AudioHandler` и `AudioManager` должны быть полностью удалены для чистоты проекта. Музыкальные клипы продлеваются через Suno/Udio и настраиваются на бесшовное зацикливание (`loop = true`). Звуковые файлы берем с Pixabay/Freesound по CC0-лицензии и подключаем напрямую к SettingsManager или через AudioMixer.
 
 ## 🚀 Протокол «Пошаговое Мастерство» (Step-by-Step Mastery)
-1. **Отслеживание прогресса:** Текущая версия v18.11.19 (Dynamic Dialogue Choice Positioning & Clean High-Density Layout, v18.11.19).
+1. **Отслеживание прогресса:** Текущая версия v18.11.20 (Fullscreen Character Panel & Advanced Inventory Grid, v18.11.20).
 2. **Инструкции Настройки Компонентов (Verified Inspector Settings):**
    - **FateMapManager (FATE_WORLD_MAP):**
      - *Maps List:* [+] Слот для глобальной карты (Map Name = "Континент Судьбы", Map Background = фоновый спрайт карты).
@@ -56,4 +57,4 @@
 5. **ОЧИСТКА:** Используйте только `SettingsManager.cs` для аудио. Удалите `AudioHandler` и `AudioManager` скрипты. Не использовать ElevenLabs.
 
 ---
-*Ядро AI пересинхронизировано (v18.11.19). Авто-апдейтер активен.*
+*Ядро AI пересинхронизировано (v18.11.20). Авто-апдейтер активен.*

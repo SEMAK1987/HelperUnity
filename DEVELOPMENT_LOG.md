@@ -1,11 +1,9 @@
 # DEVELOPMENT LOG
 
-## [2026-06-24]
-- **Версия 18.11.19**: Zenith Dialogue Choice Positioning & Clean High-Density Layout Integration.
-  - Сдвинули вниз (anchoredPosition Y=-20f) и оптимизировали размеры кнопок выбора зон высадки во время шага 3 (выбор локации) в `DialogueSystem_Manager.cs`, чтобы избежать перекрытия портрета Аэлиссы, портрета героя, а также имен и текста реплики.
-  - Настроили правильную ширину и высоту (sizeDelta=-120f, 44f) для пяти кнопок (включая кнопку подтверждения "Завершить диалог"), благодаря чему они располагаются идеально сбалансировано под декоративной рамкой диалогового окна.
-  - Обновили `version.json`, `metadata.json`, `package.json`, `knowledge_base.json` и `PROJECT_MASTER_BLUEPRINT.md` до актуальной версии 18.11.19.
-
-- **Версия 18.11.18**: Dynamic Army Units, Character Prompts Book Integration & High-Density UI.
-  - Полностью исправлен класс `FateCastleManager.cs` для устранения дублирования панелей, смещенных колонок и незакрытых фигурных скобок.
-  - Добавлено 14 уникальных видов когорт и подключены текстуры к слотам инспектора для быстрого выбора портретов армейских юнитов.
+## [v18.11.20] - 2026-06-25
+- **Fullscreen Character Panel & Advanced Inventory Grid**: Refactored `DrawStatsAllocationPanel` in `FateCastleManager.cs` to render a modern fullscreen 3-column control panel.
+- **Inventory Expansion**: Increased standard inventory capacity to 999 slots with 28 navigable tab segments. Implemented slot purchase mechanisms with progressive gold cost scaling.
+- **Hero Mannequin & Derived Stats**: Implemented an 8-slot visual equipment paper doll with real-time recalculation of Strength, Agility, Intelligence, and Stamina bonuses.
+- **Aelyssa's Tutorial Overlay**: Added step-by-step guidance overlays that highlight distinct columns and disable background closes, keeping the user interface completely locked during teaching.
+- **Visual Repair**: Cleaned up layout overlap issues and restored character stats rendering properly.
+- **Sync & Compatibility**: Synced versions across configuration files and compiled successfully.

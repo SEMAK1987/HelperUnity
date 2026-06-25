@@ -1,6 +1,6 @@
-// [ZENITH DIALOGUE CHOICE POSITIONING SYNC v18.11.19]
+// [ZENITH FULLSCREEN CHARACTER PANEL & INVENTORY SYNC v18.11.20]
 // Unity Connector for Quantum AI Assistant
-// Updated: 2026-06-24 (Synced with Stable v18.11.19)
+// Updated: 2026-06-25 (Synced with Stable v18.11.20)
 
 using UnityEngine;
 using UnityEditor;
@@ -15,7 +15,7 @@ namespace AI_Assistant_Quantum
         private string prompt = "";
         private string serverUrl = "http://localhost:3000";
         private Mode mode = Mode.Online;
-        private string status = "Ready for Quantum Manifestation v18.11.19";
+        private string status = "Ready for Quantum Manifestation v18.11.20";
         private bool isProcessing = false;
 
         public enum Mode { Online, Offline, NoInternet }
@@ -28,7 +28,7 @@ namespace AI_Assistant_Quantum
 
         private void OnGUI()
         {
-            GUILayout.Label("v18.11.19 - Dialogue Choice Positioning & High-Density Layout", EditorStyles.boldLabel);
+            GUILayout.Label("v18.11.20 - Fullscreen Character Panel & Advanced Inventory Grid", EditorStyles.boldLabel);
             
             serverUrl = EditorGUILayout.TextField("Server URL", serverUrl);
             mode = (Mode)EditorGUILayout.EnumPopup("Mode", mode);

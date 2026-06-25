@@ -306,6 +306,487 @@ public class FateCastleManager : MonoBehaviour
     private Vector2 forgeScroll = Vector2.zero;
     private Vector2 academyScroll = Vector2.zero;
     private Vector2 statsScroll = Vector2.zero;
+    private Vector2 invScroll = Vector2.zero;
+
+    // Inventory & Equipment System variables (v18.11.20)
+    private int eqBonusSTR = 0;
+    private int eqBonusAGI = 0;
+    private int eqBonusINT = 0;
+    private int eqBonusSTA = 0;
+
+    [Serializable]
+    public class InventoryItem
+    {
+        public string id = "";
+        public string name = "";
+        public string iconType = ""; // "hp", "str", "def", "armor", "weapon", "ring", "shoulders", "helmet", "boots", "belt", "necklace"
+        public int slotType = 0; // 1: head, 2: neck, 3: shoulders, 4: chest, 5: ring, 6: belt, 7: boots, 8: weapon, 0: consumable potion
+        public int level = 1;
+        public int count = 0;
+        public int statBonus = 0;
+    }
+
+    [Serializable]
+    public class InventoryData
+    {
+        public InventoryItem[] items = new InventoryItem[999];
+    }
+
+    [Serializable]
+    public class EquipmentData
+    {
+        public InventoryItem[] slots = new InventoryItem[9]; // index 1 to 8 matches Slot 1 to Slot 8
+    }
+
+    private InventoryData playerInventory = new InventoryData();
+    private EquipmentData playerEquipment = new EquipmentData();
+
+    // Aelyssa character panel tutorial state (v18.11.20)
+    public bool isAelyssaTutorialActive = false;
+    private int tutorialStep = 0;
+
+    private string[][] aelyssaTutorialDialogsRU = new string[][] {
+        new string[] { "Аэлисса", "Приветствую тебя, герой Континента Судьбы! Я вижу, ты открыл Панель Управления Героем. Давай я расскажу тебе, как устроен этот интерфейс, чтобы ты мог эффективно использовать все его возможности!" },
+        new string[] { "Аэлисса", "Слева находится вкладка ХАРАКТЕРИСТИК. Здесь ты можешь распределять очки, полученные за новые уровни. Сила (STR) повышает урон, Ловкость (AGI) — защиту, Интеллект (INT) — ману, а Выносливость (STA) — твое максимальное здоровье!" },
+        new string[] { "Аэлисса", "По центру сверху ты видишь МАНЕКЕН СНАРЯЖЕНИЯ. Всего у тебя есть 8 слотов для экипировки (Оружие, Шлем, Доспех, Наплечники, Сапоги, Пояс, Амулет и Кольцо). Нажатие на экипированный предмет снимет его!" },
+        new string[] { "Аэлисса", "Снизу по центру расположены твои КЛАССОВЫЕ НАВЫКИ — пассивные и мощные ультимативные способности, которые зависят от твоего выбранного класса (Воин, Охотник или Маг). Они дают тебе огромные преимущества в бою!" },
+        new string[] { "Аэлисса", "Справа находится твой ИНВЕНТАРЬ. Он огромный — расширяется до 999 ячеек! Изначально открыто только 10 слотов. Ты можешь покупать новые ячейки за золото (чем больше клеток, тем они дороже), либо получать БЕСПЛАТНО по 1 клетке за каждые 10 уровней героя!" },
+        new string[] { "Аэлисса", "Чтобы надеть оружие или броню, либо выпить купленное зелье жизни, силы или защиты — просто кликни по предмету в инвентаре! Твои характеристики пересчитаются мгновенно, давая тебе силу!" },
+        new string[] { "Аэлисса", "Помни, что инвентарь, зелья и индивидуальное снаряжение доступны ТОЛЬКО для тебя — главного героя! Обычные наемные отряды и солдаты сохраняют свою базовую простую структуру." },
+        new string[] { "Аэлисса", "Также твой инвентарь напрямую связан с Кузницей и Магазином снадобий в замке! Выкованное оружие и купленные зелья теперь аккуратно складываются прямо сюда. Ну что, теперь ты полностью готов к битвам!" }
+    };
+
+    private string[][] aelyssaTutorialDialogsEN = new string[][] {
+        new string[] { "Aelyssa", "Greetings, hero of the Fate Continent! I see you've opened the Hero Control Panel. Let me show you how this interface works so you can utilize all its power!" },
+        new string[] { "Aelyssa", "On the left is the ATTRIBUTES tab. Here you allocate stat points gained from leveling up. Strength (STR) boosts damage, Agility (AGI) increases defense, Intelligence (INT) raises mana, and Stamina (STA) expands max health!" },
+        new string[] { "Aelyssa", "In the upper center, you see the EQUIPMENT MANNEQUIN. You have 8 gear slots (Weapon, Helmet, Plate, Pauldrons, Boots, Belt, Pendant, and Ring). Clicking an equipped item unequips it back to your bag!" },
+        new string[] { "Aelyssa", "In the lower center are your CLASS SKILLS — passive boosts and ultimate active powers matching your chosen class (Warrior, Archer, or Mage) to dominate the battlefield!" },
+        new string[] { "Aelyssa", "On the right is your INVENTORY. It is massive, expanding up to 999 slots! You start with 10 slots. You can buy more with gold (prices rise dynamically), or get 1 free slot every 10 hero levels!" },
+        new string[] { "Aelyssa", "To equip gear or drink health/might/ward elixirs, simply click the item in your inventory! Your hero statistics will instantly update with all equipment bonuses." },
+        new string[] { "Aelyssa", "Remember, the inventory, potions, and equipment are strictly reserved for you — the main hero! Regular hired units and mercenary soldiers retain their basic simple structures." },
+        new string[] { "Aelyssa", "Your inventory is also linked directly to the Forge and Potion Shop in your castle! Forged armor and bought elixirs are placed here. Now, you are fully prepared for the journey!" }
+    };
+
+    private string[][] aelyssaTutorialDialogsCH = new string[][] {
+        new string[] { "阿艾莉萨", "你好，命运大陆的英雄！我看到你打开了英雄控制面板。让我为你介绍这个界面的构造，以便你完美发挥其全部力量！" },
+        new string[] { "阿艾莉萨", "左侧是属性面板。你可以分配升级获得的点数。力量（STR）增加伤害，敏捷（AGI）提升防御，智力（INT）增加法力值，耐力（STA）提高生命值上限！" },
+        new string[] { "阿艾莉萨", "中上方是装备模特。你拥有8个装备槽（武器、头盔、胸甲、护肩、鞋子、腰带、项链和戒指）。点击已装备的物品可以将其卸下并放回背包！" },
+        new string[] { "阿艾莉萨", "中下方是你的职业技能——根据你选择的职业（战士、弓箭手或法师）提供的被动和强大的终极主动技能，助你掌控战场！" },
+        new string[] { "阿艾莉萨", "右侧是你的背包，最大可扩展至999格！初始解锁10格。你可以用金币购买格位（越往后越贵），或者每升10级免费领取1格！" },
+        new string[] { "阿艾莉萨", "要穿戴装备或饮用购买的生命、力量、防御药水，只需点击背包中的对应物品！你的英雄属性将会瞬间更新，立竿见影！" },
+        new string[] { "阿艾莉萨", "请记住，背包、药水和个人装备仅供你——主角使用！普通的雇用士兵和佣兵队伍仍保持其原有的简单属性结构。" },
+        new string[] { "阿艾莉萨", "你的背包也已与城堡的铁匠铺和药水商店直接关联！铁匠铺锻造的装备和购买的药水都会自动放入背包中。现在，你已完全准备好迎接战斗了！" }
+    };
+
+    private string[][] aelyssaTutorialDialogsKR = new string[][] {
+        new string[] { "엘리사", "환영합니다, 운명의 대륙의 영웅이여! 영웅 제어 패널을 열어보셨군요. 모든 기능을 마스터할 수 있도록 이 인터페이스를 설명해 드릴게요!" },
+        new string[] { "엘리사", "왼쪽은 능력치 탭입니다. 레벨업 시 획득한 포인트를 분배할 수 있죠. 힘(STR)은 공격력, 민첩(AGI)은 방어력, 지능(INT)은 마나, 체력(STA)은 최대 생명력을 증가시킵니다!" },
+        new string[] { "엘리사", "중앙 상단에는 장비 마네킹이 있습니다. 무기, 투구, 갑옷, 어깨갑옷, 신발, 벨트, 아뮬렛, 반지 등 총 8개의 슬롯이 있죠. 장착 중인 아이템을 클릭하면 인벤토리로 장착 해제됩니다!" },
+        new string[] { "엘리사", "중앙 하단은 선택한 클래스(전사, 궁수, 마법사)에 따른 패시브 및 궁극기 클래스 스킬입니다. 전투에서 엄청난 이점을 가져다 줄 거예요!" },
+        new string[] { "엘리사", "오른쪽은 인벤토리입니다. 최대 999칸까지 확장 가능한 엄청난 공간이죠! 처음에는 10칸만 열려 있으며, 골드로 추가 슬롯을 구매하거나 10레벨마다 1칸씩 무료로 열 수 있습니다!" },
+        new string[] { "엘리사", "무기나 방어구를 장착하거나, 구매한 물약을 사용하려면 인벤토리의 아이템을 클릭하세요! 모든 스탯이 실시간으로 계산되어 강해집니다." },
+        new string[] { "엘리사", "참고로 인벤토리, 물약 및 개인 장비는 오직 주인공인 당신만 사용할 수 있습니다! 일반 용병들과 유닛들은 기본의 단순한 상태를 유지합니다." },
+        new string[] { "엘리사", "또한 당신의 인벤토리는 성의 대장간과 성수 상점과 직접 연동됩니다! 제작된 무기나 구매한 물약은 바로 여기로 들어오죠. 자, 이제 전장으로 나갈 준비가 끝났습니다!" }
+    };
+
+    private int GetPurchasedSlotsCount()
+    {
+        return PlayerPrefs.GetInt("Player_Inventory_Purchased_Slots", 10);
+    }
+
+    private void SetPurchasedSlotsCount(int count)
+    {
+        PlayerPrefs.SetInt("Player_Inventory_Purchased_Slots", Mathf.Clamp(count, 10, 999));
+        PlayerPrefs.Save();
+    }
+
+    private int GetUnlockedSlotsCount()
+    {
+        int purchased = GetPurchasedSlotsCount();
+        int freeSlotsByLevel = 0;
+        if (SaveGameSystem.CurrentData != null)
+        {
+            freeSlotsByLevel = SaveGameSystem.CurrentData.playerLevel / 10;
+        }
+        return Mathf.Clamp(purchased + freeSlotsByLevel, 10, 999);
+    }
+
+    private string GetTutorialSpeaker(int step, int lang)
+    {
+        string[][] arr = aelyssaTutorialDialogsEN;
+        if (lang == 0) arr = aelyssaTutorialDialogsRU;
+        else if (lang == 8) arr = aelyssaTutorialDialogsCH;
+        else if (lang == 7) arr = aelyssaTutorialDialogsKR;
+
+        if (step >= 0 && step < arr.Length) return arr[step][0];
+        return "Aelyssa";
+    }
+
+    private string GetTutorialText(int step, int lang)
+    {
+        string[][] arr = aelyssaTutorialDialogsEN;
+        if (lang == 0) arr = aelyssaTutorialDialogsRU;
+        else if (lang == 8) arr = aelyssaTutorialDialogsCH;
+        else if (lang == 7) arr = aelyssaTutorialDialogsKR;
+
+        if (step >= 0 && step < arr.Length) return arr[step][1];
+        return "";
+    }
+
+    private void SaveInventory()
+    {
+        string json = JsonUtility.ToJson(playerInventory);
+        PlayerPrefs.SetString("Player_Inventory_JSON_v18", json);
+        PlayerPrefs.Save();
+    }
+
+    private void LoadInventory()
+    {
+        if (playerInventory == null) playerInventory = new InventoryData();
+        if (playerInventory.items == null || playerInventory.items.Length < 999)
+        {
+            InventoryItem[] newItems = new InventoryItem[999];
+            if (playerInventory.items != null)
+            {
+                for (int i = 0; i < Mathf.Min(playerInventory.items.Length, 999); i++)
+                {
+                    newItems[i] = playerInventory.items[i];
+                }
+            }
+            playerInventory.items = newItems;
+        }
+
+        for (int i = 0; i < 999; i++)
+        {
+            if (playerInventory.items[i] == null) playerInventory.items[i] = new InventoryItem();
+        }
+
+        string json = PlayerPrefs.GetString("Player_Inventory_JSON_v18", "");
+        if (!string.IsNullOrEmpty(json))
+        {
+            try
+            {
+                InventoryData loaded = JsonUtility.FromJson<InventoryData>(json);
+                if (loaded != null && loaded.items != null)
+                {
+                    for (int i = 0; i < Mathf.Min(999, loaded.items.Length); i++)
+                    {
+                        if (loaded.items[i] != null)
+                        {
+                            playerInventory.items[i] = loaded.items[i];
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error loading inventory: " + ex.Message);
+            }
+        }
+        else
+        {
+            // First time initialization - fill inventory with starter items
+            playerInventory.items[0] = new InventoryItem { id = "weapon_bronze_1", name = GetItemName(8, 1, 0), iconType = "weapon", slotType = 8, level = 1, count = 1, statBonus = 3 };
+            playerInventory.items[1] = new InventoryItem { id = "helmet_bronze_1", name = GetItemName(1, 1, 0), iconType = "helmet", slotType = 1, level = 1, count = 1, statBonus = 2 };
+            playerInventory.items[2] = new InventoryItem { id = "potion_hp_1", name = "Зелье Жизни (Ур.1)", iconType = "hp", slotType = 0, level = 1, count = 3, statBonus = 0 };
+            playerInventory.items[3] = new InventoryItem { id = "potion_str_1", name = "Зелье Силы (Ур.1)", iconType = "str", slotType = 0, level = 1, count = 1, statBonus = 0 };
+            playerInventory.items[4] = new InventoryItem { id = "potion_def_1", name = "Зелье Защиты (Ур.1)", iconType = "def", slotType = 0, level = 1, count = 1, statBonus = 0 };
+            SaveInventory();
+        }
+    }
+
+    private void SaveEquipment()
+    {
+        string json = JsonUtility.ToJson(playerEquipment);
+        PlayerPrefs.SetString("Player_Equipment_JSON_v18", json);
+        PlayerPrefs.Save();
+    }
+
+    private void LoadEquipment()
+    {
+        if (playerEquipment == null) playerEquipment = new EquipmentData();
+        for (int i = 0; i < 9; i++)
+        {
+            if (playerEquipment.slots[i] == null) playerEquipment.slots[i] = new InventoryItem();
+        }
+
+        string json = PlayerPrefs.GetString("Player_Equipment_JSON_v18", "");
+        if (!string.IsNullOrEmpty(json))
+        {
+            try
+            {
+                EquipmentData loaded = JsonUtility.FromJson<EquipmentData>(json);
+                if (loaded != null && loaded.slots != null)
+                {
+                    for (int i = 0; i < Mathf.Min(9, loaded.slots.Length); i++)
+                    {
+                        if (loaded.slots[i] != null)
+                        {
+                            playerEquipment.slots[i] = loaded.slots[i];
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error loading equipment: " + ex.Message);
+            }
+        }
+    }
+
+    private bool AddInventoryItem(string id, string name, string iconType, int slotType, int level, int statBonus)
+    {
+        LoadInventory();
+        int unlockedCount = GetUnlockedSlotsCount();
+        
+        // Find stackable potion slot within unlocked slots
+        for (int i = 0; i < unlockedCount; i++)
+        {
+            if (playerInventory.items[i] != null && playerInventory.items[i].id == id && playerInventory.items[i].level == level && slotType == 0)
+            {
+                playerInventory.items[i].count++;
+                SaveInventory();
+                return true;
+            }
+        }
+        
+        // Find empty slot within unlocked slots
+        for (int i = 0; i < unlockedCount; i++)
+        {
+            if (playerInventory.items[i] == null || string.IsNullOrEmpty(playerInventory.items[i].id))
+            {
+                if (playerInventory.items[i] == null) playerInventory.items[i] = new InventoryItem();
+                playerInventory.items[i].id = id;
+                playerInventory.items[i].name = name;
+                playerInventory.items[i].iconType = iconType;
+                playerInventory.items[i].slotType = slotType;
+                playerInventory.items[i].level = level;
+                playerInventory.items[i].count = 1;
+                playerInventory.items[i].statBonus = statBonus;
+                SaveInventory();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void UnequipItem(int slotIndex)
+    {
+        LoadEquipment();
+        LoadInventory();
+        InventoryItem itemToUnequip = playerEquipment.slots[slotIndex];
+        if (itemToUnequip == null || string.IsNullOrEmpty(itemToUnequip.id)) return;
+
+        int curLang = Translator.LanguageID;
+        int unlockedCount = GetUnlockedSlotsCount();
+        bool added = false;
+        
+        for (int i = 0; i < unlockedCount; i++)
+        {
+            if (playerInventory.items[i] == null || string.IsNullOrEmpty(playerInventory.items[i].id))
+            {
+                playerInventory.items[i] = itemToUnequip;
+                playerEquipment.slots[slotIndex] = new InventoryItem();
+                added = true;
+                break;
+            }
+        }
+
+        if (added)
+        {
+            SaveInventory();
+            SaveEquipment();
+            RecalculateEquippedBonuses();
+            string itemName = GetLocalizedItemName(itemToUnequip, curLang);
+            ShowFeedback(curLang == 0 ? $"{itemName} снят и помещен в инвентарь!" : $"{itemName} unequipped into inventory!");
+        }
+        else
+        {
+            ShowFeedback(curLang == 0 ? "Инвентарь полон! Некуда положить снятый предмет. Разблокируйте новые ячейки." : "Inventory full! Unlock more slots to unequip.");
+        }
+    }
+
+    private string GetLocalizedItemName(InventoryItem item, int lang)
+    {
+        if (item == null || string.IsNullOrEmpty(item.id)) return "";
+        if (item.slotType == 0) // Potion
+        {
+            string nameBase = "Зелье";
+            if (item.id.Contains("hp"))
+            {
+                if (lang == 0) nameBase = "Зелье Жизни";
+                else if (lang == 8) nameBase = "生命药水";
+                else if (lang == 7) nameBase = "체력 물약";
+                else nameBase = "Health Elixir";
+            }
+            else if (item.id.Contains("str"))
+            {
+                if (lang == 0) nameBase = "Зелье Силы";
+                else if (lang == 8) nameBase = "力量药水";
+                else if (lang == 7) nameBase = "힘의 물약";
+                else nameBase = "Strength Potion";
+            }
+            else if (item.id.Contains("def"))
+            {
+                if (lang == 0) nameBase = "Зелье Защиты";
+                else if (lang == 8) nameBase = "防御药水";
+                else if (lang == 7) nameBase = "방어의 물약";
+                else nameBase = "Defense Potion";
+            }
+            
+            string lvlSuffix = lang == 0 ? $" (Ур.{item.level})" : $" (Lvl {item.level})";
+            if (lang == 8) lvlSuffix = $" ({item.level} 级)";
+            if (lang == 7) lvlSuffix = $" ({item.level} 레벨)";
+            return nameBase + lvlSuffix;
+        }
+        else
+        {
+            return GetItemName(item.slotType, item.level, lang);
+        }
+    }
+
+    private void EquipOrUseItem(int inventoryIndex)
+    {
+        LoadInventory();
+        LoadEquipment();
+        InventoryItem item = playerInventory.items[inventoryIndex];
+        if (item == null || string.IsNullOrEmpty(item.id)) return;
+
+        int curLang = Translator.LanguageID;
+
+        if (item.slotType >= 1 && item.slotType <= 8)
+        {
+            int slot = item.slotType;
+            InventoryItem currentlyEquipped = playerEquipment.slots[slot];
+            string itemName = GetLocalizedItemName(item, curLang);
+
+            if (currentlyEquipped != null && !string.IsNullOrEmpty(currentlyEquipped.id))
+            {
+                string oldName = GetLocalizedItemName(currentlyEquipped, curLang);
+                playerInventory.items[inventoryIndex] = currentlyEquipped;
+                playerEquipment.slots[slot] = item;
+                ShowFeedback(curLang == 0 ? $"Вы надели {itemName}, а {oldName} вернулся в инвентарь." : $"Equipped {itemName}, returned {oldName} to inventory.");
+            }
+            else
+            {
+                playerEquipment.slots[slot] = item;
+                playerInventory.items[inventoryIndex] = new InventoryItem();
+                ShowFeedback(curLang == 0 ? $"Вы успешно экипировали {itemName}!" : $"Successfully equipped {itemName}!");
+            }
+
+            SaveInventory();
+            SaveEquipment();
+            RecalculateEquippedBonuses();
+        }
+        else if (item.slotType == 0)
+        {
+            SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
+            string itemName = GetLocalizedItemName(item, curLang);
+            if (item.id.Contains("hp"))
+            {
+                float maxHp = (data.stamina + eqBonusSTA) * 10f;
+                data.currentHealth = Mathf.Min(maxHp, data.currentHealth + (item.level * 30f));
+                ShowFeedback(curLang == 0 ? $"Вы выпили {itemName}. ОЗ восстановлено!" : $"Consumed {itemName}. Health restored!");
+            }
+            else if (item.id.Contains("str"))
+            {
+                data.strength += item.level;
+                ShowFeedback(curLang == 0 ? $"Вы выпили {itemName}. Сила увеличена на +{item.level}!" : $"Consumed {itemName}. Strength increased by +{item.level}!");
+            }
+            else if (item.id.Contains("def"))
+            {
+                data.stamina += item.level;
+                ShowFeedback(curLang == 0 ? $"Вы выпили {itemName}. Выносливость увеличена на +{item.level}!" : $"Consumed {itemName}. Stamina increased by +{item.level}!");
+            }
+
+            item.count--;
+            if (item.count <= 0)
+            {
+                playerInventory.items[inventoryIndex] = new InventoryItem();
+            }
+
+            SaveInventory();
+            SaveGameSystem.Save(0);
+        }
+    }
+
+    private void RecalculateEquippedBonuses()
+    {
+        LoadEquipment();
+        eqBonusSTR = 0;
+        eqBonusAGI = 0;
+        eqBonusINT = 0;
+        eqBonusSTA = 0;
+
+        for (int i = 1; i <= 8; i++)
+        {
+            InventoryItem item = playerEquipment.slots[i];
+            if (item != null && !string.IsNullOrEmpty(item.id))
+            {
+                int tier = item.level;
+                switch (i)
+                {
+                    case 1: eqBonusSTA += tier * 2; break; // Head
+                    case 2: eqBonusINT += tier * 2; break; // Neck
+                    case 3: eqBonusSTR += tier; eqBonusSTA += tier; break; // Shoulders
+                    case 4: eqBonusSTA += tier * 3; break; // Chest
+                    case 5: eqBonusINT += tier; eqBonusAGI += tier; break; // Ring
+                    case 6: eqBonusSTA += tier; eqBonusAGI += tier; break; // Belt
+                    case 7: eqBonusAGI += tier * 2; break; // Boots
+                    case 8: eqBonusSTR += tier * 3; break; // Weapon
+                }
+            }
+        }
+    }
+
+    private string GetEmojiForSlot(int slot)
+    {
+        switch (slot)
+        {
+            case 1: return "👑"; // Head
+            case 2: return "📿"; // Neck
+            case 3: return "🦾"; // Shoulders
+            case 4: return "👕"; // Chest
+            case 5: return "💍"; // Ring
+            case 6: return "🎗️"; // Belt
+            case 7: return "🥾"; // Boots
+            case 8: return "⚔️"; // Weapon
+            default: return "🧪"; // Potion / Consumable
+        }
+    }
+
+    private string GetItemName(int slotType, int tier, int lang)
+    {
+        string[][] slotPrefixesRU = new string[][] {
+            new string[] { "Бронза", "Сталь", "Мифрил", "Кристалл", "Космос", "Легенда" }, // 0
+            new string[] { "Бронзовый Шлем", "Стальной Шлем", "Мифриловый Шлем", "Кристальный Шлем", "Звездный Венец", "Шлем Зенита v18" }, // 1
+            new string[] { "Бронзовый Амулет", "Стальной Амулет", "Мифриловый Амулет", "Кристальный Амулет", "Звездный Амулет", "Амулет Зенита v18" }, // 2
+            new string[] { "Бронзовые Наплечники", "Стальные Наплечники", "Мифриловые Наплечники", "Кристальные Наплечники", "Звездные Наплечники", "Наплечники Зенита v18" }, // 3
+            new string[] { "Бронзовый Доспех", "Стальной Доспех", "Мифриловый Доспех", "Кристальный Доспех", "Звездный Доспех", "Доспех Зенита v18" }, // 4
+            new string[] { "Бронзовое Кольцо", "Стальное Кольцо", "Мифриловое Кольцо", "Кристальное Кольцо", "Звездное Кольцо", "Кольцо Зенита v18" }, // 5
+            new string[] { "Бронзовый Пояс", "Стальной Пояс", "Мифриловый Пояс", "Кристальный Пояс", "Звездный Пояс", "Пояс Зенита v18" }, // 6
+            new string[] { "Бронзовые Сапоги", "Стальные Сапоги", "Мифриловые Сапоги", "Кристальные Сапоги", "Звездные Сапоги", "Сапоги Зенита v18" }, // 7
+            new string[] { "Бронзовый Меч", "Стальной Клинок", "Мифриловый Меч", "Кристальный Клинок", "Звездный Клинок", "Меч Зенита v18" } // 8
+        };
+
+        string[][] slotPrefixesEN = new string[][] {
+            new string[] { "Bronze", "Steel", "Mithril", "Crystalline", "Star-Forged", "Legendary Zenith" },
+            new string[] { "Bronze Helmet", "Steel Helm", "Mithril Visor", "Crystal Crown", "Astral Crest", "Zenith Crown" },
+            new string[] { "Bronze Pendant", "Steel Choker", "Mithril Talisman", "Crystal Eye", "Stellar Pendant", "Zenith Relic" },
+            new string[] { "Bronze Spaulders", "Steel Guards", "Mithril Pauldrons", "Crystal Pauldrons", "Star Shoulders", "Zenith Epaulets" },
+            new string[] { "Bronze Plate", "Steel Chestplate", "Mithril Greatplate", "Crystal Platemail", "Star Sentinel Armor", "Zenith Plate" },
+            new string[] { "Bronze Ring", "Steel Band", "Mithril Signet", "Crystal Ring", "Cosmic Loop", "Zenith Ring" },
+            new string[] { "Bronze Belt", "Steel Buckle", "Mithril Belt", "Crystal Girdle", "Nova Sash", "Zenith Girdle" },
+            new string[] { "Bronze Sabatons", "Steel Boots", "Mithril Greaves", "Crystal Treads", "Star Sabatons", "Zenith Greaves" },
+            new string[] { "Bronze Sword", "Steel Blade", "Mithril Claymore", "Crystal Scepter", "Astral Edge", "Zenith Slayer" }
+        };
+
+        int tIdx = Mathf.Clamp(tier - 1, 0, 5);
+        int sIdx = Mathf.Clamp(slotType, 0, 8);
+
+        if (lang == 0) return slotPrefixesRU[sIdx][tIdx];
+        return slotPrefixesEN[sIdx][tIdx];
+    }
 
     public bool IsHeroProfileOpen
     {
@@ -937,6 +1418,11 @@ public class FateCastleManager : MonoBehaviour
             SpawnAllCastles();
         }
         LoadClassSkillsIcons();
+
+        // Load Inventory and Equipment
+        LoadInventory();
+        LoadEquipment();
+        RecalculateEquippedBonuses();
     }
 
     public void EnableContinentGameplay()
@@ -1948,273 +2434,7 @@ public class FateCastleManager : MonoBehaviour
         ShowFeedback(finishMsg);
     }
 
-    private string GetEquipmentTierName(int tier, int lang)
-    {
-        string[][] names = new string[][] {
-            new string[] { "Бронзовая броня", "Стальной комплект", "Мифриловое вооружение", "Кристальные пластины", "Звездный доспех эгиды", "Легендарный Сет Зенита" },
-            new string[] { "Bronze Aegis", "Iron Garrison Gear", "Mithril Greatplates", "Crystalline Platemail", "Star-Forged Sentinel", "Legendary Zenith Crest" },
-            new string[] { "青铜卫士半身护铠", "强化精制钢重型甲", "秘银高密晶刃防具", "水晶雕琢流光束装", "铸星不灭光环御盾", "巅峰至尊神格圣甲" },
-            new string[] { "청동 에이전트 아머", "강철 가리슨 장비", "미스릴 중장 대갑옷", "크리스탈 유광 플레이트", "정련된 별의 구도자", "전설의 제니스 신성 세트" }
-        };
-
-        int idx = Mathf.Clamp(tier - 1, 0, 5);
-        int langIdx = 1; // Default EN
-        if (lang == 0) langIdx = 0;
-        if (lang == 8) langIdx = 2;
-        if (lang == 7) langIdx = 3;
-
-        return names[langIdx][idx];
-    }
-
-    private void ShowFeedback(string msg)
-    {
-        feedbackMessage = msg;
-        messageTimer = 4.0f;
-    }
-
-    // ==========================================
-    // HERO LEVELING & STATS SYSTEM (v18.11.15)
-    // ==========================================
-    public void GainXP(int amount)
-    {
-        SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
-        data.currentXP += amount;
-        int xpNeeded = data.playerLevel * 100;
-        
-        while (data.currentXP >= xpNeeded)
-        {
-            data.currentXP -= xpNeeded;
-            data.playerLevel++;
-            data.availableSkillPoints += 5; // Даем 5 очков характеристик за уровень!
-            
-            string levelMsg = Translator.LanguageID == 0 
-                ? $"✨ НОВЫЙ УРОВЕНЬ! Вы достигли Уровня {data.playerLevel}! (+5 очков характеристик)" 
-                : $"✨ LEVEL UP! You reached Level {data.playerLevel}! (+5 Stat Points)";
-            ShowFeedback(levelMsg);
-            
-            if (isAutonomousStatsDistribution)
-            {
-                AutoAllocateAllPoints();
-            }
-            xpNeeded = data.playerLevel * 100;
-        }
-        RecalculateStats();
-        PlayerPrefs.Save();
-    }
-
-    public void RecalculateStats()
-    {
-        SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
-        data.maxHealth = data.stamina * 10f;
-        if (data.currentHealth > data.maxHealth) data.currentHealth = data.maxHealth;
-        if (data.currentHealth <= 0f) data.currentHealth = data.maxHealth; // Воскрешение
-    }
-
-    public void AutoAllocateAllPoints()
-    {
-        SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
-        string cl = data.characterClass;
-        if (string.IsNullOrEmpty(cl)) cl = "Воин";
-
-        while (data.availableSkillPoints > 0)
-        {
-            if (cl.Contains("Воин") || cl.Contains("Paladin") || cl.Contains("Warrior") || cl.Contains("Паладин"))
-            {
-                // Воин: +3 Сила, +2 Выносливость, +1 Ловкость
-                if (data.availableSkillPoints >= 6)
-                {
-                    data.strength += 3;
-                    data.stamina += 2;
-                    data.agility += 1;
-                    data.availableSkillPoints -= 6;
-                }
-                else
-                {
-                    data.strength += data.availableSkillPoints;
-                    data.availableSkillPoints = 0;
-                }
-            }
-            else if (cl.Contains("Лук") || cl.Contains("Archer") || cl.Contains("Стрелок") || cl.Contains("Ranger") || cl.Contains("Охотник"))
-            {
-                // Лучник: +3 Ловкость, +2 Сила, +1 Выносливость
-                if (data.availableSkillPoints >= 6)
-                {
-                    data.agility += 3;
-                    data.strength += 2;
-                    data.stamina += 1;
-                    data.availableSkillPoints -= 6;
-                }
-                else
-                {
-                    data.agility += data.availableSkillPoints;
-                    data.availableSkillPoints = 0;
-                }
-            }
-            else
-            {
-                // Маг: +3 Интеллект, +2 Ловкость, +1 Выносливость
-                if (data.availableSkillPoints >= 6)
-                {
-                    data.intelligence += 3;
-                    data.agility += 2;
-                    data.stamina += 1;
-                    data.availableSkillPoints -= 6;
-                }
-                else
-                {
-                    data.agility += data.availableSkillPoints;
-                    data.availableSkillPoints = 0;
-                }
-            }
-        }
-        RecalculateStats();
-        PlayerPrefs.Save();
-    }
-
-    public void ResetPlayerStats()
-    {
-        SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
-        
-        // Определяем базовые исходные атрибуты в зависимости от класса героя
-        int startSTR = 10;
-        int startAGI = 10;
-        int startINT = 10;
-        int startSTA = 10;
-        
-        string cl = (data != null && !string.IsNullOrEmpty(data.characterClass)) ? data.characterClass.ToLower() : "воин";
-        if (cl.Contains("warrior") || cl.Contains("voin") || cl.Contains("paladin") || cl.Contains("воин") || cl.Contains("паладин") || cl.Contains("рыцар"))
-        {
-            startSTR = 15;
-            startAGI = 10;
-            startINT = 4;
-            startSTA = 15;
-        }
-        else if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow") || cl.Contains("лучник") || cl.Contains("стрел") || cl.Contains("охотн"))
-        {
-            startSTR = 10;
-            startAGI = 14;
-            startINT = 6;
-            startSTA = 11;
-        }
-        else if (cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff") || cl.Contains("маг") || cl.Contains("колдун") || cl.Contains("волшеб"))
-        {
-            startSTR = 6;
-            startAGI = 10;
-            startINT = 10;
-            startSTA = 9;
-        }
-
-        int spent = (data.strength - startSTR) + (data.agility - startAGI) + (data.intelligence - startINT) + (data.stamina - startSTA);
-        if (spent > 0)
-        {
-            data.availableSkillPoints += spent;
-        }
-        
-        data.strength = startSTR;
-        data.agility = startAGI;
-        data.intelligence = startINT;
-        data.stamina = startSTA;
-        
-        RecalculateStats();
-        PlayerPrefs.Save();
-        
-        string resetMsg = Translator.LanguageID == 0 
-            ? "♻️ Атрибуты сброшены к базовым значениям вашего класса!" 
-            : "♻️ Reverted stats back to your class baseline attributes!";
-        ShowFeedback(resetMsg);
-    }
-
-    private void OnGUI()
-    {
-        // Не рисуем игровой HUD (кошелек, день, пропустить ход, новое наложение дня и информацию о замке), 
-        // пока игрок полностью не завершил 2-й диалог-инструктаж с Аэлиссой!
-        if (!isContinentGameplayActive) return;
-
-        InitializeCachedTextures();
-
-        int curLang = Translator.LanguageID;
-
-        // Если активен 2D вид города, рисуем его во весь экран
-        if (isTownViewActive)
-        {
-            DrawTownViewGUI(curLang);
-            return;
-        }
-
-        // РИСОВАНИЕ НА ТАКТИЧЕСКОЙ КАРТЕ
-        // 1. Кошелек золота в верхнем правом углу
-        string goldText = curLang == 0 ? "Казна: " : "Treasury: ";
-        if (curLang == 8) goldText = "国库金币: ";
-        if (curLang == 7) goldText = "소지금: ";
-
-        GUIStyle walletStyle = new GUIStyle(GUI.skin.box);
-        walletStyle.fontSize = 16;
-        walletStyle.fontStyle = FontStyle.Bold;
-        walletStyle.normal.textColor = new Color(1.0f, 0.84f, 0.0f, 1.0f);
-        walletStyle.alignment = TextAnchor.MiddleCenter;
-
-        GUI.Box(new Rect(Screen.width - 240f, 20f, 220f, 42f), $"💰 {goldText}{SaveGameSystem.CurrentData.gold}", walletStyle);
-
-        // 2. Индикатор Дня
-        string dayLabel = curLang == 0 ? "День: " : "Day: ";
-        if (curLang == 8) dayLabel = "当前天数: ";
-        if (curLang == 7) dayLabel = "일차: ";
-
-        GUIStyle dStyle = new GUIStyle(GUI.skin.box);
-        dStyle.fontSize = 14;
-        dStyle.fontStyle = FontStyle.Bold;
-        dStyle.normal.textColor = new Color(0.12f, 0.88f, 1.0f, 1.0f);
-        dStyle.alignment = TextAnchor.MiddleCenter;
-
-        GUI.Box(new Rect(Screen.width - 240f, 65f, 220f, 38f), $"📅 {dayLabel}{currentDay}", dStyle);
-
-        // 3. Кнопка "Пропустить ход" UI
-        string nextDayBtnText = curLang == 0 ? "ПРОПУСТИТЬ ХОД" : "END TURN";
-        if (curLang == 8) nextDayBtnText = "结束回合";
-        if (curLang == 7) nextDayBtnText = "턴 넘기기";
-
-        GUIStyle nextDayStyle = new GUIStyle(GUI.skin.button);
-        nextDayStyle.fontSize = 13;
-        nextDayStyle.fontStyle = FontStyle.Bold;
-        nextDayStyle.normal.textColor = Color.white;
-        nextDayStyle.alignment = TextAnchor.MiddleCenter;
-
-        if (!isDetailsOpen)
-        {
-            GUI.backgroundColor = new Color(0.1f, 0.65f, 0.95f, 1.0f);
-            if (GUI.Button(new Rect(Screen.width - 240f, 107f, 220f, 44f), $"▶ {nextDayBtnText}", nextDayStyle))
-            {
-                AdvanceDay();
-            }
-            GUI.backgroundColor = Color.white;
-        }
-
-        // 4. Отрисовка ГЕРОЯ И ЕГО ХАРАКТЕРИСТИК (HUD в верхнем левом углу)
-        DrawHeroHUD(curLang);
-
-        // Overlay нового дня (ИИ отчеты)
-        if (showNewDayOverlay)
-        {
-            DrawNewDayOverlay(curLang);
-        }
-
-        // Всплывающие окна деталей (v18.11.16)
-        if (showCastleCalibrationPanel)
-        {
-            DrawCastleCalibrationPanel(curLang);
-        }
-
-        if (showSkillDetailPopup)
-        {
-            DrawSkillDetailPopup(curLang);
-        }
-
-        if (showTroopDetailPopup)
-        {
-            DrawTroopDetailPopup(curLang);
-        }
-
-        // Окно настроек деталей
+    private        // Окно настроек деталей
         if (!isDetailsOpen || activeDetailsIndex < 0 || activeDetailsIndex >= castles.Count) return;
 
         DrawDetailsWindow(curLang);
@@ -2343,10 +2563,48 @@ public class FateCastleManager : MonoBehaviour
         }
     }
 
+    private int currentInventoryTab = 0;
+
+    private void DrawHighlightBorder(Rect rect, Color color, float thickness = 3f)
+    {
+        GUI.color = color;
+        // Top
+        GUI.DrawTexture(new Rect(rect.x, rect.y, rect.width, thickness), Texture2D.whiteTexture);
+        // Bottom
+        GUI.DrawTexture(new Rect(rect.x, rect.yMax - thickness, rect.width, thickness), Texture2D.whiteTexture);
+        // Left
+        GUI.DrawTexture(new Rect(rect.x, rect.y, thickness, rect.height), Texture2D.whiteTexture);
+        // Right
+        GUI.DrawTexture(new Rect(rect.xMax - thickness, rect.y, thickness, rect.height), Texture2D.whiteTexture);
+        GUI.color = Color.white;
+    }
+
     private void DrawStatsAllocationPanel(int curLang, Texture2D winBgTex, GUIStyle barBgStyle)
     {
+        Rect col1Rect = Rect.zero;
+        Rect col2Rect = Rect.zero;
+        Rect col3Rect = Rect.zero;
+
         SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
         
+        // Ensure inventory and equipment are loaded and synchronized
+        LoadInventory();
+        LoadEquipment();
+        RecalculateEquippedBonuses();
+
+        // Trigger tutorial if not completed yet
+        bool isTutorialCompleted = PlayerPrefs.GetInt("Aelyssa_Character_Tutorial_Done2", 0) == 1;
+        if (!isTutorialCompleted && !isAelyssaTutorialActive && tutorialStep == 0)
+        {
+            isAelyssaTutorialActive = true;
+            tutorialStep = 0;
+        }
+
+        if (isAelyssaTutorialActive && GamePause_Manager.Instance != null)
+        {
+            GamePause_Manager.Instance.isPauseBlockedManually = true;
+        }
+
         // Определяем базовые стартовые характеристики в зависимости от веток
         int startSTR = 10, startAGI = 10, startINT = 10, startSTA = 10;
         string cl = (data != null && !string.IsNullOrEmpty(data.characterClass)) ? data.characterClass.ToLower() : "воин";
@@ -2366,53 +2624,67 @@ public class FateCastleManager : MonoBehaviour
         GUIStyle winStyle = new GUIStyle(GUI.skin.box);
         winStyle.normal.background = winBgTex;
         
-        // Расчет высоты и ширины Zenith UI адаптивно к разрешению экрана пользователя
-        float actualWidth = 330f;
-        float actualHeight = Mathf.Clamp(Screen.height - 180f, 360f, 650f);
-        Rect winRect = new Rect(20f, 130f, actualWidth, actualHeight);
+        // Fullscreen layout
+        float actualWidth = Screen.width - 40f;
+        float actualHeight = Screen.height - 40f;
+        Rect winRect = new Rect(20f, 20f, actualWidth, actualHeight);
         GUI.Box(winRect, "", winStyle);
         
         GUILayout.BeginArea(winRect);
         GUILayout.Space(12);
         
-        // Контейнер заголовка и кнопки "X" закрытия
+        // Container header and close "X" button
         GUILayout.BeginHorizontal();
-        GUILayout.Space(24); // компенсатор ширины кнопки, чтобы центрировать заголовок
+        GUILayout.Space(40); // align title
         
         GUIStyle headerStyle = new GUIStyle(GUI.skin.label);
         headerStyle.alignment = TextAnchor.MiddleCenter;
-        headerStyle.fontSize = 14;
+        headerStyle.fontSize = 18;
         headerStyle.fontStyle = FontStyle.Bold;
         headerStyle.normal.textColor = Color.cyan;
         
-        string headText = curLang == 0 ? "⚡ ХАРАКТЕРИСТИКИ ГЕРОЯ" : "⚡ HERO CHARACTERISTICS";
-        if (curLang == 8) headText = "⚡ 英雄属性星盘配点";
-        if (curLang == 7) headText = "⚡ 영웅 능력치 통계 제어";
+        string headText = curLang == 0 ? "⚡ ПАНЕЛЬ УПРАВЛЕНИЯ ПЕРСОНАЖЕМ" : "⚡ HERO CONTROL PANEL";
+        if (curLang == 8) headText = "⚡ 英雄控制面板与背包";
+        if (curLang == 7) headText = "⚡ 영웅 능력치 및 장비 가방";
         GUILayout.Label(headText, headerStyle);
         
-        GUI.backgroundColor = new Color(1.0f, 0.22f, 0.22f, 0.85f);
-        if (GUILayout.Button("<b>X</b>", GUILayout.Width(26), GUILayout.Height(24)))
+        if (isAelyssaTutorialActive) GUI.enabled = false;
+        GUI.backgroundColor = new Color(1.0f, 0.22f, 0.22f, 0.95f);
+        if (GUILayout.Button("<b>X</b>", GUILayout.Width(30), GUILayout.Height(28)))
         {
             showStatsPanel = false;
-            Time.timeScale = 1f; // Размораживаем время игры!
+            Time.timeScale = 1f; // Resume gameplay
             if (SettingsManager.Instance != null)
             {
                 SettingsManager.Instance.PlayHoverSound(0);
             }
         }
         GUI.backgroundColor = Color.white;
+        GUI.enabled = true;
         GUILayout.EndHorizontal();
-        GUILayout.Space(8);
+        GUILayout.Space(10);
 
-        // Включение адаптивного скролл-бара для любой карточки экрана
-        statsScroll = GUILayout.BeginScrollView(statsScroll, GUILayout.Width(winRect.width - 15f), GUILayout.Height(winRect.height - 50f));
+        // Three-column fullscreen GUI structure
+        GUILayout.BeginHorizontal();
         
-        // Переключатель автономного авто-распределения
+        // ----------------------------------------------------
+        // COLUMN 1: CHARACTERISTICS (Width: 320f)
+        // ----------------------------------------------------
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(320), GUILayout.ExpandHeight(true));
+        
+        GUIStyle colHeaderStyle = new GUIStyle(GUI.skin.label);
+        colHeaderStyle.fontSize = 13;
+        colHeaderStyle.fontStyle = FontStyle.Bold;
+        colHeaderStyle.normal.textColor = Color.yellow;
+        colHeaderStyle.alignment = TextAnchor.MiddleCenter;
+        GUILayout.Label(curLang == 0 ? "⚡ ХАРАКТЕРИСТИКИ" : "⚡ ATTRIBUTES", colHeaderStyle);
+        GUILayout.Space(6);
+        
+        statsScroll = GUILayout.BeginScrollView(statsScroll, GUILayout.Width(310), GUILayout.Height(actualHeight - 120f));
+
+        // Auto allocation toggle
         bool oldAuto = isAutonomousStatsDistribution;
         string autoLabel = curLang == 0 ? "🤖 Авто-распределение очков" : "🤖 Autonomous Allocation";
-        if (curLang == 8) autoLabel = "🤖 智能AI自动加配属性点";
-        if (curLang == 7) autoLabel = "🤖 인공지능 능력치 자동 배포";
-        
         isAutonomousStatsDistribution = GUILayout.Toggle(isAutonomousStatsDistribution, "  " + autoLabel, GUILayout.Height(24));
         if (isAutonomousStatsDistribution != oldAuto)
         {
@@ -2423,18 +2695,15 @@ public class FateCastleManager : MonoBehaviour
                 AutoAllocateAllPoints();
             }
         }
+        GUILayout.Space(10);
         
-        GUILayout.Space(12);
-        
-        // Линии атрибутов с защитой от спуска характеристик ниже стартовых значений класса
         DrawStatRow(curLang, "🔥", curLang == 0 ? "Сила (STR)" : "Strength (STR)", ref data.strength, ref data.availableSkillPoints, startSTR);
         DrawStatRow(curLang, "⚡", curLang == 0 ? "Ловкость (AGI)" : "Agility (AGI)", ref data.agility, ref data.availableSkillPoints, startAGI);
         DrawStatRow(curLang, "🔮", curLang == 0 ? "Интеллект (INT)" : "Intelligence (INT)", ref data.intelligence, ref data.availableSkillPoints, startINT);
         DrawStatRow(curLang, "💚", curLang == 0 ? "Выносливость (STA)" : "Stamina (STA)", ref data.stamina, ref data.availableSkillPoints, startSTA);
-        
         GUILayout.Space(8);
         
-        // Свободные очки
+        // Unassigned Points
         GUIStyle pointsStyle = new GUIStyle(GUI.skin.label);
         pointsStyle.alignment = TextAnchor.MiddleCenter;
         pointsStyle.fontSize = 13;
@@ -2442,128 +2711,860 @@ public class FateCastleManager : MonoBehaviour
         pointsStyle.normal.textColor = data.availableSkillPoints > 0 ? new Color(1.0f, 0.64f, 0.0f) : Color.gray;
         
         string pointsLabel = curLang == 0 ? "Свободные очки: " : "Unassigned Points: ";
-        if (curLang == 8) pointsLabel = "未分配属性星能点: ";
-        if (curLang == 7) pointsLabel = "남은 속성 수치 점수: ";
         GUILayout.Label($"{pointsLabel}{data.availableSkillPoints}", pointsStyle);
-        GUILayout.Space(6);
+        GUILayout.Space(10);
         
-        // Вычисляемые боевые параметры
-        float combatAtk = data.strength * 2.5f + data.agility * 0.5f;
-        float combatDef = data.agility * 1.5f + data.strength * 0.5f;
-        float maxHp = data.stamina * 10f;
-        float maxMp = data.intelligence * 10f;
+        // Derived Combat Parameters
+        int totalSTR = data.strength + eqBonusSTR;
+        int totalAGI = data.agility + eqBonusAGI;
+        int totalINT = data.intelligence + eqBonusINT;
+        int totalSTA = data.stamina + eqBonusSTA;
+
+        float combatAtk = totalSTR * 2.5f + totalAGI * 0.5f;
+        float combatDef = totalAGI * 1.5f + totalSTR * 0.5f;
+        float maxHp = totalSTA * 10f;
+        float maxMp = totalINT * 10f;
         
         GUIStyle derivedStyle = new GUIStyle(GUI.skin.box);
-        derivedStyle.normal.textColor = new Color(0.8f, 0.85f, 0.95f);
+        derivedStyle.normal.textColor = new Color(0.85f, 0.9f, 0.98f);
         derivedStyle.fontSize = 11;
         derivedStyle.alignment = TextAnchor.MiddleLeft;
-        derivedStyle.padding = new RectOffset(12, 12, 6, 6);
+        derivedStyle.padding = new RectOffset(12, 12, 8, 8);
         
         string statsReport = curLang == 0 
-            ? $"⚔️ Базовая Атака: {combatAtk}\n🛡️ Защита брони: {combatDef}\n❤️ Макс. ОЗ (HP): {maxHp}\n🔮 Макс. ОМ (MP): {maxMp}"
+            ? $"⚔️ Базовая Атака: {combatAtk} (База {data.strength * 2.5f + data.agility * 0.5f} + Экв. +{eqBonusSTR * 2.5f + eqBonusAGI * 0.5f})\n🛡️ Защита брони: {combatDef} (База {data.agility * 1.5f + data.strength * 0.5f} + Экв. +{eqBonusAGI * 1.5f + eqBonusSTR * 0.5f})\n❤️ Макс. ОЗ (HP): {maxHp} (База {data.stamina * 10f} + Экв. +{eqBonusSTA * 10f})\n🔮 Макс. ОМ (MP): {maxMp} (База {data.intelligence * 10f} + Экв. +{eqBonusINT * 10f})"
             : $"⚔️ Combat Damage: {combatAtk}\n🛡️ Armor Defense: {combatDef}\n❤️ Max Health (HP): {maxHp}\n🔮 Max Mana (MP): {maxMp}";
             
         GUILayout.Label(statsReport, derivedStyle);
-        GUILayout.Space(10);
+        GUILayout.Space(12);
         
-        // 🛡️ СНАРЯЖЕНИЕ ПЕРСОНАЖА (EQUIPMENT MANNEQUIN - v18.11.18)
+        // Control buttons (Reset & Add XP)
+        GUILayout.BeginHorizontal();
+        GUI.backgroundColor = new Color(1.0f, 0.22f, 0.22f);
+        string resetBtnLabel = curLang == 0 ? "СБРОС" : "RESET";
+        if (GUILayout.Button($"♻️ {resetBtnLabel}", GUILayout.Height(32)))
+        {
+            ResetPlayerStats();
+        }
+        
+        GUI.backgroundColor = new Color(0.15f, 0.8f, 0.35f);
+        string addXpText = curLang == 0 ? "ОПЫТ +50" : "+50 XP";
+        if (GUILayout.Button($"✨ {addXpText}", GUILayout.Height(32)))
+        {
+            GainXP(50);
+        }
+        GUI.backgroundColor = Color.white;
+        GUILayout.EndHorizontal();
+        
+        GUILayout.EndScrollView();
+        GUILayout.EndVertical();
+        col1Rect = GUILayoutUtility.GetLastRect();
+        
+        GUILayout.Space(15);
+        
+        // ----------------------------------------------------
+        // COLUMN 2: EQUIPMENT & CLASS SKILLS (Width: 340f)
+        // ----------------------------------------------------
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(340), GUILayout.ExpandHeight(true));
+        
+        // TOP HALF: СНАРЯЖЕНИЕ ПЕРСОНАЖА (Equipment Mannequin)
         GUIStyle eqHeaderStyle = new GUIStyle(GUI.skin.label);
         eqHeaderStyle.alignment = TextAnchor.MiddleCenter;
-        eqHeaderStyle.fontSize = 12;
+        eqHeaderStyle.fontSize = 13;
         eqHeaderStyle.fontStyle = FontStyle.Bold;
         eqHeaderStyle.normal.textColor = new Color(0.12f, 0.88f, 1.0f);
-        
-        string eqTitle = curLang == 0 ? "🛡️ СНАРЯЖЕНИЕ ПЕРСОНАЖА" : "🛡️ HERO EQUIPMENT SLOTS";
-        GUILayout.Label(eqTitle, eqHeaderStyle);
+        GUILayout.Label(curLang == 0 ? "🛡️ СНАРЯЖЕНИЕ ПЕРСОНАЖА" : "🛡️ HERO EQUIPMENT", eqHeaderStyle);
         GUILayout.Space(4);
-
-        GUILayout.BeginHorizontal(GUI.skin.box);
+        
+        GUILayout.BeginHorizontal(GUI.skin.box, GUILayout.Height(180));
         
         GUIStyle slotLabelStyle = new GUIStyle(GUI.skin.label);
         slotLabelStyle.alignment = TextAnchor.MiddleCenter;
-        slotLabelStyle.fontSize = 11;
+        slotLabelStyle.fontSize = 10;
         slotLabelStyle.normal.textColor = Color.gray;
 
-        // LEFT COLUMN (Slot 8: Weapon / Shield)
-        GUILayout.BeginVertical(GUILayout.Width(76));
+        GUIStyle slotEquippedStyle = new GUIStyle(GUI.skin.button);
+        slotEquippedStyle.fontSize = 9;
+        slotEquippedStyle.richText = true;
+        slotEquippedStyle.alignment = TextAnchor.MiddleCenter;
+        slotEquippedStyle.normal.textColor = Color.yellow;
+
+        // LEFT COLUMN: Slot 8 (Weapon)
+        GUILayout.BeginVertical(GUILayout.Width(80));
         GUILayout.Label(curLang == 0 ? "⚔️ Слот 8" : "⚔️ Slot 8", slotLabelStyle);
         GUI.backgroundColor = new Color(0.12f, 0.75f, 0.95f, 0.35f);
-        if (GUILayout.Button(curLang == 0 ? "[ SLOT 8 ]\n\n⚔️\n\nОружие\nWeapon\n(Пусто)" : "[ SLOT 8 ]\n\n⚔️\n\nWeapon\nShield\n(Empty)", GUILayout.Height(175), GUILayout.Width(70)))
+        
+        InventoryItem wpnItem = playerEquipment.slots[8];
+        if (wpnItem != null && !string.IsNullOrEmpty(wpnItem.id))
         {
-            ShowFeedback(curLang == 0 ? "Слот оружия пуст. Приобретите клинок в Кузнице!" : "Weapon slot is empty. Forge or buy equipment to slot!");
+            if (GUILayout.Button($"<b>[ 8 ] ⚔️</b>\n{wpnItem.name}\n<color=cyan>Tier {wpnItem.level}</color>\n<size=8>Нажмите,\nчтобы снять</size>", slotEquippedStyle, GUILayout.Height(140), GUILayout.Width(76)))
+            {
+                UnequipItem(8);
+            }
+        }
+        else
+        {
+            string emptyWpn = curLang == 0 ? "[ Оружие ]" : "[ Weapon ]";
+            if (GUILayout.Button(emptyWpn, GUILayout.Height(140), GUILayout.Width(76)))
+            {
+                ShowFeedback(curLang == 0 ? "Экипируйте Оружие через инвентарь справа!" : "Equip Weapon through inventory on the right!");
+            }
         }
         GUI.backgroundColor = Color.white;
         GUILayout.EndVertical();
 
-        // CENTER COLUMN (Silhouette Mannequin: Head [1], Neck [2], Chest [4], Belt [6], Boots [7])
-        GUILayout.BeginVertical(GUILayout.Width(110));
+        // MIDDLE 2 COLUMN grid for standard slots
+        GUILayout.BeginVertical();
         
-        // Slot 1: Head
-        GUI.backgroundColor = new Color(0.12f, 0.75f, 0.95f, 0.35f);
-        if (GUILayout.Button("[ 1 ] 👑\nГолова", GUILayout.Width(100), GUILayout.Height(33))) {
-            ShowFeedback(curLang == 0 ? "Шлем не экипирован." : "No helmet equipped.");
-        }
-        
-        // Slot 2: Neck
-        if (GUILayout.Button("[ 2 ] 📿\nШея / Амулет", GUILayout.Width(100), GUILayout.Height(33))) {
-            ShowFeedback(curLang == 0 ? "Амулет не экипирован." : "No necklace equipped.");
-        }
+        // First Row: Slots 1, 2
+        GUILayout.BeginHorizontal();
+        DrawEquippedSlotButton(1, "Шлем", "Helmet", curLang, slotEquippedStyle, 44);
+        DrawEquippedSlotButton(2, "Доспех", "Armor", curLang, slotEquippedStyle, 44);
+        GUILayout.EndHorizontal();
 
-        // Slot 4: Torso / Chest
-        if (GUILayout.Button("[ 4 ] 👕\nДоспех / Chest", GUILayout.Width(100), GUILayout.Height(36))) {
-            ShowFeedback(curLang == 0 ? "Броня не экипирована." : "No heavy chestplate equipped.");
-        }
+        // Second Row: Slots 3, 4
+        GUILayout.BeginHorizontal();
+        DrawEquippedSlotButton(3, "Поножи", "Greaves", curLang, slotEquippedStyle, 44);
+        DrawEquippedSlotButton(4, "Перчатки", "Gloves", curLang, slotEquippedStyle, 44);
+        GUILayout.EndHorizontal();
 
-        // Slot 6: Belt
-        if (GUILayout.Button("[ 6 ] 🎗️\nПояс", GUILayout.Width(100), GUILayout.Height(30))) {
-            ShowFeedback(curLang == 0 ? "Ремень не экипирован." : "No leather belt equipped.");
-        }
-
-        // Slot 7: Boots
-        if (GUILayout.Button("[ 7 ] 🥾\nОбувь", GUILayout.Width(100), GUILayout.Height(33))) {
-            ShowFeedback(curLang == 0 ? "Сапоги не экипированы." : "No steel boots equipped.");
-        }
-        GUI.backgroundColor = Color.white;
+        // Third Row: Slots 5, 6
+        GUILayout.BeginHorizontal();
+        DrawEquippedSlotButton(5, "Сапоги", "Boots", curLang, slotEquippedStyle, 44);
+        DrawEquippedSlotButton(6, "Кольцо", "Ring", curLang, slotEquippedStyle, 44);
+        GUILayout.EndHorizontal();
 
         GUILayout.EndVertical();
 
-        // RIGHT COLUMN (Slot 3: Shoulders, Slot 5: Rings)
-        GUILayout.BeginVertical(GUILayout.Width(76));
-        GUILayout.Label(curLang == 0 ? "🛡️ Доспехи" : "🛡️ Armor", slotLabelStyle);
-        
-        // Slot 3: Shoulders
+        // RIGHT COLUMN: Slot 7 (Amulet)
+        GUILayout.BeginVertical(GUILayout.Width(80));
+        GUILayout.Label(curLang == 0 ? "🔮 Слот 7" : "🔮 Slot 7", slotLabelStyle);
         GUI.backgroundColor = new Color(0.12f, 0.75f, 0.95f, 0.35f);
-        if (GUILayout.Button("[ 3 ] 🦾\nПлечи\nShoulders", GUILayout.Height(84), GUILayout.Width(70))) {
-            ShowFeedback(curLang == 0 ? "Наплечники не экипированы." : "No shoulders armed.");
+        
+        InventoryItem amuItem = playerEquipment.slots[7];
+        if (amuItem != null && !string.IsNullOrEmpty(amuItem.id))
+        {
+            if (GUILayout.Button($"<b>[ 7 ] 🔮</b>\n{amuItem.name}\n<color=cyan>Tier {amuItem.level}</color>\n<size=8>Нажмите,\nчтобы снять</size>", slotEquippedStyle, GUILayout.Height(140), GUILayout.Width(76)))
+            {
+                UnequipItem(7);
+            }
         }
-        
-        GUILayout.Space(6);
-        
-        // Slot 5: Rings
-        if (GUILayout.Button("[ 5 ] 💍\nКольцо\nRing", GUILayout.Height(84), GUILayout.Width(70))) {
-            ShowFeedback(curLang == 0 ? "Кольцо не экипировано." : "No ring equipped.");
+        else
+        {
+            string emptyAmu = curLang == 0 ? "[ Амулет ]" : "[ Amulet ]";
+            if (GUILayout.Button(emptyAmu, GUILayout.Height(140), GUILayout.Width(76)))
+            {
+                ShowFeedback(curLang == 0 ? "Экипируйте Амулет через инвентарь справа!" : "Equip Amulet through inventory on the right!");
+            }
         }
         GUI.backgroundColor = Color.white;
-        
         GUILayout.EndVertical();
 
         GUILayout.EndHorizontal();
-        GUILayout.Space(10);
-        
-        // 🧬 ДОПОЛНИТЕЛЬНЫЙ КЛАССОВЫЙ БЛОК НАВЫКОВ
+        GUILayout.Space(8);
+
+        // BOTTOM HALF: КЛАССОВЫЕ НАВЫКИ (Class Skills)
         GUIStyle skillsHeaderStyle = new GUIStyle(GUI.skin.label);
         skillsHeaderStyle.alignment = TextAnchor.MiddleCenter;
-        skillsHeaderStyle.fontSize = 12;
+        skillsHeaderStyle.fontSize = 13;
         skillsHeaderStyle.fontStyle = FontStyle.Bold;
-        skillsHeaderStyle.normal.textColor = Color.yellow;
-        
-        string skillsTitle = curLang == 0 ? "🧬 КЛАССОВЫЕ НАВЫКИ ГЕРОЯ" : "🧬 HERO CLASS SKILLS";
-        GUILayout.Label(skillsTitle, skillsHeaderStyle);
+        skillsHeaderStyle.normal.textColor = new Color(0.9f, 0.3f, 0.9f);
+        GUILayout.Label(curLang == 0 ? "🔮 АКТИВНЫЕ И ПАССИВНЫЕ НАВЫКИ" : "🔮 ACTIVE & PASSIVE SKILLS", skillsHeaderStyle);
         GUILayout.Space(4);
 
+        // Load class skill icons if needed
         LoadClassSkillsIcons();
 
-        GUILayout.BeginVertical(GUI.skin.box);
+        // 2x2 grid of passive and ultimate skills (LARGER sizes as requested)
+        GUILayout.BeginHorizontal();
+        
+        // Skill 1 (Passive 1)
+        GUILayout.BeginVertical();
+        GUILayout.Label(curLang == 0 ? "🌟 Пассивный 1" : "🌟 Passive 1", slotLabelStyle);
+        if (GUILayout.Button(activeSkillPassive1 != null ? activeSkillPassive1 : Texture2D.whiteTexture, GUILayout.Width(150), GUILayout.Height(100)))
+        {
+            ShowSkillDetailPopup(1, curLang);
+        }
+        GUILayout.EndVertical();
+
+        // Skill 2 (Passive 2)
+        GUILayout.BeginVertical();
+        GUILayout.Label(curLang == 0 ? "🌟 Пассивный 2" : "🌟 Passive 2", slotLabelStyle);
+        if (GUILayout.Button(activeSkillPassive2 != null ? activeSkillPassive2 : Texture2D.whiteTexture, GUILayout.Width(150), GUILayout.Height(100)))
+        {
+            ShowSkillDetailPopup(2, curLang);
+        }
+        GUILayout.EndVertical();
+
+        GUILayout.EndHorizontal();
+        GUILayout.Space(6);
+
+        GUILayout.BeginHorizontal();
+
+        // Skill 3 (Passive 3)
+        GUILayout.BeginVertical();
+        GUILayout.Label(curLang == 0 ? "🌟 Пассивный 3" : "🌟 Passive 3", slotLabelStyle);
+        if (GUILayout.Button(activeSkillPassive3 != null ? activeSkillPassive3 : Texture2D.whiteTexture, GUILayout.Width(150), GUILayout.Height(100)))
+        {
+            ShowSkillDetailPopup(3, curLang);
+        }
+        GUILayout.EndVertical();
+
+        // Skill 4 (Ultimate Ability)
+        GUILayout.BeginVertical();
+        GUILayout.Label(curLang == 0 ? "⚡ УЛЬТИМЕЙТ" : "⚡ ULTIMATE", slotLabelStyle);
+        GUI.backgroundColor = new Color(1.0f, 0.4f, 0.4f, 0.9f);
+        if (GUILayout.Button(activeSkillUltimate != null ? activeSkillUltimate : Texture2D.whiteTexture, GUILayout.Width(150), GUILayout.Height(100)))
+        {
+            ShowSkillDetailPopup(4, curLang);
+        }
+        GUI.backgroundColor = Color.white;
+        GUILayout.EndVertical();
+
+        GUILayout.EndHorizontal();
+        
+        GUILayout.EndVertical();
+        col2Rect = GUILayoutUtility.GetLastRect();
+        
+        GUILayout.Space(15);
+        
+        // ----------------------------------------------------
+        // COLUMN 3: INVENTORY GRID (Width: Remaining space)
+        // ----------------------------------------------------
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        
+        GUIStyle invHeaderStyle = new GUIStyle(GUI.skin.label);
+        invHeaderStyle.alignment = TextAnchor.MiddleCenter;
+        invHeaderStyle.fontSize = 14;
+        invHeaderStyle.fontStyle = FontStyle.Bold;
+        invHeaderStyle.normal.textColor = new Color(0.9f, 0.45f, 0.1f);
+        GUILayout.Label(curLang == 0 ? "🎒 ИНВЕНТАРЬ ПЕРСОНАЖА" : "🎒 CHARACTER INVENTORY", invHeaderStyle);
+        
+        string invHelpText = curLang == 0 ? 
+            "Все купленные зелья и снаряжение попадают сюда. Нажмите на предмет, чтобы надеть или использовать его!" :
+            "All purchased elixirs and gear are placed here. Click an item to equip or consume it!";
+        GUIStyle invHelpStyle = new GUIStyle(GUI.skin.label);
+        invHelpStyle.fontSize = 10;
+        invHelpStyle.alignment = TextAnchor.MiddleCenter;
+        invHelpStyle.normal.textColor = Color.gray;
+        GUILayout.Label(invHelpText, invHelpStyle);
+        GUILayout.Space(6);
+
+        // Pagination tabs bar (Tabs 1 to 28 representing 999 slots)
+        GUILayout.BeginHorizontal();
+        int unlockedCount = GetUnlockedSlotsCount();
+        int purchasedCount = GetPurchasedSlotsCount();
+
+        GUIStyle tabBtnStyle = new GUIStyle(GUI.skin.button);
+        tabBtnStyle.fontSize = 10;
+        tabBtnStyle.fontStyle = FontStyle.Bold;
+
+        // Draw tab buttons
+        for (int t = 0; t < 28; t++)
+        {
+            bool isTabUnlocked = (t * 36) < unlockedCount;
+            string tabName = curLang == 0 ? $"Вкл.{t + 1}" : $"Tab {t + 1}";
+            if (curLang == 8) tabName = $"分页 {t + 1}";
+            if (curLang == 7) tabName = $"탭 {t + 1}";
+
+            if (isTabUnlocked)
+            {
+                if (t == currentInventoryTab)
+                {
+                    GUI.backgroundColor = Color.cyan;
+                }
+                else
+                {
+                    GUI.backgroundColor = new Color(0.18f, 0.45f, 0.7f, 0.85f);
+                }
+
+                if (GUILayout.Button(tabName, tabBtnStyle, GUILayout.Width(52), GUILayout.Height(24)))
+                {
+                    currentInventoryTab = t;
+                    if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+                }
+            }
+            else
+            {
+                GUI.backgroundColor = new Color(0.25f, 0.25f, 0.25f, 0.5f);
+                GUI.enabled = false;
+                GUILayout.Button("🔒 " + tabName, tabBtnStyle, GUILayout.Width(52), GUILayout.Height(24));
+                GUI.enabled = true;
+            }
+            GUI.backgroundColor = Color.white;
+        }
+        GUILayout.EndHorizontal();
+        GUILayout.Space(8);
+        
+        // Beautiful 6x6 grid of 36 slots
+        GUIStyle slotGridStyle = new GUIStyle(GUI.skin.button);
+        slotGridStyle.fontSize = 9;
+        slotGridStyle.padding = new RectOffset(2, 2, 2, 2);
+        slotGridStyle.richText = true;
+        
+        invScroll = GUILayout.BeginScrollView(invScroll, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        
+        int gridColumns = 6;
+        int gridRows = 6;
+        int startSlotIndex = currentInventoryTab * 36;
+
+        for (int row = 0; row < gridRows; row++)
+        {
+            GUILayout.BeginHorizontal();
+            for (int col = 0; col < gridColumns; col++)
+            {
+                int index = startSlotIndex + row * gridColumns + col;
+                if (index >= 999)
+                {
+                    // Draw placeholder
+                    GUI.backgroundColor = new Color(0.1f, 0.12f, 0.18f, 0.3f);
+                    GUILayout.Button("-", slotGridStyle, GUILayout.Width(76), GUILayout.Height(76));
+                    GUI.backgroundColor = Color.white;
+                    continue;
+                }
+
+                if (index < unlockedCount)
+                {
+                    InventoryItem item = playerInventory.items[index];
+                    if (item != null && !string.IsNullOrEmpty(item.id))
+                    {
+                        string label = "";
+                        string colorTag = "<color=white>";
+                        if (item.level >= 5) colorTag = "<color=orange>"; // Legendary
+                        else if (item.level >= 3) colorTag = "<color=magenta>"; // Epic
+                        else if (item.level >= 2) colorTag = "<color=cyan>"; // Rare
+                        
+                        string localizedName = GetLocalizedItemName(item, curLang);
+                        if (item.slotType == 0)
+                        {
+                            label = $"{GetEmojiForSlot(0)}\n{colorTag}{localizedName}</color>\nx{item.count}";
+                            GUI.backgroundColor = new Color(0.15f, 0.8f, 0.3f, 0.25f);
+                        }
+                        else
+                        {
+                            label = $"{GetEmojiForSlot(item.slotType)}\n{colorTag}{localizedName}</color>\nTier {item.level}";
+                            GUI.backgroundColor = new Color(0.85f, 0.65f, 0.15f, 0.25f);
+                        }
+                        
+                        if (GUILayout.Button(label, slotGridStyle, GUILayout.Width(76), GUILayout.Height(76)))
+                        {
+                            EquipOrUseItem(index);
+                        }
+                    }
+                    else
+                    {
+                        GUI.backgroundColor = new Color(0.1f, 0.12f, 0.18f, 0.6f);
+                        if (GUILayout.Button($"[ #{index + 1} ]\n[ Пусто ]", slotGridStyle, GUILayout.Width(76), GUILayout.Height(76)))
+                        {
+                            // Click empty
+                        }
+                    }
+                }
+                else if (index == unlockedCount)
+                {
+                    // The first locked slot
+                    GUI.backgroundColor = new Color(0.85f, 0.2f, 0.2f, 0.85f);
+                    int cost = 30 + (purchasedCount - 10) * 12 + (int)(Mathf.Pow(purchasedCount - 10, 1.8f) * 1.5f);
+                    
+                    string buyLabel = curLang == 0 
+                        ? $"🔒 Слот {index + 1}\nКупить\nЗа {cost} 💰" 
+                        : $"🔒 Slot {index + 1}\nUnlock\nFor {cost} 💰";
+                    if (curLang == 8) buyLabel = $"🔒 槽位 {index + 1}\n解锁\n需要 {cost} 💰";
+                    if (curLang == 7) buyLabel = $"🔒 슬롯 {index + 1}\n잠금 해제\n{cost} 💰";
+
+                    if (GUILayout.Button(buyLabel, slotGridStyle, GUILayout.Width(76), GUILayout.Height(76)))
+                    {
+                        if (SaveGameSystem.CurrentData.gold < cost)
+                        {
+                            ShowFeedback(curLang == 0 ? "Недостаточно золота для покупки новой ячейки!" : "Not enough gold to unlock a slot!");
+                        }
+                        else
+                        {
+                            SaveGameSystem.CurrentData.gold -= cost;
+                            SetPurchasedSlotsCount(purchasedCount + 1);
+                            SaveGameSystem.Save(0);
+                            ShowFeedback(curLang == 0 ? $"Слот #{index + 1} успешно разблокирован!" : $"Slot #{index + 1} successfully unlocked!");
+                        }
+                    }
+                }
+                else
+                {
+                    GUI.backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.5f);
+                    GUI.enabled = false;
+                    string locLocked = curLang == 0 ? "🔒 Закрыто" : "🔒 Locked";
+                    GUILayout.Button(locLocked, slotGridStyle, GUILayout.Width(76), GUILayout.Height(76));
+                    GUI.enabled = true;
+                }
+                GUI.backgroundColor = Color.white;
+            }
+            GUILayout.EndHorizontal();
+        }
+        
+        GUILayout.EndScrollView();
+        GUILayout.EndVertical();
+        col3Rect = GUILayoutUtility.GetLastRect();
+
+        GUILayout.EndHorizontal();
+        GUILayout.Space(12);
+        GUILayout.EndArea();
+
+        // ----------------------------------------------------
+        // AELYSSA TUTORIAL OVERLAY & DIALOGUE BOX (v18.11.20)
+        // ----------------------------------------------------
+        if (isAelyssaTutorialActive)
+        {
+            // Translucent dark overlay to focus dialog area
+            GUI.color = new Color(0f, 0f, 0f, 0.45f);
+            GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
+            GUI.color = Color.white;
+
+            // Highlight the corresponding column
+            Rect highlightRect = Rect.zero;
+            if (tutorialStep == 1) highlightRect = col1Rect;
+            else if (tutorialStep == 2 || tutorialStep == 3) highlightRect = col2Rect;
+            else if (tutorialStep == 4 || tutorialStep == 5) highlightRect = col3Rect;
+
+            if (highlightRect != Rect.zero)
+            {
+                Rect absHighlight = new Rect(winRect.x + highlightRect.x, winRect.y + highlightRect.y, highlightRect.width, highlightRect.height);
+                float pulse = 0.5f + Mathf.Abs(Mathf.Sin(Time.unscaledTime * 4.5f)) * 0.5f;
+                Color glowColor = new Color(0.15f, 0.85f, 1.0f, pulse);
+                DrawHighlightBorder(absHighlight, glowColor, 4f);
+            }
+
+            // Draw Aelyssa Dialogue Box
+            float boxWidth = actualWidth - 40f;
+            float boxHeight = 150f;
+            float boxX = 20f;
+            float boxY = actualHeight - boxHeight - 10f;
+            Rect dialogBoxRect = new Rect(winRect.x + boxX, winRect.y + boxY, boxWidth, boxHeight);
+
+            GUIStyle dialogBoxStyle = new GUIStyle(GUI.skin.box);
+            dialogBoxStyle.normal.background = winBgTex; // Glassmorphic texture
+            GUI.Box(dialogBoxRect, "", dialogBoxStyle);
+
+            GUILayout.BeginArea(dialogBoxRect);
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(20);
+            
+            GUILayout.BeginVertical();
+            GUILayout.Space(12);
+
+            // Speaker Name
+            GUIStyle speakerStyle = new GUIStyle(GUI.skin.label);
+            speakerStyle.fontSize = 15;
+            speakerStyle.fontStyle = FontStyle.Bold;
+            speakerStyle.normal.textColor = Color.cyan;
+            GUILayout.Label($"✨ {GetTutorialSpeaker(tutorialStep, curLang).ToUpper()}", speakerStyle);
+            GUILayout.Space(4);
+
+            // Dialog Text
+            GUIStyle bodyStyle = new GUIStyle(GUI.skin.label);
+            bodyStyle.fontSize = 12;
+            bodyStyle.wordWrap = true;
+            bodyStyle.normal.textColor = Color.white;
+            GUILayout.Label(GetTutorialText(tutorialStep, curLang), bodyStyle);
+            
+            GUILayout.FlexibleSpace();
+
+            // Row of buttons
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+
+            string nextText = "Next ▶";
+            string skipText = "Skip ⏭";
+            string finishText = "Finish ✓";
+            if (curLang == 0) { nextText = "Далее ▶"; skipText = "Пропустить ⏭"; finishText = "Завершить ✓"; }
+            if (curLang == 8) { nextText = "下一步 ▶"; skipText = "跳过 ⏭"; finishText = "完成 ✓"; }
+            if (curLang == 7) { nextText = "다음 ▶"; skipText = "건너뛰기 ⏭"; finishText = "완료 ✓"; }
+
+            GUI.backgroundColor = new Color(0.6f, 0.6f, 0.6f, 0.8f);
+            if (GUILayout.Button($"<b>{skipText}</b>", GUILayout.Width(130), GUILayout.Height(32)))
+            {
+                isAelyssaTutorialActive = false;
+                PlayerPrefs.SetInt("Aelyssa_Character_Tutorial_Done2", 1);
+                PlayerPrefs.Save();
+                if (GamePause_Manager.Instance != null) GamePause_Manager.Instance.isPauseBlockedManually = false;
+                if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+            }
+
+            GUILayout.Space(12);
+
+            GUI.backgroundColor = new Color(0.12f, 0.72f, 0.42f, 1.0f);
+            bool isLastStep = (tutorialStep == 7);
+            string mainBtnText = isLastStep ? finishText : nextText;
+            if (GUILayout.Button($"<b>{mainBtnText}</b>", GUILayout.Width(130), GUILayout.Height(32)))
+            {
+                if (isLastStep)
+                {
+                    isAelyssaTutorialActive = false;
+                    PlayerPrefs.SetInt("Aelyssa_Character_Tutorial_Done2", 1);
+                    PlayerPrefs.Save();
+                    if (GamePause_Manager.Instance != null) GamePause_Manager.Instance.isPauseBlockedManually = false;
+                }
+                else
+                {
+                    tutorialStep++;
+                }
+                if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+            }
+            GUI.backgroundColor = Color.white;
+            GUILayout.Space(20);
+            GUILayout.EndHorizontal();
+            GUILayout.Space(12);
+
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
+            GUILayout.EndArea();
+        }
+    }        }
+
+                if (GUILayout.Button(tabName, tabBtnStyle, GUILayout.Width(52), GUILayout.Height(24)))
+                {
+                    currentInventoryTab = t;
+                    if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+                }
+            }
+            else
+            {
+                GUI.backgroundColor = new Color(0.25f, 0.25f, 0.25f, 0.5f);
+                GUI.enabled = false;
+                GUILayout.Button("🔒 " + tabName, tabBtnStyle, GUILayout.Width(52), GUILayout.Height(24));
+                GUI.enabled = true;
+            }
+            GUI.backgroundColor = Color.white;
+        }
+        GUILayout.EndHorizontal();
+        GUILayout.Space(8);
+        
+        // Beautiful 6x6 grid of 36 slots
+        GUIStyle slotGridStyle = new GUIStyle(GUI.skin.button);
+        slotGridStyle.fontSize = 9;
+        slotGridStyle.padding = new RectOffset(2, 2, 2, 2);
+        slotGridStyle.richText = true;
+        
+        invScroll = GUILayout.BeginScrollView(invScroll, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        
+        int gridColumns = 6;
+        int gridRows = 6;
+        int startSlotIndex = currentInventoryTab * 36;
+
+        for (int row = 0; row < gridRows; row++)
+        {
+            GUILayout.BeginHorizontal();
+            for (int col = 0; col < gridColumns; col++)
+            {
+                int index = startSlotIndex + row * gridColumns + col;
+                if (index >= 999)
+                {
+                    // Draw placeholder
+                    GUI.backgroundColor = new Color(0.1f, 0.12f, 0.18f, 0.3f);
+                    GUILayout.Button("-", slotGridStyle, GUILayout.Width(76), GUILayout.Height(76));
+                    GUI.backgroundColor = Color.white;
+                    continue;
+                }
+
+                if (index < unlockedCount)
+                {
+                    InventoryItem item = playerInventory.items[index];
+                    if (item != null && !string.IsNullOrEmpty(item.id))
+                    {
+                        string label = "";
+                        string colorTag = "<color=white>";
+                        if (item.level >= 5) colorTag = "<color=orange>"; // Legendary
+                        else if (item.level >= 3) colorTag = "<color=magenta>"; // Epic
+                        else if (item.level >= 2) colorTag = "<color=cyan>"; // Rare
+                        
+                        string localizedName = GetLocalizedItemName(item, curLang);
+                        if (item.slotType == 0)
+                        {
+                            label = $"{GetEmojiForSlot(0)}\n{colorTag}{localizedName}</color>\nx{item.count}";
+                            GUI.backgroundColor = new Color(0.15f, 0.8f, 0.3f, 0.25f);
+                        }
+                        else
+                        {
+                            label = $"{GetEmojiForSlot(item.slotType)}\n{colorTag}{localizedName}</color>\nTier {item.level}";
+                            GUI.backgroundColor = new Color(0.85f, 0.65f, 0.15f, 0.25f);
+                        }
+                        
+                        if (GUILayout.Button(label, slotGridStyle, GUILayout.Width(76), GUILayout.Height(76)))
+                        {
+                            EquipOrUseItem(index);
+                        }
+                    }
+                    else
+                    {
+                        GUI.backgroundColor = new Color(0.1f, 0.12f, 0.18f, 0.6f);
+                        if (GUILayout.Button($"[ #{index + 1} ]\n[ Пусто ]", slotGridStyle, GUILayout.Width(76), GUILayout.Height(76)))
+                        {
+                            // Click empty
+                        }
+                    }
+                }
+                else if (index == unlockedCount)
+                {
+                    // The first locked slot
+                    GUI.backgroundColor = new Color(0.85f, 0.2f, 0.2f, 0.85f);
+                    int cost = 30 + (purchasedCount - 10) * 12 + (int)(Mathf.Pow(purchasedCount - 10, 1.8f) * 1.5f);
+                    
+                    string buyLabel = curLang == 0 
+                        ? $"🔒 Слот {index + 1}\nКупить\nЗа {cost} 💰" 
+                        : $"🔒 Slot {index + 1}\nUnlock\nFor {cost} 💰";
+                    if (curLang == 8) buyLabel = $"🔒 槽位 {index + 1}\n解锁\n需要 {cost} 💰";
+                    if (curLang == 7) buyLabel = $"🔒 슬롯 {index + 1}\n잠금 해제\n{cost} 💰";
+
+                    if (GUILayout.Button(buyLabel, slotGridStyle, GUILayout.Width(76), GUILayout.Height(76)))
+                    {
+                        if (SaveGameSystem.CurrentData.gold < cost)
+                        {
+                            ShowFeedback(curLang == 0 ? "Недостаточно золота для покупки новой ячейки!" : "Not enough gold to unlock a slot!");
+                        }
+                        else
+                        {
+                            SaveGameSystem.CurrentData.gold -= cost;
+                            SetPurchasedSlotsCount(purchasedCount + 1);
+                            SaveGameSystem.Save(0);
+                            ShowFeedback(curLang == 0 ? $"Слот #{index + 1} успешно разблокирован!" : $"Slot #{index + 1} successfully unlocked!");
+                        }
+                    }
+                }
+                else
+                {
+                    GUI.backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.5f);
+                    GUI.enabled = false;
+                    string locLocked = curLang == 0 ? "🔒 Закрыто" : "🔒 Locked";
+                    GUILayout.Button(locLocked, slotGridStyle, GUILayout.Width(76), GUILayout.Height(76));
+                    GUI.enabled = true;
+                }
+                GUI.backgroundColor = Color.white;
+            }
+            GUILayout.EndHorizontal();
+        }
+        
+        GUILayout.EndScrollView();
+        GUILayout.EndVertical();
+        col3Rect = GUILayoutUtility.GetLastRect();
+
+        GUILayout.EndHorizontal();
+        GUILayout.Space(12);
+        GUILayout.EndArea();
+
+        // ----------------------------------------------------
+        // AELYSSA TUTORIAL OVERLAY & DIALOGUE BOX (v18.11.20)
+        // ----------------------------------------------------
+        if (isAelyssaTutorialActive)
+        {
+            // Translucent dark overlay to focus dialog area
+            GUI.color = new Color(0f, 0f, 0f, 0.45f);
+            GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
+            GUI.color = Color.white;
+
+            // Highlight the corresponding column
+            Rect highlightRect = Rect.zero;
+            if (tutorialStep == 1) highlightRect = col1Rect;
+            else if (tutorialStep == 2 || tutorialStep == 3) highlightRect = col2Rect;
+            else if (tutorialStep == 4 || tutorialStep == 5) highlightRect = col3Rect;
+
+            if (highlightRect != Rect.zero)
+            {
+                Rect absHighlight = new Rect(winRect.x + highlightRect.x, winRect.y + highlightRect.y, highlightRect.width, highlightRect.height);
+                float pulse = 0.5f + Mathf.Abs(Mathf.Sin(Time.unscaledTime * 4.5f)) * 0.5f;
+                Color glowColor = new Color(0.15f, 0.85f, 1.0f, pulse);
+                DrawHighlightBorder(absHighlight, glowColor, 4f);
+            }
+
+            // Draw Aelyssa Dialogue Box
+            float boxWidth = actualWidth - 40f;
+            float boxHeight = 150f;
+            float boxX = 20f;
+            float boxY = actualHeight - boxHeight - 10f;
+            Rect dialogBoxRect = new Rect(winRect.x + boxX, winRect.y + boxY, boxWidth, boxHeight);
+
+            GUIStyle dialogBoxStyle = new GUIStyle(GUI.skin.box);
+            dialogBoxStyle.normal.background = winBgTex; // Glassmorphic texture
+            GUI.Box(dialogBoxRect, "", dialogBoxStyle);
+
+            GUILayout.BeginArea(dialogBoxRect);
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(20);
+            
+            GUILayout.BeginVertical();
+            GUILayout.Space(12);
+
+            // Speaker Name
+            GUIStyle speakerStyle = new GUIStyle(GUI.skin.label);
+            speakerStyle.fontSize = 15;
+            speakerStyle.fontStyle = FontStyle.Bold;
+            speakerStyle.normal.textColor = Color.cyan;
+            GUILayout.Label($"✨ {GetTutorialSpeaker(tutorialStep, curLang).ToUpper()}", speakerStyle);
+            GUILayout.Space(4);
+
+            // Dialog Text
+            GUIStyle bodyStyle = new GUIStyle(GUI.skin.label);
+            bodyStyle.fontSize = 12;
+            bodyStyle.wordWrap = true;
+            bodyStyle.normal.textColor = Color.white;
+            GUILayout.Label(GetTutorialText(tutorialStep, curLang), bodyStyle);
+            
+            GUILayout.FlexibleSpace();
+
+            // Row of buttons
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+
+            string nextText = "Next ▶";
+            string skipText = "Skip ⏭";
+            string finishText = "Finish ✓";
+            if (curLang == 0) { nextText = "Далее ▶"; skipText = "Пропустить ⏭"; finishText = "Завершить ✓"; }
+            if (curLang == 8) { nextText = "下一步 ▶"; skipText = "跳过 ⏭"; finishText = "完成 ✓"; }
+            if (curLang == 7) { nextText = "다음 ▶"; skipText = "건너뛰기 ⏭"; finishText = "완료 ✓"; }
+
+            GUI.backgroundColor = new Color(0.6f, 0.6f, 0.6f, 0.8f);
+            if (GUILayout.Button($"<b>{skipText}</b>", GUILayout.Width(130), GUILayout.Height(32)))
+            {
+                isAelyssaTutorialActive = false;
+                PlayerPrefs.SetInt("Aelyssa_Character_Tutorial_Done2", 1);
+                PlayerPrefs.Save();
+                if (GamePause_Manager.Instance != null) GamePause_Manager.Instance.isPauseBlockedManually = false;
+                if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+            }
+
+            GUILayout.Space(12);
+
+            GUI.backgroundColor = new Color(0.12f, 0.72f, 0.42f, 1.0f);
+            bool isLastStep = (tutorialStep == 7);
+            string mainBtnText = isLastStep ? finishText : nextText;
+            if (GUILayout.Button($"<b>{mainBtnText}</b>", GUILayout.Width(130), GUILayout.Height(32)))
+            {
+                if (isLastStep)
+                {
+                    isAelyssaTutorialActive = false;
+                    PlayerPrefs.SetInt("Aelyssa_Character_Tutorial_Done2", 1);
+                    PlayerPrefs.Save();
+                    if (GamePause_Manager.Instance != null) GamePause_Manager.Instance.isPauseBlockedManually = false;
+                }
+                else
+                {
+                    tutorialStep++;
+                }
+                if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+            }
+            GUI.backgroundColor = Color.white;
+            GUILayout.Space(20);
+            GUILayout.EndHorizontal();
+            GUILayout.Space(12);
+
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
+            GUILayout.EndArea();
+        }
+    }" : "+50 XP";
+        if (GUILayout.Button($"✨ {addXpText}", GUILayout.Height(32)))
+        {
+            GainXP(50);
+        }
+        GUI.backgroundColor = Color.white;
+        GUILayout.EndHorizontal();
+        
+        GUILayout.EndScrollView();
+        GUILayout.EndVertical();
+        col1Rect = GUILayoutUtility.GetLastRect();
+        
+        GUILayout.Space(15);
+        
+        // ----------------------------------------------------
+        // COLUMN 2: EQUIPMENT & CLASS SKILLS (Width: 340f)
+        // ----------------------------------------------------
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(340), GUILayout.ExpandHeight(true));
+        
+        // TOP HALF: СНАРЯЖЕНИЕ ПЕРСОНАЖА (Equipment Mannequin)
+        GUIStyle eqHeaderStyle = new GUIStyle(GUI.skin.label);
+        eqHeaderStyle.alignment = TextAnchor.MiddleCenter;
+        eqHeaderStyle.fontSize = 13;
+        eqHeaderStyle.fontStyle = FontStyle.Bold;
+        eqHeaderStyle.normal.textColor = new Color(0.12f, 0.88f, 1.0f);
+        GUILayout.Label(curLang == 0 ? "🛡️ СНАРЯЖЕНИЕ ПЕРСОНАЖА" : "🛡️ HERO EQUIPMENT", eqHeaderStyle);
+        GUILayout.Space(4);
+        
+        GUILayout.BeginHorizontal(GUI.skin.box, GUILayout.Height(180));
+        
+        GUIStyle slotLabelStyle = new GUIStyle(GUI.skin.label);
+        slotLabelStyle.alignment = TextAnchor.MiddleCenter;
+        slotLabelStyle.fontSize = 10;
+        slotLabelStyle.normal.textColor = Color.gray;
+
+        GUIStyle slotEquippedStyle = new GUIStyle(GUI.skin.button);
+        slotEquippedStyle.fontSize = 9;
+        slotEquippedStyle.richText = true;
+        slotEquippedStyle.alignment = TextAnchor.MiddleCenter;
+        slotEquippedStyle.normal.textColor = Color.yellow;
+
+        // LEFT COLUMN: Slot 8 (Weapon)
+        GUILayout.BeginVertical(GUILayout.Width(80));
+        GUILayout.Label(curLang == 0 ? "⚔️ Слот 8" : "⚔️ Slot 8", slotLabelStyle);
+        GUI.backgroundColor = new Color(0.12f, 0.75f, 0.95f, 0.35f);
+        
+        InventoryItem wpnItem = playerEquipment.slots[8];
+        if (wpnItem != null && !string.IsNullOrEmpty(wpnItem.id))
+        {
+            if (GUILayout.Button($"<b>[ 8 ] ⚔️</b>\n{wpnItem.name}\n<color=cyan>Tier {wpnItem.level}</color>\n<size=8>Нажмите,\nчтобы снять</size>", slotEquippedStyle, GUILayout.Height(140), GUILayout.Width(76)))
+            {
+                UnequipItem(8);
+            }
+        }
+        else
+        {
+            if (GUILayout.Button(curLang == 0 ? "[ SLOT 8 ]\n\n⚔️\n\nОружие\n(Пусто)" : "[ SLOT 8 ]\n\n⚔️\n\nWeapon\n(Empty)", GUILayout.Height(140), GUILayout.Width(76)))
+            {
+                ShowFeedback(curLang == 0 ? "Оружие не экипировано. Кликните предмет в инвентаре справа!" : "Weapon slot is empty. Click an item in inventory to equip!");
+            }
+        }
+        GUI.backgroundColor = Color.white;
+        GUILayout.EndVertical();
+
+        // CENTER COLUMN: Head (1), Neck (2), Chest (4), Belt (6), Boots (7)
+        GUILayout.BeginVertical(GUILayout.Width(130));
+        
+        // Slot 1: Head
+        DrawEquippedSlotButton(1, "Голова", "Head", curLang, slotEquippedStyle);
+        // Slot 2: Neck
+        DrawEquippedSlotButton(2, "Шея / Амулет", "Neck", curLang, slotEquippedStyle);
+        // Slot 4: Torso / Chest
+        DrawEquippedSlotButton(4, "Доспех / Chest", "Chest", curLang, slotEquippedStyle);
+        // Slot 6: Belt
+        DrawEquippedSlotButton(6, "Пояс", "Belt", curLang, slotEquippedStyle);
+        // Slot 7: Boots
+        DrawEquippedSlotButton(7, "Обувь", "Boots", curLang, slotEquippedStyle);
+
+        GUILayout.EndVertical();
+
+        // RIGHT COLUMN: Slot 3 (Shoulders), Slot 5 (Rings)
+        GUILayout.BeginVertical(GUILayout.Width(80));
+        GUILayout.Label(curLang == 0 ? "🛡️ Доспехи" : "🛡️ Armor", slotLabelStyle);
+        
+        // Slot 3: Shoulders
+        DrawEquippedSlotButton(3, "Плечи", "Shoulders", curLang, slotEquippedStyle, 68);
+        GUILayout.Space(4);
+        // Slot 5: Rings
+        DrawEquippedSlotButton(5, "Кольцо", "Ring", curLang, slotEquippedStyle, 68);
+        
+        GUILayout.EndVertical();
+        GUILayout.EndHorizontal();
+        
+        GUILayout.Space(10);
+        
+        // BOTTOM HALF: КЛАССОВЫЕ НАВЫКИ ГЕРОЯ (Skills with LARGER icons)
+        GUIStyle skillsHeaderStyle = new GUIStyle(GUI.skin.label);
+        skillsHeaderStyle.alignment = TextAnchor.MiddleCenter;
+        skillsHeaderStyle.fontSize = 13;
+        skillsHeaderStyle.fontStyle = FontStyle.Bold;
+        skillsHeaderStyle.normal.textColor = Color.yellow;
+        GUILayout.Label(curLang == 0 ? "🧬 КЛАССОВЫЕ НАВЫКИ ГЕРОЯ" : "🧬 HERO CLASS SKILLS", skillsHeaderStyle);
+        GUILayout.Space(4);
+        
+        LoadClassSkillsIcons();
+        
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.ExpandHeight(true));
         if (cl.Contains("warrior") || cl.Contains("voin") || cl.Contains("paladin") || cl.Contains("воин") || cl.Contains("паладин") || cl.Contains("рыцар"))
         {
             DrawSkillRow(curLang, activeSkillPassive1, "🛡️", "IronSkin", curLang == 0 ? "Прочная кожа: +15% Защиты" : "+15% Armor/Defense bonus", "Passive");
@@ -2590,30 +3591,123 @@ public class FateCastleManager : MonoBehaviour
             GUILayout.Label(curLang == 0 ? "Фирменные навыки будут доступны в бою." : "Signature skills are active inside battle arena.", GUI.skin.label);
         }
         GUILayout.EndVertical();
-        GUILayout.Space(8);
         
-        // Панель управления (Сброс и Тестовые читы)
+        GUILayout.EndVertical();
+        col2Rect = GUILayoutUtility.GetLastRect();
+        
+        GUILayout.Space(15);
+        
+        // ----------------------------------------------------
+        // COLUMN 3: INVENTORY GRID (Width: Remaining space)
+        // ----------------------------------------------------
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        
+        GUIStyle invHeaderStyle = new GUIStyle(GUI.skin.label);
+        invHeaderStyle.alignment = TextAnchor.MiddleCenter;
+        invHeaderStyle.fontSize = 14;
+        invHeaderStyle.fontStyle = FontStyle.Bold;
+        invHeaderStyle.normal.textColor = new Color(0.9f, 0.45f, 0.1f);
+        GUILayout.Label(curLang == 0 ? "🎒 ИНВЕНТАРЬ ПЕРСОНАЖА" : "🎒 CHARACTER INVENTORY", invHeaderStyle);
+        
+        string invHelpText = curLang == 0 ? 
+            "Все купленные зелья и снаряжение попадают сюда. Нажмите на предмет, чтобы надеть или использовать его!" :
+            "All purchased elixirs and gear are placed here. Click an item to equip or consume it!";
+        GUIStyle invHelpStyle = new GUIStyle(GUI.skin.label);
+        invHelpStyle.fontSize = 10;
+        invHelpStyle.alignment = TextAnchor.MiddleCenter;
+        invHelpStyle.normal.textColor = Color.gray;
+        GUILayout.Label(invHelpText, invHelpStyle);
+        GUILayout.Space(6);
+        
+        // Beautiful 6x6 grid of 36 slots
+        GUIStyle slotGridStyle = new GUIStyle(GUI.skin.button);
+        slotGridStyle.fontSize = 9;
+        slotGridStyle.padding = new RectOffset(2, 2, 2, 2);
+        slotGridStyle.richText = true;
+        
+        invScroll = GUILayout.BeginScrollView(invScroll, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        
+        int gridColumns = 6;
+        int gridRows = 6;
+        for (int row = 0; row < gridRows; row++)
+        {
+            GUILayout.BeginHorizontal();
+            for (int col = 0; col < gridColumns; col++)
+            {
+                int index = row * gridColumns + col;
+                InventoryItem item = playerInventory.items[index];
+                
+                if (item != null && !string.IsNullOrEmpty(item.id))
+                {
+                    string label = "";
+                    string colorTag = "<color=white>";
+                    if (item.level >= 5) colorTag = "<color=orange>"; // Legendary
+                    else if (item.level >= 3) colorTag = "<color=magenta>"; // Epic
+                    else if (item.level >= 2) colorTag = "<color=cyan>"; // Rare
+                    
+                    if (item.slotType == 0)
+                    {
+                        label = $"{GetEmojiForSlot(0)}\n{colorTag}{item.name}</color>\nx{item.count}";
+                        GUI.backgroundColor = new Color(0.15f, 0.8f, 0.3f, 0.25f);
+                    }
+                    else
+                    {
+                        label = $"{GetEmojiForSlot(item.slotType)}\n{colorTag}{item.name}</color>\nTier {item.level}";
+                        GUI.backgroundColor = new Color(0.85f, 0.65f, 0.15f, 0.25f);
+                    }
+                    
+                    if (GUILayout.Button(label, slotGridStyle, GUILayout.Width(76), GUILayout.Height(76)))
+                    {
+                        EquipOrUseItem(index);
+                    }
+                }
+                else
+                {
+                    GUI.backgroundColor = new Color(0.1f, 0.12f, 0.18f, 0.6f);
+                    if (GUILayout.Button("[ Пусто ]\n[ Empty ]", slotGridStyle, GUILayout.Width(76), GUILayout.Height(76)))
+                    {
+                        // Click empty slot does nothing
+                    }
+                }
+                GUI.backgroundColor = Color.white;
+            }
+            GUILayout.EndHorizontal();
+        }
+        
+        GUILayout.EndScrollView();
+        GUILayout.EndVertical();
+
+        GUILayout.EndHorizontal();
+        GUILayout.Space(12);
+        GUILayout.EndArea();
+    }
+
+    private void DrawEquippedSlotButton(int slotType, string defaultNameRU, string defaultNameEN, int curLang, GUIStyle style, float height = 28)
+    {
+        InventoryItem item = playerEquipment.slots[slotType];
+        
         GUILayout.BeginHorizontal();
+        GUILayout.Label($"<b>{GetEmojiForSlot(slotType)} [{slotType}]</b>", GUILayout.Width(40));
         
-        GUI.backgroundColor = new Color(1.0f, 0.22f, 0.22f);
-        string resetBtnLabel = curLang == 0 ? "СБРОС" : "RESET";
-        if (GUILayout.Button($"♻️ {resetBtnLabel}", GUILayout.Height(30)))
+        GUI.backgroundColor = new Color(0.12f, 0.75f, 0.95f, 0.35f);
+        if (item != null && !string.IsNullOrEmpty(item.id))
         {
-            ResetPlayerStats();
+            string btnText = $"<b>{item.name}</b> (Tier {item.level}) - <color=red>[Снять]</color>";
+            if (GUILayout.Button(btnText, style, GUILayout.Height(height), GUILayout.Width(220)))
+            {
+                UnequipItem(slotType);
+            }
         }
-        
-        GUI.backgroundColor = new Color(0.15f, 0.8f, 0.35f);
-        string addXpText = curLang == 0 ? "ОПЫТ +50" : "+50 XP";
-        if (GUILayout.Button($"✨ {addXpText}", GUILayout.Height(30)))
+        else
         {
-            GainXP(50);
+            string emptyLabel = curLang == 0 ? $"[ Нет {defaultNameRU} ]" : $"[ Empty {defaultNameEN} ]";
+            if (GUILayout.Button(emptyLabel, GUILayout.Height(height), GUILayout.Width(220)))
+            {
+                ShowFeedback(curLang == 0 ? $"Экипируйте {defaultNameRU} через инвентарь справа!" : $"Equip {defaultNameEN} through inventory on the right!");
+            }
         }
-        
         GUI.backgroundColor = Color.white;
         GUILayout.EndHorizontal();
-        
-        GUILayout.EndScrollView(); // Конец прокрутки Zenith UI
-        GUILayout.EndArea();
     }
 
     private void LoadClassSkillsIcons()
@@ -4120,42 +5214,17 @@ public class FateCastleManager : MonoBehaviour
             DrawPotionItem("def", "Зелье Защиты", "Tome of Bastion Defense", "石像鬼坚韧合剂", "철갑 안개의 물약", 40, potionIndex, activeCastle.level);
 
             GUILayout.Space(15);
-            GUILayout.Box(curLang == 0 ? "⚔️ КУЗНИЦА ДОСПЕХОВ" : "⚔️ FORGE DEPARTMENT", GUILayout.Height(20));
+            GUILayout.Box(curLang == 0 ? "⚔️ КУЗНИЦА СНАРЯЖЕНИЯ" : "⚔️ FORGE DEPARTMENT", GUILayout.Height(20));
 
-            // Progressive 6 levels of equipment with gold values proportional to level
-            int armorLv = PlayerPrefs.GetInt("Player_HeroArmor_Tier", 1);
-            string curArmorName = GetEquipmentTierName(armorLv, curLang);
-            GUILayout.Label($"{(curLang == 0 ? "Текущие Латы" : "Current Gear")}: {curArmorName} (Tier {armorLv})");
-
-            if (armorLv < 6)
-            {
-                int nextLv = armorLv + 1;
-                int armorPrice = 90 * nextLv * activeCastle.level;
-                string eqBtnName = curLang == 0 ? 
-                    $"Выковать {GetEquipmentTierName(nextLv, 0)} ({armorPrice} 💰)" : 
-                    $"Forge {GetEquipmentTierName(nextLv, 1)} ({armorPrice} 💰)";
-                if (curLang == 8) eqBtnName = $"锻造 {GetEquipmentTierName(nextLv, 8)} ({armorPrice} 💰)";
-                if (curLang == 7) eqBtnName = $"제작 {GetEquipmentTierName(nextLv, 7)} ({armorPrice} 💰)";
-
-                if (GUILayout.Button(eqBtnName, GUILayout.Height(40)))
-                {
-                    if (SaveGameSystem.CurrentData.gold < armorPrice)
-                    {
-                        ShowFeedback(curLang == 0 ? "Недостаточно королевского угля и золота!" : "Insufficient gold for smithy services!");
-                    }
-                    else
-                    {
-                        SaveGameSystem.CurrentData.gold -= armorPrice;
-                        PlayerPrefs.SetInt("Player_HeroArmor_Tier", nextLv);
-                        PlayerPrefs.Save();
-                        ShowFeedback(curLang == 0 ? "Кузнец успешно перековал ваши латы!" : "Plate armor upgraded permanently!");
-                    }
-                }
-            }
-            else
-            {
-                GUILayout.Label(curLang == 0 ? "✓ Достигнуто легендарное качество ковки!" : "✓ Ultimate god-roll forging reached!", GUI.skin.box);
-            }
+            // Beautiful 8-slot forging options
+            DrawForgeEquipmentOption(8, "Оружие", "Weapon", activeCastle.level);
+            DrawForgeEquipmentOption(1, "Шлем", "Helmet", activeCastle.level);
+            DrawForgeEquipmentOption(4, "Броня", "Chestplate", activeCastle.level);
+            DrawForgeEquipmentOption(3, "Наплечники", "Shoulders", activeCastle.level);
+            DrawForgeEquipmentOption(7, "Сапоги", "Boots", activeCastle.level);
+            DrawForgeEquipmentOption(6, "Пояс", "Belt", activeCastle.level);
+            DrawForgeEquipmentOption(2, "Амулет", "Amulet", activeCastle.level);
+            DrawForgeEquipmentOption(5, "Кольцо", "Ring", activeCastle.level);
 
             GUILayout.Space(15);
             GUILayout.Box(curLang == 0 ? "🕵️ НАЙМ ПРОСТЫХ ГЕРОЕВ" : "🕵️ RECRUIT ALLIED HEROES", GUILayout.Height(20));
@@ -4500,18 +5569,95 @@ public class FateCastleManager : MonoBehaviour
             }
             else
             {
-                SaveGameSystem.CurrentData.gold -= price;
-                count++;
-                PlayerPrefs.SetInt($"Player_Potion_{id}_Lvl_{potionLvl}", count);
-                PlayerPrefs.Save();
+                string potionId = $"potion_{id}_{potionLvl}";
+                string itemNameRU = $"{nameRU} (Ур.{potionLvl})";
+                if (AddInventoryItem(potionId, itemNameRU, id, 0, potionLvl, 0))
+                {
+                    SaveGameSystem.CurrentData.gold -= price;
+                    count++;
+                    PlayerPrefs.SetInt($"Player_Potion_{id}_Lvl_{potionLvl}", count);
+                    PlayerPrefs.Save();
+                    SaveGameSystem.Save(0);
 
-                string okFeed = curLang == 0 ?
-                    $"Куплено: {name} (Ур.{potionLvl})!" :
-                    $"Acquired: {name} (Level {potionLvl})!";
-                ShowFeedback(okFeed);
+                    string okFeed = curLang == 0 ?
+                        $"Куплено и добавлено в инвентарь: {name} (Ур.{potionLvl})!" :
+                        $"Acquired and placed in inventory: {name} (Level {potionLvl})!";
+                    ShowFeedback(okFeed);
+                }
+                else
+                {
+                    ShowFeedback(curLang == 0 ? "Ваш инвентарь переполнен!" : "Inventory is full!");
+                }
             }
         }
         GUILayout.EndHorizontal();
+    }
+
+    private void DrawForgeEquipmentOption(int slotType, string slotNameRU, string slotNameEN, int castleLvl)
+    {
+        int curLang = Translator.LanguageID;
+        int currentTier = PlayerPrefs.GetInt($"Player_Equipped_Tier_Slot_{slotType}", 0);
+        
+        if (currentTier < 6)
+        {
+            int nextTier = currentTier + 1;
+            int price = 80 * nextTier * (int)(castleLvl * 0.4f + 0.6f);
+            string name = GetItemName(slotType, nextTier, curLang);
+            
+            GUILayout.BeginHorizontal(GUI.skin.box);
+            string desc = curLang == 0 ? 
+                $"Выковать {name}\n[Слот: {slotNameRU}, Tier {nextTier}]" :
+                $"Forge {name}\n[Slot: {slotNameEN}, Tier {nextTier}]";
+            GUILayout.Label(desc, GUILayout.Width(220));
+            
+            if (GUILayout.Button($"{price} 💰", GUILayout.Height(35)))
+            {
+                if (SaveGameSystem.CurrentData.gold < price)
+                {
+                    ShowFeedback(curLang == 0 ? "Недостаточно золота в казне замка!" : "Insufficient gold for blacksmith services!");
+                }
+                else
+                {
+                    string itemId = $"item_slot_{slotType}_tier_{nextTier}";
+                    string itemNameRU = GetItemName(slotType, nextTier, 0);
+                    string iconType = GetIconTypeForSlot(slotType);
+                    
+                    if (AddInventoryItem(itemId, itemNameRU, iconType, slotType, nextTier, nextTier * 3))
+                    {
+                        SaveGameSystem.CurrentData.gold -= price;
+                        PlayerPrefs.SetInt($"Player_Equipped_Tier_Slot_{slotType}", nextTier);
+                        PlayerPrefs.Save();
+                        SaveGameSystem.Save(0);
+                        ShowFeedback(curLang == 0 ? $"Выковано и помещено в инвентарь: {itemNameRU}!" : $"Forged and placed in inventory: {name}!");
+                    }
+                    else
+                    {
+                        ShowFeedback(curLang == 0 ? "Ваш инвентарь переполнен! Освободите место." : "Inventory is full! Free some slots first.");
+                    }
+                }
+            }
+            GUILayout.EndHorizontal();
+        }
+        else
+        {
+            GUILayout.Label(curLang == 0 ? $"✓ {slotNameRU}: Легендарное качество!" : $"✓ {slotNameEN}: Legendary Quality!", GUI.skin.box);
+        }
+    }
+
+    private string GetIconTypeForSlot(int slotType)
+    {
+        switch (slotType)
+        {
+            case 1: return "helmet";
+            case 2: return "necklace";
+            case 3: return "shoulders";
+            case 4: return "armor";
+            case 5: return "ring";
+            case 6: return "belt";
+            case 7: return "boots";
+            case 8: return "weapon";
+            default: return "armor";
+        }
     }
 
     private void DrawHeroRecruitItem(string key, string nameRU, string nameEN, string nameCH, string nameKR, int basePrice)
