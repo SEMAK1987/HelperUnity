@@ -3,7 +3,7 @@
   "project_name": "Fate Continent",
   "project_path": "",
   "system_instruction": "You are Zenith Quantum Divine Assistant, guiding the Fate Continent world development and Unity/Blender workflows.",
-  "version": "18.11.20",
+  "version": "18.11.21",
   "modules": [
     {
       "name": "Localization & Fonts",
@@ -50,7 +50,8 @@
         "Zenith GPU Anti-Overheat Protection & Resolution Universal Sync v18.11.16: Guards computer hardware performance during testing by capping target frame rate (30 FPS/60 FPS/120 FPS capped) according to chosen graphics level, dampening post-process volumes down to 15% on low settings, and fully synchronizes and restores screen resolution/fullscreen choices across all scene loading cycles.",
         "Zenith Dynamic Army Units & Textures Sync v18.11.18: Completely polished FateCastleManager.cs UI panels by resolving misaligned closing brackets, duplicated columns and dangling structures. Details 14 diverse cohort types with unique traits, active/passive limits, and connects customizable Texture2D fields for seamless cohort avatar inspection in the editor.",
         "Zenith Dialogue Choice Positioning & Clean High-Density Layout Integration v18.11.19: Solved overlapping of dialogue choice buttons with portraits and dialogue text by lowering the layout positions to hang beautifully below the dialogue panel, adjusting margins, and scaling size parameters to provide a pristine visual hierarchy during point selection and normal steps.",
-        "Zenith Fullscreen Character Panel & Advanced Inventory Grid v18.11.20: Implemented fullscreen 3-column Zenith Hero Control Panel in FateCastleManager.cs. Integrates local-persistent 36-slot inventory grid and dynamic 8-slot equipment mannequin with attributes calculation, larger passive/ultimate skill cards, and connects forge slot selections and potion merchants directly to the player inventory database."
+        "Zenith Fullscreen Character Panel & Advanced Inventory Grid v18.11.20: Implemented fullscreen 3-column Zenith Hero Control Panel in FateCastleManager.cs. Integrates local-persistent 36-slot inventory grid and dynamic 8-slot equipment mannequin with attributes calculation, larger passive/ultimate skill cards, and connects forge slot selections and potion merchants directly to the player inventory database.",
+        "Zenith Skill Detail & Video Sync v18.11.21: Resolves CS0103 compile errors by defining ShowSkillDetailPopup in FateCastleManager.cs to match multi-class skills configuration, and registers the latest high-definition YouTube video guides inside the master knowledge index."
       ]
     },
     {
@@ -73,7 +74,8 @@
         "https://www.youtube.com/watch?v=hmzlNvqziVI",
         "https://www.youtube.com/watch?v=JgmIM7qhGh8",
         "https://www.youtube.com/watch?v=AKKpPmxx07w",
-        "https://www.youtube.com/watch?v=juSKjpD3G7o"
+        "https://www.youtube.com/watch?v=juSKjpD3G7o",
+        "https://www.youtube.com/watch?v=NpfgeQZKmcU"
       ],
       "topics": ["Unity Physics", "Blender Geometry Nodes", "Shader Graph", "Advanced Rigging", "ML-Agents"]
     },

@@ -1,17 +1,17 @@
 # PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Total Knowledge Archive Edition)
 
-> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.11.20.
+> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.11.21.
 
 ## 1. Общая информация
-- **Версия Помощника:** 18.11.20
-- **Описание:** Гибридный ИИ-помощник нового поколения (v18.11.20 - Fullscreen Character Panel & Advanced Inventory Grid) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Интеграция адаптивного переключения ввода, калибровка зум-параметров при высадке, позиционирование маркеров по Z=-2.0f, сохранение прогресса и моделирования отрядов.
+- **Версия Помощника:** 18.11.21
+- **Описание:** Гибридный ИИ-помощник нового поколения (v18.11.21 - Zenith Skill Detail Sync & Video Reference Update) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Интеграция адаптивного переключения ввода, калибровка зум-параметров при высадке, позиционирование маркеров по Z=-2.0f, сохранение прогресса и моделирования отрядов.
 - **Путь проекта:** Не задан
 - **Локальное хранилище:** Не задано
 - **Версия Unity:** unknown
 - **Версия Blender:** unknown
 - **Версия GIMP:** unknown
 - **Версия Redot:** unknown
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_11_20_FATE_MASTER]
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_11_21_SKILL_SYNC]
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -46,18 +46,19 @@ You are Zenith Quantum Divine Assistant, guiding the Fate Continent world develo
 ```
 
 
-## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.11.11 - Real-Time Bound Locking & Ocean Backdrop)
+## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.11.21 - Zenith Skill Detail Sync & Video Reference Update)
 ### Режимы работы и Архитектурные уровни
 - **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.
 - **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.
 - **No-Internet Mode (Quantum Archive):** 10,000+ видео-уроков. Мгновенный доступ при любых внешних условиях.
 
-### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.11.11 Sync)
+### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.11.21 Sync)
 - **Unity 6 Physics & Optimization:** [Video #2](https://www.youtube.com/watch?v=9vuyis_Y-LY)
 - **Blender Advanced Rigging:** [Video #3](https://www.youtube.com/watch?v=UKZp67dY1_w)
 - **Shader Graph Mastery:** [Video #4](https://www.youtube.com/watch?v=-hvxjyzcSkI)
 - **Geometry Nodes World Gen:** [Video #6](https://www.youtube.com/watch?v=4YEB_Q8EOD8)
 - **Unity AI & ML-Agents:** [Video #9](https://www.youtube.com/watch?v=JBszeE_NgmA)
+- **Zenith Advanced Mastery:** [Video #12](https://www.youtube.com/watch?v=NpfgeQZKmcU)
 
 ### TRANSCENDENT LINK (Neural Addon Synthesis)
 - **Neural Addon Synthesis:** Возможность проектирования и генерации аддонов для Blender и плагинов для Unity, которые напрямую связывают софт с ИИ.
@@ -293,7 +294,20 @@ Freesound содержит миллионы звуков от инди-разр�
 - **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.
 - **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.
 
-## 13. История изменений (v18.11.7)
+## 13. История изменений (v18.11.21)
+- **v18.11.21:** Zenith Skill Detail Sync & Video Reference Update • Resolves the missing `ShowSkillDetailPopup` method compiler errors (CS0103) in `FateCastleManager.cs`. Standardizes active skill descriptions dynamically matching all three major player hero classes (Warrior, Archer, Mage) depending on their character class data loaded from `SaveGameSystem`. Integrates the newly requested YouTube video knowledge reference into the persistent knowledge indexes.
+- **v18.11.20:** Fullscreen Character Panel & Advanced Inventory Grid • Integrates a fullscreen 3-column Zenith Hero Control Panel in FateCastleManager.cs to solve the small parameters view. Implements a local-persistent, secure 36-slot inventory grid supporting stacking items (potions) and gear. Formulates a dynamic 8-slot equipment mannequin with attributes calculations (+STR, +AGI, +INT, +STA), larger passive/ultimate skill cards, and links potion merchants and forge slot selections directly to the player inventory database.
+- **v18.11.19:** Dynamic Dialogue Choice Positioning & Clean High-Density Layout • Solves overlapping of dialogue choice buttons with portraits and dialogue text by lowering the layout positions (anchoredPosition Y=-20f, sizeDelta=-120f, 44f) to hang beautifully below the dialogue panel. This provides a pristine visual hierarchy during point selection and normal dialogue steps.
+- **v18.11.18:** Dynamic Army Units, Character Prompts Book Integration & High-Density UI • Resolves dangling brackets, misplaced column alignment and duplicate UI panels within FateCastleManager.cs. Details 14 diverse cohort troop definitions (such as Боец Фракции, Паладин Света, Кентавр Степей, Легендарный Дракон Пустоты, etc.) with strict limit parameters for skill quantities, and connects editable Texture2D slots to easily assign troop portraits right inside the inspector. Formulates guidelines detailing where the default class prompts (Warrior, Archer, Mage) are located inside CHARACTER_PROMPTS.md.
+- **v18.11.16:** GPU Anti-Overheat Protection & Resolution Universal Sync • Implements a hardware performance safeguard within SettingsManager.cs. Disables infinite framerates in Unity; clamps Target Frame Rate to 30 FPS on low presets to minimize GPU load and avoid "Unity Bug Reporter" crashes during long testing sessions, 60 FPS on medium/high, and 120 FPS on ultra. Automatically manages standard Post-Processing Volume weights (Bloom/Postprocess is scaled down to 15% on low settings). Ensures persistent Screen Resolution and Fullscreen Mode are dynamically synchronized and automatically restored across all strategic scenes, loading processes, and gameplay transitions.
+- **v18.11.15:** RPG Skills & Turn-Based Castle • Fully integrates class base attributes (Warrior: STR 15, AGI 10, INT 4, STA 15; Archer: STR 10, AGI 14, INT 6, STA 11; Mage: STR 6, AGI 10, INT 10, STA 9) and difficulty-dependent starting free stat pools (from 0 to 30 points) during new game character initialization. Prevents reduction below base stats, implements autonomous auto-allocation, and displays a glossy glassmorphic class skills glossary (passives & ultimate abilities) inside the castle manager GUI panel. Replaced per-second gold accumulation with turn-based castle income ticking and Castle Level 1 -> Level 2 majestic visual shape-shifting morph builders!
+- **v18.11.14:** Post-Landing Narrative & Castle Progression System • Implements scale and offset persistence for the tactical world map preventing reset on play. Adds a multi-phase post-landing narrative briefing starting at DialogStep 8 through 12, focusing the camera on the player castle, locking movement and pausing. Programmatically spawns four majestic 3D castles (emerald neon for player, ruby neon for enemy built using Standard/URP-compatible materials) and establishes the interactive Castle Management logic featuring Zenith Glassmorphism UI, passive gold income tick system, military recruitment, shop equipment and espionage.
+- **v18.11.13:** Ground-Focused Camera Clamping • Refactors camera coordinates clamping in StrategicCameraController.cs to mathematically limit the screen's visual center focal point projected on the ground (Y = 0) rather than restricting raw camera coordinates. This solves physical camera locks at high elevations and allows manual limits to perfectly match visual map coordinate dimensions.
+- **v18.11.12:** Dynamic Ocean Occlusion & Quality Synchronization • Integrates auto-active ocean plane hide on Start() and show on DispatchLanding() for dialogue sequence protection; fixes pink standard shader issues in Universal Render Pipeline projects by detecting `M_Ocean_Background` automatically or compiling URP-compatible lit fallbacks; and dynamically scales water glossiness and metallic parameters based on system graphics quality levels (Low, Med, Ultra) loaded from `PlayerPrefs`.
+- **v18.11.11:** Real-Time Bound Locking, Edge Scrolling & Ocean Planes • Integrates strict real-time coordinate constraints in StrategicCameraController.cs with a dynamic AutoFitBounds() system that automatically calculates bounds according to New_Kontinent's mesh, implements mouse-steerable Edge Scrolling, and instantiates an automatic Ocean background Plane with 40x40 UV tiling ready for seamless 8K high-res textures.
+- **v18.11.10:** 4-Zone Spawn Match & Map Sync • Matches indices and names of zones ("Кровавые Пустоши" -> Oasis_SpawnPoint, "Ледяной Пик" -> Outpost_SpawnPoint, "Древние Руины" -> Shore_SpawnPoint, "Святилище Зенита" -> Citadel_SpawnPoint) in LandingPositionManager.cs to match interactive rings and user's customized map catalog. Fixes clipping/clipping depth by placing Ring interactive markers local Z coordinate at -2.0f and companions/heroes at -2.05f to bypass overlapping from any 3D continent textures.
+- **v18.11.9:** Input System Auto-Switch & Camera Rig Calibration • Solves New Input System 999+ Exception errors in StrategicCameraController.cs using smart preprocessor compilation. Calibrates landing point cameraOffset defaults from obsolete 15f height to ideal 2.5f height with auto-correction on startup, and sets crisp strategic min/max zoom limits (0.6f / 8.0f) for full continent overview.
+- **v18.11.8:** 4-Zone Landing Position Auto-Sync & Anchor Persistence • Binds four distinct landing points and automatically synchronizes physical spawn anchors (`Wastes_SpawnPoint`, `Peak_SpawnPoint`, `Ruins_SpawnPoint`, `Crags_SpawnPoint`), securely caching player selection across sessions with persistent PlayerPrefs. Fully masks 3D environments during dialog panels to secure scene purity.
 - **v18.11.7:** Selective Dialogue Map Dismissal & Hidden Faction Markers • Solves critical scene-cleanup issue where the map background, tactical landing rings, and companion marker coordinates stayed visible after clicking 'End Dialogue' or ending conversation. Directs DialogueSystem_Manager to hide active map and overlay modules dynamically on non-interactive dialogue steps, and completely hides flat white redundant faction reference circles (`Faction_Marker_Aelyssa`/class markers) from the tactical world map view and during the interactive landing phase.
 - **v18.11.6:** Synchronized Map & Marker Dismissal • Automatically caches Faction_Marker_Aelyssa and player class markers on startup to properly control their visibility in sync with the tactical world map. Directs DialogueSystem_Manager to dismiss map visibility when ending dialogue (clicking "Завершить диалог"), completely cleaning up map background sprites, active landing point rings, and the companion companion/faction markers from the viewport upon conversation exit.
 - **v18.11.5:** Single Ring Visibility & Pure Coordinates Preservation • Dynamically disables other rings at runtime, displaying ONLY the single chosen landing point ring. Preserves user-entered Inspector coordinates at runtime by establishing your exact manually fine-tuned layout coordinates as hardcoded default variable parameters in C# and removing the runtime scene-sync overwrite block, completely resolving coordinate resets or values "jumping" to zero on play start.

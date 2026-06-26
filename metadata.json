@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.20. Fullscreen Character Panel & Advanced Inventory Grid.",
+  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.21. Zenith Skill Detail Sync & Video Reference Update.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

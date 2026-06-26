@@ -12,6 +12,7 @@
     "src/DialogueSystem_Manager.cs",
     "src/EventHub.cs",
     "src/FateCastleManager.cs",
+    "src/FateDialogueBackgroundController.cs",
     "src/FateGameplayIntro_Manager.cs",
     "src/FateMapManager.cs",
     "src/GamePause_Manager.cs",
@@ -40,13 +41,17 @@
   "animators": [],
   "pdfs": [],
   "videos": [],
-  "others": [],
-  "total_files": 69,
+  "others": [
+    "src/assets/images/avatar_hero_archer_1781946116462.jpg",
+    "src/assets/images/avatar_hero_mage_1781946131822.jpg",
+    "src/assets/images/avatar_hero_warrior_1781946102639.jpg"
+  ],
+  "total_files": 74,
   "analysis": {
     "audit_issues": [],
     "todos": [],
     "asset_stats": {
-      "total_size": 2252441,
+      "total_size": 5002528,
       "large_files": []
     },
     "dependencies": {
@@ -113,7 +118,13 @@
         "System.Collections.Generic",
         "UnityEngine",
         "FateContinent",
-        "UnityEngine.InputSystem"
+        "UnityEngine.InputSystem",
+        "UnityEditor"
+      ],
+      "FateDialogueBackgroundController": [
+        "System.Collections",
+        "UnityEngine",
+        "UnityEngine.UI"
       ],
       "FateGameplayIntro_Manager": [
         "UnityEngine",
@@ -227,5 +238,5 @@
       ]
     }
   },
-  "last_updated": "2026-06-19T18:41:43.881Z"
+  "last_updated": "2026-06-25T18:29:21.274Z"
 }
