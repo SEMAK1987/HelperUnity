@@ -215,7 +215,7 @@ namespace FateContinent
             // СВЕРХВАЖНО: Кэшируем оригинальные красивые материалы регионов перед их деактивацией или перекраской!
             CacheOriginalMaterials();
 
-            bool isGameplayActive = PlayerPrefs.GetInt("ContinentGameplayActive", 0) == 1;
+            bool isGameplayActive = PlayerPrefs.GetInt("ContinentGameplayActive", 0) == 1 && PlayerPrefs.GetInt("LandedZoneIndex", -1) != -1;
 
             if (isGameplayActive)
             {
@@ -766,7 +766,7 @@ namespace FateContinent
 
         private void Update()
         {
-            bool isGameplayActive = PlayerPrefs.GetInt("ContinentGameplayActive", 0) == 1;
+            bool isGameplayActive = PlayerPrefs.GetInt("ContinentGameplayActive", 0) == 1 && PlayerPrefs.GetInt("LandedZoneIndex", -1) != -1;
             if (isGameplayActive && playerTransform != null && landingPoints != null && landingPoints.Length > 0)
             {
                 int landedZone = PlayerPrefs.GetInt("LandedZoneIndex", 0);

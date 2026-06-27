@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.21. Zenith Skill Detail Sync & Video Reference Update.",
+  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.22. Memory Optimization, Skip Day Lock & Hover Skills Detail.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

@@ -143,6 +143,11 @@ namespace FateContinent
             get { return isDialogueActive; }
         }
 
+        public int CurrentLineIndex
+        {
+            get { return currentLineIndex; }
+        }
+
         public int SelectedZoneIndex
         {
             get { return selectedZoneIndex; }

@@ -49,6 +49,11 @@ public static class SaveGameSystem
         public int activeQuestID = 0;
         public int miceCollected = 0; // Пример квестового объекта из нашего контекста (мыши бегают!)
         public string completedQuestsJSON = ""; // Можно сохранить список ID решенных квестов в JSON-строке
+
+        [Header("Кампания (Континент Судьбы)")]
+        public bool isContinentGameplayActive = false;
+        public int landedZoneIndex = -1;
+        public int currentCampaignDay = 1;
     }
 
     /// <summary>
@@ -60,6 +65,9 @@ public static class SaveGameSystem
         // 1. Собираем актуальные данные перед сохранением
         CurrentData.currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         CurrentData.saveDateTime = DateTime.Now.ToString("dd.MM.yyyy HH:mm");
+        CurrentData.isContinentGameplayActive = PlayerPrefs.GetInt("ContinentGameplayActive", 0) == 1;
+        CurrentData.landedZoneIndex = PlayerPrefs.GetInt("LandedZoneIndex", -1);
+        CurrentData.currentCampaignDay = PlayerPrefs.GetInt("Fate_Current_Day", 1);
 
         // ПРИМЕЧАНИЕ для разработчика: здесь вы можете собрать данные из ваших игровых менеджеров:
         // Пример:
@@ -111,6 +119,10 @@ public static class SaveGameSystem
 
         // Синхронизируем уровень сложности в PlayerPrefs, чтобы геймплей его подхватил
         PlayerPrefs.SetInt("Difficulty", CurrentData.selectedDifficulty);
+        PlayerPrefs.SetInt("ContinentGameplayActive", CurrentData.isContinentGameplayActive ? 1 : 0);
+        PlayerPrefs.SetInt("LandedZoneIndex", CurrentData.landedZoneIndex);
+        PlayerPrefs.SetInt("Fate_Current_Day", CurrentData.currentCampaignDay);
+        PlayerPrefs.Save();
 
         if (!loadScene)
         {

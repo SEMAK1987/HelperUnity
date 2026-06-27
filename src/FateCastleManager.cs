@@ -283,6 +283,7 @@ public class FateCastleManager : MonoBehaviour
     private int activeDetailsIndex = -1;
     private string feedbackMessage = "";
     private float messageTimer = 0f;
+    private float clickCooldown = 0f;
     
     public int currentDay = 1;
 
@@ -307,6 +308,40 @@ public class FateCastleManager : MonoBehaviour
     private Vector2 academyScroll = Vector2.zero;
     private Vector2 statsScroll = Vector2.zero;
     private Vector2 invScroll = Vector2.zero;
+    private Vector2 tabsScroll = Vector2.zero;
+
+    // Hover variables for skills (v18.11.21)
+    private bool isHoveringSkill = false;
+    private string hoveredSkillName = "";
+    private string hoveredSkillDesc = "";
+    private string hoveredSkillType = "";
+    private Texture2D hoveredSkillIcon = null;
+
+    // Cache for GUIStyles to reduce GC allocation & memory usage (v18.11.21)
+    private GUIStyle s_walletStyle;
+    private GUIStyle s_dStyle;
+    private GUIStyle s_nextDayStyle;
+    private GUIStyle s_hudBgStyle;
+    private GUIStyle s_portraitBtnStyle;
+    private GUIStyle s_labelStyle;
+    private GUIStyle s_barBgStyle;
+    private GUIStyle s_hpStyle;
+    private GUIStyle s_textOverBarStyle;
+    private GUIStyle s_mpStyle;
+    private GUIStyle s_xpStyle;
+    private GUIStyle s_winStyle;
+    private GUIStyle s_headerStyle;
+    private GUIStyle s_colHeaderStyle;
+    private GUIStyle s_pointsStyle;
+    private GUIStyle s_derivedStyle;
+    private GUIStyle s_eqHeaderStyle;
+    private GUIStyle s_slotLabelStyle;
+    private GUIStyle s_slotEquippedStyle;
+    private GUIStyle s_skillsHeaderStyle;
+    private GUIStyle s_invHeaderStyle;
+    private GUIStyle s_invHelpStyle;
+    private GUIStyle s_tabBtnStyle;
+    private GUIStyle s_slotGridStyle;
 
     // Inventory & Equipment System variables (v18.11.20)
     private int eqBonusSTR = 0;
@@ -1411,7 +1446,7 @@ public class FateCastleManager : MonoBehaviour
         int activeSlot = PlayerPrefs.GetInt("Active_Save_Slot", 0);
         SaveGameSystem.Load(activeSlot, false);
 
-        isContinentGameplayActive = PlayerPrefs.GetInt("ContinentGameplayActive", 0) == 1;
+        isContinentGameplayActive = PlayerPrefs.GetInt("ContinentGameplayActive", 0) == 1 && PlayerPrefs.GetInt("LandedZoneIndex", -1) != -1;
         currentDay = PlayerPrefs.GetInt("Fate_Current_Day", initialDaySetting);
         if (isContinentGameplayActive)
         {
@@ -1517,6 +1552,11 @@ public class FateCastleManager : MonoBehaviour
             }
         }
 
+        if (clickCooldown > 0f)
+        {
+            clickCooldown -= Time.deltaTime;
+        }
+
         // Raycast click tracking on 3D castle structures
         HandleCastleClicks();
 
@@ -1567,6 +1607,8 @@ public class FateCastleManager : MonoBehaviour
 
     private void HandleCastleClicks()
     {
+        if (clickCooldown > 0f) return;
+
         // Avoid clicking 3D structures if continent gameplay is not fully active, town view is active, day overlay is showing, or stats panel/details/popups are open
         if (!isContinentGameplayActive || isTownViewActive || showNewDayOverlay || showStatsPanel || isDetailsOpen || showTroopDetailPopup || showCastleCalibrationPanel) return;
 
@@ -1823,11 +1865,12 @@ public class FateCastleManager : MonoBehaviour
     /// </summary>
     public void SpawnAllCastles()
     {
-        // Если геймплей на континенте еще не активен и идет стартовый диалог,
-        // мы НЕ должны спавнить 3D-замки на сцене!
-        if (!isContinentGameplayActive && DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.IsDialogueActive)
+        // Если геймплей на континенте еще не активен и идет начальный вводный диалог (шаги 0-7),
+        // мы НЕ должны спавнить 3D-замки на сцене. Но если они уже выбрали точку высадки (шаг >= 8),
+        // замки должны быть заспавнены!
+        if (!isContinentGameplayActive && DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.IsDialogueActive && DialogueSystem_Manager.Instance.CurrentLineIndex < 8)
         {
-            Debug.Log("[CASTLE MGR] Пропуск спавна 3D-замков: Геймплей на континенте еще не активен (идет диалог).");
+            Debug.Log("[CASTLE MGR] Пропуск спавна 3D-замков: Идет начальный вводный диалог (выбор высадки).");
             return;
         }
 
@@ -2633,42 +2676,52 @@ public class FateCastleManager : MonoBehaviour
         if (curLang == 8) goldText = "国库金币: ";
         if (curLang == 7) goldText = "소지금: ";
 
-        GUIStyle walletStyle = new GUIStyle(GUI.skin.box);
-        walletStyle.fontSize = 16;
-        walletStyle.fontStyle = FontStyle.Bold;
-        walletStyle.normal.textColor = new Color(1.0f, 0.84f, 0.0f, 1.0f);
-        walletStyle.alignment = TextAnchor.MiddleCenter;
+        if (s_walletStyle == null)
+        {
+            s_walletStyle = new GUIStyle(GUI.skin.box);
+            s_walletStyle.fontSize = 16;
+            s_walletStyle.fontStyle = FontStyle.Bold;
+            s_walletStyle.normal.textColor = new Color(1.0f, 0.84f, 0.0f, 1.0f);
+            s_walletStyle.alignment = TextAnchor.MiddleCenter;
+        }
 
-        GUI.Box(new Rect(Screen.width - 240f, 20f, 220f, 42f), $"💰 {goldText}{SaveGameSystem.CurrentData.gold}", walletStyle);
+        GUI.Box(new Rect(Screen.width - 240f, 20f, 220f, 42f), $"💰 {goldText}{SaveGameSystem.CurrentData.gold}", s_walletStyle);
 
         // 2. Индикатор Дня
         string dayLabel = curLang == 0 ? "День: " : "Day: ";
         if (curLang == 8) dayLabel = "当前天数: ";
         if (curLang == 7) dayLabel = "일차: ";
 
-        GUIStyle dStyle = new GUIStyle(GUI.skin.box);
-        dStyle.fontSize = 14;
-        dStyle.fontStyle = FontStyle.Bold;
-        dStyle.normal.textColor = new Color(0.12f, 0.88f, 1.0f, 1.0f);
-        dStyle.alignment = TextAnchor.MiddleCenter;
+        if (s_dStyle == null)
+        {
+            s_dStyle = new GUIStyle(GUI.skin.box);
+            s_dStyle.fontSize = 14;
+            s_dStyle.fontStyle = FontStyle.Bold;
+            s_dStyle.normal.textColor = new Color(0.12f, 0.88f, 1.0f, 1.0f);
+            s_dStyle.alignment = TextAnchor.MiddleCenter;
+        }
 
-        GUI.Box(new Rect(Screen.width - 240f, 65f, 220f, 38f), $"📅 {dayLabel}{currentDay}", dStyle);
+        GUI.Box(new Rect(Screen.width - 240f, 65f, 220f, 38f), $"📅 {dayLabel}{currentDay}", s_dStyle);
 
         // 3. Кнопка "Пропустить ход" UI
         string nextDayBtnText = curLang == 0 ? "ПРОПУСТИТЬ ХОД" : "END TURN";
         if (curLang == 8) nextDayBtnText = "结束回合";
         if (curLang == 7) nextDayBtnText = "턴 넘기기";
 
-        GUIStyle nextDayStyle = new GUIStyle(GUI.skin.button);
-        nextDayStyle.fontSize = 13;
-        nextDayStyle.fontStyle = FontStyle.Bold;
-        nextDayStyle.normal.textColor = Color.white;
-        nextDayStyle.alignment = TextAnchor.MiddleCenter;
+        if (s_nextDayStyle == null)
+        {
+            s_nextDayStyle = new GUIStyle(GUI.skin.button);
+            s_nextDayStyle.fontSize = 13;
+            s_nextDayStyle.fontStyle = FontStyle.Bold;
+            s_nextDayStyle.normal.textColor = Color.white;
+            s_nextDayStyle.alignment = TextAnchor.MiddleCenter;
+        }
 
-        if (!isDetailsOpen)
+        // Блокируем кнопку "Пропустить ход", если открыта панель управления персонажем (showStatsPanel) или детали
+        if (!isDetailsOpen && !showStatsPanel)
         {
             GUI.backgroundColor = new Color(0.1f, 0.65f, 0.95f, 1.0f);
-            if (GUI.Button(new Rect(Screen.width - 240f, 107f, 220f, 44f), $"▶ {nextDayBtnText}", nextDayStyle))
+            if (GUI.Button(new Rect(Screen.width - 240f, 107f, 220f, 44f), $"▶ {nextDayBtnText}", s_nextDayStyle))
             {
                 AdvanceDay();
             }
@@ -2740,6 +2793,13 @@ public class FateCastleManager : MonoBehaviour
         portraitBtnStyle.alignment = TextAnchor.MiddleCenter;
         portraitBtnStyle.normal.textColor = avatarGlowColor;
         
+        // Блокируем управление персонажем при активных других панелях (диалог, город, детали)
+        bool blockCharacterPanel = isTownViewActive || isDetailsOpen || showNewDayOverlay || showCastleCalibrationPanel || (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.IsDialogueActive);
+        if (blockCharacterPanel)
+        {
+            GUI.enabled = false;
+        }
+
         // Кнопка аватара (при нажатии раскрывает меню распределения характеристик)
         if (GUI.Button(new Rect(30f, 30f, 65f, 65f), avatarSymbol, portraitBtnStyle))
         {
@@ -2753,6 +2813,8 @@ public class FateCastleManager : MonoBehaviour
                 SettingsManager.Instance.PlayHoverSound(0);
             }
         }
+        
+        GUI.enabled = true;
         
         // Имя и класс героя
         GUIStyle labelStyle = new GUIStyle(GUI.skin.label);
@@ -2920,10 +2982,12 @@ public class FateCastleManager : MonoBehaviour
         {
             showStatsPanel = false;
             Time.timeScale = 1f; // Resume gameplay
+            clickCooldown = 0.25f;
             if (SettingsManager.Instance != null)
             {
                 SettingsManager.Instance.PlayHoverSound(0);
             }
+            GUIUtility.ExitGUI();
         }
         GUI.backgroundColor = Color.white;
         GUI.enabled = true;
@@ -3042,8 +3106,6 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.Label(curLang == 0 ? "🛡️ СНАРЯЖЕНИЕ ПЕРСОНАЖА" : "🛡️ HERO EQUIPMENT", eqHeaderStyle);
         GUILayout.Space(4);
         
-        GUILayout.BeginHorizontal(GUI.skin.box, GUILayout.Height(180));
-        
         GUIStyle slotLabelStyle = new GUIStyle(GUI.skin.label);
         slotLabelStyle.alignment = TextAnchor.MiddleCenter;
         slotLabelStyle.fontSize = 10;
@@ -3054,111 +3116,93 @@ public class FateCastleManager : MonoBehaviour
         slotEquippedStyle.richText = true;
         slotEquippedStyle.alignment = TextAnchor.MiddleCenter;
         slotEquippedStyle.normal.textColor = Color.yellow;
-
-        // LEFT COLUMN: Slot 8 (Weapon)
-        GUILayout.BeginVertical(GUILayout.Width(80));
-        GUILayout.Label(curLang == 0 ? "⚔️ Слот 8" : "⚔️ Slot 8", slotLabelStyle);
-        GUI.backgroundColor = new Color(0.12f, 0.75f, 0.95f, 0.35f);
         
-        InventoryItem wpnItem = playerEquipment.slots[8];
-        if (wpnItem != null && !string.IsNullOrEmpty(wpnItem.id))
-        {
-            if (GUILayout.Button($"<b>[ 8 ] ⚔️</b>\n{wpnItem.name}\n<color=cyan>Tier {wpnItem.level}</color>\n<size=8>Нажмите,\nчтобы снять</size>", slotEquippedStyle, GUILayout.Height(140), GUILayout.Width(76)))
-            {
-                UnequipItem(8);
-            }
-        }
-        else
-        {
-            string emptyWpn = curLang == 0 ? "[ Оружие ]" : "[ Weapon ]";
-            if (GUILayout.Button(emptyWpn, GUILayout.Height(140), GUILayout.Width(76)))
-            {
-                ShowFeedback(curLang == 0 ? "Экипируйте Оружие через инвентарь справа!" : "Equip Weapon through inventory on the right!");
-            }
-        }
-        GUI.backgroundColor = Color.white;
-        GUILayout.EndVertical();
-
-        // MIDDLE 2 COLUMN grid for standard slots
-        GUILayout.BeginVertical();
+        GUILayout.BeginVertical(GUI.skin.box);
         
-        // First Row: Slots 1, 2
+        // Row 1: Head (Helmet - Slot 1)
         GUILayout.BeginHorizontal();
-        DrawEquippedSlotButton(1, "Шлем", "Helmet", curLang, slotEquippedStyle, 44);
-        DrawEquippedSlotButton(2, "Доспех", "Armor", curLang, slotEquippedStyle, 44);
+        GUILayout.FlexibleSpace();
+        DrawEquippedSlotButtonAnatomical(1, "Шлем", "Helmet", curLang, slotEquippedStyle, 36, 110);
+        GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
+        GUILayout.Space(3);
 
-        // Second Row: Slots 3, 4
+        // Row 2: Neck (Amulet - Slot 7)
         GUILayout.BeginHorizontal();
-        DrawEquippedSlotButton(3, "Поножи", "Greaves", curLang, slotEquippedStyle, 44);
-        DrawEquippedSlotButton(4, "Перчатки", "Gloves", curLang, slotEquippedStyle, 44);
+        GUILayout.FlexibleSpace();
+        DrawEquippedSlotButtonAnatomical(7, "Амулет", "Amulet", curLang, slotEquippedStyle, 36, 110);
+        GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
+        GUILayout.Space(3);
 
-        // Third Row: Slots 5, 6
+        // Row 3: Torso and Arms (Weapon - Slot 8 | Armor - Slot 2 | Gloves - Slot 4)
         GUILayout.BeginHorizontal();
-        DrawEquippedSlotButton(5, "Сапоги", "Boots", curLang, slotEquippedStyle, 44);
-        DrawEquippedSlotButton(6, "Кольцо", "Ring", curLang, slotEquippedStyle, 44);
+        DrawEquippedSlotButtonAnatomical(8, "Оружие", "Weapon", curLang, slotEquippedStyle, 40, 94);
+        GUILayout.Space(2);
+        DrawEquippedSlotButtonAnatomical(2, "Доспех", "Armor", curLang, slotEquippedStyle, 40, 94);
+        GUILayout.Space(2);
+        DrawEquippedSlotButtonAnatomical(4, "Перчатки", "Gloves", curLang, slotEquippedStyle, 40, 94);
+        GUILayout.EndHorizontal();
+        GUILayout.Space(3);
+
+        // Row 4: Legs & Accessories (Ring - Slot 6 | Greaves - Slot 3)
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        DrawEquippedSlotButtonAnatomical(6, "Кольцо", "Ring", curLang, slotEquippedStyle, 36, 94);
+        GUILayout.Space(4);
+        DrawEquippedSlotButtonAnatomical(3, "Поножи", "Greaves", curLang, slotEquippedStyle, 36, 110);
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+        GUILayout.Space(3);
+
+        // Row 5: Feet (Boots - Slot 5)
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        DrawEquippedSlotButtonAnatomical(5, "Сапоги", "Boots", curLang, slotEquippedStyle, 36, 110);
+        GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
 
         GUILayout.EndVertical();
-
-        // RIGHT COLUMN: Slot 7 (Amulet)
-        GUILayout.BeginVertical(GUILayout.Width(80));
-        GUILayout.Label(curLang == 0 ? "🔮 Слот 7" : "🔮 Slot 7", slotLabelStyle);
-        GUI.backgroundColor = new Color(0.12f, 0.75f, 0.95f, 0.35f);
-        
-        InventoryItem amuItem = playerEquipment.slots[7];
-        if (amuItem != null && !string.IsNullOrEmpty(amuItem.id))
-        {
-            if (GUILayout.Button($"<b>[ 7 ] 🔮</b>\n{amuItem.name}\n<color=cyan>Tier {amuItem.level}</color>\n<size=8>Нажмите,\nчтобы снять</size>", slotEquippedStyle, GUILayout.Height(140), GUILayout.Width(76)))
-            {
-                UnequipItem(7);
-            }
-        }
-        else
-        {
-            string emptyAmu = curLang == 0 ? "[ Амулет ]" : "[ Amulet ]";
-            if (GUILayout.Button(emptyAmu, GUILayout.Height(140), GUILayout.Width(76)))
-            {
-                ShowFeedback(curLang == 0 ? "Экипируйте Амулет через инвентарь справа!" : "Equip Amulet through inventory on the right!");
-            }
-        }
-        GUI.backgroundColor = Color.white;
-        GUILayout.EndVertical();
-
-        GUILayout.EndHorizontal();
         GUILayout.Space(8);
 
         // BOTTOM HALF: КЛАССОВЫЕ НАВЫКИ (Class Skills)
-        GUIStyle skillsHeaderStyle = new GUIStyle(GUI.skin.label);
-        skillsHeaderStyle.alignment = TextAnchor.MiddleCenter;
-        skillsHeaderStyle.fontSize = 13;
-        skillsHeaderStyle.fontStyle = FontStyle.Bold;
-        skillsHeaderStyle.normal.textColor = new Color(0.9f, 0.3f, 0.9f);
-        GUILayout.Label(curLang == 0 ? "🔮 АКТИВНЫЕ И ПАССИВНЫЕ НАВЫКИ" : "🔮 ACTIVE & PASSIVE SKILLS", skillsHeaderStyle);
+        // Сбрасываем флаг наведения в начале отрисовки группы навыков
+        isHoveringSkill = false;
+
+        if (s_skillsHeaderStyle == null)
+        {
+            s_skillsHeaderStyle = new GUIStyle(GUI.skin.label);
+            s_skillsHeaderStyle.alignment = TextAnchor.MiddleCenter;
+            s_skillsHeaderStyle.fontSize = 13;
+            s_skillsHeaderStyle.fontStyle = FontStyle.Bold;
+            s_skillsHeaderStyle.normal.textColor = new Color(0.9f, 0.3f, 0.9f);
+        }
+        GUILayout.Label(curLang == 0 ? "🔮 АКТИВНЫЕ И ПАССИВНЫЕ НАВЫКИ" : "🔮 ACTIVE & PASSIVE SKILLS", s_skillsHeaderStyle);
         GUILayout.Space(4);
 
         // Load class skill icons if needed
         LoadClassSkillsIcons();
 
-        // 2x2 grid of passive and ultimate skills (LARGER sizes as requested)
+        // 2x2 grid of passive and ultimate skills (UNCLICKABLE & HOVERABLE as requested)
         GUILayout.BeginHorizontal();
         
         // Skill 1 (Passive 1)
         GUILayout.BeginVertical();
         GUILayout.Label(curLang == 0 ? "🌟 Пассивный 1" : "🌟 Passive 1", slotLabelStyle);
-        if (GUILayout.Button(activeSkillPassive1 != null ? activeSkillPassive1 : Texture2D.whiteTexture, GUILayout.Width(150), GUILayout.Height(100)))
+        GUILayout.Box(activeSkillPassive1 != null ? activeSkillPassive1 : Texture2D.whiteTexture, GUILayout.Width(150), GUILayout.Height(100));
+        if (Event.current.type == EventType.Repaint && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
         {
-            ShowSkillDetailPopup(1, curLang);
+            SetHoveredSkill(1, curLang);
         }
         GUILayout.EndVertical();
 
         // Skill 2 (Passive 2)
         GUILayout.BeginVertical();
         GUILayout.Label(curLang == 0 ? "🌟 Пассивный 2" : "🌟 Passive 2", slotLabelStyle);
-        if (GUILayout.Button(activeSkillPassive2 != null ? activeSkillPassive2 : Texture2D.whiteTexture, GUILayout.Width(150), GUILayout.Height(100)))
+        GUILayout.Box(activeSkillPassive2 != null ? activeSkillPassive2 : Texture2D.whiteTexture, GUILayout.Width(150), GUILayout.Height(100));
+        if (Event.current.type == EventType.Repaint && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
         {
-            ShowSkillDetailPopup(2, curLang);
+            SetHoveredSkill(2, curLang);
         }
         GUILayout.EndVertical();
 
@@ -3170,9 +3214,10 @@ public class FateCastleManager : MonoBehaviour
         // Skill 3 (Passive 3)
         GUILayout.BeginVertical();
         GUILayout.Label(curLang == 0 ? "🌟 Пассивный 3" : "🌟 Passive 3", slotLabelStyle);
-        if (GUILayout.Button(activeSkillPassive3 != null ? activeSkillPassive3 : Texture2D.whiteTexture, GUILayout.Width(150), GUILayout.Height(100)))
+        GUILayout.Box(activeSkillPassive3 != null ? activeSkillPassive3 : Texture2D.whiteTexture, GUILayout.Width(150), GUILayout.Height(100));
+        if (Event.current.type == EventType.Repaint && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
         {
-            ShowSkillDetailPopup(3, curLang);
+            SetHoveredSkill(3, curLang);
         }
         GUILayout.EndVertical();
 
@@ -3180,9 +3225,10 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.BeginVertical();
         GUILayout.Label(curLang == 0 ? "⚡ УЛЬТИМЕЙТ" : "⚡ ULTIMATE", slotLabelStyle);
         GUI.backgroundColor = new Color(1.0f, 0.4f, 0.4f, 0.9f);
-        if (GUILayout.Button(activeSkillUltimate != null ? activeSkillUltimate : Texture2D.whiteTexture, GUILayout.Width(150), GUILayout.Height(100)))
+        GUILayout.Box(activeSkillUltimate != null ? activeSkillUltimate : Texture2D.whiteTexture, GUILayout.Width(150), GUILayout.Height(100));
+        if (Event.current.type == EventType.Repaint && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
         {
-            ShowSkillDetailPopup(4, curLang);
+            SetHoveredSkill(4, curLang);
         }
         GUI.backgroundColor = Color.white;
         GUILayout.EndVertical();
@@ -3216,14 +3262,18 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.Label(invHelpText, invHelpStyle);
         GUILayout.Space(6);
 
-        // Pagination tabs bar (Tabs 1 to 28 representing 999 slots)
+        // Pagination tabs bar (Tabs 1 to 28 representing 999 slots) - now inside a horizontal ScrollView to support scrolling!
+        tabsScroll = GUILayout.BeginScrollView(tabsScroll, GUILayout.Height(38), GUILayout.ExpandWidth(true));
         GUILayout.BeginHorizontal();
         int unlockedCount = GetUnlockedSlotsCount();
         int purchasedCount = GetPurchasedSlotsCount();
 
-        GUIStyle tabBtnStyle = new GUIStyle(GUI.skin.button);
-        tabBtnStyle.fontSize = 10;
-        tabBtnStyle.fontStyle = FontStyle.Bold;
+        if (s_tabBtnStyle == null)
+        {
+            s_tabBtnStyle = new GUIStyle(GUI.skin.button);
+            s_tabBtnStyle.fontSize = 10;
+            s_tabBtnStyle.fontStyle = FontStyle.Bold;
+        }
 
         // Draw tab buttons
         for (int t = 0; t < 28; t++)
@@ -3244,7 +3294,7 @@ public class FateCastleManager : MonoBehaviour
                     GUI.backgroundColor = new Color(0.18f, 0.45f, 0.7f, 0.85f);
                 }
 
-                if (GUILayout.Button(tabName, tabBtnStyle, GUILayout.Width(52), GUILayout.Height(24)))
+                if (GUILayout.Button(tabName, s_tabBtnStyle, GUILayout.Width(52), GUILayout.Height(24)))
                 {
                     currentInventoryTab = t;
                     if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
@@ -3254,26 +3304,32 @@ public class FateCastleManager : MonoBehaviour
             {
                 GUI.backgroundColor = new Color(0.25f, 0.25f, 0.25f, 0.5f);
                 GUI.enabled = false;
-                GUILayout.Button("🔒 " + tabName, tabBtnStyle, GUILayout.Width(52), GUILayout.Height(24));
+                GUILayout.Button("🔒 " + tabName, s_tabBtnStyle, GUILayout.Width(52), GUILayout.Height(24));
                 GUI.enabled = true;
             }
             GUI.backgroundColor = Color.white;
         }
         GUILayout.EndHorizontal();
+        GUILayout.EndScrollView();
         GUILayout.Space(8);
         
         // Beautiful 6x6 grid of 36 slots
-        GUIStyle slotGridStyle = new GUIStyle(GUI.skin.button);
-        slotGridStyle.fontSize = 9;
-        slotGridStyle.padding = new RectOffset(2, 2, 2, 2);
-        slotGridStyle.richText = true;
+        if (s_slotGridStyle == null)
+        {
+            s_slotGridStyle = new GUIStyle(GUI.skin.button);
+            s_slotGridStyle.fontSize = 8; // Slightly smaller to prevent text clipping
+            s_slotGridStyle.padding = new RectOffset(1, 1, 1, 1);
+            s_slotGridStyle.richText = true;
+            s_slotGridStyle.wordWrap = true;
+            s_slotGridStyle.alignment = TextAnchor.MiddleCenter;
+        }
         
         invScroll = GUILayout.BeginScrollView(invScroll, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         
         int gridColumns = 6;
         int gridRows = 6;
         int startSlotIndex = currentInventoryTab * 36;
-
+ 
         for (int row = 0; row < gridRows; row++)
         {
             GUILayout.BeginHorizontal();
@@ -3284,11 +3340,11 @@ public class FateCastleManager : MonoBehaviour
                 {
                     // Draw placeholder
                     GUI.backgroundColor = new Color(0.1f, 0.12f, 0.18f, 0.3f);
-                    GUILayout.Button("-", slotGridStyle, GUILayout.Width(76), GUILayout.Height(76));
+                    GUILayout.Button("-", s_slotGridStyle, GUILayout.Width(76), GUILayout.Height(76));
                     GUI.backgroundColor = Color.white;
                     continue;
                 }
-
+ 
                 if (index < unlockedCount)
                 {
                     InventoryItem item = playerInventory.items[index];
@@ -3303,7 +3359,13 @@ public class FateCastleManager : MonoBehaviour
                         string localizedName = GetLocalizedItemName(item, curLang);
                         if (item.slotType == 0)
                         {
-                            label = $"{GetEmojiForSlot(0)}\n{colorTag}{localizedName}</color>\nx{item.count}";
+                            // Shorten "Зелье Жизни" to "Зел. Жизни" to avoid wrapping clipping of letter 'З' inside the small slot button
+                            string shortName = localizedName;
+                            if (curLang == 0)
+                            {
+                                shortName = shortName.Replace("Зелье Жизни", "Зел. Жизни").Replace("Зелье Силы", "Зел. Силы").Replace("Зелье Защиты", "Зел. Защиты");
+                            }
+                            label = $"{GetEmojiForSlot(0)}\n{colorTag}{shortName}</color>\nx{item.count}";
                             GUI.backgroundColor = new Color(0.15f, 0.8f, 0.3f, 0.25f);
                         }
                         else
@@ -3312,7 +3374,7 @@ public class FateCastleManager : MonoBehaviour
                             GUI.backgroundColor = new Color(0.85f, 0.65f, 0.15f, 0.25f);
                         }
                         
-                        if (GUILayout.Button(label, slotGridStyle, GUILayout.Width(76), GUILayout.Height(76)))
+                        if (GUILayout.Button(label, s_slotGridStyle, GUILayout.Width(76), GUILayout.Height(76)))
                         {
                             EquipOrUseItem(index);
                         }
@@ -3320,7 +3382,7 @@ public class FateCastleManager : MonoBehaviour
                     else
                     {
                         GUI.backgroundColor = new Color(0.1f, 0.12f, 0.18f, 0.6f);
-                        if (GUILayout.Button($"[ #{index + 1} ]\n[ Пусто ]", slotGridStyle, GUILayout.Width(76), GUILayout.Height(76)))
+                        if (GUILayout.Button($"[ #{index + 1} ]\n[ Пусто ]", s_slotGridStyle, GUILayout.Width(76), GUILayout.Height(76)))
                         {
                             // Click empty
                         }
@@ -3337,8 +3399,8 @@ public class FateCastleManager : MonoBehaviour
                         : $"🔒 Slot {index + 1}\nUnlock\nFor {cost} 💰";
                     if (curLang == 8) buyLabel = $"🔒 槽位 {index + 1}\n解锁\n需要 {cost} 💰";
                     if (curLang == 7) buyLabel = $"🔒 슬롯 {index + 1}\n잠금 해제\n{cost} 💰";
-
-                    if (GUILayout.Button(buyLabel, slotGridStyle, GUILayout.Width(76), GUILayout.Height(76)))
+ 
+                    if (GUILayout.Button(buyLabel, s_slotGridStyle, GUILayout.Width(76), GUILayout.Height(76)))
                     {
                         if (SaveGameSystem.CurrentData.gold < cost)
                         {
@@ -3358,7 +3420,7 @@ public class FateCastleManager : MonoBehaviour
                     GUI.backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.5f);
                     GUI.enabled = false;
                     string locLocked = curLang == 0 ? "🔒 Закрыто" : "🔒 Locked";
-                    GUILayout.Button(locLocked, slotGridStyle, GUILayout.Width(76), GUILayout.Height(76));
+                    GUILayout.Button(locLocked, s_slotGridStyle, GUILayout.Width(76), GUILayout.Height(76));
                     GUI.enabled = true;
                 }
                 GUI.backgroundColor = Color.white;
@@ -3483,6 +3545,71 @@ public class FateCastleManager : MonoBehaviour
             GUILayout.EndHorizontal();
             GUILayout.EndArea();
         }
+
+        // Draw skill hover tooltip following the mouse cursor (v18.11.22) using pure GUI (NO GUILayout!)
+        if (isHoveringSkill)
+        {
+            Vector2 mousePos = Event.current.mousePosition;
+            float tooltipWidth = 280f;
+            float tooltipHeight = 165f;
+            
+            // Offset tooltip so it does not cover the cursor
+            float tooltipX = mousePos.x + 15f;
+            float tooltipY = mousePos.y + 15f;
+            
+            // Constrain within the game screen boundaries
+            if (tooltipX + tooltipWidth > Screen.width) tooltipX = Screen.width - tooltipWidth - 10f;
+            if (tooltipY + tooltipHeight > Screen.height) tooltipY = Screen.height - tooltipHeight - 10f;
+            
+            Rect tooltipRect = new Rect(tooltipX, tooltipY, tooltipWidth, tooltipHeight);
+            
+            // Draw background box using pure GUI.Box (No GUILayout!)
+            GUIStyle hoverBgStyle = new GUIStyle(GUI.skin.box);
+            hoverBgStyle.normal.background = winBgTex; // Glassmorphic background
+            GUI.Box(tooltipRect, "", hoverBgStyle);
+            
+            // Let's draw elements inside the tooltip using pure GUI (No GUILayout!)
+            // Title
+            GUIStyle hoverTitleStyle = new GUIStyle(GUI.skin.label);
+            hoverTitleStyle.fontSize = 13;
+            hoverTitleStyle.fontStyle = FontStyle.Bold;
+            hoverTitleStyle.normal.textColor = new Color(0.9f, 0.45f, 0.9f);
+            hoverTitleStyle.alignment = TextAnchor.MiddleCenter;
+            GUI.Label(new Rect(tooltipX + 10, tooltipY + 8, tooltipWidth - 20, 20), hoveredSkillName, hoverTitleStyle);
+            
+            // Skill Type (Passive/Ultimate)
+            GUIStyle hoverTypeStyle = new GUIStyle(GUI.skin.label);
+            hoverTypeStyle.fontSize = 10;
+            hoverTypeStyle.fontStyle = FontStyle.Italic;
+            hoverTypeStyle.normal.textColor = Color.cyan;
+            hoverTypeStyle.alignment = TextAnchor.MiddleCenter;
+            string skillTypeLabel = hoveredSkillType == "Ultimate" 
+                ? (curLang == 0 ? "⚡ СУПЕРУДАР" : "⚡ ULTIMATE") 
+                : (curLang == 0 ? "🌟 ПАССИВНЫЙ НАВЫК" : "🌟 PASSIVE SKILL");
+            GUI.Label(new Rect(tooltipX + 10, tooltipY + 28, tooltipWidth - 20, 16), skillTypeLabel, hoverTypeStyle);
+            
+            // Icon
+            Rect iconRect = new Rect(tooltipX + 12, tooltipY + 50, 50, 50);
+            if (hoveredSkillIcon != null)
+            {
+                GUI.DrawTexture(iconRect, hoveredSkillIcon);
+            }
+            else
+            {
+                GUIStyle emojiStyle = new GUIStyle(GUI.skin.label);
+                emojiStyle.alignment = TextAnchor.MiddleCenter;
+                emojiStyle.fontSize = 24;
+                GUI.Label(iconRect, "🔮", emojiStyle);
+            }
+            
+            // Description
+            GUIStyle hoverDescStyle = new GUIStyle(GUI.skin.label);
+            hoverDescStyle.fontSize = 10;
+            hoverDescStyle.wordWrap = true;
+            hoverDescStyle.alignment = TextAnchor.UpperLeft;
+            hoverDescStyle.normal.textColor = Color.white;
+            GUI.Label(new Rect(tooltipX + 70, tooltipY + 48, tooltipWidth - 80, tooltipHeight - 60), hoveredSkillDesc, hoverDescStyle);
+        }
     }
 
     private void DrawEquippedSlotButton(int slotType, string defaultNameRU, string defaultNameEN, int curLang, GUIStyle style, float height = 28)
@@ -3505,6 +3632,35 @@ public class FateCastleManager : MonoBehaviour
         {
             string emptyLabel = curLang == 0 ? $"[ Нет {defaultNameRU} ]" : $"[ Empty {defaultNameEN} ]";
             if (GUILayout.Button(emptyLabel, GUILayout.Height(height), GUILayout.Width(220)))
+            {
+                ShowFeedback(curLang == 0 ? $"Экипируйте {defaultNameRU} через инвентарь справа!" : $"Equip {defaultNameEN} through inventory on the right!");
+            }
+        }
+        GUI.backgroundColor = Color.white;
+        GUILayout.EndHorizontal();
+    }
+
+    private void DrawEquippedSlotButtonAnatomical(int slotType, string defaultNameRU, string defaultNameEN, int curLang, GUIStyle style, float height, float buttonWidth)
+    {
+        InventoryItem item = playerEquipment.slots[slotType];
+        
+        GUILayout.BeginHorizontal(GUILayout.Width(buttonWidth + 24));
+        GUILayout.Label($"<b>{GetEmojiForSlot(slotType)}</b>", GUILayout.Width(18), GUILayout.Height(height));
+        
+        GUI.backgroundColor = new Color(0.12f, 0.75f, 0.95f, 0.35f);
+        if (item != null && !string.IsNullOrEmpty(item.id))
+        {
+            string displayName = item.name.Length > 10 ? item.name.Substring(0, 8) + ".." : item.name;
+            string btnText = $"<b>{displayName}</b>\n(T{item.level}) <color=red>✖</color>";
+            if (GUILayout.Button(btnText, style, GUILayout.Height(height), GUILayout.Width(buttonWidth)))
+            {
+                UnequipItem(slotType);
+            }
+        }
+        else
+        {
+            string emptyLabel = curLang == 0 ? $"[{defaultNameRU}]" : $"[{defaultNameEN}]";
+            if (GUILayout.Button(emptyLabel, GUILayout.Height(height), GUILayout.Width(buttonWidth)))
             {
                 ShowFeedback(curLang == 0 ? $"Экипируйте {defaultNameRU} через инвентарь справа!" : $"Equip {defaultNameEN} through inventory on the right!");
             }
@@ -3632,6 +3788,137 @@ public class FateCastleManager : MonoBehaviour
         }
 
         OpenSkillDetailPopup(sName, sDesc, icon, skillType);
+    }
+
+    private void SetHoveredSkill(int oneBasedIndex, int curLang)
+    {
+        isHoveringSkill = true;
+        int index = oneBasedIndex - 1;
+        
+        string cl = SaveGameSystem.CurrentData != null && SaveGameSystem.CurrentData.characterClass != null 
+            ? SaveGameSystem.CurrentData.characterClass.ToLower() 
+            : "warrior";
+
+        int skillBonusLevel = SaveGameSystem.CurrentData != null ? SaveGameSystem.CurrentData.playerLevel / 10 : 0;
+
+        if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow") || cl.Contains("лучник") || cl.Contains("стрел") || cl.Contains("охотн"))
+        {
+            if (index == 0) 
+            { 
+                hoveredSkillName = curLang == 0 ? "Крит-Мастер" : "Crit-Master"; 
+                hoveredSkillDesc = curLang == 0 
+                    ? $"Повышает вероятность нанесения критического урона на {15 + 2 * skillBonusLevel}% (База 15% + {2 * skillBonusLevel}% за уровень)" 
+                    : $"+{15 + 2 * skillBonusLevel}% critical hit probability (Base 15% + {2 * skillBonusLevel}% from level)"; 
+                hoveredSkillIcon = activeSkillPassive1; 
+                hoveredSkillType = "Passive"; 
+            }
+            else if (index == 1) 
+            { 
+                hoveredSkillName = "LongShot"; 
+                hoveredSkillDesc = curLang == 0 
+                    ? $"Дальний выстрел: Усиливает урон на расстоянии на {10 + skillBonusLevel}% (База 10% + {skillBonusLevel}% за уровень)" 
+                    : $"+{10 + skillBonusLevel}% damage over wide distance range (Base 10% + {skillBonusLevel}% from level)"; 
+                hoveredSkillIcon = activeSkillPassive2; 
+                hoveredSkillType = "Passive"; 
+            }
+            else if (index == 2) 
+            { 
+                hoveredSkillName = "Evasion"; 
+                hoveredSkillDesc = curLang == 0 
+                    ? $"Поворотливость: Дарует {10 + skillBonusLevel}% шанс полного уклонения от вражеских атак (База 10% + {skillBonusLevel}% за уровень)" 
+                    : $"+{10 + skillBonusLevel}% complete dodge probability (Base 10% + {skillBonusLevel}% from level)"; 
+                hoveredSkillIcon = activeSkillPassive3; 
+                hoveredSkillType = "Passive"; 
+            }
+            else if (index == 3) 
+            { 
+                hoveredSkillName = curLang == 0 ? "Ливень Смерти" : "Death Rain"; 
+                hoveredSkillDesc = curLang == 0 
+                    ? $"Суперудар (CD 3х): Смертоносный град стрел наносит масштабный урон {1.8f + 0.1f * skillBonusLevel:F1}х по всем врагам в зоне (База 1.8х + {0.1f * skillBonusLevel:F1}х за уровень)" 
+                    : $"Ultimate (CD 3t): AoE volley dealing massive {1.8f + 0.1f * skillBonusLevel:F1}x damage to enemies (Base 1.8x + {0.1f * skillBonusLevel:F1}x from level)"; 
+                hoveredSkillIcon = activeSkillUltimate; 
+                hoveredSkillType = "Ultimate"; 
+            }
+        }
+        else if (cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff") || cl.Contains("маг") || cl.Contains("колдун") || cl.Contains("волшеб"))
+        {
+            if (index == 0) 
+            { 
+                hoveredSkillName = "ManaFlow"; 
+                hoveredSkillDesc = curLang == 0 
+                    ? $"Поток маны: Позволяет восстанавливать {5 + skillBonusLevel} очков маны за каждый совершённый ход (База 5 + {skillBonusLevel} за уровень)" 
+                    : $"+{5 + skillBonusLevel} mana points gain per turn (Base 5 + {skillBonusLevel} from level)"; 
+                hoveredSkillIcon = activeSkillPassive1; 
+                hoveredSkillType = "Passive"; 
+            }
+            else if (index == 1) 
+            { 
+                hoveredSkillName = "Elemental"; 
+                hoveredSkillDesc = curLang == 0 
+                    ? $"Сила стихий: Усиливает разрушительный потенциал ваших заклинаний на {15 + 2 * skillBonusLevel}% (База 15% + {2 * skillBonusLevel}% за уровень)" 
+                    : $"+{15 + 2 * skillBonusLevel}% magic spell power booster (Base 15% + {2 * skillBonusLevel}% from level)"; 
+                hoveredSkillIcon = activeSkillPassive2; 
+                hoveredSkillType = "Passive"; 
+            }
+            else if (index == 2) 
+            { 
+                hoveredSkillName = "Resist"; 
+                hoveredSkillDesc = curLang == 0 
+                    ? $"Сопротивление: Наделяет мистическим барьером, поглощающим {15 + skillBonusLevel}% магического урона (База 15% + {skillBonusLevel}% за уровень)" 
+                    : $"+{15 + skillBonusLevel}% spell resistance shield (Base 15% + {skillBonusLevel}% from level)"; 
+                hoveredSkillIcon = activeSkillPassive3; 
+                hoveredSkillType = "Passive"; 
+            }
+            else if (index == 3) 
+            { 
+                hoveredSkillName = "Time Rift"; 
+                hoveredSkillDesc = curLang == 0 
+                    ? $"Суперудар (CD 4х): Изменяет пространственно-временной континуум, замедляя противников на {2 + (skillBonusLevel >= 3 ? 1 : 0)} хода (Эффект замедления: {50 + 5 * skillBonusLevel}%)" 
+                    : $"Ultimate (CD 4t): Slows down enemy actions for {2 + (skillBonusLevel >= 3 ? 1 : 0)} turns (Slow rate: {50 + 5 * skillBonusLevel}%)"; 
+                hoveredSkillIcon = activeSkillUltimate; 
+                hoveredSkillType = "Ultimate"; 
+            }
+        }
+        else // Warrior
+        {
+            if (index == 0) 
+            { 
+                hoveredSkillName = "IronSkin"; 
+                hoveredSkillDesc = curLang == 0 
+                    ? $"Прочная кожа: Увеличивает показатель защиты и стойкости на {15 + 2 * skillBonusLevel}% (База 15% + {2 * skillBonusLevel}% за уровень)" 
+                    : $"+{15 + 2 * skillBonusLevel}% Armor/Defense bonus (Base 15% + {2 * skillBonusLevel}% from level)"; 
+                hoveredSkillIcon = activeSkillPassive1; 
+                hoveredSkillType = "Passive"; 
+            }
+            else if (index == 1) 
+            { 
+                hoveredSkillName = "Regen"; 
+                hoveredSkillDesc = curLang == 0 
+                    ? $"Регенерация: Обеспечивает исцеление вашего героя на {5 + skillBonusLevel} ОЗ каждый игровой ход (База 5 + {skillBonusLevel} за уровень)" 
+                    : $"+{5 + skillBonusLevel} HP recovery per turn (Base 5 + {skillBonusLevel} from level)"; 
+                hoveredSkillIcon = activeSkillPassive2; 
+                hoveredSkillType = "Passive"; 
+            }
+            else if (index == 2) 
+            { 
+                hoveredSkillName = "Threat"; 
+                hoveredSkillDesc = curLang == 0 
+                    ? $"Угроза: Ускоряет накопление боевого духа и провокацию на {10 + skillBonusLevel}% (База 10% + {skillBonusLevel}% за уровень)" 
+                    : $"+{10 + skillBonusLevel}% aggro multiplier bonus (Base 10% + {skillBonusLevel}% from level)"; 
+                hoveredSkillIcon = activeSkillPassive3; 
+                hoveredSkillType = "Passive"; 
+            }
+            else if (index == 3) 
+            { 
+                hoveredSkillName = "TitanShield"; 
+                int shieldRed = Mathf.Min(90, 70 + skillBonusLevel);
+                hoveredSkillDesc = curLang == 0 
+                    ? $"Суперудар (CD 4х): Активирует щит Титанов, снижая входящий физический урон на {shieldRed}% (База 70% + {skillBonusLevel}% за уровень)" 
+                    : $"Ultimate (CD 4t): Blocks {shieldRed}% of incoming physical damage (Base 70% + {skillBonusLevel}% from level)"; 
+                hoveredSkillIcon = activeSkillUltimate; 
+                hoveredSkillType = "Ultimate"; 
+            }
+        }
     }
 
     private void DrawSkillDetailPopup(int curLang)
@@ -4597,6 +4884,8 @@ public class FateCastleManager : MonoBehaviour
                 currentTownSubPanel = 0; // Начинаем всегда с основных Обзор города
                 isDetailsOpen = false;
                 ShowFeedback("");
+                clickCooldown = 0.25f;
+                GUIUtility.ExitGUI();
             }
             GUI.backgroundColor = Color.white;
         }
@@ -4784,6 +5073,8 @@ public class FateCastleManager : MonoBehaviour
         if (GUILayout.Button(closeBtnTxt, GUILayout.Height(36)))
         {
             isDetailsOpen = false;
+            clickCooldown = 0.25f;
+            GUIUtility.ExitGUI();
         }
         GUI.backgroundColor = Color.white;
     }
@@ -5301,6 +5592,8 @@ public class FateCastleManager : MonoBehaviour
         {
             isTownViewActive = false;
             currentTownSubPanel = 0; // Сверхнадежно сбрасываем при выходе в обзор города
+            clickCooldown = 0.25f;
+            GUIUtility.ExitGUI();
         }
         GUI.backgroundColor = Color.white;
 

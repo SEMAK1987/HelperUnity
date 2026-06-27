@@ -114,22 +114,34 @@ namespace FateContinent
 
             // Инициируем диалог СРАЗУ на старте рассеивания темноты, чтобы избежать простоя ("пустого экрана")!
             Debug.Log("[FATE INTRO] Начинаем рассеивание темноты и сразу инициализируем диалог с Аэлиссой...");
-            if (DialogueSystem_Manager.Instance != null)
+            bool isGameplayActive = PlayerPrefs.GetInt("ContinentGameplayActive", 0) == 1 && PlayerPrefs.GetInt("LandedZoneIndex", -1) != -1;
+            if (isGameplayActive)
             {
-                DialogueSystem_Manager.Instance.StartDialogue(0);
-                Debug.Log("[FATE INTRO] Скрипт вовремя вызвал DialogueSystem_Manager.Instance.StartDialogue(0)!");
+                Debug.Log("[FATE INTRO] Активный геймплей уже запущен и точка высадки выбрана. Пропускаем начальные вводные диалоги.");
+                if (FateCastleManager.Instance != null)
+                {
+                    FateCastleManager.Instance.SpawnAllCastles();
+                }
             }
             else
             {
-                Debug.LogWarning("[FATE INTRO] Ожидаемый DialogueSystem_Manager.Instance не обнаружен на сцене! Попробуем запустить поиск.");
-                DialogueSystem_Manager dm = FindFirstObjectByType<DialogueSystem_Manager>();
-                if (dm != null)
+                if (DialogueSystem_Manager.Instance != null)
                 {
-                    dm.StartDialogue(0);
+                    DialogueSystem_Manager.Instance.StartDialogue(0);
+                    Debug.Log("[FATE INTRO] Скрипт вовремя вызвал DialogueSystem_Manager.Instance.StartDialogue(0)!");
                 }
                 else
                 {
-                    Debug.LogError("[FATE INTRO] КРИТИЧЕСКАЯ ОШИБКА: DialogueSystem_Manager отсутствует на сцене! Путнику некому дать задание.");
+                    Debug.LogWarning("[FATE INTRO] Ожидаемый DialogueSystem_Manager.Instance не обнаружен на сцене! Попробуем запустить поиск.");
+                    DialogueSystem_Manager dm = FindFirstObjectByType<DialogueSystem_Manager>();
+                    if (dm != null)
+                    {
+                        dm.StartDialogue(0);
+                    }
+                    else
+                    {
+                        Debug.LogError("[FATE INTRO] КРИТИЧЕСКАЯ ОШИБКА: DialogueSystem_Manager отсутствует на сцене! Путнику некому дать задание.");
+                    }
                 }
             }
 
