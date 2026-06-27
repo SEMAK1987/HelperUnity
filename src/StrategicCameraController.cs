@@ -123,6 +123,15 @@ namespace FateContinent
         {
             if (!isControlEnabled) return;
 
+            // [BLOCK CAMERA WHEN IN TOWN VIEW OR CASTLE DETAILS OPEN]
+            // Предотвращаем любое скольжение или перетаскивание карты, если игрок взаимодействует с замком (своим или вражеским)
+            if (FateCastleManager.Instance != null && (FateCastleManager.Instance.isTownViewActive || FateCastleManager.Instance.isDetailsOpen))
+            {
+                // Сбрасываем таргет-координаты на текущие, чтобы после выхода из панели камера не прыгала
+                targetPosition = transform.position;
+                return;
+            }
+
             // Раз в секунду (приблизительно 60 кадров) пересчитываем границы, если континент масштабируется
             if (autoFitToContinent && Time.frameCount % 60 == 0)
             {

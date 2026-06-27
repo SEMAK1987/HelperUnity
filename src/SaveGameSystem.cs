@@ -178,6 +178,71 @@ public static class SaveGameSystem
     }
 
     /// <summary>
+    /// Полный сброс всех PlayerPrefs-ключей, связанных с кампанией, инвентарем, замками и прогрессом игрока.
+    /// Вызывается при запуске Новой Игры, чтобы предотвратить перенос старых открытых слотов, экипировки и уровней замков.
+    /// </summary>
+    public static void ClearCampaignAndPlayerProgression()
+    {
+        // 1. Очистка инвентаря и экипировки
+        PlayerPrefs.DeleteKey("Player_Inventory_JSON_v18");
+        PlayerPrefs.DeleteKey("Player_Equipment_JSON_v18");
+        PlayerPrefs.DeleteKey("Player_Inventory_Purchased_Slots");
+
+        // 2. Сброс уровней замков, владельцев и разведданных для всех зон (до 16 зон)
+        for (int i = 0; i < 16; i++)
+        {
+            PlayerPrefs.DeleteKey("Castle_Level_" + i);
+            PlayerPrefs.DeleteKey("Castle_Owner_" + i);
+            PlayerPrefs.DeleteKey("Castle_Spied_" + i);
+            PlayerPrefs.DeleteKey("Castle_AI_Troops_" + i);
+            PlayerPrefs.DeleteKey("Castle_AI_Armor_" + i);
+            PlayerPrefs.DeleteKey("Castle_AI_Potions_" + i);
+            PlayerPrefs.DeleteKey("Castle_AI_CommanderLvl_" + i);
+            
+            // Очищаем войска в зонах
+            string[] unitTypes = { "swordsman", "archer", "mage", "knight", "healer", "scout", "beast" };
+            foreach (var ut in unitTypes)
+            {
+                PlayerPrefs.DeleteKey("Player_HiredCount_" + ut + "_Zone_" + i);
+                PlayerPrefs.DeleteKey("Player_Unit_" + ut + "_Zone_" + i);
+            }
+        }
+
+        // 3. Сброс дополнительных ключей прокачки и туториалов
+        PlayerPrefs.DeleteKey("Aelyssa_Character_Tutorial_Done2");
+        PlayerPrefs.DeleteKey("Player_Stats_Autonomous");
+        PlayerPrefs.DeleteKey("Town_Selected_PotionLvl");
+        PlayerPrefs.DeleteKey("Player_ArmyUnit_Rank");
+
+        // Сброс зелий
+        string[] potionIds = { "hp", "str", "def", "xp" };
+        for (int lvl = 1; lvl <= 5; lvl++)
+        {
+            foreach (var pid in potionIds)
+            {
+                PlayerPrefs.DeleteKey($"Player_Potion_{pid}_Lvl_{lvl}");
+            }
+        }
+
+        // Сброс тиров экипировки
+        for (int slot = 1; slot <= 8; slot++)
+        {
+            PlayerPrefs.DeleteKey($"Player_Equipped_Tier_Slot_{slot}");
+        }
+
+        // Сброс опыта компаньонов
+        string[] classes = { "warrior", "archer", "mage", "voin", "strelok", "mag" };
+        foreach (var cl in classes)
+        {
+            PlayerPrefs.DeleteKey("Companion_Lvl_" + cl);
+            PlayerPrefs.DeleteKey("Companion_XP_" + cl);
+        }
+
+        PlayerPrefs.Save();
+        Debug.Log("[FATE SAVE] Все ключи инвентаря, экипировки, войск и замков предыдущих кампаний полностью СБРОШЕНЫ для Новой Игры!");
+    }
+
+    /// <summary>
     /// Вспомогательный метод для выбора слова "Уровень" на соответствующем языке к моменту сохранения
     /// </summary>
     private static string GetLanguageInfoSuffix()

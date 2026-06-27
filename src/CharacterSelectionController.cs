@@ -1034,6 +1034,9 @@ namespace FateContinent
             }
             SaveGameSystem.CurrentData.availableSkillPoints = difficultyBonusPoints;
 
+            // Полностью сбрасываем прогресс, открытые слоты инвентаря и экипировку прошлых игр перед созданием Новой Игры!
+            SaveGameSystem.ClearCampaignAndPlayerProgression();
+
             // Сохраняем в Слот 0 (первичный слот новой игры) и сбрасываем состояние тактической кампании в PlayerPrefs
             PlayerPrefs.SetInt("Active_Save_Slot", 0);
             PlayerPrefs.SetInt("ContinentGameplayActive", 0);

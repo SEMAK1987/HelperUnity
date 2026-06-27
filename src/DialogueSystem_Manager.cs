@@ -703,7 +703,7 @@ namespace FateContinent
         /// </summary>
         public void StartDialogue(int startIndex = 0)
         {
-            if (dialogueSteps.Count < 13 || startIndex == 0)
+            if (dialogueSteps.Count < 14 || startIndex == 0)
             {
                 SetupFallbackDialogues();
             }
@@ -784,7 +784,7 @@ namespace FateContinent
             }
 
             // Переход на следующую реплику
-            if (currentLineIndex == 11)
+            if (currentLineIndex == 12)
             {
                 if (FateCastleManager.Instance != null)
                 {
@@ -1025,7 +1025,7 @@ namespace FateContinent
 
         public void EndDialogue()
         {
-            if (currentLineIndex == 12)
+            if (currentLineIndex == 13)
             {
                 isDialogueActive = false;
                 if (dialogPanel != null)
@@ -2700,15 +2700,15 @@ namespace FateContinent
                 textJA = "個々の城は5段階のアップグレードシステムを採用しています。城のレベルに応じて、ゴールドの自動獲得、部隊の募集、回復薬や装備の購入、軍隊や英雄を訓練する演習場など、甚大な特恵を得られます。",
                 textCH = "每个城堡都采用 5 级升级系统。根据其级别，我们将获得显着的特权：被动金币收益、招募士兵、在店面里购买恢复药水和装备，以及供士兵和我们英雄训练的场所。",
                 textKR = "각 성은 5단계 업그레이드 시스템으로 운영된다. 성의 레벨에 따라 골드 자동 획득, 군사 모집, 치료용 물약 및 풍부한 장비 구매, 그리고 군사들과 영웅을 훈련시킬 연병장 등 거대한 혜택을 제공받게 된다.",
-                choicesRU = new string[] { "Показать наши замки!" },
-                choicesEN = new string[] { "Show our Castles!" },
-                choicesDE = new string[] { "Zeige unsere Burgen!" },
-                choicesFR = new string[] { "Montrer nos châteaux !" },
-                choicesES = new string[] { "¡Muestra nuestros castillos!" },
-                choicesPT = new string[] { "Mostrar nossos castelhos!" },
-                choicesJA = new string[] { "私たちの城を見せて！" },
-                choicesCH = new string[] { "展示我们的城堡！" },
-                choicesKR = new string[] { "우리의 성 보여주기!" },
+                choicesRU = new string[] { "Продолжить" },
+                choicesEN = new string[] { "Continue" },
+                choicesDE = new string[] { "Weiter" },
+                choicesFR = new string[] { "Continuer" },
+                choicesES = new string[] { "Continuar" },
+                choicesPT = new string[] { "Continuar" },
+                choicesJA = new string[] { "続ける" },
+                choicesCH = new string[] { "继续" },
+                choicesKR = new string[] { "계속" },
                 nextLineIndexes = new int[] { 12 }
             };
 
@@ -2735,10 +2735,34 @@ namespace FateContinent
                 nextLineIndexes = null // Конец диалога
             };
 
+            DialogLine l14 = new DialogLine
+            {
+                textRU = "Обрати внимание на интерфейс! В левом углу — Панель Героя (здоровье, мана и текущий уровень). В правом верхнем углу — Казна с королевским золотом и счетчик Дней похода. Кнопка «Пропустить ход» завершает день, начисляет золото из всех твоих замков и передает ход соперникам.",
+                textEN = "Pay attention to the interface! In the top-left corner is the Hero Panel (health, mana, and current level). In the top-right is the Treasury with our royal gold and the campaign Day counter. The 'End Turn' button ends the day, triggers passive castle income, and lets opponents take their actions.",
+                textDE = "Achten Sie auf das Interface! In der linken oberen Ecke befindet sich das Helden-Panel (Leben, Mana und Stufe). Oben rechts ist die Schatzkammer mit Gold und der Tageszähler. Die Schaltfläche 'Zug beenden' beendet den Tag, bringt Goldeinkommen und lässt Gegner agieren.",
+                textFR = "Faites attention à l'interface ! Dans le coin supérieur gauche se trouve le panneau du héros (santé, mana et niveau). En haut à droite se trouve la Trésorerie avec notre or et le compteur de Jours. Le bouton 'Passer le tour' termine la journée, génère des revenus et permet aux adversaires d'agir.",
+                textES = "¡Presta atención a la interfaz! En la esquina superior izquierda está el Panel del Héroe (salud, maná y nivel actual). En la esquina superior derecha está la Tesorería con nuestro oro real y el contador de Días. El botón 'Terminar turno' finaliza el día, genera ingresos y permite actuar a los oponentes.",
+                textPT = "Preste atenção na interface! No canto superior esquerdo está o Painel do Herói (vida, mana e nível atual). No canto superior direito está o Tesouro com nosso ouro e o contador de Dias. O botão 'Terminar Turno' encerra o dia, gera renda passiva e passa a vez aos oponentes.",
+                textJA = "インターフェースに注目してください！左上には英雄パネル（HP、MP、現在のレベル）があります。右上にはゴールドを保管する国庫と遠征の日数インジケーターがあります。「ターン終了」ボタンを押すと、一日が終了して城からの収入が獲得され、敵対勢力へとターンが引き継がれます。",
+                textCH = "请注意游戏界面！左上角是英雄面板（显示生命值、法力值和当前等级）。右上角是存有皇家金币的国库以及战役天数计数器。“结束回合”按钮将结束当前天数，从你的城堡中结算金币税收，并交替对手进行回合。",
+                textKR = "게임 인터페이스를 주목해라! 좌측 상단은 영웅 패널(체력, 마나 및 현재 레벨)이며, 우측 상단은 왕실 소지금 국고와 원정 일수 표시다. '턴 넘기기' 버튼을 누르면 하루가 종료되어 보유한 성들의 일일 세금 수입이 정산되고 상대방의 턴으로 교체된다.",
+                choicesRU = new string[] { "Показать наши замки!" },
+                choicesEN = new string[] { "Show our Castles!" },
+                choicesDE = new string[] { "Zeige unsere Burgen!" },
+                choicesFR = new string[] { "Montrer nos châteaux !" },
+                choicesES = new string[] { "¡Muestra nuestros castillos!" },
+                choicesPT = new string[] { "Mostrar nossos castelhos!" },
+                choicesJA = new string[] { "私たちの城を見せて！" },
+                choicesCH = new string[] { "展示我们的城堡！" },
+                choicesKR = new string[] { "우리의 성 보여주기!" },
+                nextLineIndexes = new int[] { 13 }
+            };
+
             dialogueSteps.Add(l9);
             dialogueSteps.Add(l10);
             dialogueSteps.Add(l11);
             dialogueSteps.Add(l12);
+            dialogueSteps.Add(l14);
             dialogueSteps.Add(l13);
         }
     }

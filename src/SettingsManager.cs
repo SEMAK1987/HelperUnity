@@ -343,7 +343,22 @@ public class SettingsManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"[FATE SETTINGS] Аудиоклип '{sfxName}' не найден в массиве hoverSounds или Resources.");
+            // Умный фолбэк (v18.11.22): Чтобы избежать спама предупреждений в консоли и обеспечить звуковое сопровождение,
+            // если конкретный звуковой клип (например, UI_Click_Metallic) не найден, мы проигрываем первый доступный клип из hoverSounds.
+            bool fallbackPlayed = false;
+            foreach (AudioClip clip in hoverSounds)
+            {
+                if (clip != null)
+                {
+                    sfxSource.PlayOneShot(clip);
+                    fallbackPlayed = true;
+                    break;
+                }
+            }
+            if (!fallbackPlayed)
+            {
+                Debug.Log($"[FATE SETTINGS] Аудиоклип '{sfxName}' не найден в Resources и нет доступных звуков для фолбэка.");
+            }
         }
     }
 

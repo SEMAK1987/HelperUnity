@@ -217,7 +217,7 @@ namespace FateContinent
                 }
             }
 
-            Debug.Log($"[Fate Map] Видимость тактической карты: {visible}, активное кольцо: {currentSelectedRingIndex}");
+            // Debug.Log($"[Fate Map] Видимость тактической карты: {visible}, активное кольцо: {currentSelectedRingIndex}");
         }
 
         // КЛИЕНТСКИЙ СОВМЕСТИМЫЙ ИНТЕРФЕЙС SWITCH TO MAP

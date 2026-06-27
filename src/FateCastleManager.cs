@@ -520,12 +520,82 @@ public class FateCastleManager : MonoBehaviour
         }
         else
         {
-            // First time initialization - fill inventory with starter items
-            playerInventory.items[0] = new InventoryItem { id = "weapon_bronze_1", name = GetItemName(8, 1, 0), iconType = "weapon", slotType = 8, level = 1, count = 1, statBonus = 3 };
-            playerInventory.items[1] = new InventoryItem { id = "helmet_bronze_1", name = GetItemName(1, 1, 0), iconType = "helmet", slotType = 1, level = 1, count = 1, statBonus = 2 };
-            playerInventory.items[2] = new InventoryItem { id = "potion_hp_1", name = "Зелье Жизни (Ур.1)", iconType = "hp", slotType = 0, level = 1, count = 3, statBonus = 0 };
-            playerInventory.items[3] = new InventoryItem { id = "potion_str_1", name = "Зелье Силы (Ур.1)", iconType = "str", slotType = 0, level = 1, count = 1, statBonus = 0 };
-            playerInventory.items[4] = new InventoryItem { id = "potion_def_1", name = "Зелье Защиты (Ур.1)", iconType = "def", slotType = 0, level = 1, count = 1, statBonus = 0 };
+            // First time initialization - fill inventory with starter gear depending on selected difficulty
+            int difficulty = 2; // Default to Normal (2)
+            if (SaveGameSystem.CurrentData != null)
+            {
+                difficulty = SaveGameSystem.CurrentData.selectedDifficulty;
+            }
+            else
+            {
+                difficulty = PlayerPrefs.GetInt("Difficulty", 2);
+            }
+
+            // Define all 8 Novice gear items:
+            List<InventoryItem> allNoviceGear = new List<InventoryItem>
+            {
+                new InventoryItem { id = "helmet_bronze_1", name = GetItemName(1, 1, 0), iconType = "helmet", slotType = 1, level = 1, count = 1, statBonus = 2 },
+                new InventoryItem { id = "pendant_bronze_1", name = GetItemName(2, 1, 0), iconType = "pendant", slotType = 2, level = 1, count = 1, statBonus = 2 },
+                new InventoryItem { id = "pauldrons_bronze_1", name = GetItemName(3, 1, 0), iconType = "pauldrons", slotType = 3, level = 1, count = 1, statBonus = 2 },
+                new InventoryItem { id = "armor_bronze_1", name = GetItemName(4, 1, 0), iconType = "armor", slotType = 4, level = 1, count = 1, statBonus = 4 },
+                new InventoryItem { id = "ring_bronze_1", name = GetItemName(5, 1, 0), iconType = "ring", slotType = 5, level = 1, count = 1, statBonus = 2 },
+                new InventoryItem { id = "belt_bronze_1", name = GetItemName(6, 1, 0), iconType = "belt", slotType = 6, level = 1, count = 1, statBonus = 2 },
+                new InventoryItem { id = "boots_bronze_1", name = GetItemName(7, 1, 0), iconType = "boots", slotType = 7, level = 1, count = 1, statBonus = 2 },
+                new InventoryItem { id = "weapon_bronze_1", name = GetItemName(8, 1, 0), iconType = "weapon", slotType = 8, level = 1, count = 1, statBonus = 3 }
+            };
+
+            List<InventoryItem> gearToGrant = new List<InventoryItem>();
+
+            if (difficulty == 0) // Novice (Новичок) - grant ALL 8 novice gear items
+            {
+                gearToGrant.AddRange(allNoviceGear);
+            }
+            else if (difficulty == 1) // Easy (Легко) - grant 3 random novice items
+            {
+                List<InventoryItem> temp = new List<InventoryItem>(allNoviceGear);
+                for (int i = 0; i < 3 && temp.Count > 0; i++)
+                {
+                    int randIdx = UnityEngine.Random.Range(0, temp.Count);
+                    gearToGrant.Add(temp[randIdx]);
+                    temp.RemoveAt(randIdx);
+                }
+            }
+            else if (difficulty == 2) // Normal (Нормально) - grant 2 random novice items
+            {
+                List<InventoryItem> temp = new List<InventoryItem>(allNoviceGear);
+                for (int i = 0; i < 2 && temp.Count > 0; i++)
+                {
+                    int randIdx = UnityEngine.Random.Range(0, temp.Count);
+                    gearToGrant.Add(temp[randIdx]);
+                    temp.RemoveAt(randIdx);
+                }
+            }
+            else if (difficulty == 3) // Hard (Сложно) - grant 1 random novice item
+            {
+                List<InventoryItem> temp = new List<InventoryItem>(allNoviceGear);
+                if (temp.Count > 0)
+                {
+                    int randIdx = UnityEngine.Random.Range(0, temp.Count);
+                    gearToGrant.Add(temp[randIdx]);
+                }
+            }
+            // If difficulty == 4 (Nightmare/Кошмар) - grant no starting gear items
+
+            int slotIndex = 0;
+            foreach (var item in gearToGrant)
+            {
+                if (slotIndex < 999)
+                {
+                    playerInventory.items[slotIndex] = item;
+                    slotIndex++;
+                }
+            }
+
+            // Always add default starting potions to support beginner combat/exploration survival
+            if (slotIndex < 999) playerInventory.items[slotIndex++] = new InventoryItem { id = "potion_hp_1", name = "Зелье Жизни (Ур.1)", iconType = "hp", slotType = 0, level = 1, count = 3, statBonus = 0 };
+            if (slotIndex < 999) playerInventory.items[slotIndex++] = new InventoryItem { id = "potion_str_1", name = "Зелье Силы (Ур.1)", iconType = "str", slotType = 0, level = 1, count = 1, statBonus = 0 };
+            if (slotIndex < 999) playerInventory.items[slotIndex++] = new InventoryItem { id = "potion_def_1", name = "Зелье Защиты (Ур.1)", iconType = "def", slotType = 0, level = 1, count = 1, statBonus = 0 };
+
             SaveInventory();
         }
     }
@@ -1398,7 +1468,7 @@ public class FateCastleManager : MonoBehaviour
             if (pt != null && pt.spawnAnchor != null)
             {
                 int closest = FindClosestRegionToPosition(pt.spawnAnchor.position);
-                Debug.Log($"[CASTLE MGR PROXIMITY] Динамически сопоставили landedZoneIndex={landedZoneIndex} с ближайшим регионом Region_{closest:D2} у точки {pt.spawnAnchor.name}");
+                // Debug.Log($"[CASTLE MGR PROXIMITY] Динамически сопоставили landedZoneIndex={landedZoneIndex} с ближайшим регионом Region_{closest:D2} у точки {pt.spawnAnchor.name}");
                 return closest;
             }
         }
@@ -1425,7 +1495,7 @@ public class FateCastleManager : MonoBehaviour
         if (foundObj != null)
         {
             int closest = FindClosestRegionToPosition(foundObj.transform.position);
-            Debug.Log($"[CASTLE MGR PROXIMITY] Динамически сопоставили по имени объекта {foundObj.name} к ближайшему региону Region_{closest:D2}");
+            // Debug.Log($"[CASTLE MGR PROXIMITY] Динамически сопоставили по имени объекта {foundObj.name} к ближайшему региону Region_{closest:D2}");
             return closest;
         }
 
@@ -3317,18 +3387,18 @@ public class FateCastleManager : MonoBehaviour
         if (s_slotGridStyle == null)
         {
             s_slotGridStyle = new GUIStyle(GUI.skin.button);
-            s_slotGridStyle.fontSize = 8; // Slightly smaller to prevent text clipping
+            s_slotGridStyle.fontSize = 10; // Slightly larger for better legibility in larger cells
             s_slotGridStyle.padding = new RectOffset(1, 1, 1, 1);
             s_slotGridStyle.richText = true;
             s_slotGridStyle.wordWrap = true;
             s_slotGridStyle.alignment = TextAnchor.MiddleCenter;
         }
         
-        invScroll = GUILayout.BeginScrollView(invScroll, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-        
         int gridColumns = 6;
         int gridRows = 6;
         int startSlotIndex = currentInventoryTab * 36;
+        float cellW = 88f; // Made larger (from 76 to 88) as requested
+        float cellH = 88f; // Made larger (from 76 to 88) as requested
  
         for (int row = 0; row < gridRows; row++)
         {
@@ -3340,7 +3410,7 @@ public class FateCastleManager : MonoBehaviour
                 {
                     // Draw placeholder
                     GUI.backgroundColor = new Color(0.1f, 0.12f, 0.18f, 0.3f);
-                    GUILayout.Button("-", s_slotGridStyle, GUILayout.Width(76), GUILayout.Height(76));
+                    GUILayout.Button("-", s_slotGridStyle, GUILayout.Width(cellW), GUILayout.Height(cellH));
                     GUI.backgroundColor = Color.white;
                     continue;
                 }
@@ -3374,7 +3444,7 @@ public class FateCastleManager : MonoBehaviour
                             GUI.backgroundColor = new Color(0.85f, 0.65f, 0.15f, 0.25f);
                         }
                         
-                        if (GUILayout.Button(label, s_slotGridStyle, GUILayout.Width(76), GUILayout.Height(76)))
+                        if (GUILayout.Button(label, s_slotGridStyle, GUILayout.Width(cellW), GUILayout.Height(cellH)))
                         {
                             EquipOrUseItem(index);
                         }
@@ -3382,7 +3452,7 @@ public class FateCastleManager : MonoBehaviour
                     else
                     {
                         GUI.backgroundColor = new Color(0.1f, 0.12f, 0.18f, 0.6f);
-                        if (GUILayout.Button($"[ #{index + 1} ]\n[ Пусто ]", s_slotGridStyle, GUILayout.Width(76), GUILayout.Height(76)))
+                        if (GUILayout.Button($"[ #{index + 1} ]\n[ Пусто ]", s_slotGridStyle, GUILayout.Width(cellW), GUILayout.Height(cellH)))
                         {
                             // Click empty
                         }
@@ -3400,7 +3470,7 @@ public class FateCastleManager : MonoBehaviour
                     if (curLang == 8) buyLabel = $"🔒 槽位 {index + 1}\n解锁\n需要 {cost} 💰";
                     if (curLang == 7) buyLabel = $"🔒 슬롯 {index + 1}\n잠금 해제\n{cost} 💰";
  
-                    if (GUILayout.Button(buyLabel, s_slotGridStyle, GUILayout.Width(76), GUILayout.Height(76)))
+                    if (GUILayout.Button(buyLabel, s_slotGridStyle, GUILayout.Width(cellW), GUILayout.Height(cellH)))
                     {
                         if (SaveGameSystem.CurrentData.gold < cost)
                         {
@@ -3420,7 +3490,7 @@ public class FateCastleManager : MonoBehaviour
                     GUI.backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.5f);
                     GUI.enabled = false;
                     string locLocked = curLang == 0 ? "🔒 Закрыто" : "🔒 Locked";
-                    GUILayout.Button(locLocked, s_slotGridStyle, GUILayout.Width(76), GUILayout.Height(76));
+                    GUILayout.Button(locLocked, s_slotGridStyle, GUILayout.Width(cellW), GUILayout.Height(cellH));
                     GUI.enabled = true;
                 }
                 GUI.backgroundColor = Color.white;
@@ -3428,7 +3498,6 @@ public class FateCastleManager : MonoBehaviour
             GUILayout.EndHorizontal();
         }
         
-        GUILayout.EndScrollView();
         GUILayout.EndVertical();
         col3Rect = GUILayoutUtility.GetLastRect();
 
