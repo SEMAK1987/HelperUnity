@@ -220,15 +220,15 @@ public class FateCastleManager : MonoBehaviour
     public Texture2D weapon_mage_staff;
 
     [Header("🧪 POTION ICONS (v18.11.22)")]
-    [Tooltip("Зелье Жизни • Prompt: Elegant small glass vial bottle filled with bubbling bright red glowing healing liquid, game UI item slot style, flat white background, digital art 8k.")]
+    [Tooltip("Зелье Жизни • Prompt: Symmetrical high-quality icon of an elegant ornate small glass potion bottle filled with magical glowing bubbling bright red liquid. Realistic glass texture, RPG game asset style, centered. Isolated on solid black background, no shadows, no gradient, 8k.")]
     public Texture2D icon_potion_hp;
-    [Tooltip("Зелье Силы • Prompt: Elegant small glass vial bottle filled with bubbling bright orange glowing strength liquid, game UI item slot style, flat white background, digital art 8k.")]
+    [Tooltip("Зелье Силы • Prompt: Symmetrical high-quality icon of an elegant ornate small glass potion bottle filled with magical glowing bubbling fiery orange liquid. Realistic glass texture, RPG game asset style, centered. Isolated on solid black background, no shadows, no gradient, 8k.")]
     public Texture2D icon_potion_str;
-    [Tooltip("Зелье Интеллекта • Prompt: Elegant small glass vial bottle filled with bubbling bright purple glowing mana liquid, game UI item slot style, flat white background, digital art 8k.")]
+    [Tooltip("Зелье Интеллекта • Prompt: Symmetrical high-quality icon of an elegant ornate small glass potion bottle filled with magical glowing bubbling deep purple liquid. Realistic glass texture, RPG game asset style, centered. Isolated on solid black background, no shadows, no gradient, 8k.")]
     public Texture2D icon_potion_int;
-    [Tooltip("Зелье Ловкости • Prompt: Elegant small glass vial bottle filled with bubbling bright green glowing agility liquid, game UI item slot style, flat white background, digital art 8k.")]
+    [Tooltip("Зелье Ловкости • Prompt: Symmetrical high-quality icon of an elegant ornate small glass potion bottle filled with magical glowing bubbling vibrant emerald green liquid. Realistic glass texture, RPG game asset style, centered. Isolated on solid black background, no shadows, no gradient, 8k.")]
     public Texture2D icon_potion_agi;
-    [Tooltip("Зелье Защиты/Выносливости • Prompt: Elegant small glass vial bottle filled with bubbling bright blue glowing defense liquid, game UI item slot style, flat white background, digital art 8k.")]
+    [Tooltip("Зелье Защиты/Выносливости • Prompt: Symmetrical high-quality icon of an elegant ornate small glass potion bottle filled with magical glowing bubbling celestial blue liquid. Realistic glass texture, RPG game asset style, centered. Isolated on solid black background, no shadows, no gradient, 8k.")]
     public Texture2D icon_potion_sta;
 
     [Header("⚔️ WARRIOR GLASSMORPHIC SKILLS ICONS")]
