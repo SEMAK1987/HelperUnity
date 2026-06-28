@@ -770,6 +770,15 @@ public class FateCastleManager : MonoBehaviour
         return 1;
     }
 
+    public string GetText(string ru, string en, string kr = "", string ch = "")
+    {
+        int curLang = Translator.LanguageID;
+        if (curLang == 0) return ru;
+        if (curLang == 7) return !string.IsNullOrEmpty(kr) ? kr : en;
+        if (curLang == 8) return !string.IsNullOrEmpty(ch) ? ch : en;
+        return en;
+    }
+
     private int GetPotionValueForLevel(int level, bool isHP)
     {
         if (isHP)
@@ -903,62 +912,62 @@ public class FateCastleManager : MonoBehaviour
             {
                 if (potionUsedThisTurnHP)
                 {
-                    ShowFeedback(curLang == 0 ? "Вы уже выпили зелье Жизни в этот ход!" : "You have already consumed a Health potion this turn!");
+                    ShowFeedback(GetText("Вы уже выпили зелье Жизни в этот ход!", "You have already consumed a Health potion this turn!", "이미 이번 턴에 생명력 물약을 복용했습니다!", "您在这一回合已经使用了生命药水！"));
                     return;
                 }
                 potionUsedThisTurnHP = true;
-                float maxHp = (data.stamina + eqBonusSTA + tempBonusSTA) * 10f;
-                int healAmount = GetPotionValueForLevel(item.level, true);
-                data.currentHealth = Mathf.Min(maxHp, data.currentHealth + healAmount);
-                ShowFeedback(curLang == 0 ? $"Вы выпили {itemName}. ОЗ восстановлено на +{healAmount}!" : $"Consumed {itemName}. Health restored by +{healAmount}!");
+                int rawHP = GetPotionValueForLevel(item.level, true);
+                int statBoost = Mathf.Max(1, rawHP / 10);
+                tempBonusSTA += statBoost;
+                ShowFeedback(GetText($"Вы выпили {itemName}. Макс. ОЗ (HP) временно увеличено на +{statBoost * 10}!", $"Consumed {itemName}. Max HP temporarily increased by +{statBoost * 10}!", $"{itemName}을(를) 복용했습니다. 최대 HP가 일시적으로 +{statBoost * 10}만큼 증가했습니다!", $"使用了 {itemName}。最大生命值 (HP) 临时增加 +{statBoost * 10}！"));
             }
             else if (item.id.Contains("str"))
             {
                 if (potionUsedThisTurnSTR)
                 {
-                    ShowFeedback(curLang == 0 ? "Вы уже выпили зелье Силы в этот ход!" : "You have already consumed a Strength potion this turn!");
+                    ShowFeedback(GetText("Вы уже выпили зелье Силы в этот ход!", "You have already consumed a Strength potion this turn!", "이미 이번 턴에 힘의 물약을 복용했습니다!", "您在这一回合已经使用了力量药水！"));
                     return;
                 }
                 potionUsedThisTurnSTR = true;
                 int statBoost = GetPotionValueForLevel(item.level, false);
                 tempBonusSTR += statBoost;
-                ShowFeedback(curLang == 0 ? $"Вы выпили {itemName}. Сила временно увеличена на +{statBoost}!" : $"Consumed {itemName}. Strength temporarily increased by +{statBoost}!");
+                ShowFeedback(GetText($"Вы выпили {itemName}. Сила временно увеличена на +{statBoost}!", $"Consumed {itemName}. Strength temporarily increased by +{statBoost}!", $"{itemName}을(를) 복용했습니다. 힘이 일시적으로 +{statBoost}만큼 증가했습니다!", $"使用了 {itemName}。力量临时增加 +{statBoost}！"));
             }
             else if (item.id.Contains("int"))
             {
                 if (potionUsedThisTurnINT)
                 {
-                    ShowFeedback(curLang == 0 ? "Вы уже выпили зелье Интеллекта в этот ход!" : "You have already consumed an Intelligence potion this turn!");
+                    ShowFeedback(GetText("Вы уже выпили зелье Интеллекта в этот ход!", "You have already consumed an Intelligence potion this turn!", "이미 이번 턴에 지능의 물약을 복용했습니다!", "您在这一回合已经使用了智力药水！"));
                     return;
                 }
                 potionUsedThisTurnINT = true;
                 int statBoost = GetPotionValueForLevel(item.level, false);
                 tempBonusINT += statBoost;
-                ShowFeedback(curLang == 0 ? $"Вы выпили {itemName}. Интеллект временно увеличен на +{statBoost}!" : $"Consumed {itemName}. Intelligence temporarily increased by +{statBoost}!");
+                ShowFeedback(GetText($"Вы выпили {itemName}. Интеллект временно увеличен на +{statBoost}!", $"Consumed {itemName}. Intelligence temporarily increased by +{statBoost}!", $"{itemName}을(를) 복용했습니다. 지능이 일시적으로 +{statBoost}만큼 증가했습니다!", $"使用了 {itemName}。智力临时增加 +{statBoost}！"));
             }
             else if (item.id.Contains("agi"))
             {
                 if (potionUsedThisTurnAGI)
                 {
-                    ShowFeedback(curLang == 0 ? "Вы уже выпили зелье Ловкости в этот ход!" : "You have already consumed an Agility potion this turn!");
+                    ShowFeedback(GetText("Вы уже выпили зелье Ловкости в этот ход!", "You have already consumed an Agility potion this turn!", "이미 이번 턴에 민첩의 물약을 복용했습니다!", "您在这一回合已经使用了敏捷药水！"));
                     return;
                 }
                 potionUsedThisTurnAGI = true;
                 int statBoost = GetPotionValueForLevel(item.level, false);
                 tempBonusAGI += statBoost;
-                ShowFeedback(curLang == 0 ? $"Вы выпили {itemName}. Ловкость временно увеличена на +{statBoost}!" : $"Consumed {itemName}. Agility temporarily increased by +{statBoost}!");
+                ShowFeedback(GetText($"Вы выпили {itemName}. Ловкость временно увеличена на +{statBoost}!", $"Consumed {itemName}. Agility temporarily increased by +{statBoost}!", $"{itemName}을(를) 복용했습니다. 민첩이 일시적으로 +{statBoost}만큼 증가했습니다!", $"使用了 {itemName}。敏捷临时增加 +{statBoost}！"));
             }
             else if (item.id.Contains("sta") || item.id.Contains("def"))
             {
                 if (potionUsedThisTurnSTA)
                 {
-                    ShowFeedback(curLang == 0 ? "Вы уже выпили зелье Выносливости в этот ход!" : "You have already consumed a Stamina potion this turn!");
+                    ShowFeedback(GetText("Вы уже выпили зелье Выносливости в этот ход!", "You have already consumed a Stamina potion this turn!", "이미 이번 턴에 체력의 물약을 복용했습니다!", "您在这一回合已经使用了耐力药水！"));
                     return;
                 }
                 potionUsedThisTurnSTA = true;
                 int statBoost = GetPotionValueForLevel(item.level, false);
                 tempBonusSTA += statBoost;
-                ShowFeedback(curLang == 0 ? $"Вы выпили {itemName}. Выносливость временно увеличена на +{statBoost}!" : $"Consumed {itemName}. Stamina temporarily increased by +{statBoost}!");
+                ShowFeedback(GetText($"Вы выпили {itemName}. Выносливость временно увеличена на +{statBoost}!", $"Consumed {itemName}. Stamina temporarily increased by +{statBoost}!", $"{itemName}을(를) 복용했습니다. 체력이 일시적으로 +{statBoost}만큼 증가했습니다!", $"使用了 {itemName}。耐力临时增加 +{statBoost}！"));
             }
 
             item.count--;
@@ -970,6 +979,125 @@ public class FateCastleManager : MonoBehaviour
             SaveInventory();
             SaveGameSystem.Save(0);
         }
+    }
+
+    public void ResetAfterBattle()
+    {
+        // 1. Сброс временных бонусов от зелий
+        tempBonusSTR = 0;
+        tempBonusAGI = 0;
+        tempBonusINT = 0;
+        tempBonusSTA = 0;
+
+        potionUsedThisTurnHP = false;
+        potionUsedThisTurnSTR = false;
+        potionUsedThisTurnAGI = false;
+        potionUsedThisTurnINT = false;
+        potionUsedThisTurnSTA = false;
+
+        // 2. Полное восстановление здоровья основного героя
+        if (SaveGameSystem.CurrentData != null)
+        {
+            float maxHp = (SaveGameSystem.CurrentData.stamina + eqBonusSTA) * 10f;
+            SaveGameSystem.CurrentData.currentHealth = maxHp;
+            SaveGameSystem.CurrentData.maxHealth = maxHp;
+            SaveGameSystem.Save(0);
+        }
+
+        // 3. Полное восстановление здоровья у всех активных UnitBase на сцене и очистка баффов/дебаффов
+        foreach (var unit in FindObjectsOfType<UnitBase>())
+        {
+            if (unit != null)
+            {
+                unit.InitializeStats(); // Полное восстановление ОЗ/ОМ к максимальным
+            }
+        }
+    }
+
+    private void ResetNonPlayerProgression()
+    {
+        // 1. Сброс простых героев (companions / ArcherHero, WarriorHero, MageHero)
+        string[] companion_ids = { "ArcherHero", "WarriorHero", "MageHero" };
+        foreach (var compId in companion_ids)
+        {
+            // Сбрасываем уровни до 1
+            PlayerPrefs.SetInt("Companion_Lvl_" + compId, 1);
+            PlayerPrefs.SetInt("Companion_XP_" + compId, 0);
+
+            // Сбрасываем количество нанятых героев во всех замках/зонах до 0 (надо покупать заново)
+            for (int zone = 0; zone < castles.Count; zone++)
+            {
+                PlayerPrefs.SetInt("Player_HiredCount_" + compId + "_Zone_" + zone, 0);
+            }
+        }
+
+        // 2. Сброс воинов/когорт
+        string[] troop_ids = { "warrior", "archer", "mage", "paladin", "cavalry", "cannoneer", "centaur", "necromancer", "griffin", "overlord", "hydra", "dragon", "mountain_bear", "wasteland_serpent" };
+        foreach (var troopId in troop_ids)
+        {
+            for (int zone = 0; zone < castles.Count; zone++)
+            {
+                PlayerPrefs.SetInt("Player_Unit_" + troopId + "_Zone_" + zone, 0);
+            }
+        }
+
+        // Сброс ранга воинов
+        PlayerPrefs.SetInt("Player_ArmyUnit_Rank", 1);
+
+        PlayerPrefs.Save();
+    }
+
+    private void TriggerContinentClearedTransition()
+    {
+        int curLang = Translator.LanguageID;
+
+        // 1. Оповещаем игрока сообщением
+        string clearedMsg = GetText(
+            "🎉 ВЕЛИКАЯ ПОБЕДА! Все замки на континенте захвачены! Вы переходите на следующий континент!",
+            "🎉 GRAND VICTORY! All castles on the continent conquered! You are transitioning to the next continent!",
+            "🎉 대승리! 대륙의 모든 성채를 정복했습니다! 다음 대륙으로 이동합니다!",
+            "🎉 伟大的胜利！大陆上的所有城堡都已被占领！您正在前往下一个大陆！"
+        );
+        ShowFeedback(clearedMsg);
+
+        // 2. Обнуляем воинов и простых героев до начального уровня (прокачка сбрасывается, покупать заново)
+        ResetNonPlayerProgression();
+
+        // 3. Сбрасываем владение замками (кроме стартового региона игрока) для нового континента
+        int actualPlayerRegion = GetActualRegionIndexFromLanding(PlayerPrefs.GetInt("LandedZoneIndex", -1));
+        for (int i = 0; i < castles.Count; i++)
+        {
+            if (i == actualPlayerRegion)
+            {
+                castles[i].owner = "Player";
+                castles[i].level = 1; // Стартовый уровень
+                PlayerPrefs.SetString("Castle_Owner_" + i, "Player");
+                PlayerPrefs.SetInt("Castle_Level_" + i, 1);
+            }
+            else
+            {
+                castles[i].owner = "Enemy";
+                castles[i].level = 1;
+                PlayerPrefs.SetString("Castle_Owner_" + i, "Enemy");
+                PlayerPrefs.SetInt("Castle_Level_" + i, 1);
+                PlayerPrefs.SetInt("Castle_AI_Troops_" + i, 20); // Сброс силы гарнизона
+            }
+        }
+
+        // Сбрасываем день континента
+        currentDay = 1;
+        PlayerPrefs.SetInt("Fate_Current_Day", 1);
+
+        // Перерисовываем регионы и респавним замки
+        if (LandingPositionManager.Instance != null)
+        {
+            LandingPositionManager.Instance.RepaintRegionsBasedOnLanding(0);
+        }
+        SpawnAllCastles();
+
+        // Сохраняем состояние
+        PlayerPrefs.Save();
+        SaveGameSystem.Save(0);
     }
 
     private void RecalculateEquippedBonuses()
@@ -1324,6 +1452,21 @@ public class FateCastleManager : MonoBehaviour
                 $"👑 ПОБЕДА! Мы захватили {castle.nameRU}! Добыча: +{lootGold} 💰. Враг бежал, регион окрасился в цвета Ордена Света!" :
                 $"👑 VICTORY! Conquered {castle.nameEN}! Loot: +{lootGold} 💰. Underneath grounds claim the banner of Light Alliance!";
             ShowFeedback(resMsg);
+
+            // Check if all castles are conquered!
+            bool allConquered = true;
+            for (int i = 0; i < castles.Count; i++)
+            {
+                if (castles[i].owner != "Player")
+                {
+                    allConquered = false;
+                    break;
+                }
+            }
+            if (allConquered)
+            {
+                TriggerContinentClearedTransition();
+            }
         }
         else
         {
@@ -1346,6 +1489,9 @@ public class FateCastleManager : MonoBehaviour
                 $"❌ DEFEAT! Defending sentinel forces repelled our siege. Heavy cohort casualties suffered.";
             ShowFeedback(resMsg);
         }
+
+        // В конце любой осады полностью восстанавливаем здоровье и сбрасываем баффы
+        ResetAfterBattle();
     }
 
     private void UpdateHoveredCastle()
@@ -1689,6 +1835,7 @@ public class FateCastleManager : MonoBehaviour
 
     private void Start()
     {
+        EventHub.OnCombatEnd += HandleCombatEndEvent;
         // [CRITICAL SAVE SYNC] Синхронизируем и загружаем активный слот сохранений игрока при запуске сцены континента
         int activeSlot = PlayerPrefs.GetInt("Active_Save_Slot", 0);
         SaveGameSystem.Load(activeSlot, false);
@@ -1705,6 +1852,16 @@ public class FateCastleManager : MonoBehaviour
         LoadInventory();
         LoadEquipment();
         RecalculateEquippedBonuses();
+    }
+
+    private void OnDestroy()
+    {
+        EventHub.OnCombatEnd -= HandleCombatEndEvent;
+    }
+
+    private void HandleCombatEndEvent(int winner)
+    {
+        ResetAfterBattle();
     }
 
     public void EnableContinentGameplay()
@@ -3376,7 +3533,7 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.EndVertical();
         col1Rect = GUILayoutUtility.GetLastRect();
         
-        GUILayout.Space(35); // Shift column 2 (Equipment) to the right!
+        GUILayout.Space(55); // Shift column 2 (Equipment) further to the right!
         
         // ----------------------------------------------------
         // COLUMN 2: EQUIPMENT & CLASS SKILLS (Width: 380f)
@@ -3389,7 +3546,7 @@ public class FateCastleManager : MonoBehaviour
         eqHeaderStyle.fontSize = 13;
         eqHeaderStyle.fontStyle = FontStyle.Bold;
         eqHeaderStyle.normal.textColor = new Color(0.12f, 0.88f, 1.0f);
-        GUILayout.Label(curLang == 0 ? "🛡️ СНАРЯЖЕНИЕ ПЕРСОНАЖА" : "🛡️ HERO EQUIPMENT", eqHeaderStyle);
+        GUILayout.Label(GetText("🛡️ СНАРЯЖЕНИЕ ПЕРСОНАЖА", "🛡️ HERO EQUIPMENT", "🛡️ 영웅 장비 창", "🛡️ 英雄装备栏"), eqHeaderStyle);
         GUILayout.Space(4);
         
         GUIStyle slotLabelStyle = new GUIStyle(GUI.skin.label);
@@ -3403,12 +3560,15 @@ public class FateCastleManager : MonoBehaviour
         slotEquippedStyle.alignment = TextAnchor.MiddleCenter;
         slotEquippedStyle.normal.textColor = Color.yellow;
         
+        // Shift mannequin to the right inside Column 2!
+        GUILayout.BeginHorizontal();
+        GUILayout.Space(30); 
         GUILayout.BeginVertical(GUI.skin.box);
         
         // Row 1: Head (Helmet - Slot 1) - Larger dimensions (v18.11.22)
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        DrawEquippedSlotButtonAnatomical(1, "Шлем", "Helmet", curLang, slotEquippedStyle, 54, 120);
+        DrawEquippedSlotButtonAnatomical(1, "Шлем", "Helmet", curLang, slotEquippedStyle, 68, 135);
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
         GUILayout.Space(4);
@@ -3416,27 +3576,27 @@ public class FateCastleManager : MonoBehaviour
         // Row 2: Neck (Amulet - Slot 2)
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        DrawEquippedSlotButtonAnatomical(2, "Амулет", "Amulet", curLang, slotEquippedStyle, 54, 120);
+        DrawEquippedSlotButtonAnatomical(2, "Амулет", "Amulet", curLang, slotEquippedStyle, 68, 135);
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
         GUILayout.Space(4);
 
         // Row 3: Torso and Arms (Weapon - Slot 8 | Armor - Slot 4 | Shoulders - Slot 3)
         GUILayout.BeginHorizontal();
-        DrawEquippedSlotButtonAnatomical(8, "Оружие", "Weapon", curLang, slotEquippedStyle, 58, 104);
+        DrawEquippedSlotButtonAnatomical(8, "Оружие", "Weapon", curLang, slotEquippedStyle, 74, 115);
         GUILayout.Space(3);
-        DrawEquippedSlotButtonAnatomical(4, "Доспех", "Armor", curLang, slotEquippedStyle, 58, 104);
+        DrawEquippedSlotButtonAnatomical(4, "Доспех", "Armor", curLang, slotEquippedStyle, 74, 115);
         GUILayout.Space(3);
-        DrawEquippedSlotButtonAnatomical(3, "Наплечники", "Shoulders", curLang, slotEquippedStyle, 58, 104);
+        DrawEquippedSlotButtonAnatomical(3, "Наплечники", "Shoulders", curLang, slotEquippedStyle, 74, 115);
         GUILayout.EndHorizontal();
         GUILayout.Space(4);
 
         // Row 4: Legs & Accessories (Ring - Slot 5 | Belt - Slot 6)
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        DrawEquippedSlotButtonAnatomical(5, "Кольцо", "Ring", curLang, slotEquippedStyle, 54, 104);
+        DrawEquippedSlotButtonAnatomical(5, "Кольцо", "Ring", curLang, slotEquippedStyle, 68, 115);
         GUILayout.Space(4);
-        DrawEquippedSlotButtonAnatomical(6, "Пояс", "Belt", curLang, slotEquippedStyle, 54, 120);
+        DrawEquippedSlotButtonAnatomical(6, "Пояс", "Belt", curLang, slotEquippedStyle, 68, 135);
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
         GUILayout.Space(4);
@@ -3444,13 +3604,15 @@ public class FateCastleManager : MonoBehaviour
         // Row 5: Feet (Boots - Slot 7)
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        DrawEquippedSlotButtonAnatomical(7, "Сапоги", "Boots", curLang, slotEquippedStyle, 54, 120);
+        DrawEquippedSlotButtonAnatomical(7, "Сапоги", "Boots", curLang, slotEquippedStyle, 68, 135);
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
 
         GUILayout.EndVertical();
+        GUILayout.EndHorizontal(); // End shift layout
         
-        // PUSH SKILLS SECTION DOWN TO THE BOTTOM OF THE COLUMN
+        // PUSH SKILLS SECTION DOWN TO THE BOTTOM OF THE COLUMN WITH EXPLICIT SEPARATION SPACE
+        GUILayout.Space(45);
         GUILayout.FlexibleSpace();
 
         // BOTTOM HALF: КЛАССОВЫЕ НАВЫКИ (Class Skills)
