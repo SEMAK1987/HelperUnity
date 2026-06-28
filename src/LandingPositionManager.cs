@@ -206,6 +206,25 @@ namespace FateContinent
                 }
             }
 
+            // Автоматическое нахождение главной камеры, если она не задана в Инспекторе
+            if (mainCameraTransform == null)
+            {
+                if (Camera.main != null)
+                {
+                    mainCameraTransform = Camera.main.transform;
+                    Debug.Log("<color=#00FFCC>[LANDING SYS]</color> Скрипт автоматически нашел Главную Камеру по тегу MainCamera.");
+                }
+                else
+                {
+                    Camera cam = FindFirstObjectByType<Camera>();
+                    if (cam != null)
+                    {
+                        mainCameraTransform = cam.transform;
+                        Debug.Log("<color=#00FFCC>[LANDING SYS]</color> Скрипт автоматически нашел первую попавшуюся Камеру в сцене.");
+                    }
+                }
+            }
+
             // Кэшируем оригинальные красивые материалы регионов в самом начале, пока сцена полностью активна
             CacheOriginalMaterials();
         }

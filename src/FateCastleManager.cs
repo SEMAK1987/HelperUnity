@@ -197,6 +197,40 @@ public class FateCastleManager : MonoBehaviour
     [Tooltip("Manual starting troop power boost for all opponent castles on campaign start")]
     public int manualAiStartingTroopPower = 15;
 
+    [Header("🛡️ GEAR & CLASS WEAPON ICONS (v18.11.22)")]
+    [Tooltip("Шлем (Slot 1) • Prompt: Symmetrical front portrait of a legendary royal glowing steel knight helmet, game UI item slot style, flat white background, digital art 8k.")]
+    public Texture2D icon_helmet;
+    [Tooltip("Амулет (Slot 2) • Prompt: Symmetrical front portrait of a mystical glowing sapphire amulet pendant, game UI item slot style, flat white background, digital art 8k.")]
+    public Texture2D icon_amulet;
+    [Tooltip("Наплечники (Slot 3) • Prompt: Symmetrical front portrait of legendary steel knight pauldrons, game UI item slot style, flat white background, digital art 8k.")]
+    public Texture2D icon_pauldrons;
+    [Tooltip("Доспех (Slot 4) • Prompt: Symmetrical front portrait of legendary royal steel knight plate body armor, game UI item slot style, flat white background, digital art 8k.")]
+    public Texture2D icon_armor;
+    [Tooltip("Кольцо (Slot 5) • Prompt: Symmetrical front portrait of a legendary golden diamond signet ring, game UI item slot style, flat white background, digital art 8k.")]
+    public Texture2D icon_ring;
+    [Tooltip("Пояс (Slot 6) • Prompt: Symmetrical front portrait of a legendary runic leather belt, game UI item slot style, flat white background, digital art 8k.")]
+    public Texture2D icon_belt;
+    [Tooltip("Сапоги (Slot 7) • Prompt: Symmetrical front portrait of legendary steel knight armor boots, game UI item slot style, flat white background, digital art 8k.")]
+    public Texture2D icon_boots;
+    [Tooltip("Меч Воина (Slot 8) • Prompt: Symmetrical front portrait of a legendary royal glowing steel broadsword, epic runic gold and turquoise neon blade, game UI item slot style, flat white background, digital art 8k.")]
+    public Texture2D weapon_warrior_sword;
+    [Tooltip("Лук Стрелка (Slot 8) • Prompt: Symmetrical front portrait of a mystical elven composite recurve bow, glowing jade wood finish, magic emerald neon arrow nocked on string, game UI item slot style, flat white background, digital art 8k.")]
+    public Texture2D weapon_archer_bow;
+    [Tooltip("Посох Мага (Slot 8) • Prompt: Symmetrical front portrait of a majestic wizard's archmage runic staff, crystal sapphire sphere floating at tip radiating blue lightning, game UI item slot style, flat white background, digital art 8k.")]
+    public Texture2D weapon_mage_staff;
+
+    [Header("🧪 POTION ICONS (v18.11.22)")]
+    [Tooltip("Зелье Жизни • Prompt: Elegant small glass vial bottle filled with bubbling bright red glowing healing liquid, game UI item slot style, flat white background, digital art 8k.")]
+    public Texture2D icon_potion_hp;
+    [Tooltip("Зелье Силы • Prompt: Elegant small glass vial bottle filled with bubbling bright orange glowing strength liquid, game UI item slot style, flat white background, digital art 8k.")]
+    public Texture2D icon_potion_str;
+    [Tooltip("Зелье Интеллекта • Prompt: Elegant small glass vial bottle filled with bubbling bright purple glowing mana liquid, game UI item slot style, flat white background, digital art 8k.")]
+    public Texture2D icon_potion_int;
+    [Tooltip("Зелье Ловкости • Prompt: Elegant small glass vial bottle filled with bubbling bright green glowing agility liquid, game UI item slot style, flat white background, digital art 8k.")]
+    public Texture2D icon_potion_agi;
+    [Tooltip("Зелье Защиты/Выносливости • Prompt: Elegant small glass vial bottle filled with bubbling bright blue glowing defense liquid, game UI item slot style, flat white background, digital art 8k.")]
+    public Texture2D icon_potion_sta;
+
     [Header("⚔️ WARRIOR GLASSMORPHIC SKILLS ICONS")]
     [Tooltip("Passive 1: IronSkin Icon")]
     public Texture2D warriorSkillPassive1;
@@ -348,6 +382,19 @@ public class FateCastleManager : MonoBehaviour
     private int eqBonusAGI = 0;
     private int eqBonusINT = 0;
     private int eqBonusSTA = 0;
+
+    // Temporary potion stat bonuses (lasts for one turn, resets on AdvanceDay)
+    private int tempBonusSTR = 0;
+    private int tempBonusAGI = 0;
+    private int tempBonusINT = 0;
+    private int tempBonusSTA = 0;
+
+    // Use tracking flags for potions per turn (resets on AdvanceDay)
+    private bool potionUsedThisTurnHP = false;
+    private bool potionUsedThisTurnSTR = false;
+    private bool potionUsedThisTurnAGI = false;
+    private bool potionUsedThisTurnINT = false;
+    private bool potionUsedThisTurnSTA = false;
 
     [Serializable]
     public class InventoryItem
@@ -711,6 +758,56 @@ public class FateCastleManager : MonoBehaviour
         }
     }
 
+    private int GetRequiredCastleLevelForPotion(int potionLvl)
+    {
+        if (potionLvl == 1 || potionLvl == 2) return 1;
+        if (potionLvl == 3) return 2;
+        if (potionLvl == 4 || potionLvl == 5) return 3;
+        if (potionLvl == 6) return 4;
+        if (potionLvl == 7) return 5;
+        if (potionLvl == 8 || potionLvl == 9) return 6;
+        if (potionLvl == 10) return 7;
+        return 1;
+    }
+
+    private int GetPotionValueForLevel(int level, bool isHP)
+    {
+        if (isHP)
+        {
+            switch (level)
+            {
+                case 1: return 30;
+                case 2: return 60;
+                case 3: return 100;
+                case 4: return 150;
+                case 5: return 220;
+                case 6: return 300;
+                case 7: return 400;
+                case 8: return 550;
+                case 9: return 750;
+                case 10: return 1100;
+                default: return 30;
+            }
+        }
+        else
+        {
+            switch (level)
+            {
+                case 1: return 2;
+                case 2: return 4;
+                case 3: return 6;
+                case 4: return 9;
+                case 5: return 12;
+                case 6: return 16;
+                case 7: return 20;
+                case 8: return 25;
+                case 9: return 32;
+                case 10: return 45;
+                default: return 2;
+            }
+        }
+    }
+
     private string GetLocalizedItemName(InventoryItem item, int lang)
     {
         if (item == null || string.IsNullOrEmpty(item.id)) return "";
@@ -731,12 +828,26 @@ public class FateCastleManager : MonoBehaviour
                 else if (lang == 7) nameBase = "힘의 물약";
                 else nameBase = "Strength Potion";
             }
-            else if (item.id.Contains("def"))
+            else if (item.id.Contains("int"))
             {
-                if (lang == 0) nameBase = "Зелье Защиты";
-                else if (lang == 8) nameBase = "防御药水";
-                else if (lang == 7) nameBase = "방어의 물약";
-                else nameBase = "Defense Potion";
+                if (lang == 0) nameBase = "Зелье Интеллекта";
+                else if (lang == 8) nameBase = "智力药水";
+                else if (lang == 7) nameBase = "지능의 물약";
+                else nameBase = "Intelligence Potion";
+            }
+            else if (item.id.Contains("agi"))
+            {
+                if (lang == 0) nameBase = "Зелье Ловкости";
+                else if (lang == 8) nameBase = "敏捷药水";
+                else if (lang == 7) nameBase = "민첩의 물약";
+                else nameBase = "Agility Potion";
+            }
+            else if (item.id.Contains("sta") || item.id.Contains("def"))
+            {
+                if (lang == 0) nameBase = "Зелье Выносливости";
+                else if (lang == 8) nameBase = "耐力药水";
+                else if (lang == 7) nameBase = "지구력의 물약";
+                else nameBase = "Stamina Potion";
             }
             
             string lvlSuffix = lang == 0 ? $" (Ур.{item.level})" : $" (Lvl {item.level})";
@@ -787,21 +898,67 @@ public class FateCastleManager : MonoBehaviour
         {
             SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
             string itemName = GetLocalizedItemName(item, curLang);
+            
             if (item.id.Contains("hp"))
             {
-                float maxHp = (data.stamina + eqBonusSTA) * 10f;
-                data.currentHealth = Mathf.Min(maxHp, data.currentHealth + (item.level * 30f));
-                ShowFeedback(curLang == 0 ? $"Вы выпили {itemName}. ОЗ восстановлено!" : $"Consumed {itemName}. Health restored!");
+                if (potionUsedThisTurnHP)
+                {
+                    ShowFeedback(curLang == 0 ? "Вы уже выпили зелье Жизни в этот ход!" : "You have already consumed a Health potion this turn!");
+                    return;
+                }
+                potionUsedThisTurnHP = true;
+                float maxHp = (data.stamina + eqBonusSTA + tempBonusSTA) * 10f;
+                int healAmount = GetPotionValueForLevel(item.level, true);
+                data.currentHealth = Mathf.Min(maxHp, data.currentHealth + healAmount);
+                ShowFeedback(curLang == 0 ? $"Вы выпили {itemName}. ОЗ восстановлено на +{healAmount}!" : $"Consumed {itemName}. Health restored by +{healAmount}!");
             }
             else if (item.id.Contains("str"))
             {
-                data.strength += item.level;
-                ShowFeedback(curLang == 0 ? $"Вы выпили {itemName}. Сила увеличена на +{item.level}!" : $"Consumed {itemName}. Strength increased by +{item.level}!");
+                if (potionUsedThisTurnSTR)
+                {
+                    ShowFeedback(curLang == 0 ? "Вы уже выпили зелье Силы в этот ход!" : "You have already consumed a Strength potion this turn!");
+                    return;
+                }
+                potionUsedThisTurnSTR = true;
+                int statBoost = GetPotionValueForLevel(item.level, false);
+                tempBonusSTR += statBoost;
+                ShowFeedback(curLang == 0 ? $"Вы выпили {itemName}. Сила временно увеличена на +{statBoost}!" : $"Consumed {itemName}. Strength temporarily increased by +{statBoost}!");
             }
-            else if (item.id.Contains("def"))
+            else if (item.id.Contains("int"))
             {
-                data.stamina += item.level;
-                ShowFeedback(curLang == 0 ? $"Вы выпили {itemName}. Выносливость увеличена на +{item.level}!" : $"Consumed {itemName}. Stamina increased by +{item.level}!");
+                if (potionUsedThisTurnINT)
+                {
+                    ShowFeedback(curLang == 0 ? "Вы уже выпили зелье Интеллекта в этот ход!" : "You have already consumed an Intelligence potion this turn!");
+                    return;
+                }
+                potionUsedThisTurnINT = true;
+                int statBoost = GetPotionValueForLevel(item.level, false);
+                tempBonusINT += statBoost;
+                ShowFeedback(curLang == 0 ? $"Вы выпили {itemName}. Интеллект временно увеличен на +{statBoost}!" : $"Consumed {itemName}. Intelligence temporarily increased by +{statBoost}!");
+            }
+            else if (item.id.Contains("agi"))
+            {
+                if (potionUsedThisTurnAGI)
+                {
+                    ShowFeedback(curLang == 0 ? "Вы уже выпили зелье Ловкости в этот ход!" : "You have already consumed an Agility potion this turn!");
+                    return;
+                }
+                potionUsedThisTurnAGI = true;
+                int statBoost = GetPotionValueForLevel(item.level, false);
+                tempBonusAGI += statBoost;
+                ShowFeedback(curLang == 0 ? $"Вы выпили {itemName}. Ловкость временно увеличена на +{statBoost}!" : $"Consumed {itemName}. Agility temporarily increased by +{statBoost}!");
+            }
+            else if (item.id.Contains("sta") || item.id.Contains("def"))
+            {
+                if (potionUsedThisTurnSTA)
+                {
+                    ShowFeedback(curLang == 0 ? "Вы уже выпили зелье Выносливости в этот ход!" : "You have already consumed a Stamina potion this turn!");
+                    return;
+                }
+                potionUsedThisTurnSTA = true;
+                int statBoost = GetPotionValueForLevel(item.level, false);
+                tempBonusSTA += statBoost;
+                ShowFeedback(curLang == 0 ? $"Вы выпили {itemName}. Выносливость временно увеличена на +{statBoost}!" : $"Consumed {itemName}. Stamina temporarily increased by +{statBoost}!");
             }
 
             item.count--;
@@ -862,6 +1019,26 @@ public class FateCastleManager : MonoBehaviour
 
     private string GetItemName(int slotType, int tier, int lang)
     {
+        string cl = "warrior";
+        if (SaveGameSystem.CurrentData != null && !string.IsNullOrEmpty(SaveGameSystem.CurrentData.characterClass))
+        {
+            cl = SaveGameSystem.CurrentData.characterClass.ToLower();
+        }
+
+        string[] weaponNamesRU = new string[] { "Бронзовый Меч", "Стальной Клинок", "Мифриловый Меч", "Кристальный Клинок", "Звездный Клинок", "Меч Зенита v18" };
+        string[] weaponNamesEN = new string[] { "Bronze Sword", "Steel Blade", "Mithril Claymore", "Crystal Scepter", "Astral Edge", "Zenith Slayer" };
+
+        if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow") || cl.Contains("стрелок"))
+        {
+            weaponNamesRU = new string[] { "Бронзовый Лук", "Стальной Лук", "Мифриловый Лук", "Кристальный Лук", "Звездный Лук", "Лук Зенита v18" };
+            weaponNamesEN = new string[] { "Bronze Bow", "Steel Bow", "Mithril Bow", "Crystal Bow", "Astral Bow", "Zenith Bow" };
+        }
+        else if (cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff") || cl.Contains("маг"))
+        {
+            weaponNamesRU = new string[] { "Бронзовый Посох", "Стальной Посох", "Мифриловый Посох", "Кристальный Посох", "Звездный Посох", "Посох Зенита v18" };
+            weaponNamesEN = new string[] { "Bronze Staff", "Steel Staff", "Mithril Staff", "Crystal Staff", "Astral Staff", "Zenith Staff" };
+        }
+
         string[][] slotPrefixesRU = new string[][] {
             new string[] { "Бронза", "Сталь", "Мифрил", "Кристалл", "Космос", "Легенда" }, // 0
             new string[] { "Бронзовый Шлем", "Стальной Шлем", "Мифриловый Шлем", "Кристальный Шлем", "Звездный Венец", "Шлем Зенита v18" }, // 1
@@ -871,7 +1048,7 @@ public class FateCastleManager : MonoBehaviour
             new string[] { "Бронзовое Кольцо", "Стальное Кольцо", "Мифриловое Кольцо", "Кристальное Кольцо", "Звездное Кольцо", "Кольцо Зенита v18" }, // 5
             new string[] { "Бронзовый Пояс", "Стальной Пояс", "Мифриловый Пояс", "Кристальный Пояс", "Звездный Пояс", "Пояс Зенита v18" }, // 6
             new string[] { "Бронзовые Сапоги", "Стальные Сапоги", "Мифриловые Сапоги", "Кристальные Сапоги", "Звездные Сапоги", "Сапоги Зенита v18" }, // 7
-            new string[] { "Бронзовый Меч", "Стальной Клинок", "Мифриловый Меч", "Кристальный Клинок", "Звездный Клинок", "Меч Зенита v18" } // 8
+            weaponNamesRU // 8
         };
 
         string[][] slotPrefixesEN = new string[][] {
@@ -883,7 +1060,7 @@ public class FateCastleManager : MonoBehaviour
             new string[] { "Bronze Ring", "Steel Band", "Mithril Signet", "Crystal Ring", "Cosmic Loop", "Zenith Ring" },
             new string[] { "Bronze Belt", "Steel Buckle", "Mithril Belt", "Crystal Girdle", "Nova Sash", "Zenith Girdle" },
             new string[] { "Bronze Sabatons", "Steel Boots", "Mithril Greaves", "Crystal Treads", "Star Sabatons", "Zenith Greaves" },
-            new string[] { "Bronze Sword", "Steel Blade", "Mithril Claymore", "Crystal Scepter", "Astral Edge", "Zenith Slayer" }
+            weaponNamesEN // 8
         };
 
         int tIdx = Mathf.Clamp(tier - 1, 0, 5);
@@ -1559,6 +1736,15 @@ public class FateCastleManager : MonoBehaviour
             PlayerPrefs.DeleteKey("Castle_AI_Armor_" + i);
             PlayerPrefs.DeleteKey("Castle_AI_Potions_" + i);
         }
+
+        // Удаляем сохраненный инвентарь и экипировку, чтобы выдать стартовое снаряжение заново по сложности!
+        PlayerPrefs.DeleteKey("Player_Inventory_JSON_v18");
+        PlayerPrefs.DeleteKey("Player_Equipment_JSON_v18");
+        PlayerPrefs.Save();
+
+        // Сразу инициализируем чистый инвентарь и экипировку на основе новой сложности
+        LoadInventory();
+        LoadEquipment();
 
         // Динамический расчет стартового золота на основе сохраненной в Slot 0 / активном слоте сложности
         int activeSlot = PlayerPrefs.GetInt("Active_Save_Slot", 0);
@@ -2431,6 +2617,18 @@ public class FateCastleManager : MonoBehaviour
     /// </summary>
     public void AdvanceDay()
     {
+        // Сброс временных бонусов и флагов использования зелий на начало нового дня
+        tempBonusSTR = 0;
+        tempBonusAGI = 0;
+        tempBonusINT = 0;
+        tempBonusSTA = 0;
+
+        potionUsedThisTurnHP = false;
+        potionUsedThisTurnSTR = false;
+        potionUsedThisTurnAGI = false;
+        potionUsedThisTurnINT = false;
+        potionUsedThisTurnSTA = false;
+
         currentDay++;
         PlayerPrefs.SetInt("Fate_Current_Day", currentDay);
         PlayerPrefs.Save();
@@ -2727,7 +2925,17 @@ public class FateCastleManager : MonoBehaviour
     {
         // Не рисуем игровой HUD (кошелек, день, пропустить ход, новое наложение дня и информацию о замке), 
         // пока игрок полностью не завершил 2-й диалог-инструктаж с Аэлиссой!
-        if (!isContinentGameplayActive) return;
+        // Исключение: разрешаем отрисовку HUD, когда идет обучение Аэлиссы по интерфейсу (шаги >= 8)
+        bool isDialogueTutorialActive = false;
+        if (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.IsDialogueActive)
+        {
+            if (DialogueSystem_Manager.Instance.CurrentLineIndex >= 8)
+            {
+                isDialogueTutorialActive = true;
+            }
+        }
+
+        if (!isContinentGameplayActive && !isDialogueTutorialActive) return;
 
         InitializeCachedTextures();
 
@@ -2787,8 +2995,9 @@ public class FateCastleManager : MonoBehaviour
             s_nextDayStyle.alignment = TextAnchor.MiddleCenter;
         }
 
-        // Блокируем кнопку "Пропустить ход", если открыта панель управления персонажем (showStatsPanel) или детали
-        if (!isDetailsOpen && !showStatsPanel)
+        // Блокируем кнопку "Пропустить ход", если открыта панель управления персонажем (showStatsPanel), детали или идет диалог
+        bool isDialogueOpen = DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.IsDialogueActive;
+        if (!isDetailsOpen && !showStatsPanel && !isDialogueOpen)
         {
             GUI.backgroundColor = new Color(0.1f, 0.65f, 0.95f, 1.0f);
             if (GUI.Button(new Rect(Screen.width - 240f, 107f, 220f, 44f), $"▶ {nextDayBtnText}", s_nextDayStyle))
@@ -3115,10 +3324,10 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.Space(10);
         
         // Derived Combat Parameters
-        int totalSTR = data.strength + eqBonusSTR;
-        int totalAGI = data.agility + eqBonusAGI;
-        int totalINT = data.intelligence + eqBonusINT;
-        int totalSTA = data.stamina + eqBonusSTA;
+        int totalSTR = data.strength + eqBonusSTR + tempBonusSTR;
+        int totalAGI = data.agility + eqBonusAGI + tempBonusAGI;
+        int totalINT = data.intelligence + eqBonusINT + tempBonusINT;
+        int totalSTA = data.stamina + eqBonusSTA + tempBonusSTA;
 
         float combatAtk = totalSTR * 2.5f + totalAGI * 0.5f;
         float combatDef = totalAGI * 1.5f + totalSTR * 0.5f;
@@ -3132,8 +3341,14 @@ public class FateCastleManager : MonoBehaviour
         derivedStyle.padding = new RectOffset(12, 12, 8, 8);
         
         string statsReport = curLang == 0 
-            ? $"⚔️ Базовая Атака: {combatAtk} (База {data.strength * 2.5f + data.agility * 0.5f} + Экв. +{eqBonusSTR * 2.5f + eqBonusAGI * 0.5f})\n🛡️ Защита брони: {combatDef} (База {data.agility * 1.5f + data.strength * 0.5f} + Экв. +{eqBonusAGI * 1.5f + eqBonusSTR * 0.5f})\n❤️ Макс. ОЗ (HP): {maxHp} (База {data.stamina * 10f} + Экв. +{eqBonusSTA * 10f})\n🔮 Макс. ОМ (MP): {maxMp} (База {data.intelligence * 10f} + Экв. +{eqBonusINT * 10f})"
-            : $"⚔️ Combat Damage: {combatAtk}\n🛡️ Armor Defense: {combatDef}\n❤️ Max Health (HP): {maxHp}\n🔮 Max Mana (MP): {maxMp}";
+            ? $"⚔️ Базовая Атака: {combatAtk} (База {data.strength * 2.5f + data.agility * 0.5f} + Экв. +{eqBonusSTR * 2.5f + eqBonusAGI * 0.5f} + Зелья +{tempBonusSTR * 2.5f + tempBonusAGI * 0.5f})\n" +
+              $"🛡️ Защита брони: {combatDef} (База {data.agility * 1.5f + data.strength * 0.5f} + Экв. +{eqBonusAGI * 1.5f + eqBonusSTR * 0.5f} + Зелья +{tempBonusAGI * 1.5f + tempBonusSTR * 0.5f})\n" +
+              $"❤️ Макс. ОЗ (HP): {maxHp} (База {data.stamina * 10f} + Экв. +{eqBonusSTA * 10f} + Зелья +{tempBonusSTA * 10f})\n" +
+              $"🔮 Макс. ОМ (MP): {maxMp} (База {data.intelligence * 10f} + Экв. +{eqBonusINT * 10f} + Зелья +{tempBonusINT * 10f})"
+            : $"⚔️ Combat Damage: {combatAtk} (Potion +{tempBonusSTR * 2.5f + tempBonusAGI * 0.5f})\n" +
+              $"🛡️ Armor Defense: {combatDef} (Potion +{tempBonusAGI * 1.5f + tempBonusSTR * 0.5f})\n" +
+              $"❤️ Max Health (HP): {maxHp} (Potion +{tempBonusSTA * 10f})\n" +
+              $"🔮 Max Mana (MP): {maxMp} (Potion +{tempBonusINT * 10f})";
             
         GUILayout.Label(statsReport, derivedStyle);
         GUILayout.Space(12);
@@ -3197,38 +3412,38 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.EndHorizontal();
         GUILayout.Space(3);
 
-        // Row 2: Neck (Amulet - Slot 7)
+        // Row 2: Neck (Amulet - Slot 2)
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        DrawEquippedSlotButtonAnatomical(7, "Амулет", "Amulet", curLang, slotEquippedStyle, 36, 110);
+        DrawEquippedSlotButtonAnatomical(2, "Амулет", "Amulet", curLang, slotEquippedStyle, 36, 110);
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
         GUILayout.Space(3);
 
-        // Row 3: Torso and Arms (Weapon - Slot 8 | Armor - Slot 2 | Gloves - Slot 4)
+        // Row 3: Torso and Arms (Weapon - Slot 8 | Armor - Slot 4 | Shoulders - Slot 3)
         GUILayout.BeginHorizontal();
         DrawEquippedSlotButtonAnatomical(8, "Оружие", "Weapon", curLang, slotEquippedStyle, 40, 94);
         GUILayout.Space(2);
-        DrawEquippedSlotButtonAnatomical(2, "Доспех", "Armor", curLang, slotEquippedStyle, 40, 94);
+        DrawEquippedSlotButtonAnatomical(4, "Доспех", "Armor", curLang, slotEquippedStyle, 40, 94);
         GUILayout.Space(2);
-        DrawEquippedSlotButtonAnatomical(4, "Перчатки", "Gloves", curLang, slotEquippedStyle, 40, 94);
+        DrawEquippedSlotButtonAnatomical(3, "Наплечники", "Shoulders", curLang, slotEquippedStyle, 40, 94);
         GUILayout.EndHorizontal();
         GUILayout.Space(3);
 
-        // Row 4: Legs & Accessories (Ring - Slot 6 | Greaves - Slot 3)
+        // Row 4: Legs & Accessories (Ring - Slot 5 | Belt - Slot 6)
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        DrawEquippedSlotButtonAnatomical(6, "Кольцо", "Ring", curLang, slotEquippedStyle, 36, 94);
+        DrawEquippedSlotButtonAnatomical(5, "Кольцо", "Ring", curLang, slotEquippedStyle, 36, 94);
         GUILayout.Space(4);
-        DrawEquippedSlotButtonAnatomical(3, "Поножи", "Greaves", curLang, slotEquippedStyle, 36, 110);
+        DrawEquippedSlotButtonAnatomical(6, "Пояс", "Belt", curLang, slotEquippedStyle, 36, 110);
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
         GUILayout.Space(3);
 
-        // Row 5: Feet (Boots - Slot 5)
+        // Row 5: Feet (Boots - Slot 7)
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        DrawEquippedSlotButtonAnatomical(5, "Сапоги", "Boots", curLang, slotEquippedStyle, 36, 110);
+        DrawEquippedSlotButtonAnatomical(7, "Сапоги", "Boots", curLang, slotEquippedStyle, 36, 110);
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
 
@@ -3444,9 +3659,47 @@ public class FateCastleManager : MonoBehaviour
                             GUI.backgroundColor = new Color(0.85f, 0.65f, 0.15f, 0.25f);
                         }
                         
-                        if (GUILayout.Button(label, s_slotGridStyle, GUILayout.Width(cellW), GUILayout.Height(cellH)))
+                        Texture2D itemTex = GetItemIconTexture(item);
+                        if (itemTex != null)
                         {
-                            EquipOrUseItem(index);
+                            // Draw empty button as slot base
+                            if (GUILayout.Button("", s_slotGridStyle, GUILayout.Width(cellW), GUILayout.Height(cellH)))
+                            {
+                                EquipOrUseItem(index);
+                            }
+                            Rect btnRect = GUILayoutUtility.GetLastRect();
+                            
+                            // Draw texture with aspect ratio preserved, transparent background, and absolutely no border!
+                            float padding = 8f;
+                            Rect iconRect = new Rect(btnRect.x + padding, btnRect.y + padding, btnRect.width - padding * 2, btnRect.height - padding * 2 - 14f);
+                            GUI.DrawTexture(iconRect, itemTex, ScaleMode.ScaleToFit, true);
+                            
+                            // Draw small text overlay at the bottom of the slot
+                            Rect labelRect = new Rect(btnRect.x, btnRect.y + btnRect.height - 22f, btnRect.width, 18f);
+                            GUIStyle overlayStyle = new GUIStyle(GUI.skin.label);
+                            overlayStyle.alignment = TextAnchor.MiddleCenter;
+                            overlayStyle.fontSize = 9;
+                            overlayStyle.richText = true;
+                            overlayStyle.normal.textColor = Color.white;
+                            
+                            string overlayText = "";
+                            if (item.slotType == 0)
+                            {
+                                overlayText = $"<color=#00FFCC>x{item.count}</color>";
+                            }
+                            else
+                            {
+                                overlayText = $"{colorTag}Tier {item.level}</color>";
+                            }
+                            GUI.Label(labelRect, overlayText, overlayStyle);
+                        }
+                        else
+                        {
+                            // Text fallback
+                            if (GUILayout.Button(label, s_slotGridStyle, GUILayout.Width(cellW), GUILayout.Height(cellH)))
+                            {
+                                EquipOrUseItem(index);
+                            }
                         }
                     }
                     else
@@ -3713,29 +3966,134 @@ public class FateCastleManager : MonoBehaviour
     {
         InventoryItem item = playerEquipment.slots[slotType];
         
-        GUILayout.BeginHorizontal(GUILayout.Width(buttonWidth + 24));
-        GUILayout.Label($"<b>{GetEmojiForSlot(slotType)}</b>", GUILayout.Width(18), GUILayout.Height(height));
+        GUILayout.BeginHorizontal(GUILayout.Width(buttonWidth));
         
+        Texture2D customTex = null;
+        switch (slotType)
+        {
+            case 1: customTex = icon_helmet; break;
+            case 2: customTex = icon_amulet; break;
+            case 3: customTex = icon_pauldrons; break;
+            case 4: customTex = icon_armor; break;
+            case 5: customTex = icon_ring; break;
+            case 6: customTex = icon_belt; break;
+            case 7: customTex = icon_boots; break;
+            case 8: // Weapon slot
+                string cl = SaveGameSystem.CurrentData != null && SaveGameSystem.CurrentData.characterClass != null 
+                    ? SaveGameSystem.CurrentData.characterClass.ToLower() 
+                    : "warrior";
+                    
+                if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow") || cl.Contains("стрелок"))
+                {
+                    customTex = weapon_archer_bow;
+                }
+                else if (cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff") || cl.Contains("маг"))
+                {
+                    customTex = weapon_mage_staff;
+                }
+                else
+                {
+                    customTex = weapon_warrior_sword;
+                }
+                break;
+        }
+
         GUI.backgroundColor = new Color(0.12f, 0.75f, 0.95f, 0.35f);
+        
         if (item != null && !string.IsNullOrEmpty(item.id))
         {
-            string displayName = item.name.Length > 10 ? item.name.Substring(0, 8) + ".." : item.name;
-            string btnText = $"<b>{displayName}</b>\n(T{item.level}) <color=red>✖</color>";
-            if (GUILayout.Button(btnText, style, GUILayout.Height(height), GUILayout.Width(buttonWidth)))
+            // Item is equipped! Draw empty button with style and overlay its icon
+            if (GUILayout.Button("", style, GUILayout.Height(height), GUILayout.Width(buttonWidth)))
             {
                 UnequipItem(slotType);
             }
+            Rect btnRect = GUILayoutUtility.GetLastRect();
+            
+            // Overlay icon preserving transparency
+            if (customTex != null)
+            {
+                float padding = 4f;
+                Rect iconRect = new Rect(btnRect.x + padding, btnRect.y + padding, btnRect.width - padding * 2, btnRect.height - padding * 2 - 12f);
+                GUI.DrawTexture(iconRect, customTex, ScaleMode.ScaleToFit, true);
+            }
+            
+            // Overlay small item description text at bottom
+            Rect labelRect = new Rect(btnRect.x, btnRect.y + btnRect.height - 15f, btnRect.width, 14f);
+            GUIStyle overlayStyle = new GUIStyle(GUI.skin.label);
+            overlayStyle.alignment = TextAnchor.MiddleCenter;
+            overlayStyle.fontSize = 8;
+            overlayStyle.richText = true;
+            overlayStyle.normal.textColor = Color.red;
+            GUI.Label(labelRect, "✖", overlayStyle);
         }
         else
         {
+            // Empty slot! Draw default empty label on button
             string emptyLabel = curLang == 0 ? $"[{defaultNameRU}]" : $"[{defaultNameEN}]";
-            if (GUILayout.Button(emptyLabel, GUILayout.Height(height), GUILayout.Width(buttonWidth)))
+            if (GUILayout.Button(emptyLabel, style, GUILayout.Height(height), GUILayout.Width(buttonWidth)))
             {
                 ShowFeedback(curLang == 0 ? $"Экипируйте {defaultNameRU} через инвентарь справа!" : $"Equip {defaultNameEN} through inventory on the right!");
             }
+            Rect btnRect = GUILayoutUtility.GetLastRect();
+            
+            // Draw default icon transparently to signify what goes here
+            if (customTex != null)
+            {
+                GUI.color = new Color(1f, 1f, 1f, 0.15f); // 15% opacity for empty slot placeholder
+                float padding = 8f;
+                Rect iconRect = new Rect(btnRect.x + padding, btnRect.y + padding, btnRect.width - padding * 2, btnRect.height - padding * 2);
+                GUI.DrawTexture(iconRect, customTex, ScaleMode.ScaleToFit, true);
+                GUI.color = Color.white;
+            }
         }
+        
         GUI.backgroundColor = Color.white;
         GUILayout.EndHorizontal();
+    }
+
+    private Texture2D GetItemIconTexture(InventoryItem item)
+    {
+        if (item == null || string.IsNullOrEmpty(item.id)) return null;
+        
+        if (item.slotType == 0) // Potion
+        {
+            string id = item.id.ToLower();
+            if (id.Contains("hp") || id.Contains("life") || id.Contains("жизн")) return icon_potion_hp;
+            if (id.Contains("str") || id.Contains("силы")) return icon_potion_str;
+            if (id.Contains("int") || id.Contains("инт")) return icon_potion_int;
+            if (id.Contains("agi") || id.Contains("ловк")) return icon_potion_agi;
+            if (id.Contains("sta") || id.Contains("вынос") || id.Contains("def") || id.Contains("защит")) return icon_potion_sta;
+            return icon_potion_hp; // fallback
+        }
+        
+        switch (item.slotType)
+        {
+            case 1: return icon_helmet;
+            case 2: return icon_amulet;
+            case 3: return icon_pauldrons;
+            case 4: return icon_armor;
+            case 5: return icon_ring;
+            case 6: return icon_belt;
+            case 7: return icon_boots;
+            case 8: // Weapon slot
+                string cl = SaveGameSystem.CurrentData != null && SaveGameSystem.CurrentData.characterClass != null 
+                    ? SaveGameSystem.CurrentData.characterClass.ToLower() 
+                    : "warrior";
+                    
+                if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow") || cl.Contains("стрелок"))
+                {
+                    return weapon_archer_bow;
+                }
+                else if (cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff") || cl.Contains("маг"))
+                {
+                    return weapon_mage_staff;
+                }
+                else
+                {
+                    return weapon_warrior_sword;
+                }
+        }
+        return null;
     }
 
     private void LoadClassSkillsIcons()
@@ -5401,17 +5759,19 @@ public class FateCastleManager : MonoBehaviour
             GUILayout.Space(10);
             forgeScroll = GUILayout.BeginScrollView(forgeScroll);
 
-            // POTIONS sections (dynamic scaling with Castle Level and potion levels (1 to 3))
+            // POTIONS sections (dynamic scaling with Castle Level and potion levels (1 to 10))
             int potionIndex = PlayerPrefs.GetInt("Town_Selected_PotionLvl", 1);
             GUILayout.BeginHorizontal();
             GUILayout.Label((curLang == 0 ? "Выбор ур-ня зелья: " : "Select Potion level: ") + potionIndex, GUILayout.Width(170));
             if (GUILayout.Button("-", GUILayout.Width(35))) { if (potionIndex > 1) potionIndex--; PlayerPrefs.SetInt("Town_Selected_PotionLvl", potionIndex); }
-            if (GUILayout.Button("+", GUILayout.Width(35))) { if (potionIndex < 3) potionIndex++; PlayerPrefs.SetInt("Town_Selected_PotionLvl", potionIndex); }
+            if (GUILayout.Button("+", GUILayout.Width(35))) { if (potionIndex < 10) potionIndex++; PlayerPrefs.SetInt("Town_Selected_PotionLvl", potionIndex); }
             GUILayout.EndHorizontal();
 
             DrawPotionItem("hp", "Зелье Жизни", "Elixir of Vital Health", "生命圣水", "체력 신성 물약", 30, potionIndex, activeCastle.level);
             DrawPotionItem("str", "Зелье Силы", "Potion of Giant Strength", "巨人之力药水", "거인의 괴력 물약", 45, potionIndex, activeCastle.level);
-            DrawPotionItem("def", "Зелье Защиты", "Tome of Bastion Defense", "石像鬼坚韧合剂", "철갑 안개의 물약", 40, potionIndex, activeCastle.level);
+            DrawPotionItem("int", "Зелье Интеллекта", "Potion of Mind Intelligence", "智力药水", "지능 영약", 40, potionIndex, activeCastle.level);
+            DrawPotionItem("agi", "Зелье Ловкости", "Potion of Swift Agility", "敏捷药水", "민첩 영약", 40, potionIndex, activeCastle.level);
+            DrawPotionItem("sta", "Зелье Выносливости", "Potion of Iron Stamina", "耐力药水", "체력/지구력 영약", 40, potionIndex, activeCastle.level);
 
             GUILayout.Space(15);
             GUILayout.Box(curLang == 0 ? "⚔️ КУЗНИЦА СНАРЯЖЕНИЯ" : "⚔️ FORGE DEPARTMENT", GUILayout.Height(20));
@@ -5752,6 +6112,9 @@ public class FateCastleManager : MonoBehaviour
     private void DrawPotionItem(string id, string nameRU, string nameEN, string nameCH, string nameKR, int basePrice, int potionLvl, int castleLvl)
     {
         int curLang = Translator.LanguageID;
+        int reqLvl = GetRequiredCastleLevelForPotion(potionLvl);
+        bool isUnlocked = castleLvl >= reqLvl;
+
         int price = Mathf.RoundToInt(basePrice * potionLvl * (castleLvl * 0.4f + 0.6f));
         int count = PlayerPrefs.GetInt($"Player_Potion_{id}_Lvl_{potionLvl}", 0);
 
@@ -5763,34 +6126,44 @@ public class FateCastleManager : MonoBehaviour
         string itemTitle = $"{name} (Ур.{potionLvl})\n[Запас: {count}]";
         GUILayout.Label(itemTitle, GUILayout.Width(180));
 
-        if (GUILayout.Button($"{price} 💰", GUILayout.Height(35)))
+        if (isUnlocked)
         {
-            if (SaveGameSystem.CurrentData.gold < price)
+            if (GUILayout.Button($"{price} 💰", GUILayout.Height(35)))
             {
-                ShowFeedback(curLang == 0 ? "Жители города отказываются продавать снадобье в долг!" : "Potion merchants deny debt!");
-            }
-            else
-            {
-                string potionId = $"potion_{id}_{potionLvl}";
-                string itemNameRU = $"{nameRU} (Ур.{potionLvl})";
-                if (AddInventoryItem(potionId, itemNameRU, id, 0, potionLvl, 0))
+                if (SaveGameSystem.CurrentData.gold < price)
                 {
-                    SaveGameSystem.CurrentData.gold -= price;
-                    count++;
-                    PlayerPrefs.SetInt($"Player_Potion_{id}_Lvl_{potionLvl}", count);
-                    PlayerPrefs.Save();
-                    SaveGameSystem.Save(0);
-
-                    string okFeed = curLang == 0 ?
-                        $"Куплено и добавлено в инвентарь: {name} (Ур.{potionLvl})!" :
-                        $"Acquired and placed in inventory: {name} (Level {potionLvl})!";
-                    ShowFeedback(okFeed);
+                    ShowFeedback(curLang == 0 ? "Жители города отказываются продавать снадобье в долг!" : "Potion merchants deny debt!");
                 }
                 else
                 {
-                    ShowFeedback(curLang == 0 ? "Ваш инвентарь переполнен!" : "Inventory is full!");
+                    string potionId = $"potion_{id}_{potionLvl}";
+                    string itemNameRU = $"{nameRU} (Ур.{potionLvl})";
+                    if (AddInventoryItem(potionId, itemNameRU, id, 0, potionLvl, 0))
+                    {
+                        SaveGameSystem.CurrentData.gold -= price;
+                        count++;
+                        PlayerPrefs.SetInt($"Player_Potion_{id}_Lvl_{potionLvl}", count);
+                        PlayerPrefs.Save();
+                        SaveGameSystem.Save(0);
+
+                        string okFeed = curLang == 0 ?
+                            $"Куплено и добавлено в инвентарь: {name} (Ур.{potionLvl})!" :
+                            $"Acquired and placed in inventory: {name} (Level {potionLvl})!";
+                        ShowFeedback(okFeed);
+                    }
+                    else
+                    {
+                        ShowFeedback(curLang == 0 ? "Ваш инвентарь переполнен!" : "Inventory is full!");
+                    }
                 }
             }
+        }
+        else
+        {
+            GUI.enabled = false;
+            string lockLabel = curLang == 0 ? $"Замок ур.{reqLvl} 🔒" : $"Castle Lvl.{reqLvl} 🔒";
+            GUILayout.Button(lockLabel, GUILayout.Height(35));
+            GUI.enabled = true;
         }
         GUILayout.EndHorizontal();
     }

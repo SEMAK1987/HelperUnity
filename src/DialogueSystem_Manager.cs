@@ -1120,20 +1120,27 @@ namespace FateContinent
             }
 
             // Проверяем, на каком шаге мы закончили диалог (это определяет выбранную локацию!)
-            if (currentLineIndex == 4)
+            if (lpm == null)
             {
-                Debug.Log("[GATEWAY] Попытка загрузки уровня: Кровавые Пустоши!");
-                TryLoadScene(sceneCrimsonWastes);
+                if (currentLineIndex == 4)
+                {
+                    Debug.Log("[GATEWAY] Попытка загрузки уровня: Кровавые Пустоши!");
+                    TryLoadScene(sceneCrimsonWastes);
+                }
+                else if (currentLineIndex == 5)
+                {
+                    Debug.Log("[GATEWAY] Попытка загрузки уровня: Ледяной Пик!");
+                    TryLoadScene(sceneIceBoundPeak);
+                }
+                else if (currentLineIndex == 6)
+                {
+                    Debug.Log("[GATEWAY] Попытка загрузки уровня: Древние Руины!");
+                    TryLoadScene(sceneAncientRuins);
+                }
             }
-            else if (currentLineIndex == 5)
+            else
             {
-                Debug.Log("[GATEWAY] Попытка загрузки уровня: Ледяной Пик!");
-                TryLoadScene(sceneIceBoundPeak);
-            }
-            else if (currentLineIndex == 6)
-            {
-                Debug.Log("[GATEWAY] Попытка загрузки уровня: Древние Руины!");
-                TryLoadScene(sceneAncientRuins);
+                Debug.Log("[DIALOGUE SYSTEM] LandingPositionManager активен. Остаемся в стратегическом режиме кампании на текущей сцене.");
             }
             
             Debug.Log("[DIALOGUE SYSTEM] Диалог завершен.");
