@@ -3198,6 +3198,7 @@ public class FateCastleManager : MonoBehaviour
         LoadInventory();
         LoadEquipment();
         RecalculateEquippedBonuses();
+        isHoveringSkill = false;
 
         // Trigger tutorial if not completed yet
         bool isTutorialCompleted = PlayerPrefs.GetInt("Aelyssa_Character_Tutorial_Done2", 0) == 1;
@@ -3375,12 +3376,12 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.EndVertical();
         col1Rect = GUILayoutUtility.GetLastRect();
         
-        GUILayout.Space(15);
+        GUILayout.Space(35); // Shift column 2 (Equipment) to the right!
         
         // ----------------------------------------------------
-        // COLUMN 2: EQUIPMENT & CLASS SKILLS (Width: 340f)
+        // COLUMN 2: EQUIPMENT & CLASS SKILLS (Width: 380f)
         // ----------------------------------------------------
-        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(340), GUILayout.ExpandHeight(true));
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(380), GUILayout.ExpandHeight(true));
         
         // TOP HALF: СНАРЯЖЕНИЕ ПЕРСОНАЖА (Equipment Mannequin)
         GUIStyle eqHeaderStyle = new GUIStyle(GUI.skin.label);
@@ -3404,55 +3405,55 @@ public class FateCastleManager : MonoBehaviour
         
         GUILayout.BeginVertical(GUI.skin.box);
         
-        // Row 1: Head (Helmet - Slot 1)
+        // Row 1: Head (Helmet - Slot 1) - Larger dimensions (v18.11.22)
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        DrawEquippedSlotButtonAnatomical(1, "Шлем", "Helmet", curLang, slotEquippedStyle, 36, 110);
+        DrawEquippedSlotButtonAnatomical(1, "Шлем", "Helmet", curLang, slotEquippedStyle, 54, 120);
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
-        GUILayout.Space(3);
+        GUILayout.Space(4);
 
         // Row 2: Neck (Amulet - Slot 2)
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        DrawEquippedSlotButtonAnatomical(2, "Амулет", "Amulet", curLang, slotEquippedStyle, 36, 110);
+        DrawEquippedSlotButtonAnatomical(2, "Амулет", "Amulet", curLang, slotEquippedStyle, 54, 120);
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
-        GUILayout.Space(3);
+        GUILayout.Space(4);
 
         // Row 3: Torso and Arms (Weapon - Slot 8 | Armor - Slot 4 | Shoulders - Slot 3)
         GUILayout.BeginHorizontal();
-        DrawEquippedSlotButtonAnatomical(8, "Оружие", "Weapon", curLang, slotEquippedStyle, 40, 94);
-        GUILayout.Space(2);
-        DrawEquippedSlotButtonAnatomical(4, "Доспех", "Armor", curLang, slotEquippedStyle, 40, 94);
-        GUILayout.Space(2);
-        DrawEquippedSlotButtonAnatomical(3, "Наплечники", "Shoulders", curLang, slotEquippedStyle, 40, 94);
-        GUILayout.EndHorizontal();
+        DrawEquippedSlotButtonAnatomical(8, "Оружие", "Weapon", curLang, slotEquippedStyle, 58, 104);
         GUILayout.Space(3);
+        DrawEquippedSlotButtonAnatomical(4, "Доспех", "Armor", curLang, slotEquippedStyle, 58, 104);
+        GUILayout.Space(3);
+        DrawEquippedSlotButtonAnatomical(3, "Наплечники", "Shoulders", curLang, slotEquippedStyle, 58, 104);
+        GUILayout.EndHorizontal();
+        GUILayout.Space(4);
 
         // Row 4: Legs & Accessories (Ring - Slot 5 | Belt - Slot 6)
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        DrawEquippedSlotButtonAnatomical(5, "Кольцо", "Ring", curLang, slotEquippedStyle, 36, 94);
+        DrawEquippedSlotButtonAnatomical(5, "Кольцо", "Ring", curLang, slotEquippedStyle, 54, 104);
         GUILayout.Space(4);
-        DrawEquippedSlotButtonAnatomical(6, "Пояс", "Belt", curLang, slotEquippedStyle, 36, 110);
+        DrawEquippedSlotButtonAnatomical(6, "Пояс", "Belt", curLang, slotEquippedStyle, 54, 120);
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
-        GUILayout.Space(3);
+        GUILayout.Space(4);
 
         // Row 5: Feet (Boots - Slot 7)
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        DrawEquippedSlotButtonAnatomical(7, "Сапоги", "Boots", curLang, slotEquippedStyle, 36, 110);
+        DrawEquippedSlotButtonAnatomical(7, "Сапоги", "Boots", curLang, slotEquippedStyle, 54, 120);
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
 
         GUILayout.EndVertical();
-        GUILayout.Space(8);
+        
+        // PUSH SKILLS SECTION DOWN TO THE BOTTOM OF THE COLUMN
+        GUILayout.FlexibleSpace();
 
         // BOTTOM HALF: КЛАССОВЫЕ НАВЫКИ (Class Skills)
-        // Сбрасываем флаг наведения в начале отрисовки группы навыков
-        isHoveringSkill = false;
 
         if (s_skillsHeaderStyle == null)
         {
@@ -3523,7 +3524,7 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.EndVertical();
         col2Rect = GUILayoutUtility.GetLastRect();
         
-        GUILayout.Space(15);
+        GUILayout.Space(35); // Shift column 3 (Inventory) to the right!
         
         // ----------------------------------------------------
         // COLUMN 3: INVENTORY GRID (Width: Remaining space)
@@ -3618,6 +3619,7 @@ public class FateCastleManager : MonoBehaviour
         for (int row = 0; row < gridRows; row++)
         {
             GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace(); // Center slots row - left space!
             for (int col = 0; col < gridColumns; col++)
             {
                 int index = startSlotIndex + row * gridColumns + col;
@@ -3669,6 +3671,12 @@ public class FateCastleManager : MonoBehaviour
                             }
                             Rect btnRect = GUILayoutUtility.GetLastRect();
                             
+                            // Check Hover here!
+                            if (Event.current.type == EventType.Repaint && btnRect.Contains(Event.current.mousePosition))
+                            {
+                                SetHoveredItem(item, curLang);
+                            }
+                            
                             // Draw texture with aspect ratio preserved, transparent background, and absolutely no border!
                             float padding = 8f;
                             Rect iconRect = new Rect(btnRect.x + padding, btnRect.y + padding, btnRect.width - padding * 2, btnRect.height - padding * 2 - 14f);
@@ -3699,6 +3707,11 @@ public class FateCastleManager : MonoBehaviour
                             if (GUILayout.Button(label, s_slotGridStyle, GUILayout.Width(cellW), GUILayout.Height(cellH)))
                             {
                                 EquipOrUseItem(index);
+                            }
+                            Rect btnRect = GUILayoutUtility.GetLastRect();
+                            if (Event.current.type == EventType.Repaint && btnRect.Contains(Event.current.mousePosition))
+                            {
+                                SetHoveredItem(item, curLang);
                             }
                         }
                     }
@@ -3748,6 +3761,7 @@ public class FateCastleManager : MonoBehaviour
                 }
                 GUI.backgroundColor = Color.white;
             }
+            GUILayout.FlexibleSpace(); // Center slots row - right space!
             GUILayout.EndHorizontal();
         }
         
@@ -3905,9 +3919,29 @@ public class FateCastleManager : MonoBehaviour
             hoverTypeStyle.fontStyle = FontStyle.Italic;
             hoverTypeStyle.normal.textColor = Color.cyan;
             hoverTypeStyle.alignment = TextAnchor.MiddleCenter;
-            string skillTypeLabel = hoveredSkillType == "Ultimate" 
-                ? (curLang == 0 ? "⚡ СУПЕРУДАР" : "⚡ ULTIMATE") 
-                : (curLang == 0 ? "🌟 ПАССИВНЫЙ НАВЫК" : "🌟 PASSIVE SKILL");
+            
+            string skillTypeLabel = "";
+            if (hoveredSkillType == "Ultimate")
+            {
+                skillTypeLabel = (curLang == 0 ? "⚡ СУПЕРУДАР" : "⚡ ULTIMATE");
+            }
+            else if (hoveredSkillType == "Passive")
+            {
+                skillTypeLabel = (curLang == 0 ? "🌟 ПАССИВНЫЙ НАВЫК" : "🌟 PASSIVE SKILL");
+            }
+            else if (hoveredSkillType == "Potion")
+            {
+                skillTypeLabel = (curLang == 0 ? "🧪 ЭЛИКСИР / ЗЕЛЬЕ" : "🧪 ELIXIR / POTION");
+            }
+            else if (hoveredSkillType.Contains("🛡️") || hoveredSkillType.Contains("EQUIPMENT"))
+            {
+                skillTypeLabel = hoveredSkillType;
+            }
+            else
+            {
+                skillTypeLabel = (curLang == 0 ? "🌟 ПАССИВНЫЙ НАВЫК" : "🌟 PASSIVE SKILL");
+            }
+            
             GUI.Label(new Rect(tooltipX + 10, tooltipY + 28, tooltipWidth - 20, 16), skillTypeLabel, hoverTypeStyle);
             
             // Icon
@@ -3928,6 +3962,7 @@ public class FateCastleManager : MonoBehaviour
             GUIStyle hoverDescStyle = new GUIStyle(GUI.skin.label);
             hoverDescStyle.fontSize = 10;
             hoverDescStyle.wordWrap = true;
+            hoverDescStyle.richText = true; // Support rich-text color formatting!
             hoverDescStyle.alignment = TextAnchor.UpperLeft;
             hoverDescStyle.normal.textColor = Color.white;
             GUI.Label(new Rect(tooltipX + 70, tooltipY + 48, tooltipWidth - 80, tooltipHeight - 60), hoveredSkillDesc, hoverDescStyle);
@@ -4025,6 +4060,12 @@ public class FateCastleManager : MonoBehaviour
             overlayStyle.richText = true;
             overlayStyle.normal.textColor = Color.red;
             GUI.Label(labelRect, "✖", overlayStyle);
+            
+            // Check hover tooltip
+            if (Event.current.type == EventType.Repaint && btnRect.Contains(Event.current.mousePosition))
+            {
+                SetHoveredItem(item, curLang);
+            }
         }
         else
         {
@@ -4345,6 +4386,118 @@ public class FateCastleManager : MonoBehaviour
                 hoveredSkillIcon = activeSkillUltimate; 
                 hoveredSkillType = "Ultimate"; 
             }
+        }
+    }
+
+    private void SetHoveredItem(InventoryItem item, int curLang)
+    {
+        if (item == null || string.IsNullOrEmpty(item.id)) return;
+        
+        isHoveringSkill = true; // reuse same logic to display the tooltip box!
+        hoveredSkillIcon = GetItemIconTexture(item);
+        hoveredSkillName = GetLocalizedItemName(item, curLang);
+        
+        if (item.slotType == 0) // Potion
+        {
+            hoveredSkillType = "Potion";
+            
+            if (item.id.Contains("hp"))
+            {
+                int healAmount = GetPotionValueForLevel(item.level, true);
+                hoveredSkillDesc = curLang == 0
+                    ? $"Восстанавливает <color=#33FF33>+{healAmount} ОЗ</color> при использовании."
+                    : $"Restores <color=#33FF33>+{healAmount} HP</color> upon use.";
+            }
+            else if (item.id.Contains("str"))
+            {
+                int boost = GetPotionValueForLevel(item.level, false);
+                hoveredSkillDesc = curLang == 0
+                    ? $"Временно увеличивает Силу на <color=#FF6600>+{boost} STR</color> до конца текущего дня."
+                    : $"Temporarily boosts Strength by <color=#FF6600>+{boost} STR</color> until the end of the day.";
+            }
+            else if (item.id.Contains("int"))
+            {
+                int boost = GetPotionValueForLevel(item.level, false);
+                hoveredSkillDesc = curLang == 0
+                    ? $"Временно увеличивает Интеллект на <color=#CC33FF>+{boost} INT</color> до конца текущего дня."
+                    : $"Temporarily boosts Intelligence by <color=#CC33FF>+{boost} INT</color> until the end of the day.";
+            }
+            else if (item.id.Contains("agi"))
+            {
+                int boost = GetPotionValueForLevel(item.level, false);
+                hoveredSkillDesc = curLang == 0
+                    ? $"Временно увеличивает Ловкость на <color=#33FF33>+{boost} AGI</color> до конца текущего дня."
+                    : $"Temporarily boosts Agility by <color=#33FF33>+{boost} AGI</color> until the end of the day.";
+            }
+            else if (item.id.Contains("sta") || item.id.Contains("def"))
+            {
+                int boost = GetPotionValueForLevel(item.level, false);
+                hoveredSkillDesc = curLang == 0
+                    ? $"Временно увеличивает Выносливость на <color=#33CCFF>+{boost} STA</color> до конца текущего дня."
+                    : $"Temporarily boosts Stamina by <color=#33CCFF>+{boost} STA</color> until the end of the day.";
+            }
+            else
+            {
+                hoveredSkillDesc = curLang == 0 ? "Таинственное зелье." : "A mysterious elixir.";
+            }
+        }
+        else // Equipment
+        {
+            int tier = item.level;
+            if (curLang == 0)
+            {
+                hoveredSkillType = $"🛡️ СНАРЯЖЕНИЕ (T{tier})";
+            }
+            else
+            {
+                hoveredSkillType = $"🛡️ EQUIPMENT (Tier {tier})";
+            }
+            
+            string statReport = "";
+            switch (item.slotType)
+            {
+                case 1: // Head (Helmet)
+                    statReport = curLang == 0 
+                        ? $"Выносливость: <color=#33FF33>+{tier * 2} STA</color> (Повышает здоровье на +{tier * 20} HP)"
+                        : $"Stamina: <color=#33FF33>+{tier * 2} STA</color> (+{tier * 20} Max HP)";
+                    break;
+                case 2: // Neck (Amulet)
+                    statReport = curLang == 0
+                        ? $"Интеллект: <color=#33FF33>+{tier * 2} INT</color> (Повышает ману на +{tier * 20} MP)"
+                        : $"Intelligence: <color=#33FF33>+{tier * 2} INT</color> (+{tier * 20} Max Mana)";
+                    break;
+                case 3: // Shoulders (Pauldrons)
+                    statReport = curLang == 0
+                        ? $"Сила: <color=#33FF33>+{tier} STR</color> (Урон +{tier * 2.5f})\nВыносливость: <color=#33FF33>+{tier} STA</color> (Здоровье +{tier * 10} HP)"
+                        : $"Strength: <color=#33FF33>+{tier} STR</color> (+{tier * 2.5f} Dmg)\nStamina: <color=#33FF33>+{tier} STA</color> (+{tier * 10} HP)";
+                    break;
+                case 4: // Chest (Armor)
+                    statReport = curLang == 0
+                        ? $"Выносливость: <color=#33FF33>+{tier * 3} STA</color> (Повышает здоровье на +{tier * 30} HP)"
+                        : $"Stamina: <color=#33FF33>+{tier * 3} STA</color> (+{tier * 30} Max HP)";
+                    break;
+                case 5: // Ring
+                    statReport = curLang == 0
+                        ? $"Интеллект: <color=#33FF33>+{tier} INT</color> (Мана +{tier * 10} MP)\nЛовкость: <color=#33FF33>+{tier} AGI</color> (Защита +{tier * 1.5f})"
+                        : $"Intelligence: <color=#33FF33>+{tier} INT</color> (+{tier * 10} MP)\nAgility: <color=#33FF33>+{tier} AGI</color> (+{tier * 1.5f} Def)";
+                    break;
+                case 6: // Belt
+                    statReport = curLang == 0
+                        ? $"Выносливость: <color=#33FF33>+{tier} STA</color> (Здоровье +{tier * 10} HP)\nЛовкость: <color=#33FF33>+{tier} AGI</color> (Защита +{tier * 1.5f})"
+                        : $"Stamina: <color=#33FF33>+{tier} STA</color> (+{tier * 10} HP)\nAgility: <color=#33FF33>+{tier} AGI</color> (+{tier * 1.5f} Def)";
+                    break;
+                case 7: // Boots
+                    statReport = curLang == 0
+                        ? $"Ловкость: <color=#33FF33>+{tier * 2} AGI</color> (Повышает защиту на +{tier * 3.0f})"
+                        : $"Agility: <color=#33FF33>+{tier * 2} AGI</color> (+{tier * 3.0f} Def)";
+                    break;
+                case 8: // Weapon
+                    statReport = curLang == 0
+                        ? $"Сила: <color=#33FF33>+{tier * 3} STR</color> (Повышает базовую атаку на +{tier * 7.5f} урона)"
+                        : $"Strength: <color=#33FF33>+{tier * 3} STR</color> (+{tier * 7.5f} Combat Damage)";
+                    break;
+            }
+            hoveredSkillDesc = statReport;
         }
     }
 
