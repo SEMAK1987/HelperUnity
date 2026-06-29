@@ -779,6 +779,24 @@ public class FateCastleManager : MonoBehaviour
         return en;
     }
 
+    public string GetText9(string ru, string en, string de, string fr, string es, string pt, string ja, string ko, string zh)
+    {
+        int curLang = Translator.LanguageID;
+        switch (curLang)
+        {
+            case 0: return ru;
+            case 1: return en;
+            case 2: return !string.IsNullOrEmpty(de) ? de : en;
+            case 3: return !string.IsNullOrEmpty(fr) ? fr : en;
+            case 4: return !string.IsNullOrEmpty(es) ? es : en;
+            case 5: return !string.IsNullOrEmpty(pt) ? pt : en;
+            case 6: return !string.IsNullOrEmpty(ja) ? ja : en;
+            case 7: return !string.IsNullOrEmpty(ko) ? ko : en;
+            case 8: return !string.IsNullOrEmpty(zh) ? zh : en;
+            default: return en;
+        }
+    }
+
     private int GetPotionValueForLevel(int level, bool isHP)
     {
         if (isHP)
@@ -1417,9 +1435,44 @@ public class FateCastleManager : MonoBehaviour
             return;
         }
 
-        int bossPower = castle.aiTroopsPower;
-        
-        if (maxPower >= bossPower)
+        // --- RPG CALCULATIONS WITH HERO STATS & POTION BUFFS ---
+        int mainHeroPower = 0;
+        if (SaveGameSystem.CurrentData != null)
+        {
+            mainHeroPower = (SaveGameSystem.CurrentData.playerLevel * 50) + 
+                (SaveGameSystem.CurrentData.strength + eqBonusSTR + tempBonusSTR) * 12 + 
+                (SaveGameSystem.CurrentData.agility + eqBonusAGI + tempBonusAGI) * 12 + 
+                (SaveGameSystem.CurrentData.intelligence + eqBonusINT + tempBonusINT) * 12 + 
+                (SaveGameSystem.CurrentData.stamina + eqBonusSTA + tempBonusSTA) * 12;
+        }
+        int totalPlayerPower = maxPower + mainHeroPower;
+
+        // --- COMPUTER DRINKING POTIONS BEFORE BATTLE ---
+        int enemyPotionsDrunk = 0;
+        if (castle.aiPotionsStock > 0)
+        {
+            enemyPotionsDrunk = Mathf.Min(castle.aiPotionsStock, UnityEngine.Random.Range(1, 3));
+            castle.aiPotionsStock -= enemyPotionsDrunk;
+            PlayerPrefs.SetInt("Castle_AI_Potions_" + targetZoneIdx, castle.aiPotionsStock);
+            PlayerPrefs.Save();
+        }
+
+        int enemyHeroPower = (castle.aiCommanderLevel * 50) + (castle.aiArmorTier * 100) + (enemyPotionsDrunk * 150);
+        int totalEnemyPower = castle.aiTroopsPower + enemyHeroPower;
+
+        // Print information about the battle preparation
+        if (enemyPotionsDrunk > 0)
+        {
+            string prepMsg = GetText(
+                $"🛡️ Перед началом боя вражеский полководец выпил {enemyPotionsDrunk} боевых зелий, получив +{enemyPotionsDrunk * 150} к силе!",
+                $"🛡️ Before the battle, the enemy commander drank {enemyPotionsDrunk} combat potions, gaining +{enemyPotionsDrunk * 150} battle power!",
+                $"🛡️ 전투가 시작되기 전에 적 사령관이 {enemyPotionsDrunk}개의 영약을 복용하여 전투력이 +{enemyPotionsDrunk * 150} 증가했습니다!",
+                $"🛡️ 战斗开始前，敌方领主服用了 {enemyPotionsDrunk} 瓶战斗药水，战斗力提升了 +{enemyPotionsDrunk * 150}！"
+            );
+            ShowFeedback(prepMsg);
+        }
+
+        if (totalPlayerPower >= totalEnemyPower)
         {
             castle.owner = "Player";
             PlayerPrefs.SetString("Castle_Owner_" + targetZoneIdx, "Player");
@@ -1448,9 +1501,12 @@ public class FateCastleManager : MonoBehaviour
             
             SpawnAllCastles();
 
-            string resMsg = curLang == 0 ?
-                $"👑 ПОБЕДА! Мы захватили {castle.nameRU}! Добыча: +{lootGold} 💰. Враг бежал, регион окрасился в цвета Ордена Света!" :
-                $"👑 VICTORY! Conquered {castle.nameEN}! Loot: +{lootGold} 💰. Underneath grounds claim the banner of Light Alliance!";
+            string resMsg = GetText(
+                $"👑 ПОБЕДА! Мы захватили {castle.nameRU}! Добыча: +{lootGold} 💰. Враг бежал, регион окрасился в цвета Ордена Света! (Сила авангарда: {totalPlayerPower} vs Сила обороны: {totalEnemyPower})",
+                $"👑 VICTORY! Conquered {castle.nameEN}! Loot: +{lootGold} 💰. Underneath grounds claim the banner of Light Alliance! (Vanguard Power: {totalPlayerPower} vs Defense Power: {totalEnemyPower})",
+                $"👑 승리! {castle.nameKR}을(를) 정복했습니다! 전리품: +{lootGold} 💰. (아군 정예력: {totalPlayerPower} vs 적군 수비력: {totalEnemyPower})",
+                $"👑 胜利！我们成功占领了 {castle.nameCH}！战利品: +{lootGold} 💰。 (我方总战力: {totalPlayerPower} vs 敌方防守力: {totalEnemyPower})"
+            );
             ShowFeedback(resMsg);
 
             // Check if all castles are conquered!
@@ -1484,9 +1540,12 @@ public class FateCastleManager : MonoBehaviour
             
             PlayerPrefs.Save();
 
-            string resMsg = curLang == 0 ?
-                $"❌ ПОРАЖЕНИЕ! Наши силы были разбиты у крепостных стен! Потеряно большинство когорт осады." :
-                $"❌ DEFEAT! Defending sentinel forces repelled our siege. Heavy cohort casualties suffered.";
+            string resMsg = GetText(
+                $"❌ ПОРАЖЕНИЕ! Наши силы были разбиты у крепостных стен! Потеряно большинство когорт осады. (Наша сила: {totalPlayerPower} vs Оборона врага: {totalEnemyPower})",
+                $"❌ DEFEAT! Defending sentinel forces repelled our siege. Heavy cohort casualties suffered. (Our Power: {totalPlayerPower} vs Enemy Defense: {totalEnemyPower})",
+                $"❌ 패배! 적 성벽 앞수비대에 패배했습니다! (아군 전투력: {totalPlayerPower} vs 적 수비력: {totalEnemyPower})",
+                $"❌ 失败！我们在城墙下被击退！损失了大部分攻城部队。 (我方总战力: {totalPlayerPower} vs 敌方防守力: {totalEnemyPower})"
+            );
             ShowFeedback(resMsg);
         }
 
@@ -5284,117 +5343,6 @@ public class FateCastleManager : MonoBehaviour
             showCastleCalibrationPanel = false;
         }
         GUI.backgroundColor = Color.white;
-
-        GUILayout.EndArea();
-    }
-
-    private void DrawStatRow(int curLang, string emoji, string statName, ref int statValue, ref int availablePoints, int minValue)
-    {
-        GUILayout.BeginHorizontal();
-        GUILayout.Label($" {emoji} {statName}:", GUILayout.Width(150), GUILayout.Height(22));
-        GUILayout.Label($"{statValue}", GUILayout.Width(40), GUILayout.Height(22));
-        
-        // Ограничиваем не-автономным ручным распределением
-        if (!isAutonomousStatsDistribution)
-        {
-            // Кнопка Уменьшить (Если прокачали выше минимального базового значения для класса)
-            if (statValue > minValue)
-            {
-                if (GUILayout.Button("-", GUILayout.Width(32), GUILayout.Height(20)))
-                {
-                    statValue--;
-                    availablePoints++;
-                    RecalculateStats();
-                    PlayerPrefs.Save();
-                }
-            }
-            else
-            {
-                GUILayout.Space(36); // Пустышка для удержания сетки
-            }
-            
-            // Кнопка Увеличить (Если есть свободные очки)
-            if (availablePoints > 0)
-            {
-                if (GUILayout.Button("+", GUILayout.Width(32), GUILayout.Height(20)))
-                {
-                    statValue++;
-                    availablePoints--;
-                    RecalculateStats();
-                    PlayerPrefs.Save();
-                }
-            }
-            else
-            {
-                GUILayout.Space(36);
-            }
-        }
-        else
-        {
-            GUILayout.Label("🤖", GUILayout.Width(64), GUILayout.Height(22));
-        }
-        
-        GUILayout.EndHorizontal();
-    }
-
-    private void DrawNewDayOverlay(int curLang)
-    {
-        float wWidth = Screen.width * 0.55f;
-        float wHeight = Screen.height * 0.60f;
-        float wx = (Screen.width - wWidth) / 2f;
-        float wy = (Screen.height - wHeight) / 2f;
-
-        GUI.backgroundColor = new Color(0.02f, 0.05f, 0.12f, 0.99f);
-        GUILayout.BeginArea(new Rect(wx, wy, wWidth, wHeight), GUI.skin.box);
-        
-        GUILayout.Space(12);
-        GUIStyle tStyle = new GUIStyle(GUI.skin.label);
-        tStyle.alignment = TextAnchor.MiddleCenter;
-        tStyle.fontSize = 24;
-        tStyle.fontStyle = FontStyle.Bold;
-        tStyle.normal.textColor = Color.cyan;
-
-        string repHeader = curLang == 0 ? "ОТЧЕТ КОНТИНЕНТА СУДЬБЫ" : "REPORT OF THE FATE CONTINENT";
-        if (curLang == 8) repHeader = "命运大陆军事汇报总览";
-        if (curLang == 7) repHeader = "운명의 대륙 군사 정찰 보고서";
-        GUILayout.Label($"📅 {repHeader} (День {currentDay})", tStyle);
-
-        GUILayout.Space(15);
-
-        GUIStyle itemStyle = new GUIStyle(GUI.skin.label);
-        itemStyle.fontSize = 14;
-        itemStyle.alignment = TextAnchor.MiddleLeft;
-        itemStyle.normal.textColor = new Color(0.95f, 0.95f, 0.95f);
-
-        GUILayout.Label(curLang == 0 ? "События на континенте во время смены хода:" : "Actions taken by rival factions during overnight transition:", itemStyle);
-        GUILayout.Space(8);
-
-        if (aiLogs.Count == 0)
-        {
-            GUILayout.Label(curLang == 0 ? "• Спокойный ход времени. Активных конфликтов не обнаружено." : "• Tranquil hours. No unexpected border development or assaults reported.", itemStyle);
-        }
-        else
-        {
-            for (int i = 0; i < aiLogs.Count; i++)
-            {
-                GUILayout.Label($"• {aiLogs[i]}", itemStyle);
-            }
-        }
-
-        GUILayout.FlexibleSpace();
-
-        GUI.backgroundColor = new Color(0.12f, 0.88f, 0.45f, 1.0f);
-        string contBtnLabel = curLang == 0 ? "ПРИНЯТЬ ОТЧЕТ" : "ACKNOWLEDGE REPORT";
-        if (curLang == 8) contBtnLabel = "阅览并关闭汇报";
-        if (curLang == 7) contBtnLabel = "정찰 보고서 확인";
-
-        if (GUILayout.Button(contBtnLabel, GUILayout.Height(40)))
-        {
-            showNewDayOverlay = false;
-        }
-        GUI.backgroundColor = Color.white;
-
-        GUILayout.Space(12);
         GUILayout.EndArea();
     }
 
@@ -5581,138 +5529,122 @@ public class FateCastleManager : MonoBehaviour
                         SpawnAllCastles();
 
                         string okMsg = curLang == 0 ?
-                            $"Цитадель расширена до Уровня {castle.level}! Новые чертежи разблокированы." :
-                            $"Fortress expanded to Tier {castle.level}! New strategic blueprints unlocked.";
-                        ShowFeedback(okMsg);
-                    }
-                }
-                GUI.backgroundColor = Color.white;
-            }
-            else
+                            $"Цитадель расшир            if (currentTownSubPanel == 1)
             {
-                GUIStyle maxS = new GUIStyle(GUI.skin.label);
-                maxS.alignment = TextAnchor.MiddleCenter;
-                maxS.fontStyle = FontStyle.Bold;
-                maxS.normal.textColor = new Color(0.2f, 1.0f, 0.95f, 1.0f);
-
-                string maxLabel = curLang == 0 ? "👑 ДОСТИГНУТ ЛИМИТ 3 УРОВНЯ НА 1-м КОНТИНЕНТЕ!" : "👑 TIER 3 LIMIT REACHED ON THE 1st CONTINENT!";
-                if (curLang == 8) maxLabel = "👑 已达到第一大陆的3级上限！";
-                if (curLang == 7) maxLabel = "👑 제1대륙 3단계 한계 도달!";
-
-                string subLabel = curLang == 0 ? "Дальнейшее развитие возможно на других континентах." : "Further upgrades are available on other continents.";
-                if (curLang == 8) subLabel = "后续升级可在其他大陆进行。";
-                if (curLang == 7) subLabel = "추가 확장은 다른 대륙에서 가능합니다.";
-
-                GUILayout.Label(maxLabel, maxS);
-
-                GUIStyle subS = new GUIStyle(GUI.skin.label);
-                subS.alignment = TextAnchor.MiddleCenter;
-                subS.fontSize = 11;
-                subS.normal.textColor = Color.gray;
-                GUILayout.Label(subLabel, subS);
-            }
+                float colWidth = wWidth - 24;
+                GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(colWidth));
+                
+                GUIStyle colHeader1 = new GUIStyle(GUI.skin.box);
+                colHeader1.alignment = TextAnchor.MiddleCenter;
+                colHeader1.fontSize = 17;
+                colHeader1.fontStyle = FontStyle.Bold;
+                colHeader1.normal.textColor = new Color(0.2f, 1.0f, 0.6f);
+                
+                string barracksHeader = GetText("⚔️ КАЗАРМЫ", "⚔️ BARRACKS", "⚔️ 연병장/배럭", "⚔️ 军营/兵营");
+                GUILayout.Label(barracksHeader, colHeader1, GUILayout.Height(36));
+            
+            string bDesc = curLang == 0 ? "Найм войск в армию согласно уровню замка" : "Troop recruitment matching castle tier";
+            GUILayout.Label(bDesc, subSt);
 
             GUILayout.Space(10);
+            barracksScroll = GUILayout.BeginScrollView(barracksScroll);
 
-            // КНОПКА ВХОДА В 2D ГОРОД
-            string townBtnLabel = curLang == 0 ? "🏟️ ВОЙТИ В 2D ЗАМКОВЫЙ ГОРОД" : "🏟️ ENTER 2D CASTLE TOWN";
-            if (curLang == 8) townBtnLabel = "🏟️ 进入2D城堡内城";
-            if (curLang == 7) townBtnLabel = "🏟️ 2D 영지 마을 입장";
+            DrawUnitItem("warrior", "Боец фракции", "Faction Warrior", "皇室精锐战士", "왕실 정예 전사", 50, 1, activeCastle.level);
+            DrawUnitItem("archer", "Эльфийский Лучник", "Elven Archer", "精灵神射手", "엘프 신궁 대원", 75, 1, activeCastle.level);
+            DrawUnitItem("mage", "Боевой Маг Зенита", "Zenith Battle Mage", "제니스 전투 마법사", "제니스 전투 마법사", 120, 1, activeCastle.level);
+            DrawUnitItem("paladin", "Паладин Света", "Holy Paladin", "圣光审判圣骑士", "성광의 발키리 기사", 200, 2, activeCastle.level);
+            DrawUnitItem("cavalry", "Имперская Конница", "Imperial Cavalry", "帝国重装重骑兵", "황실 중갑 철기병", 320, 3, activeCastle.level);
+            DrawUnitItem("cannoneer", "Осадно-боевой Пушкарь", "Garrison Cannoneer", "重击攻锤铁炮手", "공성 사격 철포병", 450, 4, activeCastle.level);
+            DrawUnitItem("centaur", "Кентавр Степей", "Steppe Centaur", "荒野疾行百里人马", "초원의 켄타우로스", 130, 5, activeCastle.level);
+            DrawUnitItem("necromancer", "Некромант Тьмы", "Shadow Necromancer", "黑暗禁忌亡灵巫师", "어둠의 네크로맨서", 260, 5, activeCastle.level);
+            DrawUnitItem("griffin", "Элитный Королевский Грифон", "Royal Griffin", "皇家狮鹫守御猛禽", "황실 고대 그리폰", 380, 5, activeCastle.level);
+            DrawUnitItem("overlord", "Рыцарь-Властелин", "Dread Overlord", "铁王座幽夜统治者", "공포의 지옥 영주", 680, 5, activeCastle.level);
+            DrawUnitItem("hydra", "Многоголовая Гидра", "Swamp Hydra", "九头沼泽极冻毒蜃", "맹독의 아홉머리 히дра", 800, 5, activeCastle.level);
+            DrawUnitItem("dragon", "Легендарный Дракон Пустоты", "Void Dragon", "虚空至尊不灭邪龙", "허공의 전설 고대 용", 1500, 6, activeCastle.level);
+            DrawUnitItem("mountain_bear", "Ураганный Медведь Гор", "Mountain Bear Guard", "极寒高山怒嚎巨熊", "태산의 수호 거대 곰", 1000, 6, activeCastle.level);
+            DrawUnitItem("wasteland_serpent", "Гигантская Змея Пустошей", "Wasteland Serpent", "荒原巨型暴食沙蟒", "황무지의 고대 거대 뱀", 1100, 6, activeCastle.level);
 
-            GUI.backgroundColor = new Color(0.0f, 0.82f, 0.98f, 1.0f);
-            if (GUILayout.Button(townBtnLabel, GUILayout.Height(46)))
-            {
-                isTownViewActive = true;
-                currentTownSubPanel = 0; // Начинаем всегда с основных Обзор города
-                isDetailsOpen = false;
-                ShowFeedback("");
-                clickCooldown = 0.25f;
-                GUIUtility.ExitGUI();
-            }
-            GUI.backgroundColor = Color.white;
+            GUILayout.EndScrollView();
+            GUILayout.EndVertical();
         }
-        else
+
+        // --- Column 2: FORGE & HEALTH SHOP ---
+        if (currentTownSubPanel == 0 || currentTownSubPanel == 2)
         {
-            // Вражеский замок - Espionage & Info Panel
-            GUIStyle warnS = new GUIStyle(GUI.skin.label);
-            warnS.alignment = TextAnchor.MiddleCenter;
-            warnS.fontStyle = FontStyle.Bold;
-            warnS.fontSize = 12;
-            warnS.normal.textColor = new Color(1.0f, 0.35f, 0.35f, 1.0f);
-
-            string warnDesc = curLang == 0 ?
-                "ЭТИ ЗЕМЛИ НАХОДЯТСЯ ПОД КОНТРОЛЕМ ВРАЖЕСКИХ ЛОРДОВ.\nДля захвата зачистите Пустоши и поднимите армию!" :
-                "THIS PROVINCE LIES DEEP WITHIN ENEMY BORDERS.\nClear tasks and raise an imperial army to assault!";
-            GUILayout.Label(warnDesc, warnS);
-
-            GUILayout.Space(8);
-
-            // Espionage logic (v18.11.15)
-            int reqMinLevel = GetMinSpyRequiredLevel();
-            int pMaxLvl = GetPlayerMaxCastleLevel();
-            bool hasMinLvlUnlocked = pMaxLvl >= reqMinLevel;
-            bool lvlMatch = pMaxLvl >= castle.level;
-            bool isSpied = PlayerPrefs.GetInt("Castle_Spied_" + castle.zoneIndex, 0) == 1;
-
-            GUIStyle intelBox = new GUIStyle(GUI.skin.box);
-            intelBox.normal.textColor = Color.yellow;
-            intelBox.alignment = TextAnchor.MiddleLeft;
-            intelBox.fontSize = 13;
-
-            GUILayout.BeginVertical(intelBox);
+            float colWidth = (currentTownSubPanel == 2) ? (wWidth - 24) : (wWidth / 3.12f);
+            GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(colWidth));
             
-            string reportHeader = curLang == 0 ? "📋 ДАННЫЕ ВОЕННОЙ РАЗВЕДКИ:" : "📋 MILITARY INTELLIGENCE REPORT:";
-            if (curLang == 8) reportHeader = "📋 军事情报搜集总览:";
-            if (curLang == 7) reportHeader = "📋 군사 정찰 보고 데이터:";
-            GUILayout.Label(reportHeader, GUI.skin.label);
+            GUIStyle colHeader2 = new GUIStyle(GUI.skin.box);
+            colHeader2.alignment = TextAnchor.MiddleCenter;
+            colHeader2.fontSize = 17;
+            colHeader2.fontStyle = FontStyle.Bold;
+            colHeader2.normal.textColor = new Color(1.0f, 0.7f, 0.15f);
             
-            GUILayout.Space(4);
+            string forgeHeader = GetText("🧪 КУЗНИЦА И ЛАВКА", "🧪 FORGE & POTION SHOP", "🧪 대장간 & 물약 상점", "🧪 铁匠铺与药水商会");
+            GUILayout.Label(forgeHeader, colHeader2, GUILayout.Height(36));
+            
+            string fDesc = curLang == 0 ? "Покупка зелий разного уровня и 6 тиров доспехов" : "Purchase elixirs & progressive 6 tiers armor gear";
+            GUILayout.Label(fDesc, subSt);
 
-            if (isSpied)
-            {
-                string guardPowerText = curLang == 0 ?
-                    $"• Общая мощь гарнизона: {castle.aiTroopsPower} ед. мощи\n" +
-                    $"• Уровень Полководца: {castle.aiCommanderLevel} ур.\n" +
-                    $"• Класс ковки защиты: Tier {castle.aiArmorTier}\n" +
-                    $"• Запас боевых зелий: {castle.aiPotionsStock} шт." :
-                    $"• Total Defense Power: {castle.aiTroopsPower} Combat rating\n" +
-                    $"• Faction Commander: Level {castle.aiCommanderLevel}\n" +
-                    $"• Guard Armor Quality: Tier {castle.aiArmorTier}\n" +
-                    $"• Supply Potions count: {castle.aiPotionsStock} bottles";
-                
-                if (curLang == 8) guardPowerText = $"• 戍军总战斗力: {castle.aiTroopsPower} 点\n• 守城将领等级: {castle.aiCommanderLevel} 级\n• 防具锻造等级: Tier {castle.aiArmorTier}\n• 备用药水数量: {castle.aiPotionsStock} 瓶";
-                if (curLang == 7) guardPowerText = $"• 총 가드 수비력: {castle.aiTroopsPower}\n• 영주 사령관 훈련: {castle.aiCommanderLevel} 렙\n• 장갑 무구 구조: {castle.aiArmorTier} 단계\n• 회복 약물 비축량: {castle.aiPotionsStock} 개";
+            GUILayout.Space(10);
+            forgeScroll = GUILayout.BeginScrollView(forgeScroll);
 
-                GUILayout.Label(guardPowerText, GUI.skin.label);
-                
-                GUILayout.Space(5);
-                GUIStyle okS = new GUIStyle(GUI.skin.label);
-                okS.normal.textColor = Color.green;
-                okS.alignment = TextAnchor.MiddleCenter;
-                GUILayout.Label(curLang == 0 ? "✓ Данные разведки получены!" : "✓ Espionage data acquired!", okS);
-            }
-            else
-            {
-                string unknownTxt = curLang == 0 ?
-                    "⚠️ Гарнизон скрыт туманом войны! Вы не видите численность войск.\n" +
-                    $"Требуется уровень вашей цитадели: {reqMinLevel}+" :
-                    "⚠️ Garrison obscured by fog of war! Defending army details unknown.\n" +
-                    $"Your citadel level required: {reqMinLevel}+";
-                if (curLang == 8) unknownTxt = "⚠️ 北境大本营戍军信息处于迷雾中！\n需要我方主城等级达到: " + reqMinLevel + "+";
-                if (curLang == 7) unknownTxt = "⚠️ 수비대 정보가 안개로 가려져 있습니다!\n필요 영지 요새 레벨: " + reqMinLevel + "+";
-                
-                GUILayout.Label(unknownTxt, GUI.skin.label);
+            // POTIONS sections (dynamic scaling with Castle Level and potion levels (1 to 10))
+            int potionIndex = PlayerPrefs.GetInt("Town_Selected_PotionLvl", 1);
+            GUILayout.BeginHorizontal();
+            GUILayout.Label((curLang == 0 ? "Выбор ур-ня зелья: " : "Select Potion level: ") + potionIndex, GUILayout.Width(170));
+            if (GUILayout.Button("-", GUILayout.Width(35))) { if (potionIndex > 1) potionIndex--; PlayerPrefs.SetInt("Town_Selected_PotionLvl", potionIndex); }
+            if (GUILayout.Button("+", GUILayout.Width(35))) { if (potionIndex < 10) potionIndex++; PlayerPrefs.SetInt("Town_Selected_PotionLvl", potionIndex); }
+            GUILayout.EndHorizontal();
 
-                GUILayout.Space(8);
+            DrawPotionItem("hp", "Зелье Жизни", "Elixir of Vital Health", "生命圣水", "체력 신성 물약", 30, potionIndex, activeCastle.level);
+            DrawPotionItem("str", "Зелье Силы", "Potion of Giant Strength", "巨人之力药水", "거인의 괴력 물약", 45, potionIndex, activeCastle.level);
+            DrawPotionItem("int", "Зелье Интеллекта", "Potion of Mind Intelligence", "智力药水", "지능 영약", 40, potionIndex, activeCastle.level);
+            DrawPotionItem("agi", "Зелье Ловкости", "Potion of Swift Agility", "敏捷药水", "민첩 영약", 40, potionIndex, activeCastle.level);
+            DrawPotionItem("sta", "Зелье Выносливости", "Potion of Iron Stamina", "耐力药水", "체력/지구력 영약", 40, potionIndex, activeCastle.level);
 
-                int spyCost = GetSpyCost(castle.level);
+            GUILayout.Space(15);
+            GUILayout.Box(curLang == 0 ? "⚔️ КУЗНИЦА СНАРЯЖЕНИЯ" : "⚔️ FORGE DEPARTMENT", GUILayout.Height(20));
 
-                if (hasMinLvlUnlocked)
-                {
-                    string spyBtnText = curLang == 0 ?
-                        $"Заслать Шпиона ({spyCost} 💰)" :
-                        $"Infiltrate Spy ({spyCost} 💰)";
-                    if (curLang == 8) spyBtnText = $"派遣细作探子 ({spyCost} 💰)";
+            // Beautiful 8-slot forging options
+            DrawForgeEquipmentOption(8, "Оружие", "Weapon", activeCastle.level);
+            DrawForgeEquipmentOption(1, "Шлем", "Helmet", activeCastle.level);
+            DrawForgeEquipmentOption(4, "Броня", "Chestplate", activeCastle.level);
+            DrawForgeEquipmentOption(3, "Наплечники", "Shoulders", activeCastle.level);
+            DrawForgeEquipmentOption(7, "Сапоги", "Boots", activeCastle.level);
+            DrawForgeEquipmentOption(6, "Пояс", "Belt", activeCastle.level);
+            DrawForgeEquipmentOption(2, "Амулет", "Amulet", activeCastle.level);
+            DrawForgeEquipmentOption(5, "Кольцо", "Ring", activeCastle.level);
+
+            GUILayout.Space(15);
+            GUILayout.Box(curLang == 0 ? "🕵️ НАЙМ ПРОСТЫХ ГЕРОЕВ" : "🕵️ RECRUIT ALLIED HEROES", GUILayout.Height(20));
+            
+            // Simple Heroes recruitment
+            DrawHeroRecruitItem("ArcherHero", "Герой: Стрелок", "Comrade: Marksman Hero", "游侠英雄-神射手", "동료 영웅 - 명사수", 300);
+            DrawHeroRecruitItem("WarriorHero", "Герой: Воин", "Comrade: Iron Warrior", "先锋英雄-铁血战士", "동료 영웅 - 광전사", 350);
+            DrawHeroRecruitItem("MageHero", "Герой: Боевой Маг", "Comrade: Sorcerer Elite", "元素法师-高阶贤者", "동료 영웅 - 일급 현자", 400);
+
+            GUILayout.EndScrollView();
+            GUILayout.EndVertical();
+        }
+
+        // --- Column 3: ACADEMY & ARENA ---
+        if (currentTownSubPanel == 0 || currentTownSubPanel == 3)
+        {
+            float colWidth = (currentTownSubPanel == 3) ? (wWidth - 24) : (wWidth / 3.12f);
+            GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(colWidth));
+            
+            GUIStyle colHeader3 = new GUIStyle(GUI.skin.box);
+            colHeader3.alignment = TextAnchor.MiddleCenter;
+            colHeader3.fontSize = 17;
+            colHeader3.fontStyle = FontStyle.Bold;
+            colHeader3.normal.textColor = new Color(0.85f, 0.45f, 0.95f);
+            
+            string academyHeader = GetText("🎓 АКАДЕМИЯ И АРЕНА", "🎓 ACADEMY & ARENA", "🎓 아카데미 & 투기장", "🎓 皇家学院与斗技场");
+            GUILayout.Label(academyHeader, colHeader3, GUILayout.Height(36));
+            
+            string aDesc = curLang == 0 ? "Тренировки героев, прокачка XP и ранги воинов" : "Hero workouts, dynamic XP drills & troop promotions";
+            GUILayout.Label(aDesc, subSt);8) spyBtnText = $"派遣细作探子 ({spyCost} 💰)";
                     if (curLang == 7) spyBtnText = $"간첩 잠입시키기 ({spyCost} 💰)";
 
                     if (GUILayout.Button(spyBtnText, GUILayout.Height(30)))
@@ -5837,11 +5769,15 @@ public class FateCastleManager : MonoBehaviour
         titleSt.normal.textColor = Color.cyan;
 
         CastleInstance activeCastle = castles[activeDetailsIndex];
+        string barracksHeader = GetText("⚔️ КАЗАРМЫ", "⚔️ BARRACKS", "⚔️ 연병장/배럭", "⚔️ 军营/兵营");
+        string forgeHeader = GetText("🧪 КУЗНИЦА И ЛАВКА", "🧪 FORGE & POTION SHOP", "🧪 대장간 & 물약 상점", "🧪 铁匠铺与药水商会");
+        string academyHeader = GetText("🎓 АКАДЕМИЯ И АРЕНА", "🎓 ACADEMY & ARENA", "🎓 아카데미 & 투기장", "🎓 皇家学院与斗技场");
         string cName = curLang == 0 ? activeCastle.nameRU : activeCastle.nameEN;
         if (curLang == 8) cName = activeCastle.nameCH;
         if (curLang == 7) cName = activeCastle.nameKR;
 
-        GUILayout.Label($"🏯 {cName.ToUpper()} (УРОВЕНЬ {activeCastle.level})", titleSt);
+        string lvlWord = GetText("УРОВЕНЬ", "LEVEL", "레벨", "等级").ToUpper();
+        GUILayout.Label($"🏯 {cName.ToUpper()} ({lvlWord} {activeCastle.level})", titleSt);
 
         GUIStyle subSt = new GUIStyle(GUI.skin.label);
         subSt.fontSize = 13;
@@ -5888,8 +5824,9 @@ public class FateCastleManager : MonoBehaviour
             colTitle.fontStyle = FontStyle.Bold;
             colTitle.normal.textColor = new Color(0.2f, 1.0f, 0.6f);
             
-            GUILayout.Label("⚔️ КАЗАРМЫ", colTitle);
-            GUILayout.Label(curLang == 0 ? "Найм когерт легиона и войск" : "Legion cohort recruitment", subSt);
+            GUILayout.Label(barracksHeader, colTitle);
+            string barracksDesc = GetText9("Найм когорт легиона и войск", "Recruit legion cohorts and troops", "Legionenrekrutierung und Truppen", "Recrutement de cohortes de la légion", "Reclutamiento de cohortes y tropas", "Recrutamento de coortes e tropas", "レギオン歩兵兵団と軍隊の雇用", "레기온 보병 및 병사 모집", "征募军团步兵与军队部众");
+            GUILayout.Label(barracksDesc, subSt);
             
             GUILayout.FlexibleSpace();
             
@@ -5918,7 +5855,8 @@ public class FateCastleManager : MonoBehaviour
             enterBtnStyle.normal.textColor = Color.white;
             
             GUI.backgroundColor = new Color(0.12f, 0.72f, 0.42f);
-            if (GUILayout.Button(curLang == 0 ? "ВОЙТИ В КАЗАРМЫ" : "ENTER BARRACKS", enterBtnStyle, GUILayout.Height(45)))
+            string barracksBtn = GetText9("ВОЙТИ В КАЗАРМЫ", "ENTER BARRACKS", "KASERNE BETRETEN", "ENTRER DANS LES CASERNES", "ENTRAR A LOS CUARTELES", "ENTRAR NO QUARTEL", "兵舎に入る", "연병장/배럭 입장", "进入军营");
+            if (GUILayout.Button(barracksBtn, enterBtnStyle, GUILayout.Height(45)))
             {
                 currentTownSubPanel = 1;
                 feedbackMessage = "";
@@ -5935,8 +5873,9 @@ public class FateCastleManager : MonoBehaviour
             colTitle2.fontStyle = FontStyle.Bold;
             colTitle2.normal.textColor = new Color(1.0f, 0.7f, 0.15f);
             
-            GUILayout.Label("🧪 КУЗНИЦА И ЛАВКА", colTitle2);
-            GUILayout.Label(curLang == 0 ? "Торговля, снаряжение и зелья" : "Elixirs & blacksmith forging", subSt);
+            GUILayout.Label(forgeHeader, colTitle2);
+            string forgeDesc = GetText9("Торговля, снаряжение и зелья", "Elixirs & blacksmith forging", "Elixiere & Schmiede", "Élixirs et forge", "Elixires y forja", "Elixires e forja", "エリクサーとブラック smith 鍛造", "엘릭서 및 대장간 제작", "炼制药水与铁匠铺锻造");
+            GUILayout.Label(forgeDesc, subSt);
             
             GUILayout.FlexibleSpace();
             
@@ -5960,7 +5899,8 @@ public class FateCastleManager : MonoBehaviour
             GUILayout.FlexibleSpace();
             
             GUI.backgroundColor = new Color(0.88f, 0.58f, 0.12f);
-            if (GUILayout.Button(curLang == 0 ? "ОТКРЫТЬ КУЗНИЦУ" : "OPEN FORGE & SHOP", enterBtnStyle, GUILayout.Height(45)))
+            string forgeBtn = GetText9("ОТКРЫТЬ КУЗНИЦУ", "OPEN FORGE & SHOP", "SCHMIEDE ÖFFNEN", "OUVRIR LA FORGE", "ABRIR FORJA", "ABRIR FORJA", "鍛冶屋を開く", "대장간 및 상점 열기", "开启铁匠铺与商会");
+            if (GUILayout.Button(forgeBtn, enterBtnStyle, GUILayout.Height(45)))
             {
                 currentTownSubPanel = 2;
                 feedbackMessage = "";
@@ -5977,8 +5917,9 @@ public class FateCastleManager : MonoBehaviour
             colTitle3.fontStyle = FontStyle.Bold;
             colTitle3.normal.textColor = new Color(0.85f, 0.45f, 0.95f);
             
-            GUILayout.Label("🎓 АКАДЕМИЯ И АРЕНА", colTitle3);
-            GUILayout.Label(curLang == 0 ? "Прокачка героев и ранги армии" : "Workout drills & army promotion", subSt);
+            GUILayout.Label(academyHeader, colTitle3);
+            string academyDesc = GetText9("Прокачка героев и ранги армии", "Workout drills & army promotion", "Helden-Training & Armeerang-Upgrade", "Entraînement des héros et rang d'armée", "Entrenamiento de héroes y rango del ejército", "Treino de heróis e ranques de exército", "ヒーロー育成と軍隊階級昇格", "영웅 단련 및 군대 계급 승급", "英雄试炼与军队阶级晋升");
+            GUILayout.Label(academyDesc, subSt);
             
             GUILayout.FlexibleSpace();
             
@@ -6002,7 +5943,8 @@ public class FateCastleManager : MonoBehaviour
             GUILayout.FlexibleSpace();
             
             GUI.backgroundColor = new Color(0.68f, 0.28f, 0.85f);
-            if (GUILayout.Button(curLang == 0 ? "ВОЙТИ В АКАДЕМИЮ" : "ENTER ACADEMY", enterBtnStyle, GUILayout.Height(45)))
+            string academyBtn = GetText9("ВОЙТИ В АКАДЕМИЮ", "ENTER ACADEMY", "AKADEMIE BETRETEN", "ENTRER DANS L'ACADÉMIE", "ENTRAR A LA ACADEMIA", "ENTRAR NA ACADEMIA", "学院に入る", "아카데미 및 투기장 입장", "进入皇家学院");
+            if (GUILayout.Button(academyBtn, enterBtnStyle, GUILayout.Height(45)))
             {
                 currentTownSubPanel = 3;
                 feedbackMessage = "";
@@ -6028,7 +5970,7 @@ public class FateCastleManager : MonoBehaviour
                 colHeader1.fontSize = 17;
                 colHeader1.fontStyle = FontStyle.Bold;
                 colHeader1.normal.textColor = new Color(0.2f, 1.0f, 0.6f);
-                GUILayout.Label("⚔️ КАЗАРМЫ", colHeader1, GUILayout.Height(36));
+                GUILayout.Label(barracksHeader, colHeader1, GUILayout.Height(36));
             
             string bDesc = curLang == 0 ? "Найм войск в армию согласно уровню замка" : "Troop recruitment matching castle tier";
             GUILayout.Label(bDesc, subSt);
@@ -6066,7 +6008,7 @@ public class FateCastleManager : MonoBehaviour
             colHeader2.fontSize = 17;
             colHeader2.fontStyle = FontStyle.Bold;
             colHeader2.normal.textColor = new Color(1.0f, 0.7f, 0.15f);
-            GUILayout.Label("🧪 КУЗНИЦА И ЛАВКА", colHeader2, GUILayout.Height(36));
+            GUILayout.Label(forgeHeader, colHeader2, GUILayout.Height(36));
             
             string fDesc = curLang == 0 ? "Покупка зелий разного уровня и 6 тиров доспехов" : "Purchase elixirs & progressive 6 tiers armor gear";
             GUILayout.Label(fDesc, subSt);
@@ -6124,7 +6066,7 @@ public class FateCastleManager : MonoBehaviour
             colHeader3.fontSize = 17;
             colHeader3.fontStyle = FontStyle.Bold;
             colHeader3.normal.textColor = new Color(0.85f, 0.45f, 0.95f);
-            GUILayout.Label("🎓 АКАДЕМИЯ И АРЕНА", colHeader3, GUILayout.Height(36));
+            GUILayout.Label(academyHeader, colHeader3, GUILayout.Height(36));
             
             string aDesc = curLang == 0 ? "Тренировки героев, прокачка XP и ранги воинов" : "Hero workouts, dynamic XP drills & troop promotions";
             GUILayout.Label(aDesc, subSt);
