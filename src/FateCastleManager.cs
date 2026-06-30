@@ -87,6 +87,7 @@ public class FateCastleManager : MonoBehaviour
         if (hpTex != null) { Destroy(hpTex); hpTex = null; }
         if (mpTex != null) { Destroy(mpTex); mpTex = null; }
         if (xpTex != null) { Destroy(xpTex); xpTex = null; }
+        EventHub.OnCombatEnd -= HandleCombatEndEvent;
     }
 
     [System.Serializable]
@@ -343,6 +344,7 @@ public class FateCastleManager : MonoBehaviour
     private Vector2 statsScroll = Vector2.zero;
     private Vector2 invScroll = Vector2.zero;
     private Vector2 tabsScroll = Vector2.zero;
+    private Vector2 overlayLogScroll = Vector2.zero;
 
     // Hover variables for skills (v18.11.21)
     private bool isHoveringSkill = false;
@@ -1023,7 +1025,7 @@ public class FateCastleManager : MonoBehaviour
         }
 
         // 3. Полное восстановление здоровья у всех активных UnitBase на сцене и очистка баффов/дебаффов
-        foreach (var unit in FindObjectsOfType<UnitBase>())
+        foreach (var unit in FindObjectsByType<UnitBase>(FindObjectsSortMode.None))
         {
             if (unit != null)
             {
@@ -1911,11 +1913,6 @@ public class FateCastleManager : MonoBehaviour
         LoadInventory();
         LoadEquipment();
         RecalculateEquippedBonuses();
-    }
-
-    private void OnDestroy()
-    {
-        EventHub.OnCombatEnd -= HandleCombatEndEvent;
     }
 
     private void HandleCombatEndEvent(int winner)
@@ -4190,6 +4187,185 @@ public class FateCastleManager : MonoBehaviour
         }
     }
 
+    private void DrawStatRow(int curLang, string icon, string nameText, ref int statVal, ref int availablePoints, int minVal)
+    {
+        GUILayout.BeginHorizontal();
+        GUIStyle labelStyle = new GUIStyle(GUI.skin.label);
+        labelStyle.alignment = TextAnchor.MiddleLeft;
+        labelStyle.fontSize = 14;
+        labelStyle.normal.textColor = Color.white;
+        GUILayout.Label($"{icon} {nameText}: {statVal}", labelStyle, GUILayout.Width(220));
+
+        // Disable buttons if autonomous distribution is enabled
+        GUI.enabled = !isAutonomousStatsDistribution;
+
+        if (GUILayout.Button("-", GUILayout.Width(35), GUILayout.Height(24)))
+        {
+            if (statVal > minVal)
+            {
+                statVal--;
+                availablePoints++;
+                SaveGameSystem.Save(0);
+                RecalculateEquippedBonuses();
+            }
+        }
+
+        if (GUILayout.Button("+", GUILayout.Width(35), GUILayout.Height(24)))
+        {
+            if (availablePoints > 0)
+            {
+                statVal++;
+                availablePoints--;
+                SaveGameSystem.Save(0);
+                RecalculateEquippedBonuses();
+            }
+        }
+
+        GUI.enabled = true;
+        GUILayout.EndHorizontal();
+        GUILayout.Space(4);
+    }
+
+    private void DrawNewDayOverlay(int curLang)
+    {
+        // Full screen blocking background (dark translucent)
+        GUI.color = new Color(0.05f, 0.05f, 0.08f, 0.85f);
+        GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
+        GUI.color = Color.white;
+
+        // Centered glassmorphic card window
+        float winW = Mathf.Min(Screen.width * 0.8f, 650f);
+        float winH = Mathf.Min(Screen.height * 0.8f, 500f);
+        float winX = (Screen.width - winW) / 2f;
+        float winY = (Screen.height - winH) / 2f;
+        Rect overlayRect = new Rect(winX, winY, winW, winH);
+
+        // Render card base using hudTex or simple GUI.Box
+        GUIStyle cardStyle = new GUIStyle(GUI.skin.box);
+        cardStyle.normal.background = hudTex;
+        GUI.Box(overlayRect, "", cardStyle);
+
+        // Draw neon neon blue/cyan border representing Zenith Glassmorphism
+        DrawHighlightBorder(overlayRect, new Color(0f, 0.8f, 1.0f, 0.9f), 3f);
+
+        GUILayout.BeginArea(overlayRect);
+        GUILayout.Space(25);
+
+        // Title
+        GUIStyle titleStyle = new GUIStyle(GUI.skin.label);
+        titleStyle.fontSize = 20;
+        titleStyle.fontStyle = FontStyle.Bold;
+        titleStyle.alignment = TextAnchor.MiddleCenter;
+        titleStyle.normal.textColor = Color.cyan;
+
+        string titleTxt = "⚔️ A NEW DAY HAS ARISEN ⚔️";
+        if (curLang == 0) titleTxt = "⚔️ НАСТУПИЛ НОВЫЙ ДЕНЬ ⚔️";
+        if (curLang == 8) titleTxt = "⚔️ 新的一天已降临 ⚔️";
+        if (curLang == 7) titleTxt = "⚔️ 새로운 날이 밝았습니다 ⚔️";
+
+        GUILayout.Label(titleTxt, titleStyle);
+        GUILayout.Space(10);
+
+        // Day Number Display
+        GUIStyle dayStyle = new GUIStyle(GUI.skin.label);
+        dayStyle.fontSize = 32;
+        dayStyle.fontStyle = FontStyle.Bold;
+        dayStyle.alignment = TextAnchor.MiddleCenter;
+        dayStyle.normal.textColor = Color.yellow;
+
+        string dayTxt = $"DAY {currentDay}";
+        if (curLang == 0) dayTxt = $"ДЕНЬ {currentDay}";
+        if (curLang == 8) dayTxt = $"第 {currentDay} 天";
+        if (curLang == 7) dayTxt = $"제 {currentDay} 일";
+
+        GUILayout.Label(dayTxt, dayStyle);
+        GUILayout.Space(20);
+
+        // Log Title
+        GUIStyle logTitleStyle = new GUIStyle(GUI.skin.label);
+        logTitleStyle.fontSize = 14;
+        logTitleStyle.fontStyle = FontStyle.Bold;
+        logTitleStyle.alignment = TextAnchor.MiddleLeft;
+        logTitleStyle.normal.textColor = new Color(0.9f, 0.9f, 0.9f);
+
+        string logHeader = "ENEMY FORCES MILITARY INTEL REPORT:";
+        if (curLang == 0) logHeader = "ОТЧЕТ РАЗВЕДКИ СИЛ ПРОТИВНИКА:";
+        if (curLang == 8) logHeader = "敌方军事动向情报：";
+        if (curLang == 7) logHeader = "적군 군사 동향 보고서:";
+
+        GUILayout.BeginHorizontal();
+        GUILayout.Space(30);
+        GUILayout.Label(logHeader, logTitleStyle);
+        GUILayout.EndHorizontal();
+        GUILayout.Space(8);
+
+        // Scrollable List of Logs
+        float scrollHeight = winH - 210f; // dynamic height
+        GUILayout.BeginHorizontal();
+        GUILayout.Space(30);
+        overlayLogScroll = GUILayout.BeginScrollView(overlayLogScroll, GUILayout.Width(winW - 60f), GUILayout.Height(scrollHeight));
+
+        GUIStyle logLineStyle = new GUIStyle(GUI.skin.label);
+        logLineStyle.fontSize = 13;
+        logLineStyle.wordWrap = true;
+        logLineStyle.normal.textColor = new Color(0.85f, 0.85f, 0.85f);
+        logLineStyle.margin = new RectOffset(0, 0, 4, 4);
+
+        if (aiLogs != null && aiLogs.Count > 0)
+        {
+            foreach (string logLine in aiLogs)
+            {
+                GUILayout.Label(logLine, logLineStyle);
+            }
+        }
+        else
+        {
+            string emptyLog = "Enemy forces are consolidating their defensive garrisons... No aggressive activity detected today.";
+            if (curLang == 0) emptyLog = "Силы противника укрепляют свои гарнизоны... Вражеской активности сегодня не обнаружено.";
+            if (curLang == 8) emptyLog = "敌方力量正在巩固他们的防御驻军…… 今天未检测到侵略活动。";
+            if (curLang == 7) emptyLog = "적군 세력이 방어 주둔지를 보강하고 있습니다... 오늘 탐지된 공격 활동은 없습니다.";
+
+            logLineStyle.fontStyle = FontStyle.Italic;
+            logLineStyle.normal.textColor = Color.gray;
+            GUILayout.Label(emptyLog, logLineStyle);
+        }
+
+        GUILayout.EndScrollView();
+        GUILayout.Space(30);
+        GUILayout.EndHorizontal();
+
+        GUILayout.FlexibleSpace();
+
+        // Continue Button
+        GUI.backgroundColor = new Color(0f, 0.65f, 0.95f, 1.0f);
+        string btnTxt = "CONTINUE";
+        if (curLang == 0) btnTxt = "ПРОДОЛЖИТЬ";
+        if (curLang == 8) btnTxt = "继续";
+        if (curLang == 7) btnTxt = "계속";
+
+        string autoCloseTxt = $" (Auto-close in {Mathf.CeilToInt(overlayTimer)}s)";
+        if (curLang == 0) autoCloseTxt = $" (Автозакрытие через {Mathf.CeilToInt(overlayTimer)} сек)";
+        if (curLang == 8) autoCloseTxt = $" （将在 {Mathf.CeilToInt(overlayTimer)} 秒后自动关闭）";
+        if (curLang == 7) autoCloseTxt = $" （{Mathf.CeilToInt(overlayTimer)}초 후 자동 닫힘）";
+
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        if (GUILayout.Button($"<b>{btnTxt}</b>{autoCloseTxt}", GUILayout.Width(winW - 100f), GUILayout.Height(44)))
+        {
+            showNewDayOverlay = false;
+            if (SettingsManager.Instance != null)
+            {
+                SettingsManager.Instance.PlayHoverSound(0);
+            }
+        }
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+
+        GUI.backgroundColor = Color.white;
+        GUILayout.Space(20);
+        GUILayout.EndArea();
+    }
+
     private void DrawEquippedSlotButton(int slotType, string defaultNameRU, string defaultNameEN, int curLang, GUIStyle style, float height = 28)
     {
         InventoryItem item = playerEquipment.slots[slotType];
@@ -5528,28 +5704,73 @@ public class FateCastleManager : MonoBehaviour
 
                         SpawnAllCastles();
 
-                        string okMsg = curLang == 0 ?
-                            $"Цитадель расшир            if (currentTownSubPanel == 1)
+                        string okMsg = curLang == 0 ? "Цитадель расширена!" : "Citadel expanded!";
+                        ShowFeedback(okMsg);
+                    }
+                }
+            }
+            else
             {
-                float colWidth = wWidth - 24;
-                GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(colWidth));
-                
-                GUIStyle colHeader1 = new GUIStyle(GUI.skin.box);
-                colHeader1.alignment = TextAnchor.MiddleCenter;
-                colHeader1.fontSize = 17;
-                colHeader1.fontStyle = FontStyle.Bold;
-                colHeader1.normal.textColor = new Color(0.2f, 1.0f, 0.6f);
-                
-                string barracksHeader = GetText("⚔️ КАЗАРМЫ", "⚔️ BARRACKS", "⚔️ 연병장/배럭", "⚔️ 军营/兵营");
-                GUILayout.Label(barracksHeader, colHeader1, GUILayout.Height(36));
+                // Max level reached
+                GUIStyle maxS = new GUIStyle(GUI.skin.label);
+                maxS.normal.textColor = Color.yellow;
+                maxS.alignment = TextAnchor.MiddleCenter;
+                maxS.fontSize = 13;
+                string maxTxt = curLang == 0 ?
+                    "⭐ ЦИТАДЕЛЬ ДОСТИГЛА МАКС. УРОВНЯ ДЛЯ ДАННОГО КОНТИНЕНТА ⭐" :
+                    "⭐ CITADEL ATTAINED MAXIMUM LEVEL CAP FOR THIS WORLD ⭐";
+                if (curLang == 8) maxTxt = "⭐ 领地已达到当前世界最大等级上限 ⭐";
+                if (curLang == 7) maxTxt = "⭐ 현재 영지가 도달할 수 있는 최대 등급입니다 ⭐";
+                GUILayout.Label(maxTxt, maxS);
+            }
+
+            GUILayout.Space(12);
+
+            // Button to open Town Interior
+            string interiorBtnTxt = curLang == 0 ? "🏛️ ВОЙТИ В ГОРОД" : "🏛️ ENTER CITADEL INTERIOR";
+            if (curLang == 8) interiorBtnTxt = "🏛️ 进入城内管理";
+            if (curLang == 7) interiorBtnTxt = "🏛️ 성안으로 진입";
+
+            GUI.backgroundColor = new Color(0.2f, 0.8f, 1.0f, 1.0f);
+            if (GUILayout.Button(interiorBtnTxt, GUILayout.Height(40)))
+            {
+                isTownViewActive = true;
+                currentTownSubPanel = 0;
+                feedbackMessage = "";
+            }
+            GUI.backgroundColor = Color.white;
+        }
+        else
+        {
+            // Enemy Castle
+            GUIStyle intelBox = new GUIStyle(GUI.skin.box);
+            intelBox.normal.textColor = Color.yellow;
+            GUILayout.BeginVertical(intelBox);
             
-            string bDesc = curLang == 0 ? "Найм войск в армию согласно уровню замка" : "Troop recruitment matching castle tier";
-            GUILayout.Label(bDesc, subSt);
+            string spyTitle = curLang == 0 ? "🕵️ ШПИОНАЖ И РАЗВЕДКА" : "🕵️ ESPIONAGE & INTEL";
+            if (curLang == 8) spyTitle = "🕵️ 敌情侦查与谍报";
+            if (curLang == 7) spyTitle = "🕵️ 정보 획득 및 간첩";
+            GUILayout.Label(spyTitle, GUI.skin.label);
+            GUILayout.Space(4);
 
-            GUILayout.Space(10);
-            barracksScroll = GUILayout.BeginScrollView(barracksScroll);
+            int reqMinLevel = 2;
+            int spyCost = 150;
 
-            DrawUnitItem("warrior", "Боец фракции", "Faction Warrior", "皇室精锐战士", "왕실 정예 전사", 50, 1, activeCastle.level);
+            bool canSpy = false;
+            for (int i = 0; i < castles.Count; i++)
+            {
+                if (castles[i].owner == "Player" && castles[i].level >= reqMinLevel)
+                {
+                    canSpy = true;
+                    break;
+                }
+            }
+
+            if (canSpy)
+            {
+                string spyBtnText = curLang == 0 ? $"Заслать лазутчика ({spyCost} 💰)" : $"Infiltrate Spy ({spyCost} 💰)";
+
+            /* DrawUnitItem("warrior", "Боец фракции", "Faction Warrior", "皇室精锐战士", "왕실 정예 전사", 50, 1, activeCastle.level);
             DrawUnitItem("archer", "Эльфийский Лучник", "Elven Archer", "精灵神射手", "엘프 신궁 대원", 75, 1, activeCastle.level);
             DrawUnitItem("mage", "Боевой Маг Зенита", "Zenith Battle Mage", "제니스 전투 마법사", "제니스 전투 마법사", 120, 1, activeCastle.level);
             DrawUnitItem("paladin", "Паладин Света", "Holy Paladin", "圣光审判圣骑士", "성광의 발키리 기사", 200, 2, activeCastle.level);
@@ -5644,8 +5865,10 @@ public class FateCastleManager : MonoBehaviour
             GUILayout.Label(academyHeader, colHeader3, GUILayout.Height(36));
             
             string aDesc = curLang == 0 ? "Тренировки героев, прокачка XP и ранги воинов" : "Hero workouts, dynamic XP drills & troop promotions";
-            GUILayout.Label(aDesc, subSt);8) spyBtnText = $"派遣细作探子 ({spyCost} 💰)";
-                    if (curLang == 7) spyBtnText = $"간첩 잠입시키기 ({spyCost} 💰)";
+            GUILayout.Label(aDesc, subSt); */
+            spyBtnText = "";
+            if (curLang == 8) spyBtnText = $"派遣细作探子 ({spyCost} 💰)";
+            if (curLang == 7) spyBtnText = $"간첩 잠입시키기 ({spyCost} 💰)";
 
                     if (GUILayout.Button(spyBtnText, GUILayout.Height(30)))
                     {
@@ -5661,7 +5884,6 @@ public class FateCastleManager : MonoBehaviour
                             ShowFeedback(curLang == 0 ? "Шпион успешно проник в замок и доложил обстановку!" : "Spy successfully infiltrated the garrison!");
                         }
                     }
-                }
                 else
                 {
                     GUIStyle lockS = new GUIStyle(GUI.skin.label);
