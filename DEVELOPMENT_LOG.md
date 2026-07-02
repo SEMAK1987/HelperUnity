@@ -1,18 +1,37 @@
-# DEVELOPMENT LOG • Fate Continent (Континент Судьбы)
+# DEVELOPMENT LOG
 
-## [v18.11.22] - 2026-06-26
+## [v18.11.23] - 2026-07-02
 ### Added
-- **Horizontal ScrollView for Inventory Tabs**: Wraps the pagination bar (unlocked/locked tabs 1-28) in a horizontal scroll panel (`GUILayout.BeginScrollView`), resolving horizontal squishing and clipping on smaller screens.
-- **Dynamic Skill Hover Tooltip**: Adds an interactive hover detection system in `DrawStatsAllocationPanel` that displays complete descriptions, icons, and skill types (Passive/Ultimate) following the mouse cursor.
-- **Memory & VRAM Optimization**: Implements class-level style caching (`GUIStyle` fields) for all primary rendering structures in `FateCastleManager.cs`, replacing dynamic `new GUIStyle` allocations inside `OnGUI` frame loops to eliminate GC allocations and system lag.
+- Re-engineered Potion Shop item rendering with level-based color rarity names.
+- Added detailed characteristics and temporary combat buffs description for each potion item.
+- Added explicit required Castle level under each potion item name.
+- Repositioned price button cleanly at the far-right of each horizontal shop row.
+- Expanded Barracks troop passive skills column width from 250 to 380 (descriptions to 370) to prevent wrapping and squishing.
+- Enhanced XP cheat code reward to give +100 XP (previously +50 XP).
+- Lifted Class Active/Passive skills layout upwards by reducing vertical spacer between the equipment mannequin and skill titles.
 
-### Changed
-- **Unclickable Skill Cards**: Replaces clickable skill button triggers with unclickable `GUILayout.Box` texture displays to prevent accidental modal locks during skill inspections.
-- **Shortened Consumable Naming**: Compresses long potion strings inside inventory buttons (e.g., `Зелье Жизни` -> `Зел. Жизни`) and scales down slot grid font size to 8px to guarantee that the letter 'З' is fully visible and not cut off by text wrapping.
-- **Skip Turn Button Interlocking**: Disables and hides the top-right "Skip Day" button when the Hero Management character screen (`showStatsPanel`) is active to avoid skipping days concurrently with character editing.
+## [v18.11.22] - 2026-07-01
+### Optimized
+- Replaced dynamic GUIStyle allocations inside the OnGUI rendering loop in `FateCastleManager.cs` with lazy-cached class fields to optimize memory.
+- Added interlocking system to disable the "Skip Day" button when the Hero Management character panel is active.
+- Configured active & passive skill cards as unclickable hover boxes displaying interactive tooltips following the mouse cursor.
+- Integrated horizontal scrolling for inventory tabs and compressed potion labels to solve layout clipping.
 
-## [v18.11.21] - 2026-06-25
-### Changed
-- **Zenith Skill Detail Sync & Video Reference Update**: Resolves the missing `ShowSkillDetailPopup` method compiler errors (CS0103) in `FateCastleManager.cs`.
-- **Dynamic Character Skills Mapping**: Matches Warrior, Archer, and Mage character class data dynamically with skill definitions loaded from `SaveGameSystem`.
-- **AI Knowledge Index**: Registers external video reference link `https://www.youtube.com/watch?v=NpfgeQZKmcU` in `knowledge_base.json`.
+## [v18.11.21] - 2026-06-30
+### Fixed
+- Fixed missing `ShowSkillDetailPopup` method compiler errors (CS0103) in `FateCastleManager.cs`.
+- Standardized active skill descriptions dynamically matching all three major player classes (Warrior, Archer, Mage) using class data from `SaveGameSystem`.
+
+## [v18.11.20] - 2026-06-29
+### Added
+- Integrated a fullscreen 3-column Zenith Hero Control Panel in `FateCastleManager.cs` to solve the small parameters view.
+- Implemented a local-persistent, secure 36-slot inventory grid supporting stacking items and gear.
+- Added dynamic 8-slot equipment mannequin with attributes calculations (+STR, +AGI, +INT, +STA).
+
+## [v18.11.19] - 2026-06-28
+### Improved
+- Solved overlapping of dialogue choice buttons with portraits and dialogue text by lowering layout positions (anchoredPosition Y=-20f, sizeDelta=-120f, 44f).
+
+## [v18.11.18] - 2026-06-27
+### Added
+- Formulated 14 diverse troop cohort definitions (such as Боец Фракции, Паладин Света, Кентавр Степей, Легендарный Дракон Пустоты, etc.) with unique traits and skill quantities limits.

@@ -122,6 +122,156 @@
 
 ---
 
+## 🔮 Книга Промптов для Навыков Войск (Barracks Troop Skills Prompts Book)
+
+Используйте эти профессионально разработанные промпты для генератора **Leonardo.ai**, чтобы создать стильные, высококонтрастные квадратные иконки навыков (3D RPG/Fantasy Skill Icons). Все промпты оптимизированы для моделей `Leonardo Phoenix`, `3D Animation Style` или `Leonardo XL`.
+
+### 1. 🛡️ Боец фракции (Faction Warrior)
+*   🔥 **Активный навык: Удар щитом (Shield Slam)**
+    > `Centered 3D fantasy game icon, a massive metal tower shield impacting the air with visual shockwave ripples, vibrant emerald green glow, professional clean vector skill art, isolated dark slate grey background, high contrast octane render`
+*   ❄️ **Пассивный 1: Железная Воля (Iron Will)**
+    > `Centered 3D fantasy game icon, a glowing heavy iron shield overlaid with light blue divine wings, bright celestial glow, clean vector style, game ability skill icon, dark fantasy theme, isolated dark background`
+
+---
+
+### 2. 🏹 Эльфийский Лучник (Elven Archer)
+*   🔥 **Активный навык: Стрела Ветра (Wind Arrow)**
+    > `Centered 3D fantasy game icon, a high speed projectile arrow enveloped in spiral green wind currents and glowing sparks, fantasy spell projectile, clean vector asset, dark background, dynamic lighting`
+*   ❄️ **Пассивный 1: Меткий Взгляд (Eagle Eye)**
+    > `Centered 3D fantasy game icon, a sharp glowing emerald eye target reticle lock, neon green digital lines, clean simplistic mobile ui skill vector icon, fantasy game asset, isolated black slate background`
+
+---
+
+### 3. 🔮 Боевой Маг Зенита (Zenith Battle Mage)
+*   🔥 **Активный навык: Чародейская Вспышка (Arcane Flash)**
+    > `Centered 3D fantasy game icon, a magnificent spiral cosmic explosion of violet nebula starlight, beam of magical projectile energy, spell ability tile icon vector, neon purple glow, isolated dark background`
+*   ❄️ **Пассивный 1: Источник Маны (Mana Source)**
+    > `Centered 3D fantasy game icon, a crystal flask shaped container filled with glowing liquid purple magic energy, starry sparkles, stylized mobile RPG skill vector icon, isolated dark background`
+
+---
+
+### 4. 🥇 Паладин Света (Holy Paladin)
+*   🔥 **Активный навык: Очищение (Cleansing)**
+    > `Centered 3D fantasy game icon, a warm divine light beam descending from heaven, dissolving black shadow magic, fantasy healing spell skill design icon, golden neon light, isolated dark background`
+*   ❄️ **Пассивный 1: Аура Света (Holy Aura)**
+    > `Centered 3D fantasy game icon, golden mystical sun rays bursting outwards from a glowing star construct, fantasy halo aura, vector mobile ui icon asset, isolated dark background`
+*   ❄️ **Пассивный 2: Священный Доспех (Sacred Plate)**
+    > `Centered 3D fantasy game icon, a majestic celestial shining golden breastplate armor, surrounded by holy runic symbols, pristine specular shine, professional game asset, isolated slate background`
+
+---
+
+### 5. 🐎 Имперская Конница (Imperial Cavalry)
+*   🔥 **Активный навык: Разбег (Charge)**
+    > `Centered 3D fantasy game icon, heavy steel lance tip sparking with lightning kinetic force during a powerful thrust motion, vector web emblem design, high action impact, isolated dark background`
+*   ❄️ **Пассивный 1: Натиск (Onslaught)**
+    > `Centered 3D fantasy game icon, a silhouetted heavy warhorse hoof kicking up dirt with golden energy trail, motion blur, speed skill emblem icon, isolated dark background`
+*   ❄️ **Пассивный 2: Закаленный Всадник (Veteran Rider)**
+    > `Centered 3D fantasy game icon, twin crossed iron lances wrapped in red banners, royal golden insignia emblem, medieval battle pass skill icon, isolated dark background`
+
+---
+
+### 6. 💣 Осадно-боевой Пушкарь (Garrison Cannoneer)
+*   🔥 **Активный навык: Разрушительный Залп (Demolishing Blast)**
+    > `Centered 3D fantasy game icon, massive bronze mortar cannon barrel firing a fiery exploding cannonball with thick smoke rings, stylized 3D blast icon, fiery orange embers, isolated dark background`
+*   ❄️ **Пассивный 1: Осадный Прицел (Siege Crosshair)**
+    > `Centered 3D fantasy game icon, a digital crosshair overlay on a stone castle wall projection with red structural stress points, skill icon, isolated dark background`
+*   ❄️ **Пассивный 2: Тяжелый Порох (Heavy Powder)**
+    > `Centered 3D fantasy game icon, a wooden barrel filled with black gunpowder with a burning sparkling fuse, game skill icon design, high-contrast, isolated dark background`
+
+---
+
+### 7. 🦌 Кентавр Степей (Steppe Centaur)
+*   🔥 **Активный навык: Бросок Копья (Spear Throw)**
+    > `Centered 3D fantasy game icon, a razor sharp war spear propelled forward with intense yellow sonic bloom and speed lines, game skill icon, isolated dark background`
+*   ❄️ **Пассивный 1: Степной Ветер (Steppe Wind)**
+    > `Centered 3D fantasy game icon, a whirlwind spiral dust wind trail over wild grassy plains, speed visual feedback, vector talent icon, isolated dark background`
+*   ❄️ **Пассивный 2: Охотничий Инстинкт (Hunter Instinct)**
+    > `Centered 3D fantasy game icon, wild beast golden predator claw marks glowing yellow, stylized nature hunter emblem, game asset graphic, isolated dark background`
+
+---
+
+### 8. 💀 Некромант Тьмы (Shadow Necromancer)
+*   🔥 **Активный навык: Подъем Скелета (Raise Skeleton)**
+    > `Centered 3D fantasy game icon, a skeletal bony hand breaking through dry graveyard soil holding a rusted iron blade, under eerie neon green moonlight, isolated dark background`
+*   ❄️ **Пассивный 1: Жатва Душ (Soul Harvest)**
+    > `Centered 3D fantasy game icon, glowing neon green skeletal hands snatching wandering spectral ghost soul wisps, necromancy spell ability emblem design, isolated dark background`
+*   ❄️ **Пассивный 2: Оскверненная Кровь (Vile Blood)**
+    > `Centered 3D fantasy game icon, a splat of dark toxic purple blood causing smoke acid melting on ground, mobile tactical ui icon, isolated dark background`
+
+---
+
+### 9. 🦅 Элитный Королевский Грифон (Royal Griffin)
+*   🔥 **Активный навык: Удар Когтями (Talon Slash)**
+    > `Centered 3D fantasy game icon, four razor sharp metal talon claw marks glowing white cutting through slate iron armor metal plates, sparks, isolated dark background`
+*   ❄️ **Пассивный 1: Превосходство Высоты (Altitude Dominance)**
+    > `Centered 3D fantasy game icon, a majestic giant eagle silhouette diving from clouds against a bright sun, wings spread, fantasy skill icon vectors, isolated dark background`
+*   ❄️ **Пассивный 2: Неуловимый Полет (Evasive Flight)**
+    > `Centered 3D fantasy game icon, feather wings flapping leaving faint gold sparkles traces, speed agility passive icon decoration, isolated dark background`
+*   ❄️ **Пассивный 3: Гнездовье (The Nest)**
+    > `Centered 3D fantasy game icon, a woven wooden high nest holding a golden glowing bird egg on a stellar high mountaintop, starry sky, isolated dark background`
+
+---
+
+### 10. 👑 Рыцарь-Властелин (Dread Overlord)
+*   🔥 **Активный навык: Клинок Бездны (Abyss Blade)**
+    > `Centered 3D fantasy game icon, a gigantic spiky obsidian greatsword blade wreathed in dark purple flames and dark magic trail arc, isolated dark background`
+*   ❄️ **Пассивный 1: Аура Ужаса (Dread Aura)**
+    > `Centered 3D fantasy game icon, a terrifying demonic face shadow mask outline with glowing void purple eyes, horror psychological warfare icon, isolated dark background`
+*   ❄️ **Пассивный 2: Прилив Скверны (Corruption Surge)**
+    > `Centered 3D fantasy game icon, a black bubbling dynamic wave of dark corrupted purple water rising with red highlights, magical corruption, isolated dark background`
+*   ❄️ **Пассивный 3: Костяной Щит (Bone Shield)**
+    > `Centered 3D fantasy game icon, a ring of three spinning jagged human ribs bones creating a protective purple spectral shield barrier, isolated dark background`
+
+---
+
+### 11. 🐍 Многоголовая Гидра (Swamp Hydra)
+*   🔥 **Активный навык: Тройная Атака (Triple Strike)**
+    > `Centered 3D fantasy game icon, three giant scary green snake heads lunging simultaneously forward in a dynamic bite action from left to right, isolated dark background`
+*   ❄️ **Пассивный 1: Кислотные Укусы (Acidic Bites)**
+    > `Centered 3D fantasy game icon, two green reptilian snake fangs dripping luminous fluid green venom droplets, toxic acid, isolated dark background`
+*   ❄️ **Пассивный 2: Регенерация Тела (Body Regeneration)**
+    > `Centered 3D fantasy game icon, a green lizard scaly tail re-growing with light blue biological cellular cell activity glowing layers, isolated dark background`
+*   ❄️ **Пассивный 3: Токсичная Кожа (Toxic Skin)**
+    > `Centered 3D fantasy game icon, a close-up of poisonous swamp frog skin texture with neon green toxic pores, high fantasy style, isolated dark background`
+
+---
+
+### 12. 🌌 Легендарный Дракон Пустоты (Void Dragon)
+*   🔥 **Активный навык: Дыхание Плазмы (Plasma Breath)**
+    > `Centered 3D fantasy game icon, a stream of brilliant cosmic purple stellar flame blast incinerating iron targets, cosmic dragon breath, isolated black background`
+*   ❄️ **Пассивный 1: Чешуя Пустоты (Void Scales)**
+    > `Centered 3D fantasy game icon, indestructible dark amethyst crystal dragon scales layout glistening with starry points, spell deflection, isolated dark background`
+*   ❄️ **Пассивный 2: Межзвездная Ярость (Interstellar Rage)**
+    > `Centered 3D fantasy game icon, a raging cosmic violet dragon claw clutching a hot core of glowing supernova star, raw power, isolated dark background`
+*   ❄️ **Пассивный 3: Суперсонический полет (Supersonic Flight)**
+    > `Centered 3D fantasy game icon, dragon wings outline glowing at warp speed crossing star systems, sonic boom ripples, isolated dark background`
+
+---
+
+### 13. 🐻 Ураганный Медведь Гор (Mountain Bear Guard)
+*   🔥 **Активный навык: Растерзание (Mangle)**
+    > `Centered 3D fantasy game icon, enormous bear claws slashing vertically downwards leaving three thick blue ice-frost gashes in the midnight air, cold frost, isolated dark background`
+*   ❄️ **Пассивный 1: Морозная Стойкость (Frost Resilience)**
+    > `Centered 3D fantasy game icon, an armored polar bear footprint seal glowing with cold runic frost blue energy on snow surface, isolated dark background`
+*   ❄️ **Пассивный 2: Снежный Гнев (Snow Fury)**
+    > `Centered 3D fantasy game icon, a raging polar bear face silhouette glowing red inside a frosted blue glacier shard outline, isolated dark background`
+*   ❄️ **Пассивный 3: Ледяной Доспех (Glacier Plates)**
+    > `Centered 3D fantasy game icon, a thick slab of clear polar blue glacier ice plate covering ancient steel chest piece armor, isolated dark background`
+
+---
+
+### 14. 🐛 Гигантская Змея Пустошей (Wasteland Serpent)
+*   🔥 **Активный навык: Поглощение (Devour)**
+    > `Centered 3D fantasy game icon, a massive vertical desert serpent mouth filled with rows of needle teeth rising directly from a sand whirlpool, isolated dark background`
+*   ❄️ **Пассивный 1: Песчаная Скрытность (Sand Stealth)**
+    > `Centered 3D fantasy game icon, a golden sandy whirlpool vortex sucking down debris under bright intense desert sun, sandstorm, isolated dark background`
+*   ❄️ **Пассивный 2: Твердость Чешуи (Carapace Hardness)**
+    > `Centered 3D fantasy game icon, a detailed layer of diamond hard golden crystalline snake skin scales pattern, shiny hot desert sunlight glint, isolated dark background`
+*   ❄️ **Пассивный 3: Дюны Внимания (Dune Presence)**
+    > `Centered 3D fantasy game icon, a dune mirage of giant golden snake eyes outline shimmering over hot heatwave desert sand, isolated dark background`
+
+---
+
 ## 🛠️ Что Именно Было Изменено в Скриптах Проекта
 
 Внесенные изменения полностью соответствуют протоколам высокой стандартизованности и оптимизации (v18.11.17):

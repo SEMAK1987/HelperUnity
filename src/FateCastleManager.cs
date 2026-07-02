@@ -91,6 +91,16 @@ public class FateCastleManager : MonoBehaviour
     }
 
     [System.Serializable]
+    public class TroopSkillAsset
+    {
+        public string troopId;
+        public Texture2D activeIcon;
+        public Texture2D passiveIcon1;
+        public Texture2D passiveIcon2;
+        public Texture2D passiveIcon3;
+    }
+
+    [System.Serializable]
     public class CastleInstance
     {
         public int zoneIndex;
@@ -111,6 +121,10 @@ public class FateCastleManager : MonoBehaviour
     }
 
     public List<CastleInstance> castles = new List<CastleInstance>();
+
+    [Header("⚔️ НАВЫКИ ВОИНОВ (BARRACKS TROOP SKILL ICONS)")]
+    [Tooltip("Список ассетов навыков для всех 14 типов войск, редактируемый напрямую через инспектор")]
+    public List<TroopSkillAsset> troopSkillAssets = new List<TroopSkillAsset>();
 
     [Header("🏰 MANUAL CASTLE PLACEMENT & OVERRIDES")]
     [Tooltip("If checked, the script will use the custom manual positions specified below instead of landing point anchors")]
@@ -291,6 +305,100 @@ public class FateCastleManager : MonoBehaviour
     public Texture2D avatar_mountain_bear;
     [Tooltip("Гигантская Змея Пустошей • Prompt: Symmetrical front portrait of massive desert dunes sands serpent, golden crystalline scales, open jaws of crystalline sand-fire, flat white background.")]
     public Texture2D avatar_wasteland_serpent;
+
+    [Header("🔥 ИКОНКИ АКТИВНЫХ НАВЫКОВ ВОЙСК (BARRACKS ACTIVE SKILLS ICONS)")]
+    [Tooltip("Боец фракции • Удар щитом • Prompt: Symbolic icon of a massive metal tower shield impacting air with visual shockwave ripples, emerald glow, vector skill art, isolated slate background.")]
+    public Texture2D skill_warrior_active;
+    [Tooltip("Эльфийский Лучник • Стрела Ветра • Prompt: A high speed projectile arrow enveloped in spiral green wind currents and glowing sparks, fantasy spell icon skill vector, dark background.")]
+    public Texture2D skill_archer_active;
+    [Tooltip("Боевой Маг Зенита • Чародейская Вспышка • Prompt: A magnificent spiral cosmic explosion of violet nebula starlight, beam of magic projectile, spell ability tile icon vector.")]
+    public Texture2D skill_mage_active;
+    [Tooltip("Паладин Света • Очищение • Prompt: A ray of warm divine light beam descending, dissolving darkness, fantasy healing spell skill design icon.")]
+    public Texture2D skill_paladin_active;
+    [Tooltip("Имперская Конница • Разбег • Prompt: Heavy steel lance tip sparking with lightning kinetic force during thrust motion, vector web emblem design.")]
+    public Texture2D skill_cavalry_active;
+    [Tooltip("Осадно-боевой Пушкарь • Разрушительный Залп • Prompt: Massive bronze mortar cannon barrel firing a fiery exploding cannonball with smoke rings, stylized 3D blast icon.")]
+    public Texture2D skill_cannoneer_active;
+    [Tooltip("Кентавр Степей • Бросок Копья • Prompt: A razor sharp war spear propelled forward with intense sonic bloom, game skill icon.")]
+    public Texture2D skill_centaur_active;
+    [Tooltip("Некромант Тьмы • Подъем Скелета • Prompt: Skeletal hand breaking through dry graveyard soil holding rusted iron blade, under eerie neon green moonlight.")]
+    public Texture2D skill_necromancer_active;
+    [Tooltip("Элитный Королевский Грифон • Удар Когтями • Prompt: Four razor sharp metal talon claw marks glowing white cutting through slate iron armor metal plates.")]
+    public Texture2D skill_griffin_active;
+    [Tooltip("Рыцарь-Властелин • Клинок Бездны • Prompt: Gigantic spiky obsidian greatsword blade wreathed in dark purple flame, trail arc vector.")]
+    public Texture2D skill_overlord_active;
+    [Tooltip("Многоголовая Гидра • Тройная Атака • Prompt: Three giant snake heads lunging simultaneously forward in dynamic action from left to right.")]
+    public Texture2D skill_hydra_active;
+    [Tooltip("Легендарный Дракон Пустоты • Дыхание Плазмы • Prompt: A stream of brilliant cosmic purple stellar flame blast incinerating iron targets on black background.")]
+    public Texture2D skill_dragon_active;
+    [Tooltip("Ураганный Медведь Гор • Растерзание • Prompt: Enormous bear claws slashing vertically downwards leaving three thick ice-frost gashes in midnight air.")]
+    public Texture2D skill_mountain_bear_active;
+    [Tooltip("Гигантская Змея Пустошей • Поглощение • Prompt: Massive vertical serpent maw filled with rows of needle teeth rising directly from sand swirl.")]
+    public Texture2D skill_wasteland_serpent_active;
+
+    [Header("❄️ ИКОНКИ ПАССИВНЫХ НАВЫКОВ ВОЙСК (BARRACKS PASSIVE SKILLS ICONS)")]
+    [Tooltip("Боец фракции • Железная Воля • Prompt: Symbolic icon of a glowing shield overlaid with light blue divine wings, clean vector design, game ability skill icon, dark fantasy theme.")]
+    public Texture2D skill_warrior_passive1;
+    [Tooltip("Эльфийский Лучник • Меткий Взгляд • Prompt: A sharp glowing emerald eye target reticle lock, neon green lines, clean simplistic mobile ui skill vector icon, fantasy game asset.")]
+    public Texture2D skill_archer_passive1;
+    [Tooltip("Боевой Маг Зенита • Источник Маны • Prompt: A crystal flask shaped container filled with glowing liquid purple magic energy, sparkles, stylized mobile RPG skill vector icon.")]
+    public Texture2D skill_mage_passive1;
+    [Tooltip("Паладин Света • Аура Света • Prompt: Golden mystical sun rays bursting outwards from a glowing star construct, fantasy halo aura, vector ui icon asset.")]
+    public Texture2D skill_paladin_passive1;
+    [Tooltip("Паладин Света • Священный Доспех • Prompt: A celestial shining golden breastplate, surrounded by holy runes, pristine specular shine, icon design.")]
+    public Texture2D skill_paladin_passive2;
+    [Tooltip("Имперская Конница • Натиск • Prompt: A silhouetted heavy horse hoof kicking up dirt with golden energy trail, movement blur, skill emblem icon.")]
+    public Texture2D skill_cavalry_passive1;
+    [Tooltip("Имперская Конница • Закаленный Всадник • Prompt: Twin crossed iron lances wrapped in red banners, royal insignia emblem, medieval battle pass skill icon.")]
+    public Texture2D skill_cavalry_passive2;
+    [Tooltip("Осадно-боевой Пушкарь • Осадный Прицел • Prompt: Crosshair overlay on a castle wall projection with structural stress points, skill icon.")]
+    public Texture2D skill_cannoneer_passive1;
+    [Tooltip("Осадно-боевой Пушкарь • Тяжелый Порох • Prompt: A wooden barrel with burning fuse, sparkling black powder, game skill icon design.")]
+    public Texture2D skill_cannoneer_passive2;
+    [Tooltip("Кентавр Степей • Степной Ветер • Prompt: Whirlwind spiral dust wind trail over plains, speed visual feedback, vector talent icon.")]
+    public Texture2D skill_centaur_passive1;
+    [Tooltip("Кентавр Степей • Охотничий Инстинкт • Prompt: Wild predator claw marks glowing yellow, stylized nature hunter emblem, game asset graphic.")]
+    public Texture2D skill_centaur_passive2;
+    [Tooltip("Некромант Тьмы • Жатва Душ • Prompt: Glowing neon green hands snatching wandering spectral soul wisps, spell ability emblem design.")]
+    public Texture2D skill_necromancer_passive1;
+    [Tooltip("Некромант Тьмы • Оскверненная Кровь • Prompt: Splatter of dark toxic blood causing smoke acid melting, mobile tactical ui icon.")]
+    public Texture2D skill_necromancer_passive2;
+    [Tooltip("Элитный Королевский Грифон • Превосходство Высоты • Prompt: Giant eagle silhouette diving from clouds against sun, majestic wings spread, skill icon vectors.")]
+    public Texture2D skill_griffin_passive1;
+    [Tooltip("Элитный Королевский Грифон • Неуловимый Полет • Prompt: Feather wings flapping leaving faint gold sparkles traces, agility passive icon decoration.")]
+    public Texture2D skill_griffin_passive2;
+    [Tooltip("Элитный Королевский Грифон • Гнездовье • Prompt: Woven wooden high nest holding golden glowing bird egg on stellar mountaintop.")]
+    public Texture2D skill_griffin_passive3;
+    [Tooltip("Рыцарь-Властелин • Аура Ужаса • Prompt: Terrifying demonic face shadow mask outline with glowing void purple eyes, psychological warfare icon.")]
+    public Texture2D skill_overlord_passive1;
+    [Tooltip("Рыцарь-Властелин • Прилив Скверны • Prompt: A black bubbling dynamic wave of dark corrupted water rising, red highlights.")]
+    public Texture2D skill_overlord_passive2;
+    [Tooltip("Рыцарь-Властелин • Костяной Щит • Prompt: Ring of three spinning jagged human ribs bones creating protective spectral shield barrier.")]
+    public Texture2D skill_overlord_passive3;
+    [Tooltip("Многоголовая Гидра • Кислотные Укусы • Prompt: Two reptilian snake fangs dripping luminous fluid green venom droplets, dark focus.")]
+    public Texture2D skill_hydra_passive1;
+    [Tooltip("Многоголовая Гидра • Регенерация Тела • Prompt: Lizard scaly tail re-growing with light blue biological cellular cell activity glowing layers.")]
+    public Texture2D skill_hydra_passive2;
+    [Tooltip("Многоголовая Гидра • Токсичная Кожа • Prompt: Close-up of poisonous swamp frog skin texture with neon green toxic pores, fantasy style.")]
+    public Texture2D skill_hydra_passive3;
+    [Tooltip("Легендарный Дракон Пустоты • Чешуя Пустоты • Prompt: Indestructible dark amethyst crystal dragon scales layout glistening with starry points, spell deflect.")]
+    public Texture2D skill_dragon_passive1;
+    [Tooltip("Легендарный Дракон Пустоты • Межзвездная Ярость • Prompt: Raging cosmic violet dragon claw icon clutching a core of glowing supernova, raw power.")]
+    public Texture2D skill_dragon_passive2;
+    [Tooltip("Легендарный Дракон Пустоты • Суперсонический полет • Prompt: Dragon wings outline glowing at warp speed crossing star systems, sonic boom ripples.")]
+    public Texture2D skill_dragon_passive3;
+    [Tooltip("Ураганный Медведь Гор • Морозная Стойкость • Prompt: Armored polar bear footprint seal glowing with cold runic frost blue energy on snow surface.")]
+    public Texture2D skill_mountain_bear_passive1;
+    [Tooltip("Ураганный Медведь Гор • Снежный Гнев • Prompt: Raging bear face silhouette glowing red inside frosted glacier shard outline, power boost.")]
+    public Texture2D skill_mountain_bear_passive2;
+    [Tooltip("Ураганный Медведь Гор • Ледяной Доспех • Prompt: Slab of thick clear polar blue glacier ice plate covering ancient chest piece armor master.")]
+    public Texture2D skill_mountain_bear_passive3;
+    [Tooltip("Гигантская Змея Пустошей • Песчаная Скрытность • Prompt: A golden sandy whirlpool vortex sucking down debris under bright intense desert sun.")]
+    public Texture2D skill_wasteland_serpent_passive1;
+    [Tooltip("Гигантская Змея Пустошей • Твердость Чешуи • Prompt: Layer of diamond hard golden crystalline snake skin scales pattern, shiny sunlight glint.")]
+    public Texture2D skill_wasteland_serpent_passive2;
+    [Tooltip("Гигантская Змея Пустошей • Дюны Внимания • Prompt: Dune mirage of giant golden snake eyes outline shimmering over hot heatwave sand.")]
+    public Texture2D skill_wasteland_serpent_passive3;
 
     [Header("🕵️ ПРОСТЫЕ НАНИМАЕМЫЕ ГЕРОИ - АВАТАРКИ/ИКОНКИ")]
     [Tooltip("Герой-Стрелок • Prompt: High precision portrait of elite fantasy rangers bowmaster, sapphire eyes, runic leather hood, white background.")]
@@ -936,10 +1044,22 @@ public class FateCastleManager : MonoBehaviour
                     return;
                 }
                 potionUsedThisTurnHP = true;
-                int rawHP = GetPotionValueForLevel(item.level, true);
-                int statBoost = Mathf.Max(1, rawHP / 10);
-                tempBonusSTA += statBoost;
-                ShowFeedback(GetText($"Вы выпили {itemName}. Макс. ОЗ (HP) временно увеличено на +{statBoost * 10}!", $"Consumed {itemName}. Max HP temporarily increased by +{statBoost * 10}!", $"{itemName}을(를) 복용했습니다. 최대 HP가 일시적으로 +{statBoost * 10}만큼 증가했습니다!", $"使用了 {itemName}。最大生命值 (HP) 临时增加 +{statBoost * 10}！"));
+                int hpBoost = GetPotionValueForLevel(item.level, true);
+                int staminaEquivalent = hpBoost / 10;
+                tempBonusSTA += staminaEquivalent;
+                
+                string feedbackMsg = "";
+                if (curLang == 0) feedbackMsg = $"Вы выпили {itemName}. Макс. ОЗ (HP) временно увеличено на +{hpBoost} до конца текущего дня (без мгновенного восстановления ОЗ)!";
+                else if (curLang == 8) feedbackMsg = $"使用了 {itemName}。最大生命值 (HP) 临时增加 +{hpBoost}，持续到当天结束（不进行即时治疗）！";
+                else if (curLang == 7) feedbackMsg = $"{itemName}을(를) 복용했습니다. 하루가 끝날 때까지 최대 HP가 일시적으로 +{hpBoost}만큼 증가합니다 (즉시 회복 없음)!";
+                else if (curLang == 2) feedbackMsg = $"Sie haben {itemName} getrunken. Maximale LP (HP) vorübergehend um +{hpBoost} erhöht, bis zum Ende des Tages (ohne sofortige Heilung)!";
+                else if (curLang == 3) feedbackMsg = $"Vous avez bu {itemName}. PV max temporairement augmentés de +{hpBoost} jusqu'à la fin de la journée (sans soins instantanés) !";
+                else if (curLang == 4) feedbackMsg = $"Has bebido {itemName}. ¡PS máx. (HP) aumentados temporalmente en +{hpBoost} hasta el final del día (sin curación instantánea)!";
+                else if (curLang == 5) feedbackMsg = $"Você bebeu {itemName}. PV máx. (HP) temporariamente aumentado em +{hpBoost} até o final do dia (sem cura instantânea)!";
+                else if (curLang == 6) feedbackMsg = $"{itemName}を服用しました。一日の終わりまで最大HPが一時的に +{hpBoost} 増加します（即時回復なし）！";
+                else feedbackMsg = $"Consumed {itemName}. Max HP temporarily increased by +{hpBoost} until the end of the day (without instant healing)!";
+                
+                ShowFeedback(feedbackMsg);
             }
             else if (item.id.Contains("str"))
             {
@@ -1695,8 +1815,153 @@ public class FateCastleManager : MonoBehaviour
         }
     }
 
+    public void ValidateTroopSkillAssets()
+    {
+        if (troopSkillAssets == null)
+            troopSkillAssets = new List<TroopSkillAsset>();
+
+        string[] defaultTroopIds = new string[] {
+            "warrior", "archer", "mage", "paladin", "cavalry", "cannoneer",
+            "centaur", "necromancer", "griffin", "overlord", "hydra",
+            "dragon", "mountain_bear", "wasteland_serpent"
+        };
+
+        foreach (string tId in defaultTroopIds)
+        {
+            bool exists = false;
+            foreach (var asset in troopSkillAssets)
+            {
+                if (asset != null && asset.troopId == tId)
+                {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists)
+            {
+                TroopSkillAsset newAsset = new TroopSkillAsset();
+                newAsset.troopId = tId;
+                troopSkillAssets.Add(newAsset);
+            }
+        }
+    }
+
+    public Texture2D GetTroopActiveSkillIcon(string troopId)
+    {
+        switch (troopId)
+        {
+            case "warrior": if (skill_warrior_active != null) return skill_warrior_active; break;
+            case "archer": if (skill_archer_active != null) return skill_archer_active; break;
+            case "mage": if (skill_mage_active != null) return skill_mage_active; break;
+            case "paladin": if (skill_paladin_active != null) return skill_paladin_active; break;
+            case "cavalry": if (skill_cavalry_active != null) return skill_cavalry_active; break;
+            case "cannoneer": if (skill_cannoneer_active != null) return skill_cannoneer_active; break;
+            case "centaur": if (skill_centaur_active != null) return skill_centaur_active; break;
+            case "necromancer": if (skill_necromancer_active != null) return skill_necromancer_active; break;
+            case "griffin": if (skill_griffin_active != null) return skill_griffin_active; break;
+            case "overlord": if (skill_overlord_active != null) return skill_overlord_active; break;
+            case "hydra": if (skill_hydra_active != null) return skill_hydra_active; break;
+            case "dragon": if (skill_dragon_active != null) return skill_dragon_active; break;
+            case "mountain_bear": if (skill_mountain_bear_active != null) return skill_mountain_bear_active; break;
+            case "wasteland_serpent": if (skill_wasteland_serpent_active != null) return skill_wasteland_serpent_active; break;
+        }
+
+        if (troopSkillAssets != null)
+        {
+            foreach (var asset in troopSkillAssets)
+            {
+                if (asset != null && asset.troopId == troopId)
+                {
+                    return asset.activeIcon;
+                }
+            }
+        }
+        return null;
+    }
+
+    public Texture2D GetTroopPassiveSkillIcon(string troopId, int index)
+    {
+        switch (troopId)
+        {
+            case "warrior":
+                if (index == 0 && skill_warrior_passive1 != null) return skill_warrior_passive1;
+                break;
+            case "archer":
+                if (index == 0 && skill_archer_passive1 != null) return skill_archer_passive1;
+                break;
+            case "mage":
+                if (index == 0 && skill_mage_passive1 != null) return skill_mage_passive1;
+                break;
+            case "paladin":
+                if (index == 0 && skill_paladin_passive1 != null) return skill_paladin_passive1;
+                if (index == 1 && skill_paladin_passive2 != null) return skill_paladin_passive2;
+                break;
+            case "cavalry":
+                if (index == 0 && skill_cavalry_passive1 != null) return skill_cavalry_passive1;
+                if (index == 1 && skill_cavalry_passive2 != null) return skill_cavalry_passive2;
+                break;
+            case "cannoneer":
+                if (index == 0 && skill_cannoneer_passive1 != null) return skill_cannoneer_passive1;
+                if (index == 1 && skill_cannoneer_passive2 != null) return skill_cannoneer_passive2;
+                break;
+            case "centaur":
+                if (index == 0 && skill_centaur_passive1 != null) return skill_centaur_passive1;
+                if (index == 1 && skill_centaur_passive2 != null) return skill_centaur_passive2;
+                break;
+            case "necromancer":
+                if (index == 0 && skill_necromancer_passive1 != null) return skill_necromancer_passive1;
+                if (index == 1 && skill_necromancer_passive2 != null) return skill_necromancer_passive2;
+                break;
+            case "griffin":
+                if (index == 0 && skill_griffin_passive1 != null) return skill_griffin_passive1;
+                if (index == 1 && skill_griffin_passive2 != null) return skill_griffin_passive2;
+                if (index == 2 && skill_griffin_passive3 != null) return skill_griffin_passive3;
+                break;
+            case "overlord":
+                if (index == 0 && skill_overlord_passive1 != null) return skill_overlord_passive1;
+                if (index == 1 && skill_overlord_passive2 != null) return skill_overlord_passive2;
+                if (index == 2 && skill_overlord_passive3 != null) return skill_overlord_passive3;
+                break;
+            case "hydra":
+                if (index == 0 && skill_hydra_passive1 != null) return skill_hydra_passive1;
+                if (index == 1 && skill_hydra_passive2 != null) return skill_hydra_passive2;
+                if (index == 2 && skill_hydra_passive3 != null) return skill_hydra_passive3;
+                break;
+            case "dragon":
+                if (index == 0 && skill_dragon_passive1 != null) return skill_dragon_passive1;
+                if (index == 1 && skill_dragon_passive2 != null) return skill_dragon_passive2;
+                if (index == 2 && skill_dragon_passive3 != null) return skill_dragon_passive3;
+                break;
+            case "mountain_bear":
+                if (index == 0 && skill_mountain_bear_passive1 != null) return skill_mountain_bear_passive1;
+                if (index == 1 && skill_mountain_bear_passive2 != null) return skill_mountain_bear_passive2;
+                if (index == 2 && skill_mountain_bear_passive3 != null) return skill_mountain_bear_passive3;
+                break;
+            case "wasteland_serpent":
+                if (index == 0 && skill_wasteland_serpent_passive1 != null) return skill_wasteland_serpent_passive1;
+                if (index == 1 && skill_wasteland_serpent_passive2 != null) return skill_wasteland_serpent_passive2;
+                if (index == 2 && skill_wasteland_serpent_passive3 != null) return skill_wasteland_serpent_passive3;
+                break;
+        }
+
+        if (troopSkillAssets != null)
+        {
+            foreach (var asset in troopSkillAssets)
+            {
+                if (asset != null && asset.troopId == troopId)
+                {
+                    if (index == 0) return asset.passiveIcon1;
+                    if (index == 1) return asset.passiveIcon2;
+                    if (index == 2) return asset.passiveIcon3;
+                }
+            }
+        }
+        return null;
+    }
+
     private void Awake()
     {
+        ValidateTroopSkillAssets();
         if (customCastlePositions == null || customCastlePositions.Length != 12)
         {
             System.Array.Resize(ref customCastlePositions, 12);
@@ -1903,10 +2168,12 @@ public class FateCastleManager : MonoBehaviour
 
         isContinentGameplayActive = PlayerPrefs.GetInt("ContinentGameplayActive", 0) == 1 && PlayerPrefs.GetInt("LandedZoneIndex", -1) != -1;
         currentDay = PlayerPrefs.GetInt("Fate_Current_Day", initialDaySetting);
+        
         if (isContinentGameplayActive)
         {
             SpawnAllCastles();
         }
+        
         LoadClassSkillsIcons();
 
         // Load Inventory and Equipment
@@ -3151,6 +3418,7 @@ public class FateCastleManager : MonoBehaviour
         if (!isContinentGameplayActive && !isDialogueTutorialActive) return;
 
         InitializeCachedTextures();
+        isHoveringSkill = false;
 
         int curLang = Translator.LanguageID;
 
@@ -3577,10 +3845,23 @@ public class FateCastleManager : MonoBehaviour
         }
         
         GUI.backgroundColor = new Color(0.15f, 0.8f, 0.35f);
-        string addXpText = curLang == 0 ? "ОПЫТ +50" : "+50 XP";
+        string addXpText = curLang == 0 ? "ОПЫТ +100" : "+100 XP";
         if (GUILayout.Button($"✨ {addXpText}", GUILayout.Height(32)))
         {
-            GainXP(50);
+            GainXP(100);
+        }
+        GUI.backgroundColor = Color.white;
+        GUILayout.EndHorizontal();
+        
+        GUILayout.Space(6);
+        
+        GUILayout.BeginHorizontal();
+        GUI.backgroundColor = new Color(0.95f, 0.75f, 0.12f);
+        string addGoldText = curLang == 0 ? "ЗОЛОТО +1000" : "+1000 GOLD";
+        if (GUILayout.Button($"💰 {addGoldText}", GUILayout.Height(32)))
+        {
+            SaveGameSystem.CurrentData.gold += 1000;
+            if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
         }
         GUI.backgroundColor = Color.white;
         GUILayout.EndHorizontal();
@@ -3668,8 +3949,7 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.EndHorizontal(); // End shift layout
         
         // PUSH SKILLS SECTION DOWN TO THE BOTTOM OF THE COLUMN WITH EXPLICIT SEPARATION SPACE
-        GUILayout.Space(45);
-        GUILayout.FlexibleSpace();
+        GUILayout.Space(16);
 
         // BOTTOM HALF: КЛАССОВЫЕ НАВЫКИ (Class Skills)
 
@@ -4800,10 +5080,25 @@ public class FateCastleManager : MonoBehaviour
             
             if (item.id.Contains("hp"))
             {
-                int healAmount = GetPotionValueForLevel(item.level, true);
-                hoveredSkillDesc = curLang == 0
-                    ? $"Восстанавливает <color=#33FF33>+{healAmount} ОЗ</color> при использовании."
-                    : $"Restores <color=#33FF33>+{healAmount} HP</color> upon use.";
+                int boost = GetPotionValueForLevel(item.level, true);
+                if (curLang == 0)
+                    hoveredSkillDesc = $"Временно увеличивает Макс. ОЗ (HP) на <color=#33FF33>+{boost}</color> до конца текущего дня (без мгновенного восстановления ОЗ).";
+                else if (curLang == 8)
+                    hoveredSkillDesc = $"临时增加最大生命值 (HP) <color=#33FF33>+{boost}</color>，持续到当天结束（不进行即时治疗）。";
+                else if (curLang == 7)
+                    hoveredSkillDesc = $"하루가 끝날 때까지 최대 HP를 일시적으로 <color=#33FF33>+{boost}</color>만큼 증가시킵니다 (즉시 회복 없음).";
+                else if (curLang == 2)
+                    hoveredSkillDesc = $"Erhöht die max. LP (HP) vorübergehend um <color=#33FF33>+{boost}</color> bis zum Ende des Tages (ohne sofortige Heilung).";
+                else if (curLang == 3)
+                    hoveredSkillDesc = $"Augmente temporairement les PV max de <color=#33FF33>+{boost}</color> jusqu'à la fin de la journée (sans soins instantanés).";
+                else if (curLang == 4)
+                    hoveredSkillDesc = $"Aumenta temporalmente los PS máx. (HP) en <color=#33FF33>+{boost}</color> hasta el final del día (sin curación instantánea).";
+                else if (curLang == 5)
+                    hoveredSkillDesc = $"Aumenta temporariamente os PV máx. (HP) em <color=#33FF33>+{boost}</color> até o fim do dia (sem cura instantânea).";
+                else if (curLang == 6)
+                    hoveredSkillDesc = $"一日の終わりまで最大HPを一時的に <color=#33FF33>+{boost}</color> 増やす（即時回復なし）。";
+                else
+                    hoveredSkillDesc = $"Temporarily increases Max HP by <color=#33FF33>+{boost}</color> until the end of the day (without instant healing).";
             }
             else if (item.id.Contains("str"))
             {
@@ -6517,8 +6812,14 @@ public class FateCastleManager : MonoBehaviour
         if (curLang == 8) name = nameCH;
         if (curLang == 7) name = nameKR;
 
+        TroopData td = GetTroopData(id);
+
         GUILayout.BeginHorizontal(GUI.skin.box);
         
+        // ================= COLUMN 1: PORTRAIT, NAME & CHARACTERISTICS =================
+        GUILayout.BeginVertical(GUILayout.Width(220));
+        
+        GUILayout.BeginHorizontal();
         // Render assignable Avatar box
         Texture2D av = GetTroopAvatarTexture(id);
         GUIStyle avBtnStyle = new GUIStyle(GUI.skin.button);
@@ -6542,31 +6843,193 @@ public class FateCastleManager : MonoBehaviour
             }
         }
 
-        GUILayout.Space(5);
+        GUILayout.Space(6);
 
-        GUIStyle itemBtnStyle = new GUIStyle(GUI.skin.button);
-        itemBtnStyle.alignment = TextAnchor.MiddleLeft;
+        GUIStyle itemBtnStyle = new GUIStyle(GUI.skin.label);
         itemBtnStyle.fontStyle = FontStyle.Bold;
         itemBtnStyle.fontSize = 12;
-        itemBtnStyle.normal.textColor = Color.white;
+        itemBtnStyle.normal.textColor = Color.yellow;
+        itemBtnStyle.wordWrap = true;
         
-        string btnLabel = $"{name}\n(Ур.{requiredLvl} +) | [{count} шт]";
-        if (GUILayout.Button(btnLabel, itemBtnStyle, GUILayout.Width(130), GUILayout.Height(44)))
+        string btnLabel = $"{name}\n(Ур.{requiredLvl}+) | [{count} шт]";
+        GUILayout.Label(btnLabel, itemBtnStyle, GUILayout.Height(44));
+        GUILayout.EndHorizontal();
+
+        GUILayout.Space(4);
+
+        // Stats rows in compact high-density layout
+        GUIStyle statLabelStyle = new GUIStyle(GUI.skin.label);
+        statLabelStyle.fontSize = 11;
+        statLabelStyle.normal.textColor = new Color(0.85f, 0.85f, 0.85f);
+        
+        string hpLabel = GetText("❤️ ОЗ", "❤️ HP", "❤️ HP", "❤️ 生命值");
+        string atkLabel = GetText("⚔️ АТК", "⚔️ ATK", "⚔️ ATK", "⚔️ 攻击力");
+        string defLabel = GetText("🛡️ ЗАЩ", "🛡️ DEF", "🛡️ DEF", "🛡️ 防御力");
+        string spdLabel = GetText("⚡ СКОР", "⚡ SPD", "⚡ SPD", "⚡ 速度");
+        
+        GUILayout.Label($"{hpLabel}: {td.hp}  |  {atkLabel}: {td.atk}", statLabelStyle);
+        GUILayout.Label($"{defLabel}: {td.def}  |  {spdLabel}: {td.spd}", statLabelStyle);
+
+        GUILayout.EndVertical();
+
+        GUILayout.Space(12);
+
+        // ================= COLUMN 2: ACTIVE SKILLS ("🔥") =================
+        GUILayout.BeginVertical(GUILayout.Width(220));
+        GUIStyle skillHeaderStyle = new GUIStyle(GUI.skin.label);
+        skillHeaderStyle.fontStyle = FontStyle.Bold;
+        skillHeaderStyle.fontSize = 11;
+        skillHeaderStyle.normal.textColor = new Color(1f, 0.5f, 0.3f); // Light orange/red for actives
+
+        string actHeader = GetText("🔥 АКТИВНЫЕ НАВЫКИ", "🔥 ACTIVE SKILLS", "🔥 액티브 스킬", "🔥 主动技能");
+        GUILayout.Label(actHeader, skillHeaderStyle);
+        GUILayout.Space(4);
+
+        GUIStyle skillDescStyle = new GUIStyle(GUI.skin.label);
+        skillDescStyle.fontSize = 10;
+        skillDescStyle.wordWrap = true;
+        skillDescStyle.normal.textColor = new Color(0.9f, 0.9f, 0.9f);
+
+        string firstActiveName = (td.activeNames != null && td.activeNames.Length > 0) ? td.activeNames[0] : "";
+        string firstActiveDesc = (td.activeDesc != null && td.activeDesc.Length > 0) ? td.activeDesc[0] : "";
+        string activePrompt = (td.activePrompts != null && td.activePrompts.Length > 0) ? td.activePrompts[0] : "";
+
+        GUILayout.BeginHorizontal();
+        Texture2D activeIconTex = GetTroopActiveSkillIcon(id);
+        GUIStyle skillBtnStyle = new GUIStyle(GUI.skin.button);
+        skillBtnStyle.padding = new RectOffset(0, 0, 0, 0);
+
+        if (activeIconTex != null)
         {
-            selectedTroopId = id;
-            showTroopDetailPopup = true;
-            if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+            GUILayout.Button(activeIconTex, skillBtnStyle, GUILayout.Width(40), GUILayout.Height(40));
+        }
+        else
+        {
+            GUILayout.Button("🔥", skillBtnStyle, GUILayout.Width(40), GUILayout.Height(40));
         }
 
+        Rect activeIconRect = GUILayoutUtility.GetLastRect();
+        if (Event.current.type == EventType.Repaint && activeIconRect.Contains(Event.current.mousePosition) && !string.IsNullOrEmpty(firstActiveName))
+        {
+            isHoveringSkill = true;
+            hoveredSkillName = firstActiveName;
+            
+            string fullActiveDesc = firstActiveDesc;
+            if (!string.IsNullOrEmpty(activePrompt))
+            {
+                fullActiveDesc += $"\n\n<color=cyan><i>AI Prompt: {activePrompt}</i></color>";
+            }
+            
+            hoveredSkillDesc = fullActiveDesc;
+            hoveredSkillType = GetText("🔥 АКТИВНЫЙ НАВЫК", "🔥 ACTIVE SKILL", "🔥 액티브 스킬", "🔥 主动技能");
+            hoveredSkillIcon = activeIconTex;
+        }
+
+        GUILayout.Space(6);
+
+        GUILayout.BeginVertical();
+        if (!string.IsNullOrEmpty(firstActiveName))
+        {
+            GUILayout.Label($"<b>{firstActiveName}</b>", skillDescStyle);
+            GUILayout.Label(firstActiveDesc, skillDescStyle, GUILayout.Width(164));
+        }
+        else
+        {
+            GUILayout.Label("-", skillDescStyle);
+        }
+        GUILayout.EndVertical();
+        GUILayout.EndHorizontal();
+
+        GUILayout.EndVertical();
+
+        GUILayout.Space(12);
+
+        // ================= COLUMN 3: PASSIVE SKILLS ("❄️") =================
+        GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
+        GUIStyle passiveHeaderStyle = new GUIStyle(GUI.skin.label);
+        passiveHeaderStyle.fontStyle = FontStyle.Bold;
+        passiveHeaderStyle.fontSize = 11;
+        passiveHeaderStyle.normal.textColor = new Color(0.3f, 0.75f, 1f); // Sky blue for passives
+
+        string pasHeader = GetText("❄️ ПАССИВНЫЕ НАВЫКИ", "❄️ PASSIVE SKILLS", "❄️ 패시브 С킬", "❄️ 被动技能");
+        GUILayout.Label(pasHeader, passiveHeaderStyle);
+        GUILayout.Space(4);
+
+        if (td.passiveNames != null && td.passiveNames.Length > 0)
+        {
+            // Row of passive icon squares
+            GUILayout.BeginHorizontal();
+            for (int i = 0; i < td.passiveNames.Length; i++)
+            {
+                Texture2D pasIconTex = GetTroopPassiveSkillIcon(id, i);
+                string pasName = td.passiveNames[i];
+                string pasDesc = (td.passiveDesc != null && i < td.passiveDesc.Length) ? td.passiveDesc[i] : "";
+                string pasPrompt = (td.passivePrompts != null && i < td.passivePrompts.Length) ? td.passivePrompts[i] : "";
+
+                if (pasIconTex != null)
+                {
+                    GUILayout.Button(pasIconTex, skillBtnStyle, GUILayout.Width(40), GUILayout.Height(40));
+                }
+                else
+                {
+                    GUILayout.Button("❄️", skillBtnStyle, GUILayout.Width(40), GUILayout.Height(40));
+                }
+
+                Rect pasIconRect = GUILayoutUtility.GetLastRect();
+                if (Event.current.type == EventType.Repaint && pasIconRect.Contains(Event.current.mousePosition))
+                {
+                    isHoveringSkill = true;
+                    hoveredSkillName = pasName;
+                    
+                     string fullPasDesc = pasDesc;
+                     if (!string.IsNullOrEmpty(pasPrompt))
+                     {
+                         fullPasDesc += $"\n\n<color=cyan><i>AI Prompt: {pasPrompt}</i></color>";
+                     }
+                     
+                     hoveredSkillDesc = fullPasDesc;
+                     hoveredSkillType = GetText("❄️ ПАССИВНЫЙ НАВЫК", "❄️ PASSIVE SKILL", "❄️ 패시브 스킬", "❄️ 被动技能");
+                     hoveredSkillIcon = pasIconTex;
+                }
+                GUILayout.Space(8);
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(6);
+
+            // Row names/descriptions list
+            for (int i = 0; i < td.passiveNames.Length; i++)
+            {
+                string pasName = td.passiveNames[i];
+                string pasDesc = (td.passiveDesc != null && i < td.passiveDesc.Length) ? td.passiveDesc[i] : "";
+                GUILayout.Label($"• <b>{pasName}</b>: {pasDesc}", skillDescStyle, GUILayout.ExpandWidth(true));
+            }
+        }
+        else
+        {
+            GUILayout.Label("-", skillDescStyle);
+        }
+        GUILayout.EndVertical();
+
+        // Push the recruit button column to the far right of the item box
+        GUILayout.FlexibleSpace();
+
+        // ================= COLUMN 4: COST & RECRUIT BUTTON (FAR RIGHT) =================
+        GUILayout.BeginVertical(GUILayout.Width(130));
+        GUILayout.Space(12);
         if (castleLvl < requiredLvl)
         {
-            GUI.backgroundColor = Color.grey;
-            GUILayout.Button(curLang == 0 ? "⚡ Замок LVL " + requiredLvl : "⚡ Build T-" + requiredLvl, GUILayout.Height(44));
+            GUI.backgroundColor = new Color(0.4f, 0.4f, 0.4f, 0.8f);
+            string lockLabel = curLang == 0 ? "🔒 Замок LVL " + requiredLvl : "🔒 Build T-" + requiredLvl;
+            if (curLang == 8) lockLabel = "🔒 城堡等级 " + requiredLvl;
+            if (curLang == 7) lockLabel = "🔒 성 레벨 " + requiredLvl;
+            GUILayout.Button(lockLabel, GUILayout.Height(40));
             GUI.backgroundColor = Color.white;
         }
         else
         {
-            if (GUILayout.Button($"{price} 💰", GUILayout.Height(44)))
+            GUI.backgroundColor = new Color(0.12f, 0.72f, 0.42f);
+            if (GUILayout.Button($"{price} 💰", GUILayout.Height(40)))
             {
                 if (SaveGameSystem.CurrentData.gold < price)
                 {
@@ -6582,10 +7045,24 @@ public class FateCastleManager : MonoBehaviour
                         $"Отряд {name} нанят в гарнизон!" :
                         $"Cohort {name} recruited successfully!";
                     ShowFeedback(buyMsg);
+                    if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
                 }
             }
+            GUI.backgroundColor = Color.white;
         }
+        GUILayout.EndVertical();
+
         GUILayout.EndHorizontal();
+    }
+
+    private Texture2D GetPotionIconById(string id)
+    {
+        if (id == "hp") return icon_potion_hp;
+        if (id == "str") return icon_potion_str;
+        if (id == "int") return icon_potion_int;
+        if (id == "agi") return icon_potion_agi;
+        if (id == "sta" || id == "def") return icon_potion_sta;
+        return icon_potion_hp;
     }
 
     private void DrawPotionItem(string id, string nameRU, string nameEN, string nameCH, string nameKR, int basePrice, int potionLvl, int castleLvl)
@@ -6601,13 +7078,80 @@ public class FateCastleManager : MonoBehaviour
         if (curLang == 8) name = nameCH;
         if (curLang == 7) name = nameKR;
 
+        string colorTag = "<color=white>";
+        if (potionLvl >= 7) colorTag = "<color=orange>"; // Legendary
+        else if (potionLvl >= 4) colorTag = "<color=magenta>"; // Epic
+        else if (potionLvl >= 2) colorTag = "<color=cyan>"; // Rare
+
+        Texture2D potionIcon = GetPotionIconById(id);
+
         GUILayout.BeginHorizontal(GUI.skin.box);
-        string itemTitle = $"{name} (Ур.{potionLvl})\n[Запас: {count}]";
-        GUILayout.Label(itemTitle, GUILayout.Width(180));
+        
+        // Icon box (colored background / styled border)
+        GUILayout.BeginVertical(GUILayout.Width(44), GUILayout.Height(44));
+        if (potionIcon != null)
+        {
+            GUILayout.Box(potionIcon, GUILayout.Width(40), GUILayout.Height(40));
+        }
+        else
+        {
+            GUILayout.Box("🧪", GUILayout.Width(40), GUILayout.Height(40));
+        }
+        GUILayout.EndVertical();
+
+        GUILayout.Space(8);
+
+        // Name, Stats and Requirements Column
+        GUILayout.BeginVertical();
+        
+        GUIStyle nameStyle = new GUIStyle(GUI.skin.label);
+        nameStyle.richText = true;
+        nameStyle.fontStyle = FontStyle.Bold;
+        nameStyle.fontSize = 12;
+        
+        string titleStr = $"{colorTag}<b>{name} (Ур.{potionLvl})</b></color>";
+        string ownedLabel = curLang == 0 ? $"Запас: {count} шт." : $"Owned: {count}";
+        GUILayout.Label($"{titleStr}  |  <color=gray>{ownedLabel}</color>", nameStyle);
+
+        bool isHP = id == "hp";
+        int boostVal = GetPotionValueForLevel(potionLvl, isHP);
+        
+        string statName = "";
+        if (id == "hp") statName = curLang == 0 ? "Макс. ОЗ (HP)" : "Max HP";
+        else if (id == "str") statName = curLang == 0 ? "Сила (STR)" : "Strength (STR)";
+        else if (id == "int") statName = curLang == 0 ? "Интеллект (INT)" : "Intelligence (INT)";
+        else if (id == "agi") statName = curLang == 0 ? "Ловкость (AGI)" : "Agility (AGI)";
+        else if (id == "sta") statName = curLang == 0 ? "Выносливость (STA)" : "Stamina (STA)";
+
+        string effectText = curLang == 0 ? 
+            $"Временный боевой бафф: +{boostVal} {statName}" : 
+            $"Temporary combat buff: +{boostVal} {statName}";
+        if (curLang == 8) effectText = $"临时战斗增益: +{boostVal} {statName}";
+        if (curLang == 7) effectText = $"임시 전투 버프: +{boostVal} {statName}";
+
+        string reqText = curLang == 0 ? 
+            $"Требуемый уровень Замка: {reqLvl}" : 
+            $"Required Castle Level: {reqLvl}";
+        if (curLang == 8) reqText = $"需要城堡等级: {reqLvl}";
+        if (curLang == 7) reqText = $"필요 성 레벨: {reqLvl}";
+
+        GUIStyle descStyle = new GUIStyle(GUI.skin.label);
+        descStyle.fontSize = 10;
+        descStyle.normal.textColor = new Color(0.8f, 0.8f, 0.8f);
+        GUILayout.Label(effectText, descStyle);
+        
+        GUIStyle reqStyle = new GUIStyle(GUI.skin.label);
+        reqStyle.fontSize = 10;
+        reqStyle.normal.textColor = isUnlocked ? Color.green : Color.red;
+        GUILayout.Label(reqText, reqStyle);
+
+        GUILayout.EndVertical();
+
+        GUILayout.FlexibleSpace();
 
         if (isUnlocked)
         {
-            if (GUILayout.Button($"{price} 💰", GUILayout.Height(35)))
+            if (GUILayout.Button($"{price} 💰", GUILayout.Width(100), GUILayout.Height(35)))
             {
                 if (SaveGameSystem.CurrentData.gold < price)
                 {
@@ -6640,8 +7184,10 @@ public class FateCastleManager : MonoBehaviour
         else
         {
             GUI.enabled = false;
-            string lockLabel = curLang == 0 ? $"Замок ур.{reqLvl} 🔒" : $"Castle Lvl.{reqLvl} 🔒";
-            GUILayout.Button(lockLabel, GUILayout.Height(35));
+            string lockLabel = curLang == 0 ? $"Заперто 🔒" : $"Locked 🔒";
+            if (curLang == 8) lockLabel = "已锁 🔒";
+            if (curLang == 7) lockLabel = "잠김 🔒";
+            GUILayout.Button(lockLabel, GUILayout.Width(100), GUILayout.Height(35));
             GUI.enabled = true;
         }
         GUILayout.EndHorizontal();

@@ -1,6 +1,6 @@
-// [ZENITH SKILL DETAIL SYNC & VIDEO SYNC v18.11.21]
+// [ZENITH POTION MECHANICAL REWORK & STABILIZATION v18.11.23]
 // Unity Connector for Quantum AI Assistant
-// Updated: 2026-06-26 (Synced with Stable v18.11.21)
+// Updated: 2026-07-02 (Synced with Stable v18.11.23)
 
 using UnityEngine;
 using UnityEditor;
@@ -15,7 +15,7 @@ namespace AI_Assistant_Quantum
         private string prompt = "";
         private string serverUrl = "http://localhost:3000";
         private Mode mode = Mode.Online;
-        private string status = "Ready for Quantum Manifestation v18.11.21";
+        private string status = "Ready for Quantum Manifestation v18.11.23";
         private bool isProcessing = false;
 
         public enum Mode { Online, Offline, NoInternet }
@@ -28,7 +28,7 @@ namespace AI_Assistant_Quantum
 
         private void OnGUI()
         {
-            GUILayout.Label("v18.11.21 - Zenith Skill Detail Sync & Video Reference Update", EditorStyles.boldLabel);
+            GUILayout.Label("v18.11.23 - Zenith Potion Mechanics Rework & UI Stabilization", EditorStyles.boldLabel);
             
             serverUrl = EditorGUILayout.TextField("Server URL", serverUrl);
             mode = (Mode)EditorGUILayout.EnumPopup("Mode", mode);
