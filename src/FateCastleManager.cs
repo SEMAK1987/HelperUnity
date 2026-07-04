@@ -408,6 +408,68 @@ public class FateCastleManager : MonoBehaviour
     [Tooltip("Герой-Боевой Маг • Prompt: High precision portrait of high sorcerer archmage, starry cosmic wizard crown beard, glowing nebula light, white background.")]
     public Texture2D avatar_hero_mage;
 
+    [Header("🕵️ ПРОСТЫЕ НАНИМАЕМЫЕ ГЕРОИ - АКТИВНЫЕ И ПАССИВНЫЕ НАВЫКИ")]
+    [Tooltip("Герой-Стрелок • Ветряной Щит (Пассивный) • Prompt: Golden wind barrier circular shield deflection sparkles, fantasy vector skill icon.")]
+    public Texture2D skill_hero_archer_passive1;
+    [Tooltip("Герой-Стрелок • Критическая Метка (Пассивный) • Prompt: Glowing red skull mark target icon on enemy helmet, high contrast vector icon.")]
+    public Texture2D skill_hero_archer_passive2;
+    [Tooltip("Герой-Стрелок • Обстрел Пустоты (Активный) • Prompt: Five glowing violet arrow projectiles flying simultaneously in fan pattern, dark violet trace.")]
+    public Texture2D skill_hero_archer_active;
+
+    [Tooltip("Герой-Воин • Закалка Металла (Пассивный) • Prompt: A glowing anvil with a mystical iron sword being forged under bright yellow flames, game icon.")]
+    public Texture2D skill_hero_warrior_passive1;
+    [Tooltip("Герой-Воин • Брат Гвардии (Пассивный) • Prompt: Symbolic alliance hand shake between heavy armored gauntlets, gold neon ribbon emblem.")]
+    public Texture2D skill_hero_warrior_passive2;
+    [Tooltip("Герой-Воин • Удар Разрушителя (Активный) • Prompt: Heavy metal battle hammer impact on soil cracking stone tiles with volcanic magma veins glowing.")]
+    public Texture2D skill_hero_warrior_active;
+
+    [Tooltip("Герой-Боевой Маг • Щит Возмездия (Пассивный) • Prompt: Crackling blue electric storm shield barrier encircling glowing central orb, vector shield skill icon.")]
+    public Texture2D skill_hero_mage_passive1;
+    [Tooltip("Герой-Боевой Маг • Ткач Заклинаний (Пассивный) • Prompt: Mystical hands weaving glowing thread lines of stellar nebula starlight cosmos, magic craft.")]
+    public Texture2D skill_hero_mage_passive2;
+    [Tooltip("Герой-Боевой Маг • Инферно Звездопада (Активный) • Prompt: A majestic high column of red-orange elemental volcano fire vortex eruption on isolated block.")]
+    public Texture2D skill_hero_mage_active;
+
+    [Header("⚔️ КУЗНИЦА СНАРЯЖЕНИЯ - ИКОНКИ ПО ТИРАМ (Т1 - Т6)")]
+    public Texture2D[] warriorWeaponIcons = new Texture2D[6];
+    public Texture2D[] archerWeaponIcons = new Texture2D[6];
+    public Texture2D[] mageWeaponIcons = new Texture2D[6];
+    
+    public Texture2D[] warriorHelmetIcons = new Texture2D[6];
+    public Texture2D[] archerHelmetIcons = new Texture2D[6];
+    public Texture2D[] mageHelmetIcons = new Texture2D[6];
+    public Texture2D[] helmetIcons = new Texture2D[6];
+
+    public Texture2D[] warriorAmuletIcons = new Texture2D[6];
+    public Texture2D[] archerAmuletIcons = new Texture2D[6];
+    public Texture2D[] mageAmuletIcons = new Texture2D[6];
+    public Texture2D[] amuletIcons = new Texture2D[6];
+
+    public Texture2D[] warriorPauldronsIcons = new Texture2D[6];
+    public Texture2D[] archerPauldronsIcons = new Texture2D[6];
+    public Texture2D[] magePauldronsIcons = new Texture2D[6];
+    public Texture2D[] pauldronsIcons = new Texture2D[6];
+
+    public Texture2D[] warriorArmorIcons = new Texture2D[6];
+    public Texture2D[] archerArmorIcons = new Texture2D[6];
+    public Texture2D[] mageArmorIcons = new Texture2D[6];
+    public Texture2D[] armorIcons = new Texture2D[6];
+
+    public Texture2D[] warriorRingIcons = new Texture2D[6];
+    public Texture2D[] archerRingIcons = new Texture2D[6];
+    public Texture2D[] mageRingIcons = new Texture2D[6];
+    public Texture2D[] ringIcons = new Texture2D[6];
+
+    public Texture2D[] warriorBeltIcons = new Texture2D[6];
+    public Texture2D[] archerBeltIcons = new Texture2D[6];
+    public Texture2D[] mageBeltIcons = new Texture2D[6];
+    public Texture2D[] beltIcons = new Texture2D[6];
+
+    public Texture2D[] warriorBootsIcons = new Texture2D[6];
+    public Texture2D[] archerBootsIcons = new Texture2D[6];
+    public Texture2D[] mageBootsIcons = new Texture2D[6];
+    public Texture2D[] bootsIcons = new Texture2D[6];
+
     // Active dynamic placeholders resolved on Load/Draw
     private Texture2D activeSkillPassive1;
     private Texture2D activeSkillPassive2;
@@ -453,6 +515,12 @@ public class FateCastleManager : MonoBehaviour
     private Vector2 invScroll = Vector2.zero;
     private Vector2 tabsScroll = Vector2.zero;
     private Vector2 overlayLogScroll = Vector2.zero;
+    private Vector2 forgeDetailScroll = Vector2.zero;
+
+    // Forge popup state
+    private bool showForgeDetailPopup = false;
+    private int selectedForgeSlotType = 8;
+    private int selectedForgeTier = 1;
 
     // Hover variables for skills (v18.11.21)
     private bool isHoveringSkill = false;
@@ -583,12 +651,19 @@ public class FateCastleManager : MonoBehaviour
 
     private int GetPurchasedSlotsCount()
     {
-        return PlayerPrefs.GetInt("Player_Inventory_Purchased_Slots", 10);
+        int val = PlayerPrefs.GetInt("Player_Inventory_Purchased_Slots", 12);
+        if (val < 12)
+        {
+            val = 12;
+            PlayerPrefs.SetInt("Player_Inventory_Purchased_Slots", 12);
+            PlayerPrefs.Save();
+        }
+        return val;
     }
 
     private void SetPurchasedSlotsCount(int count)
     {
-        PlayerPrefs.SetInt("Player_Inventory_Purchased_Slots", Mathf.Clamp(count, 10, 999));
+        PlayerPrefs.SetInt("Player_Inventory_Purchased_Slots", Mathf.Clamp(count, 12, 999));
         PlayerPrefs.Save();
     }
 
@@ -600,7 +675,7 @@ public class FateCastleManager : MonoBehaviour
         {
             freeSlotsByLevel = SaveGameSystem.CurrentData.playerLevel / 10;
         }
-        return Mathf.Clamp(purchased + freeSlotsByLevel, 10, 999);
+        return Mathf.Clamp(purchased + freeSlotsByLevel, 12, 999);
     }
 
     private string GetTutorialSpeaker(int step, int lang)
@@ -1240,6 +1315,132 @@ public class FateCastleManager : MonoBehaviour
         SaveGameSystem.Save(0);
     }
 
+    public void GetItemStats(int slotType, int tier, out int str, out int agi, out int intel, out int sta, string overrideClass = null)
+    {
+        str = 0; agi = 0; intel = 0; sta = 0;
+        
+        string cl = "warrior";
+        if (!string.IsNullOrEmpty(overrideClass))
+        {
+            cl = overrideClass.ToLower();
+        }
+        else if (SaveGameSystem.CurrentData != null && !string.IsNullOrEmpty(SaveGameSystem.CurrentData.characterClass))
+        {
+            cl = SaveGameSystem.CurrentData.characterClass.ToLower();
+        }
+
+        bool isWarrior = cl.Contains("warrior") || cl.Contains("voin") || cl.Contains("воин");
+        bool isArcher = cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow") || cl.Contains("стрелок");
+        bool isMage = cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff") || cl.Contains("маг");
+
+        if (slotType == 8) // Weapon is heavily customized by class!
+        {
+            if (isWarrior) str = tier * 3;
+            else if (isArcher) agi = tier * 3;
+            else if (isMage) intel = tier * 3;
+            else str = tier * 3; // fallback
+        }
+        else if (slotType == 1) // Helmet
+        {
+            if (isWarrior) sta = tier * 2;
+            else if (isArcher) agi = tier * 2;
+            else if (isMage) intel = tier * 2;
+            else sta = tier * 2;
+        }
+        else if (slotType == 2) // Amulet / Neck
+        {
+            if (isWarrior) str = tier * 2;
+            else if (isArcher) agi = tier * 2;
+            else if (isMage) intel = tier * 2;
+            else intel = tier * 2;
+        }
+        else if (slotType == 3) // Pauldrons / Shoulders
+        {
+            if (isWarrior) { str = tier; sta = tier; }
+            else if (isArcher) { agi = tier; sta = tier; }
+            else if (isMage) { intel = tier; sta = tier; }
+            else { str = tier; sta = tier; }
+        }
+        else if (slotType == 4) // Armor / Chest
+        {
+            if (isWarrior) { sta = tier * 3; }
+            else if (isArcher) { sta = tier * 2; agi = tier; }
+            else if (isMage) { sta = tier * 2; intel = tier; }
+            else { sta = tier * 3; }
+        }
+        else if (slotType == 5) // Ring
+        {
+            if (isWarrior) { str = tier; sta = tier; }
+            else if (isArcher) { agi = tier; intel = tier; }
+            else if (isMage) { intel = tier; agi = tier; }
+            else { intel = tier; agi = tier; }
+        }
+        else if (slotType == 6) // Belt
+        {
+            if (isWarrior) { str = tier; sta = tier; }
+            else if (isArcher) { agi = tier; sta = tier; }
+            else if (isMage) { intel = tier; sta = tier; }
+            else { sta = tier; agi = tier; }
+        }
+        else if (slotType == 7) // Boots
+        {
+            if (isWarrior) { str = tier; sta = tier; }
+            else if (isArcher) { agi = tier * 2; }
+            else if (isMage) { agi = tier; intel = tier; }
+            else { agi = tier * 2; }
+        }
+    }
+
+    public string GetItemPrompt(int slotType, int tier, string cl)
+    {
+        bool isWarrior = cl.Contains("warrior") || cl.Contains("voin") || cl.Contains("воин");
+        bool isArcher = cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow") || cl.Contains("стрелок");
+        bool isMage = cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff") || cl.Contains("маг");
+
+        string quality = "fantasy metallic";
+        if (tier == 6) quality = "legendary golden glowing";
+        else if (tier >= 4) quality = "epic magical purple glowing";
+        else if (tier >= 2) quality = "rare mystical blue glowing";
+
+        switch (slotType)
+        {
+            case 1:
+                if (isWarrior) return $"High precision game icon of a heavy {quality} barbarian horned warrior helmet, white background.";
+                if (isArcher) return $"High precision game icon of an agile {quality} elven ranger leather hood with green gemstones, white background.";
+                return $"High precision game icon of a mystical {quality} wizard circlet with glowing ruby, white background.";
+            case 2:
+                if (isWarrior) return $"High precision game icon of a massive {quality} iron chain with lion medallion, white background.";
+                if (isArcher) return $"High precision game icon of a lightweight {quality} emerald falcon feather pendant, white background.";
+                return $"High precision game icon of a glowing {quality} sapphire orb amulet, white background.";
+            case 3:
+                if (isWarrior) return $"High precision game icon of heavy {quality} spiked steel plate pauldrons, white background.";
+                if (isArcher) return $"High precision game icon of sleek {quality} leather rangers shoulder guards, white background.";
+                return $"High precision game icon of glowing {quality} runic arcane mage pauldrons, white background.";
+            case 4:
+                if (isWarrior) return $"High precision game icon of heavy {quality} plate chestplate armor, white background.";
+                if (isArcher) return $"High precision game icon of reinforced {quality} scale mail hunter chest armor, white background.";
+                return $"High precision game icon of embroidered {quality} silk wizard robes, white background.";
+            case 5:
+                if (isWarrior) return $"High precision game icon of a heavy {quality} brass signet warrior ring, white background.";
+                if (isArcher) return $"High precision game icon of a swift {quality} jade feather archer ring, white background.";
+                return $"High precision game icon of a glowing {quality} amethyst mana wizard ring, white background.";
+            case 6:
+                if (isWarrior) return $"High precision game icon of a heavy {quality} leather belt with colossal metal buckle, white background.";
+                if (isArcher) return $"High precision game icon of a sleek {quality} ranger belt with dual arrow pouches, white background.";
+                return $"High precision game icon of a glowing {quality} mana-weaver sash with runic patterns, white background.";
+            case 7:
+                if (isWarrior) return $"High precision game icon of heavy {quality} steel plated soldier sabatons boots, white background.";
+                if (isArcher) return $"High precision game icon of soft {quality} silent leather tracker boots, white background.";
+                return $"High precision game icon of glowing {quality} runic boots with wings embroidery, white background.";
+            case 8:
+                if (isWarrior) return $"High precision game icon of a giant {quality} two-handed steel greatsword, white background.";
+                if (isArcher) return $"High precision game icon of a composite {quality} recurve bow, white background.";
+                return $"High precision game icon of a glowing {quality} crystal spell staff, white background.";
+            default:
+                return $"High precision game icon of a {quality} mystical artifact, white background.";
+        }
+    }
+
     private void RecalculateEquippedBonuses()
     {
         LoadEquipment();
@@ -1254,17 +1455,12 @@ public class FateCastleManager : MonoBehaviour
             if (item != null && !string.IsNullOrEmpty(item.id))
             {
                 int tier = item.level;
-                switch (i)
-                {
-                    case 1: eqBonusSTA += tier * 2; break; // Head
-                    case 2: eqBonusINT += tier * 2; break; // Neck
-                    case 3: eqBonusSTR += tier; eqBonusSTA += tier; break; // Shoulders
-                    case 4: eqBonusSTA += tier * 3; break; // Chest
-                    case 5: eqBonusINT += tier; eqBonusAGI += tier; break; // Ring
-                    case 6: eqBonusSTA += tier; eqBonusAGI += tier; break; // Belt
-                    case 7: eqBonusAGI += tier * 2; break; // Boots
-                    case 8: eqBonusSTR += tier * 3; break; // Weapon
-                }
+                int itemStr, itemAgi, itemInt, itemSta;
+                GetItemStats(i, tier, out itemStr, out itemAgi, out itemInt, out itemSta);
+                eqBonusSTR += itemStr;
+                eqBonusAGI += itemAgi;
+                eqBonusINT += itemInt;
+                eqBonusSTA += itemSta;
             }
         }
     }
@@ -1285,10 +1481,14 @@ public class FateCastleManager : MonoBehaviour
         }
     }
 
-    private string GetItemName(int slotType, int tier, int lang)
+    private string GetItemName(int slotType, int tier, int lang, string overrideClass = null)
     {
         string cl = "warrior";
-        if (SaveGameSystem.CurrentData != null && !string.IsNullOrEmpty(SaveGameSystem.CurrentData.characterClass))
+        if (!string.IsNullOrEmpty(overrideClass))
+        {
+            cl = overrideClass.ToLower();
+        }
+        else if (SaveGameSystem.CurrentData != null && !string.IsNullOrEmpty(SaveGameSystem.CurrentData.characterClass))
         {
             cl = SaveGameSystem.CurrentData.characterClass.ToLower();
         }
@@ -1864,6 +2064,9 @@ public class FateCastleManager : MonoBehaviour
             case "dragon": if (skill_dragon_active != null) return skill_dragon_active; break;
             case "mountain_bear": if (skill_mountain_bear_active != null) return skill_mountain_bear_active; break;
             case "wasteland_serpent": if (skill_wasteland_serpent_active != null) return skill_wasteland_serpent_active; break;
+            case "ArcherHero": if (skill_hero_archer_active != null) return skill_hero_archer_active; break;
+            case "WarriorHero": if (skill_hero_warrior_active != null) return skill_hero_warrior_active; break;
+            case "MageHero": if (skill_hero_mage_active != null) return skill_hero_mage_active; break;
         }
 
         if (troopSkillAssets != null)
@@ -1883,6 +2086,18 @@ public class FateCastleManager : MonoBehaviour
     {
         switch (troopId)
         {
+            case "ArcherHero":
+                if (index == 0 && skill_hero_archer_passive1 != null) return skill_hero_archer_passive1;
+                if (index == 1 && skill_hero_archer_passive2 != null) return skill_hero_archer_passive2;
+                break;
+            case "WarriorHero":
+                if (index == 0 && skill_hero_warrior_passive1 != null) return skill_hero_warrior_passive1;
+                if (index == 1 && skill_hero_warrior_passive2 != null) return skill_hero_warrior_passive2;
+                break;
+            case "MageHero":
+                if (index == 0 && skill_hero_mage_passive1 != null) return skill_hero_mage_passive1;
+                if (index == 1 && skill_hero_mage_passive2 != null) return skill_hero_mage_passive2;
+                break;
             case "warrior":
                 if (index == 0 && skill_warrior_passive1 != null) return skill_warrior_passive1;
                 break;
@@ -2346,7 +2561,7 @@ public class FateCastleManager : MonoBehaviour
         if (clickCooldown > 0f) return;
 
         // Avoid clicking 3D structures if continent gameplay is not fully active, town view is active, day overlay is showing, or stats panel/details/popups are open
-        if (!isContinentGameplayActive || isTownViewActive || showNewDayOverlay || showStatsPanel || isDetailsOpen || showTroopDetailPopup || showCastleCalibrationPanel) return;
+        if (!isContinentGameplayActive || isTownViewActive || showNewDayOverlay || showStatsPanel || isDetailsOpen || showTroopDetailPopup || showForgeDetailPopup || showCastleCalibrationPanel) return;
 
         if (WasLeftMouseButtonClicked())
         {
@@ -3497,7 +3712,23 @@ public class FateCastleManager : MonoBehaviour
             DrawNewDayOverlay(curLang);
         }
 
-        // Всплывающие окна деталей (v18.11.16)
+        // Окно настроек деталей (сначала рисуем подложку, чтобы всплывающие окна были поверх неё)
+        if (isDetailsOpen && activeDetailsIndex >= 0 && activeDetailsIndex < castles.Count)
+        {
+            DrawDetailsWindow(curLang);
+        }
+
+        // Всплывающие окна деталей (v18.11.16) - рисуются после основных окон, чтобы быть на самом верху!
+        // Рисуем затемнение экрана (Modal Blocker) для всплывающих окон, чтобы избежать визуального наложения
+        if (showCastleCalibrationPanel || showSkillDetailPopup || showTroopDetailPopup || showForgeDetailPopup)
+        {
+            GUI.backgroundColor = new Color(0.01f, 0.02f, 0.06f, 0.88f);
+            GUIStyle blockerStyle = new GUIStyle(GUI.skin.box);
+            blockerStyle.normal.background = hudTex;
+            GUI.Box(new Rect(0, 0, Screen.width, Screen.height), "", blockerStyle);
+            GUI.backgroundColor = Color.white;
+        }
+
         if (showCastleCalibrationPanel)
         {
             DrawCastleCalibrationPanel(curLang);
@@ -3513,10 +3744,10 @@ public class FateCastleManager : MonoBehaviour
             DrawTroopDetailPopup(curLang);
         }
 
-        // Окно настроек деталей
-        if (!isDetailsOpen || activeDetailsIndex < 0 || activeDetailsIndex >= castles.Count) return;
-
-        DrawDetailsWindow(curLang);
+        if (showForgeDetailPopup)
+        {
+            DrawForgeDetailPopup(curLang);
+        }
     }
 
     private void DrawHeroHUD(int curLang)
@@ -3554,7 +3785,7 @@ public class FateCastleManager : MonoBehaviour
         portraitBtnStyle.normal.textColor = avatarGlowColor;
         
         // Блокируем управление персонажем при активных других панелях (диалог, город, детали)
-        bool blockCharacterPanel = isTownViewActive || isDetailsOpen || showNewDayOverlay || showCastleCalibrationPanel || (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.IsDialogueActive);
+        bool blockCharacterPanel = isTownViewActive || isDetailsOpen || showNewDayOverlay || showCastleCalibrationPanel || showForgeDetailPopup || (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.IsDialogueActive);
         if (blockCharacterPanel)
         {
             GUI.enabled = false;
@@ -4769,9 +5000,14 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.EndHorizontal();
     }
 
-    private Texture2D GetItemIconTexture(InventoryItem item)
+    private Texture2D GetItemIconTexture(InventoryItem item, string overrideClass = null)
     {
         if (item == null || string.IsNullOrEmpty(item.id)) return null;
+        
+        int tier = item.level;
+        int tIndex = tier - 1;
+        if (tIndex < 0) tIndex = 0;
+        if (tIndex > 5) tIndex = 5;
         
         if (item.slotType == 0) // Potion
         {
@@ -4784,30 +5020,79 @@ public class FateCastleManager : MonoBehaviour
             return icon_potion_hp; // fallback
         }
         
+        string cl = !string.IsNullOrEmpty(overrideClass) ? overrideClass.ToLower() : (SaveGameSystem.CurrentData != null && SaveGameSystem.CurrentData.characterClass != null 
+            ? SaveGameSystem.CurrentData.characterClass.ToLower() 
+            : "warrior");
+            
+        bool isArcher = cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow") || cl.Contains("стрелок");
+        bool isMage = cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff") || cl.Contains("маг");
+        bool isWarrior = !isArcher && !isMage;
+
         switch (item.slotType)
         {
-            case 1: return icon_helmet;
-            case 2: return icon_amulet;
-            case 3: return icon_pauldrons;
-            case 4: return icon_armor;
-            case 5: return icon_ring;
-            case 6: return icon_belt;
-            case 7: return icon_boots;
+            case 1: // Helmet
+                if (isArcher && archerHelmetIcons != null && archerHelmetIcons.Length > tIndex && archerHelmetIcons[tIndex] != null) return archerHelmetIcons[tIndex];
+                if (isMage && mageHelmetIcons != null && mageHelmetIcons.Length > tIndex && mageHelmetIcons[tIndex] != null) return mageHelmetIcons[tIndex];
+                if (isWarrior && warriorHelmetIcons != null && warriorHelmetIcons.Length > tIndex && warriorHelmetIcons[tIndex] != null) return warriorHelmetIcons[tIndex];
+                if (helmetIcons != null && helmetIcons.Length > tIndex && helmetIcons[tIndex] != null) return helmetIcons[tIndex];
+                return icon_helmet;
+
+            case 2: // Amulet
+                if (isArcher && archerAmuletIcons != null && archerAmuletIcons.Length > tIndex && archerAmuletIcons[tIndex] != null) return archerAmuletIcons[tIndex];
+                if (isMage && mageAmuletIcons != null && mageAmuletIcons.Length > tIndex && mageAmuletIcons[tIndex] != null) return mageAmuletIcons[tIndex];
+                if (isWarrior && warriorAmuletIcons != null && warriorAmuletIcons.Length > tIndex && warriorAmuletIcons[tIndex] != null) return warriorAmuletIcons[tIndex];
+                if (amuletIcons != null && amuletIcons.Length > tIndex && amuletIcons[tIndex] != null) return amuletIcons[tIndex];
+                return icon_amulet;
+
+            case 3: // Pauldrons
+                if (isArcher && archerPauldronsIcons != null && archerPauldronsIcons.Length > tIndex && archerPauldronsIcons[tIndex] != null) return archerPauldronsIcons[tIndex];
+                if (isMage && magePauldronsIcons != null && magePauldronsIcons.Length > tIndex && magePauldronsIcons[tIndex] != null) return magePauldronsIcons[tIndex];
+                if (isWarrior && warriorPauldronsIcons != null && warriorPauldronsIcons.Length > tIndex && warriorPauldronsIcons[tIndex] != null) return warriorPauldronsIcons[tIndex];
+                if (pauldronsIcons != null && pauldronsIcons.Length > tIndex && pauldronsIcons[tIndex] != null) return pauldronsIcons[tIndex];
+                return icon_pauldrons;
+
+            case 4: // Armor
+                if (isArcher && archerArmorIcons != null && archerArmorIcons.Length > tIndex && archerArmorIcons[tIndex] != null) return archerArmorIcons[tIndex];
+                if (isMage && mageArmorIcons != null && mageArmorIcons.Length > tIndex && mageArmorIcons[tIndex] != null) return mageArmorIcons[tIndex];
+                if (isWarrior && warriorArmorIcons != null && warriorArmorIcons.Length > tIndex && warriorArmorIcons[tIndex] != null) return warriorArmorIcons[tIndex];
+                if (armorIcons != null && armorIcons.Length > tIndex && armorIcons[tIndex] != null) return armorIcons[tIndex];
+                return icon_armor;
+
+            case 5: // Ring
+                if (isArcher && archerRingIcons != null && archerRingIcons.Length > tIndex && archerRingIcons[tIndex] != null) return archerRingIcons[tIndex];
+                if (isMage && mageRingIcons != null && mageRingIcons.Length > tIndex && mageRingIcons[tIndex] != null) return mageRingIcons[tIndex];
+                if (isWarrior && warriorRingIcons != null && warriorRingIcons.Length > tIndex && warriorRingIcons[tIndex] != null) return warriorRingIcons[tIndex];
+                if (ringIcons != null && ringIcons.Length > tIndex && ringIcons[tIndex] != null) return ringIcons[tIndex];
+                return icon_ring;
+
+            case 6: // Belt
+                if (isArcher && archerBeltIcons != null && archerBeltIcons.Length > tIndex && archerBeltIcons[tIndex] != null) return archerBeltIcons[tIndex];
+                if (isMage && mageBeltIcons != null && mageBeltIcons.Length > tIndex && mageBeltIcons[tIndex] != null) return mageBeltIcons[tIndex];
+                if (isWarrior && warriorBeltIcons != null && warriorBeltIcons.Length > tIndex && warriorBeltIcons[tIndex] != null) return warriorBeltIcons[tIndex];
+                if (beltIcons != null && beltIcons.Length > tIndex && beltIcons[tIndex] != null) return beltIcons[tIndex];
+                return icon_belt;
+
+            case 7: // Boots
+                if (isArcher && archerBootsIcons != null && archerBootsIcons.Length > tIndex && archerBootsIcons[tIndex] != null) return archerBootsIcons[tIndex];
+                if (isMage && mageBootsIcons != null && mageBootsIcons.Length > tIndex && mageBootsIcons[tIndex] != null) return mageBootsIcons[tIndex];
+                if (isWarrior && warriorBootsIcons != null && warriorBootsIcons.Length > tIndex && warriorBootsIcons[tIndex] != null) return warriorBootsIcons[tIndex];
+                if (bootsIcons != null && bootsIcons.Length > tIndex && bootsIcons[tIndex] != null) return bootsIcons[tIndex];
+                return icon_boots;
+
             case 8: // Weapon slot
-                string cl = SaveGameSystem.CurrentData != null && SaveGameSystem.CurrentData.characterClass != null 
-                    ? SaveGameSystem.CurrentData.characterClass.ToLower() 
-                    : "warrior";
-                    
-                if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow") || cl.Contains("стрелок"))
+                if (isArcher)
                 {
+                    if (archerWeaponIcons != null && archerWeaponIcons.Length > tIndex && archerWeaponIcons[tIndex] != null) return archerWeaponIcons[tIndex];
                     return weapon_archer_bow;
                 }
-                else if (cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff") || cl.Contains("маг"))
+                else if (isMage)
                 {
+                    if (mageWeaponIcons != null && mageWeaponIcons.Length > tIndex && mageWeaponIcons[tIndex] != null) return mageWeaponIcons[tIndex];
                     return weapon_mage_staff;
                 }
                 else
                 {
+                    if (warriorWeaponIcons != null && warriorWeaponIcons.Length > tIndex && warriorWeaponIcons[tIndex] != null) return warriorWeaponIcons[tIndex];
                     return weapon_warrior_sword;
                 }
         }
@@ -5289,6 +5574,178 @@ public class FateCastleManager : MonoBehaviour
         return null;
     }
 
+    private void DrawForgeDetailPopup(int curLang)
+    {
+        GUIStyle winStyle = new GUIStyle(GUI.skin.box);
+        winStyle.normal.background = hudTex;
+
+        float winWidth = 600f;
+        float winHeight = 520f;
+        Rect winRect = new Rect((Screen.width - winWidth) / 2f, (Screen.height - winHeight) / 2f, winWidth, winHeight);
+        GUI.Box(winRect, "", winStyle);
+
+        GUILayout.BeginArea(winRect);
+        GUILayout.Space(12);
+
+        GUIStyle mainTitle = new GUIStyle(GUI.skin.label);
+        mainTitle.alignment = TextAnchor.MiddleCenter;
+        mainTitle.fontStyle = FontStyle.Bold;
+        mainTitle.fontSize = 15;
+        mainTitle.normal.textColor = Color.yellow;
+        
+        string titleText = "⚒️ ЧЕРТЕЖИ И АНАЛИЗ СНАРЯЖЕНИЯ ⚒️";
+        if (curLang != 0) titleText = "⚒️ EQUIPMENT SCHEMATICS & ANALYSIS ⚒️";
+        if (curLang == 8) titleText = "⚒️ 装备蓝图与属性分析 ⚒️";
+        if (curLang == 7) titleText = "⚒️ 장비 도면 및 능력치 분석 ⚒️";
+
+        GUILayout.Label(titleText, mainTitle);
+        GUILayout.Space(10);
+
+        forgeDetailScroll = GUILayout.BeginScrollView(forgeDetailScroll, GUILayout.Width(winWidth - 20), GUILayout.Height(winHeight - 90));
+
+        string[] classes = new string[] { "warrior", "archer", "mage" };
+        string[] classNames = new string[] { "⚔️ КЛАСС: ВОИН", "🏹 КЛАСС: СТРЕЛОК", "🔮 КЛАСС: МАГ" };
+        if (curLang != 0) classNames = new string[] { "⚔️ CLASS: WARRIOR", "🏹 CLASS: ARCHER", "🔮 CLASS: MAGE" };
+        if (curLang == 8) classNames = new string[] { "⚔️ 职业: 战士", "🏹 职业: 游侠", "🔮 职业: 法师" };
+        if (curLang == 7) classNames = new string[] { "⚔️ 클래스: 전사", "🏹 클래스: 궁수", "🔮 클래스: 마법사" };
+
+        for (int i = 0; i < classes.Length; i++)
+        {
+            string clKey = classes[i];
+            string itemName = GetItemName(selectedForgeSlotType, selectedForgeTier, curLang, clKey);
+            int itemStr, itemAgi, itemInt, itemSta;
+            GetItemStats(selectedForgeSlotType, selectedForgeTier, out itemStr, out itemAgi, out itemInt, out itemSta, clKey);
+
+            List<string> statParts = new List<string>();
+            if (itemStr > 0) statParts.Add(curLang == 0 ? $"+{itemStr} Сила" : $"+{itemStr} Strength");
+            if (itemAgi > 0) statParts.Add(curLang == 0 ? $"+{itemAgi} Ловкость" : $"+{itemAgi} Agility");
+            if (itemInt > 0) statParts.Add(curLang == 0 ? $"+{itemInt} Интеллект" : $"+{itemInt} Intelligence");
+            if (itemSta > 0) statParts.Add(curLang == 0 ? $"+{itemSta} Выносливость" : $"+{itemSta} Stamina");
+            if (curLang == 8)
+            {
+                statParts.Clear();
+                if (itemStr > 0) statParts.Add($"+{itemStr} 力量");
+                if (itemAgi > 0) statParts.Add($"+{itemAgi} 敏捷");
+                if (itemInt > 0) statParts.Add($"+{itemInt} 智力");
+                if (itemSta > 0) statParts.Add($"+{itemSta} 耐力");
+            }
+            if (curLang == 7)
+            {
+                statParts.Clear();
+                if (itemStr > 0) statParts.Add($"+{itemStr} 힘");
+                if (itemAgi > 0) statParts.Add($"+{itemAgi} 민첩");
+                if (itemInt > 0) statParts.Add($"+{itemInt} 지능");
+                if (itemSta > 0) statParts.Add($"+{itemSta} 체력");
+            }
+
+            string statDesc = string.Join(", ", statParts.ToArray());
+            string prompt = GetItemPrompt(selectedForgeSlotType, selectedForgeTier, clKey);
+
+            GUILayout.BeginVertical(GUI.skin.box);
+            
+            // Sub-header for class
+            GUIStyle subTitleStyle = new GUIStyle(GUI.skin.label);
+            subTitleStyle.fontStyle = FontStyle.Bold;
+            subTitleStyle.fontSize = 12;
+            subTitleStyle.normal.textColor = (i == 0) ? new Color(1f, 0.4f, 0.4f) : ((i == 1) ? new Color(0.4f, 1f, 0.4f) : new Color(0.4f, 0.7f, 1f));
+            GUILayout.Label(classNames[i], subTitleStyle);
+            GUILayout.Space(3);
+
+            GUILayout.BeginHorizontal();
+            
+            // Render slot icon
+            InventoryItem tempItem = new InventoryItem { id = $"item_slot_{selectedForgeSlotType}_tier_{selectedForgeTier}", slotType = selectedForgeSlotType, level = selectedForgeTier };
+            Texture2D tex = GetItemIconTexture(tempItem, clKey);
+            
+            GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(50), GUILayout.Height(50));
+            if (tex != null)
+            {
+                GUILayout.Label(tex, GUILayout.Width(44), GUILayout.Height(44));
+            }
+            else
+            {
+                GUIStyle emojiStyle = new GUIStyle(GUI.skin.label);
+                emojiStyle.alignment = TextAnchor.MiddleCenter;
+                emojiStyle.fontSize = 20;
+                GUILayout.Label(GetEmojiForSlot(selectedForgeSlotType), emojiStyle, GUILayout.Width(44), GUILayout.Height(44));
+            }
+            GUILayout.EndVertical();
+
+            GUILayout.Space(10);
+
+            // Stats and info
+            GUILayout.BeginVertical();
+            GUIStyle nameStyle = new GUIStyle(GUI.skin.label);
+            nameStyle.fontStyle = FontStyle.Bold;
+            nameStyle.fontSize = 13;
+            nameStyle.normal.textColor = Color.yellow;
+            
+            string tierLbl = curLang == 0 ? "Тир" : "Tier";
+            if (curLang == 8) tierLbl = "等阶";
+            if (curLang == 7) tierLbl = "티어";
+            
+            GUILayout.Label($"{itemName} ({tierLbl} {selectedForgeTier})", nameStyle);
+
+            GUIStyle stStyle = new GUIStyle(GUI.skin.label);
+            stStyle.fontSize = 11;
+            stStyle.normal.textColor = Color.white;
+            GUILayout.Label(statDesc, stStyle);
+            GUILayout.EndVertical();
+
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(5);
+
+            // Prompt field with copy button
+            GUIStyle prHeader = new GUIStyle(GUI.skin.label);
+            prHeader.fontSize = 10;
+            prHeader.fontStyle = FontStyle.Bold;
+            prHeader.normal.textColor = Color.cyan;
+            
+            string prHeaderTxt = "🎨 LEONARDO AI GENERATION PROMPT:";
+            if (curLang == 8) prHeaderTxt = "🎨 LEONARDO AI 绘图提示词:";
+            if (curLang == 7) prHeaderTxt = "🎨 LEONARDO AI 이미지 생성 프롬프트:";
+            GUILayout.Label(prHeaderTxt, prHeader);
+
+            GUILayout.BeginHorizontal();
+            prompt = GUILayout.TextField(prompt, GUILayout.Height(30));
+            
+            string copyBtnTxt = curLang == 0 ? "📋 Копировать" : "📋 Copy";
+            if (curLang == 8) copyBtnTxt = "📋 复制提示词";
+            if (curLang == 7) copyBtnTxt = "📋 복사하기";
+
+            if (GUILayout.Button(copyBtnTxt, GUILayout.Width(110), GUILayout.Height(30)))
+            {
+                GUIUtility.systemCopyBuffer = prompt;
+                string copyMsg = curLang == 0 ? "Промпт успешно скопирован!" : "Prompt successfully copied!";
+                if (curLang == 8) copyMsg = "提示词已成功复制到剪贴板！";
+                if (curLang == 7) copyMsg = "프롬프트가 클립보드에 복사되었습니다!";
+                ShowFeedback(copyMsg);
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.EndVertical();
+            GUILayout.Space(10);
+        }
+
+        GUILayout.EndScrollView();
+
+        GUILayout.Space(10);
+        GUI.backgroundColor = Color.red;
+        
+        string closeBtnTxt = curLang == 0 ? "Закрыть Окно" : "Close Blueprint";
+        if (curLang == 8) closeBtnTxt = "关闭蓝图面板";
+        if (curLang == 7) closeBtnTxt = "닫기";
+
+        if (GUILayout.Button(closeBtnTxt, GUILayout.Height(30)))
+        {
+            showForgeDetailPopup = false;
+        }
+        GUI.backgroundColor = Color.white;
+
+        GUILayout.EndArea();
+    }
+
     private void DrawTroopDetailPopup(int curLang)
     {
         GUIStyle winStyle = new GUIStyle(GUI.skin.box);
@@ -5436,67 +5893,91 @@ public class FateCastleManager : MonoBehaviour
 
         GUILayout.Space(12);
 
-        // AVATAR prompt section
-        GUIStyle promptHeader = new GUIStyle(GUI.skin.label);
-        promptHeader.fontStyle = FontStyle.Bold;
-        promptHeader.normal.textColor = Color.cyan;
-        GUILayout.Label(curLang == 0 ? "🎨 ПРОМПТ ДЛЯ ГЕНЕРАЦИИ АВАТАРКИ:" : "🎨 AVATAR GENERATION AI PROMPT:", promptHeader);
-        
-        GUILayout.BeginHorizontal();
-        avatarPrompt = GUILayout.TextField(avatarPrompt, GUILayout.Height(40));
-        if (GUILayout.Button(curLang == 0 ? "📋 Копировать" : "📋 Copy", GUILayout.Width(100), GUILayout.Height(40)))
-        {
-            GUIUtility.systemCopyBuffer = avatarPrompt;
-            ShowFeedback(curLang == 0 ? "Промпт скопирован в буфер обмена!" : "Prompt copied to Clipboard!");
-        }
-        GUILayout.EndHorizontal();
+        GUIStyle skillHeader = new GUIStyle(GUI.skin.label);
+        skillHeader.fontStyle = FontStyle.Bold;
+        skillHeader.fontSize = 14;
+        skillHeader.normal.textColor = Color.cyan;
+        GUILayout.Label(curLang == 0 ? "⚔️ УМЕНИЯ И НАВЫКИ ПЕРСОНАЖА:" : "⚔️ CHARACTER SKILLS & ABILITIES:", skillHeader);
+        GUILayout.Space(8);
 
-        GUILayout.Space(15);
+        GUIStyle skillTitleStyle = new GUIStyle(GUI.skin.label);
+        skillTitleStyle.fontStyle = FontStyle.Bold;
+        skillTitleStyle.fontSize = 13;
+        skillTitleStyle.normal.textColor = Color.yellow;
 
-        // PASSIVE SKILLS list
-        GUILayout.Label(curLang == 0 ? "🔮 ПАССИВНЫЕ НАВЫКИ И ПРОМПТЫ:" : "🔮 PASSIVE ABILITIES & PROMPTS:", promptHeader);
-        for (int i = 0; i < pNames.Length; i++)
-        {
-            GUILayout.BeginVertical(GUI.skin.box);
-            GUILayout.Label($"★ {pNames[i]}", GUI.skin.label);
-            GUILayout.Label(pDescs[i], GUI.skin.label);
-            
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(curLang == 0 ? "Иконка:" : "Icon:", GUILayout.Width(60));
-            string skillPrompt = pPrompts[i];
-            skillPrompt = GUILayout.TextField(skillPrompt, GUILayout.Height(28));
-            if (GUILayout.Button(curLang == 0 ? "Копировать" : "Copy", GUILayout.Width(80), GUILayout.Height(28)))
-            {
-                GUIUtility.systemCopyBuffer = skillPrompt;
-                ShowFeedback(curLang == 0 ? $"Промпт {pNames[i]} скопирован!" : $"Prompt {pNames[i]} copied!");
-            }
-            GUILayout.EndHorizontal();
-            GUILayout.EndVertical();
-            GUILayout.Space(6);
-        }
+        GUIStyle skillBodyStyle = new GUIStyle(GUI.skin.label);
+        skillBodyStyle.fontSize = 12;
+        skillBodyStyle.wordWrap = true;
+        skillBodyStyle.normal.textColor = new Color(0.9f, 0.9f, 0.9f);
 
-        GUILayout.Space(10);
-
-        // ACTIVE SKILLS list
-        GUILayout.Label(curLang == 0 ? "💥 АКТИВНЫЕ НАВЫКИ И ПРОМПТЫ:" : "💥 ACTIVE ABILITIES & PROMPTS:", promptHeader);
+        // First render ACTIVE skills (sequentially)
         for (int i = 0; i < aNames.Length; i++)
         {
             GUILayout.BeginVertical(GUI.skin.box);
-            GUILayout.Label($"⚡ {aNames[i]}", GUI.skin.label);
-            GUILayout.Label(aDescs[i], GUI.skin.label);
             
             GUILayout.BeginHorizontal();
-            GUILayout.Label(curLang == 0 ? "Иконка:" : "Icon:", GUILayout.Width(60));
-            string skillPrompt = aPrompts[i];
-            skillPrompt = GUILayout.TextField(skillPrompt, GUILayout.Height(28));
-            if (GUILayout.Button(curLang == 0 ? "Копировать" : "Copy", GUILayout.Width(80), GUILayout.Height(28)))
+            // Larger visual square slot/preview window for active skill (e.g. 72x72 for high visibility)
+            Texture2D skillIcon = GetTroopActiveSkillIcon(selectedTroopId);
+            GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(72), GUILayout.Height(72));
+            if (skillIcon != null)
             {
-                GUIUtility.systemCopyBuffer = skillPrompt;
-                ShowFeedback(curLang == 0 ? $"Промпт {aNames[i]} скопирован!" : $"Prompt {aNames[i]} copied!");
+                GUILayout.Label(skillIcon, GUILayout.Width(66), GUILayout.Height(66));
             }
+            else
+            {
+                GUIStyle pS = new GUIStyle(GUI.skin.label);
+                pS.alignment = TextAnchor.MiddleCenter;
+                pS.fontSize = 14;
+                pS.normal.textColor = Color.gray;
+                GUILayout.Label("🔥", pS, GUILayout.Width(66), GUILayout.Height(66));
+            }
+            GUILayout.EndVertical();
+
+            GUILayout.Space(12);
+
+            GUILayout.BeginVertical();
+            GUILayout.Label($"⚡ {aNames[i]} ({GetText("Активный", "Active", "액티브", "主动")})", skillTitleStyle);
+            GUILayout.Label(aDescs[i], skillBodyStyle);
+            GUILayout.EndVertical();
+
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
-            GUILayout.Space(6);
+            GUILayout.Space(8);
+        }
+
+        // Then render PASSIVE skills (sequentially)
+        for (int i = 0; i < pNames.Length; i++)
+        {
+            GUILayout.BeginVertical(GUI.skin.box);
+            
+            GUILayout.BeginHorizontal();
+            // Larger visual square slot/preview window for passive skill
+            Texture2D skillIcon = GetTroopPassiveSkillIcon(selectedTroopId, i);
+            GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(72), GUILayout.Height(72));
+            if (skillIcon != null)
+            {
+                GUILayout.Label(skillIcon, GUILayout.Width(66), GUILayout.Height(66));
+            }
+            else
+            {
+                GUIStyle pS = new GUIStyle(GUI.skin.label);
+                pS.alignment = TextAnchor.MiddleCenter;
+                pS.fontSize = 14;
+                pS.normal.textColor = Color.gray;
+                GUILayout.Label("❄️", pS, GUILayout.Width(66), GUILayout.Height(66));
+            }
+            GUILayout.EndVertical();
+
+            GUILayout.Space(12);
+
+            GUILayout.BeginVertical();
+            GUILayout.Label($"🔮 {pNames[i]} ({GetText("Пассивный", "Passive", "패시브", "被动")})", skillTitleStyle);
+            GUILayout.Label(pDescs[i], skillBodyStyle);
+            GUILayout.EndVertical();
+
+            GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
+            GUILayout.Space(8);
         }
 
         GUILayout.EndScrollView();
@@ -6088,60 +6569,7 @@ public class FateCastleManager : MonoBehaviour
         if (currentTownSubPanel == 0 || currentTownSubPanel == 2)
         {
             float colWidth = (currentTownSubPanel == 2) ? (wWidth - 24) : (wWidth / 3.12f);
-            GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(colWidth));
-            
-            GUIStyle colHeader2 = new GUIStyle(GUI.skin.box);
-            colHeader2.alignment = TextAnchor.MiddleCenter;
-            colHeader2.fontSize = 17;
-            colHeader2.fontStyle = FontStyle.Bold;
-            colHeader2.normal.textColor = new Color(1.0f, 0.7f, 0.15f);
-            
-            string forgeHeader = GetText("🧪 КУЗНИЦА И ЛАВКА", "🧪 FORGE & POTION SHOP", "🧪 대장간 & 물약 상점", "🧪 铁匠铺与药水商会");
-            GUILayout.Label(forgeHeader, colHeader2, GUILayout.Height(36));
-            
-            string fDesc = curLang == 0 ? "Покупка зелий разного уровня и 6 тиров доспехов" : "Purchase elixirs & progressive 6 tiers armor gear";
-            GUILayout.Label(fDesc, subSt);
-
-            GUILayout.Space(10);
-            forgeScroll = GUILayout.BeginScrollView(forgeScroll);
-
-            // POTIONS sections (dynamic scaling with Castle Level and potion levels (1 to 10))
-            int potionIndex = PlayerPrefs.GetInt("Town_Selected_PotionLvl", 1);
-            GUILayout.BeginHorizontal();
-            GUILayout.Label((curLang == 0 ? "Выбор ур-ня зелья: " : "Select Potion level: ") + potionIndex, GUILayout.Width(170));
-            if (GUILayout.Button("-", GUILayout.Width(35))) { if (potionIndex > 1) potionIndex--; PlayerPrefs.SetInt("Town_Selected_PotionLvl", potionIndex); }
-            if (GUILayout.Button("+", GUILayout.Width(35))) { if (potionIndex < 10) potionIndex++; PlayerPrefs.SetInt("Town_Selected_PotionLvl", potionIndex); }
-            GUILayout.EndHorizontal();
-
-            DrawPotionItem("hp", "Зелье Жизни", "Elixir of Vital Health", "生命圣水", "체력 신성 물약", 30, potionIndex, activeCastle.level);
-            DrawPotionItem("str", "Зелье Силы", "Potion of Giant Strength", "巨人之力药水", "거인의 괴력 물약", 45, potionIndex, activeCastle.level);
-            DrawPotionItem("int", "Зелье Интеллекта", "Potion of Mind Intelligence", "智力药水", "지능 영약", 40, potionIndex, activeCastle.level);
-            DrawPotionItem("agi", "Зелье Ловкости", "Potion of Swift Agility", "敏捷药水", "민첩 영약", 40, potionIndex, activeCastle.level);
-            DrawPotionItem("sta", "Зелье Выносливости", "Potion of Iron Stamina", "耐力药水", "체력/지구력 영약", 40, potionIndex, activeCastle.level);
-
-            GUILayout.Space(15);
-            GUILayout.Box(curLang == 0 ? "⚔️ КУЗНИЦА СНАРЯЖЕНИЯ" : "⚔️ FORGE DEPARTMENT", GUILayout.Height(20));
-
-            // Beautiful 8-slot forging options
-            DrawForgeEquipmentOption(8, "Оружие", "Weapon", activeCastle.level);
-            DrawForgeEquipmentOption(1, "Шлем", "Helmet", activeCastle.level);
-            DrawForgeEquipmentOption(4, "Броня", "Chestplate", activeCastle.level);
-            DrawForgeEquipmentOption(3, "Наплечники", "Shoulders", activeCastle.level);
-            DrawForgeEquipmentOption(7, "Сапоги", "Boots", activeCastle.level);
-            DrawForgeEquipmentOption(6, "Пояс", "Belt", activeCastle.level);
-            DrawForgeEquipmentOption(2, "Амулет", "Amulet", activeCastle.level);
-            DrawForgeEquipmentOption(5, "Кольцо", "Ring", activeCastle.level);
-
-            GUILayout.Space(15);
-            GUILayout.Box(curLang == 0 ? "🕵️ НАЙМ ПРОСТЫХ ГЕРОЕВ" : "🕵️ RECRUIT ALLIED HEROES", GUILayout.Height(20));
-            
-            // Simple Heroes recruitment
-            DrawHeroRecruitItem("ArcherHero", "Герой: Стрелок", "Comrade: Marksman Hero", "游侠英雄-神射手", "동료 영웅 - 명사수", 300);
-            DrawHeroRecruitItem("WarriorHero", "Герой: Воин", "Comrade: Iron Warrior", "先锋英雄-铁血战士", "동료 영웅 - 광전사", 350);
-            DrawHeroRecruitItem("MageHero", "Герой: Боевой Маг", "Comrade: Sorcerer Elite", "元素法师-高阶贤者", "동료 영웅 - 일급 현자", 400);
-
-            GUILayout.EndScrollView();
-            GUILayout.EndVertical();
+            DrawUnifiedForgeSection(activeCastle, curLang, colWidth, subSt);
         }
 
         // --- Column 3: ACADEMY & ARENA ---
@@ -6391,7 +6819,7 @@ public class FateCastleManager : MonoBehaviour
             colTitle2.normal.textColor = new Color(1.0f, 0.7f, 0.15f);
             
             GUILayout.Label(forgeHeader, colTitle2);
-            string forgeDesc = GetText9("Торговля, снаряжение и зелья", "Elixirs & blacksmith forging", "Elixiere & Schmiede", "Élixirs et forge", "Elixires y forja", "Elixires e forja", "エリクサーとブラック smith 鍛造", "엘릭서 및 대장간 제작", "炼制药水与铁匠铺锻造");
+            string forgeDesc = GetText9("Торговля, снаряжение и зелья", "Elixirs & blacksmith forging", "Elixiere & Schmiede", "Élixirs et forge", "Elixires y forja", "Elixires e forja", "エリкサーとブラック smith 鍛造", "엘릭서 및 대장간 제작", "炼制药水与铁匠铺锻造");
             GUILayout.Label(forgeDesc, subSt);
             
             GUILayout.FlexibleSpace();
@@ -6460,7 +6888,7 @@ public class FateCastleManager : MonoBehaviour
             GUILayout.FlexibleSpace();
             
             GUI.backgroundColor = new Color(0.68f, 0.28f, 0.85f);
-            string academyBtn = GetText9("ВОЙТИ В АКАДЕМИЮ", "ENTER ACADEMY", "AKADEMIE BETRETEN", "ENTRER DANS L'ACADÉMIE", "ENTRAR A LA ACADEMIA", "ENTRAR NA ACADEMIA", "学院に入る", "아카데미 및 투기장 입장", "进入皇家学院");
+            string academyBtn = GetText9("ВОЙТИ В АКАДЕМИЮ", "ENTER ACADEMY", "AKADEMIE BETRETEN", "ENTRER DANS L'ACADÉMIE", "ENTRAR A LA ACADEMIA", "ENTRAR NA ACADEMIA", "学院に入る", "연병장/배럭 입장", "进入学院");
             if (GUILayout.Button(academyBtn, enterBtnStyle, GUILayout.Height(45)))
             {
                 currentTownSubPanel = 3;
@@ -6473,303 +6901,21 @@ public class FateCastleManager : MonoBehaviour
         }
         else
         {
-            // Render active section
-            GUILayout.BeginHorizontal();
-
-            // --- Column 1: BARRACKS ---
+            // If currentTownSubPanel != 0 (user has entered Barracks, Forge, or Academy)
+            float colWidth = wWidth - 10;
             if (currentTownSubPanel == 1)
             {
-                float colWidth = wWidth - 24;
-                GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(colWidth));
-                
-                GUIStyle colHeader1 = new GUIStyle(GUI.skin.box);
-                colHeader1.alignment = TextAnchor.MiddleCenter;
-                colHeader1.fontSize = 17;
-                colHeader1.fontStyle = FontStyle.Bold;
-                colHeader1.normal.textColor = new Color(0.2f, 1.0f, 0.6f);
-                GUILayout.Label(barracksHeader, colHeader1, GUILayout.Height(36));
-            
-            string bDesc = curLang == 0 ? "Найм войск в армию согласно уровню замка" : "Troop recruitment matching castle tier";
-            GUILayout.Label(bDesc, subSt);
-
-            GUILayout.Space(10);
-            barracksScroll = GUILayout.BeginScrollView(barracksScroll);
-
-            DrawUnitItem("warrior", "Боец фракции", "Faction Warrior", "皇室精锐战士", "왕실 정예 전사", 50, 1, activeCastle.level);
-            DrawUnitItem("archer", "Эльфийский Лучник", "Elven Archer", "精灵神射手", "엘프 신궁 대원", 75, 1, activeCastle.level);
-            DrawUnitItem("mage", "Боевой Маг Зенита", "Zenith Battle Mage", "제니스 전투 마법사", "제니스 전투 마법사", 120, 1, activeCastle.level);
-            DrawUnitItem("paladin", "Паладин Света", "Holy Paladin", "圣光审判圣骑士", "성광의 발키리 기사", 200, 2, activeCastle.level);
-            DrawUnitItem("cavalry", "Имперская Конница", "Imperial Cavalry", "帝国重装重骑兵", "황실 중갑 철기병", 320, 3, activeCastle.level);
-            DrawUnitItem("cannoneer", "Осадно-боевой Пушкарь", "Garrison Cannoneer", "重击攻锤铁炮手", "공성 사격 철포병", 450, 4, activeCastle.level);
-            DrawUnitItem("centaur", "Кентавр Степей", "Steppe Centaur", "荒野疾行百里人马", "초원의 켄타우로스", 130, 5, activeCastle.level);
-            DrawUnitItem("necromancer", "Некромант Тьмы", "Shadow Necromancer", "黑暗禁忌亡灵巫师", "어둠의 네크로맨서", 260, 5, activeCastle.level);
-            DrawUnitItem("griffin", "Элитный Королевский Грифон", "Royal Griffin", "皇家狮鹫守御猛禽", "황실 고대 그리폰", 380, 5, activeCastle.level);
-            DrawUnitItem("overlord", "Рыцарь-Властелин", "Dread Overlord", "铁王座幽夜统治者", "공포의 지옥 영주", 680, 5, activeCastle.level);
-            DrawUnitItem("hydra", "Многоголовая Гидра", "Swamp Hydra", "九头沼泽极冻毒蜃", "맹독의 아홉머리 히드라", 800, 5, activeCastle.level);
-            DrawUnitItem("dragon", "Легендарный Дракон Пустоты", "Void Dragon", "虚空至尊不灭邪龙", "허공의 전설 고대 용", 1500, 6, activeCastle.level);
-            DrawUnitItem("mountain_bear", "Ураганный Медведь Гор", "Mountain Bear Guard", "极寒高山怒嚎巨熊", "태산의 수호 거대 곰", 1000, 6, activeCastle.level);
-            DrawUnitItem("wasteland_serpent", "Гигантская Змея Пустошей", "Wasteland Serpent", "荒原巨型暴食沙蟒", "황무지의 고대 거대 뱀", 1100, 6, activeCastle.level);
-
-            GUILayout.EndScrollView();
-            GUILayout.EndVertical();
+                DrawUnifiedBarracksSection(activeCastle, curLang, colWidth, subSt);
+            }
+            else if (currentTownSubPanel == 2)
+            {
+                DrawUnifiedForgeSection(activeCastle, curLang, colWidth, subSt);
+            }
+            else if (currentTownSubPanel == 3)
+            {
+                DrawUnifiedAcademySection(activeCastle, curLang, colWidth, subSt);
+            }
         }
-
-        // --- Column 2: FORGE & HEALTH SHOP ---
-        if (currentTownSubPanel == 0 || currentTownSubPanel == 2)
-        {
-            float colWidth = (currentTownSubPanel == 2) ? (wWidth - 24) : (wWidth / 3.12f);
-            GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(colWidth));
-            
-            GUIStyle colHeader2 = new GUIStyle(GUI.skin.box);
-            colHeader2.alignment = TextAnchor.MiddleCenter;
-            colHeader2.fontSize = 17;
-            colHeader2.fontStyle = FontStyle.Bold;
-            colHeader2.normal.textColor = new Color(1.0f, 0.7f, 0.15f);
-            GUILayout.Label(forgeHeader, colHeader2, GUILayout.Height(36));
-            
-            string fDesc = curLang == 0 ? "Покупка зелий разного уровня и 6 тиров доспехов" : "Purchase elixirs & progressive 6 tiers armor gear";
-            GUILayout.Label(fDesc, subSt);
-
-            GUILayout.Space(10);
-            forgeScroll = GUILayout.BeginScrollView(forgeScroll);
-
-            // POTIONS sections (dynamic scaling with Castle Level and potion levels (1 to 10))
-            int potionIndex = PlayerPrefs.GetInt("Town_Selected_PotionLvl", 1);
-            GUILayout.BeginHorizontal();
-            GUILayout.Label((curLang == 0 ? "Выбор ур-ня зелья: " : "Select Potion level: ") + potionIndex, GUILayout.Width(170));
-            if (GUILayout.Button("-", GUILayout.Width(35))) { if (potionIndex > 1) potionIndex--; PlayerPrefs.SetInt("Town_Selected_PotionLvl", potionIndex); }
-            if (GUILayout.Button("+", GUILayout.Width(35))) { if (potionIndex < 10) potionIndex++; PlayerPrefs.SetInt("Town_Selected_PotionLvl", potionIndex); }
-            GUILayout.EndHorizontal();
-
-            DrawPotionItem("hp", "Зелье Жизни", "Elixir of Vital Health", "生命圣水", "체력 신성 물약", 30, potionIndex, activeCastle.level);
-            DrawPotionItem("str", "Зелье Силы", "Potion of Giant Strength", "巨人之力药水", "거인의 괴력 물약", 45, potionIndex, activeCastle.level);
-            DrawPotionItem("int", "Зелье Интеллекта", "Potion of Mind Intelligence", "智力药水", "지능 영약", 40, potionIndex, activeCastle.level);
-            DrawPotionItem("agi", "Зелье Ловкости", "Potion of Swift Agility", "敏捷药水", "민첩 영약", 40, potionIndex, activeCastle.level);
-            DrawPotionItem("sta", "Зелье Выносливости", "Potion of Iron Stamina", "耐力药水", "체력/지구력 영약", 40, potionIndex, activeCastle.level);
-
-            GUILayout.Space(15);
-            GUILayout.Box(curLang == 0 ? "⚔️ КУЗНИЦА СНАРЯЖЕНИЯ" : "⚔️ FORGE DEPARTMENT", GUILayout.Height(20));
-
-            // Beautiful 8-slot forging options
-            DrawForgeEquipmentOption(8, "Оружие", "Weapon", activeCastle.level);
-            DrawForgeEquipmentOption(1, "Шлем", "Helmet", activeCastle.level);
-            DrawForgeEquipmentOption(4, "Броня", "Chestplate", activeCastle.level);
-            DrawForgeEquipmentOption(3, "Наплечники", "Shoulders", activeCastle.level);
-            DrawForgeEquipmentOption(7, "Сапоги", "Boots", activeCastle.level);
-            DrawForgeEquipmentOption(6, "Пояс", "Belt", activeCastle.level);
-            DrawForgeEquipmentOption(2, "Амулет", "Amulet", activeCastle.level);
-            DrawForgeEquipmentOption(5, "Кольцо", "Ring", activeCastle.level);
-
-            GUILayout.Space(15);
-            GUILayout.Box(curLang == 0 ? "🕵️ НАЙМ ПРОСТЫХ ГЕРОЕВ" : "🕵️ RECRUIT ALLIED HEROES", GUILayout.Height(20));
-            
-            // Simple Heroes recruitment
-            DrawHeroRecruitItem("ArcherHero", "Герой: Стрелок", "Comrade: Marksman Hero", "游侠英雄-神射手", "동료 영웅 - 명사수", 300);
-            DrawHeroRecruitItem("WarriorHero", "Герой: Воин", "Comrade: Iron Warrior", "先锋英雄-铁血战士", "동료 영웅 - 광전사", 350);
-            DrawHeroRecruitItem("MageHero", "Герой: Боевой Маг", "Comrade: Sorcerer Elite", "元素法师-高阶贤者", "동료 영웅 - 일급 현자", 400);
-
-            GUILayout.EndScrollView();
-            GUILayout.EndVertical();
-        }
-
-        // --- Column 3: ACADEMY & ARENA ---
-        if (currentTownSubPanel == 0 || currentTownSubPanel == 3)
-        {
-            float colWidth = (currentTownSubPanel == 3) ? (wWidth - 24) : (wWidth / 3.12f);
-            GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(colWidth));
-            
-            GUIStyle colHeader3 = new GUIStyle(GUI.skin.box);
-            colHeader3.alignment = TextAnchor.MiddleCenter;
-            colHeader3.fontSize = 17;
-            colHeader3.fontStyle = FontStyle.Bold;
-            colHeader3.normal.textColor = new Color(0.85f, 0.45f, 0.95f);
-            GUILayout.Label(academyHeader, colHeader3, GUILayout.Height(36));
-            
-            string aDesc = curLang == 0 ? "Тренировки героев, прокачка XP и ранги воинов" : "Hero workouts, dynamic XP drills & troop promotions";
-            GUILayout.Label(aDesc, subSt);
-
-            GUILayout.Space(10);
-            academyScroll = GUILayout.BeginScrollView(academyScroll);
-                        // Display maps level limits
-            GUIStyle infoBoxStyle = new GUIStyle(GUI.skin.box);
-            infoBoxStyle.normal.textColor = Color.yellow;
-            infoBoxStyle.fontSize = 12;
-            GUILayout.Label(curLang == 0 ? "📌 Предел Уровня на 1-ой карте: 15" : "📌 Level Ceiling on Map 1: 15", infoBoxStyle);
-
-            GUILayout.Space(10);
-            GUILayout.Box(curLang == 0 ? "🎯 ТРЕНИРОВОЧНЫЙ ПЛАЦ" : "🎯 PARADE INSTRUCTION GROUND", GUILayout.Height(20));
-
-            int actLvl = activeCastle.level;
-            GUIStyle barGS = new GUIStyle(GUI.skin.label);
-            barGS.normal.textColor = Color.green;
-
-            // 1. Main Hero Training
-            GUILayout.BeginVertical(GUI.skin.box);
-            int pLvl = SaveGameSystem.CurrentData.playerLevel;
-            int pXp = SaveGameSystem.CurrentData.currentXP;
-            string mainHeroLabel = curLang == 0 ? 
-                $"Основной Герой (Ур.{pLvl})\n[Опыт: {pXp}/100]" : 
-                $"Main Protagonist (Lvl {pLvl})\n[XP: {pXp}/100]";
-            GUILayout.Label(mainHeroLabel, GUI.skin.label);
-            
-            // Draw visual progress bar for Protagonist
-            string pBar = "[";
-            int pBlocks = pXp / 10;
-            for (int b = 0; b < 10; b++) pBar += (b < pBlocks) ? "■" : "░";
-            pBar += "]";
-            GUILayout.Label(pBar, barGS);
-
-            int mainTrainCost = pLvl * 15 * actLvl;
-            string mainTrainBtn = curLang == 0 ? $"Тренировать ({mainTrainCost} 💰)" : $"Train Protagonist ({mainTrainCost} 💰)";
-            if (GUILayout.Button(mainTrainBtn, GUILayout.Height(30)))
-            {
-                if (SaveGameSystem.CurrentData.gold < mainTrainCost)
-                {
-                    ShowFeedback(curLang == 0 ? "Недостаточно королевского угля и золота в казне!" : "Not enough kingdom gold!");
-                }
-                else
-                {
-                    TriggerTraining(0, 0, 35, 15, mainTrainCost, curLang);
-                }
-            }
-            GUILayout.EndVertical();
-
-            // 2. Companion Ranged Training
-            GUILayout.BeginVertical(GUI.skin.box);
-            int countArcher = GetHeroCount("ArcherHero", activeDetailsIndex);
-            int archerLvl = PlayerPrefs.GetInt("Companion_Lvl_ArcherHero", 1);
-            int archerXp = PlayerPrefs.GetInt("Companion_XP_ArcherHero", 0);
-            GUILayout.Label(curLang == 0 ? 
-                $"Нанятые Стрелки (Ур.{archerLvl}) [Нанято: {countArcher}]\n[Опыт: {archerXp}/100]" : 
-                $"Hired Marksmen (Lvl {archerLvl}) [Hired: {countArcher}]\n[XP: {archerXp}/100]");
-            
-            string archBar = "[";
-            int archBlocks = archerXp / 10;
-            for (int b = 0; b < 10; b++) archBar += (b < archBlocks) ? "■" : "░";
-            archBar += "]";
-            GUILayout.Label(archBar, barGS);
-
-            int archerTrainCost = archerLvl * 12 * actLvl;
-            if (GUILayout.Button(curLang == 0 ? $"Тренировать ({archerTrainCost} 💰)" : $"Train Archers ({archerTrainCost} 💰)", GUILayout.Height(30)))
-            {
-                if (countArcher <= 0)
-                {
-                    ShowFeedback(curLang == 0 ? "Необходимо нанять Стрелков в лавке!" : "Hire Marksman First!");
-                }
-                else if (SaveGameSystem.CurrentData.gold < archerTrainCost)
-                {
-                    ShowFeedback(curLang == 0 ? "Казна пуста!" : "Insufficient gold!");
-                }
-                else
-                {
-                    TriggerTraining(1, 40, 0, 15, archerTrainCost, curLang);
-                }
-            }
-            GUILayout.EndVertical();
-
-            // 3. Companion Warrior Training
-            GUILayout.BeginVertical(GUI.skin.box);
-            int countWarrior = GetHeroCount("WarriorHero", activeDetailsIndex);
-            int warriorLvl = PlayerPrefs.GetInt("Companion_Lvl_WarriorHero", 1);
-            int warriorXp = PlayerPrefs.GetInt("Companion_XP_WarriorHero", 0);
-            GUILayout.Label(curLang == 0 ? 
-                $"Нанятые Воины (Ур.{warriorLvl}) [Нанято: {countWarrior}]\n[Опыт: {warriorXp}/100]" : 
-                $"Hired Gladiators (Lvl {warriorLvl}) [Hired: {countWarrior}]\n[XP: {warriorXp}/100]");
-            
-            string warBar = "[";
-            int warBlocks = warriorXp / 10;
-            for (int b = 0; b < 10; b++) warBar += (b < warBlocks) ? "■" : "░";
-            warBar += "]";
-            GUILayout.Label(warBar, barGS);
-
-            int warriorTrainCost = warriorLvl * 12 * actLvl;
-            if (GUILayout.Button(curLang == 0 ? $"Тренировать ({warriorTrainCost} 💰)" : $"Train Gladiators ({warriorTrainCost} 💰)", GUILayout.Height(30)))
-            {
-                if (countWarrior <= 0)
-                {
-                    ShowFeedback(curLang == 0 ? "Необходимо нанять Воинов в лавке!" : "Hire Gladiator First!");
-                }
-                else if (SaveGameSystem.CurrentData.gold < warriorTrainCost)
-                {
-                    ShowFeedback(curLang == 0 ? "Казна пуста!" : "Insufficient gold!");
-                }
-                else
-                {
-                    TriggerTraining(2, 40, 0, 15, warriorTrainCost, curLang);
-                }
-            }
-            GUILayout.EndVertical();
-
-            // 4. Companion Mage Training
-            GUILayout.BeginVertical(GUI.skin.box);
-            int countMage = GetHeroCount("MageHero", activeDetailsIndex);
-            int mageLvl = PlayerPrefs.GetInt("Companion_Lvl_MageHero", 1);
-            int mageXp = PlayerPrefs.GetInt("Companion_XP_MageHero", 0);
-            GUILayout.Label(curLang == 0 ? 
-                $"Нанятые Маги (Ур.{mageLvl}) [Нанято: {countMage}]\n[Опыт: {mageXp}/100]" : 
-                $"Hired Magicians (Lvl {mageLvl}) [Hired: {countMage}]\n[XP: {mageXp}/100]");
-            
-            string mageBar = "[";
-            int mageBlocks = mageXp / 10;
-            for (int b = 0; b < 10; b++) mageBar += (b < mageBlocks) ? "■" : "░";
-            mageBar += "]";
-            GUILayout.Label(mageBar, barGS);
-
-            int mageTrainCost = mageLvl * 12 * actLvl;
-            if (GUILayout.Button(curLang == 0 ? $"Тренировать ({mageTrainCost} 💰)" : $"Train Magicians ({mageTrainCost} 💰)", GUILayout.Height(30)))
-            {
-                if (countMage <= 0)
-                {
-                    ShowFeedback(curLang == 0 ? "Необходимо нанять Магов в лавке!" : "Hire Magician First!");
-                }
-                else if (SaveGameSystem.CurrentData.gold < mageTrainCost)
-                {
-                    ShowFeedback(curLang == 0 ? "Казна пуста!" : "Insufficient gold!");
-                }
-                else
-                {
-                    TriggerTraining(3, 40, 0, 15, mageTrainCost, curLang);
-                }
-            }
-            GUILayout.EndVertical();
-
-            GUILayout.Space(15);
-            GUILayout.Box(curLang == 0 ? "🛡️ ПОВЫШЕНИЕ РАНГА ВСЕЙ АРМИИ" : "🛡️ ARMY COHORT GLOBAL PROMOTION", GUILayout.Height(20));
-
-            int unitRank = PlayerPrefs.GetInt("Player_ArmyUnit_Rank", 1);
-            GUILayout.Label(curLang == 0 ? $"Текущий боевой ранг войск: Кавалеры Tier-{unitRank}" : $"Current Cohort Battle Badge: Tier-{unitRank}");
-
-            if (unitRank < 5)
-            {
-                int rankPrice = 250 * unitRank * actLvl;
-                string promoBtn = curLang == 0 ? $"Повысить Ранг Воинства ({rankPrice} 💰)" : $"Promote Army Rank ({rankPrice} 💰)";
-                if (GUILayout.Button(promoBtn, GUILayout.Height(40)))
-                {
-                    if (SaveGameSystem.CurrentData.gold < rankPrice)
-                    {
-                        ShowFeedback(curLang == 0 ? "Недостаточно золота!" : "Not enough gold!");
-                    }
-                    else
-                    {
-                        SaveGameSystem.CurrentData.gold -= rankPrice;
-                        unitRank++;
-                        PlayerPrefs.SetInt("Player_ArmyUnit_Rank", unitRank);
-                        PlayerPrefs.Save();
-                        ShowFeedback(curLang == 0 ? "Ранг воинов успешно повышен! Все войска получили прирост к характеристикам." : "Army rank increased! All units got a stats boost.");
-                    }
-                }
-            }
-            else
-            {
-                GUILayout.Label(curLang == 0 ? "✓ Достигнута максимальная слава воинства!" : "✓ Ultimate military vanguard status reached!", GUI.skin.box);
-            }
-
-            GUILayout.EndScrollView();
-            GUILayout.EndVertical();
-        }
-
-        GUILayout.EndHorizontal();
-    }
 
         GUILayout.FlexibleSpace();
 
@@ -6953,11 +7099,10 @@ public class FateCastleManager : MonoBehaviour
 
         string pasHeader = GetText("❄️ ПАССИВНЫЕ НАВЫКИ", "❄️ PASSIVE SKILLS", "❄️ 패시브 С킬", "❄️ 被动技能");
         GUILayout.Label(pasHeader, passiveHeaderStyle);
-        GUILayout.Space(4);
+        GUILayout.Space(6);
 
         if (td.passiveNames != null && td.passiveNames.Length > 0)
         {
-            // Row of passive icon squares
             GUILayout.BeginHorizontal();
             for (int i = 0; i < td.passiveNames.Length; i++)
             {
@@ -6965,6 +7110,8 @@ public class FateCastleManager : MonoBehaviour
                 string pasName = td.passiveNames[i];
                 string pasDesc = (td.passiveDesc != null && i < td.passiveDesc.Length) ? td.passiveDesc[i] : "";
                 string pasPrompt = (td.passivePrompts != null && i < td.passivePrompts.Length) ? td.passivePrompts[i] : "";
+
+                GUILayout.BeginVertical(GUILayout.Width(125));
 
                 if (pasIconTex != null)
                 {
@@ -6981,29 +7128,28 @@ public class FateCastleManager : MonoBehaviour
                     isHoveringSkill = true;
                     hoveredSkillName = pasName;
                     
-                     string fullPasDesc = pasDesc;
-                     if (!string.IsNullOrEmpty(pasPrompt))
-                     {
-                         fullPasDesc += $"\n\n<color=cyan><i>AI Prompt: {pasPrompt}</i></color>";
-                     }
-                     
-                     hoveredSkillDesc = fullPasDesc;
-                     hoveredSkillType = GetText("❄️ ПАССИВНЫЙ НАВЫК", "❄️ PASSIVE SKILL", "❄️ 패시브 스킬", "❄️ 被动技能");
-                     hoveredSkillIcon = pasIconTex;
+                    string fullPasDesc = pasDesc;
+                    if (!string.IsNullOrEmpty(pasPrompt))
+                    {
+                        fullPasDesc += $"\n\n<color=cyan><i>AI Prompt: {pasPrompt}</i></color>";
+                    }
+                    
+                    hoveredSkillDesc = fullPasDesc;
+                    hoveredSkillType = GetText("❄️ ПАССИВНЫЙ НАВЫК", "❄️ PASSIVE SKILL", "❄️ 패시브 스킬", "❄️ 被动技能");
+                    hoveredSkillIcon = pasIconTex;
                 }
-                GUILayout.Space(8);
+
+                GUILayout.Space(4);
+                GUILayout.Label($"<b>{pasName}</b>", skillDescStyle);
+                GUILayout.Label(pasDesc, skillDescStyle, GUILayout.Width(120));
+                GUILayout.EndVertical();
+
+                if (i < td.passiveNames.Length - 1)
+                {
+                    GUILayout.Space(12);
+                }
             }
             GUILayout.EndHorizontal();
-
-            GUILayout.Space(6);
-
-            // Row names/descriptions list
-            for (int i = 0; i < td.passiveNames.Length; i++)
-            {
-                string pasName = td.passiveNames[i];
-                string pasDesc = (td.passiveDesc != null && i < td.passiveDesc.Length) ? td.passiveDesc[i] : "";
-                GUILayout.Label($"• <b>{pasName}</b>: {pasDesc}", skillDescStyle, GUILayout.ExpandWidth(true));
-            }
         }
         else
         {
@@ -7065,69 +7211,170 @@ public class FateCastleManager : MonoBehaviour
         return icon_potion_hp;
     }
 
-    private void DrawPotionItem(string id, string nameRU, string nameEN, string nameCH, string nameKR, int basePrice, int potionLvl, int castleLvl)
+    private int GetRequiredCastleLevelForForge(int tier)
+    {
+        if (tier == 1) return 1;
+        if (tier == 2) return 2;
+        if (tier == 3) return 3;
+        if (tier == 4) return 4;
+        if (tier == 5) return 5;
+        if (tier == 6) return 6;
+        return 1;
+    }
+
+    private string GetItemStatDescription(int slotType, int tier, string previewClass)
+    {
+        int str, agi, intel, sta;
+        GetItemStats(slotType, tier, out str, out agi, out intel, out sta, previewClass);
+        List<string> stats = new List<string>();
+        if (str > 0) stats.Add($"+{str} STR");
+        if (agi > 0) stats.Add($"+{agi} AGI");
+        if (intel > 0) stats.Add($"+{intel} INT");
+        if (sta > 0) stats.Add($"+{sta} STA");
+        
+        int curLang = Translator.LanguageID;
+        string statStr = string.Join(", ", stats);
+        if (curLang == 0) return $"Параметры: {statStr} (Ковка)";
+        return $"Stats: {statStr} (Crafted)";
+    }
+
+    private string GetItemClassRecommendation(int slotType, int tier)
     {
         int curLang = Translator.LanguageID;
-        int reqLvl = GetRequiredCastleLevelForPotion(potionLvl);
+        string previewClass = PlayerPrefs.GetString("Forge_Preview_Class", "warrior");
+        if (string.IsNullOrEmpty(previewClass)) previewClass = "warrior";
+        
+        string classLabel = "Воин";
+        if (previewClass == "archer") classLabel = "Стрелок";
+        else if (previewClass == "mage") classLabel = "Маг";
+        
+        if (curLang == 0) return $"★ Рекомендуется классу: {classLabel}";
+        return $"★ Recommended for class: {previewClass.ToUpper()}";
+    }
+
+    private void DrawForgeEquipmentOption(int slotType, int tier, int castleLvl)
+    {
+        int curLang = Translator.LanguageID;
+        int reqLvl = GetRequiredCastleLevelForForge(tier);
         bool isUnlocked = castleLvl >= reqLvl;
 
-        int price = Mathf.RoundToInt(basePrice * potionLvl * (castleLvl * 0.4f + 0.6f));
-        int count = PlayerPrefs.GetInt($"Player_Potion_{id}_Lvl_{potionLvl}", 0);
+        int price = Mathf.RoundToInt(50 * tier * (castleLvl * 0.35f + 0.65f));
+        string previewClass = PlayerPrefs.GetString("Forge_Preview_Class", "warrior");
+        if (string.IsNullOrEmpty(previewClass)) previewClass = "warrior";
 
-        string name = curLang == 0 ? nameRU : nameEN;
-        if (curLang == 8) name = nameCH;
-        if (curLang == 7) name = nameKR;
+        string name = GetItemName(slotType, tier, curLang, previewClass);
+        
+        InventoryItem tempItem = new InventoryItem();
+        tempItem.id = $"item_slot_{slotType}_tier_{tier}";
+        tempItem.slotType = slotType;
+        tempItem.level = tier;
+        Texture2D itemTex = GetItemIconTexture(tempItem, previewClass);
+
+        string emoji = GetEmojiForSlot(slotType);
 
         string colorTag = "<color=white>";
-        if (potionLvl >= 7) colorTag = "<color=orange>"; // Legendary
-        else if (potionLvl >= 4) colorTag = "<color=magenta>"; // Epic
-        else if (potionLvl >= 2) colorTag = "<color=cyan>"; // Rare
+        if (tier == 6) colorTag = "<color=red>"; // Mythic
+        else if (tier == 5) colorTag = "<color=orange>"; // Legendary
+        else if (tier == 4) colorTag = "<color=magenta>"; // Epic
+        else if (tier == 3) colorTag = "<color=cyan>"; // Rare
+        else if (tier == 2) colorTag = "<color=green>"; // Uncommon
 
-        Texture2D potionIcon = GetPotionIconById(id);
+        string statDesc = GetItemStatDescription(slotType, tier, previewClass);
+        string classRecommend = GetItemClassRecommendation(slotType, tier);
 
         GUILayout.BeginHorizontal(GUI.skin.box);
-        
+
         // Icon box (colored background / styled border)
         GUILayout.BeginVertical(GUILayout.Width(44), GUILayout.Height(44));
-        if (potionIcon != null)
+        GUIStyle iconBtnStyle = new GUIStyle(GUI.skin.button);
+        iconBtnStyle.padding = new RectOffset(2, 2, 2, 2);
+        
+        if (itemTex != null)
         {
-            GUILayout.Box(potionIcon, GUILayout.Width(40), GUILayout.Height(40));
+            if (GUILayout.Button(itemTex, iconBtnStyle, GUILayout.Width(40), GUILayout.Height(40)))
+            {
+                selectedForgeSlotType = slotType;
+                selectedForgeTier = tier;
+                showForgeDetailPopup = true;
+                if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+            }
         }
         else
         {
-            GUILayout.Box("🧪", GUILayout.Width(40), GUILayout.Height(40));
+            if (GUILayout.Button(emoji, GUILayout.Width(40), GUILayout.Height(40)))
+            {
+                selectedForgeSlotType = slotType;
+                selectedForgeTier = tier;
+                showForgeDetailPopup = true;
+                if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+            }
         }
         GUILayout.EndVertical();
 
+        Rect iconRect = GUILayoutUtility.GetLastRect();
+
         GUILayout.Space(8);
 
-        // Name, Stats and Requirements Column
+        // Details
         GUILayout.BeginVertical();
         
         GUIStyle nameStyle = new GUIStyle(GUI.skin.label);
         nameStyle.richText = true;
         nameStyle.fontStyle = FontStyle.Bold;
         nameStyle.fontSize = 12;
-        
-        string titleStr = $"{colorTag}<b>{name} (Ур.{potionLvl})</b></color>";
-        string ownedLabel = curLang == 0 ? $"Запас: {count} шт." : $"Owned: {count}";
-        GUILayout.Label($"{titleStr}  |  <color=gray>{ownedLabel}</color>", nameStyle);
 
-        bool isHP = id == "hp";
-        int boostVal = GetPotionValueForLevel(potionLvl, isHP);
-        
-        string statName = "";
-        if (id == "hp") statName = curLang == 0 ? "Макс. ОЗ (HP)" : "Max HP";
-        else if (id == "str") statName = curLang == 0 ? "Сила (STR)" : "Strength (STR)";
-        else if (id == "int") statName = curLang == 0 ? "Интеллект (INT)" : "Intelligence (INT)";
-        else if (id == "agi") statName = curLang == 0 ? "Ловкость (AGI)" : "Agility (AGI)";
-        else if (id == "sta") statName = curLang == 0 ? "Выносливость (STA)" : "Stamina (STA)";
+        GUILayout.Label($"{colorTag}<b>{name} (Тир {tier})</b></color>", nameStyle);
 
-        string effectText = curLang == 0 ? 
-            $"Временный боевой бафф: +{boostVal} {statName}" : 
-            $"Temporary combat buff: +{boostVal} {statName}";
-        if (curLang == 8) effectText = $"临时战斗增益: +{boostVal} {statName}";
-        if (curLang == 7) effectText = $"임시 전투 버프: +{boostVal} {statName}";
+        GUIStyle descStyle = new GUIStyle(GUI.skin.label);
+        descStyle.fontSize = 10;
+        descStyle.normal.textColor = new Color(0.8f, 0.8f, 0.8f);
+        GUILayout.Label(statDesc, descStyle);
+
+        // Multi-class Prompt copy buttons and Info button
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button("⚔️ Warrior", GUILayout.Width(75), GUILayout.Height(18)))
+        {
+            string p = GetItemPrompt(slotType, tier, "warrior");
+            GUIUtility.systemCopyBuffer = p;
+            string copyMsg = curLang == 0 ? $"Промпт Воина для {GetItemName(slotType, tier, curLang, "warrior")} скопирован!" : $"Warrior prompt for {GetItemName(slotType, tier, curLang, "warrior")} copied!";
+            ShowFeedback(copyMsg);
+        }
+        GUILayout.Space(2);
+        if (GUILayout.Button("🏹 Archer", GUILayout.Width(75), GUILayout.Height(18)))
+        {
+            string p = GetItemPrompt(slotType, tier, "archer");
+            GUIUtility.systemCopyBuffer = p;
+            string copyMsg = curLang == 0 ? $"Промпт Стрелка для {GetItemName(slotType, tier, curLang, "archer")} скопирован!" : $"Archer prompt for {GetItemName(slotType, tier, curLang, "archer")} copied!";
+            ShowFeedback(copyMsg);
+        }
+        GUILayout.Space(2);
+        if (GUILayout.Button("🔮 Mage", GUILayout.Width(65), GUILayout.Height(18)))
+        {
+            string p = GetItemPrompt(slotType, tier, "mage");
+            GUIUtility.systemCopyBuffer = p;
+            string copyMsg = curLang == 0 ? $"Промпт Мага для {GetItemName(slotType, tier, curLang, "mage")} скопирован!" : $"Mage prompt for {GetItemName(slotType, tier, curLang, "mage")} copied!";
+            ShowFeedback(copyMsg);
+        }
+        GUILayout.Space(2);
+        GUI.backgroundColor = new Color(0.2f, 0.7f, 1f, 1f);
+        if (GUILayout.Button("ℹ️ Инфо", GUILayout.Width(65), GUILayout.Height(18)))
+        {
+            selectedForgeSlotType = slotType;
+            selectedForgeTier = tier;
+            showForgeDetailPopup = true;
+            if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+        }
+        GUI.backgroundColor = Color.white;
+
+        if (!string.IsNullOrEmpty(classRecommend))
+        {
+            GUILayout.Space(5);
+            GUIStyle recStyle = new GUIStyle(GUI.skin.label);
+            recStyle.fontSize = 9;
+            recStyle.normal.textColor = new Color(1f, 0.7f, 0.15f);
+            GUILayout.Label(classRecommend, recStyle);
+        }
+        GUILayout.EndHorizontal();
 
         string reqText = curLang == 0 ? 
             $"Требуемый уровень Замка: {reqLvl}" : 
@@ -7135,17 +7382,32 @@ public class FateCastleManager : MonoBehaviour
         if (curLang == 8) reqText = $"需要城堡等级: {reqLvl}";
         if (curLang == 7) reqText = $"필요 성 레벨: {reqLvl}";
 
-        GUIStyle descStyle = new GUIStyle(GUI.skin.label);
-        descStyle.fontSize = 10;
-        descStyle.normal.textColor = new Color(0.8f, 0.8f, 0.8f);
-        GUILayout.Label(effectText, descStyle);
-        
         GUIStyle reqStyle = new GUIStyle(GUI.skin.label);
         reqStyle.fontSize = 10;
         reqStyle.normal.textColor = isUnlocked ? Color.green : Color.red;
         GUILayout.Label(reqText, reqStyle);
 
         GUILayout.EndVertical();
+
+        // Tooltip logic when hovering over icon
+        if (Event.current.type == EventType.Repaint && iconRect.Contains(Event.current.mousePosition))
+        {
+            isHoveringSkill = true;
+            hoveredSkillName = $"{name} (Тир {tier})";
+            
+            string toolDesc = $"{statDesc}";
+            if (!string.IsNullOrEmpty(classRecommend))
+            {
+                toolDesc += $"\n\n<color=yellow>{classRecommend}</color>";
+            }
+            string previewPrompt = GetItemPrompt(slotType, tier, previewClass);
+            toolDesc += $"\n\n<color=cyan><b>AI Prompt ({previewClass.ToUpper()}):</b> {previewPrompt}</color>";
+            toolDesc += $"\n\n{(isUnlocked ? "<color=green>Доступно для создания</color>" : $"<color=red>Требуется Замок Ур.{reqLvl}</color>")}";
+
+            hoveredSkillDesc = toolDesc;
+            hoveredSkillType = curLang == 0 ? "⚔️ СНАРЯЖЕНИЕ" : "⚔️ EQUIPMENT";
+            hoveredSkillIcon = itemTex;
+        }
 
         GUILayout.FlexibleSpace();
 
@@ -7155,28 +7417,24 @@ public class FateCastleManager : MonoBehaviour
             {
                 if (SaveGameSystem.CurrentData.gold < price)
                 {
-                    ShowFeedback(curLang == 0 ? "Жители города отказываются продавать снадобье в долг!" : "Potion merchants deny debt!");
+                    ShowFeedback(curLang == 0 ? "Недостаточно золота в казне замка!" : "Insufficient gold for blacksmith services!");
                 }
                 else
                 {
-                    string potionId = $"potion_{id}_{potionLvl}";
-                    string itemNameRU = $"{nameRU} (Ур.{potionLvl})";
-                    if (AddInventoryItem(potionId, itemNameRU, id, 0, potionLvl, 0))
+                    string itemId = $"item_slot_{slotType}_tier_{tier}";
+                    string itemNameRU = GetItemName(slotType, tier, 0, previewClass);
+                    string iconType = GetIconTypeForSlot(slotType);
+                    
+                    if (AddInventoryItem(itemId, itemNameRU, iconType, slotType, tier, tier * 3))
                     {
                         SaveGameSystem.CurrentData.gold -= price;
-                        count++;
-                        PlayerPrefs.SetInt($"Player_Potion_{id}_Lvl_{potionLvl}", count);
                         PlayerPrefs.Save();
                         SaveGameSystem.Save(0);
-
-                        string okFeed = curLang == 0 ?
-                            $"Куплено и добавлено в инвентарь: {name} (Ур.{potionLvl})!" :
-                            $"Acquired and placed in inventory: {name} (Level {potionLvl})!";
-                        ShowFeedback(okFeed);
+                        ShowFeedback(curLang == 0 ? $"Выковано и помещено в инвентарь: {itemNameRU}!" : $"Forged and placed in inventory: {name}!");
                     }
                     else
                     {
-                        ShowFeedback(curLang == 0 ? "Ваш инвентарь переполнен!" : "Inventory is full!");
+                        ShowFeedback(curLang == 0 ? "Ваш инвентарь переполнен! Освободите место." : "Inventory is full! Free some slots first.");
                     }
                 }
             }
@@ -7190,58 +7448,204 @@ public class FateCastleManager : MonoBehaviour
             GUILayout.Button(lockLabel, GUILayout.Width(100), GUILayout.Height(35));
             GUI.enabled = true;
         }
+
         GUILayout.EndHorizontal();
     }
 
-    private void DrawForgeEquipmentOption(int slotType, string slotNameRU, string slotNameEN, int castleLvl)
+    private int GetSlotTypeFromForgeTab(int tab)
     {
-        int curLang = Translator.LanguageID;
-        int currentTier = PlayerPrefs.GetInt($"Player_Equipped_Tier_Slot_{slotType}", 0);
+        switch (tab)
+        {
+            case 0: return 8; // Weapon
+            case 1: return 1; // Helmet
+            case 2: return 4; // Chestplate/Armor
+            case 3: return 3; // Shoulders
+            case 4: return 7; // Boots
+            case 5: return 6; // Belt
+            case 6: return 2; // Amulet
+            case 7: return 5; // Ring
+            default: return 8;
+        }
+    }
+
+    private void DrawUnifiedForgeSection(CastleInstance activeCastle, int curLang, float colWidth, GUIStyle subSt)
+    {
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(colWidth));
         
-        if (currentTier < 6)
+        GUIStyle colHeader2 = new GUIStyle(GUI.skin.box);
+        colHeader2.alignment = TextAnchor.MiddleCenter;
+        colHeader2.fontSize = 17;
+        colHeader2.fontStyle = FontStyle.Bold;
+        colHeader2.normal.textColor = new Color(1.0f, 0.7f, 0.15f);
+        
+        string forgeHeader = GetText("🧪 КУЗНИЦА И ЛАВКА", "🧪 FORGE & POTION SHOP", "🧪 대장간 & 물약 상점", "🧪 铁匠铺与药水商会");
+        GUILayout.Label(forgeHeader, colHeader2, GUILayout.Height(36));
+        
+        string fDesc = curLang == 0 ? "Покупка зелий разного уровня и создание доспехов" : "Purchase elixirs & progressive armor gear";
+        GUILayout.Label(fDesc, subSt);
+
+        GUILayout.Space(10);
+        forgeScroll = GUILayout.BeginScrollView(forgeScroll);
+
+        // --- POTIONS TABS ---
+        int potionTab = PlayerPrefs.GetInt("Town_Selected_PotionTab", 0);
+        GUILayout.BeginHorizontal();
+        GUIStyle tabStyle = new GUIStyle(GUI.skin.button);
+        tabStyle.fontSize = 11;
+        tabStyle.fontStyle = FontStyle.Bold;
+
+        string[] potTabNames = curLang == 0 ? 
+            new string[] { "❤️ Жизнь", "💪 Сила", "🔮 Интеллект", "⚡ Ловкость", "🛡️ Стойкость" } :
+            new string[] { "❤️ Health", "💪 Strength", "🔮 Intelligence", "⚡ Agility", "🛡️ Stamina" };
+        if (curLang == 8) potTabNames = new string[] { "❤️ 生命", "💪 力量", "🔮 智力", "⚡ 敏捷", "🛡️ 耐力" };
+        if (curLang == 7) potTabNames = new string[] { "❤️ 체력", "💪 힘", "🔮 지능", "⚡ 민첩", "🛡️ 지구력" };
+
+        for (int i = 0; i < potTabNames.Length; i++)
         {
-            int nextTier = currentTier + 1;
-            int price = 80 * nextTier * (int)(castleLvl * 0.4f + 0.6f);
-            string name = GetItemName(slotType, nextTier, curLang);
-            
-            GUILayout.BeginHorizontal(GUI.skin.box);
-            string desc = curLang == 0 ? 
-                $"Выковать {name}\n[Слот: {slotNameRU}, Tier {nextTier}]" :
-                $"Forge {name}\n[Slot: {slotNameEN}, Tier {nextTier}]";
-            GUILayout.Label(desc, GUILayout.Width(220));
-            
-            if (GUILayout.Button($"{price} 💰", GUILayout.Height(35)))
+            GUI.backgroundColor = (potionTab == i) ? new Color(0.2f, 0.7f, 1f, 1f) : Color.white;
+            if (GUILayout.Button(potTabNames[i], tabStyle, GUILayout.Height(30)))
             {
-                if (SaveGameSystem.CurrentData.gold < price)
-                {
-                    ShowFeedback(curLang == 0 ? "Недостаточно золота в казне замка!" : "Insufficient gold for blacksmith services!");
-                }
-                else
-                {
-                    string itemId = $"item_slot_{slotType}_tier_{nextTier}";
-                    string itemNameRU = GetItemName(slotType, nextTier, 0);
-                    string iconType = GetIconTypeForSlot(slotType);
-                    
-                    if (AddInventoryItem(itemId, itemNameRU, iconType, slotType, nextTier, nextTier * 3))
-                    {
-                        SaveGameSystem.CurrentData.gold -= price;
-                        PlayerPrefs.SetInt($"Player_Equipped_Tier_Slot_{slotType}", nextTier);
-                        PlayerPrefs.Save();
-                        SaveGameSystem.Save(0);
-                        ShowFeedback(curLang == 0 ? $"Выковано и помещено в инвентарь: {itemNameRU}!" : $"Forged and placed in inventory: {name}!");
-                    }
-                    else
-                    {
-                        ShowFeedback(curLang == 0 ? "Ваш инвентарь переполнен! Освободите место." : "Inventory is full! Free some slots first.");
-                    }
-                }
+                potionTab = i;
+                PlayerPrefs.SetInt("Town_Selected_PotionTab", potionTab);
+                PlayerPrefs.Save();
+                if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
             }
-            GUILayout.EndHorizontal();
         }
-        else
+        GUI.backgroundColor = Color.white;
+        GUILayout.EndHorizontal();
+
+        GUILayout.Space(10);
+
+        string potType = "hp";
+        string pNameRU = "Зелье Жизни", pNameEN = "Elixir of Vital Health", pNameCH = "生命圣水", pNameKR = "체력 신성 물약";
+        int basePrice = 30;
+
+        if (potionTab == 1) { potType = "str"; pNameRU = "Зелье Силы"; pNameEN = "Potion of Giant Strength"; pNameCH = "巨人之力药水"; pNameKR = "거인의 괴력 물약"; basePrice = 45; }
+        else if (potionTab == 2) { potType = "int"; pNameRU = "Зелье Интеллекта"; pNameEN = "Potion of Mind Intelligence"; pNameCH = "智力药水"; pNameKR = "지능 영약"; basePrice = 40; }
+        else if (potionTab == 3) { potType = "agi"; pNameRU = "Зелье Ловкости"; pNameEN = "Potion of Swift Agility"; pNameCH = "敏捷药水"; pNameKR = "민첩 영약"; basePrice = 40; }
+        else if (potionTab == 4) { potType = "sta"; pNameRU = "Зелье Выносливости"; pNameEN = "Potion of Iron Stamina"; pNameCH = "耐力药水"; pNameKR = "체력/지구력 영약"; basePrice = 40; }
+
+        for (int lvl = 1; lvl <= 10; lvl++)
         {
-            GUILayout.Label(curLang == 0 ? $"✓ {slotNameRU}: Легендарное качество!" : $"✓ {slotNameEN}: Legendary Quality!", GUI.skin.box);
+            DrawPotionItem(potType, pNameRU, pNameEN, pNameCH, pNameKR, basePrice, lvl, activeCastle.level);
         }
+
+        GUILayout.Space(15);
+        GUILayout.Box(curLang == 0 ? "⚔️ КУЗНИЦА СНАРЯЖЕНИЯ" : "⚔️ FORGE DEPARTMENT", GUILayout.Height(20));
+
+        // --- FORGE PREVIEW CLASS (v18.11.23) ---
+        string previewClass = PlayerPrefs.GetString("Forge_Preview_Class", "");
+        string realClass = "warrior";
+        if (SaveGameSystem.CurrentData != null && !string.IsNullOrEmpty(SaveGameSystem.CurrentData.characterClass))
+        {
+            realClass = SaveGameSystem.CurrentData.characterClass.ToLower();
+        }
+        if (string.IsNullOrEmpty(previewClass))
+        {
+            previewClass = realClass;
+        }
+
+        GUILayout.BeginHorizontal();
+        GUIStyle previewLabelStyle = new GUIStyle(GUI.skin.label);
+        previewLabelStyle.fontSize = 11;
+        previewLabelStyle.fontStyle = FontStyle.Bold;
+        previewLabelStyle.normal.textColor = Color.yellow;
+        GUILayout.Label(curLang == 0 ? "Просмотр класса:" : "Class View:", previewLabelStyle, GUILayout.Width(110));
+
+        string[] previewClassNames = curLang == 0 ? 
+            new string[] { "⚔️ Воин", "🏹 Стрелок", "🔮 Маг" } :
+            new string[] { "⚔️ Warrior", "🏹 Archer", "🔮 Mage" };
+        string[] previewClassKeys = new string[] { "warrior", "archer", "mage" };
+        for (int i = 0; i < previewClassKeys.Length; i++)
+        {
+            bool isSel = previewClass.Contains(previewClassKeys[i]);
+            GUI.backgroundColor = isSel ? new Color(0.15f, 0.75f, 0.35f, 1f) : Color.white;
+            if (GUILayout.Button(previewClassNames[i], tabStyle, GUILayout.Height(24)))
+            {
+                previewClass = previewClassKeys[i];
+                PlayerPrefs.SetString("Forge_Preview_Class", previewClass);
+                PlayerPrefs.Save();
+                if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+            }
+        }
+        GUI.backgroundColor = Color.white;
+        GUILayout.EndHorizontal();
+
+        // Informative subtitle
+        GUIStyle subHintStyle = new GUIStyle(GUI.skin.label);
+        subHintStyle.fontSize = 9;
+        subHintStyle.alignment = TextAnchor.MiddleCenter;
+        subHintStyle.normal.textColor = Color.gray;
+        string hintText = curLang == 0 ?
+            "★ Характеристики и названия снаряжения автоматически подстроятся под ваш класс при надевании!" :
+            "★ Equipment stats and names automatically adapt to your chosen hero class when equipped!";
+        GUILayout.Label(hintText, subHintStyle);
+        GUILayout.Space(5);
+
+        // --- EQUIPMENT FORGING TABS ---
+        int forgeTab = PlayerPrefs.GetInt("Town_Selected_ForgeTab", 0);
+        
+        string[] forgeTabNames = curLang == 0 ? 
+            new string[] { "⚔️ Оружие", "👑 Шлем", "👕 Броня", "🦾 Наплечники", "🥾 Сапоги", "🎗️ Пояс", "📿 Амулет", "💍 Кольцо" } :
+            new string[] { "⚔️ Weapon", "👑 Helmet", "👕 Chest", "🦾 Shoulders", "🥾 Boots", "🎗️ Belt", "📿 Amulet", "💍 Ring" };
+        if (curLang == 8) forgeTabNames = new string[] { "⚔️ 武器", "👑 头盔", "👕 护甲", "🦾 护肩", "🥾 鞋子", "🎗️ 腰带", "📿 项链", "💍 戒指" };
+        if (curLang == 7) forgeTabNames = new string[] { "⚔️ 무기", "👑 투구", "👕 갑옷", "🦾 어깨갑옷", "🥾 신발", "🎗️ 벨트", "📿 아뮬렛", "💍 반지" };
+
+        tabsScroll = GUILayout.BeginScrollView(tabsScroll, GUILayout.Height(44));
+        GUILayout.BeginHorizontal();
+        for (int i = 0; i < forgeTabNames.Length; i++)
+        {
+            GUI.backgroundColor = (forgeTab == i) ? new Color(1f, 0.6f, 0.2f, 1f) : Color.white;
+            if (GUILayout.Button(forgeTabNames[i], tabStyle, GUILayout.Height(26)))
+            {
+                forgeTab = i;
+                PlayerPrefs.SetInt("Town_Selected_ForgeTab", forgeTab);
+                PlayerPrefs.Save();
+                if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+            }
+        }
+        GUILayout.EndHorizontal();
+        GUILayout.EndScrollView();
+        GUI.backgroundColor = Color.white;
+
+        GUILayout.Space(10);
+
+        int fSlotType = GetSlotTypeFromForgeTab(forgeTab);
+        for (int tier = 1; tier <= 6; tier++)
+        {
+            DrawForgeEquipmentOption(fSlotType, tier, activeCastle.level);
+        }
+
+        GUILayout.Space(15);
+        GUILayout.Box(curLang == 0 ? "🕵️ НАЙМ ПРОСТЫХ ГЕРОЕВ" : "🕵️ RECRUIT ALLIED HEROES", GUILayout.Height(20));
+        
+        int activeZoneIdx = activeDetailsIndex >= 0 ? activeDetailsIndex : 0;
+        int maxSimp = 20 + activeZoneIdx * 15;
+        int simpTot = GetHeroCount("ArcherHero", activeZoneIdx) + 
+                     GetHeroCount("WarriorHero", activeZoneIdx) + 
+                     GetHeroCount("MageHero", activeZoneIdx);
+
+        GUIStyle limStyle = new GUIStyle(GUI.skin.label);
+        limStyle.alignment = TextAnchor.MiddleCenter;
+        limStyle.fontSize = 11;
+        limStyle.fontStyle = FontStyle.Bold;
+        limStyle.normal.textColor = (simpTot >= maxSimp) ? Color.red : new Color(0.2f, 0.8f, 1f);
+
+        string limLabel = curLang == 0 ?
+            $"★ Лимит на {activeZoneIdx + 1}-м Континенте: {simpTot} / {maxSimp} простых героев нанято" :
+            $"★ Limit on Continent {activeZoneIdx + 1}: {simpTot} / {maxSimp} allied heroes recruited";
+        if (curLang == 8) limLabel = $"★ 当前大陆上限: 已招募 {simpTot} / {maxSimp} 位普通英雄";
+        if (curLang == 7) limLabel = $"★ 이 대륙의 한도: {simpTot} / {maxSimp}명의 일반 영웅 고용됨";
+
+        GUILayout.Label(limLabel, limStyle);
+        GUILayout.Space(5);
+        
+        DrawHeroRecruitItem("ArcherHero", "Герой: Стрелок", "Comrade: Marksman Hero", "游侠英雄-神射手", "동료 영웅 - 명사수", 300);
+        DrawHeroRecruitItem("WarriorHero", "Герой: Воин", "Comrade: Iron Warrior", "先锋英雄-铁血战士", "동료 영웅 - 광전사", 350);
+        DrawHeroRecruitItem("MageHero", "Герой: Боевой Маг", "Comrade: Sorcerer Elite", "元素法师-高阶贤者", "동료 영웅 - 일급 현자", 400);
+
+        GUILayout.EndScrollView();
+        GUILayout.EndVertical();
     }
 
     private string GetIconTypeForSlot(int slotType)
@@ -7265,9 +7669,15 @@ public class FateCastleManager : MonoBehaviour
         int curLang = Translator.LanguageID;
         int count = GetHeroCount(key, activeDetailsIndex);
 
-        string name = curLang == 0 ? nameRU : nameEN;
-        if (curLang == 8) name = nameCH;
-        if (curLang == 7) name = nameKR;
+        CompanionData cd = GetCompanionData(key);
+        int lvl = PlayerPrefs.GetInt("Companion_Lvl_" + key, 1);
+        int hp = GetCompanionStat(key, "hp", lvl);
+        int atk = GetCompanionStat(key, "atk", lvl);
+        int def = GetCompanionStat(key, "def", lvl);
+
+        string name = curLang == 0 ? cd.nameRU : cd.nameEN;
+        if (curLang == 8) name = cd.nameRU; // fallback to localized or let companion names handle it
+        if (curLang == 7) name = cd.nameEN;
 
         GUILayout.BeginHorizontal(GUI.skin.box);
 
@@ -7294,40 +7704,193 @@ public class FateCastleManager : MonoBehaviour
             }
         }
 
-        GUILayout.Space(5);
+        GUILayout.Space(6);
 
-        GUIStyle itemBtnStyle = new GUIStyle(GUI.skin.button);
-        itemBtnStyle.alignment = TextAnchor.MiddleLeft;
-        itemBtnStyle.fontStyle = FontStyle.Bold;
-        itemBtnStyle.fontSize = 12;
-        itemBtnStyle.normal.textColor = Color.yellow;
+        GUILayout.BeginVertical();
+        
+        // Name and Count
+        GUIStyle nameStyle = new GUIStyle(GUI.skin.label);
+        nameStyle.fontStyle = FontStyle.Bold;
+        nameStyle.fontSize = 12;
+        nameStyle.normal.textColor = Color.yellow;
+        string labelText = curLang == 0 ? 
+            $"<b>{cd.nameRU}</b> [Гарнизон: {count} шт]" : 
+            $"<b>{cd.nameEN}</b> [Garrison: {count}]";
+        GUILayout.Label(labelText, nameStyle);
 
-        string btnLabel = $"{name}\n[В замке: {count}]";
-        if (GUILayout.Button(btnLabel, itemBtnStyle, GUILayout.Width(130), GUILayout.Height(44)))
+        // Stats Row
+        GUIStyle statsStyle = new GUIStyle(GUI.skin.label);
+        statsStyle.fontSize = 10;
+        statsStyle.normal.textColor = new Color(0.85f, 0.85f, 0.85f);
+        string hpTxt = curLang == 0 ? "❤️ ОЗ" : "❤️ HP";
+        string atkTxt = curLang == 0 ? "⚔️ АТК" : "⚔️ ATK";
+        string defTxt = curLang == 0 ? "🛡️ ЗАЩ" : "🛡️ DEF";
+        GUILayout.Label($"{hpTxt}: {hp}  |  {atkTxt}: {atk}  |  {defTxt}: {def}", statsStyle);
+
+        // Detailed skill layout sequentially with large icons and descriptions on the side (v18.11.23)
+        GUIStyle descStyle = new GUIStyle(GUI.skin.label);
+        descStyle.fontSize = 11;
+        descStyle.wordWrap = true;
+        descStyle.richText = true;
+        
+        string activeName = cd.activeName;
+        string activeDesc = cd.activeDesc;
+        string pass1Name = cd.passiveNames.Length > 0 ? cd.passiveNames[0] : "Passive 1";
+        string pass1Desc = cd.passiveDesc.Length > 0 ? cd.passiveDesc[0] : "";
+        string pass2Name = cd.passiveNames.Length > 1 ? cd.passiveNames[1] : "Passive 2";
+        string pass2Desc = cd.passiveDesc.Length > 1 ? cd.passiveDesc[1] : "";
+
+        Texture2D activeSkillIcon = GetTroopActiveSkillIcon(key);
+        Texture2D pass1SkillIcon = GetTroopPassiveSkillIcon(key, 0);
+        Texture2D pass2SkillIcon = GetTroopPassiveSkillIcon(key, 1);
+
+        // --- SKILL 1: ACTIVE ---
+        GUILayout.BeginHorizontal();
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(64), GUILayout.Height(64));
+        if (activeSkillIcon != null)
         {
-            selectedTroopId = key;
-            showTroopDetailPopup = true;
-            if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+            GUILayout.Label(activeSkillIcon, GUILayout.Width(58), GUILayout.Height(58));
+        }
+        else
+        {
+            GUIStyle pS = new GUIStyle(GUI.skin.label);
+            pS.alignment = TextAnchor.MiddleCenter;
+            pS.fontSize = 12;
+            pS.normal.textColor = Color.gray;
+            GUILayout.Label("📷", pS, GUILayout.Width(58), GUILayout.Height(58));
+        }
+        GUILayout.EndVertical();
+        Rect actRect = GUILayoutUtility.GetLastRect();
+
+        GUILayout.Space(10);
+
+        GUILayout.BeginVertical();
+        GUILayout.Label($"🔥 <color=orange><b>{activeName}</b></color> (Актив)", nameStyle);
+        GUILayout.Label(activeDesc, descStyle);
+        GUILayout.EndVertical();
+        GUILayout.EndHorizontal();
+
+        GUILayout.Space(6);
+
+        // --- SKILL 2: PASSIVE 1 ---
+        GUILayout.BeginHorizontal();
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(64), GUILayout.Height(64));
+        if (pass1SkillIcon != null)
+        {
+            GUILayout.Label(pass1SkillIcon, GUILayout.Width(58), GUILayout.Height(58));
+        }
+        else
+        {
+            GUIStyle pS = new GUIStyle(GUI.skin.label);
+            pS.alignment = TextAnchor.MiddleCenter;
+            pS.fontSize = 12;
+            pS.normal.textColor = Color.gray;
+            GUILayout.Label("📷", pS, GUILayout.Width(58), GUILayout.Height(58));
+        }
+        GUILayout.EndVertical();
+        Rect p1Rect = GUILayoutUtility.GetLastRect();
+
+        GUILayout.Space(10);
+
+        GUILayout.BeginVertical();
+        GUILayout.Label($"🔮 <color=cyan><b>{pass1Name}</b></color> (Пассив)", nameStyle);
+        GUILayout.Label(pass1Desc, descStyle);
+        GUILayout.EndVertical();
+        GUILayout.EndHorizontal();
+
+        GUILayout.Space(6);
+
+        // --- SKILL 3: PASSIVE 2 ---
+        GUILayout.BeginHorizontal();
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(64), GUILayout.Height(64));
+        if (pass2SkillIcon != null)
+        {
+            GUILayout.Label(pass2SkillIcon, GUILayout.Width(58), GUILayout.Height(58));
+        }
+        else
+        {
+            GUIStyle pS = new GUIStyle(GUI.skin.label);
+            pS.alignment = TextAnchor.MiddleCenter;
+            pS.fontSize = 12;
+            pS.normal.textColor = Color.gray;
+            GUILayout.Label("📷", pS, GUILayout.Width(58), GUILayout.Height(58));
+        }
+        GUILayout.EndVertical();
+        Rect p2Rect = GUILayoutUtility.GetLastRect();
+
+        GUILayout.Space(10);
+
+        GUILayout.BeginVertical();
+        GUILayout.Label($"🔮 <color=cyan><b>{pass2Name}</b></color> (Пассив)", nameStyle);
+        GUILayout.Label(pass2Desc, descStyle);
+        GUILayout.EndVertical();
+        GUILayout.EndHorizontal();
+
+        // Tooltip hover support for recruitment skill previews
+        if (Event.current.type == EventType.Repaint)
+        {
+            if (actRect.Contains(Event.current.mousePosition))
+            {
+                isHoveringSkill = true;
+                hoveredSkillName = cd.activeName;
+                hoveredSkillDesc = cd.activeDesc;
+                hoveredSkillType = curLang == 0 ? "🔥 АКТИВНЫЙ НАВЫК" : "🔥 ACTIVE SKILL";
+                hoveredSkillIcon = activeSkillIcon;
+            }
+            else if (p1Rect.Contains(Event.current.mousePosition))
+            {
+                isHoveringSkill = true;
+                hoveredSkillName = cd.passiveNames.Length > 0 ? cd.passiveNames[0] : "";
+                hoveredSkillDesc = (cd.passiveDesc.Length > 0 ? cd.passiveDesc[0] : "");
+                hoveredSkillType = curLang == 0 ? "🔮 ПАССИВНЫЙ НАВЫК" : "🔮 PASSIVE SKILL";
+                hoveredSkillIcon = pass1SkillIcon;
+            }
+            else if (p2Rect.Contains(Event.current.mousePosition))
+            {
+                isHoveringSkill = true;
+                hoveredSkillName = cd.passiveNames.Length > 1 ? cd.passiveNames[1] : "";
+                hoveredSkillDesc = (cd.passiveDesc.Length > 1 ? cd.passiveDesc[1] : "");
+                hoveredSkillType = curLang == 0 ? "🔮 ПАССИВНЫЙ НАВЫК" : "🔮 PASSIVE SKILL";
+                hoveredSkillIcon = pass2SkillIcon;
+            }
         }
 
-        if (GUILayout.Button($"{basePrice} 💰", GUILayout.Height(44)))
+        GUILayout.EndVertical();
+
+        GUILayout.FlexibleSpace();
+
+        if (GUILayout.Button($"{basePrice} 💰", GUILayout.Width(80), GUILayout.Height(44)))
         {
             CastleInstance activeCastle = castles[activeDetailsIndex >= 0 ? activeDetailsIndex : 0];
             int currentHeroes = GetHeroesCountInCastle(activeCastle.zoneIndex);
             int capacity = GetHeroCapacity(activeCastle.level);
 
-            if (currentHeroes >= capacity)
+            int maxSimpleHeroes = 20 + activeDetailsIndex * 15;
+            int simpleHeroesTotal = GetHeroCount("ArcherHero", activeDetailsIndex) + 
+                                   GetHeroCount("WarriorHero", activeDetailsIndex) + 
+                                   GetHeroCount("MageHero", activeDetailsIndex);
+
+            if (simpleHeroesTotal >= maxSimpleHeroes)
+            {
+                string limitTxt = curLang == 0 ?
+                    $"Лимит покупки простых героев на этом континенте ({maxSimpleHeroes} шт) исчерпан!" :
+                    $"Simple hero recruitment limit on this continent ({maxSimpleHeroes}) reached!";
+                if (curLang == 8) limitTxt = $"当前大陆普通英雄招募上限 ({maxSimpleHeroes}) 已达！";
+                if (curLang == 7) limitTxt = $"이 대륙의 일반 영웅 모집 한도 ({maxSimpleHeroes}명)가 초과되었습니다!";
+                ShowFeedback(limitTxt);
+            }
+            else if (currentHeroes >= capacity)
             {
                 string limitTxt = curLang == 0 ?
                     $"Достигнут лимит героев в этом замке ({currentHeroes}/{capacity})! Повысьте уровень цитадели." :
                     $"Castle hero garrison limit reached ({currentHeroes}/{capacity})! Upgrade stronghold first.";
                 if (curLang == 8) limitTxt = $"已达城堡英雄上限 ({currentHeroes}/{capacity})！请先升级主城。";
-                if (curLang == 7) limitTxt = $"성채 영웅 한도 초과 ({currentHeroes}/{capacity})! 성채를 먼저 업г레이드 하십시오.";
+                if (curLang == 7) limitTxt = $"성채 영웅 한도 초과 ({currentHeroes}/{capacity})! 성채를 먼저 업그레이드 하십시오.";
                 ShowFeedback(limitTxt);
             }
             else if (SaveGameSystem.CurrentData.gold < basePrice)
             {
-                ShowFeedback(curLang == 0 ? "Легендарные рекруты стоят дорого!" : "Noble adventurers deny cheap calls!");
+                ShowFeedback(curLang == 0 ? "Недостаточно золота в казне замка!" : "Not enough gold in the castle treasury!");
             }
             else
             {
@@ -7336,11 +7899,355 @@ public class FateCastleManager : MonoBehaviour
                 SetHeroCount(key, activeDetailsIndex, count);
 
                 string joinFeed = curLang == 0 ?
-                    $"Герой успешно размещен в гарнизоне замка!" :
-                    $"Renowned combat leader joined the castle garrison!";
+                    $"Герой {cd.nameRU} успешно нанят в гарнизон замка!" :
+                    $"Renowned leader {cd.nameEN} joined the castle garrison!";
                 ShowFeedback(joinFeed);
+                if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
             }
         }
+        GUILayout.EndHorizontal();
+    }
+
+    private Vector2 barracksScrollPos = Vector2.zero;
+
+    private void DrawUnifiedBarracksSection(CastleInstance activeCastle, int curLang, float colWidth, GUIStyle subSt)
+    {
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(colWidth));
+
+        GUIStyle colHeader1 = new GUIStyle(GUI.skin.box);
+        colHeader1.alignment = TextAnchor.MiddleCenter;
+        colHeader1.fontSize = 17;
+        colHeader1.fontStyle = FontStyle.Bold;
+        colHeader1.normal.textColor = new Color(0.95f, 0.45f, 0.45f);
+
+        string barracksHeader = GetText("⚔️ КАЗАРМЫ И ГАРНИЗОН", "⚔️ BARRACKS & GARRISON", "⚔️ 병영 및 가리온", "⚔️ 军营与要塞驻军");
+        GUILayout.Label(barracksHeader, colHeader1, GUILayout.Height(36));
+
+        string bDesc = curLang == 0 ? "Найм воинов и пополнение атакующего авангарда замка" : "Recruit diverse cohorts & reinforce your fortress garrison";
+        GUILayout.Label(bDesc, subSt);
+
+        GUILayout.Space(8);
+
+        barracksScrollPos = GUILayout.BeginScrollView(barracksScrollPos, GUILayout.Height(420));
+
+        DrawUnitItem("warrior", "Боец фракции", "Faction Warrior", "皇室精锐战士", "왕실 정예 전사", 50, 1, activeCastle.level);
+        DrawUnitItem("archer", "Эльфийский Лучник", "Elven Archer", "精灵神射手", "엘프 신궁 대원", 75, 1, activeCastle.level);
+        DrawUnitItem("mage", "Боевой Маг Зенита", "Zenith Battle Mage", "제니스 전투 마법사", "제니스 전투 마법사", 120, 1, activeCastle.level);
+        DrawUnitItem("paladin", "Паладин Света", "Holy Paladin", "圣光审判圣骑士", "성광의 발키리 기사", 200, 2, activeCastle.level);
+        DrawUnitItem("cavalry", "Имперская Конница", "Imperial Cavalry", "帝国重装重骑兵", "황실 중갑 철기병", 320, 3, activeCastle.level);
+        DrawUnitItem("cannoneer", "Осадно-боевой Пушкарь", "Garrison Cannoneer", "重击攻锤铁炮手", "공성 사격 철포병", 450, 4, activeCastle.level);
+        DrawUnitItem("centaur", "Кентавр Степей", "Steppe Centaur", "荒野疾行百里人ма", "초원의 켄타우로스", 130, 5, activeCastle.level);
+        DrawUnitItem("necromancer", "Некромант Тьмы", "Shadow Necromancer", "黑暗禁忌亡灵巫师", "어둠의 네크ро맨서", 260, 5, activeCastle.level);
+        DrawUnitItem("griffin", "Элитный Королевский Грифон", "Royal Griffin", "皇家狮鹫守御猛禽", "황실 고대 그리폰", 380, 5, activeCastle.level);
+        DrawUnitItem("overlord", "Рыцарь-Властелин", "Dread Overlord", "铁王座幽夜统治者", "공포의 지옥 영주", 680, 5, activeCastle.level);
+        DrawUnitItem("hydra", "Многоголовая Гидра", "Swamp Hydra", "九头沼泽极冻毒蜃", "맹독의 아홉머리 히드라", 800, 5, activeCastle.level);
+        DrawUnitItem("dragon", "Легендарный Дракон Пустоты", "Void Dragon", "虚空至尊不灭邪龙", "허공의 전설 고대 용", 1500, 6, activeCastle.level);
+        DrawUnitItem("mountain_bear", "Ураганный Медведь Гор", "Mountain Bear Guard", "极寒高山怒嚎巨熊", "태산의 수호 거대 곰", 1000, 6, activeCastle.level);
+        DrawUnitItem("wasteland_serpent", "Гигантская Змея Пустошей", "Wasteland Serpent", "荒原巨型暴食沙蟒", "황무지의 고대 거대 뱀", 1100, 6, activeCastle.level);
+
+        GUILayout.EndScrollView();
+
+        GUILayout.EndVertical();
+    }
+
+    private void DrawUnifiedAcademySection(CastleInstance activeCastle, int curLang, float colWidth, GUIStyle subSt)
+    {
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(colWidth));
+
+        GUIStyle colHeader3 = new GUIStyle(GUI.skin.box);
+        colHeader3.alignment = TextAnchor.MiddleCenter;
+        colHeader3.fontSize = 17;
+        colHeader3.fontStyle = FontStyle.Bold;
+        colHeader3.normal.textColor = new Color(0.85f, 0.45f, 0.95f);
+
+        string academyHeader = GetText("🎓 АКАДЕМИЯ И АРЕНА", "🎓 ACADEMY & ARENA", "🎓 아카데미 & 투기장", "🎓 皇家学院与斗技场");
+        GUILayout.Label(academyHeader, colHeader3, GUILayout.Height(36));
+
+        string aDesc = curLang == 0 ? "Тренировки героев, прокачка XP и ранги воинов" : "Hero workouts, dynamic XP drills & troop promotions";
+        GUILayout.Label(aDesc, subSt);
+
+        GUILayout.Space(12);
+
+        int cap = 5 + activeCastle.level * 5;
+        string capText = curLang == 0 ? $"Текущий лимит тренировок: до {cap} уровня (зависит от уровня Замка)" : $"Current training limit: up to Level {cap} (based on Castle Level)";
+        GUILayout.Label($"<b>{capText}</b>", GUI.skin.label);
+        GUILayout.Space(8);
+
+        DrawTrainingOption(0, "Main Hero", "Основной Герой", "主角", "주인공 영웅", activeCastle.level, cap, curLang);
+        GUILayout.Space(10);
+
+        DrawTrainingOption(1, "Archer Comrades", "Эльфийские Стрелки", "精灵射手", "엘프 궁수 부대", activeCastle.level, cap, curLang);
+        GUILayout.Space(10);
+
+        DrawTrainingOption(2, "Warrior Comrades", "Священные Воины", "圣光战士", "성광 전사 부대", activeCastle.level, cap, curLang);
+        GUILayout.Space(10);
+
+        DrawTrainingOption(3, "Mage Comrades", "Чародеи Зенита", "제니스 마법사", "제니스 마법 부대", activeCastle.level, cap, curLang);
+
+        GUILayout.EndVertical();
+    }
+
+    private void DrawTrainingOption(int target, string nameEN, string nameRU, string nameCH, string nameKR, int castleLvl, int cap, int curLang)
+    {
+        string name = curLang == 0 ? nameRU : nameEN;
+        if (curLang == 8) name = nameCH;
+        if (curLang == 7) name = nameKR;
+
+        int lvl = 1;
+        int xp = 0;
+        bool available = true;
+
+        if (target == 0)
+        {
+            lvl = SaveGameSystem.CurrentData.playerLevel;
+            xp = SaveGameSystem.CurrentData.currentXP;
+        }
+        else
+        {
+            string classKey = target == 1 ? "ArcherHero" : (target == 2 ? "WarriorHero" : "MageHero");
+            int comradeCount = PlayerPrefs.GetInt("Player_HiredCount_" + classKey, 0);
+            lvl = PlayerPrefs.GetInt("Companion_Lvl_" + classKey, 1);
+            xp = PlayerPrefs.GetInt("Companion_XP_" + classKey, 0);
+            if (comradeCount == 0)
+            {
+                available = false;
+            }
+        }
+
+        int goldCost = 25 + lvl * 10;
+        int mainXP = 25 + castleLvl * 5;
+        int baseXP = 20 + castleLvl * 5;
+
+        GUILayout.BeginHorizontal(GUI.skin.box);
+
+        string emoji = target == 0 ? "👑" : (target == 1 ? "🏹" : (target == 2 ? "🛡️" : "🔮"));
+        GUILayout.Label($"<size=24>{emoji}</size>", GUILayout.Width(44), GUILayout.Height(44));
+
+        GUILayout.Space(6);
+
+        GUILayout.BeginVertical();
+        GUILayout.Label($"<b>{name}</b>", GUI.skin.label);
+
+        if (!available)
+        {
+            string lockedMsg = curLang == 0 ? "<color=red>Герой не нанят в таверне!</color>" : "<color=red>Not hired in Tavern!</color>";
+            if (curLang == 8) lockedMsg = "<color=red>未在酒馆招募！</color>";
+            if (curLang == 7) lockedMsg = "<color=red>선술집에서 고용되지 않음!</color>";
+            GUILayout.Label(lockedMsg, GUI.skin.label);
+        }
+        else
+        {
+            string lvlText = curLang == 0 ? $"Ур. {lvl} (Опыт: {xp}/100)" : $"Lvl {lvl} (XP: {xp}/100)";
+            if (curLang == 8) lvlText = $"等级 {lvl} (经验: {xp}/100)";
+            if (curLang == 7) lvlText = $"레벨 {lvl} (경험치: {xp}/100)";
+            GUILayout.Label(lvlText, GUI.skin.label);
+        }
+        GUILayout.EndVertical();
+
+        GUILayout.FlexibleSpace();
+
+        if (!available)
+        {
+            GUI.enabled = false;
+            GUILayout.Button("🔒", GUILayout.Width(100), GUILayout.Height(36));
+            GUI.enabled = true;
+        }
+        else if (lvl >= (target == 0 ? cap : cap - 2))
+        {
+            GUI.enabled = false;
+            string maxLabel = curLang == 0 ? "МАКС" : "MAX";
+            GUILayout.Button(maxLabel, GUILayout.Width(100), GUILayout.Height(36));
+            GUI.enabled = true;
+        }
+        else
+        {
+            GUI.backgroundColor = new Color(0.12f, 0.72f, 0.42f);
+            if (GUILayout.Button($"{goldCost} 💰", GUILayout.Width(100), GUILayout.Height(36)))
+            {
+                if (SaveGameSystem.CurrentData.gold < goldCost)
+                {
+                    ShowFeedback(curLang == 0 ? "Недостаточно золота в казне!" : "Not enough gold!");
+                }
+                else
+                {
+                    TriggerTraining(target, baseXP, mainXP, cap, goldCost, curLang);
+                    if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+                }
+            }
+            GUI.backgroundColor = Color.white;
+        }
+
+        GUILayout.EndHorizontal();
+    }
+
+    private void DrawPotionItem(string id, string nameRU, string nameEN, string nameCH, string nameKR, int basePrice, int level, int castleLvl)
+    {
+        int curLang = Translator.LanguageID;
+        int reqLvl = level;
+        bool isUnlocked = castleLvl >= reqLvl;
+
+        int price = basePrice * level;
+        
+        string name = curLang == 0 ? nameRU : nameEN;
+        if (curLang == 8) name = nameCH;
+        if (curLang == 7) name = nameKR;
+
+        Texture2D potTex = GetPotionIconById(id);
+
+        string colorTag = "<color=white>";
+        if (level >= 9) colorTag = "<color=red>";
+        else if (level >= 7) colorTag = "<color=orange>";
+        else if (level >= 5) colorTag = "<color=magenta>";
+        else if (level >= 3) colorTag = "<color=cyan>";
+        else if (level >= 2) colorTag = "<color=green>";
+
+        bool isHP = (id == "hp");
+        int boost = GetPotionValueForLevel(level, isHP);
+        string statDesc = "";
+        if (isHP)
+        {
+            statDesc = curLang == 0 ? $"+{boost} к макс. ОЗ (HP)" : $"+{boost} to Max HP";
+        }
+        else
+        {
+            string statName = id.ToUpper();
+            statDesc = $"+{boost} {statName}";
+        }
+
+        GUILayout.BeginHorizontal(GUI.skin.box);
+
+        GUILayout.BeginVertical(GUILayout.Width(44), GUILayout.Height(44));
+        GUIStyle iconBtnStyle = new GUIStyle(GUI.skin.button);
+        iconBtnStyle.padding = new RectOffset(2, 2, 2, 2);
+        
+        if (potTex != null)
+        {
+            GUILayout.Button(potTex, iconBtnStyle, GUILayout.Width(40), GUILayout.Height(40));
+        }
+        else
+        {
+            GUILayout.Button("🧪", iconBtnStyle, GUILayout.Width(40), GUILayout.Height(40));
+        }
+        GUILayout.EndVertical();
+
+        Rect iconRect = GUILayoutUtility.GetLastRect();
+
+        GUILayout.Space(8);
+
+        GUILayout.BeginVertical();
+        
+        GUIStyle nameStyle = new GUIStyle(GUI.skin.label);
+        nameStyle.richText = true;
+        nameStyle.fontStyle = FontStyle.Bold;
+        nameStyle.fontSize = 12;
+
+        GUILayout.Label($"{colorTag}<b>{name} (Ур. {level})</b></color>", nameStyle);
+
+        GUIStyle descStyle = new GUIStyle(GUI.skin.label);
+        descStyle.fontSize = 10;
+        descStyle.normal.textColor = new Color(0.8f, 0.8f, 0.8f);
+        GUILayout.Label(statDesc, descStyle);
+
+        string reqText = curLang == 0 ? 
+            $"Требуемый уровень Замка: {reqLvl}" : 
+            $"Required Castle Level: {reqLvl}";
+        if (curLang == 8) reqText = $"需要城堡等级: {reqLvl}";
+        if (curLang == 7) reqText = $"필요 성 레벨: {reqLvl}";
+
+        GUIStyle reqStyle = new GUIStyle(GUI.skin.label);
+        reqStyle.fontSize = 10;
+        reqStyle.normal.textColor = isUnlocked ? Color.green : Color.red;
+        GUILayout.Label(reqText, reqStyle);
+
+        GUILayout.EndVertical();
+
+        if (Event.current.type == EventType.Repaint && iconRect.Contains(Event.current.mousePosition))
+        {
+            isHoveringSkill = true;
+            hoveredSkillName = $"{name} (Ур. {level})";
+            
+            string toolDesc = $"{statDesc}\n\n";
+            if (isHP)
+            {
+                if (curLang == 0)
+                    toolDesc += "Временно увеличивает Макс. ОЗ (HP) на <color=#33FF33>+" + boost + "</color> до конца текущего дня.";
+                else if (curLang == 8)
+                    toolDesc += "临时增加最大生命值 (HP) <color=#33FF33>+" + boost + "</color>，持续到当天结束。";
+                else if (curLang == 7)
+                    toolDesc += "오늘 하루 동안 최대 HP를 <color=#33FF33>+" + boost + "</color>만큼 일시적으로 증가시킵니다.";
+                else
+                    toolDesc += "Temporarily increases Max HP by <color=#33FF33>+" + boost + "</color> until the end of the day.";
+            }
+            else if (id == "str")
+            {
+                toolDesc += curLang == 0
+                    ? "Временно увеличивает Силу на <color=#FF6600>+" + boost + " STR</color> до конца текущего дня."
+                    : "Temporarily boosts Strength by <color=#FF6600>+" + boost + " STR</color> until the end of the day.";
+            }
+            else if (id == "int")
+            {
+                toolDesc += curLang == 0
+                    ? "Временно увеличивает Интеллект на <color=#CC33FF>+" + boost + " INT</color> до конца текущего дня."
+                    : "Temporarily boosts Intelligence by <color=#CC33FF>+" + boost + " INT</color> until the end of the day.";
+            }
+            else if (id == "agi")
+            {
+                toolDesc += curLang == 0
+                    ? "Временно увеличивает Ловкость на <color=#33FF33>+" + boost + " AGI</color> до конца текущего дня."
+                    : "Temporarily boosts Agility by <color=#33FF33>+" + boost + " AGI</color> until the end of the day.";
+            }
+            else if (id == "sta")
+            {
+                toolDesc += curLang == 0
+                    ? "Временно увеличивает Выносливость на <color=#33CCFF>+" + boost + " STA</color> до конца текущего дня."
+                    : "Temporarily boosts Stamina by <color=#33CCFF>+" + boost + " STA</color> until the end of the day.";
+            }
+            toolDesc += "\n\n" + (isUnlocked ? "<color=green>Доступно для покупки</color>" : "<color=red>Требуется Замок Ур." + reqLvl + "</color>");
+
+            hoveredSkillDesc = toolDesc;
+            hoveredSkillType = "Potion";
+            hoveredSkillIcon = potTex;
+        }
+
+        GUILayout.FlexibleSpace();
+
+        if (isUnlocked)
+        {
+            if (GUILayout.Button($"{price} 💰", GUILayout.Width(100), GUILayout.Height(35)))
+            {
+                if (SaveGameSystem.CurrentData.gold < price)
+                {
+                    ShowFeedback(curLang == 0 ? "Недостаточно золота в казне замка!" : "Insufficient gold for potion shop!");
+                }
+                else
+                {
+                    string itemId = $"item_potion_{id}_level_{level}";
+                    string itemNameRU = $"{nameRU} Ур.{level}";
+                    
+                    if (AddInventoryItem(itemId, itemNameRU, "potion", 0, level, boost))
+                    {
+                        SaveGameSystem.CurrentData.gold -= price;
+                        PlayerPrefs.Save();
+                        SaveGameSystem.Save(0);
+                        ShowFeedback(curLang == 0 ? $"Куплено и помещено в инвентарь: {itemNameRU}!" : $"Purchased and placed in inventory: {name}!");
+                    }
+                    else
+                    {
+                        ShowFeedback(curLang == 0 ? "Ваш инвентарь переполнен! Освободите место." : "Inventory is full! Free some slots first.");
+                    }
+                }
+            }
+        }
+        else
+        {
+            GUI.enabled = false;
+            string lockLabel = curLang == 0 ? "Заперто 🔒" : "Locked 🔒";
+            if (curLang == 8) lockLabel = "已锁 🔒";
+            if (curLang == 7) lockLabel = "잠김 🔒";
+            GUILayout.Button(lockLabel, GUILayout.Width(100), GUILayout.Height(35));
+            GUI.enabled = true;
+        }
+
         GUILayout.EndHorizontal();
     }
 
