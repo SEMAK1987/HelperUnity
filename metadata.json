@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.23. Potion Mechanics Rework, Forge & Barracks UI, Cheat Code Upgrade.",
+  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.24. Multilingual Expansion & Interface Disaster Recovery System.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

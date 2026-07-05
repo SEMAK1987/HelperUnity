@@ -963,6 +963,9 @@ namespace FateContinent
         {
             if (selectedHeroIndex == -1 || pedestals == null || selectedHeroIndex >= pedestals.Length) return;
 
+            // Регистрируем запуск через Главное Меню
+            SaveGameSystem.IsStartedFromMenu = true;
+
             var chosenPedestal = pedestals[selectedHeroIndex];
             var heroData = balanceConfig.Heroes.FirstOrDefault(h => h.ID == chosenPedestal.HeroID);
 

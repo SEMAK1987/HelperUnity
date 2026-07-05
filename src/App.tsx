@@ -204,7 +204,7 @@ function GameHelpView() {
             Помощь По Игре (Unity 6)
           </h2>
           <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">
-            Интерактивное руководство по разработке • v18.11.23
+            Интерактивное руководство по разработке • v18.11.24
           </p>
         </div>
         <div className="flex items-center gap-4">

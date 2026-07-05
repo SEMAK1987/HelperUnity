@@ -1,37 +1,31 @@
 # DEVELOPMENT LOG
 
-## [v18.11.23] - 2026-07-02
-### Added
-- Re-engineered Potion Shop item rendering with level-based color rarity names.
-- Added detailed characteristics and temporary combat buffs description for each potion item.
-- Added explicit required Castle level under each potion item name.
-- Repositioned price button cleanly at the far-right of each horizontal shop row.
-- Expanded Barracks troop passive skills column width from 250 to 380 (descriptions to 370) to prevent wrapping and squishing.
-- Enhanced XP cheat code reward to give +100 XP (previously +50 XP).
-- Lifted Class Active/Passive skills layout upwards by reducing vertical spacer between the equipment mannequin and skill titles.
+## [2026-07-04]
+### v18.11.24 - Multilingual Expansion & Disaster Recovery System
+- **Multilingual Support for Castle Town:** Expanded all castle subpanels, academy training controls, potion shop inventories, and dynamic tooltips to support 9 languages (Russian, English, German, French, Spanish, Portuguese, Japanese, Korean, Simplified Chinese) using `GetText9()`.
+- **System Disaster Recovery Guide:** Generated a comprehensive disaster recovery manual (`AI_ASSISTANT_RECOVERY_GUIDE.md`) including mockups, core state patterns, and reconstruction guides.
+- **Synchronized Connectors:** Synced version labels across `server.ts`, `UnityConnector.cs`, `blender_connector.py`, `package.json`, `metadata.json`, and `knowledge_base.json` to v18.11.24.
 
-## [v18.11.22] - 2026-07-01
-### Optimized
-- Replaced dynamic GUIStyle allocations inside the OnGUI rendering loop in `FateCastleManager.cs` with lazy-cached class fields to optimize memory.
-- Added interlocking system to disable the "Skip Day" button when the Hero Management character panel is active.
-- Configured active & passive skill cards as unclickable hover boxes displaying interactive tooltips following the mouse cursor.
-- Integrated horizontal scrolling for inventory tabs and compressed potion labels to solve layout clipping.
+## [2026-07-02]
+### v18.11.23 - Potion Mechanics Rework & Interface Stabilization
+- **Potion Buffs Rework:** Changed potion mechanics so that potions now grant temporary, single-battle attribute buffs instead of instant healing.
+- **Castle Calibration & Overlays:** Restored custom calibration layout, `DrawStatRow`, and `DrawNewDayOverlay` within `FateCastleManager.cs`.
 
-## [v18.11.21] - 2026-06-30
-### Fixed
-- Fixed missing `ShowSkillDetailPopup` method compiler errors (CS0103) in `FateCastleManager.cs`.
-- Standardized active skill descriptions dynamically matching all three major player classes (Warrior, Archer, Mage) using class data from `SaveGameSystem`.
+## [2026-06-28]
+### v18.11.22 - Memory Optimization & Hover Tooltips
+- **RAM/VRAM Cache:** Lazy-cached GUIStyle allocations to stop reallocation in IMGUI `OnGUI` loop.
+- **Skip Day Interlocking:** Interlocked and locked the "Skip Day" button when the Hero Management character panel is active.
+- **Tooltip Hover Details:** Converted skills cards to unclickable rectangles displaying dynamic mouse-hover tooltips.
 
-## [v18.11.20] - 2026-06-29
-### Added
-- Integrated a fullscreen 3-column Zenith Hero Control Panel in `FateCastleManager.cs` to solve the small parameters view.
-- Implemented a local-persistent, secure 36-slot inventory grid supporting stacking items and gear.
-- Added dynamic 8-slot equipment mannequin with attributes calculations (+STR, +AGI, +INT, +STA).
+## [2026-06-25]
+### v18.11.21 - Zenith Skill Detail Sync
+- **ShowSkillDetailPopup Integration:** Implemented missing skill detail popup logic dynamically matching character classes.
 
-## [v18.11.19] - 2026-06-28
-### Improved
-- Solved overlapping of dialogue choice buttons with portraits and dialogue text by lowering layout positions (anchoredPosition Y=-20f, sizeDelta=-120f, 44f).
+## [2026-06-20]
+### v18.11.20 - Fullscreen Character Panel & Advanced Inventory Grid
+- **Hero Panel Expansion:** Created a fullscreen 3-column Zenith Hero Control Panel inside the castle interface.
+- **Persistent Grid:** Implemented 36-slot local-persistent inventory grid with potion stacking and 8 equipment mannequin slots.
 
-## [v18.11.18] - 2026-06-27
-### Added
-- Formulated 14 diverse troop cohort definitions (such as Боец Фракции, Паладин Света, Кентавр Степей, Легендарный Дракон Пустоты, etc.) with unique traits and skill quantities limits.
+## [2026-05-14]
+### v18.5.8 - Zenith Multi-Tool Synergy & Settings Fix
+- Initial stable release.

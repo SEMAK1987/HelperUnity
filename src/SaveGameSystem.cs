@@ -13,6 +13,9 @@ public static class SaveGameSystem
     // Текущие данные игры в оперативной памяти. Они перезаписываются при загрузке.
     public static SaveData CurrentData = new SaveData();
 
+    // Флаг того, что игра была начата через Главное Меню / Выбор Персонажа
+    public static bool IsStartedFromMenu = false;
+
     [Serializable]
     public class SaveData
     {

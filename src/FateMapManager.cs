@@ -7,7 +7,26 @@ namespace FateContinent
     [RequireComponent(typeof(SpriteRenderer))]
     public class FateMapManager : MonoBehaviour
     {
-        public static FateMapManager Instance { get; private set; }
+        private static FateMapManager _instance;
+        public static FateMapManager Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    FateMapManager[] all = Resources.FindObjectsOfTypeAll<FateMapManager>();
+                    if (all != null && all.Length > 0)
+                    {
+                        _instance = all[0];
+                    }
+                }
+                return _instance;
+            }
+            private set
+            {
+                _instance = value;
+            }
+        }
 
         [System.Serializable]
         public class RingConfig

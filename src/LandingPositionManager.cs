@@ -142,6 +142,31 @@ namespace FateContinent
                 return;
             }
 
+#if UNITY_EDITOR
+            // Если мы запустили геймплейную сцену напрямую в редакторе, принудительно сбрасываем кампанию для тестирования новой игры
+            if (!SaveGameSystem.IsStartedFromMenu)
+            {
+                Debug.Log("<color=yellow>[FATE EDITOR DEBUG]</color> Прямой запуск GameScene в редакторе! Сбрасываем кампанию для чистоты тестирования...");
+                PlayerPrefs.SetInt("ContinentGameplayActive", 0);
+                PlayerPrefs.SetInt("LandedZoneIndex", -1);
+                PlayerPrefs.SetInt("Fate_Current_Day", 1);
+                PlayerPrefs.Save();
+
+                // Заполняем чистые дефолтные характеристики
+                SaveGameSystem.ResetData();
+                SaveGameSystem.CurrentData.characterClass = "Warrior";
+                SaveGameSystem.CurrentData.playerLevel = 1;
+                SaveGameSystem.CurrentData.gold = 500;
+                SaveGameSystem.CurrentData.strength = 15;
+                SaveGameSystem.CurrentData.agility = 10;
+                SaveGameSystem.CurrentData.intelligence = 4;
+                SaveGameSystem.CurrentData.stamina = 15;
+                SaveGameSystem.Save(0);
+
+                SaveGameSystem.IsStartedFromMenu = true;
+            }
+#endif
+
             // Гарантируем корректное заполнение при старте
             InitializeDefaultPoints();
 
