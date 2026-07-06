@@ -2605,7 +2605,7 @@ public class FateCastleManager : MonoBehaviour
                     float py = (Screen.height - panelHeight) / 2f;
                     Rect guiRect = new Rect(px, py, panelWidth, panelHeight);
                     // Match screen pos (Y up) to GUI pos (Y down)
-                    Vector2 guiMouse = new Vector2(mousePos.x, Screen.height - mousePos.y);
+                    guiMouse = new Vector2(mousePos.x, Screen.height - mousePos.y);
                     if (guiRect.Contains(guiMouse))
                     {
                         return; // Clicked inside Details panel, ignore raycast
@@ -6920,7 +6920,6 @@ public class FateCastleManager : MonoBehaviour
                     }
                 }
             }
-        }
             else
             {
                 GUIStyle lockS = new GUIStyle(GUI.skin.label);
@@ -7459,79 +7458,99 @@ public class FateCastleManager : MonoBehaviour
             else if (r == 3 && GetHeroCount("MageHero", activeDetailsIndex) > 0)
             {
                 heroKey = "MageHero";
-                heroName = cur    private string GetItemClassRecommendation(int slotType, int tier)
-    {
-        int curLang = Translator.LanguageID;
-        string previewClass = PlayerPrefs.GetString("Forge_Preview_Class", "warrior");
-        if (string.IsNullOrEmpty(previewClass)) previewClass = "warrior";
-        
-        string classLabel = "Воин";
-        if (previewClass == "archer") classLabel = "Стрелок";
-        else if (previewClass == "mage") classLabel = "Маг";
-        
-        if (curLang == 0) return $"★ Рекомендуется классу: {classLabel}";
-        return $"★ Recommended for class: {previewClass.ToUpper()}";
-    }
-
-    private void DrawForgeEquipmentOption(int slotType, int tier, int castleLvl)
-    {
-        int curLang = Translator.LanguageID;
-        int reqLvl = GetRequiredCastleLevelForForge(tier);
-        bool isUnlocked = castleLvl >= reqLvl;
-
-        int price = Mathf.RoundToInt(50 * tier * (castleLvl * 0.35f + 0.65f));
-        string previewClass = PlayerPrefs.GetString("Forge_Preview_Class", "warrior");
-        if (string.IsNullOrEmpty(previewClass)) previewClass = "warrior";
-
-        string name = GetItemName(slotType, tier, curLang, previewClass);
-        
-        InventoryItem tempItem = new InventoryItem();
-        tempItem.id = $"item_slot_{slotType}_tier_{tier}";
-        tempItem.slotType = slotType;
-        tempItem.level = tier;
-        Texture2D itemTex = GetItemIconTexture(tempItem, previewClass);
-
-        string emoji = GetEmojiForSlot(slotType);
-
-        string colorTag = "<color=white>";
-        if (tier == 6) colorTag = "<color=red>"; // Mythic
-        else if (tier == 5) colorTag = "<color=orange>"; // Legendary
-        else if (tier == 4) colorTag = "<color=magenta>"; // Epic
-        else if (tier == 3) colorTag = "<color=cyan>"; // Rare
-        else if (tier == 2) colorTag = "<color=green>"; // Uncommon
-
-        string statDesc = GetItemStatDescription(slotType, tier, previewClass);
-        string classRecommend = GetItemClassRecommendation(slotType, tier);
-
-        GUILayout.BeginHorizontal(GUI.skin.box);
-
-        // Icon box (colored background / styled border)
-        GUILayout.BeginVertical(GUILayout.Width(58), GUILayout.Height(58));
-        GUIStyle iconBtnStyle = new GUIStyle(GUI.skin.button);
-        iconBtnStyle.padding = new RectOffset(2, 2, 2, 2);
-        iconBtnStyle.fontSize = 24; // Более крупный эмодзи при отсутствии текстуры
-        
-        if (itemTex != null)
-        {
-            if (GUILayout.Button(itemTex, iconBtnStyle, GUILayout.Width(54), GUILayout.Height(54)))
-            {
-                selectedForgeSlotType = slotType;
-                selectedForgeTier = tier;
-                showForgeDetailPopup = true;
-                if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+                heroName = curLang == 0 ? "Боевой Маг" : "Sorcerer Elite";
+                heroIcon = GetTroopAvatarTexture("MageHero");
             }
-        }
-        else
-        {
-            if (GUILayout.Button(emoji, iconBtnStyle, GUILayout.Width(54), GUILayout.Height(54)))
+
+            Rect heroRect = GUILayoutUtility.GetRect(slotSize + 10, slotSize);
+            if (!string.IsNullOrEmpty(heroKey))
             {
-                selectedForgeSlotType = slotType;
-                selectedForgeTier = tier;
-                showForgeDetailPopup = true;
-                if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+                GUI.backgroundColor = new Color(0.85f, 0.7f, 0.1f, 1f);
+                GUI.Box(heroRect, "", slotStyle);
+                GUI.backgroundColor = Color.white;
+
+                if (heroIcon != null)
+                {
+                    GUI.DrawTexture(heroRect, heroIcon, ScaleMode.ScaleToFit);
+                }
+
+                if (heroRect.Contains(evt.mousePosition))
+                {
+                    if (evt.type == EventType.Repaint)
+                    {
+                        SetHoveredGridUnit(heroKey, r, curLang);
+                    }
+                    if (evt.type == EventType.MouseDown)
+                    {
+                        if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+                        ShowFeedback(curLang == 0 ? $"Выбран герой: {heroName}" : $"Selected hero: {heroName}");
+                        evt.Use();
+                    }
+                }
             }
-        }
-        GUILayout.EndVertical();Col = c;
+            else
+            {
+                GUI.backgroundColor = new Color(0.12f, 0.12f, 0.12f, 0.5f);
+                GUI.Box(heroRect, "Ø", slotStyle);
+                GUI.backgroundColor = Color.white;
+            }
+
+            // Space between Hero and Troops
+            GUILayout.Space(14);
+
+            // --- 10 TROOP COHORT SLOTS ---
+            for (int c = 0; c < 10; c++)
+            {
+                string unitId = gridUnits[r, c];
+                bool isSelected = (r == selectedGridRow && c == selectedGridCol);
+
+                Rect cellRect = GUILayoutUtility.GetRect(slotSize, slotSize);
+
+                if (isSelected)
+                {
+                    GUI.backgroundColor = Color.cyan;
+                }
+                else if (!string.IsNullOrEmpty(unitId))
+                {
+                    GUI.backgroundColor = new Color(0.2f, 0.8f, 0.4f, 1f);
+                }
+                else
+                {
+                    GUI.backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.6f);
+                }
+
+                GUI.Box(cellRect, "", slotStyle);
+                GUI.backgroundColor = Color.white;
+
+                Texture2D troopAv = !string.IsNullOrEmpty(unitId) ? GetTroopAvatarTexture(unitId) : null;
+                if (troopAv != null)
+                {
+                    GUI.DrawTexture(cellRect, troopAv, ScaleMode.ScaleToFit);
+                }
+                else if (string.IsNullOrEmpty(unitId))
+                {
+                    GUIStyle symStyle = new GUIStyle(GUI.skin.label);
+                    symStyle.alignment = TextAnchor.MiddleCenter;
+                    symStyle.fontSize = 11;
+                    symStyle.normal.textColor = Color.gray;
+                    GUI.Label(cellRect, "Ø", symStyle);
+                }
+
+                // Handle interactions
+                if (cellRect.Contains(evt.mousePosition))
+                {
+                    if (!string.IsNullOrEmpty(unitId))
+                    {
+                        if (evt.type == EventType.Repaint)
+                        {
+                            SetHoveredGridUnit(unitId, r, curLang);
+                        }
+
+                        if (evt.type == EventType.MouseDown)
+                        {
+                            isDraggingUnit = true;
+                            dragSourceRow = r;
+                            dragSourceCol = c;
                             dragSourceUnitId = unitId;
                             evt.Use();
                         }
@@ -8069,59 +8088,63 @@ public class FateCastleManager : MonoBehaviour
         return $"Stats: {statStr} (Crafted)";
     }
 
-    private string GetItemClassRecommendation(int slotType, in        if (GUILayout.Button($"{basePrice} 💰", GUILayout.Width(80), GUILayout.Height(44)))
+    private string GetItemClassRecommendation(int slotType, int tier)
+    {
+        int curLang = Translator.LanguageID;
+        string previewClass = PlayerPrefs.GetString("Forge_Preview_Class", "warrior");
+        if (string.IsNullOrEmpty(previewClass)) previewClass = "warrior";
+        
+        string classLabel = "Воин";
+        if (previewClass == "archer") classLabel = "Стрелок";
+        else if (previewClass == "mage") classLabel = "Маг";
+        
+        if (curLang == 0) return $"★ Рекомендуется классу: {classLabel}";
+        return $"★ Recommended for class: {previewClass.ToUpper()}";
+    }
+
+    private void DrawForgeEquipmentOption(int slotType, int tier, int castleLvl)
+    {
+        int curLang = Translator.LanguageID;
+        int reqLvl = GetRequiredCastleLevelForForge(tier);
+        bool isUnlocked = castleLvl >= reqLvl;
+
+        int price = Mathf.RoundToInt(50 * tier * (castleLvl * 0.35f + 0.65f));
+        string previewClass = PlayerPrefs.GetString("Forge_Preview_Class", "warrior");
+        if (string.IsNullOrEmpty(previewClass)) previewClass = "warrior";
+
+        string name = GetItemName(slotType, tier, curLang, previewClass);
+        
+        InventoryItem tempItem = new InventoryItem();
+        tempItem.id = $"item_slot_{slotType}_tier_{tier}";
+        tempItem.slotType = slotType;
+        tempItem.level = tier;
+        Texture2D itemTex = GetItemIconTexture(tempItem, previewClass);
+
+        string emoji = GetEmojiForSlot(slotType);
+
+        string colorTag = "<color=white>";
+        if (tier == 6) colorTag = "<color=red>"; // Mythic
+        else if (tier == 5) colorTag = "<color=orange>"; // Legendary
+        else if (tier == 4) colorTag = "<color=magenta>"; // Epic
+        else if (tier == 3) colorTag = "<color=cyan>"; // Rare
+        else if (tier == 2) colorTag = "<color=green>"; // Uncommon
+
+        string statDesc = GetItemStatDescription(slotType, tier, previewClass);
+        string classRecommend = GetItemClassRecommendation(slotType, tier);
+
+        GUILayout.BeginHorizontal(GUI.skin.box);
+
+        // Icon box (colored background / styled border)
+        GUILayout.BeginVertical(GUILayout.Width(58), GUILayout.Height(58));
+        GUIStyle iconBtnStyle = new GUIStyle(GUI.skin.button);
+        iconBtnStyle.padding = new RectOffset(2, 2, 2, 2);
+        iconBtnStyle.fontSize = 24; // Более крупный эмодзи при отсутствии текстуры
+        
+        if (itemTex != null)
         {
-            CastleInstance activeCastle = castles[activeDetailsIndex >= 0 ? activeDetailsIndex : 0];
-            int currentHeroes = GetHeroesCountInCastle(activeCastle.zoneIndex);
-            int capacity = GetHeroCapacity(activeCastle.level);
-
-            int maxSimpleHeroes = 20 + activeDetailsIndex * 15;
-            int simpleHeroesTotal = GetHeroCount("ArcherHero", activeDetailsIndex) + 
-                                   GetHeroCount("WarriorHero", activeDetailsIndex) + 
-                                   GetHeroCount("MageHero", activeDetailsIndex);
-
-            if (simpleHeroesTotal >= maxSimpleHeroes)
+            if (GUILayout.Button(itemTex, iconBtnStyle, GUILayout.Width(54), GUILayout.Height(54)))
             {
-                string limitTxt = curLang == 0 ?
-                    $"Лимит покупки простых героев на этом континенте ({maxSimpleHeroes} шт) исчерпан!" :
-                    $"Simple hero recruitment limit on this continent ({maxSimpleHeroes}) reached!";
-                if (curLang == 8) limitTxt = $"当前大陆普通英雄招募上限 ({maxSimpleHeroes}) 已达！";
-                if (curLang == 7) limitTxt = $"이 대륙의 일반 영웅 모집 한도 ({maxSimpleHeroes}명)가 초과되었습니다!";
-                ShowFeedback(limitTxt);
-            }
-            else if (currentHeroes >= capacity)
-            {
-                string limitTxt = curLang == 0 ?
-                    $"Достигнут лимит героев в этом замке ({currentHeroes}/{capacity})! Повысьте уровень цитадели." :
-                    $"Castle hero garrison limit reached ({currentHeroes}/{capacity})! Upgrade stronghold first.";
-                if (curLang == 8) limitTxt = $"已达城堡英雄上限 ({currentHeroes}/{capacity})！请先升级主城。";
-                if (curLang == 7) limitTxt = $"성채 영웅 한도 초과 ({currentHeroes}/{capacity})! 성채를 먼저 업г레이드 하십시오.";
-                ShowFeedback(limitTxt);
-            }
-            else
-            {
-                int targetPrice = basePrice;
-                string targetKey = key;
-                int targetCount = count;
-                CompanionData targetCd = cd;
-                
-                confirmItemName = curLang == 0 ? cd.nameRU : cd.nameEN;
-                confirmCost = basePrice;
-                confirmAction = () => {
-                    SaveGameSystem.CurrentData.gold -= targetPrice;
-                    int newCount = targetCount + 1;
-                    SetHeroCount(targetKey, activeDetailsIndex, newCount);
-
-                    string joinFeed = curLang == 0 ?
-                        $"Герой {targetCd.nameRU} успешно нанят в гарнизон замка!" :
-                        $"Renowned leader {targetCd.nameEN} joined the castle garrison!";
-                    ShowFeedback(joinFeed);
-                    SaveGameSystem.Save(0);
-                };
-                showPurchaseConfirmPopup = true;
-                if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
-            }
-        }geSlotType = slotType;
+                selectedForgeSlotType = slotType;
                 selectedForgeTier = tier;
                 showForgeDetailPopup = true;
                 if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
@@ -8736,20 +8759,27 @@ public class FateCastleManager : MonoBehaviour
                 if (curLang == 7) limitTxt = $"성채 영웅 한도 초과 ({currentHeroes}/{capacity})! 성채를 먼저 업г레이드 하십시오.";
                 ShowFeedback(limitTxt);
             }
-            else if (SaveGameSystem.CurrentData.gold < basePrice)
-            {
-                ShowFeedback(curLang == 0 ? "Недостаточно золота в казне замка!" : "Not enough gold in the castle treasury!");
-            }
             else
             {
-                SaveGameSystem.CurrentData.gold -= basePrice;
-                count++;
-                SetHeroCount(key, activeDetailsIndex, count);
+                int targetPrice = basePrice;
+                string targetKey = key;
+                int targetCount = count;
+                CompanionData targetCd = cd;
+                
+                confirmItemName = curLang == 0 ? cd.nameRU : cd.nameEN;
+                confirmCost = basePrice;
+                confirmAction = () => {
+                    SaveGameSystem.CurrentData.gold -= targetPrice;
+                    int newCount = targetCount + 1;
+                    SetHeroCount(targetKey, activeDetailsIndex, newCount);
 
-                string joinFeed = curLang == 0 ?
-                    $"Герой {cd.nameRU} успешно нанят в гарнизон замка!" :
-                    $"Renowned leader {cd.nameEN} joined the castle garrison!";
-                ShowFeedback(joinFeed);
+                    string joinFeed = curLang == 0 ?
+                        $"Герой {targetCd.nameRU} успешно нанят в гарнизон замка!" :
+                        $"Renowned leader {targetCd.nameEN} joined the castle garrison!";
+                    ShowFeedback(joinFeed);
+                    SaveGameSystem.Save(0);
+                };
+                showPurchaseConfirmPopup = true;
                 if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
             }
         }
