@@ -201,13 +201,34 @@ public static class SaveGameSystem
             PlayerPrefs.DeleteKey("Castle_AI_Armor_" + i);
             PlayerPrefs.DeleteKey("Castle_AI_Potions_" + i);
             PlayerPrefs.DeleteKey("Castle_AI_CommanderLvl_" + i);
+            PlayerPrefs.DeleteKey("Castle_Spied_Lvl_" + i);
             
-            // Очищаем войска в зонах
-            string[] unitTypes = { "swordsman", "archer", "mage", "knight", "healer", "scout", "beast" };
+            // Очищаем войска в зонах (как старые, так и новые типы юнитов и когорт)
+            string[] unitTypes = { 
+                "swordsman", "archer", "mage", "knight", "healer", "scout", "beast",
+                "warrior", "paladin", "cavalry", "cannoneer", "centaur", "necromancer", 
+                "griffin", "overlord", "hydra", "dragon", "mountain_bear", "wasteland_serpent"
+            };
             foreach (var ut in unitTypes)
             {
                 PlayerPrefs.DeleteKey("Player_HiredCount_" + ut + "_Zone_" + i);
                 PlayerPrefs.DeleteKey("Player_Unit_" + ut + "_Zone_" + i);
+            }
+
+            // Очищаем простых героев (компаньонов) во всех зонах
+            string[] compKeys = { "WarriorHero", "ArcherHero", "MageHero" };
+            foreach (var ck in compKeys)
+            {
+                PlayerPrefs.DeleteKey("Player_HiredCount_" + ck + "_Zone_" + i);
+            }
+
+            // Очищаем тактическую сетку расположения войск (10x10) для каждого замка
+            for (int r = 0; r < 10; r++)
+            {
+                for (int c = 0; c < 10; c++)
+                {
+                    PlayerPrefs.DeleteKey($"Castle_Grid_Unit_{i}_{r}_{c}");
+                }
             }
         }
 
@@ -233,8 +254,8 @@ public static class SaveGameSystem
             PlayerPrefs.DeleteKey($"Player_Equipped_Tier_Slot_{slot}");
         }
 
-        // Сброс опыта компаньонов
-        string[] classes = { "warrior", "archer", "mage", "voin", "strelok", "mag" };
+        // Сброс опыта и уровней компаньонов (как по старым, так и по новым ключам классов)
+        string[] classes = { "warrior", "archer", "mage", "voin", "strelok", "mag", "WarriorHero", "ArcherHero", "MageHero" };
         foreach (var cl in classes)
         {
             PlayerPrefs.DeleteKey("Companion_Lvl_" + cl);

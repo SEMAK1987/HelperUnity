@@ -816,7 +816,6 @@ namespace FateContinent
         {
             if (difficultyDescriptionText == null || balanceConfig == null || balanceConfig.Difficulties == null || selectedDifficultyIndex >= balanceConfig.Difficulties.Length) return;
 
-            var d = balanceConfig.Difficulties[selectedDifficultyIndex];
             int lang = Translator.LanguageID;
 
             ApplyFontToText(difficultyDescriptionText, false);
@@ -873,36 +872,178 @@ namespace FateContinent
                 case 6: // Japanese
                     phraseAggro = "AI 攻撃性: ";
                     phraseDef = "AI 防御力: ";
-                    phraseEcon = "ゴールド倍率: ";
-                    phraseGoldBonus = "AI ボーナス: ";
+                    phraseEcon = "プレイヤーゴールド: ";
+                    phraseGoldBonus = "AI ボーナスゴールド: ";
                     phraseTurns = "AI 予測: ";
                     phraseGoldSuffix = " G";
                     break;
                 case 7: // Korean
                     phraseAggro = "AI 공격성: ";
                     phraseDef = "AI 방어력: ";
-                    phraseEcon = "골드 배율: ";
-                    phraseGoldBonus = "AI 보너스: ";
+                    phraseEcon = "플레이어 골드: ";
+                    phraseGoldBonus = "AI 보너스 골드: ";
                     phraseTurns = "AI 예측 턴: ";
                     phraseGoldSuffix = " 골드";
                     break;
                 case 8: // Chinese
                     phraseAggro = "AI 攻击倾向: ";
-                    phraseDef = "AI 防御倍率: ";
-                    phraseEcon = "玩家黄金乘数: ";
+                    phraseDef = "AI 防御力: ";
+                    phraseEcon = "玩家黄金: ";
                     phraseGoldBonus = "AI 初始黄金: ";
                     phraseTurns = "预测回合数: ";
                     phraseGoldSuffix = " 黄金";
                     break;
             }
 
+            int playerStartingGold = 1000;
+            int aiStartingGoldBonus = 0;
+            int forecastTurns = 4;
+            int aggressionPercent = 20;
+
+            switch (selectedDifficultyIndex)
+            {
+                case 0:
+                    aggressionPercent = 20;
+                    playerStartingGold = 1000;
+                    aiStartingGoldBonus = 0;
+                    forecastTurns = 4;
+                    break;
+                case 1:
+                    aggressionPercent = 50;
+                    playerStartingGold = 800;
+                    aiStartingGoldBonus = 100;
+                    forecastTurns = 3;
+                    break;
+                case 2:
+                    aggressionPercent = 70;
+                    playerStartingGold = 500;
+                    aiStartingGoldBonus = 500;
+                    forecastTurns = 2;
+                    break;
+                case 3:
+                    aggressionPercent = 70;
+                    playerStartingGold = 300;
+                    aiStartingGoldBonus = 1000;
+                    forecastTurns = 1;
+                    break;
+                case 4:
+                    aggressionPercent = 100;
+                    playerStartingGold = 100;
+                    aiStartingGoldBonus = 2500;
+                    forecastTurns = 0;
+                    break;
+            }
+
+            string defenseText = GetLocalizedDefenseText(selectedDifficultyIndex, lang);
+            string turnsSuffix = GetLocalizedTurnsSuffix(forecastTurns, lang);
+
             difficultyDescriptionText.text = $"<line-height=150%>" +
-                                             $"{phraseAggro}<b><color=#FF5555>{d.Aggression * 100}%</color></b>\n" +
-                                             $"{phraseDef}<b><color=#55AAFF>x{d.Defense}</color></b>\n" +
-                                             $"{phraseEcon}<b><color=#FFFF55>x{d.EconMod}</color></b>\n" +
-                                             $"{phraseGoldBonus}<b><color=#FFCC00>+{d.AIGoldBonus}{phraseGoldSuffix}</color></b>\n" +
-                                             $"{phraseTurns}<b><color=#55FF55>{d.ForecastTurns}</color></b>" +
+                                             $"{phraseAggro}<b><color=#FF5555>{aggressionPercent}%</color></b>\n" +
+                                             $"{phraseDef}<b><color=#55AAFF>{defenseText}</color></b>\n" +
+                                             $"{phraseEcon}<b><color=#FFFF55>+{playerStartingGold}{phraseGoldSuffix}</color></b>\n" +
+                                             $"{phraseGoldBonus}<b><color=#FFCC00>+{aiStartingGoldBonus}{phraseGoldSuffix}</color></b>\n" +
+                                             $"{phraseTurns}<b><color=#55FF55>{forecastTurns}{turnsSuffix}</color></b>" +
                                              $"</line-height>";
+        }
+
+        private string GetLocalizedDefenseText(int idx, int lang)
+        {
+            switch (idx)
+            {
+                case 0:
+                    switch (lang)
+                    {
+                        case 0: return "очень Слабая (х0,8)";
+                        case 2: return "Sehr schwach (x0.8)";
+                        case 3: return "Très faible (x0.8)";
+                        case 4: return "Muy débil (x0.8)";
+                        case 5: return "Muito fraca (x0.8)";
+                        case 6: return "非常に弱い (x0.8)";
+                        case 7: return "매우 약함 (x0.8)";
+                        case 8: return "非常微弱 (x0.8)";
+                        default: return "Very Weak (x0.8)";
+                    }
+                case 1:
+                    switch (lang)
+                    {
+                        case 0: return "Слабая (х0,5)";
+                        case 2: return "Schwach (x0.5)";
+                        case 3: return "Faible (x0.5)";
+                        case 4: return "Débil (x0.5)";
+                        case 5: return "Fraca (x0.5)";
+                        case 6: return "弱い (x0.5)";
+                        case 7: return "약함 (x0.5)";
+                        case 8: return "较弱 (x0.5)";
+                        default: return "Weak (x0.5)";
+                    }
+                case 2:
+                    switch (lang)
+                    {
+                        case 0: return "Нормальная (х0,3)";
+                        case 2: return "Normal (x0.3)";
+                        case 3: return "Normale (x0.3)";
+                        case 4: return "Normal (x0.3)";
+                        case 5: return "Normal (x0.3)";
+                        case 6: return "普通 (x0.3)";
+                        case 7: return "보통 (x0.3)";
+                        case 8: return "正常 (x0.3)";
+                        default: return "Normal (x0.3)";
+                    }
+                case 3:
+                    switch (lang)
+                    {
+                        case 0: return "Сложно пробить (х0,9)";
+                        case 2: return "Schwer zu durchbrechen (x0.9)";
+                        case 3: return "Difficile à percer (x0.9)";
+                        case 4: return "Difícil de penetrar (x0.9)";
+                        case 5: return "Difícil de romper (x0.9)";
+                        case 6: return "突破困難 (x0.9)";
+                        case 7: return "돌파하기 어려움 (x0.9)";
+                        case 8: return "难以攻破 (x0.9)";
+                        default: return "Hard to Breach (x0.9)";
+                    }
+                case 4:
+                default:
+                    switch (lang)
+                    {
+                        case 0: return "Очень Сложно пробить (х1)";
+                        case 2: return "Sehr schwer zu durchbrechen (x1)";
+                        case 3: return "Très difficile à percer (x1)";
+                        case 4: return "Muy difícil de penetrar (x1)";
+                        case 5: return "Muito difícil de romper (x1)";
+                        case 6: return "突破極めて困難 (x1)";
+                        case 7: return "돌파하기 매우 어려움 (x1)";
+                        case 8: return "极难攻破 (x1)";
+                        default: return "Very Hard to Breach (x1)";
+                    }
+            }
+        }
+
+        private string GetLocalizedTurnsSuffix(int turns, int lang)
+        {
+            switch (lang)
+            {
+                case 0: // Russian
+                    if (turns == 1) return " ход";
+                    if (turns >= 2 && turns <= 4) return " хода";
+                    return " ходов";
+                case 2: // German
+                    return turns == 1 ? " Zug" : " Züge";
+                case 3: // French
+                    return turns == 1 ? " tour" : " tours";
+                case 4: // Spanish
+                    return turns == 1 ? " turno" : " turnos";
+                case 5: // Portuguese
+                    return turns == 1 ? " turno" : " turnos";
+                case 6: // Japanese
+                    return " ターン";
+                case 7: // Korean
+                    return " 턴";
+                case 8: // Chinese
+                    return " 回合";
+                default: // English
+                    return turns == 1 ? " turn" : " turns";
+            }
         }
 
         private void UpdateButtonsLocalization()
@@ -976,13 +1117,13 @@ namespace FateContinent
             SaveGameSystem.CurrentData.characterClass = chosenPedestal.HeroID;
             SaveGameSystem.CurrentData.playerLevel = 1;
             SaveGameSystem.CurrentData.currentXP = 0;
-            int difficultyStartingGold = 150;
+            int difficultyStartingGold = 500;
             switch (selectedDifficultyIndex)
             {
                 case 0: difficultyStartingGold = 1000; break; // Новичок
-                case 1: difficultyStartingGold = 500;  break; // Легко
-                case 2: difficultyStartingGold = 300;  break; // Нормально
-                case 3: difficultyStartingGold = 200;  break; // Сложно
+                case 1: difficultyStartingGold = 800;  break; // Легко
+                case 2: difficultyStartingGold = 500;  break; // Нормально
+                case 3: difficultyStartingGold = 300;  break; // Сложно
                 case 4: difficultyStartingGold = 100;  break; // Кошмар (Самый сложный)
             }
             SaveGameSystem.CurrentData.gold = difficultyStartingGold;

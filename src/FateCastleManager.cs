@@ -2469,15 +2469,15 @@ public class FateCastleManager : MonoBehaviour
             selectedDifficulty = SaveGameSystem.CurrentData.selectedDifficulty;
         }
 
-        int difficultyStartingGold = 300;
+        int difficultyStartingGold = 500;
         switch (selectedDifficulty)
         {
             case 0: difficultyStartingGold = 1000; break; // Новичок (+1000)
-            case 1: difficultyStartingGold = 500;  break; // Легко (+500)
-            case 2: difficultyStartingGold = 300;  break; // Нормально (+300)
-            case 3: difficultyStartingGold = 200;  break; // Сложно (+200)
+            case 1: difficultyStartingGold = 800;  break; // Легко (+800)
+            case 2: difficultyStartingGold = 500;  break; // Нормально (+500)
+            case 3: difficultyStartingGold = 300;  break; // Сложно (+300)
             case 4: difficultyStartingGold = 100;  break; // Кошмар (+100)
-            default: difficultyStartingGold = 300; break;
+            default: difficultyStartingGold = 500; break;
         }
 
         if (SaveGameSystem.CurrentData != null)
@@ -3738,8 +3738,9 @@ public class FateCastleManager : MonoBehaviour
             DrawNewDayOverlay(curLang);
         }
 
-        // Окно настроек деталей (сначала рисуем подложку, чтобы всплывающие окна были поверх неё)
-        if (isDetailsOpen && activeDetailsIndex >= 0 && activeDetailsIndex < castles.Count)
+        // Окно настроек деталей (сначала рисуем подложку, чтобы всплывающие окна были поверх неё; скрываем замок при покупках и поп-апах для чистоты)
+        if (isDetailsOpen && activeDetailsIndex >= 0 && activeDetailsIndex < castles.Count 
+            && !showPurchaseConfirmPopup && !showCastleCalibrationPanel && !showTroopDetailPopup && !showForgeDetailPopup && !showSpyReportPopup)
         {
             DrawDetailsWindow(curLang);
         }
@@ -7465,7 +7466,14 @@ public class FateCastleManager : MonoBehaviour
             Rect heroRect = GUILayoutUtility.GetRect(slotSize + 10, slotSize);
             if (!string.IsNullOrEmpty(heroKey))
             {
-                GUI.backgroundColor = new Color(0.85f, 0.7f, 0.1f, 1f);
+                if (heroKey == "MainHero")
+                {
+                    GUI.backgroundColor = new Color(0.15f, 0.85f, 1.0f, 1.0f); // Bright Royal Cyan for Main Hero
+                }
+                else
+                {
+                    GUI.backgroundColor = new Color(0.85f, 0.70f, 0.10f, 1.0f); // Golden Orange for Comrades
+                }
                 GUI.Box(heroRect, "", slotStyle);
                 GUI.backgroundColor = Color.white;
 

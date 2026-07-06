@@ -2857,10 +2857,15 @@ export default function App() {
 
   // Sync starting gold with selected difficulty levels
   useEffect(() => {
-    if (selectedDifficulty === "Легкий") {
+    const d = selectedDifficulty || "";
+    if (d === "Новичок" || d === "Novice") {
+      setPlayerGold(1000);
+    } else if (d === "Легкий" || d === "Легко" || d === "Easy") {
       setPlayerGold(800);
-    } else if (selectedDifficulty === "Тяжелый") {
+    } else if (d === "Сложный" || d === "Сложно" || d === "Hard") {
       setPlayerGold(300);
+    } else if (d === "Кошмар" || d === "Nightmare") {
+      setPlayerGold(100);
     } else {
       setPlayerGold(500);
     }
