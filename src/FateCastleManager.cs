@@ -3738,11 +3738,19 @@ public class FateCastleManager : MonoBehaviour
             DrawNewDayOverlay(curLang);
         }
 
-        // Окно настроек деталей (сначала рисуем подложку, чтобы всплывающие окна были поверх неё; скрываем замок при покупках и поп-апах для чистоты)
-        if (isDetailsOpen && activeDetailsIndex >= 0 && activeDetailsIndex < castles.Count 
-            && !showPurchaseConfirmPopup && !showCastleCalibrationPanel && !showTroopDetailPopup && !showForgeDetailPopup && !showSpyReportPopup)
+        // Окно настроек деталей (сначала рисуем подложку, чтобы всплывающие окна были поверх неё; фон затемняется при активных поп-апах)
+        if (isDetailsOpen && activeDetailsIndex >= 0 && activeDetailsIndex < castles.Count)
         {
+            bool modalActive = showCastleCalibrationPanel || showSkillDetailPopup || showTroopDetailPopup || showForgeDetailPopup || showSpyReportPopup || showPurchaseConfirmPopup;
+            if (modalActive)
+            {
+                GUI.enabled = false;
+            }
             DrawDetailsWindow(curLang);
+            if (modalActive)
+            {
+                GUI.enabled = true;
+            }
         }
 
         // Всплывающие окна деталей (v18.11.16) - рисуются после основных окон, чтобы быть на самом верху!
@@ -7441,7 +7449,14 @@ public class FateCastleManager : MonoBehaviour
             {
                 heroKey = "MainHero";
                 heroName = curLang == 0 ? "Главный Герой" : "Main Hero";
-                string pClass = SaveGameSystem.CurrentData != null ? SaveGameSystem.CurrentData.characterClass : "Warrior";
+                string pClassRaw = (SaveGameSystem.CurrentData != null && SaveGameSystem.CurrentData.characterClass != null) 
+                    ? SaveGameSystem.CurrentData.characterClass.ToLower() : "warrior";
+                string pClass = "Mage";
+                if (pClassRaw.Contains("warrior") || pClassRaw.Contains("воин") || pClassRaw.Contains("voin") || pClassRaw.Contains("paladin") || pClassRaw.Contains("паладин"))
+                    pClass = "Warrior";
+                else if (pClassRaw.Contains("archer") || pClassRaw.Contains("стрелок") || pClassRaw.Contains("strelok") || pClassRaw.Contains("лучник") || pClassRaw.Contains("ranger"))
+                    pClass = "Archer";
+
                 heroIcon = (pClass == "Warrior") ? avatar_hero_warrior : ((pClass == "Archer") ? avatar_hero_archer : avatar_hero_mage);
             }
             else if (r == 1 && GetHeroCount("WarriorHero", activeDetailsIndex) > 0)
@@ -7708,7 +7723,14 @@ public class FateCastleManager : MonoBehaviour
         {
             if (SaveGameSystem.CurrentData == null) return;
             int pLvl = SaveGameSystem.CurrentData.playerLevel;
-            string pClass = SaveGameSystem.CurrentData.characterClass;
+            string pClassRaw = SaveGameSystem.CurrentData.characterClass;
+            string pClass = "Mage";
+            string pClassLower = (pClassRaw != null) ? pClassRaw.ToLower() : "";
+            if (pClassLower.Contains("warrior") || pClassLower.Contains("воин") || pClassLower.Contains("voin") || pClassLower.Contains("paladin") || pClassLower.Contains("паладин"))
+                pClass = "Warrior";
+            else if (pClassLower.Contains("archer") || pClassLower.Contains("стрелок") || pClassLower.Contains("strelok") || pClassLower.Contains("лучник") || pClassLower.Contains("ranger"))
+                pClass = "Archer";
+
             float currentHealth = SaveGameSystem.CurrentData.currentHealth;
             float maxHealth = SaveGameSystem.CurrentData.maxHealth;
             int str = SaveGameSystem.CurrentData.strength;
@@ -7717,7 +7739,7 @@ public class FateCastleManager : MonoBehaviour
             int sta = SaveGameSystem.CurrentData.stamina;
             int maxMana = intel * 15;
 
-            hoveredSkillName = curLang == 0 ? $"Главный Герой ({pClass})" : $"Main Hero ({pClass})";
+            hoveredSkillName = curLang == 0 ? $"Главный Герой ({pClassRaw})" : $"Main Hero ({pClassRaw})";
             hoveredSkillType = curLang == 0 ? "Гарнизонный Герой" : "Garrison Hero";
             hoveredSkillIcon = (pClass == "Warrior") ? avatar_hero_warrior : ((pClass == "Archer") ? avatar_hero_archer : avatar_hero_mage);
 
