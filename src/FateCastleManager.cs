@@ -88,6 +88,7 @@ public class FateCastleManager : MonoBehaviour
         if (mpTex != null) { Destroy(mpTex); mpTex = null; }
         if (xpTex != null) { Destroy(xpTex); xpTex = null; }
         EventHub.OnCombatEnd -= HandleCombatEndEvent;
+        EventHub.OnCombatStart -= HandleCombatStartEvent;
     }
 
     [System.Serializable]
@@ -595,6 +596,7 @@ public class FateCastleManager : MonoBehaviour
     private bool potionUsedThisTurnAGI = false;
     private bool potionUsedThisTurnINT = false;
     private bool potionUsedThisTurnSTA = false;
+    private bool isCombatActive = false;
 
     [Serializable]
     public class InventoryItem
@@ -2395,6 +2397,7 @@ public class FateCastleManager : MonoBehaviour
     private void Start()
     {
         EventHub.OnCombatEnd += HandleCombatEndEvent;
+        EventHub.OnCombatStart += HandleCombatStartEvent;
         // [CRITICAL SAVE SYNC] Синхронизируем и загружаем активный слот сохранений игрока при запуске сцены континента
         int activeSlot = PlayerPrefs.GetInt("Active_Save_Slot", 0);
         SaveGameSystem.Load(activeSlot, false);
@@ -2424,8 +2427,14 @@ public class FateCastleManager : MonoBehaviour
         }
     }
 
+    private void HandleCombatStartEvent(System.Collections.Generic.List<UnitBase> participants)
+    {
+        isCombatActive = true;
+    }
+
     private void HandleCombatEndEvent(int winner)
     {
+        isCombatActive = false;
         ResetAfterBattle();
     }
 
@@ -3505,11 +3514,25 @@ public class FateCastleManager : MonoBehaviour
     public void GainXP(int amount)
     {
         SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
+        if (data.playerLevel >= 9999)
+        {
+            data.playerLevel = 9999;
+            data.currentXP = 0;
+            RecalculateStats();
+            PlayerPrefs.Save();
+            return;
+        }
         data.currentXP += amount;
         int xpNeeded = data.playerLevel * 100;
         
         while (data.currentXP >= xpNeeded)
         {
+            if (data.playerLevel >= 9999)
+            {
+                data.playerLevel = 9999;
+                data.currentXP = 0;
+                break;
+            }
             data.currentXP -= xpNeeded;
             data.playerLevel++;
             data.availableSkillPoints += 5; // Даем 5 очков характеристик за уровень!
@@ -3529,12 +3552,38 @@ public class FateCastleManager : MonoBehaviour
         PlayerPrefs.Save();
     }
 
+    public void SetMaxLevel()
+    {
+        SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
+        if (data != null)
+        {
+            if (data.playerLevel < 9999)
+            {
+                int lvls = 9999 - data.playerLevel;
+                data.playerLevel = 9999;
+                data.availableSkillPoints += lvls * 5;
+            }
+            data.currentXP = 0;
+            RecalculateStats();
+            SaveGameSystem.Save(0);
+            ShowFeedback(Translator.LanguageID == 0 ? "✨ Уровень повышен до 9999 (Максимум)!" : "✨ Level set to 9999 (Maximum)!");
+        }
+    }
+
     public void RecalculateStats()
     {
         SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
+        if (data == null) return;
         data.maxHealth = (data.stamina + eqBonusSTA) * 10f;
-        if (data.currentHealth > data.maxHealth) data.currentHealth = data.maxHealth;
-        if (data.currentHealth <= 0f) data.currentHealth = data.maxHealth; // Воскрешение
+        if (isCombatActive)
+        {
+            if (data.currentHealth > data.maxHealth) data.currentHealth = data.maxHealth;
+            if (data.currentHealth <= 0f) data.currentHealth = data.maxHealth; // Воскрешение
+        }
+        else
+        {
+            data.currentHealth = data.maxHealth; // Полное восстановление вне боя!
+        }
     }
 
     public void AutoAllocateAllPoints()
@@ -4265,6 +4314,11 @@ public class FateCastleManager : MonoBehaviour
         {
             GainXP(100000);
         }
+        GUI.backgroundColor = new Color(0.85f, 0.15f, 0.15f);
+        if (GUILayout.Button("-MAX-", GUILayout.Height(26)))
+        {
+            SetMaxLevel();
+        }
         GUI.backgroundColor = Color.white;
         GUILayout.EndHorizontal();
         
@@ -4512,6 +4566,10 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.BeginHorizontal();
         int unlockedCount = GetUnlockedSlotsCount();
         int purchasedCount = GetPurchasedSlotsCount();
+        if (currentInventoryTab * 36 >= unlockedCount)
+        {
+            currentInventoryTab = 0;
+        }
 
         if (s_tabBtnStyle == null)
         {
@@ -4950,8 +5008,9 @@ public class FateCastleManager : MonoBehaviour
             {
                 statVal--;
                 availablePoints++;
-                SaveGameSystem.Save(0);
                 RecalculateEquippedBonuses();
+                RecalculateStats();
+                SaveGameSystem.Save(0);
             }
         }
 
@@ -4961,8 +5020,9 @@ public class FateCastleManager : MonoBehaviour
             {
                 statVal++;
                 availablePoints--;
-                SaveGameSystem.Save(0);
                 RecalculateEquippedBonuses();
+                RecalculateStats();
+                SaveGameSystem.Save(0);
             }
         }
 
@@ -9494,6 +9554,8 @@ public class FateCastleManager : MonoBehaviour
                     $"protagonist training complete! (+{mainHeroXP} XP)";
                 ShowFeedback(feed);
             }
+            RecalculateStats();
+            SaveGameSystem.Save(0);
         }
         else
         {
