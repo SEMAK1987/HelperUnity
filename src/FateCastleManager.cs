@@ -2413,6 +2413,15 @@ public class FateCastleManager : MonoBehaviour
         LoadInventory();
         LoadEquipment();
         RecalculateEquippedBonuses();
+
+        // Fully restore player health and synchronize maxHealth on initialization (v18.11.24)
+        if (SaveGameSystem.CurrentData != null)
+        {
+            float maxHp = (SaveGameSystem.CurrentData.stamina + eqBonusSTA) * 10f;
+            SaveGameSystem.CurrentData.maxHealth = maxHp;
+            SaveGameSystem.CurrentData.currentHealth = maxHp; // Полное восстановление при старте
+            SaveGameSystem.Save(activeSlot);
+        }
     }
 
     private void HandleCombatEndEvent(int winner)
@@ -3523,7 +3532,7 @@ public class FateCastleManager : MonoBehaviour
     public void RecalculateStats()
     {
         SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
-        data.maxHealth = data.stamina * 10f;
+        data.maxHealth = (data.stamina + eqBonusSTA) * 10f;
         if (data.currentHealth > data.maxHealth) data.currentHealth = data.maxHealth;
         if (data.currentHealth <= 0f) data.currentHealth = data.maxHealth; // Воскрешение
     }
@@ -3667,6 +3676,48 @@ public class FateCastleManager : MonoBehaviour
         if (isTownViewActive)
         {
             DrawTownViewGUI(curLang);
+            
+            // Отрисовка всплывающих окон поверх вида города, чтобы не блокировать и не скрывать их (v18.11.24)
+            bool modalActive = showCastleCalibrationPanel || showSkillDetailPopup || showTroopDetailPopup || showForgeDetailPopup || showSpyReportPopup || showPurchaseConfirmPopup;
+            if (modalActive)
+            {
+                // Рисуем затемнение экрана (Modal Blocker) поверх вида города
+                GUI.backgroundColor = new Color(0.01f, 0.02f, 0.06f, 0.88f);
+                GUIStyle blockerStyle = new GUIStyle(GUI.skin.box);
+                blockerStyle.normal.background = hudTex;
+                GUI.Box(new Rect(0, 0, Screen.width, Screen.height), "", blockerStyle);
+                GUI.backgroundColor = Color.white;
+
+                if (showCastleCalibrationPanel)
+                {
+                    DrawCastleCalibrationPanel(curLang);
+                }
+
+                if (showSkillDetailPopup)
+                {
+                    DrawSkillDetailPopup(curLang);
+                }
+
+                if (showTroopDetailPopup)
+                {
+                    DrawTroopDetailPopup(curLang);
+                }
+
+                if (showForgeDetailPopup)
+                {
+                    DrawForgeDetailPopup(curLang);
+                }
+
+                if (showSpyReportPopup)
+                {
+                    DrawSpyReportPopup(curLang);
+                }
+
+                if (showPurchaseConfirmPopup)
+                {
+                    DrawPurchaseConfirmPopup(curLang);
+                }
+            }
             return;
         }
 
@@ -3878,7 +3929,7 @@ public class FateCastleManager : MonoBehaviour
         
         // РИСОВАНИЕ БАРОВ ХАРАКТЕРИСТИК (ЗДОРОВЬЕ / МАНА / ОПЫТ)
         // 1. Здоровье (Красный)
-        float maxHp = data.stamina * 10f;
+        float maxHp = (data.stamina + eqBonusSTA + tempBonusSTA) * 10f;
         if (data.currentHealth > maxHp) data.currentHealth = maxHp;
         float hpPct = maxHp > 0f ? (data.currentHealth / maxHp) : 1f;
         
@@ -3899,7 +3950,7 @@ public class FateCastleManager : MonoBehaviour
         GUI.Label(new Rect(110f, 47f, 230f, 13f), $"HP: {Mathf.CeilToInt(data.currentHealth)} / {maxHp}", textOverBarStyle);
         
         // 2. Мана (Красивый сине-фиолетовый энергетический бар)
-        float maxMana = data.intelligence * 10f;
+        float maxMana = (data.intelligence + eqBonusINT + tempBonusINT) * 10f;
         float manaPct = 1.0f; // Всегда полная мана для заклинаний
         
         GUIStyle mpStyle = new GUIStyle(GUI.skin.box);
@@ -4184,6 +4235,39 @@ public class FateCastleManager : MonoBehaviour
         GUI.backgroundColor = Color.white;
         GUILayout.EndHorizontal();
         
+        // 5 Extra XP Cheat Buttons for Testing High Levels (v18.11.24)
+        GUILayout.Space(4);
+        GUILayout.BeginHorizontal();
+        GUI.backgroundColor = new Color(0.12f, 0.75f, 0.4f);
+        if (GUILayout.Button("+1000 XP", GUILayout.Height(26)))
+        {
+            GainXP(1000);
+        }
+        if (GUILayout.Button("+5000 XP", GUILayout.Height(26)))
+        {
+            GainXP(5000);
+        }
+        if (GUILayout.Button("+10000 XP", GUILayout.Height(26)))
+        {
+            GainXP(10000);
+        }
+        GUI.backgroundColor = Color.white;
+        GUILayout.EndHorizontal();
+
+        GUILayout.Space(2);
+        GUILayout.BeginHorizontal();
+        GUI.backgroundColor = new Color(0.10f, 0.65f, 0.45f);
+        if (GUILayout.Button("+50000 XP", GUILayout.Height(26)))
+        {
+            GainXP(50000);
+        }
+        if (GUILayout.Button("+100000 XP", GUILayout.Height(26)))
+        {
+            GainXP(100000);
+        }
+        GUI.backgroundColor = Color.white;
+        GUILayout.EndHorizontal();
+        
         GUILayout.Space(6);
         
         GUILayout.BeginHorizontal();
@@ -4196,6 +4280,52 @@ public class FateCastleManager : MonoBehaviour
         }
         GUI.backgroundColor = Color.white;
         GUILayout.EndHorizontal();
+
+        GUILayout.Space(12);
+
+        // РЕНДЕРИНГ ОПЫТА И УРОВНЯ ОСНОВНОГО ГЕРОЯ ПОД КНОПКАМИ ЧИТОВ (v18.11.24)
+        int neededXpForProgress = data.playerLevel * 100;
+        float progressPct = neededXpForProgress > 0 ? Mathf.Clamp01((float)data.currentXP / neededXpForProgress) : 0f;
+
+        GUIStyle progressTitleStyle = new GUIStyle(GUI.skin.label);
+        progressTitleStyle.alignment = TextAnchor.MiddleCenter;
+        progressTitleStyle.fontSize = 12;
+        progressTitleStyle.fontStyle = FontStyle.Bold;
+        progressTitleStyle.normal.textColor = Color.yellow;
+
+        string lvlString = curLang == 0 
+            ? $"📊 УРОВЕНЬ ГЕРОЯ: {data.playerLevel}" 
+            : $"📊 HERO LEVEL: {data.playerLevel}";
+        if (curLang == 8) lvlString = $"📊 英雄等级: {data.playerLevel}";
+        if (curLang == 7) lvlString = $"📊 영웅 레벨: {data.playerLevel}";
+        GUILayout.Label(lvlString, progressTitleStyle);
+
+        string xpString = curLang == 0
+            ? $"✨ Опыт: {data.currentXP} / {neededXpForProgress} XP"
+            : $"✨ Experience: {data.currentXP} / {neededXpForProgress} XP";
+        if (curLang == 8) xpString = $"✨ 经验值: {data.currentXP} / {neededXpForProgress} XP";
+        if (curLang == 7) xpString = $"✨ 경험치: {data.currentXP} / {neededXpForProgress} XP";
+
+        GUIStyle xpValStyle = new GUIStyle(GUI.skin.label);
+        xpValStyle.alignment = TextAnchor.MiddleCenter;
+        xpValStyle.fontSize = 11;
+        xpValStyle.normal.textColor = new Color(0.12f, 0.88f, 1.0f);
+        GUILayout.Label(xpString, xpValStyle);
+
+        // Progress bar for XP
+        Rect xpProgressRect = GUILayoutUtility.GetRect(220, 16);
+        GUIStyle xpBarBgStyle = new GUIStyle(GUI.skin.box);
+        xpBarBgStyle.normal.background = barBgTex;
+        GUI.Box(xpProgressRect, "", xpBarBgStyle);
+
+        if (progressPct > 0f)
+        {
+            Rect xpFillRect = new Rect(xpProgressRect.x + 1, xpProgressRect.y + 1, (xpProgressRect.width - 2) * progressPct, xpProgressRect.height - 2);
+            Color originalColor = GUI.color;
+            GUI.color = new Color(0.12f, 0.88f, 1.0f); // Bright cyan for XP
+            GUI.DrawTexture(xpFillRect, Texture2D.whiteTexture);
+            GUI.color = originalColor;
+        }
         
         GUILayout.EndScrollView();
         GUILayout.EndVertical();
@@ -6033,9 +6163,9 @@ public class FateCastleManager : MonoBehaviour
             case "dragon": return avatar_dragon;
             case "mountain_bear": return avatar_mountain_bear;
             case "wasteland_serpent": return avatar_wasteland_serpent;
-            case "ArcherHero": return avatar_hero_archer;
-            case "WarriorHero": return avatar_hero_warrior;
-            case "MageHero": return avatar_hero_mage;
+            case "ArcherHero": return avatar_hero_archer != null ? avatar_hero_archer : (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.archerPortrait != null ? DialogueSystem_Manager.Instance.archerPortrait.texture : null);
+            case "WarriorHero": return avatar_hero_warrior != null ? avatar_hero_warrior : (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.warriorPortrait != null ? DialogueSystem_Manager.Instance.warriorPortrait.texture : null);
+            case "MageHero": return avatar_hero_mage != null ? avatar_hero_mage : (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.magePortrait != null ? DialogueSystem_Manager.Instance.magePortrait.texture : null);
         }
         return null;
     }
@@ -7017,6 +7147,18 @@ public class FateCastleManager : MonoBehaviour
             GUIUtility.ExitGUI();
         }
         GUI.backgroundColor = Color.white;
+
+        // Если открыто какое-либо модальное окно поверх, накладываем затемняющий слой на всю область окна деталей (v18.11.24)
+        bool modalActive = showCastleCalibrationPanel || showSkillDetailPopup || showTroopDetailPopup || showForgeDetailPopup || showSpyReportPopup || showPurchaseConfirmPopup;
+        if (modalActive)
+        {
+            float currentHeight = (castle.owner == "Player") ? 550f : 620f;
+            GUI.backgroundColor = new Color(0.01f, 0.02f, 0.05f, 0.90f);
+            GUIStyle darkOverlayStyle = new GUIStyle(GUI.skin.box);
+            darkOverlayStyle.normal.background = Texture2D.whiteTexture; // Используем белую текстуру, покрашенную через GUI.backgroundColor
+            GUI.Box(new Rect(0, 0, 485f, currentHeight), "", darkOverlayStyle);
+            GUI.backgroundColor = Color.white;
+        }
     }
 
     private void LoadGridState()
@@ -7457,7 +7599,10 @@ public class FateCastleManager : MonoBehaviour
                 else if (pClassRaw.Contains("archer") || pClassRaw.Contains("стрелок") || pClassRaw.Contains("strelok") || pClassRaw.Contains("лучник") || pClassRaw.Contains("ranger"))
                     pClass = "Archer";
 
-                heroIcon = (pClass == "Warrior") ? avatar_hero_warrior : ((pClass == "Archer") ? avatar_hero_archer : avatar_hero_mage);
+                Texture2D wTex = avatar_hero_warrior != null ? avatar_hero_warrior : (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.warriorPortrait != null ? DialogueSystem_Manager.Instance.warriorPortrait.texture : null);
+                Texture2D aTex = avatar_hero_archer != null ? avatar_hero_archer : (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.archerPortrait != null ? DialogueSystem_Manager.Instance.archerPortrait.texture : null);
+                Texture2D mTex = avatar_hero_mage != null ? avatar_hero_mage : (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.magePortrait != null ? DialogueSystem_Manager.Instance.magePortrait.texture : null);
+                heroIcon = (pClass == "Warrior") ? wTex : ((pClass == "Archer") ? aTex : mTex);
             }
             else if (r == 1 && GetHeroCount("WarriorHero", activeDetailsIndex) > 0)
             {
@@ -7741,7 +7886,10 @@ public class FateCastleManager : MonoBehaviour
 
             hoveredSkillName = curLang == 0 ? $"Главный Герой ({pClassRaw})" : $"Main Hero ({pClassRaw})";
             hoveredSkillType = curLang == 0 ? "Гарнизонный Герой" : "Garrison Hero";
-            hoveredSkillIcon = (pClass == "Warrior") ? avatar_hero_warrior : ((pClass == "Archer") ? avatar_hero_archer : avatar_hero_mage);
+            Texture2D wTex = avatar_hero_warrior != null ? avatar_hero_warrior : (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.warriorPortrait != null ? DialogueSystem_Manager.Instance.warriorPortrait.texture : null);
+            Texture2D aTex = avatar_hero_archer != null ? avatar_hero_archer : (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.archerPortrait != null ? DialogueSystem_Manager.Instance.archerPortrait.texture : null);
+            Texture2D mTex = avatar_hero_mage != null ? avatar_hero_mage : (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.magePortrait != null ? DialogueSystem_Manager.Instance.magePortrait.texture : null);
+            hoveredSkillIcon = (pClass == "Warrior") ? wTex : ((pClass == "Archer") ? aTex : mTex);
 
             string statsText = curLang == 0 
                 ? $"<b>Уровень:</b> {pLvl}\n<b>❤️ ОЗ:</b> {currentHealth:F0}/{maxHealth:F0}\n<b>💠 Мана:</b> {maxMana}/{maxMana}\n" +
