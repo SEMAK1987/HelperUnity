@@ -3570,6 +3570,55 @@ public class FateCastleManager : MonoBehaviour
         }
     }
 
+    public void SetMinLevel()
+    {
+        SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
+        if (data != null)
+        {
+            data.playerLevel = 1;
+            data.currentXP = 0;
+            data.availableSkillPoints = 0;
+
+            // Определяем базовые исходные атрибуты в зависимости от класса героя
+            int startSTR = 10;
+            int startAGI = 10;
+            int startINT = 10;
+            int startSTA = 10;
+            
+            string cl = (!string.IsNullOrEmpty(data.characterClass)) ? data.characterClass.ToLower() : "воин";
+            if (cl.Contains("warrior") || cl.Contains("voin") || cl.Contains("paladin") || cl.Contains("воин") || cl.Contains("паладин") || cl.Contains("рыцар"))
+            {
+                startSTR = 15;
+                startAGI = 10;
+                startINT = 4;
+                startSTA = 15;
+            }
+            else if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow") || cl.Contains("лучник") || cl.Contains("стрел") || cl.Contains("охотн"))
+            {
+                startSTR = 10;
+                startAGI = 14;
+                startINT = 6;
+                startSTA = 11;
+            }
+            else if (cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff") || cl.Contains("маг") || cl.Contains("колдун") || cl.Contains("волшеб"))
+            {
+                startSTR = 6;
+                startAGI = 10;
+                startINT = 10;
+                startSTA = 9;
+            }
+
+            data.strength = startSTR;
+            data.agility = startAGI;
+            data.intelligence = startINT;
+            data.stamina = startSTA;
+
+            RecalculateStats();
+            SaveGameSystem.Save(0);
+            ShowFeedback(Translator.LanguageID == 0 ? "✨ Уровень сброшен до 1 (Минимум)!" : "✨ Level reset to 1 (Minimum)!");
+        }
+    }
+
     public void RecalculateStats()
     {
         SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
@@ -4318,6 +4367,11 @@ public class FateCastleManager : MonoBehaviour
         if (GUILayout.Button("-MAX-", GUILayout.Height(26)))
         {
             SetMaxLevel();
+        }
+        GUI.backgroundColor = new Color(0.15f, 0.15f, 0.85f);
+        if (GUILayout.Button("-MIN-", GUILayout.Height(26)))
+        {
+            SetMinLevel();
         }
         GUI.backgroundColor = Color.white;
         GUILayout.EndHorizontal();
@@ -7659,9 +7713,9 @@ public class FateCastleManager : MonoBehaviour
                 else if (pClassRaw.Contains("archer") || pClassRaw.Contains("стрелок") || pClassRaw.Contains("strelok") || pClassRaw.Contains("лучник") || pClassRaw.Contains("ranger"))
                     pClass = "Archer";
 
-                Texture2D wTex = avatar_hero_warrior != null ? avatar_hero_warrior : (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.warriorPortrait != null ? DialogueSystem_Manager.Instance.warriorPortrait.texture : null);
-                Texture2D aTex = avatar_hero_archer != null ? avatar_hero_archer : (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.archerPortrait != null ? DialogueSystem_Manager.Instance.archerPortrait.texture : null);
-                Texture2D mTex = avatar_hero_mage != null ? avatar_hero_mage : (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.magePortrait != null ? DialogueSystem_Manager.Instance.magePortrait.texture : null);
+                Texture2D wTex = (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.warriorPortrait != null) ? DialogueSystem_Manager.Instance.warriorPortrait.texture : avatar_hero_warrior;
+                Texture2D aTex = (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.archerPortrait != null) ? DialogueSystem_Manager.Instance.archerPortrait.texture : avatar_hero_archer;
+                Texture2D mTex = (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.magePortrait != null) ? DialogueSystem_Manager.Instance.magePortrait.texture : avatar_hero_mage;
                 heroIcon = (pClass == "Warrior") ? wTex : ((pClass == "Archer") ? aTex : mTex);
             }
             else if (r == 1 && GetHeroCount("WarriorHero", activeDetailsIndex) > 0)
@@ -7946,9 +8000,9 @@ public class FateCastleManager : MonoBehaviour
 
             hoveredSkillName = curLang == 0 ? $"Главный Герой ({pClassRaw})" : $"Main Hero ({pClassRaw})";
             hoveredSkillType = curLang == 0 ? "Гарнизонный Герой" : "Garrison Hero";
-            Texture2D wTex = avatar_hero_warrior != null ? avatar_hero_warrior : (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.warriorPortrait != null ? DialogueSystem_Manager.Instance.warriorPortrait.texture : null);
-            Texture2D aTex = avatar_hero_archer != null ? avatar_hero_archer : (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.archerPortrait != null ? DialogueSystem_Manager.Instance.archerPortrait.texture : null);
-            Texture2D mTex = avatar_hero_mage != null ? avatar_hero_mage : (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.magePortrait != null ? DialogueSystem_Manager.Instance.magePortrait.texture : null);
+            Texture2D wTex = (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.warriorPortrait != null) ? DialogueSystem_Manager.Instance.warriorPortrait.texture : avatar_hero_warrior;
+            Texture2D aTex = (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.archerPortrait != null) ? DialogueSystem_Manager.Instance.archerPortrait.texture : avatar_hero_archer;
+            Texture2D mTex = (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.magePortrait != null) ? DialogueSystem_Manager.Instance.magePortrait.texture : avatar_hero_mage;
             hoveredSkillIcon = (pClass == "Warrior") ? wTex : ((pClass == "Archer") ? aTex : mTex);
 
             string statsText = curLang == 0 
