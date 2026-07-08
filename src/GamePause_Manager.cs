@@ -54,6 +54,9 @@ namespace FateContinent
         private int lastLanguageID = -1;
         private Canvas createdCanvas; // Временный Canvas для рантайм-меню
 
+        private Slider mouseSensitivitySlider;
+        private TextMeshProUGUI mouseSensitivityLabel;
+
         private void Awake()
         {
             if (Instance == null)
@@ -498,6 +501,7 @@ namespace FateContinent
             ApplyFontToText(pauseTitleText, true);
             ApplyFontToText(confirmPromptText, false);
             ApplyFontToText(toastNotificationText, false);
+            ApplyFontToText(mouseSensitivityLabel, false);
 
             if (pauseTitleText != null) pauseTitleText.text = GetLocalizedTitleText();
             if (confirmPromptText != null) confirmPromptText.text = GetLocalizedConfirmText();
@@ -512,6 +516,11 @@ namespace FateContinent
             
             TranslateButton(confirmYesButton, GetLocalizedYesText());
             TranslateButton(confirmNoButton, GetLocalizedNoText());
+
+            if (mouseSensitivityLabel != null && mouseSensitivitySlider != null)
+            {
+                mouseSensitivityLabel.text = GetLocalizedMouseMovementText() + $": {Mathf.RoundToInt(mouseSensitivitySlider.value * 100)}%";
+            }
         }
 
         private void TranslateButton(Button btn, string text)
@@ -717,6 +726,23 @@ namespace FateContinent
             }
         }
 
+        private string GetLocalizedMouseMovementText()
+        {
+            switch (Translator.LanguageID)
+            {
+                case 0: return "Движение мыши";
+                case 2: return "Mausbewegung";
+                case 3: return "Mouvement de souris";
+                case 4: return "Movimiento del ratón";
+                case 5: return "Movimento do mouse";
+                case 6: return "マウス移動速度";
+                case 7: return "마우스 이동 속도";
+                case 8: return "鼠标移动速度";
+                case 1:
+                default: return "Mouse Movement";
+            }
+        }
+
         // ==========================================
         // 🔮 Автоматическая генерация UI при запуске
         // ==========================================
@@ -757,7 +783,7 @@ namespace FateContinent
             menuImg.color = new Color(0.08f, 0.11f, 0.22f, 0.95f); // Космически-синее стекло
             
             var menuRect = menuPanelGov.GetComponent<RectTransform>();
-            menuRect.sizeDelta = new Vector4(450, 520);
+            menuRect.sizeDelta = new Vector2(450, 560);
             menuRect.anchoredPosition = Vector2.zero;
 
             // Outline закругленный
@@ -776,11 +802,11 @@ namespace FateContinent
             pauseTitleText.color = Color.white;
 
             var titleRect = titleGov.GetComponent<RectTransform>();
-            titleRect.anchoredPosition = new Vector2(0, 210);
+            titleRect.anchoredPosition = new Vector2(0, 230);
             titleRect.sizeDelta = new Vector2(400, 50);
 
             // Навешиваем вертикальную разметку кнопкам
-            float startY = 120;
+            float startY = 140;
             float spacingY = 55;
 
             // Вспомогательный метод спавна кнопки
@@ -788,8 +814,12 @@ namespace FateContinent
             saveSlot2Button = CreateMenuButton(menuPanelGov.transform, "Btn_SaveSlot2", "Сохранить: Слот 2", new Vector2(0, startY - spacingY));
             saveSlot3Button = CreateMenuButton(menuPanelGov.transform, "Btn_SaveSlot3", "Сохранить: Слот 3", new Vector2(0, startY - spacingY * 2));
             autosaveButton  = CreateMenuButton(menuPanelGov.transform, "Btn_Autosave",  "Создать автосохранение", new Vector2(0, startY - spacingY * 3), new Color(0.1f, 0.6f, 0.3f, 0.8f));
-            resumeGameButton = CreateMenuButton(menuPanelGov.transform, "Btn_Resume",    "ВЕРНУТЬСЯ В ИГРУ", new Vector2(0, startY - spacingY * 4.2f), new Color(0.2f, 0.4f, 1f, 0.9f));
-            exitToMenuButton = CreateMenuButton(menuPanelGov.transform, "Btn_ExitToMenu", "ВЫХОД В ГЛАВНОЕ МЕНЮ", new Vector2(0, startY - spacingY * 5.2f), new Color(0.8f, 0.15f, 0.15f, 0.8f));
+            
+            // Слайдер Движения Мыши
+            CreateMouseSensitivitySlider(menuPanelGov.transform, new Vector2(0, -85));
+
+            resumeGameButton = CreateMenuButton(menuPanelGov.transform, "Btn_Resume",    "ВЕРНУТЬСЯ В ИГРУ", new Vector2(0, -155), new Color(0.2f, 0.4f, 1f, 0.9f));
+            exitToMenuButton = CreateMenuButton(menuPanelGov.transform, "Btn_ExitToMenu", "ВЫХОД В ГЛАВНОЕ МЕНЮ", new Vector2(0, -210), new Color(0.8f, 0.15f, 0.15f, 0.8f));
 
             // 4. Текст Оповещений Тлеющий (Toast)
             var toastGov = new GameObject("Toast_Text");
@@ -801,7 +831,7 @@ namespace FateContinent
             toastNotificationText.color = new Color(1f, 0.85f, 0f, 1f); // Золотой
             
             var toastRect = toastGov.GetComponent<RectTransform>();
-            toastRect.anchoredPosition = new Vector2(0, -230);
+            toastRect.anchoredPosition = new Vector2(0, -250);
             toastRect.sizeDelta = new Vector2(400, 30);
             toastGov.SetActive(false);
 
@@ -849,6 +879,113 @@ namespace FateContinent
             confirmNoButton  = CreateMenuButton(warningWindowGov.transform, "Btn_ConfirmExitNo",  "НЕТ", new Vector2(110, -50), new Color(0.25f, 0.25f, 0.25f, 0.9f), 180);
 
             confirmExitPanel.SetActive(false); // Выключено по умолчанию
+        }
+
+        private void CreateMouseSensitivitySlider(Transform parent, Vector2 pos)
+        {
+            // 1. Container for Label & Slider
+            var containerGov = new GameObject("Mouse_Sensitivity_Container");
+            containerGov.transform.SetParent(parent, false);
+            var containerRect = containerGov.AddComponent<RectTransform>();
+            containerRect.sizeDelta = new Vector2(360f, 50f);
+            containerRect.anchoredPosition = pos;
+
+            // 2. Label Text
+            var labelGov = new GameObject("Label");
+            labelGov.transform.SetParent(containerGov.transform, false);
+            mouseSensitivityLabel = labelGov.AddComponent<TextMeshProUGUI>();
+            
+            float currentSens = PlayerPrefs.GetFloat("FATE_MOUSE_SENSITIVITY", 1.0f);
+            mouseSensitivityLabel.text = GetLocalizedMouseMovementText() + $": {Mathf.RoundToInt(currentSens * 100)}%";
+            mouseSensitivityLabel.fontSize = 13f;
+            mouseSensitivityLabel.fontStyle = FontStyles.Bold;
+            mouseSensitivityLabel.color = new Color(0.7f, 0.85f, 1f, 1f); // Light Cyan
+            mouseSensitivityLabel.alignment = TextAlignmentOptions.Left;
+            ApplyFontToText(mouseSensitivityLabel, false);
+
+            var labelRect = labelGov.GetComponent<RectTransform>();
+            labelRect.anchorMin = new Vector2(0f, 0.5f);
+            labelRect.anchorMax = new Vector2(1f, 1f);
+            labelRect.offsetMin = new Vector2(5, 0);
+            labelRect.offsetMax = new Vector2(-5, 0);
+
+            // 3. Slider Object
+            var sliderGov = new GameObject("Slider");
+            sliderGov.transform.SetParent(containerGov.transform, false);
+            var slider = sliderGov.AddComponent<Slider>();
+            mouseSensitivitySlider = slider;
+
+            var sliderRect = sliderGov.AddComponent<RectTransform>();
+            sliderRect.anchorMin = new Vector2(0f, 0f);
+            sliderRect.anchorMax = new Vector2(1f, 0.4f);
+            sliderRect.offsetMin = new Vector2(5, 0);
+            sliderRect.offsetMax = new Vector2(-5, 0);
+
+            // Background Track
+            var bgGov = new GameObject("Background");
+            bgGov.transform.SetParent(sliderGov.transform, false);
+            var bgImg = bgGov.AddComponent<Image>();
+            bgImg.color = new Color(0.12f, 0.15f, 0.25f, 0.9f); // Dark track
+            var bgRect = bgGov.GetComponent<RectTransform>();
+            bgRect.anchorMin = Vector2.zero;
+            bgRect.anchorMax = Vector2.one;
+            bgRect.offsetMin = Vector2.zero;
+            bgRect.offsetMax = Vector2.zero;
+
+            // Fill Area (maskless simple fill)
+            var fillAreaGov = new GameObject("Fill Area");
+            fillAreaGov.transform.SetParent(sliderGov.transform, false);
+            var fillAreaRect = fillAreaGov.AddComponent<RectTransform>();
+            fillAreaRect.anchorMin = Vector2.zero;
+            fillAreaRect.anchorMax = Vector2.one;
+            fillAreaRect.offsetMin = Vector2.zero;
+            fillAreaRect.offsetMax = Vector2.zero;
+
+            var fillGov = new GameObject("Fill");
+            fillGov.transform.SetParent(fillAreaGov.transform, false);
+            var fillImg = fillGov.AddComponent<Image>();
+            fillImg.color = new Color(0.0f, 0.7f, 1.0f, 0.9f); // Bright Neon Cyan/Blue
+            var fillRect = fillGov.AddComponent<RectTransform>();
+            fillRect.offsetMin = Vector2.zero;
+            fillRect.offsetMax = Vector2.zero;
+
+            // Handle Slide Area
+            var handleAreaGov = new GameObject("Handle Slide Area");
+            handleAreaGov.transform.SetParent(sliderGov.transform, false);
+            var handleAreaRect = handleAreaGov.AddComponent<RectTransform>();
+            handleAreaRect.anchorMin = Vector2.zero;
+            handleAreaRect.anchorMax = Vector2.one;
+            handleAreaRect.offsetMin = Vector2.zero;
+            handleAreaRect.offsetMax = Vector2.zero;
+
+            var handleGov = new GameObject("Handle");
+            handleGov.transform.SetParent(handleAreaGov.transform, false);
+            var handleImg = handleGov.AddComponent<Image>();
+            handleImg.color = Color.white; // White knob
+            
+            // Outline or glow to handle
+            var handleOutline = handleGov.AddComponent<Outline>();
+            handleOutline.effectColor = new Color(0.0f, 0.7f, 1.0f, 0.8f);
+            handleOutline.effectDistance = new Vector2(2, 2);
+
+            var handleRect = handleGov.AddComponent<RectTransform>();
+            handleRect.sizeDelta = new Vector2(16f, 16f);
+
+            // Connect Slider components
+            slider.fillRect = fillRect;
+            slider.handleRect = handleRect;
+            slider.targetGraphic = handleImg;
+            slider.direction = Slider.Direction.LeftToRight;
+            slider.minValue = 0.1f;
+            slider.maxValue = 3.0f;
+            slider.value = currentSens;
+
+            // Add listener
+            slider.onValueChanged.AddListener((val) => {
+                PlayerPrefs.SetFloat("FATE_MOUSE_SENSITIVITY", val);
+                PlayerPrefs.Save();
+                mouseSensitivityLabel.text = GetLocalizedMouseMovementText() + $": {Mathf.RoundToInt(val * 100)}%";
+            });
         }
 
         private Button CreateMenuButton(Transform parent, string name, string label, Vector2 pos, Color? colColor = null, float width = 360f)

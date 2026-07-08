@@ -79,6 +79,18 @@ namespace FateContinent
         private float targetZoom;
         private Vector3 lastDragMousePosition;
 
+        private float originalEdgeScrollSpeed;
+        private float originalDragSensitivity;
+        private bool hasInitializedOriginals = false;
+
+        private void InitializeOriginals()
+        {
+            if (hasInitializedOriginals) return;
+            originalEdgeScrollSpeed = edgeScrollSpeed;
+            originalDragSensitivity = dragSensitivity;
+            hasInitializedOriginals = true;
+        }
+
         private void Awake()
         {
             if (Instance == null)
@@ -93,6 +105,8 @@ namespace FateContinent
 
         private void Start()
         {
+            InitializeOriginals();
+
             // Принудительно отключаем свободное перемещение камеры во время стартовых диалогов Аэлиссы,
             // чтобы пользователь не улетел в пустоту, пока идет вступительный разговор и выбор зон.
             isControlEnabled = false;
@@ -121,6 +135,14 @@ namespace FateContinent
 
         private void Update()
         {
+            float mouseSensitivity = PlayerPrefs.GetFloat("FATE_MOUSE_SENSITIVITY", 1.0f);
+            if (!hasInitializedOriginals)
+            {
+                InitializeOriginals();
+            }
+            edgeScrollSpeed = originalEdgeScrollSpeed * mouseSensitivity;
+            dragSensitivity = originalDragSensitivity * mouseSensitivity;
+
             if (!isControlEnabled) return;
 
             // [BLOCK CAMERA WHEN IN TOWN VIEW OR CASTLE DETAILS OPEN]

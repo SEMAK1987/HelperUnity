@@ -236,3 +236,23 @@ Bust headshot portrait of a powerful Cosmic Magician hero from Fate Continent, l
 > **Prompt:** Brutalist fantasy background texture of overlapping massive dark obsidian mineral basalt plates, thin glowing gold and warm amber molten lava cracks weaving through the crevices, rough crystalline dark stone material, moody dramatic soft overhead shadows, photorealistic 8k micro-detail --no flat colors, continent, text, GUI --ar 16:9
 
 
+---
+
+## 🎲 РАЗДЕЛ 11: Настольные Мини-Фигурки Героев для 3D Генерации (Tabletop Miniature Figurines for 3D AI Modeling)
+
+*Эти специализированные промпты созданы для генерации **одиночных мини-фигурок** (настольных миниатюр, как в Warhammer или D&D), стоящих на маленькой круглой пластиковой подставке на чистом белом фоне. Они строго исключают развертки, чертежи спереди-сзади (split view, turnarounds) и идеально подходят для загрузки в нейросети генерации 3D-моделей (например, Hunyuan 3D).*
+
+### 🛡️ 1. Мини-фигурка Воина (Warrior Tabletop Miniature)
+> **Prompt:**
+> Symmetrical front view studio photography of a single tabletop miniature figurine of a heavy fantasy warrior, wearing ornate dark slate steel plate armor with glowing neon-cyan runes. He is standing on a small round black plastic display base, holding a massive glowing runic broadsword resting in front of him. Single figure, centered composition, isolated on a solid, pure clean white background. High-quality acrylic paint job, sharp macro lens detail, professional 3D print model rendering --no turnaround sheet, split view, front and back, orthographic character sheet, text, shadows behind, multi-angle --ar 1:1 --v 6.0
+
+### 🏹 2. Мини-фигурка Стрелка (Archer Tabletop Miniature)
+> **Prompt:**
+> Symmetrical front-facing studio photography of a single tabletop miniature figurine of an agile elven archer, wearing dark forest green leather ranger cowl and translucent sapphire shoulder plates. Standing on a small round black plastic display base, holding an elegant un-drawn crystalline longbow in one hand. Single figure, centered composition, isolated on a solid, pure clean white background. High-quality miniature model paint job, sharp focus, macro photography --no turnaround sheet, split view, front and back, orthographic character sheet, text, secondary views, multi-pose --ar 1:1 --v 6.0
+
+### 🔮 3. Мини-фигурка Мага (Mage Tabletop Miniature)
+> **Prompt:**
+> Symmetrical front-facing studio photography of a single tabletop miniature figurine of a cosmic sorcerer wizard, wearing deep velvet purple robes with glowing silver galaxy patterns and floating gold rings. Standing on a small round black plastic display base, holding a celestial wizard staff vertically with a sapphire sphere at the tip. Single figure, centered composition, isolated on a solid, pure clean white background. Exquisite detail, professional game miniature paint job, sharp focus --no turnaround sheet, split view, front and back, orthographic, text, split images, dual pose --ar 1:1 --v 6.0
+
+
+

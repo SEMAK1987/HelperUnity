@@ -519,6 +519,7 @@ public class FateCastleManager : MonoBehaviour
 
     // Purchase confirmation popup fields (v18.11.24)
     private bool showPurchaseConfirmPopup = false;
+    private float confirmPopupOpenedTime = 0f;
     private string confirmItemName = "";
     private int confirmCost = 0;
     private System.Action confirmAction = null;
@@ -895,10 +896,35 @@ public class FateCastleManager : MonoBehaviour
         }
     }
 
+    private bool CanAddInventoryItem(string id, int slotType, int level)
+    {
+        LoadInventory();
+        int unlockedCount = Mathf.Min(GetUnlockedSlotsCount(), playerInventory.items.Length);
+        
+        // Check stackable potion slot
+        for (int i = 0; i < unlockedCount; i++)
+        {
+            if (playerInventory.items[i] != null && playerInventory.items[i].id == id && playerInventory.items[i].level == level && slotType == 0)
+            {
+                return true;
+            }
+        }
+        
+        // Check empty slot
+        for (int i = 0; i < unlockedCount; i++)
+        {
+            if (playerInventory.items[i] == null || string.IsNullOrEmpty(playerInventory.items[i].id))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private bool AddInventoryItem(string id, string name, string iconType, int slotType, int level, int statBonus)
     {
         LoadInventory();
-        int unlockedCount = GetUnlockedSlotsCount();
+        int unlockedCount = Mathf.Min(GetUnlockedSlotsCount(), playerInventory.items.Length);
         
         // Find stackable potion slot within unlocked slots
         for (int i = 0; i < unlockedCount; i++)
@@ -939,7 +965,7 @@ public class FateCastleManager : MonoBehaviour
         if (itemToUnequip == null || string.IsNullOrEmpty(itemToUnequip.id)) return;
 
         int curLang = Translator.LanguageID;
-        int unlockedCount = GetUnlockedSlotsCount();
+        int unlockedCount = Mathf.Min(GetUnlockedSlotsCount(), playerInventory.items.Length);
         bool added = false;
         
         for (int i = 0; i < unlockedCount; i++)
@@ -958,6 +984,8 @@ public class FateCastleManager : MonoBehaviour
             SaveInventory();
             SaveEquipment();
             RecalculateEquippedBonuses();
+            RecalculateStats();
+            SaveGameSystem.Save(0);
             string itemName = GetLocalizedItemName(itemToUnequip, curLang);
             ShowFeedback(curLang == 0 ? $"{itemName} снят и помещен в инвентарь!" : $"{itemName} unequipped into inventory!");
         }
@@ -1129,6 +1157,8 @@ public class FateCastleManager : MonoBehaviour
             SaveInventory();
             SaveEquipment();
             RecalculateEquippedBonuses();
+            RecalculateStats();
+            SaveGameSystem.Save(0);
         }
         else if (item.slotType == 0)
         {
@@ -1612,6 +1642,23 @@ public class FateCastleManager : MonoBehaviour
         count += GetHeroCount("WarriorHero", zoneIndex);
         count += GetHeroCount("MageHero", zoneIndex);
         return count;
+    }
+
+    public int GetTroopsCountInCastle()
+    {
+        int count = 0;
+        string[] troop_ids = { "warrior", "archer", "mage", "paladin", "cavalry", "cannoneer", "centaur", "necromancer", "griffin", "overlord", "hydra", "dragon", "mountain_bear", "wasteland_serpent" };
+        int zoneIdx = activeDetailsIndex >= 0 ? activeDetailsIndex : 0;
+        for (int i = 0; i < troop_ids.Length; i++)
+        {
+            count += GetUnitCount(troop_ids[i], zoneIdx);
+        }
+        return count;
+    }
+
+    public int GetTroopCapacity(int lvl)
+    {
+        return 30 * Mathf.Max(1, lvl);
     }
 
     public int GetPlayerMaxCastleLevel()
@@ -3973,10 +4020,21 @@ public class FateCastleManager : MonoBehaviour
             avatarGlowColor = new Color(0.7f, 0.3f, 1.0f);
         }
 
+        string pClassRaw = cl.ToLower();
+        string pClass = "Mage";
+        if (pClassRaw.Contains("warrior") || pClassRaw.Contains("воин") || pClassRaw.Contains("voin") || pClassRaw.Contains("paladin") || pClassRaw.Contains("паладин"))
+            pClass = "Warrior";
+        else if (pClassRaw.Contains("archer") || pClassRaw.Contains("стрелок") || pClassRaw.Contains("strelok") || pClassRaw.Contains("лучник") || pClassRaw.Contains("ranger"))
+            pClass = "Archer";
+
+        Texture2D wTex = (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.warriorPortrait != null) ? DialogueSystem_Manager.Instance.warriorPortrait.texture : avatar_hero_warrior;
+        Texture2D aTex = (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.archerPortrait != null) ? DialogueSystem_Manager.Instance.archerPortrait.texture : avatar_hero_archer;
+        Texture2D mTex = (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.magePortrait != null) ? DialogueSystem_Manager.Instance.magePortrait.texture : avatar_hero_mage;
+        Texture2D heroIcon = (pClass == "Warrior") ? wTex : ((pClass == "Archer") ? aTex : mTex);
+
+        bool hasIcon = heroIcon != null;
         GUIStyle portraitBtnStyle = new GUIStyle(GUI.skin.button);
-        portraitBtnStyle.fontSize = 28;
-        portraitBtnStyle.alignment = TextAnchor.MiddleCenter;
-        portraitBtnStyle.normal.textColor = avatarGlowColor;
+        portraitBtnStyle.padding = new RectOffset(2, 2, 2, 2);
         
         // Блокируем управление персонажем при активных других панелях (диалог, город, детали)
         bool blockCharacterPanel = isTownViewActive || isDetailsOpen || showNewDayOverlay || showCastleCalibrationPanel || showForgeDetailPopup || showSpyReportPopup || (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.IsDialogueActive);
@@ -3985,8 +4043,20 @@ public class FateCastleManager : MonoBehaviour
             GUI.enabled = false;
         }
 
-        // Кнопка аватара (при нажатии раскрывает меню распределения характеристик)
-        if (GUI.Button(new Rect(30f, 30f, 65f, 65f), avatarSymbol, portraitBtnStyle))
+        bool clickedAvatar = false;
+        if (hasIcon)
+        {
+            clickedAvatar = GUI.Button(new Rect(30f, 30f, 65f, 65f), heroIcon, portraitBtnStyle);
+        }
+        else
+        {
+            portraitBtnStyle.fontSize = 28;
+            portraitBtnStyle.alignment = TextAnchor.MiddleCenter;
+            portraitBtnStyle.normal.textColor = avatarGlowColor;
+            clickedAvatar = GUI.Button(new Rect(30f, 30f, 65f, 65f), avatarSymbol, portraitBtnStyle);
+        }
+
+        if (clickedAvatar)
         {
             showStatsPanel = !showStatsPanel;
             // Управляем шкалой времени Unity (замораживаем игру при открытии профиля)
@@ -4618,7 +4688,7 @@ public class FateCastleManager : MonoBehaviour
         // Pagination tabs bar (Tabs 1 to 28 representing 999 slots) - now inside a horizontal ScrollView to support scrolling!
         tabsScroll = GUILayout.BeginScrollView(tabsScroll, GUILayout.Height(38), GUILayout.ExpandWidth(true));
         GUILayout.BeginHorizontal();
-        int unlockedCount = GetUnlockedSlotsCount();
+        int unlockedCount = Mathf.Min(GetUnlockedSlotsCount(), playerInventory.items.Length);
         int purchasedCount = GetPurchasedSlotsCount();
         if (currentInventoryTab * 36 >= unlockedCount)
         {
@@ -4821,6 +4891,7 @@ public class FateCastleManager : MonoBehaviour
                             SaveGameSystem.Save(0);
                             ShowFeedback(curLang == 0 ? $"Слот #{targetIndex + 1} успешно разблокирован!" : $"Slot #{targetIndex + 1} successfully unlocked!");
                         };
+                        confirmPopupOpenedTime = Time.realtimeSinceStartup;
                         showPurchaseConfirmPopup = true;
                         if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
                     }
@@ -6407,6 +6478,16 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.EndVertical();
     }
 
+    private void TriggerPurchaseConfirmPopup(string itemName, int cost, System.Action action)
+    {
+        confirmItemName = itemName;
+        confirmCost = cost;
+        confirmAction = action;
+        confirmPopupOpenedTime = Time.realtimeSinceStartup;
+        showPurchaseConfirmPopup = true;
+        if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+    }
+
     private void DrawPurchaseConfirmPopup(int curLang)
     {
         float panelWidth = 380f;
@@ -6473,6 +6554,11 @@ public class FateCastleManager : MonoBehaviour
             // YES Button
             GUI.backgroundColor = new Color(0.12f, 0.72f, 0.42f, 1.0f);
             string yesBtn = curLang == 0 ? "Да" : "Yes";
+            bool canConfirm = (Time.realtimeSinceStartup - confirmPopupOpenedTime) >= 0.25f;
+            if (!canConfirm)
+            {
+                GUI.enabled = false;
+            }
             if (GUILayout.Button($"<b>{yesBtn}</b>", GUILayout.Height(35), GUILayout.Width(130)))
             {
                 showPurchaseConfirmPopup = false;
@@ -6482,6 +6568,7 @@ public class FateCastleManager : MonoBehaviour
                 }
                 if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
             }
+            GUI.enabled = true;
 
             GUILayout.FlexibleSpace();
 
@@ -7075,6 +7162,7 @@ public class FateCastleManager : MonoBehaviour
                         ShowFeedback(okMsg);
                         SaveGameSystem.Save(0);
                     };
+                    confirmPopupOpenedTime = Time.realtimeSinceStartup;
                     showPurchaseConfirmPopup = true;
                     if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
                 }
@@ -8301,6 +8389,11 @@ public class FateCastleManager : MonoBehaviour
         // ================= COLUMN 4: COST & RECRUIT BUTTON (FAR RIGHT) =================
         GUILayout.BeginVertical(GUILayout.Width(130));
         GUILayout.Space(12);
+        
+        CastleInstance activeCastle = castles[activeDetailsIndex >= 0 ? activeDetailsIndex : 0];
+        int currentTroops = GetTroopsCountInCastle();
+        int troopCapacity = GetTroopCapacity(activeCastle.level);
+
         if (castleLvl < requiredLvl)
         {
             GUI.backgroundColor = new Color(0.4f, 0.4f, 0.4f, 0.8f);
@@ -8308,6 +8401,24 @@ public class FateCastleManager : MonoBehaviour
             if (curLang == 8) lockLabel = "🔒 城堡等级 " + requiredLvl;
             if (curLang == 7) lockLabel = "🔒 성 레벨 " + requiredLvl;
             GUILayout.Button(lockLabel, GUILayout.Height(40));
+            GUI.backgroundColor = Color.white;
+        }
+        else if (currentTroops >= troopCapacity)
+        {
+            GUI.backgroundColor = new Color(0.55f, 0.2f, 0.2f, 1.0f);
+            string limitLabel = curLang == 0 ? "Лимит войск!" : "Troop Limit!";
+            if (curLang == 8) limitLabel = "兵力上限！";
+            if (curLang == 7) limitLabel = "부대 한도!";
+            if (GUILayout.Button(limitLabel, GUILayout.Height(40)))
+            {
+                string failMsg = curLang == 0 ?
+                    $"Достигнут лимит войск в этом замке ({currentTroops}/{troopCapacity})! Повысьте уровень цитадели." :
+                    $"Castle troop garrison limit reached ({currentTroops}/{troopCapacity})! Upgrade stronghold first.";
+                if (curLang == 8) failMsg = $"已达城堡兵力上限 ({currentTroops}/{troopCapacity})！请先升级主城。";
+                if (curLang == 7) failMsg = $"성채 군대 한도 초과 ({currentTroops}/{troopCapacity})! 성채를 먼저 업그레이드 하십시오.";
+                ShowFeedback(failMsg);
+                if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+            }
             GUI.backgroundColor = Color.white;
         }
         else
@@ -8333,6 +8444,7 @@ public class FateCastleManager : MonoBehaviour
                     ShowFeedback(buyMsg);
                     SaveGameSystem.Save(0);
                 };
+                confirmPopupOpenedTime = Time.realtimeSinceStartup;
                 showPurchaseConfirmPopup = true;
                 if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
             }
@@ -8557,19 +8669,23 @@ public class FateCastleManager : MonoBehaviour
                 else
                 {
                     string itemId = $"item_slot_{slotType}_tier_{tier}";
-                    string itemNameRU = GetItemName(slotType, tier, 0, previewClass);
-                    string iconType = GetIconTypeForSlot(slotType);
                     
-                    if (AddInventoryItem(itemId, itemNameRU, iconType, slotType, tier, tier * 3))
+                    if (!CanAddInventoryItem(itemId, slotType, tier))
                     {
-                        SaveGameSystem.CurrentData.gold -= price;
-                        PlayerPrefs.Save();
-                        SaveGameSystem.Save(0);
-                        ShowFeedback(curLang == 0 ? $"Выковано и помещено в инвентарь: {itemNameRU}!" : $"Forged and placed in inventory: {name}!");
+                        ShowFeedback(curLang == 0 ? "Ваш инвентарь переполнен! Освободите место." : "Inventory is full! Free some slots first.");
                     }
                     else
                     {
-                        ShowFeedback(curLang == 0 ? "Ваш инвентарь переполнен! Освободите место." : "Inventory is full! Free some slots first.");
+                        string itemNameRU = GetItemName(slotType, tier, 0, previewClass);
+                        string iconType = GetIconTypeForSlot(slotType);
+                        
+                        if (AddInventoryItem(itemId, itemNameRU, iconType, slotType, tier, tier * 3))
+                        {
+                            SaveGameSystem.CurrentData.gold -= price;
+                            PlayerPrefs.Save();
+                            SaveGameSystem.Save(0);
+                            ShowFeedback(curLang == 0 ? $"Выковано и помещено в инвентарь: {itemNameRU}!" : $"Forged and placed in inventory: {name}!");
+                        }
                     }
                 }
             }
@@ -9071,6 +9187,7 @@ public class FateCastleManager : MonoBehaviour
                     ShowFeedback(joinFeed);
                     SaveGameSystem.Save(0);
                 };
+                confirmPopupOpenedTime = Time.realtimeSinceStartup;
                 showPurchaseConfirmPopup = true;
                 if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
             }
@@ -9272,6 +9389,7 @@ public class FateCastleManager : MonoBehaviour
                     TriggerTraining(targetIndex, targetBaseXP, targetMainXP, targetCap, targetGoldCost, curLang);
                     SaveGameSystem.Save(0);
                 };
+                confirmPopupOpenedTime = Time.realtimeSinceStartup;
                 showPurchaseConfirmPopup = true;
                 if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
             }
@@ -9506,48 +9624,52 @@ public class FateCastleManager : MonoBehaviour
                 int targetBoost = boost;
                 string targetNameRU = $"{nameRU} Ур.{level}";
                 string targetName = name;
+                string itemId = $"item_potion_{targetId}_level_{targetLevel}";
                 
-                confirmItemName = targetName;
-                confirmCost = price;
-                confirmAction = () => {
-                    string itemId = $"item_potion_{targetId}_level_{targetLevel}";
-                    
-                    if (AddInventoryItem(itemId, targetNameRU, "potion", 0, targetLevel, targetBoost))
-                    {
-                        SaveGameSystem.CurrentData.gold -= targetPrice;
-                        PlayerPrefs.Save();
-                        SaveGameSystem.Save(0);
-                        string pSucc = GetText9(
-                            $"Куплено и помещено в инвентарь: {targetNameRU}!",
-                            $"Purchased and placed in inventory: {targetName}!",
-                            $"Gekauft und ins Inventar gelegt: {targetName}!",
-                            $"Acheté et placé dans l'investaire : {targetName} !",
-                            $"¡Comprado y colocado en el inventario: {targetName}!",
-                            $"Comprado e colocado no inventário: {targetName}!",
-                            $"購入してインベントリに入れました: {targetName}！",
-                            $"구매하여 인벤토리에 보관함: {targetName}!",
-                            $"购买并放入背包：{targetName}！"
-                        );
-                        ShowFeedback(pSucc);
-                    }
-                    else
-                    {
-                        string pFail = GetText9(
-                            "Ваш инвентарь переполнен! Освободите место.",
-                            "Your inventory is full! Free some slots first.",
-                            "Dein Inventar ist voll! Bitte machen Sie Platz.",
-                            "Votre inventaire est plein ! Libérez de la place.",
-                            "¡Tu inventario está lleno! Libera espacio.",
-                            "Seu inventário está cheio! Libere espaço.",
-                            "インベントリがいっぱいです！空きを作ってください。",
-                            "인벤토리가 가득 찼습니다! 자리를 비워주십시오.",
-                            "背包已满！请先清理背包。"
-                        );
-                        ShowFeedback(pFail);
-                    }
-                };
-                showPurchaseConfirmPopup = true;
-                if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+                if (!CanAddInventoryItem(itemId, 0, targetLevel))
+                {
+                    string pFail = GetText9(
+                        "Ваш инвентарь переполнен! Освободите место.",
+                        "Your inventory is full! Free some slots first.",
+                        "Dein Inventar ist voll! Bitte machen Sie Platz.",
+                        "Votre inventaire est plein ! Libérez de la place.",
+                        "¡Tu inventario está lleno! Libera espacio.",
+                        "Seu inventário está cheio! Libere espaço.",
+                        "インベントリがいっぱいです！空きを作ってください。",
+                        "인벤토리가 가득 찼습니다! 자리를 비워주십시오.",
+                        "背包已满！请先清理背包。"
+                    );
+                    ShowFeedback(pFail);
+                    if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+                }
+                else
+                {
+                    confirmItemName = targetName;
+                    confirmCost = price;
+                    confirmAction = () => {
+                        if (AddInventoryItem(itemId, targetNameRU, "potion", 0, targetLevel, targetBoost))
+                        {
+                            SaveGameSystem.CurrentData.gold -= targetPrice;
+                            PlayerPrefs.Save();
+                            SaveGameSystem.Save(0);
+                            string pSucc = GetText9(
+                                $"Куплено и помещено в инвентарь: {targetNameRU}!",
+                                $"Purchased and placed in inventory: {targetName}!",
+                                $"Gekauft und ins Inventar gelegt: {targetName}!",
+                                $"Acheté et placé dans l'investaire : {targetName} !",
+                                $"¡Comprado y colocado en el inventario: {targetName}!",
+                                $"Comprado e colocado no inventário: {targetName}!",
+                                $"購入してインベントリに入れました: {targetName}！",
+                                $"구매하여 인벤토리에 보관함: {targetName}!",
+                                $"购买并放入背包：{targetName}！"
+                            );
+                            ShowFeedback(pSucc);
+                        }
+                    };
+                    confirmPopupOpenedTime = Time.realtimeSinceStartup;
+                    showPurchaseConfirmPopup = true;
+                    if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+                }
             }
         }
         else
@@ -10270,4 +10392,113 @@ public class CompanionData
 public class InteractiveCastle : MonoBehaviour
 {
     public int zoneIndex;
+    
+    private Transform playerTransform;
+    private bool isPlayerInside = false;
+    private bool hasInitialized = false;
+
+    private void Update()
+    {
+        if (playerTransform == null || !playerTransform.gameObject.activeInHierarchy)
+        {
+            if (LandingPositionManager.Instance != null && LandingPositionManager.Instance.playerTransform != null)
+            {
+                playerTransform = LandingPositionManager.Instance.playerTransform;
+            }
+            else
+            {
+                GameObject pObj = GameObject.Find("Player_Placeholder");
+                if (pObj != null)
+                {
+                    playerTransform = pObj.transform;
+                }
+            }
+        }
+
+        if (playerTransform == null || !playerTransform.gameObject.activeInHierarchy)
+        {
+            if (isPlayerInside || !hasInitialized)
+            {
+                SetCastleTransparency(false);
+                isPlayerInside = false;
+                hasInitialized = true;
+            }
+            return;
+        }
+
+        Vector3 playerPos = playerTransform.position;
+        Vector3 castlePos = transform.position;
+        playerPos.y = 0;
+        castlePos.y = 0;
+
+        float dist = Vector3.Distance(playerPos, castlePos);
+        bool currentlyInside = dist < 3.2f;
+
+        if (currentlyInside != isPlayerInside || !hasInitialized)
+        {
+            isPlayerInside = currentlyInside;
+            SetCastleTransparency(currentlyInside);
+            hasInitialized = true;
+        }
+    }
+
+    private void SetCastleTransparency(bool makeTransparent)
+    {
+        Renderer[] renderers = GetComponentsInChildren<Renderer>();
+        foreach (Renderer r in renderers)
+        {
+            if (r != null)
+            {
+                // Использование r.material клонирует инстанс материала, что позволяет менять прозрачность индивидуально для каждого замка
+                SetMaterialTransparent(r.material, makeTransparent);
+            }
+        }
+    }
+
+    private void SetMaterialTransparent(Material mat, bool transparent)
+    {
+        if (mat == null) return;
+
+        if (transparent)
+        {
+            mat.SetFloat("_Mode", 3); // Стандартный шейдер (Transparent)
+            
+            // Поддержка URP Lit Shader
+            mat.SetFloat("_Surface", 1); // 1 = Transparent
+            mat.SetFloat("_Blend", 0); // Alpha blend
+            mat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+            mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            mat.SetInt("_ZWrite", 0);
+            
+            mat.DisableKeyword("_ALPHATEST_ON");
+            mat.EnableKeyword("_ALPHABLEND_ON");
+            mat.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+            
+            mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+            
+            Color col = mat.color;
+            col.a = 0.35f; // Красивая полупрозрачность
+            mat.color = col;
+        }
+        else
+        {
+            mat.SetFloat("_Mode", 0); // Стандартный шейдер (Opaque)
+            
+            // Поддержка URP Lit Shader
+            mat.SetFloat("_Surface", 0); // 0 = Opaque
+            mat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
+            mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
+            mat.SetInt("_ZWrite", 1);
+            
+            mat.DisableKeyword("_ALPHATEST_ON");
+            mat.DisableKeyword("_ALPHABLEND_ON");
+            mat.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+            
+            mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Geometry;
+            
+            Color col = mat.color;
+            col.a = 1.0f; // Полностью непрозрачный
+            mat.color = col;
+        }
+    }
 }
