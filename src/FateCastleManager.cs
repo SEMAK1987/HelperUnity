@@ -2021,7 +2021,8 @@ public class FateCastleManager : MonoBehaviour
     {
         for (int i = 0; i < castles.Count; i++)
         {
-            bool isVisible = (i == hoveredCastleIdx) || (showCastleCalibrationPanel && i == selectedCalibCastleIdx);
+            // Показываем зеленый маркер коллайдера только когда открыта панель калибровки замков (для разработчиков)
+            bool isVisible = showCastleCalibrationPanel && (i == hoveredCastleIdx || i == selectedCalibCastleIdx);
             UpdateColliderVisualizer(i, isVisible);
         }
     }
@@ -7766,9 +7767,17 @@ public class FateCastleManager : MonoBehaviour
         string titleText = curLang == 0 ? "🛡️ ТАКТИЧЕСКИЙ ГАРНИЗОН И ПОСТРОЕНИЕ ВОЙСК" : "🛡️ TACTICAL GARRISON & ARMY FORMATION";
         GUILayout.Label(titleText, headerStyle);
 
-        string subtitleText = curLang == 0 
-            ? "Перетаскивайте (drag-and-drop) или кликайте по отрядам для перестановки. Наведите на ячейку, чтобы прочитать характеристики." 
-            : "Drag-and-drop or click-select to rearrange troops. Hover over a slot to read details and stats.";
+        string subtitleText = GetText9(
+            "Кликайте по отрядам для перестановки. Наведите на ячейку, чтобы прочитать характеристики.",
+            "Click-select to rearrange troops. Hover over a slot to read details and stats.",
+            "Klicken Sie auf Truppen, um sie neu anzuordnen. Bewegen Sie den Mauszeiger über ein Feld, um Details zu lesen.",
+            "Cliquez pour réorganiser les troupes. Survolez un emplacement pour lire les détails.",
+            "Haga clic para reorganizar las tropas. Pase el cursor sobre una casilla para ver los detalles.",
+            "Clique para reorganizar as tropas. Passe o mouse sobre um slot para ver os detalhes.",
+            "部隊を配置換えするにはクリックしてください。スロットにホバーすると詳細が表示されます。",
+            "부대를 재배치하려면 클릭하십시오. 슬롯에 마우스를 올리면 세부 정보를 볼 수 있습니다.",
+            "点击队伍以重新排列。将鼠标悬停在卡槽上可查看详细信息。"
+        );
         GUIStyle subStyle = new GUIStyle(GUI.skin.label);
         subStyle.fontSize = 12;
         subStyle.normal.textColor = Color.gray;
@@ -8434,9 +8443,8 @@ public class FateCastleManager : MonoBehaviour
                 confirmCost = price;
                 confirmAction = () => {
                     SaveGameSystem.CurrentData.gold -= targetPrice;
-                    int newCount = targetCount + 1;
-                    SetUnitCount(targetId, activeDetailsIndex, newCount);
                     AddUnitToGrid(targetId);
+                    SyncGridToUnitCounts();
                     
                     string buyMsg = curLang == 0 ?
                         $"Отряд {targetName} нанят в гарнизон!" :
@@ -10426,13 +10434,26 @@ public class InteractiveCastle : MonoBehaviour
             return;
         }
 
-        Vector3 playerPos = playerTransform.position;
-        Vector3 castlePos = transform.position;
-        playerPos.y = 0;
-        castlePos.y = 0;
+        BoxCollider col = GetComponent<BoxCollider>();
+        bool currentlyInside = false;
+        if (col != null)
+        {
+            Vector3 localPlayerPos = col.transform.InverseTransformPoint(playerTransform.position);
+            Vector3 min = col.center - col.size * 0.5f;
+            Vector3 max = col.center + col.size * 0.5f;
 
-        float dist = Vector3.Distance(playerPos, castlePos);
-        bool currentlyInside = dist < 3.2f;
+            // Проверяем нахождение игрока внутри границ коллайдера замка (по осям X и Z)
+            currentlyInside = (localPlayerPos.x >= min.x && localPlayerPos.x <= max.x) &&
+                              (localPlayerPos.z >= min.z && localPlayerPos.z <= max.z);
+        }
+        else
+        {
+            Vector3 playerPos = playerTransform.position;
+            Vector3 castlePos = transform.position;
+            playerPos.y = 0;
+            castlePos.y = 0;
+            currentlyInside = Vector3.Distance(playerPos, castlePos) < 1.5f;
+        }
 
         if (currentlyInside != isPlayerInside || !hasInitialized)
         {
@@ -10447,7 +10468,7 @@ public class InteractiveCastle : MonoBehaviour
         Renderer[] renderers = GetComponentsInChildren<Renderer>();
         foreach (Renderer r in renderers)
         {
-            if (r != null)
+            if (r != null && r.gameObject.name != "Collider_Visualizer")
             {
                 // Использование r.material клонирует инстанс материала, что позволяет менять прозрачность индивидуально для каждого замка
                 SetMaterialTransparent(r.material, makeTransparent);
