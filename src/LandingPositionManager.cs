@@ -49,6 +49,10 @@ namespace FateContinent
         public float cameraMoveSpeed = 3.0f;
         public Vector3 cameraOffset = new Vector3(0, 2.5f, -2.0f); // Ракурс сверху на точку
 
+        [Header("👤 Настройки Импорта 3D-моделей Героев")]
+        [Tooltip("Коэффициент масштаба для импортируемой 3D-фигурки (если модель слишком большая или маленькая)")]
+        public float customHeroModelScale = 1.0f;
+
         private void OnValidate()
         {
             InitializeDefaultPoints();
@@ -152,6 +156,9 @@ namespace FateContinent
                 PlayerPrefs.SetInt("Fate_Current_Day", 1);
                 PlayerPrefs.Save();
 
+                // Полностью очищаем старый инвентарь, экипировку и прогресс игрока для чистоты теста
+                SaveGameSystem.ClearCampaignAndPlayerProgression();
+
                 // Заполняем чистые дефолтные характеристики
                 SaveGameSystem.ResetData();
                 SaveGameSystem.CurrentData.characterClass = "Warrior";
@@ -252,12 +259,18 @@ namespace FateContinent
 
             // Кэшируем оригинальные красивые материалы регионов в самом начале, пока сцена полностью активна
             CacheOriginalMaterials();
+
+            // Динамически загружаем 3D-фигурку выбранного класса вместо стандартной синей сферы
+            ApplyPlayerVisualClass();
         }
 
         private void Start()
         {
             // СВЕРХВАЖНО: Кэшируем оригинальные красивые материалы регионов перед их деактивацией или перекраской!
             CacheOriginalMaterials();
+
+            // Гарантируем, что визуальная фигурка героя соответствует выбранному классу
+            ApplyPlayerVisualClass();
 
             bool isGameplayActive = PlayerPrefs.GetInt("ContinentGameplayActive", 0) == 1 && PlayerPrefs.GetInt("LandedZoneIndex", -1) != -1;
 
@@ -385,6 +398,9 @@ namespace FateContinent
             {
                 playerTransform.gameObject.SetActive(true);
                 Debug.Log("<color=#00FFCC>[LANDING SYS]</color> Активируем Player_Placeholder!");
+                
+                // Гарантируем, что модель героя обновлена и правильно отображается при десантировании
+                ApplyPlayerVisualClass();
             }
 
             // Активируем океан обратно при старте полета
@@ -582,7 +598,16 @@ namespace FateContinent
                     oceanMat.name = "M_Ocean_Background";
                     
                     // Цветовой оттенок темного космического океана
-                    oceanMat.color = new Color(0.05f, 0.18f, 0.38f, 1.0f);
+                    Color oceanBlueColor = new Color(0.05f, 0.18f, 0.38f, 1.0f);
+                    oceanMat.color = oceanBlueColor;
+                    if (oceanMat.HasProperty("_BaseColor"))
+                    {
+                        oceanMat.SetColor("_BaseColor", oceanBlueColor);
+                    }
+                    if (oceanMat.HasProperty("_Color"))
+                    {
+                        oceanMat.SetColor("_Color", oceanBlueColor);
+                    }
                     
                     // Шероховатость и отражения
                     if (oceanMat.HasProperty("_Glossiness")) oceanMat.SetFloat("_Glossiness", 0.75f);
@@ -810,6 +835,16 @@ namespace FateContinent
 
         private void Update()
         {
+            // Динамическое обновление масштаба 3D-модели на лету в режиме Play Mode
+            if (playerTransform != null)
+            {
+                Transform visualChild = playerTransform.Find("Player_Model_Visual");
+                if (visualChild != null)
+                {
+                    visualChild.localScale = Vector3.one * customHeroModelScale;
+                }
+            }
+
             bool isGameplayActive = PlayerPrefs.GetInt("ContinentGameplayActive", 0) == 1 && PlayerPrefs.GetInt("LandedZoneIndex", -1) != -1;
             if (isGameplayActive && playerTransform != null && landingPoints != null && landingPoints.Length > 0)
             {
@@ -838,6 +873,100 @@ namespace FateContinent
                         Debug.Log($"[LANDING SYS] Автоматически обнаружено ручное изменение положения игрока в Play Mode! Сохранён новый кастомный оффсет для зоны {landedZone}: {currentOffset}");
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Динамически заменяет синюю сферу Player_Placeholder на высококачественную 3D-фигурку героя
+        /// в зависимости от выбранного игроком класса (Воин, Стрелок, Маг).
+        /// Модели загружаются из папки Assets/Resources/Heroes_pick/
+        /// </summary>
+        public void ApplyPlayerVisualClass()
+        {
+            if (playerTransform == null)
+            {
+                Debug.LogWarning("[LANDING SYS] playerTransform не назначен. Невозможно обновить визуальную модель.");
+                return;
+            }
+
+            // Получаем класс игрока из системы сохранений
+            string charClass = "warrior";
+            if (SaveGameSystem.CurrentData != null && !string.IsNullOrEmpty(SaveGameSystem.CurrentData.characterClass))
+            {
+                charClass = SaveGameSystem.CurrentData.characterClass.ToLower();
+            }
+
+            bool isWarrior = charClass.Contains("warrior") || charClass.Contains("voin") || charClass.Contains("воин") || charClass.Contains("paladin");
+            bool isArcher = charClass.Contains("archer") || charClass.Contains("strelok") || charClass.Contains("streloc") || charClass.Contains("стрелок") || charClass.Contains("лучник") || charClass.Contains("ranger") || charClass.Contains("bow");
+            bool isMage = charClass.Contains("mage") || charClass.Contains("mag") || charClass.Contains("маг") || charClass.Contains("wizard") || charClass.Contains("mar");
+
+            // Ищем подходящий префаб/модель в папке Resources/Heroes_pick/
+            GameObject heroModelPrefab = null;
+
+            if (isWarrior)
+            {
+                heroModelPrefab = Resources.Load<GameObject>("Heroes_pick/Warrior");
+                if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Воин");
+                if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Warrior");
+            }
+            else if (isArcher)
+            {
+                heroModelPrefab = Resources.Load<GameObject>("Heroes_pick/Streloc");
+                if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes_pick/Strelok");
+                if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Стрелок");
+                if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Archer");
+                if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Strelok");
+            }
+            else if (isMage)
+            {
+                heroModelPrefab = Resources.Load<GameObject>("Heroes_pick/Mage");
+                if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes_pick/Mar");
+                if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Mar");
+                if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Маг");
+                if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Mage");
+                if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Mag");
+            }
+
+            MeshRenderer defaultSphereRenderer = playerTransform.GetComponent<MeshRenderer>();
+
+            if (heroModelPrefab != null)
+            {
+                // 1. Скрываем стандартную синюю сферу
+                if (defaultSphereRenderer != null)
+                {
+                    defaultSphereRenderer.enabled = false;
+                }
+
+                // 2. Удаляем старые созданные модели, чтобы избежать дублирования
+                foreach (Transform child in playerTransform)
+                {
+                    if (child.name == "Player_Model_Visual")
+                    {
+                        Destroy(child.gameObject);
+                    }
+                }
+
+                // 3. Инстанциируем новую 3D-модель под объектом Player_Placeholder
+                GameObject instantiatedModel = Instantiate(heroModelPrefab, playerTransform);
+                instantiatedModel.name = "Player_Model_Visual";
+                
+                // Сбрасываем локальные координаты, чтобы модель стояла ровно в центре сферы
+                instantiatedModel.transform.localPosition = Vector3.zero;
+                instantiatedModel.transform.localRotation = Quaternion.identity;
+
+                // Устанавливаем масштаб модели с учётом инспекторского коэффициента customHeroModelScale
+                instantiatedModel.transform.localScale = Vector3.one * customHeroModelScale;
+
+                Debug.Log($"<color=#00FFCC>[LANDING SYS]</color> Успешно заменили сферу на 3D-фигурку класса: <b>{SaveGameSystem.CurrentData?.characterClass}</b> (Загружен файл: {heroModelPrefab.name}, масштаб: {customHeroModelScale})");
+            }
+            else
+            {
+                // Если файлы FBX еще не добавлены, возвращаем стандартную синюю сферу, чтобы игра не ломалась
+                if (defaultSphereRenderer != null)
+                {
+                    defaultSphereRenderer.enabled = true;
+                }
+                Debug.LogWarning($"[LANDING SYS] Модель для класса {SaveGameSystem.CurrentData?.characterClass} не найдена в Resources/Heroes_pick/. Используем стандартный шар-плейсхолдер.");
             }
         }
     }

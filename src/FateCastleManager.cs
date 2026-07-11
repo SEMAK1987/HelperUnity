@@ -1357,6 +1357,10 @@ public class FateCastleManager : MonoBehaviour
         currentDay = 1;
         PlayerPrefs.SetInt("Fate_Current_Day", 1);
 
+        // Увеличиваем индекс текущего континента
+        int continentCount = PlayerPrefs.GetInt("Fate_Current_Continent", 1);
+        PlayerPrefs.SetInt("Fate_Current_Continent", continentCount + 1);
+
         // Перерисовываем регионы и респавним замки
         if (LandingPositionManager.Instance != null)
         {
@@ -2387,6 +2391,10 @@ public class FateCastleManager : MonoBehaviour
     /// </summary>
     public static int GetActualRegionIndexFromLanding(int landedZoneIndex)
     {
+        if (landedZoneIndex == 3)
+        {
+            return 8; // Грозовые Кряжи (всегда принудительно 8 регион по просьбе игрока)
+        }
         if (landedZoneIndex < 0)
         {
             return -1;
@@ -2501,6 +2509,7 @@ public class FateCastleManager : MonoBehaviour
         PlayerPrefs.SetInt("ContinentGameplayActive", 0);
         isContinentGameplayActive = false;
         PlayerPrefs.SetInt("LandedZoneIndex", -1);
+        PlayerPrefs.SetInt("Fate_Current_Continent", 1);
         
         PlayerPrefs.SetInt("Fate_Current_Day", initialDaySetting);
         currentDay = initialDaySetting;
@@ -2731,7 +2740,8 @@ public class FateCastleManager : MonoBehaviour
             case 3: return 1200;
             case 4: return 2300;
             case 5: return 4000;
-            default: return 7000;
+            case 6: return 7000; // to upgrade level 6 to 7
+            default: return 9999;
         }
     }
 
@@ -2739,13 +2749,14 @@ public class FateCastleManager : MonoBehaviour
     {
         switch (level)
         {
-            case 1: return 5;
-            case 2: return 15;
-            case 3: return 35;
-            case 4: return 75;
-            case 5: return 150;
-            case 6: return 280;
-            default: return 5;
+            case 1: return 100;
+            case 2: return 250;
+            case 3: return 500;
+            case 4: return 900;
+            case 5: return 1500;
+            case 6: return 3000;
+            case 7: return 5000;
+            default: return 100;
         }
     }
 
@@ -3308,7 +3319,7 @@ public class FateCastleManager : MonoBehaviour
                     spireDiamond.transform.localRotation = Quaternion.Euler(30f, 45f, 30f);
                     spireDiamond.GetComponent<Renderer>().material = coreMat;
                 }
-                else
+                else if (castle.level == 6)
                 {
                     // LEVEL 6: Легендарная Цитадель Зенита (Парящие защитные кольца, многоуровневая структура, супер-излучение)
                     GameObject comp = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -3369,6 +3380,59 @@ public class FateCastleManager : MonoBehaviour
                     rightA.transform.localPosition = new Vector3(2.5f, 1.2f, 0f);
                     rightA.transform.localScale = new Vector3(1.5f, 2.4f, 1.5f);
                     rightA.GetComponent<Renderer>().material = castleMat;
+                }
+                else
+                {
+                    // LEVEL 7: Высший Космический Пантеон Судьбы (Три парящих кольца, мега-бастионы и светящиеся призмы)
+                    GameObject basePantheon = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    Destroy(basePantheon.GetComponent<BoxCollider>());
+                    basePantheon.transform.SetParent(root.transform);
+                    basePantheon.transform.localPosition = new Vector3(0f, 2.5f, 0f);
+                    basePantheon.transform.localScale = new Vector3(3.6f, 5.0f, 3.6f);
+                    basePantheon.GetComponent<Renderer>().material = castleMat;
+
+                    // 4 Flanking Guardian Obelisks at corners
+                    float obOffset = 2.0f;
+                    float[] xS = { -obOffset, obOffset };
+                    float[] zS = { -obOffset, obOffset };
+                    foreach (float x in xS)
+                    {
+                        foreach (float z in zS)
+                        {
+                            GameObject obelisk = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                            Destroy(obelisk.GetComponent<BoxCollider>());
+                            obelisk.transform.SetParent(root.transform);
+                            obelisk.transform.localPosition = new Vector3(x, 1.8f, z);
+                            obelisk.transform.localScale = new Vector3(0.6f, 3.6f, 0.6f);
+                            obelisk.GetComponent<Renderer>().material = castleMat;
+                        }
+                    }
+
+                    // 3 Concentric Floating Aura Rings
+                    Material auraMat = new Material(urpShader);
+                    auraMat.color = castle.owner == "Player" ? new Color(1.0f, 0.84f, 0.0f, 1.0f) : new Color(0.85f, 0.07f, 1.0f, 1.0f); // Gold vs Celestial Violet
+                    if (auraMat.HasProperty("_EmissionColor")) auraMat.SetColor("_EmissionColor", auraMat.color * 5.0f);
+
+                    float[] ringHeights = { 7.8f, 8.5f, 9.2f };
+                    float[] ringScales = { 2.8f, 2.0f, 1.2f };
+                    for (int rIndex = 0; rIndex < 3; rIndex++)
+                    {
+                        GameObject auraRing = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                        Destroy(auraRing.GetComponent<BoxCollider>());
+                        auraRing.transform.SetParent(root.transform);
+                        auraRing.transform.localPosition = new Vector3(0f, ringHeights[rIndex], 0f);
+                        auraRing.transform.localScale = new Vector3(ringScales[rIndex], 0.15f, ringScales[rIndex]);
+                        auraRing.GetComponent<Renderer>().material = auraMat;
+                    }
+
+                    // Colossal Hovering Prism
+                    GameObject corePrism = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    Destroy(corePrism.GetComponent<BoxCollider>());
+                    corePrism.transform.SetParent(root.transform);
+                    corePrism.transform.localPosition = new Vector3(0f, 9.8f, 0f);
+                    corePrism.transform.localScale = new Vector3(0.8f, 1.6f, 0.8f);
+                    corePrism.transform.localRotation = Quaternion.Euler(45f, 45f, 45f);
+                    corePrism.GetComponent<Renderer>().material = auraMat;
                 }
             }
             else
@@ -3452,7 +3516,9 @@ public class FateCastleManager : MonoBehaviour
                 float equipmentChance = useManualAiSimulationSettings ? manualAiEquipmentProbability : (0.20f + (diff * 0.12f));
 
                 // А. Попытка улучшения замка компьютером
-                if (c.level < 6 && c.goldAccumulated >= GetUpgradeCost(c.level) && UnityEngine.Random.value < upgradeChance)
+                int aiContinent = PlayerPrefs.GetInt("Fate_Current_Continent", 1);
+                int aiMaxLevelLimit = aiContinent == 1 ? 3 : 7;
+                if (c.level < aiMaxLevelLimit && c.goldAccumulated >= GetUpgradeCost(c.level) && UnityEngine.Random.value < upgradeChance)
                 {
                     c.goldAccumulated -= GetUpgradeCost(c.level);
                     c.level++;
@@ -7064,7 +7130,9 @@ public class FateCastleManager : MonoBehaviour
         if (curLang == 8) lvlPrefix = "领地级别";
         if (curLang == 7) lvlPrefix = "성채 레벨";
 
-        GUILayout.Label($"{lvlPrefix}: {castle.level} / 6", descS);
+        int curContinentForCap = PlayerPrefs.GetInt("Fate_Current_Continent", 1);
+        int maxLvlLimitHeader = curContinentForCap == 1 ? 3 : 7;
+        GUILayout.Label($"{lvlPrefix}: {castle.level} / {maxLvlLimitHeader}", descS);
 
         int inc = GetGoldIncome(castle.level);
         string flowTxt = curLang == 0 ?
@@ -7128,8 +7196,10 @@ public class FateCastleManager : MonoBehaviour
 
         if (castle.owner == "Player")
         {
-            // Upgrade button logic: limit to Tier 3 on the first continent
-            if (castle.level < 3)
+            // Upgrade button logic: limit to Tier 3 on the first continent, Tier 7 on others
+            int curContinentForUpgrade = PlayerPrefs.GetInt("Fate_Current_Continent", 1);
+            int maxLevelLimit = curContinentForUpgrade == 1 ? 3 : 7;
+            if (castle.level < maxLevelLimit)
             {
                 int nextLvl = castle.level + 1;
                 int cost = GetUpgradeCost(castle.level);
@@ -8711,54 +8781,619 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.EndHorizontal();
     }
 
-    private int GetSlotTypeFromForgeTab(int tab)
+    private Vector2 academyScrollPos = Vector2.zero;
+
+    private struct TrainingEntity
     {
-        switch (tab)
+        public string id;       // "main_hero", "comrade_...", "troop_..."
+        public string name;     // localized name
+        public string emoji;
+        public int level;
+        public int xp;
+    }
+
+    public bool CheckAndEnforceHeroLimits(CastleInstance castle, bool isMainHero, int futureSimpleCount, bool isComputer = false)
+    {
+        if (castle.level <= 3)
         {
-            case 0: return 8; // Weapon
-            case 1: return 1; // Helmet
-            case 2: return 4; // Chestplate/Armor
-            case 3: return 3; // Shoulders
-            case 4: return 7; // Boots
-            case 5: return 6; // Belt
-            case 6: return 2; // Amulet
-            case 7: return 5; // Ring
-            default: return 8;
+            int totalHeroes = (isMainHero ? 1 : 0) + futureSimpleCount;
+            if (futureSimpleCount > 5 || (isMainHero && futureSimpleCount > 4) || totalHeroes > 5)
+            {
+                string limitMsg = 
+                    "RU: Лимит героев превышен!\n" +
+                    "EN: Hero limit exceeded!\n" +
+                    "DE: Heldenlimit überschritten!\n" +
+                    "FR: Limite de héros dépassée !\n" +
+                    "ES: ¡Límite de héroes excedido!\n" +
+                    "PT: Limite de heróis excedido!\n" +
+                    "JA: ヒーローの制限を超えました！\n" +
+                    "KO: 영웅 제한이 초과되었습니다!\n" +
+                    "ZH: 英雄数量已达上限！";
+                ShowFeedback(limitMsg);
+                if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(1);
+                return true; // Exceeded!
+            }
+        }
+        return false; // OK
+    }
+
+    public int GetTroopLevel(string id, int zoneIndex)
+    {
+        string key = $"Player_Unit_Lvl_{id}_Zone_{zoneIndex}";
+        return PlayerPrefs.GetInt(key, 1);
+    }
+
+    public void SetTroopLevel(string id, int zoneIndex, int level)
+    {
+        string key = $"Player_Unit_Lvl_{id}_Zone_{zoneIndex}";
+        PlayerPrefs.SetInt(key, level);
+        PlayerPrefs.Save();
+    }
+
+    public int GetTroopXP(string id, int zoneIndex)
+    {
+        string key = $"Player_Unit_XP_{id}_Zone_{zoneIndex}";
+        return PlayerPrefs.GetInt(key, 0);
+    }
+
+    public void SetTroopXP(string id, int zoneIndex, int xp)
+    {
+        string key = $"Player_Unit_XP_{id}_Zone_{zoneIndex}";
+        PlayerPrefs.SetInt(key, xp);
+        PlayerPrefs.Save();
+    }
+
+    private int GetDailyTrainingCount(int typeIndex, string unitId, int zoneIndex)
+    {
+        string dayKey = $"DailyTrainDay_{typeIndex}_{unitId}_{zoneIndex}";
+        string countKey = $"DailyTrainCount_{typeIndex}_{unitId}_{zoneIndex}";
+        
+        int savedDay = PlayerPrefs.GetInt(dayKey, 0);
+        if (savedDay != currentDay)
+        {
+            return 0;
+        }
+        return PlayerPrefs.GetInt(countKey, 0);
+    }
+
+    private void IncrementDailyTrainingCount(int typeIndex, string unitId, int zoneIndex)
+    {
+        string dayKey = $"DailyTrainDay_{typeIndex}_{unitId}_{zoneIndex}";
+        string countKey = $"DailyTrainCount_{typeIndex}_{unitId}_{zoneIndex}";
+        
+        int currentCount = GetDailyTrainingCount(typeIndex, unitId, zoneIndex);
+        PlayerPrefs.SetInt(dayKey, currentDay);
+        PlayerPrefs.SetInt(countKey, currentCount + 1);
+        PlayerPrefs.Save();
+    }
+
+    private void DrawUnifiedAcademySection(CastleInstance activeCastle, int curLang, float colWidth, GUIStyle subSt)
+    {
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(colWidth));
+
+        GUIStyle colHeader3 = new GUIStyle(GUI.skin.box);
+        colHeader3.alignment = TextAnchor.MiddleCenter;
+        colHeader3.fontSize = 17;
+        colHeader3.fontStyle = FontStyle.Bold;
+        colHeader3.normal.textColor = new Color(0.85f, 0.45f, 0.95f);
+
+        string academyHeader = GetText9("🎓 АКАДЕМИЯ И АРЕНА", "🎓 ACADEMY & ARENA", "🎓 AKADEMIE & ARENA", "🎓 ACADÉMIE & ARÈNE", "🎓 ACADEMIA Y ARENA", "🎓 ACADEMIA E ARENA", "🎓 学院と闘技場", "🎓 아카데미 & 투기장", "🎓 皇家学院与斗技场");
+        GUILayout.Label(academyHeader, colHeader3, GUILayout.Height(36));
+
+        string aDesc = GetText9("Тренировки героев, прокачка XP и ранги воинов", "Hero workouts, dynamic XP drills & troop promotions", "Heldentraining, XP-Übungen und Truppenbeförderung", "Entraînement des héros, exercices d'XP et promotions", "Entrenamiento de héroes, ejercicios de XP y ascensos", "Treino de heróis, exercícios de XP e promoções", "ヒーロー訓練、経験値獲得、部隊の昇進", "영웅 훈련, 경험치 획득 및 군대 계급 승급", "进行英雄试炼、提升经验值与晋升军队阶级");
+        GUILayout.Label(aDesc, subSt);
+
+        GUILayout.Space(12);
+
+        int cap = 5 + activeCastle.level * 5;
+        string capText = GetText9(
+            $"Текущий лимит тренировок: до {cap} уровня (зависит от уровня Замка)",
+            $"Current training limit: up to Level {cap} (based on Castle Level)",
+            $"Aktuelles Trainingslimit: bis Level {cap} (basierend auf Burglevel)",
+            $"Limite d'entraînement : jusqu'au niveau {cap} (selon le niveau du château)",
+            $"Límite de entrenamiento: hasta nivel {cap} (según nivel de castillo)",
+            $"Limite de treino: até o nível {cap} (baseado no nível do castelo)",
+            $"現在の訓練制限：レベル {cap} まで（城의 레벨에 의존）",
+            $"현재 훈련 제한: 최대 {cap} 레벨까지 (성 레벨에 의함)",
+            $"当前训练上限：最高可达 {cap} 级（受城堡等级限制）"
+        );
+        GUILayout.Label($"<b>{capText}</b>", GUI.skin.label);
+        GUILayout.Space(12);
+
+        // Collect entities to draw
+        List<TrainingEntity> entities = new List<TrainingEntity>();
+        
+        // 1. Main Hero
+        int landedZone = PlayerPrefs.GetInt("LandedZoneIndex", -1);
+        int actualPlayerRegion = GetActualRegionIndexFromLanding(landedZone);
+        bool isMainHeroPresent = (actualPlayerRegion == activeCastle.zoneIndex);
+        if (isMainHeroPresent)
+        {
+            TrainingEntity main = new TrainingEntity();
+            main.id = "main_hero";
+            main.name = GetText9(
+                "👑 Основной Герой", "👑 Main Hero", "👑 Hauptheld", "👑 Héros Principal", 
+                "👑 Héro Principal", "👑 Herói Principal", "👑 メインヒーロー", "👑 주인공 영웅", "👑 主角"
+            );
+            main.emoji = "👑";
+            main.level = SaveGameSystem.CurrentData.playerLevel;
+            main.xp = SaveGameSystem.CurrentData.currentXP;
+            entities.Add(main);
+        }
+        
+        // 2. Comrades
+        string[] comradeKeys = { "ArcherHero", "WarriorHero", "MageHero" };
+        foreach (var key in comradeKeys)
+        {
+            if (GetHeroCount(key, activeCastle.zoneIndex) > 0)
+            {
+                TrainingEntity comp = new TrainingEntity();
+                comp.id = "comrade_" + key;
+                string compName = "";
+                string emoji = "";
+                if (key == "ArcherHero")
+                {
+                    compName = GetText9("🏹 Эльфийский Стрелок", "🏹 Elven Archer Hero", "🏹 Elfenbogenschütze", "🏹 Archer Elfe", "🏹 Arquero Elfo", "🏹 Arqueiro Elfo", "🏹 エルフの射手", "🏹 엘프 궁수 영웅", "🏹 精灵射手(英雄)");
+                    emoji = "🏹";
+                }
+                else if (key == "WarriorHero")
+                {
+                    compName = GetText9("🛡️ Священный Воин", "🛡️ Holy Warrior Hero", "🛡️ Heiliger Krieger", "🛡️ Guerrier Saint", "🛡️ Guerrero Santo", "🛡️ Guerreiro Santo", "🛡️ 聖なる戦士", "🛡️ 성광 전사 영웅", "🛡️ 圣光战士(英雄)");
+                    emoji = "🛡️";
+                }
+                else
+                {
+                    compName = GetText9("🔮 Чародей Зенита", "🔮 Zenith Sorcerer Hero", "🔮 Zenit-Magier", "🔮 Sorcier de Zénith", "🔮 Sorcerer de Zénith", "🔮 Feiticeiro de Zênite", "🔮 ゼニスの魔術師", "🔮 제니스 마법사 영웅", "🔮 元素法师(英雄)");
+                    emoji = "🔮";
+                }
+                comp.name = compName;
+                comp.emoji = emoji;
+                comp.level = PlayerPrefs.GetInt("Companion_Lvl_" + key, 1);
+                comp.xp = PlayerPrefs.GetInt("Companion_XP_" + key, 0);
+                entities.Add(comp);
+            }
+        }
+        
+        // 3. Troops (Войска) present in this castle
+        string[] troop_ids = { "warrior", "archer", "mage", "paladin", "cavalry", "cannoneer", "centaur", "necromancer", "griffin", "overlord", "hydra", "dragon", "mountain_bear", "wasteland_serpent" };
+        foreach (var tid in troop_ids)
+        {
+            if (GetUnitCount(tid, activeCastle.zoneIndex) > 0)
+            {
+                TrainingEntity tr = new TrainingEntity();
+                tr.id = "troop_" + tid;
+                tr.name = "⚔️ " + GetUnitNameByID(tid, curLang);
+                tr.emoji = "⚔️";
+                tr.level = GetTroopLevel(tid, activeCastle.zoneIndex);
+                tr.xp = GetTroopXP(tid, activeCastle.zoneIndex);
+                entities.Add(tr);
+            }
+        }
+
+        // Draw Table Headers
+        GUILayout.BeginHorizontal(GUI.skin.box);
+        GUILayout.Label(GetText9("Герой / Воин", "Hero / Troop", "Held / Truppe", "Héros / Troupe", "Héroe / Tropa", "Herói / Tropa", "ヒーロー / 部隊", "영웅 / 부대", "英雄 / 士兵"), GUILayout.Width(240));
+        GUILayout.Label(GetText9("Простая (100💰)", "Simple (100💰)", "Einfach (100💰)", "Simple (100💰)", "Simple (100💰)", "Simples (100💰)", "簡易 (100💰)", "일반 (100💰)", "初级 (100💰)"), GUILayout.Width(130));
+        GUILayout.Label(GetText9("Средняя (300💰)", "Medium (300💰)", "Mittel (300💰)", "Moyen (300💰)", "Medio (300💰)", "Médio (300💰)", "中級 (300💰)", "중급 (300💰)", "中级 (300💰)"), GUILayout.Width(130));
+        GUILayout.Label(GetText9("Высокая (500💰)", "High (500💰)", "Hoch (500💰)", "Élevé (500💰)", "Alto (500💰)", "Alto (500💰)", "上級 (500💰)", "상급 (500💰)", "高级 (500💰)"), GUILayout.Width(130));
+        GUILayout.Label(GetText9("Героическая (1000💰)", "Heroic (1000💰)", "Heldenhaft (1000💰)", "Héroïque (1000💰)", "Heroico (1000💰)", "Heroico (1000💰)", "英雄的 (1000💰)", "영웅 (1000💰)", "大师级 (1000💰)"), GUILayout.Width(130));
+        GUILayout.Label(GetText9("Легендарная (3000💰)", "Legendary (3000💰)", "Legendär (3000💰)", "Légendaire (3000💰)", "Legendario (3000💰)", "Lendário (3000💰)", "伝説の (3000💰)", "전설 (3000💰)", "传说级 (3000💰)"), GUILayout.Width(130));
+        GUILayout.EndHorizontal();
+
+        academyScrollPos = GUILayout.BeginScrollView(academyScrollPos, GUILayout.Height(360));
+        
+        if (entities.Count == 0)
+        {
+            GUILayout.Label(GetText9(
+                "⚠️ В этом замке нет купленных войск или героев для тренировки!",
+                "⚠️ No purchased troops or heroes in this castle to train!",
+                "⚠️ Keine gekauften Truppen oder Helden in dieser Burg zum Trainieren!",
+                "⚠️ Aucune troupe ou héros acheté dans ce château pour s'entraîner !",
+                "⚠️ ¡No hay tropas ni héroes comprados en este castillo para entrenar!",
+                "⚠️ Sem tropas ou heróis comprados neste castelo para treinar!",
+                "⚠️ この城には訓練可能な部隊やヒーローがいません！",
+                "⚠️ 이 성에는 훈련할 수 있는 구매한 부대나 영웅이 없습니다!",
+                "⚠️ 此城堡中暂无已招募的兵种或英雄可供训练！"
+            ), subSt);
+        }
+        else
+        {
+            foreach (var entity in entities)
+            {
+                DrawTrainingGridRow(entity, activeCastle, curLang);
+            }
+        }
+        
+        GUILayout.EndScrollView();
+
+        GUILayout.EndVertical();
+    }
+
+    private void DrawTrainingGridRow(TrainingEntity ent, CastleInstance activeCastle, int curLang)
+    {
+        GUILayout.BeginHorizontal(GUI.skin.box);
+        
+        // Col 1: Unit details
+        GUILayout.BeginVertical(GUILayout.Width(240));
+        GUIStyle nameSt = new GUIStyle(GUI.skin.label);
+        nameSt.fontStyle = FontStyle.Bold;
+        nameSt.fontSize = 12;
+        nameSt.normal.textColor = Color.white;
+        GUILayout.Label(ent.name, nameSt);
+        
+        // Progress bar for XP
+        float xpProgress = Mathf.Clamp01(ent.xp / 100f);
+        int cap = 5 + activeCastle.level * 5;
+        
+        GUIStyle lvlSt = new GUIStyle(GUI.skin.label);
+        lvlSt.fontSize = 10;
+        lvlSt.normal.textColor = new Color(0.7f, 0.9f, 1f);
+        
+        string lvlLabel = GetText9("Ур.", "Lvl", "St.", "Niv", "Niv", "Nív", "Lv", "레벨", "等级");
+        GUILayout.Label($"{lvlLabel} {ent.level} (XP: {ent.xp}/100) / Max: {cap}", lvlSt);
+        
+        // Graphical XP progress bar
+        int bars = Mathf.RoundToInt(xpProgress * 10);
+        string barStr = " [";
+        for (int b = 0; b < 10; b++)
+        {
+            if (b < bars) barStr += "█";
+            else barStr += "░";
+        }
+        barStr += "]";
+        
+        GUIStyle barSt = new GUIStyle(GUI.skin.label);
+        barSt.fontSize = 9;
+        barSt.normal.textColor = Color.yellow;
+        GUILayout.Label(barStr, barSt);
+        
+        GUILayout.EndVertical();
+        
+        // Draw training buttons for 5 tiers
+        DrawTrainingButtonCell(ent, 1, 100, 100, 20, activeCastle, curLang);
+        DrawTrainingButtonCell(ent, 2, 300, 300, 10, activeCastle, curLang);
+        DrawTrainingButtonCell(ent, 3, 500, 500, 5, activeCastle, curLang);
+        DrawTrainingButtonCell(ent, 4, 1000, 1000, 3, activeCastle, curLang);
+        DrawTrainingButtonCell(ent, 5, 3000, 3000, 1, activeCastle, curLang);
+        
+        GUILayout.EndHorizontal();
+    }
+
+    private void DrawTrainingButtonCell(TrainingEntity ent, int typeIndex, int cost, int xpToAdd, int maxTimes, CastleInstance activeCastle, int curLang)
+    {
+        int timesUsed = GetDailyTrainingCount(typeIndex, ent.id, activeCastle.zoneIndex);
+        int cap = 5 + activeCastle.level * 5;
+        bool limitReached = (timesUsed >= maxTimes);
+        bool maxLevelReached = (ent.level >= cap);
+
+        if (maxLevelReached)
+        {
+            GUI.enabled = false;
+            GUI.backgroundColor = new Color(0.4f, 0.4f, 0.4f, 0.6f);
+            GUILayout.Button("MAX LVL", GUILayout.Width(130), GUILayout.Height(44));
+            GUI.backgroundColor = Color.white;
+            GUI.enabled = true;
+        }
+        else if (limitReached)
+        {
+            GUI.enabled = false;
+            GUI.backgroundColor = new Color(0.6f, 0.2f, 0.2f, 0.6f);
+            GUILayout.Button("LIMIT", GUILayout.Width(130), GUILayout.Height(44));
+            GUI.backgroundColor = Color.white;
+            GUI.enabled = true;
+        }
+        else
+        {
+            if (SaveGameSystem.CurrentData.gold < cost)
+            {
+                GUI.backgroundColor = new Color(0.4f, 0.3f, 0.3f, 1f);
+            }
+            else
+            {
+                GUI.backgroundColor = new Color(0.15f, 0.7f, 0.4f, 1f);
+            }
+            
+            if (GUILayout.Button($"{cost} 💰\n+{xpToAdd} XP [{timesUsed}/{maxTimes}]", GUILayout.Width(130), GUILayout.Height(44)))
+            {
+                TrainEntity(ent.id, typeIndex, cost, xpToAdd, maxTimes, activeCastle.zoneIndex, curLang);
+            }
+            GUI.backgroundColor = Color.white;
+        }
+    }
+
+    private void TrainEntity(string unitId, int typeIndex, int cost, int xpToAdd, int maxTimes, int zoneIndex, int curLang)
+    {
+        CastleInstance activeCastle = castles[zoneIndex];
+        int cap = 5 + activeCastle.level * 5;
+
+        if (SaveGameSystem.CurrentData.gold < cost)
+        {
+            string noGold = GetText9(
+                "Недостаточно золота для тренировки!",
+                "Not enough gold for training!",
+                "Nicht genug Gold für das Training!",
+                "Pas assez d'or pour l'entraînement !",
+                "¡No hay suficiente oro para entrenar!",
+                "Ouro insuficiente para o treino!",
+                "訓練に必要なゴールドが不足しています！",
+                "훈련에 필요한 골드가 부족합니다!",
+                "金币不足，无法进行训练！"
+            );
+            ShowFeedback(noGold);
+            if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(1);
+            return;
+        }
+
+        int timesUsed = GetDailyTrainingCount(typeIndex, unitId, zoneIndex);
+        if (timesUsed >= maxTimes)
+        {
+            string noLmt = GetText9(
+                "Достигнут дневной лимит тренировок этого типа!",
+                "Daily limit for this training type reached!",
+                "Tägliches Trainingslimit für diesen Typ erreicht!",
+                "Limite quotidienne pour ce type d'entraînement atteinte !",
+                "¡Límite diario para este tipo de entrenamiento alcanzado!",
+                "Limite diário para este tipo de treino atingido!",
+                "このタイプのトレーニングの1日制限に達しました！",
+                "이 유형의 일일 훈련 제한에 도달했습니다!",
+                "该类型的每日训练上限已满！"
+            );
+            ShowFeedback(noLmt);
+            if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(1);
+            return;
+        }
+
+        // Apply based on unitId
+        if (unitId == "main_hero")
+        {
+            int curLvl = SaveGameSystem.CurrentData.playerLevel;
+            int curXp = SaveGameSystem.CurrentData.currentXP;
+            
+            if (curLvl >= cap)
+            {
+                ShowFeedback(GetText9(
+                    "Достигнут лимит уровня основного героя для этого замка!",
+                    "Main hero level limit reached for this castle!",
+                    "Heldenlevel-Limit für diese Burg erreicht!",
+                    "Limite de niveau de héros principal atteinte !",
+                    "¡Límite de nivel de héroe principal alcanzado!",
+                    "Limite de nível do herói principal atingido!",
+                    "メインヒーロー의 레벨 제한에 도달했습니다！",
+                    "주인공 영웅의 레벨 제한에 도달했습니다!",
+                    "主角已达当前城堡的等级上限！"
+                ));
+                return;
+            }
+
+            SaveGameSystem.CurrentData.gold -= cost;
+            IncrementDailyTrainingCount(typeIndex, unitId, zoneIndex);
+            
+            curXp += xpToAdd;
+            bool lvlUp = false;
+            while (curXp >= 100 && curLvl < cap)
+            {
+                curXp -= 100;
+                curLvl++;
+                lvlUp = true;
+            }
+            if (curLvl >= cap) curXp = 0;
+            
+            SaveGameSystem.CurrentData.playerLevel = curLvl;
+            SaveGameSystem.CurrentData.currentXP = curXp;
+            
+            if (lvlUp)
+            {
+                string lvlMsg = GetText9(
+                    $"🌟 УРОВЕНЬ ПОВЫШЕН! Основной герой достиг {curLvl} уровня!",
+                    $"🌟 protagonist LEVEL UP achieved! Protagonist reached Level {curLvl}!",
+                    $"🌟 STUFE ERHÖHT! Hauptheld hat Stufe {curLvl} erreicht!",
+                    $"🌟 NIVEAU SUPÉRIEUR ! Le héros principal a atteint le niveau {curLvl} !",
+                    $"🌟 ¡SUBIDA DE NIVEL! ¡El héroe principal ha alcanzado el nivel {curLvl}!",
+                    $"🌟 LEVEL UP! Herói principal atingiu o Nível {curLvl}!",
+                    $"🌟 レベルアップ！メインヒーローがレベル {curLvl} に達しました！",
+                    $"🌟 레벨 업! 주인공 영웅이 레벨 {curLvl}에 도달했습니다!",
+                    $"🌟 等级提升！主角已升至 {curLvl} 级！"
+                );
+                ShowFeedback(lvlMsg);
+                if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+            }
+            else
+            {
+                string feed = GetText9(
+                    $"Тренировка основного персонажа завершена! (+{xpToAdd} XP)",
+                    $"protagonist training complete! (+{xpToAdd} XP)",
+                    $"Haupthelden-Training abgeschlossen! (+{xpToAdd} XP)",
+                    $"Entraînement du héros principal terminé ! (+{xpToAdd} XP)",
+                    $"¡Entrenamiento del héroe principal completado! (+{xpToAdd} XP)",
+                    $"Treino do herói principal completo! (+{xpToAdd} XP)",
+                    $"メインヒーロー의 훈련 완료！ (+{xpToAdd} XP)",
+                    $"주인공 영웅의 훈련 완료! (+{xpToAdd} XP)",
+                    $"主角训练完成！ (+{xpToAdd} 经验)"
+                );
+                ShowFeedback(feed);
+                if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+            }
+            RecalculateStats();
+            SaveGameSystem.Save(0);
+        }
+        else if (unitId.StartsWith("comrade_"))
+        {
+            string key = unitId.Substring("comrade_".Length);
+            int curLvl = PlayerPrefs.GetInt("Companion_Lvl_" + key, 1);
+            int curXp = PlayerPrefs.GetInt("Companion_XP_" + key, 0);
+
+            if (curLvl >= cap)
+            {
+                ShowFeedback(GetText9(
+                    "Достигнут лимит уровня союзного героя для этого замка!",
+                    "Companion hero level limit reached for this castle!",
+                    "Gefährtenlevel-Limit für diese Burg erreicht!",
+                    "Limite de niveau de compagnon atteinte !",
+                    "¡Límite de nivel de compañero alcanzado!",
+                    "Limite de nível do companheiro atingido!",
+                    "コンパニオン의 레벨 제한에 도달했습니다！",
+                    "동료 영웅의 레벨 제한에 도달했습니다!",
+                    "副将已达当前城堡的等级上限！"
+                ));
+                return;
+            }
+
+            SaveGameSystem.CurrentData.gold -= cost;
+            IncrementDailyTrainingCount(typeIndex, unitId, zoneIndex);
+
+            curXp += xpToAdd;
+            bool lvlUp = false;
+            while (curXp >= 100 && curLvl < cap)
+            {
+                curXp -= 100;
+                curLvl++;
+                lvlUp = true;
+            }
+            if (curLvl >= cap) curXp = 0;
+
+            PlayerPrefs.SetInt("Companion_Lvl_" + key, curLvl);
+            PlayerPrefs.SetInt("Companion_XP_" + key, curXp);
+
+            if (lvlUp)
+            {
+                string lvlMsg = GetText9(
+                    $"🌟 УРОВЕНЬ ПОВЫШЕН! Союзный герой {key} достиг {curLvl} уровня!",
+                    $"🌟 COMPANION LEVEL UP! Companion {key} reached Level {curLvl}!",
+                    $"🌟 STUFE ERHÖHT! Gefährte {key} hat Stufe {curLvl} erreicht!",
+                    $"🌟 NIVEAU SUPÉRIEUR ! Le compagnon {key} a atteint le niveau {curLvl} !",
+                    $"🌟 ¡SUBIDA DE NIVEL! ¡El compañero {key} ha alcanzado el nivel {curLvl}!",
+                    $"🌟 LEVEL UP! Companheiro {key} atingiu o Nível {curLvl}!",
+                    $"🌟 レベルアップ！コンパニオン {key} がレベル {curLvl} に達しました！",
+                    $"🌟 레벨 업! 동료 {key}이(가) 레벨 {curLvl}에 도달했습니다!",
+                    $"🌟 等级提升！英雄 {key} 已升至 {curLvl} 级！"
+                );
+                ShowFeedback(lvlMsg);
+                if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+            }
+            else
+            {
+                string feed = GetText9(
+                    $"Тренировка союзного героя завершена! (+{xpToAdd} XP)",
+                    $"Companion training complete! (+{xpToAdd} XP)",
+                    "Gefährten-Training abgeschlossen! (+{xpToAdd} XP)",
+                    "Entraînement du compagnon terminé ! (+{xpToAdd} XP)",
+                    "¡Entrenamiento del compañero completado! (+{xpToAdd} XP)",
+                    "Treino do companheiro completo! (+{xpToAdd} XP)",
+                    $"コンパニオン의 훈련 완료！ (+{xpToAdd} XP)",
+                    $"동료 영웅의 훈련 완료! (+{xpToAdd} XP)",
+                    $"英雄训练完成！ (+{xpToAdd} 经验)"
+                );
+                ShowFeedback(feed);
+                if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+            }
+            SaveGameSystem.Save(0);
+        }
+        else if (unitId.StartsWith("troop_"))
+        {
+            string key = unitId.Substring("troop_".Length);
+            int curLvl = GetTroopLevel(key, zoneIndex);
+            int curXp = GetTroopXP(key, zoneIndex);
+
+            if (curLvl >= cap)
+            {
+                ShowFeedback(GetText9(
+                    "Достигнут лимит уровня отряда для этого замка!",
+                    "Troop level limit reached for this castle!",
+                    "Truppenlevel-Limit für diese Burg erreicht!",
+                    "Limite de niveau de troupe atteinte !",
+                    "¡Límite de nivel de tropa alcanzado!",
+                    "Limite de nível da tropa atingido!",
+                    "部隊의 レ벨 제한에 도달했습니다！",
+                    "부대 레벨 제한에 도달했습니다!",
+                    "士兵已达当前城堡的等级上限！"
+                ));
+                return;
+            }
+
+            SaveGameSystem.CurrentData.gold -= cost;
+            IncrementDailyTrainingCount(typeIndex, unitId, zoneIndex);
+
+            curXp += xpToAdd;
+            bool lvlUp = false;
+            while (curXp >= 100 && curLvl < cap)
+            {
+                curXp -= 100;
+                curLvl++;
+                lvlUp = true;
+            }
+            if (curLvl >= cap) curXp = 0;
+
+            SetTroopLevel(key, zoneIndex, curLvl);
+            SetTroopXP(key, zoneIndex, curXp);
+
+            string displayName = GetUnitNameByID(key, curLang);
+
+            if (lvlUp)
+            {
+                string lvlMsg = GetText9(
+                    $"🌟 РАНГ ПОВЫШЕН! Отряд {displayName} в этом замке получил {curLvl} уровень!",
+                    $"🌟 TROOP PROMOTION! {displayName} cohort reached Level {curLvl}!",
+                    $"🌟 TRUPPEN-BEFÖRDERUNG! {displayName}-Kohorte hat Stufe {curLvl} erreicht!",
+                    $"🌟 PROMOTION DE TROUPE ! La cohorte de {displayName} a atteint le niveau {curLvl} !",
+                    $"🌟 ¡ASCENSO DE TROPA! ¡La cohorte de {displayName} ha alcanzado el nivel {curLvl}!",
+                    $"🌟 PROMOÇÃO DE TROPA! Coorte de {displayName} atingiu o Nível {curLvl}!",
+                    $"🌟 昇進！ {displayName} の部隊がレベル {curLvl} に達しました！",
+                    $"🌟 부대 승급! {displayName} 부대가 레벨 {curLvl}에 도달했습니다!",
+                    $"🌟 等级提升！该城堡的 {displayName} 已升至 {curLvl} 级！"
+                );
+                ShowFeedback(lvlMsg);
+                if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+            }
+            else
+            {
+                string feed = GetText9(
+                    $"Тренировка отряда {displayName} завершена! (+{xpToAdd} XP)",
+                    $"Cohort {displayName} training complete! (+{xpToAdd} XP)",
+                    $"Garnisons-Training für {displayName} abgeschlossen! (+{xpToAdd} XP)",
+                    $"Entraînement de la cohorte de {displayName} terminé ! (+{xpToAdd} XP)",
+                    $"¡Entrenamiento de la cohorte de {displayName} completado! (+{xpToAdd} XP)",
+                    $"Treino da coorte de {displayName} completo! (+{xpToAdd} XP)",
+                    $"{displayName} の部隊の訓練完了！ (+{xpToAdd} XP)",
+                    $"{displayName} 부대의 훈련 완료! (+{xpToAdd} XP)",
+                    $"{displayName} 训练完成！ (+{xpToAdd} 经验)"
+                );
+                ShowFeedback(feed);
+                if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+            }
+            SaveGameSystem.Save(0);
         }
     }
 
     private void DrawUnifiedForgeSection(CastleInstance activeCastle, int curLang, float colWidth, GUIStyle subSt)
     {
+        GUIStyle tabStyle = s_tabBtnStyle != null ? s_tabBtnStyle : new GUIStyle(GUI.skin.button);
+        tabStyle.fontSize = 10;
+        tabStyle.fontStyle = FontStyle.Bold;
+
         GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(colWidth));
-        
+
         GUIStyle colHeader2 = new GUIStyle(GUI.skin.box);
         colHeader2.alignment = TextAnchor.MiddleCenter;
         colHeader2.fontSize = 17;
         colHeader2.fontStyle = FontStyle.Bold;
         colHeader2.normal.textColor = new Color(1.0f, 0.7f, 0.15f);
-        
-        string forgeHeader = GetText9("🧪 КУЗНИЦА И ЛАВКА", "🧪 FORGE & POTION SHOP", "🧪 SCHMIEDE & ALCHEMIELADEN", "🧪 FORGE & BOUTIQUE D'ALCHIMIE", "🧪 FORJA Y TIENDA DE POCIONES", "🧪 FORJA E LOJA DE POÇÕES", "🧪 鍛冶屋と魔法薬ショップ", "🧪 대장간 & 물약 상점", "🧪 铁匠铺与药水商会");
+
+        string forgeHeader = GetText9("🧪 КУЗНИЦА И ЛАВКА", "🧪 FORGE & POTION SHOP", "🧪 SCHMIEDE & ALCHEMIELADEN", "🧪 FORGE & ALCHIMIE", "🧪 FORJA Y BOTICA", "🧪 FORJA E BOTICA", "🧪 鍛冶屋とポーションショップ", "🧪 대장간 및 물약 상점", "🧪 铁匠铺与药水商会");
         GUILayout.Label(forgeHeader, colHeader2, GUILayout.Height(36));
-        
-        string fDesc = GetText9("Покупка зелий разного уровня и создание доспехов", "Purchase elixirs & progressive armor gear", "Kaufen Sie Elixiere und schmieden Sie Rüstungen", "Acheter des élixirs et forger des armures", "Comprar pociones y forjar armaduras", "Comprar poções e forjar armaduras", "各種ポーションの購入と防具の鍛造を行います", "다양한 물약 구매 및 방어구 제작", "购买不同等级 of 药水与锻造专属装备防具");
+
+        string fDesc = GetText9("Изготовление элитного снаряжения и боевых зелий за золото", "Forge high-tier gear and brew combat potions using gold", "Schmieden Sie erstklassige Ausrüstung und brauen Sie Kampftränke mit Gold", "Forgez des équipements d'élite et brassez des potions de combat avec de l'or", "Forja equipo de élite y elabora pociones de combate usando oro", "Forje equipamentos de elite e produza poções de combate usando ouro", "ゴールドを消費してエリート装備を鍛造し、戦闘ポーションを調合します", "골드를 소모하여 엘리트 장비를 제작하고 전투 물약을 조제합니다", "消耗金币来锻造精良装备与炼制战斗药水");
         GUILayout.Label(fDesc, subSt);
 
-        GUILayout.Space(10);
-        forgeScroll = GUILayout.BeginScrollView(forgeScroll);
+        GUILayout.Space(12);
 
-        // --- POTIONS TABS ---
+        // --- POTION BREWING TAB ---
         int potionTab = PlayerPrefs.GetInt("Town_Selected_PotionTab", 0);
-        GUILayout.BeginHorizontal();
-        GUIStyle tabStyle = new GUIStyle(GUI.skin.button);
-        tabStyle.fontSize = 11;
-        tabStyle.fontStyle = FontStyle.Bold;
-
-        string[] potTabNames = new string[] { "❤️ Жизнь", "💪 Сила", "🔮 Интеллект", "⚡ Ловкость", "🛡️ Стойкость" };
+        string[] potTabNames;
         switch (curLang)
         {
             case 0: potTabNames = new string[] { "❤️ Жизнь", "💪 Сила", "🔮 Интеллект", "⚡ Ловкость", "🛡️ Стойкость" }; break;
             case 1: potTabNames = new string[] { "❤️ Health", "💪 Strength", "🔮 Intelligence", "⚡ Agility", "🛡️ Stamina" }; break;
-            case 2: potTabNames = new string[] { "❤️ Gesundheit", "💪 Stärke", "🔮 Intelligenz", "⚡ Agilität", "🛡️ Ausdauer" }; break;
+            case 2: potTabNames = new string[] { "❤️ Leben", "💪 Stärke", "🔮 Intelligenz", "⚡ Beweglichkeit", "🛡️ Ausdauer" }; break;
             case 3: potTabNames = new string[] { "❤️ Vie", "💪 Force", "🔮 Intelligence", "⚡ Agilité", "🛡️ Endurance" }; break;
             case 4: potTabNames = new string[] { "❤️ Salud", "💪 Fuerza", "🔮 Inteligencia", "⚡ Agilidad", "🛡️ Aguante" }; break;
             case 5: potTabNames = new string[] { "❤️ Vida", "💪 Força", "🔮 Inteligência", "⚡ Agilidade", "🛡️ Resistência" }; break;
@@ -8914,6 +9549,22 @@ public class FateCastleManager : MonoBehaviour
 
         GUILayout.EndScrollView();
         GUILayout.EndVertical();
+    }
+
+    private int GetSlotTypeFromForgeTab(int forgeTab)
+    {
+        switch (forgeTab)
+        {
+            case 0: return 8; // Weapon
+            case 1: return 1; // Helmet
+            case 2: return 4; // Chest
+            case 3: return 3; // Shoulders
+            case 4: return 7; // Boots
+            case 5: return 6; // Belt
+            case 6: return 2; // Amulet
+            case 7: return 5; // Ring
+            default: return 8;
+        }
     }
 
     private string GetIconTypeForSlot(int slotType)
@@ -9157,10 +9808,18 @@ public class FateCastleManager : MonoBehaviour
                                    GetHeroCount("WarriorHero", activeDetailsIndex) + 
                                    GetHeroCount("MageHero", activeDetailsIndex);
 
-            if (simpleHeroesTotal >= maxSimpleHeroes)
+            int landedZone = PlayerPrefs.GetInt("LandedZoneIndex", -1);
+            int actualPlayerRegion = GetActualRegionIndexFromLanding(landedZone);
+            bool isMainHeroPresent = (actualPlayerRegion == activeDetailsIndex);
+
+            if (CheckAndEnforceHeroLimits(activeCastle, isMainHeroPresent, simpleHeroesTotal + 1))
+            {
+                // Exceeded Level 1, 2, 3 hero limits! Handled inside CheckAndEnforceHeroLimits.
+            }
+            else if (simpleHeroesTotal >= maxSimpleHeroes)
             {
                 string limitTxt = curLang == 0 ?
-                    $"Лимит покупки простых героев на этом континенте ({maxSimpleHeroes} шт) исчерпан!" :
+                    $"Лимит покупки простых простых героев на этом континенте ({maxSimpleHeroes} шт) исчерпан!" :
                     $"Simple hero recruitment limit on this continent ({maxSimpleHeroes}) reached!";
                 if (curLang == 8) limitTxt = $"当前大陆普通英雄招募上限 ({maxSimpleHeroes}) 已达！";
                 if (curLang == 7) limitTxt = $"이 대륙의 일반 영웅 모집 한도 ({maxSimpleHeroes}명)가 초과되었습니다!";
@@ -9245,167 +9904,7 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.EndVertical();
     }
 
-    private void DrawUnifiedAcademySection(CastleInstance activeCastle, int curLang, float colWidth, GUIStyle subSt)
-    {
-        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(colWidth));
 
-        GUIStyle colHeader3 = new GUIStyle(GUI.skin.box);
-        colHeader3.alignment = TextAnchor.MiddleCenter;
-        colHeader3.fontSize = 17;
-        colHeader3.fontStyle = FontStyle.Bold;
-        colHeader3.normal.textColor = new Color(0.85f, 0.45f, 0.95f);
-
-        string academyHeader = GetText9("🎓 АКАДЕМИЯ И АРЕНА", "🎓 ACADEMY & ARENA", "🎓 AKADEMIE & ARENA", "🎓 ACADÉMIE & ARÈNE", "🎓 ACADEMIA Y ARENA", "🎓 ACADEMIA E ARENA", "🎓 学院と闘技場", "🎓 아카데미 & 투기장", "🎓 皇家学院与斗技场");
-        GUILayout.Label(academyHeader, colHeader3, GUILayout.Height(36));
-
-        string aDesc = GetText9("Тренировки героев, прокачка XP и ранги воинов", "Hero workouts, dynamic XP drills & troop promotions", "Heldentraining, XP-Übungen und Truppenbeförderung", "Entraînement des héros, exercices d'XP et promotions", "Entrenamiento de héroes, ejercicios de XP y ascensos", "Treino de heróis, exercícios de XP e promoções", "ヒーロー訓練、経験値獲得、部隊の昇進", "영웅 훈련, 경험치 획득 및 군대 계급 승급", "进行英雄试炼、提升经验值与晋升军队阶级");
-        GUILayout.Label(aDesc, subSt);
-
-        GUILayout.Space(12);
-
-        int cap = 5 + activeCastle.level * 5;
-        string capText = GetText9(
-            $"Текущий лимит тренировок: до {cap} уровня (зависит от уровня Замка)",
-            $"Current training limit: up to Level {cap} (based on Castle Level)",
-            $"Aktuelles Trainingslimit: bis Level {cap} (basierend auf Burglevel)",
-            $"Limite d'entraînement : jusqu'au niveau {cap} (selon le niveau du château)",
-            $"Límite de entrenamiento: hasta nivel {cap} (según nivel de castillo)",
-            $"Limite de treino: até o nível {cap} (baseado no nível do castelo)",
-            $"現在の訓練制限：レベル {cap} まで（城의 레벨에 의존）",
-            $"현재 훈련 제한: 최대 {cap} 레벨까지 (성 레벨에 의함)",
-            $"当前训练上限：最高可达 {cap} 级（受城堡等级限制）"
-        );
-        GUILayout.Label($"<b>{capText}</b>", GUI.skin.label);
-        GUILayout.Space(8);
-
-        DrawTrainingOption(0, "Main Hero", "Основной Герой", "主角", "주인공 영웅", activeCastle.level, cap, curLang);
-        GUILayout.Space(10);
-
-        DrawTrainingOption(1, "Archer Comrades", "Эльфийские Стрелки", "精灵射手", "엘프 궁수 부대", activeCastle.level, cap, curLang);
-        GUILayout.Space(10);
-
-        DrawTrainingOption(2, "Warrior Comrades", "Священные Воины", "圣光战士", "성광 전사 부대", activeCastle.level, cap, curLang);
-        GUILayout.Space(10);
-
-        DrawTrainingOption(3, "Mage Comrades", "Чародеи Зенита", "제니스 마법사", "제니스 마법 부대", activeCastle.level, cap, curLang);
-
-        GUILayout.EndVertical();
-    }
-
-    private void DrawTrainingOption(int target, string nameEN, string nameRU, string nameCH, string nameKR, int castleLvl, int cap, int curLang)
-    {
-        string name = curLang == 0 ? nameRU : nameEN;
-        if (curLang == 8) name = nameCH;
-        if (curLang == 7) name = nameKR;
-
-        int lvl = 1;
-        int xp = 0;
-        bool available = true;
-
-        if (target == 0)
-        {
-            lvl = SaveGameSystem.CurrentData.playerLevel;
-            xp = SaveGameSystem.CurrentData.currentXP;
-        }
-        else
-        {
-            string classKey = target == 1 ? "ArcherHero" : (target == 2 ? "WarriorHero" : "MageHero");
-            int comradeCount = PlayerPrefs.GetInt("Player_HiredCount_" + classKey, 0);
-            lvl = PlayerPrefs.GetInt("Companion_Lvl_" + classKey, 1);
-            xp = PlayerPrefs.GetInt("Companion_XP_" + classKey, 0);
-            if (comradeCount == 0)
-            {
-                available = false;
-            }
-        }
-
-        int goldCost = 25 + lvl * 10;
-        int mainXP = 25 + castleLvl * 5;
-        int baseXP = 20 + castleLvl * 5;
-
-        GUILayout.BeginHorizontal(GUI.skin.box);
-
-        string emoji = target == 0 ? "👑" : (target == 1 ? "🏹" : (target == 2 ? "🛡️" : "🔮"));
-        GUILayout.Label($"<size=24>{emoji}</size>", GUILayout.Width(44), GUILayout.Height(44));
-
-        GUILayout.Space(6);
-
-        GUILayout.BeginVertical();
-        GUILayout.Label($"<b>{name}</b>", GUI.skin.label);
-
-        if (!available)
-        {
-            string lockedMsg = GetText9(
-                "<color=red>Герой не нанят в таверне!</color>",
-                "<color=red>Not hired in Tavern!</color>",
-                "<color=red>In der Taverne nicht angeheuert!</color>",
-                "<color=red>Non recruté dans la taverne !</color>",
-                "<color=red>¡No contratado en la taberna!</color>",
-                "<color=red>Não contratado na taverna!</color>",
-                "<color=red>酒場で雇用されていません！</color>",
-                "<color=red>선술집에서 고용되지 않음!</color>",
-                "<color=red>未在酒馆招募！</color>"
-            );
-            GUILayout.Label(lockedMsg, GUI.skin.label);
-        }
-        else
-        {
-            string lvlText = GetText9(
-                $"Ур. {lvl} (Опыт: {xp}/100)",
-                $"Lvl {lvl} (XP: {xp}/100)",
-                $"Stufe {lvl} (XP: {xp}/100)",
-                $"Niveau {lvl} (XP: {xp}/100)",
-                $"Nivel {lvl} (XP: {xp}/100)",
-                $"Nível {lvl} (XP: {xp}/100)",
-                $"Lv {lvl} (EXP {xp}/100)",
-                $"레벨 {lvl} (경험치 {xp}/100)",
-                $"等级 {lvl} (经验 {xp}/100)"
-            );
-            GUILayout.Label(lvlText, GUI.skin.label);
-        }
-        GUILayout.EndVertical();
-
-        GUILayout.FlexibleSpace();
-
-        if (!available)
-        {
-            GUI.enabled = false;
-            GUILayout.Button("🔒", GUILayout.Width(100), GUILayout.Height(36));
-            GUI.enabled = true;
-        }
-        else if (lvl >= (target == 0 ? cap : cap - 2))
-        {
-            GUI.enabled = false;
-            string maxLabel = GetText9("МАКС", "MAX", "MAX", "MAX", "MÁX", "MÁX", "最大", "최대", "最大");
-            GUILayout.Button(maxLabel, GUILayout.Width(100), GUILayout.Height(36));
-            GUI.enabled = true;
-        }
-        else
-        {
-            GUI.backgroundColor = new Color(0.12f, 0.72f, 0.42f);
-            if (GUILayout.Button($"{goldCost} 💰", GUILayout.Width(100), GUILayout.Height(36)))
-            {
-                int targetIndex = target;
-                int targetBaseXP = baseXP;
-                int targetMainXP = mainXP;
-                int targetCap = cap;
-                int targetGoldCost = goldCost;
-                
-                confirmItemName = curLang == 0 ? "Тренировка отряда / героя" : "Troop / Hero Training";
-                confirmCost = goldCost;
-                confirmAction = () => {
-                    TriggerTraining(targetIndex, targetBaseXP, targetMainXP, targetCap, targetGoldCost, curLang);
-                    SaveGameSystem.Save(0);
-                };
-                confirmPopupOpenedTime = Time.realtimeSinceStartup;
-                showPurchaseConfirmPopup = true;
-                if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
-            }
-            GUI.backgroundColor = Color.white;
-        }
-
-        GUILayout.EndHorizontal();
-    }
 
     private void DrawPotionItem(string id, string nameRU, string nameEN, string nameCH, string nameKR, int basePrice, int level, int castleLvl)
     {
@@ -9701,97 +10200,7 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.EndHorizontal();
     }
 
-    private void TriggerTraining(int target, int baseXP, int mainHeroXP, int cap, int goldCost, int lang)
-    {
-        if (goldCost > 0)
-        {
-            SaveGameSystem.CurrentData.gold -= goldCost;
-        }
 
-        if (target == 0)
-        {
-            // Main Hero training
-            if (SaveGameSystem.CurrentData.playerLevel >= cap)
-            {
-                string maxMsg = lang == 0 ? 
-                    "Основной герой достиг лимита для этой карты! Улучшите замок." : 
-                    "Main protagonist reached maximum level limit of this area! Expand castle.";
-                ShowFeedback(maxMsg);
-                return;
-            }
-
-            SaveGameSystem.CurrentData.currentXP += mainHeroXP;
-            if (SaveGameSystem.CurrentData.currentXP >= 100)
-            {
-                SaveGameSystem.CurrentData.currentXP -= 100;
-                SaveGameSystem.CurrentData.playerLevel++;
-                
-                string sfxLvl = lang == 0 ?
-                    $"🌟 УРОВЕНЬ ПОВЫШЕН! Основной герой достиг {SaveGameSystem.CurrentData.playerLevel} уровня!" :
-                    $"🌟 protagonist LEVEL UP achieved! Protagonist reached Level {SaveGameSystem.CurrentData.playerLevel}!";
-                ShowFeedback(sfxLvl);
-            }
-            else
-            {
-                string feed = lang == 0 ?
-                    $"Тренировка основного персонажа завершена! (+{mainHeroXP} XP)" :
-                    $"protagonist training complete! (+{mainHeroXP} XP)";
-                ShowFeedback(feed);
-            }
-            RecalculateStats();
-            SaveGameSystem.Save(0);
-        }
-        else
-        {
-            // Companion training
-            string classKey = target == 1 ? "ArcherHero" : (target == 2 ? "WarriorHero" : "MageHero");
-            int comradeCount = PlayerPrefs.GetInt("Player_HiredCount_" + classKey, 0);
-
-            if (comradeCount == 0)
-            {
-                string noH = lang == 0 ?
-                    "Вы ещё не наняли союзных героев этого класса в лавке!" :
-                    "You have not hired any companion heroes of this class yet!";
-                ShowFeedback(noH);
-                return;
-            }
-
-            int currentCompLvl = PlayerPrefs.GetInt("Companion_Lvl_" + classKey, 1);
-            int currentCompXP = PlayerPrefs.GetInt("Companion_XP_" + classKey, 0);
-
-            if (currentCompLvl >= cap - 2) // Companion cap slightly lower for progression balance
-            {
-                string maxComp = lang == 0 ?
-                    "Покупные герои достигли лимита опыта для этой области!" :
-                    "Comrades reached local combat ceiling!";
-                ShowFeedback(maxComp);
-                return;
-            }
-
-            currentCompXP += baseXP;
-            if (currentCompXP >= 100)
-            {
-                currentCompXP -= 100;
-                currentCompLvl++;
-                PlayerPrefs.SetInt("Companion_Lvl_" + classKey, currentCompLvl);
-
-                string lvlMsg = lang == 0 ?
-                    $"🌟 ПОДДЕРЖКА ПОВЫШЕНА! Союзные {classKey} подняты до {currentCompLvl} раунда!" :
-                    $"🌟 COM COMPANION UPGRADE COMPLETE! Supporting comrades scaled to {currentCompLvl} round!";
-                ShowFeedback(lvlMsg);
-            }
-            else
-            {
-                string xpMsg = lang == 0 ?
-                    $"Отряд союзников потренировался. (+{baseXP} XP)" :
-                    $"Recruited cohort trained beautifully. (+{baseXP} XP)";
-                ShowFeedback(xpMsg);
-            }
-
-            PlayerPrefs.SetInt("Companion_XP_" + classKey, currentCompXP);
-            PlayerPrefs.Save();
-        }
-    }
 
 
 

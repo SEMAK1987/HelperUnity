@@ -237,6 +237,7 @@ public static class SaveGameSystem
         PlayerPrefs.DeleteKey("Player_Stats_Autonomous");
         PlayerPrefs.DeleteKey("Town_Selected_PotionLvl");
         PlayerPrefs.DeleteKey("Player_ArmyUnit_Rank");
+        PlayerPrefs.DeleteKey("Fate_Current_Continent");
 
         // Сброс зелий
         string[] potionIds = { "hp", "str", "def", "xp" };

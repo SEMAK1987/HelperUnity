@@ -445,7 +445,7 @@ export const CastleFacilities: React.FC<CastleFacilitiesProps> = ({
                   {/* Left subpart: Photo Frame & Image drag-and-drop box (5/12 cols) */}
                   <div className="md:col-span-5 flex flex-col items-center space-y-3">
                     <div className="text-[8px] font-bold text-slate-400 uppercase tracking-wider text-center">
-                      🖼️ Фото воина (Drag & Drop или Клик):
+                      🖼️ Фото воина:
                     </div>
                     
                     {/* Upload Drag box */}
@@ -493,13 +493,13 @@ export const CastleFacilities: React.FC<CastleFacilitiesProps> = ({
                             referrerPolicy="no-referrer" 
                           />
                           <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white p-2 text-center text-[8.5px]">
-                            <span>🔄 Перетащите файл для замены</span>
+                            <span>🔄 Нажмите для замены</span>
                           </div>
                         </div>
                       ) : (
                         <div className="text-center p-2 space-y-1">
                           <span className="text-3xl filter saturate-50">{selectedTroop.icon}</span>
-                          <span className="text-[8px] text-slate-500 block">Перенесите фото сюда</span>
+                          <span className="text-[8px] text-slate-500 block">Нажмите для выбора фото</span>
                           <span className="text-[7px] text-emerald-400 font-bold uppercase bg-emerald-500/10 px-1.5 py-0.5 rounded inline-block">Загрузить JPG</span>
                         </div>
                       )}
