@@ -53,9 +53,37 @@ namespace FateContinent
         [Tooltip("Коэффициент масштаба для импортируемой 3D-фигурки (если модель слишком большая или маленькая)")]
         public float customHeroModelScale = 1.0f;
 
+        [Tooltip("Слот под префаб или модель Воина (Warrior)")]
+        public GameObject warriorModelPrefab;
+        [Tooltip("Слот под префаб или модель Стрелка (Streloc)")]
+        public GameObject archerModelPrefab;
+        [Tooltip("Слот под префаб или модель Мага (Mage)")]
+        public GameObject mageModelPrefab;
+
+        [Header("🛠️ Тестирование в редакторе (Edit Mode)")]
+        [Tooltip("Выберите класс для предпросмотра 3D-модели прямо в Редакторе")]
+        public EditorPreviewClass editorPreviewClass = EditorPreviewClass.Warrior;
+
+        public enum EditorPreviewClass { Warrior, Archer, Mage }
+
+        private System.Collections.Generic.Dictionary<string, Material> originalRegionMaterials = new System.Collections.Generic.Dictionary<string, Material>();
+
         private void OnValidate()
         {
             InitializeDefaultPoints();
+
+            // Автоматическое обновление превью персонажа в редакторе (Edit Mode)
+            if (playerTransform != null && !Application.isPlaying)
+            {
+#if UNITY_EDITOR
+                UnityEditor.EditorApplication.delayCall += () => {
+                    if (this != null && playerTransform != null)
+                    {
+                        ApplyPlayerVisualClass();
+                    }
+                };
+#endif
+            }
         }
 
         private void InitializeDefaultPoints()
@@ -102,9 +130,19 @@ namespace FateContinent
                 "Citadel_SpawnPoint" 
             };
 
+            // Принудительно корректируем индекс 3 (Грозовые Кряжи) под 8-й регион (Shore_SpawnPoint / Древние Руины)
+            // по требованию игрока, чтобы избежать высадки в 11-й регион.
+            defaultAnchorNames[3] = "Shore_SpawnPoint";
+
             for (int i = 0; i < landingPoints.Length; i++)
             {
                 if (landingPoints[i] == null) continue;
+
+                // Для надежности, если i == 3, всегда принудительно переназначаем на Shore_SpawnPoint
+                if (i == 3)
+                {
+                    landingPoints[3].spawnAnchor = null;
+                }
 
                 if (landingPoints[i].spawnAnchor == null)
                 {
@@ -543,6 +581,35 @@ namespace FateContinent
             CompleteLandingAndStartDialogue(lookAtPoint);
         }
 
+        private void CacheOriginalMaterials()
+        {
+            if (originalRegionMaterials == null)
+            {
+                originalRegionMaterials = new System.Collections.Generic.Dictionary<string, Material>();
+            }
+
+            GameObject newContinent = GameObject.Find("New_Kontinent") ?? GameObject.Find("Континент");
+            if (newContinent != null)
+            {
+                for (int i = 0; i < 12; i++)
+                {
+                    string regionName = "Region_" + i.ToString("D2");
+                    Transform regTrans = newContinent.transform.Find(regionName);
+                    if (regTrans != null)
+                    {
+                        Renderer mr = regTrans.GetComponent<Renderer>();
+                        if (mr != null && mr.sharedMaterial != null)
+                        {
+                            if (!originalRegionMaterials.ContainsKey(regionName))
+                            {
+                                originalRegionMaterials.Add(regionName, mr.sharedMaterial);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// Создает красивую плоскость океана под континентом для фонового ландшафта, если она отсутствует.
         /// </summary>
@@ -551,282 +618,131 @@ namespace FateContinent
             GameObject oceanObj = GameObject.Find("Fate_Ocean_Plane");
             if (oceanObj == null)
             {
+                foreach (var go in Resources.FindObjectsOfTypeAll<GameObject>())
+                {
+                    if (go.name == "Fate_Ocean_Plane" && go.scene.isLoaded)
+                    {
+                        oceanObj = go;
+                        break;
+                    }
+                }
+            }
+
+            if (oceanObj == null)
+            {
                 oceanObj = GameObject.CreatePrimitive(PrimitiveType.Plane);
                 oceanObj.name = "Fate_Ocean_Plane";
-                
-                // Располагаем под континентом (чуть ниже Y = -0.5f, чтобы не было Z-файта с ландшафтом)
-                oceanObj.transform.position = new Vector3(0f, -0.6f, 0f);
-                
-                // Делаем плоскость достаточно огромной для стратегического обзора
-                oceanObj.transform.localScale = new Vector3(80f, 1f, 80f); 
+                oceanObj.transform.position = new Vector3(0f, -5f, 0f);
+                oceanObj.transform.localScale = new Vector3(300f, 1f, 300f);
+
+                MeshRenderer mr = oceanObj.GetComponent<MeshRenderer>();
+                if (mr != null)
+                {
+                    mr.receiveShadows = true;
+
+                    Material oceanMat = Resources.Load<Material>("M_Ocean_Background");
+                    if (oceanMat == null) oceanMat = Resources.Load<Material>("Materials/M_Ocean_Background");
+                    if (oceanMat == null) oceanMat = Resources.Load<Material>("Ocean/M_Ocean_Background");
+
+                    if (oceanMat != null)
+                    {
+                        mr.sharedMaterial = oceanMat;
+                        Debug.Log("[LANDING SYS] Успешно загрузили оригинальный материал океана: M_Ocean_Background");
+                    }
+                    else
+                    {
+                        Shader targetShader = Shader.Find("Universal Render Pipeline/Lit");
+                        if (targetShader == null) targetShader = Shader.Find("Standard");
+                        if (targetShader == null) targetShader = Shader.Find("Diffuse");
+                        if (targetShader == null) targetShader = Shader.Find("Mobile/Diffuse");
+
+                        Material fallbackMat = new Material(targetShader != null ? targetShader : Shader.Find("Standard"));
+                        fallbackMat.name = "M_Ocean_Background_Fallback";
+                        
+                        Color deepOceanColor = new Color(0.04f, 0.12f, 0.25f, 1.0f);
+                        if (fallbackMat.HasProperty("_Color")) fallbackMat.SetColor("_Color", deepOceanColor);
+                        if (fallbackMat.HasProperty("_BaseColor")) fallbackMat.SetColor("_BaseColor", deepOceanColor);
+                        
+                        if (fallbackMat.HasProperty("_MainTex")) fallbackMat.SetTextureScale("_MainTex", new Vector2(40f, 40f));
+                        if (fallbackMat.HasProperty("_BaseMap")) fallbackMat.SetTextureScale("_BaseMap", new Vector2(40f, 40f));
+
+                        if (fallbackMat.HasProperty("_Glossiness")) fallbackMat.SetFloat("_Glossiness", 0.7f);
+                        if (fallbackMat.HasProperty("_Smoothness")) fallbackMat.SetFloat("_Smoothness", 0.7f);
+                        if (fallbackMat.HasProperty("_Metallic")) fallbackMat.SetFloat("_Metallic", 0.2f);
+
+                        mr.sharedMaterial = fallbackMat;
+                        Debug.Log("[LANDING SYS] Создан красивый URP/Standard fallback материал океана темно-синего цвета с UV тайлингом 40x40.");
+                    }
+                }
             }
 
-            // Гарантируем правильную настройку материала, текстур и тайлинга при каждом запуске!
-            MeshRenderer mr = oceanObj.GetComponent<MeshRenderer>();
-            if (mr != null)
+            if (SettingsManager.Instance != null)
             {
-                Material oceanMat = null;
-                
-                // Сначала проверяем, назначен ли уже материал M_Ocean_Background непосредственно на плоскости
-                if (mr.sharedMaterial != null && mr.sharedMaterial.name.Contains("M_Ocean_Background"))
-                {
-                    oceanMat = mr.sharedMaterial;
-                }
-                
-                // Попытка найти уже настроенный в ассетах материал M_Ocean_Background, чтобы избежать сброса текстур
-                if (oceanMat == null)
-                {
-                    Material[] availableMats = Resources.FindObjectsOfTypeAll<Material>();
-                    foreach (var m in availableMats)
-                    {
-                        if (m != null && m.name == "M_Ocean_Background")
-                        {
-                            oceanMat = m;
-                            break;
-                        }
-                    }
-                }
-
-                // Если материала нет, создаем его динамически с поддержкой Universal Render Pipeline
-                if (oceanMat == null)
-                {
-                    Shader urpShader = Shader.Find("Universal Render Pipeline/Lit");
-                    if (urpShader == null) urpShader = Shader.Find("URP/Lit");
-                    if (urpShader == null) urpShader = Shader.Find("Standard");
-                    
-                    oceanMat = new Material(urpShader);
-                    oceanMat.name = "M_Ocean_Background";
-                    
-                    // Цветовой оттенок темного космического океана
-                    Color oceanBlueColor = new Color(0.05f, 0.18f, 0.38f, 1.0f);
-                    oceanMat.color = oceanBlueColor;
-                    if (oceanMat.HasProperty("_BaseColor"))
-                    {
-                        oceanMat.SetColor("_BaseColor", oceanBlueColor);
-                    }
-                    if (oceanMat.HasProperty("_Color"))
-                    {
-                        oceanMat.SetColor("_Color", oceanBlueColor);
-                    }
-                    
-                    // Шероховатость и отражения
-                    if (oceanMat.HasProperty("_Glossiness")) oceanMat.SetFloat("_Glossiness", 0.75f);
-                    if (oceanMat.HasProperty("_Smoothness")) oceanMat.SetFloat("_Smoothness", 0.75f);
-                    if (oceanMat.HasProperty("_Metallic")) oceanMat.SetFloat("_Metallic", 0.4f);
-                }
-
-                // Восстанавливаем текстуру, только если она действительно пуста
-                if (oceanMat.mainTexture == null)
-                {
-                    Texture2D[] allTextures = Resources.FindObjectsOfTypeAll<Texture2D>();
-                    foreach (var tex in allTextures)
-                    {
-                        if (tex != null && (tex.name.ToLower().Contains("water") || tex.name.ToLower().Contains("ocean") || tex.name.ToLower().Contains("sea")))
-                        {
-                            // Избегаем случайного назначения текстур нормалей (bump maps, normal maps)
-                            if (tex.name.ToLower().Contains("normal") || tex.name.ToLower().Contains("bump"))
-                                continue;
-
-                            oceanMat.mainTexture = tex;
-                            break;
-                        }
-                    }
-                }
-
-                // Принудительно задаем 40x40 тайлинг, чтобы 8K текстура воды не растягивалась мылом
-                if (oceanMat.HasProperty("_BaseMap"))
-                {
-                    oceanMat.SetTextureScale("_BaseMap", new Vector2(40f, 40f));
-                }
-                else if (oceanMat.HasProperty("_MainTex"))
-                {
-                    oceanMat.SetTextureScale("_MainTex", new Vector2(40f, 40f));
-                }
-
-                mr.material = oceanMat;
-                
-                // Отключаем тени, чтобы плоскость выглядела чисто
-                mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-                mr.receiveShadows = true;
-
-                Debug.Log("<color=#00FFCC>[OCEAN GENERATOR]</color> Успешно проверили и настроили материал Fate_Ocean_Plane (Y = -0.6f, масштаб 80x80).");
-            }
-        }
-
-        private System.Collections.Generic.Dictionary<string, Material> originalRegionMaterials = new System.Collections.Generic.Dictionary<string, Material>();
-
-        /// <summary>
-        /// Кэширует изначальные оригинальные материалы регионов, чтобы сохранить их текстуры и шейдеры безупречно
-        /// </summary>
-        public void CacheOriginalMaterials()
-        {
-            // СВЕРХВАЖНО: предотвращаем перезапись красивых оригинальных материалов!
-            if (originalRegionMaterials.Count > 0)
-            {
-                return;
-            }
-
-            GameObject continent = GameObject.Find("New_Kontinent") ?? GameObject.Find("/New_Kontinent");
-            if (continent == null && continentObject != null)
-            {
-                continent = continentObject;
-            }
-
-            if (continent != null)
-            {
-                string[] regionNames = new string[] { "Region_03", "Region_06", "Region_08", "Region_11" };
-                foreach (string name in regionNames)
-                {
-                    Transform regionTrans = continent.transform.Find(name);
-                    if (regionTrans == null)
-                    {
-                        foreach (Transform child in continent.GetComponentsInChildren<Transform>(true))
-                        {
-                            if (child.name == name)
-                            {
-                                regionTrans = child;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (regionTrans != null)
-                    {
-                        MeshRenderer mr = regionTrans.GetComponent<MeshRenderer>();
-                        if (mr != null && mr.sharedMaterial != null)
-                        {
-                            // Сохраняем ссылку на оригинальный материал
-                            originalRegionMaterials[name] = mr.sharedMaterial;
-                            Debug.Log($"[LANDING SYS] Успешно закеширован оригинальный материал для {name}: {mr.sharedMaterial.name}");
-                        }
-                    }
-                }
+                int currentQuality = PlayerPrefs.GetInt("Fate_Graphics_Quality", 2);
+                SettingsManager.Instance.ApplyOceanQuality(currentQuality);
             }
         }
 
         /// <summary>
-        /// Восстанавливает оригинальный красивый материал под игроком, а остальные делает нейтрально серыми,
-        /// с поддержкой ручной настройки цвета каждого из 12 регионов при калибровке!
+        /// Перекрашивает 12 регионов 3D-карты в зависимости от выбранной зоны высадки игрока.
         /// </summary>
         public void RepaintRegionsBasedOnLanding(int activeZoneIndex)
         {
-            string[] regionNames = new string[12];
-            for (int r = 0; r < 12; r++)
-            {
-                regionNames[r] = "Region_" + r.ToString("D2");
-            }
+            CacheOriginalMaterials();
 
-            GameObject continent = GameObject.Find("New_Kontinent") ?? GameObject.Find("/New_Kontinent");
-            if (continent == null && continentObject != null)
-            {
-                continent = continentObject;
-            }
+            int actualPlayerRegion = FateCastleManager.GetActualRegionIndexFromLanding(activeZoneIndex);
+            string actualPlayerRegionName = "Region_" + actualPlayerRegion.ToString("D2");
 
-            if (continent != null)
+            GameObject newContinent = GameObject.Find("New_Kontinent") ?? GameObject.Find("Континент");
+            if (newContinent != null)
             {
-                Shader urpShader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("URP/Lit") ?? Shader.Find("Standard");
-
                 for (int i = 0; i < 12; i++)
                 {
-                    string name = regionNames[i];
-                    Transform regionTrans = continent.transform.Find(name);
-                    if (regionTrans == null)
+                    string regionName = "Region_" + i.ToString("D2");
+                    Transform regTrans = newContinent.transform.Find(regionName);
+                    if (regTrans != null)
                     {
-                        foreach (Transform child in continent.GetComponentsInChildren<Transform>(true))
-                        {
-                            if (child.name == name)
-                            {
-                                regionTrans = child;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (regionTrans != null)
-                    {
-                        MeshRenderer mr = regionTrans.GetComponent<MeshRenderer>();
+                        Renderer mr = regTrans.GetComponent<Renderer>();
                         if (mr != null)
                         {
-                            // Определяем владельца замка 'i'
-                            string owner = "Enemy";
-                            if (FateCastleManager.Instance != null && i < FateCastleManager.Instance.castles.Count)
+                            if (i == actualPlayerRegion && originalRegionMaterials.ContainsKey(actualPlayerRegionName) && originalRegionMaterials[actualPlayerRegionName] != null)
                             {
-                                owner = FateCastleManager.Instance.castles[i].owner;
+                                mr.sharedMaterial = originalRegionMaterials[actualPlayerRegionName];
+                                Debug.Log($"[LANDING SYS] Восстановили оригинальный красивый материал для региона игрока: {actualPlayerRegionName}");
                             }
                             else
                             {
-                                int tempLanded = PlayerPrefs.GetInt("LandedZoneIndex", 0);
-                                int actReg = FateCastleManager.GetActualRegionIndexFromLanding(tempLanded);
-                                owner = (i == actReg) ? "Player" : "Enemy";
-                            }
+                                Color targetColor;
 
-                            // Определяем целевой цвет региона
-                            Color targetColor;
-                            int landedZone = PlayerPrefs.GetInt("LandedZoneIndex", activeZoneIndex);
-                            int actualPlayerRegion = FateCastleManager.GetActualRegionIndexFromLanding(landedZone);
-
-                            if (i == actualPlayerRegion)
-                            {
-                                // Регион игрока: 00008B (Dark Blue)
-                                targetColor = new Color(0.0f, 0.0f, 0.545f, 1.0f);
-                            }
-                            else
-                            {
-                                // Регион врагов или нейтралов:
-                                // Проверяем, есть ли сохраненный пользователем вручную цвет для этого региона (Level Editor)
-                                if (PlayerPrefs.HasKey("Region_ColorR_" + i))
+                                if (i == actualPlayerRegion)
                                 {
-                                    float rVal = PlayerPrefs.GetFloat("Region_ColorR_" + i);
-                                    float gVal = PlayerPrefs.GetFloat("Region_ColorG_" + i);
-                                    float bVal = PlayerPrefs.GetFloat("Region_ColorB_" + i);
-                                    targetColor = new Color(rVal, gVal, bVal, 1.0f);
+                                    // Регион игрока (если не восстановили оригинальный материал): 00008B (Dark Blue)
+                                    targetColor = new Color(0.0f, 0.0f, 0.545f, 1.0f);
                                 }
                                 else
                                 {
-                                    // Цветовая палитра фракций по умолчанию согласно бизнес-требованиям Континента Судьбы
-                                    if (i == 2 || i == 10) 
+                                    if (PlayerPrefs.HasKey("Region_ColorR_" + i))
                                     {
-                                        targetColor = new Color(0.584f, 0.647f, 0.651f, 1.0f); // Slate Neutrals (цвет 95A5A6)
+                                        float rVal = PlayerPrefs.GetFloat("Region_ColorR_" + i);
+                                        float gVal = PlayerPrefs.GetFloat("Region_ColorG_" + i);
+                                        float bVal = PlayerPrefs.GetFloat("Region_ColorB_" + i);
+                                        targetColor = new Color(rVal, gVal, bVal, 1.0f);
                                     }
-                                    else if (i == 1 || i == 7) 
+                                    else
                                     {
-                                        targetColor = new Color(0.906f, 0.298f, 0.235f, 1.0f); // Bandit Crimson (цвет E74C3C)
-                                    }
-                                    else if (i == 0 || i == 4 || i == 5 || i == 9) 
-                                    {
-                                        targetColor = new Color(0.180f, 0.800f, 0.443f, 1.0f); // Forest Dwellers Green (цвет 2ECC71)
-                                    }
-                                    else 
-                                    {
-                                        // Остальные 3 потенциальных региона высадки игрока становятся нейтральной территорией! (цвет 95A5A6)
-                                        targetColor = new Color(0.584f, 0.647f, 0.651f, 1.0f); 
+                                        if (i == 2 || i == 10) 
+                                        {
+                                            targetColor = new Color(0.584f, 0.647f, 0.651f, 1.0f); // серый/нейтральный
+                                        }
+                                        else
+                                        {
+                                            targetColor = new Color(0.8f, 0.2f, 0.2f, 1.0f); // красный/вражеский
+                                        }
                                     }
                                 }
+
+                                mr.material.color = targetColor;
                             }
-
-                            // Если это активный регион под ГЕРОЕМ, подсвечиваем его дополнительной яркостью с мягким блендом!
-                            if (i == actualPlayerRegion)
-                            {
-                                // Мягкая подсветка активного заземленного региона под героем
-                                targetColor = Color.Lerp(targetColor, Color.cyan, 0.2f);
-                            }
-
-                            // Создаем оригинальный материал
-                            Material dynamicMat = new Material(urpShader);
-                            dynamicMat.color = targetColor;
-                            
-                            // Сохраняем исходную текстуру, если она была на оригинальном материале
-                            if (originalRegionMaterials.ContainsKey(name) && originalRegionMaterials[name] != null)
-                            {
-                                dynamicMat.mainTexture = originalRegionMaterials[name].mainTexture;
-                            }
-
-                            // Настройка шейдера и отражений
-                            if (dynamicMat.HasProperty("_Glossiness")) dynamicMat.SetFloat("_Glossiness", (i == actualPlayerRegion) ? 0.75f : 0.4f);
-                            if (dynamicMat.HasProperty("_Smoothness")) dynamicMat.SetFloat("_Smoothness", (i == actualPlayerRegion) ? 0.75f : 0.4f);
-                            if (dynamicMat.HasProperty("_Metallic")) dynamicMat.SetFloat("_Metallic", (i == actualPlayerRegion) ? 0.25f : 0.12f);
-
-                            mr.material = dynamicMat;
                         }
                     }
                 }
@@ -851,17 +767,17 @@ namespace FateContinent
                 int landedZone = PlayerPrefs.GetInt("LandedZoneIndex", 0);
                 int targetIndex = Mathf.Clamp(landedZone, 0, landingPoints.Length - 1);
                 LandingPoint point = landingPoints[targetIndex];
-                if (point.spawnAnchor != null && playerTransform.gameObject.activeInHierarchy)
+                if (point.spawnAnchor != null)
                 {
-                    Vector3 currentPos = playerTransform.position;
-                    Vector3 anchorPos = point.spawnAnchor.position;
-                    Vector3 currentOffset = currentPos - anchorPos;
-
+                    // Считываем текущую позицию игрока относительно spawnAnchor
+                    Vector3 currentOffset = playerTransform.position - point.spawnAnchor.position;
+                    
+                    // Сверяем с сохраненным оффсетом
                     float savedOx = PlayerPrefs.GetFloat($"PlayerOffset_X_{landedZone}", 0f);
-                    float savedOy = PlayerPrefs.GetFloat($"PlayerOffset_Y_{landedZone}", 0.8f); // По умолчанию приподнят на 0.8 метра
+                    float savedOy = PlayerPrefs.GetFloat($"PlayerOffset_Y_{landedZone}", 0.8f);
                     float savedOz = PlayerPrefs.GetFloat($"PlayerOffset_Z_{landedZone}", 0f);
 
-                    // Если положение было изменено вручную в редакторе (порог 0.01м), автоматически сохраняем его!
+                    // Если игрок переместил объект вручную в редакторе (порог 0.01м), автоматически сохраняем его!
                     if (Mathf.Abs(currentOffset.x - savedOx) > 0.01f ||
                         Mathf.Abs(currentOffset.y - savedOy) > 0.01f ||
                         Mathf.Abs(currentOffset.z - savedOz) > 0.01f)
@@ -879,7 +795,7 @@ namespace FateContinent
         /// <summary>
         /// Динамически заменяет синюю сферу Player_Placeholder на высококачественную 3D-фигурку героя
         /// в зависимости от выбранного игроком класса (Воин, Стрелок, Маг).
-        /// Модели загружаются из папки Assets/Resources/Heroes_pick/
+        /// Приоритет отдается перетащенным в инспектор префабам. В случае их отсутствия используется fallback на Resources.
         /// </summary>
         public void ApplyPlayerVisualClass()
         {
@@ -889,84 +805,185 @@ namespace FateContinent
                 return;
             }
 
-            // Получаем класс игрока из системы сохранений
+            // Получаем класс игрока из системы сохранений (в Play Mode) или из настройки предпросмотра (в Edit Mode)
             string charClass = "warrior";
-            if (SaveGameSystem.CurrentData != null && !string.IsNullOrEmpty(SaveGameSystem.CurrentData.characterClass))
+            if (Application.isPlaying)
             {
-                charClass = SaveGameSystem.CurrentData.characterClass.ToLower();
+                if (SaveGameSystem.CurrentData != null && !string.IsNullOrEmpty(SaveGameSystem.CurrentData.characterClass))
+                {
+                    charClass = SaveGameSystem.CurrentData.characterClass.ToLower();
+                }
+            }
+            else
+            {
+                charClass = editorPreviewClass.ToString().ToLower();
             }
 
             bool isWarrior = charClass.Contains("warrior") || charClass.Contains("voin") || charClass.Contains("воин") || charClass.Contains("paladin");
             bool isArcher = charClass.Contains("archer") || charClass.Contains("strelok") || charClass.Contains("streloc") || charClass.Contains("стрелок") || charClass.Contains("лучник") || charClass.Contains("ranger") || charClass.Contains("bow");
             bool isMage = charClass.Contains("mage") || charClass.Contains("mag") || charClass.Contains("маг") || charClass.Contains("wizard") || charClass.Contains("mar");
 
-            // Ищем подходящий префаб/модель в папке Resources/Heroes_pick/
             GameObject heroModelPrefab = null;
 
             if (isWarrior)
             {
-                heroModelPrefab = Resources.Load<GameObject>("Heroes_pick/Warrior");
-                if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Воин");
-                if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Warrior");
+                // Сначала проверяем слот в инспекторе
+                if (warriorModelPrefab != null)
+                {
+                    heroModelPrefab = warriorModelPrefab;
+                }
+                else
+                {
+                    heroModelPrefab = Resources.Load<GameObject>("Heroes_pick/Warrior");
+                    if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Воин");
+                    if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Warrior");
+                }
             }
             else if (isArcher)
             {
-                heroModelPrefab = Resources.Load<GameObject>("Heroes_pick/Streloc");
-                if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes_pick/Strelok");
-                if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Стрелок");
-                if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Archer");
-                if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Strelok");
+                // Сначала проверяем слот в инспекторе
+                if (archerModelPrefab != null)
+                {
+                    heroModelPrefab = archerModelPrefab;
+                }
+                else
+                {
+                    heroModelPrefab = Resources.Load<GameObject>("Heroes_pick/Streloc");
+                    if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes_pick/Strelok");
+                    if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Стрелок");
+                    if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Archer");
+                    if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Strelok");
+                }
             }
             else if (isMage)
             {
-                heroModelPrefab = Resources.Load<GameObject>("Heroes_pick/Mage");
-                if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes_pick/Mar");
-                if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Mar");
-                if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Маг");
-                if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Mage");
-                if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Mag");
+                // Сначала проверяем слот в инспекторе
+                if (mageModelPrefab != null)
+                {
+                    heroModelPrefab = mageModelPrefab;
+                }
+                else
+                {
+                    heroModelPrefab = Resources.Load<GameObject>("Heroes_pick/Mage");
+                    if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes_pick/Mar");
+                    if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Mar");
+                    if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Маг");
+                    if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Mage");
+                    if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Mag");
+                }
             }
 
-            MeshRenderer defaultSphereRenderer = playerTransform.GetComponent<MeshRenderer>();
+            // Перед спавном новой модели сначала аккуратно удаляем все старые, чтобы избежать дублирования
+            var childrenToDestroy = new System.Collections.Generic.List<GameObject>();
+            foreach (Transform child in playerTransform)
+            {
+                if (child.name == "Player_Model_Visual")
+                {
+                    childrenToDestroy.Add(child.gameObject);
+                }
+            }
+
+            foreach (var childGo in childrenToDestroy)
+            {
+                if (Application.isPlaying)
+                {
+                    Destroy(childGo);
+                }
+                else
+                {
+                    DestroyImmediate(childGo);
+                }
+            }
 
             if (heroModelPrefab != null)
             {
-                // 1. Скрываем стандартную синюю сферу
-                if (defaultSphereRenderer != null)
+                // 1. ПОЛНОСТЬЮ выключаем стандартные рендереры плейсхолдера (круга/сферы)
+                var mainRenderer = playerTransform.GetComponent<Renderer>();
+                if (mainRenderer != null)
                 {
-                    defaultSphereRenderer.enabled = false;
+                    mainRenderer.enabled = false;
                 }
 
-                // 2. Удаляем старые созданные модели, чтобы избежать дублирования
+                // Отключаем MeshRenderer напрямую, чтобы круг не мешал
+                var mainMeshRenderer = playerTransform.GetComponent<MeshRenderer>();
+                if (mainMeshRenderer != null)
+                {
+                    mainMeshRenderer.enabled = false;
+                }
+
                 foreach (Transform child in playerTransform)
                 {
-                    if (child.name == "Player_Model_Visual")
+                    if (child.name != "Player_Model_Visual")
                     {
-                        Destroy(child.gameObject);
+                        foreach (var r in child.GetComponentsInChildren<Renderer>(true))
+                        {
+                            r.enabled = false;
+                        }
                     }
                 }
 
-                // 3. Инстанциируем новую 3D-модель под объектом Player_Placeholder
-                GameObject instantiatedModel = Instantiate(heroModelPrefab, playerTransform);
+                // 2. Инстанциируем новую 3D-модель под объектом Player_Placeholder
+                GameObject instantiatedModel = null;
+#if UNITY_EDITOR
+                if (!Application.isPlaying)
+                {
+                    instantiatedModel = UnityEditor.PrefabUtility.InstantiatePrefab(heroModelPrefab) as GameObject;
+                    if (instantiatedModel != null)
+                    {
+                        instantiatedModel.transform.SetParent(playerTransform, false);
+                    }
+                }
+#endif
+                if (instantiatedModel == null)
+                {
+                    instantiatedModel = Instantiate(heroModelPrefab, playerTransform);
+                }
+
                 instantiatedModel.name = "Player_Model_Visual";
                 
                 // Сбрасываем локальные координаты, чтобы модель стояла ровно в центре сферы
                 instantiatedModel.transform.localPosition = Vector3.zero;
                 instantiatedModel.transform.localRotation = Quaternion.identity;
 
-                // Устанавливаем масштаб модели с учётом инспекторского коэффициента customHeroModelScale
-                instantiatedModel.transform.localScale = Vector3.one * customHeroModelScale;
+                // Устанавливаем масштаб модели с учётом компенсации масштаба родительского объекта
+                float parentScaleX = playerTransform.localScale.x != 0 ? playerTransform.localScale.x : 1f;
+                float parentScaleY = playerTransform.localScale.y != 0 ? playerTransform.localScale.y : 1f;
+                float parentScaleZ = playerTransform.localScale.z != 0 ? playerTransform.localScale.z : 1f;
+                
+                instantiatedModel.transform.localScale = new Vector3(
+                    customHeroModelScale / parentScaleX,
+                    customHeroModelScale / parentScaleY,
+                    customHeroModelScale / parentScaleZ
+                );
 
-                Debug.Log($"<color=#00FFCC>[LANDING SYS]</color> Успешно заменили сферу на 3D-фигурку класса: <b>{SaveGameSystem.CurrentData?.characterClass}</b> (Загружен файл: {heroModelPrefab.name}, масштаб: {customHeroModelScale})");
+                Debug.Log($"<color=#00FFCC>[LANDING SYS]</color> Успешно заменили круг-сферу на 3D-модель класса: <b>{charClass}</b> (Объект: {heroModelPrefab.name}, компенсированный масштаб: {instantiatedModel.transform.localScale})");
             }
             else
             {
-                // Если файлы FBX еще не добавлены, возвращаем стандартную синюю сферу, чтобы игра не ломалась
-                if (defaultSphereRenderer != null)
+                // Если префабы/модели еще не назначены и файлы не найдены, возвращаем стандартную видимость сферы-круга, чтобы не ломать игру
+                var mainRenderer = playerTransform.GetComponent<Renderer>();
+                if (mainRenderer != null)
                 {
-                    defaultSphereRenderer.enabled = true;
+                    mainRenderer.enabled = true;
                 }
-                Debug.LogWarning($"[LANDING SYS] Модель для класса {SaveGameSystem.CurrentData?.characterClass} не найдена в Resources/Heroes_pick/. Используем стандартный шар-плейсхолдер.");
+
+                var mainMeshRenderer = playerTransform.GetComponent<MeshRenderer>();
+                if (mainMeshRenderer != null)
+                {
+                    mainMeshRenderer.enabled = true;
+                }
+
+                foreach (Transform child in playerTransform)
+                {
+                    if (child.name != "Player_Model_Visual")
+                    {
+                        foreach (var r in child.GetComponentsInChildren<Renderer>(true))
+                        {
+                            r.enabled = true;
+                        }
+                    }
+                }
+                Debug.LogWarning($"[LANDING SYS] Модель для класса {charClass} не найдена в слотах инспектора и папке Resources/Heroes_pick/. Используем стандартный шар-плейсхолдер.");
             }
         }
     }
