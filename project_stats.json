@@ -42,16 +42,18 @@
   "pdfs": [],
   "videos": [],
   "others": [
+    "src/assets/images/archer_miniature_3d_1783529415235.jpg",
     "src/assets/images/avatar_hero_archer_1781946116462.jpg",
     "src/assets/images/avatar_hero_mage_1781946131822.jpg",
-    "src/assets/images/avatar_hero_warrior_1781946102639.jpg"
+    "src/assets/images/avatar_hero_warrior_1781946102639.jpg",
+    "src/assets/images/warrior_miniature_3d_1783529396804.jpg"
   ],
-  "total_files": 74,
+  "total_files": 93,
   "analysis": {
     "audit_issues": [],
     "todos": [],
     "asset_stats": {
-      "total_size": 5002528,
+      "total_size": 8590287,
       "large_files": []
     },
     "dependencies": {
@@ -78,7 +80,8 @@
       ],
       "WorldObjectData": [
         "UnityEngine",
-        "System.IO"
+        "System.IO",
+        "GameStudio.Core"
       ],
       "BalanceConfig": [
         "UnityEngine",
@@ -238,5 +241,5 @@
       ]
     }
   },
-  "last_updated": "2026-06-25T18:29:21.274Z"
+  "last_updated": "2026-07-12T12:26:55.018Z"
 }

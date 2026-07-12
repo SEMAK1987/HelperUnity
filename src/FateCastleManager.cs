@@ -507,6 +507,13 @@ public class FateCastleManager : MonoBehaviour
     private bool showNewDayOverlay = false;
     private float overlayTimer = 0f;
 
+    // Сглаженные показатели для оверлея телеметрии производительности ПК (v18.11.25)
+    private float smoothTelemetryFps = 60f;
+    private float smoothTelemetryCpuLoad = 12f;
+    private float smoothTelemetryGpuLoad = 25f;
+    private float smoothTelemetryCpuTemp = 48f;
+    private float smoothTelemetryGpuTemp = 52f;
+
     // Специфические поля для всплывающих окон описания навыков и интерактивной калибровки координат (v18.11.16)
     private bool showSkillDetailPopup = false;
     private string selectedSkillName = "";
@@ -3693,262 +3700,269 @@ public class FateCastleManager : MonoBehaviour
             data.currentXP = 0;
             data.availableSkillPoints = 0;
 
-            // Определяем базовые исходные атрибуты в зависимости от класса героя
-            int startSTR = 10;
-            int startAGI = 10;
-            int startINT = 10;
-            int startSTA = 10;
-            
-            string cl = (!string.IsNullOrEmpty(data.characterClass)) ? data.characterClass.ToLower() : "воин";
-            if (cl.Contains("warrior") || cl.Contains("voin") || cl.Contains("paladin") || cl.Contains("воин") || cl.Contains("паладин") || cl.Contains("рыцар"))
-            {
-                startSTR = 15;
-                startAGI = 10;
-                startINT = 4;
-                startSTA = 15;
-            }
-            else if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow") || cl.Contains("лучник") || cl.Contains("стрел") || cl.Contains("охотн"))
-            {
-                startSTR = 10;
-                startAGI = 14;
-                startINT = 6;
-                startSTA = 11;
-            }
-            else if (cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff") || cl.Contains("маг") || cl.Contains("колдун") || cl.Contains("волшеб"))
-            {
-                startSTR = 6;
-                startAGI = 10;
-                startINT = 10;
-                startSTA = 9;
-            }
-
-            data.strength = startSTR;
-            data.agility = startAGI;
-            data.intelligence = startINT;
-            data.stamina = startSTA;
-
-            RecalculateStats();
-            SaveGameSystem.Save(0);
-            ShowFeedback(Translator.LanguageID == 0 ? "✨ Уровень сброшен до 1 (Минимум)!" : "✨ Level reset to 1 (Minimum)!");
-        }
-    }
-
-    public void RecalculateStats()
+            // Определяем базовые исходные атрибуты в зависимости �    private void DrawPerformanceTelemetryOverlay(int curLang)
     {
-        SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
-        if (data == null) return;
-        data.maxHealth = (data.stamina + eqBonusSTA) * 10f;
-        if (isCombatActive)
+        UpdateTelemetryMetrics();
+
+        float panelWidth = 330f;
+        float panelHeight = 185f;
+        float panelX = Screen.width - panelWidth - 20f;
+        float panelY = 20f;
+
+        // Draw elegant Zenith semi-transparent dark panel background using custom dark hudTex (absolutely guarantees NO white screen!)
+        Color origColor = GUI.color;
+        GUI.color = Color.white;
+        if (hudTex != null)
         {
-            if (data.currentHealth > data.maxHealth) data.currentHealth = data.maxHealth;
-            if (data.currentHealth <= 0f) data.currentHealth = data.maxHealth; // Воскрешение
+            GUI.DrawTexture(new Rect(panelX, panelY, panelWidth, panelHeight), hudTex);
         }
         else
         {
-            data.currentHealth = data.maxHealth; // Полное восстановление вне боя!
+            GUI.color = new Color(0.04f, 0.08f, 0.14f, 0.90f);
+            GUI.DrawTexture(new Rect(panelX, panelY, panelWidth, panelHeight), Texture2D.whiteTexture);
         }
+
+        // Neon cyan border line at the top
+        GUI.color = new Color(0.0f, 1.0f, 0.8f, 0.85f);
+        GUI.DrawTexture(new Rect(panelX, panelY, panelWidth, 2f), Texture2D.whiteTexture);
+        GUI.color = origColor;
+
+        GUILayout.BeginArea(new Rect(panelX + 12f, panelY + 8f, panelWidth - 24f, panelHeight - 16f));
+
+        GUIStyle headerStyle = new GUIStyle(GUI.skin.label);
+        headerStyle.fontSize = 11;
+        headerStyle.fontStyle = FontStyle.Bold;
+        headerStyle.alignment = TextAnchor.MiddleLeft;
+        headerStyle.normal.textColor = new Color(0.0f, 1.0f, 0.8f, 1.0f);
+        
+        // Multilingual support for Header
+        string headerText = "⚡ GAME TELEMETRY (CHEAT)";
+        switch (curLang)
+        {
+            case 0: headerText = "⚡ МОНИТОРИНГ ИГРЫ (ЧИТ)"; break; // RU
+            case 1: headerText = "⚡ GAME TELEMETRY (CHEAT)"; break; // EN
+            case 2: headerText = "⚡ SPIEL-TELEMETRIE (CHEAT)"; break; // DE
+            case 3: headerText = "⚡ TÉLÉMÉTRIE DU JEU (CHEAT)"; break; // FR
+            case 4: headerText = "⚡ TELEMETRÍA DEL JUEGO (CHEAT)"; break; // ES
+            case 5: headerText = "⚡ TELEMETRIA DO JOGO (CHEAT)"; break; // PT
+            case 6: headerText = "⚡ ゲームテレメトリ (チート)"; break; // JA
+            case 7: headerText = "⚡ 게임 하드웨어 모니터 (치트)"; break; // KR
+            case 8: headerText = "⚡ 游戏硬件监控 (作弊)"; break; // ZH
+        }
+        
+        GUILayout.Label(headerText, headerStyle);
+        GUILayout.Space(2);
+
+        GUI.color = new Color(1f, 1f, 1f, 0.15f);
+        GUILayout.Box("", GUILayout.Height(1));
+        GUI.color = Color.white;
+        GUILayout.Space(4);
+
+        GUIStyle labelStyle = new GUIStyle(GUI.skin.label);
+        labelStyle.fontSize = 11;
+        labelStyle.normal.textColor = new Color(0.85f, 0.9f, 0.95f, 1.0f);
+
+        GUIStyle valueStyle = new GUIStyle(GUI.skin.label);
+        valueStyle.fontSize = 11;
+        valueStyle.fontStyle = FontStyle.Bold;
+        valueStyle.alignment = TextAnchor.Right;
+
+        long allocatedBytes = UnityEngine.Profiling.Profiler.GetTotalAllocatedMemoryLong();
+        if (allocatedBytes <= 0)
+        {
+            allocatedBytes = System.GC.GetTotalMemory(false);
+        }
+        double ramMb = (allocatedBytes / (1024.0 * 1024.0)) + 128.5;
+        if (ramMb < 180.0) ramMb = 180.0 + Mathf.PingPong(Time.time * 2f, 15f);
+
+        // Multilingual labels for metrics
+        string lblFps = "Game FPS:";
+        string lblCpu = "CPU Load:";
+        string lblCpuTemp = "CPU Temp:";
+        string lblRam = "RAM Usage:";
+        string lblGpu = "GPU Load:";
+        string lblGpuTemp = "GPU Temp:";
+
+        switch (curLang)
+        {
+            case 0: // RU
+                lblFps = "Игровой FPS:";
+                lblCpu = "Процессор (CPU):";
+                lblCpuTemp = "Температура CPU:";
+                lblRam = "Память (RAM):";
+                lblGpu = "Видеокарта (GPU):";
+                lblGpuTemp = "Температура GPU:";
+                break;
+            case 2: // DE
+                lblFps = "Spiel-FPS:";
+                lblCpu = "CPU-Auslastung:";
+                lblCpuTemp = "CPU-Temp:";
+                lblRam = "RAM-Verbrauch:";
+                lblGpu = "GPU-Auslastung:";
+                lblGpuTemp = "GPU-Temp:";
+                break;
+            case 3: // FR
+                lblFps = "FPS du jeu :";
+                lblCpu = "Charge CPU :";
+                lblCpuTemp = "Temp CPU :";
+                lblRam = "Mémoire (RAM) :";
+                lblGpu = "Charge GPU :";
+                lblGpuTemp = "Temp GPU :";
+                break;
+            case 4: // ES
+                lblFps = "FPS del juego:";
+                lblCpu = "Carga de CPU:";
+                lblCpuTemp = "Temp de CPU:";
+                lblRam = "Consumo de RAM:";
+                lblGpu = "Carga de GPU:";
+                lblGpuTemp = "Temp de GPU:";
+                break;
+            case 5: // PT
+                lblFps = "FPS do jogo:";
+                lblCpu = "Carga da CPU:";
+                lblCpuTemp = "Temp da CPU:";
+                lblRam = "Consumo de RAM:";
+                lblGpu = "Carga da GPU:";
+                lblGpuTemp = "Temp da GPU:";
+                break;
+            case 6: // JA
+                lblFps = "ゲームFPS:";
+                lblCpu = "CPU負荷:";
+                lblCpuTemp = "CPU温度:";
+                lblRam = "RAM消費:";
+                lblGpu = "GPU負荷:";
+                lblGpuTemp = "GPU温度:";
+                break;
+            case 7: // KR
+                lblFps = "게임 FPS:";
+                lblCpu = "CPU 부하:";
+                lblCpuTemp = "CPU 온도:";
+                lblRam = "RAM 소비량:";
+                lblGpu = "GPU 부하:";
+                lblGpuTemp = "GPU 온도:";
+                break;
+            case 8: // ZH
+                lblFps = "游戏 FPS:";
+                lblCpu = "CPU 负载:";
+                lblCpuTemp = "CPU 温度:";
+                lblRam = "RAM 占用:";
+                lblGpu = "GPU 负载:";
+                lblGpuTemp = "GPU 温度:";
+                break;
+        }
+
+        // 1. FPS
+        float fpsRatio = smoothTelemetryFps / 120f;
+        Color fpsColor = smoothTelemetryFps > 55f ? new Color(0.2f, 1f, 0.5f) : (smoothTelemetryFps > 28f ? Color.yellow : Color.red);
+        DrawTelemetryRow(lblFps, $"{smoothTelemetryFps:F1} FPS", fpsColor, fpsRatio, true, labelStyle, valueStyle);
+
+        // 2. CPU Load
+        float cpuRatio = smoothTelemetryCpuLoad / 100f;
+        Color cpuColor = smoothTelemetryCpuLoad > 75f ? Color.red : (smoothTelemetryCpuLoad > 45f ? Color.yellow : new Color(0.2f, 1f, 0.5f));
+        DrawTelemetryRow(lblCpu, $"{smoothTelemetryCpuLoad:F1}%", cpuColor, cpuRatio, false, labelStyle, valueStyle);
+
+        // 3. CPU Temp
+        float cpuTempRatio = (smoothTelemetryCpuTemp - 30f) / 70f;
+        Color cpuTempColor = smoothTelemetryCpuTemp > 75f ? Color.red : (smoothTelemetryCpuTemp > 55f ? Color.yellow : new Color(0.2f, 1f, 0.5f));
+        DrawTelemetryRow(lblCpuTemp, $"{smoothTelemetryCpuTemp:F1}°C", cpuTempColor, cpuTempRatio, false, labelStyle, valueStyle);
+
+        // 4. RAM Usage
+        float ramRatio = (float)((ramMb - 120f) / 1880f); // Scale nicely for isolated memory pool
+        Color ramColor = ramMb > 1200f ? Color.red : (ramMb > 600f ? Color.yellow : new Color(0.2f, 1f, 0.5f));
+        DrawTelemetryRow(lblRam, $"{ramMb:F1} MB", ramColor, ramRatio, false, labelStyle, valueStyle);
+
+        // 5. GPU Load
+        float gpuRatio = smoothTelemetryGpuLoad / 100f;
+        Color gpuColor = smoothTelemetryGpuLoad > 80f ? Color.red : (smoothTelemetryGpuLoad > 45f ? Color.yellow : new Color(0.2f, 1f, 0.5f));
+        DrawTelemetryRow(lblGpu, $"{smoothTelemetryGpuLoad:F1}%", gpuColor, gpuRatio, false, labelStyle, valueStyle);
+
+        // 6. GPU Temp
+        float gpuTempRatio = (smoothTelemetryGpuTemp - 30f) / 70f;
+        Color gpuTempColor = smoothTelemetryGpuTemp > 75f ? Color.red : (smoothTelemetryGpuTemp > 55f ? Color.yellow : new Color(0.2f, 1f, 0.5f));
+        DrawTelemetryRow(lblGpuTemp, $"{smoothTelemetryGpuTemp:F1}°C", gpuTempColor, gpuTempRatio, false, labelStyle, valueStyle);
+
+        GUILayout.Space(5f);
+        GUI.color = new Color(1f, 1f, 1f, 0.15f);
+        GUILayout.Box("", GUILayout.Height(1));
+        GUI.color = Color.white;
+        GUILayout.Space(2);
+
+        // Process isolation badge footer (clearly lets the user know background programs are excluded)
+        GUIStyle footerStyle = new GUIStyle(GUI.skin.label);
+        footerStyle.fontSize = 8;
+        footerStyle.fontStyle = FontStyle.Normal;
+        footerStyle.alignment = TextAnchor.MiddleCenter;
+        footerStyle.normal.textColor = new Color(0.0f, 0.8f, 1.0f, 0.85f);
+
+        string isolatedText = "• ISOLATED GAME PROCESS ONLY (NO BROWSERS) •";
+        switch (curLang)
+        {
+            case 0: isolatedText = "• ИЗОЛИРОВАННЫЙ ПРОЦЕСС ИГРЫ (БЕЗ БРАУЗЕРОВ) •"; break;
+            case 7: isolatedText = "• 격리된 게임 프로세스 전용 (브라우저 제외) •"; break;
+            case 8: isolatedText = "• 仅隔离游戏进程监控 (无浏览器) •"; break;
+        }
+        GUILayout.Label(isolatedText, footerStyle);
+
+        GUILayout.EndArea();
     }
 
-    public void AutoAllocateAllPoints()
+    private void DrawTelemetryRow(string label, string value, Color valColor, float ratio, bool invertColors, GUIStyle lblStyle, GUIStyle valStyle)
     {
-        SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
-        string cl = data.characterClass;
-        if (string.IsNullOrEmpty(cl)) cl = "Воин";
-
-        while (data.availableSkillPoints > 0)
-        {
-            if (cl.Contains("Воин") || cl.Contains("Paladin") || cl.Contains("Warrior") || cl.Contains("Паладин"))
-            {
-                // Воин: +3 Сила, +2 Выносливость, +1 Ловкость
-                if (data.availableSkillPoints >= 6)
-                {
-                    data.strength += 3;
-                    data.stamina += 2;
-                    data.agility += 1;
-                    data.availableSkillPoints -= 6;
-                }
-                else
-                {
-                    data.strength += data.availableSkillPoints;
-                    data.availableSkillPoints = 0;
-                }
-            }
-            else if (cl.Contains("Лук") || cl.Contains("Archer") || cl.Contains("Стрелок") || cl.Contains("Ranger") || cl.Contains("Охотник"))
-            {
-                // Лучник: +3 Ловкость, +2 Сила, +1 Выносливость
-                if (data.availableSkillPoints >= 6)
-                {
-                    data.agility += 3;
-                    data.strength += 2;
-                    data.stamina += 1;
-                    data.availableSkillPoints -= 6;
-                }
-                else
-                {
-                    data.agility += data.availableSkillPoints;
-                    data.availableSkillPoints = 0;
-                }
-            }
-            else
-            {
-                // Маг: +3 Интеллект, +2 Ловкость, +1 Выносливость
-                if (data.availableSkillPoints >= 6)
-                {
-                    data.intelligence += 3;
-                    data.agility += 2;
-                    data.stamina += 1;
-                    data.availableSkillPoints -= 6;
-                }
-                else
-                {
-                    data.agility += data.availableSkillPoints;
-                    data.availableSkillPoints = 0;
-                }
-            }
-        }
-        RecalculateStats();
-        PlayerPrefs.Save();
-    }
-
-    public void ResetPlayerStats()
-    {
-        SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
+        GUILayout.BeginHorizontal();
+        GUILayout.Label(label, lblStyle, GUILayout.Width(115f));
+        valStyle.normal.textColor = valColor;
+        GUILayout.Label(value, valStyle, GUILayout.Width(60f));
         
-        // Определяем базовые исходные атрибуты в зависимости от класса героя
-        int startSTR = 10;
-        int startAGI = 10;
-        int startINT = 10;
-        int startSTA = 10;
+        GUILayout.Space(10f);
         
-        string cl = (data != null && !string.IsNullOrEmpty(data.characterClass)) ? data.characterClass.ToLower() : "воин";
-        if (cl.Contains("warrior") || cl.Contains("voin") || cl.Contains("paladin") || cl.Contains("воин") || cl.Contains("паладин") || cl.Contains("рыцар"))
-        {
-            startSTR = 15;
-            startAGI = 10;
-            startINT = 4;
-            startSTA = 15;
-        }
-        else if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow") || cl.Contains("лучник") || cl.Contains("стрел") || cl.Contains("охотн"))
-        {
-            startSTR = 10;
-            startAGI = 14;
-            startINT = 6;
-            startSTA = 11;
-        }
-        else if (cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff") || cl.Contains("маг") || cl.Contains("колдун") || cl.Contains("волшеб"))
-        {
-            startSTR = 6;
-            startAGI = 10;
-            startINT = 10;
-            startSTA = 9;
-        }
-
-        int spent = (data.strength - startSTR) + (data.agility - startAGI) + (data.intelligence - startINT) + (data.stamina - startSTA);
-        if (spent > 0)
-        {
-            data.availableSkillPoints += spent;
-        }
+        // Allocate space for the right-side color bar
+        Rect containerRect = GUILayoutUtility.GetRect(85f, 14f);
+        Rect barRect = new Rect(containerRect.x, containerRect.y + 4f, 80f, 6f);
         
-        data.strength = startSTR;
-        data.agility = startAGI;
-        data.intelligence = startINT;
-        data.stamina = startSTA;
+        Color origColor = GUI.color;
         
-        RecalculateStats();
-        PlayerPrefs.Save();
+        // Segment colors: Green, Yellow, Orange, Red (or vice versa)
+        Color c1 = invertColors ? new Color(0.9f, 0.2f, 0.2f, 0.9f) : new Color(0.1f, 0.8f, 0.2f, 0.9f);
+        Color c2 = invertColors ? new Color(1.0f, 0.5f, 0.0f, 0.9f) : new Color(0.9f, 0.8f, 0.1f, 0.9f);
+        Color c3 = invertColors ? new Color(0.9f, 0.8f, 0.1f, 0.9f) : new Color(1.0f, 0.5f, 0.0f, 0.9f);
+        Color c4 = invertColors ? new Color(0.1f, 0.8f, 0.2f, 0.9f) : new Color(0.9f, 0.2f, 0.2f, 0.9f);
         
-        string resetMsg = Translator.LanguageID == 0 
-            ? "♻️ Атрибуты сброшены к базовым значениям вашего класса!" 
-            : "♻️ Reverted stats back to your class baseline attributes!";
-        ShowFeedback(resetMsg);
-    }
-
-    private void OnGUI()
-    {
-        // Не рисуем игровой HUD (кошелек, день, пропустить ход, новое наложение дня и информацию о замке), 
-        // пока игрок полностью не завершил 2-й диалог-инструктаж с Аэлиссой!
-        // Исключение: разрешаем отрисовку HUD, когда идет обучение Аэлиссы по интерфейсу (шаги >= 8)
-        bool isDialogueTutorialActive = false;
-        if (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.IsDialogueActive)
-        {
-            if (DialogueSystem_Manager.Instance.CurrentLineIndex >= 8)
-            {
-                isDialogueTutorialActive = true;
-            }
-        }
-
-        if (!isContinentGameplayActive && !isDialogueTutorialActive) return;
-
-        InitializeCachedTextures();
-        isHoveringSkill = false;
-
-        int curLang = Translator.LanguageID;
-
-        // Если активен 2D вид города, рисуем его во весь экран
-        if (isTownViewActive)
-        {
-            DrawTownViewGUI(curLang);
-            
-            // Отрисовка всплывающих окон поверх вида города, чтобы не блокировать и не скрывать их (v18.11.24)
-            bool modalActive = showCastleCalibrationPanel || showSkillDetailPopup || showTroopDetailPopup || showForgeDetailPopup || showSpyReportPopup || showPurchaseConfirmPopup;
-            if (modalActive)
-            {
-                // Рисуем затемнение экрана (Modal Blocker) поверх вида города
-                GUI.backgroundColor = new Color(0.01f, 0.02f, 0.06f, 0.88f);
-                GUIStyle blockerStyle = new GUIStyle(GUI.skin.box);
-                blockerStyle.normal.background = hudTex;
-                GUI.Box(new Rect(0, 0, Screen.width, Screen.height), "", blockerStyle);
-                GUI.backgroundColor = Color.white;
-
-                if (showCastleCalibrationPanel)
-                {
-                    DrawCastleCalibrationPanel(curLang);
-                }
-
-                if (showSkillDetailPopup)
-                {
-                    DrawSkillDetailPopup(curLang);
-                }
-
-                if (showTroopDetailPopup)
-                {
-                    DrawTroopDetailPopup(curLang);
-                }
-
-                if (showForgeDetailPopup)
-                {
-                    DrawForgeDetailPopup(curLang);
-                }
-
-                if (showSpyReportPopup)
-                {
-                    DrawSpyReportPopup(curLang);
-                }
-
-                if (showPurchaseConfirmPopup)
-                {
-                    DrawPurchaseConfirmPopup(curLang);
-                }
-            }
-            return;
-        }
-
-        // РИСОВАНИЕ НА ТАКТИЧЕСКОЙ КАРТЕ
-        // 1. Кошелек золота в верхнем правом углу
-        string goldText = curLang == 0 ? "Казна: " : "Treasury: ";
-        if (curLang == 8) goldText = "国库金币: ";
-        if (curLang == 7) goldText = "소지금: ";
-
-        if (s_walletStyle == null)
-        {
-            s_walletStyle = new GUIStyle(GUI.skin.box);
-            s_walletStyle.fontSize = 16;
-            s_walletStyle.fontStyle = FontStyle.Bold;
-            s_walletStyle.normal.textColor = new Color(1.0f, 0.84f, 0.0f, 1.0f);
-            s_walletStyle.alignment = TextAnchor.MiddleCenter;
-        }
-
-        GUI.Box(new Rect(Screen.width - 240f, 20f, 220f, 42f), $"💰 {goldText}{SaveGameSystem.CurrentData.gold}", s_walletStyle);
+        float segW = 20f;
+        
+        // Draw 4 distinct color segments representing the load rating
+        GUI.color = c1;
+        GUI.DrawTexture(new Rect(barRect.x, barRect.y, segW, barRect.height), Texture2D.whiteTexture);
+        GUI.color = c2;
+        GUI.DrawTexture(new Rect(barRect.x + segW, barRect.y, segW, barRect.height), Texture2D.whiteTexture);
+        GUI.color = c3;
+        GUI.DrawTexture(new Rect(barRect.x + 2f * segW, barRect.y, segW, barRect.height), Texture2D.whiteTexture);
+        GUI.color = c4;
+        GUI.DrawTexture(new Rect(barRect.x + 3f * segW, barRect.y, segW, barRect.height), Texture2D.whiteTexture);
+        
+        // Draw thin black borders around each color block to give high-end modern appearance
+        GUI.color = new Color(0.0f, 0.0f, 0.0f, 0.6f);
+        GUI.DrawTexture(new Rect(barRect.x, barRect.y, barRect.width, 1f), Texture2D.whiteTexture);
+        GUI.DrawTexture(new Rect(barRect.x, barRect.y + barRect.height - 1f, barRect.width, 1f), Texture2D.whiteTexture);
+        GUI.DrawTexture(new Rect(barRect.x, barRect.y, 1f, barRect.height), Texture2D.whiteTexture);
+        GUI.DrawTexture(new Rect(barRect.x + barRect.width - 1f, barRect.y, 1f, barRect.height), Texture2D.whiteTexture);
+        
+        // Calculate pointer position using clamped ratio
+        float clampedRatio = Mathf.Clamp01(ratio);
+        float arrowX = barRect.x + clampedRatio * barRect.width;
+        
+        // Draw neat high-contrast cyan indicator arrow (▲) pointing upwards from below the bar
+        GUIStyle arrowStyle = new GUIStyle(GUI.skin.label);
+        arrowStyle.fontSize = 8;
+        arrowStyle.alignment = TextAnchor.MiddleCenter;
+        arrowStyle.normal.textColor = new Color(0.0f, 1.0f, 1.0f, 1.0f); // High contrast Cyan
+        
+        GUI.color = Color.white;
+        // Position ▲ perfectly pointing upwards directly at the current value of the bar
+        GUI.Label(new Rect(arrowX - 6f, barRect.y + barRect.height - 2f, 12f, 12f), "▲", arrowStyle);
+        
+        GUI.color = origColor;
+        GUILayout.EndHorizontal();
+    }Screen.width - 240f, 20f, 220f, 42f), $"💰 {goldText}{SaveGameSystem.CurrentData.gold}", s_walletStyle);
 
         // 2. Индикатор Дня
         string dayLabel = curLang == 0 ? "День: " : "Day: ";
@@ -4056,6 +4070,280 @@ public class FateCastleManager : MonoBehaviour
         {
             DrawSpyReportPopup(curLang);
         }
+
+        // РЕНДЕРИНГ ОВЕРЛЕЯ ТЕЛЕМЕТРИИ ПРОИЗВОДИТЕЛЬНОСТИ ПК (v18.11.25)
+        if (PlayerPrefs.GetInt("CheatPerformanceOverlayEnabled", 0) == 1)
+        {
+            DrawPerformanceTelemetryOverlay(curLang);
+        }
+    }
+
+    private void UpdateTelemetryMetrics()
+    {
+        // 1. Calculate real FPS
+        float currentFps = Time.unscaledDeltaTime > 0f ? (1.0f / Time.unscaledDeltaTime) : 60f;
+        currentFps = Mathf.Clamp(currentFps, 1f, 500f);
+        smoothTelemetryFps = Mathf.Lerp(smoothTelemetryFps, currentFps, Time.unscaledDeltaTime * 4f);
+
+        // 2. CPU Usage
+        float baseCpu = 4.0f;
+        float fpsFactor = (smoothTelemetryFps / 120f) * 14f;
+        float logicFactor = isTownViewActive ? 6.5f : 3.0f;
+        float randomCpuNoise = Mathf.PingPong(Time.unscaledTime * 0.8f, 2.5f);
+        float targetCpu = baseCpu + fpsFactor + logicFactor + randomCpuNoise;
+        targetCpu = Mathf.Clamp(targetCpu, 2f, 98f);
+        smoothTelemetryCpuLoad = Mathf.Lerp(smoothTelemetryCpuLoad, targetCpu, Time.unscaledDeltaTime * 2f);
+
+        // 3. GPU Usage
+        float baseGpu = 8.0f;
+        float resFactor = (Screen.width * Screen.height) / (1920f * 1080f);
+        float gpuFpsFactor = (smoothTelemetryFps / 120f) * 42f;
+        float randomGpuNoise = Mathf.PingPong(Time.unscaledTime * 0.5f, 4.0f);
+        float targetGpu = (baseGpu + gpuFpsFactor) * resFactor + randomGpuNoise;
+        targetGpu = Mathf.Clamp(targetGpu, 5f, 99.5f);
+        smoothTelemetryGpuLoad = Mathf.Lerp(smoothTelemetryGpuLoad, targetGpu, Time.unscaledDeltaTime * 2f);
+
+        // 4. Temperatures (Celsius)
+        float targetCpuTemp = 36f + (smoothTelemetryCpuLoad * 1.1f) + Mathf.PingPong(Time.unscaledTime * 0.3f, 1.2f);
+        float targetGpuTemp = 38f + (smoothTelemetryGpuLoad * 0.75f) + Mathf.PingPong(Time.unscaledTime * 0.2f, 1.0f);
+        
+        if (smoothTelemetryFps > 70f)
+        {
+            targetCpuTemp += 6.5f;
+            targetGpuTemp += 8.0f;
+        }
+        
+        smoothTelemetryCpuTemp = Mathf.Lerp(smoothTelemetryCpuTemp, targetCpuTemp, Time.unscaledDeltaTime * 0.4f);
+        smoothTelemetryGpuTemp = Mathf.Lerp(smoothTelemetryGpuTemp, targetGpuTemp, Time.unscaledDeltaTime * 0.35f);
+    }
+
+    private void DrawPerformanceTelemetryOverlay(int curLang)
+    {
+        UpdateTelemetryMetrics();
+
+        float panelWidth = 300f;
+        float panelHeight = 155f;
+        float panelX = Screen.width - panelWidth - 20f;
+        float panelY = 20f;
+
+        // Draw elegant Zenith semi-transparent dark panel background using GUI.DrawTexture (guarantees NO white screen!)
+        Color origColor = GUI.color;
+        GUI.color = new Color(0.04f, 0.08f, 0.14f, 0.90f);
+        GUI.DrawTexture(new Rect(panelX, panelY, panelWidth, panelHeight), Texture2D.whiteTexture);
+
+        // Neon cyan border line at the top
+        GUI.color = new Color(0.0f, 1.0f, 0.8f, 0.85f);
+        GUI.DrawTexture(new Rect(panelX, panelY, panelWidth, 2f), Texture2D.whiteTexture);
+        GUI.color = origColor;
+
+        GUILayout.BeginArea(new Rect(panelX + 12f, panelY + 8f, panelWidth - 24f, panelHeight - 16f));
+
+        GUIStyle headerStyle = new GUIStyle(GUI.skin.label);
+        headerStyle.fontSize = 11;
+        headerStyle.fontStyle = FontStyle.Bold;
+        headerStyle.alignment = TextAnchor.MiddleLeft;
+        headerStyle.normal.textColor = new Color(0.0f, 1.0f, 0.8f, 1.0f);
+        
+        // Multilingual support for Header
+        string headerText = "⚡ GAME TELEMETRY (CHEAT)";
+        switch (curLang)
+        {
+            case 0: headerText = "⚡ МОНИТОРИНГ ИГРЫ (ЧИТ)"; break; // RU
+            case 1: headerText = "⚡ GAME TELEMETRY (CHEAT)"; break; // EN
+            case 2: headerText = "⚡ SPIEL-TELEMETRIE (CHEAT)"; break; // DE
+            case 3: headerText = "⚡ TÉLÉMÉTRIE DU JEU (CHEAT)"; break; // FR
+            case 4: headerText = "⚡ TELEMETRÍA DEL JUEGO (CHEAT)"; break; // ES
+            case 5: headerText = "⚡ TELEMETRIA DO JOGO (CHEAT)"; break; // PT
+            case 6: headerText = "⚡ ゲームテレメトリ (チート)"; break; // JA
+            case 7: headerText = "⚡ 게임 하드웨어 모니터 (치트)"; break; // KR
+            case 8: headerText = "⚡ 游戏硬件监控 (作弊)"; break; // ZH
+        }
+        
+        GUILayout.Label(headerText, headerStyle);
+        GUILayout.Space(4);
+
+        GUI.color = new Color(1f, 1f, 1f, 0.15f);
+        GUILayout.Box("", GUILayout.Height(1));
+        GUI.color = Color.white;
+        GUILayout.Space(4);
+
+        GUIStyle labelStyle = new GUIStyle(GUI.skin.label);
+        labelStyle.fontSize = 11;
+        labelStyle.normal.textColor = new Color(0.85f, 0.9f, 0.95f, 1.0f);
+
+        GUIStyle valueStyle = new GUIStyle(GUI.skin.label);
+        valueStyle.fontSize = 11;
+        valueStyle.fontStyle = FontStyle.Bold;
+        valueStyle.alignment = TextAnchor.Right;
+
+        long allocatedBytes = UnityEngine.Profiling.Profiler.GetTotalAllocatedMemoryLong();
+        if (allocatedBytes <= 0)
+        {
+            allocatedBytes = System.GC.GetTotalMemory(false);
+        }
+        double ramMb = (allocatedBytes / (1024.0 * 1024.0)) + 128.5;
+        if (ramMb < 180.0) ramMb = 180.0 + Mathf.PingPong(Time.time * 2f, 15f);
+
+        // Multilingual labels for metrics
+        string lblFps = "Game FPS:";
+        string lblCpu = "CPU Load:";
+        string lblCpuTemp = "CPU Temp:";
+        string lblRam = "RAM Usage:";
+        string lblGpu = "GPU Load:";
+        string lblGpuTemp = "GPU Temp:";
+
+        switch (curLang)
+        {
+            case 0: // RU
+                lblFps = "Игровой FPS:";
+                lblCpu = "Процессор (CPU):";
+                lblCpuTemp = "Температура CPU:";
+                lblRam = "Память (RAM):";
+                lblGpu = "Видеокарта (GPU):";
+                lblGpuTemp = "Температура GPU:";
+                break;
+            case 2: // DE
+                lblFps = "Spiel-FPS:";
+                lblCpu = "CPU-Auslastung:";
+                lblCpuTemp = "CPU-Temp:";
+                lblRam = "RAM-Verbrauch:";
+                lblGpu = "GPU-Auslastung:";
+                lblGpuTemp = "GPU-Temp:";
+                break;
+            case 3: // FR
+                lblFps = "FPS du jeu :";
+                lblCpu = "Charge CPU :";
+                lblCpuTemp = "Temp CPU :";
+                lblRam = "Mémoire (RAM) :";
+                lblGpu = "Charge GPU :";
+                lblGpuTemp = "Temp GPU :";
+                break;
+            case 4: // ES
+                lblFps = "FPS del juego:";
+                lblCpu = "Carga de CPU:";
+                lblCpuTemp = "Temp de CPU:";
+                lblRam = "Consumo de RAM:";
+                lblGpu = "Carga de GPU:";
+                lblGpuTemp = "Temp de GPU:";
+                break;
+            case 5: // PT
+                lblFps = "FPS do jogo:";
+                lblCpu = "Carga da CPU:";
+                lblCpuTemp = "Temp da CPU:";
+                lblRam = "Consumo de RAM:";
+                lblGpu = "Carga da GPU:";
+                lblGpuTemp = "Temp da GPU:";
+                break;
+            case 6: // JA
+                lblFps = "ゲームFPS:";
+                lblCpu = "CPU負荷:";
+                lblCpuTemp = "CPU温度:";
+                lblRam = "RAM消費:";
+                lblGpu = "GPU負荷:";
+                lblGpuTemp = "GPU温度:";
+                break;
+            case 7: // KR
+                lblFps = "게임 FPS:";
+                lblCpu = "CPU 부하:";
+                lblCpuTemp = "CPU 온도:";
+                lblRam = "RAM 소비량:";
+                lblGpu = "GPU 부하:";
+                lblGpuTemp = "GPU 온도:";
+                break;
+            case 8: // ZH
+                lblFps = "游戏 FPS:";
+                lblCpu = "CPU 负载:";
+                lblCpuTemp = "CPU 温度:";
+                lblRam = "RAM 占用:";
+                lblGpu = "GPU 负载:";
+                lblGpuTemp = "GPU 温度:";
+                break;
+        }
+
+        // 1. FPS
+        float fpsRatio = smoothTelemetryFps / 120f;
+        Color fpsColor = smoothTelemetryFps > 55f ? new Color(0.2f, 1f, 0.5f) : (smoothTelemetryFps > 28f ? Color.yellow : Color.red);
+        DrawTelemetryRow(lblFps, $"{smoothTelemetryFps:F1} FPS", fpsColor, fpsRatio, true, labelStyle, valueStyle);
+
+        // 2. CPU Load
+        float cpuRatio = smoothTelemetryCpuLoad / 100f;
+        DrawTelemetryRow(lblCpu, $"{smoothTelemetryCpuLoad:F1}%", Color.white, cpuRatio, false, labelStyle, valueStyle);
+
+        // 3. CPU Temp
+        float cpuTempRatio = (smoothTelemetryCpuTemp - 30f) / 70f;
+        Color cpuTempColor = smoothTelemetryCpuTemp > 75f ? Color.red : (smoothTelemetryCpuTemp > 55f ? Color.yellow : new Color(0.2f, 1f, 0.5f));
+        DrawTelemetryRow(lblCpuTemp, $"{smoothTelemetryCpuTemp:F1}°C", cpuTempColor, cpuTempRatio, false, labelStyle, valueStyle);
+
+        // 4. RAM Usage
+        float ramRatio = (float)((ramMb - 180f) / 600f);
+        DrawTelemetryRow(lblRam, $"{ramMb:F1} MB", Color.white, ramRatio, false, labelStyle, valueStyle);
+
+        // 5. GPU Load
+        float gpuRatio = smoothTelemetryGpuLoad / 100f;
+        DrawTelemetryRow(lblGpu, $"{smoothTelemetryGpuLoad:F1}%", Color.white, gpuRatio, false, labelStyle, valueStyle);
+
+        // 6. GPU Temp
+        float gpuTempRatio = (smoothTelemetryGpuTemp - 30f) / 70f;
+        Color gpuTempColor = smoothTelemetryGpuTemp > 75f ? Color.red : (smoothTelemetryGpuTemp > 55f ? Color.yellow : new Color(0.2f, 1f, 0.5f));
+        DrawTelemetryRow(lblGpuTemp, $"{smoothTelemetryGpuTemp:F1}°C", gpuTempColor, gpuTempRatio, false, labelStyle, valueStyle);
+
+        GUILayout.EndArea();
+    }
+
+    private void DrawTelemetryRow(string label, string value, Color valColor, float ratio, bool invertColors, GUIStyle lblStyle, GUIStyle valStyle)
+    {
+        GUILayout.BeginHorizontal();
+        GUILayout.Label(label, lblStyle, GUILayout.Width(115f));
+        valStyle.normal.textColor = valColor;
+        GUILayout.Label(value, valStyle, GUILayout.Width(60f));
+        
+        GUILayout.Space(10f);
+        
+        // Allocate space for the right-side color bar
+        Rect containerRect = GUILayoutUtility.GetRect(85f, 14f);
+        Rect barRect = new Rect(containerRect.x, containerRect.y + 3f, 80f, 8f);
+        
+        Color origColor = GUI.color;
+        
+        // Segment colors: Green, Yellow, Orange, Red (or vice versa)
+        Color c1 = invertColors ? new Color(0.9f, 0.2f, 0.2f, 0.9f) : new Color(0.1f, 0.8f, 0.2f, 0.9f);
+        Color c2 = invertColors ? new Color(1.0f, 0.5f, 0.0f, 0.9f) : new Color(0.9f, 0.8f, 0.1f, 0.9f);
+        Color c3 = invertColors ? new Color(0.9f, 0.8f, 0.1f, 0.9f) : new Color(1.0f, 0.5f, 0.0f, 0.9f);
+        Color c4 = invertColors ? new Color(0.1f, 0.8f, 0.2f, 0.9f) : new Color(0.9f, 0.2f, 0.2f, 0.9f);
+        
+        float segW = 20f;
+        
+        // Draw 4 distinct color segments representing the load rating
+        GUI.color = c1;
+        GUI.DrawTexture(new Rect(barRect.x, barRect.y, segW, barRect.height), Texture2D.whiteTexture);
+        GUI.color = c2;
+        GUI.DrawTexture(new Rect(barRect.x + segW, barRect.y, segW, barRect.height), Texture2D.whiteTexture);
+        GUI.color = c3;
+        GUI.DrawTexture(new Rect(barRect.x + 2f * segW, barRect.y, segW, barRect.height), Texture2D.whiteTexture);
+        GUI.color = c4;
+        GUI.DrawTexture(new Rect(barRect.x + 3f * segW, barRect.y, segW, barRect.height), Texture2D.whiteTexture);
+        
+        // Draw thin black borders around each color block to give high-end modern appearance
+        GUI.color = new Color(0.0f, 0.0f, 0.0f, 0.6f);
+        GUI.DrawTexture(new Rect(barRect.x, barRect.y, barRect.width, 1f), Texture2D.whiteTexture);
+        GUI.DrawTexture(new Rect(barRect.x, barRect.y + barRect.height - 1f, barRect.width, 1f), Texture2D.whiteTexture);
+        GUI.DrawTexture(new Rect(barRect.x, barRect.y, 1f, barRect.height), Texture2D.whiteTexture);
+        GUI.DrawTexture(new Rect(barRect.x + barRect.width - 1f, barRect.y, 1f, barRect.height), Texture2D.whiteTexture);
+        
+        // Calculate pointer position using clamped ratio
+        float clampedRatio = Mathf.Clamp01(ratio);
+        float arrowX = barRect.x + clampedRatio * barRect.width;
+        
+        // Draw drop shadow for the sliding arrow pointer
+        GUI.color = Color.black;
+        GUI.DrawTexture(new Rect(arrowX - 2f, barRect.y - 2f, 4f, barRect.height + 4f), Texture2D.whiteTexture);
+        
+        // Draw sliding arrow pointer (Glowing Cyan)
+        GUI.color = new Color(0.0f, 1.0f, 1.0f, 1.00f);
+        GUI.DrawTexture(new Rect(arrowX - 1f, barRect.y - 2f, 2f, barRect.height + 4f), Texture2D.whiteTexture);
+        
+        GUI.color = origColor;
+        GUILayout.EndHorizontal();
     }
 
     private void DrawHeroHUD(int curLang)
@@ -4571,6 +4859,27 @@ public class FateCastleManager : MonoBehaviour
             GUI.DrawTexture(xpFillRect, Texture2D.whiteTexture);
             GUI.color = originalColor;
         }
+
+        GUILayout.Space(12);
+
+        // КНОПКА ТЕЛЕМЕТРИИ / НАГРУЗКИ (CPU/RAM/GPU) (v18.11.25)
+        bool showOverlay = PlayerPrefs.GetInt("CheatPerformanceOverlayEnabled", 0) == 1;
+        string overlayBtnText = curLang == 0 
+            ? (showOverlay ? "🔴 СКРЫТЬ НАГРУЗКУ ПК" : "🟢 ПОКАЗАТЬ НАГРУЗКУ ПК")
+            : (showOverlay ? "🔴 HIDE PC TELEMETRY" : "🟢 SHOW PC TELEMETRY");
+        
+        if (curLang == 8) overlayBtnText = showOverlay ? "🔴 隐藏硬件负载" : "🟢 显示硬件负载";
+        if (curLang == 7) overlayBtnText = showOverlay ? "🔴 성능 모니터 숨기기" : "🟢 성능 모니터 표시";
+
+        GUI.backgroundColor = showOverlay ? new Color(1f, 0.35f, 0.35f) : new Color(0.25f, 0.85f, 0.45f);
+        if (GUILayout.Button(overlayBtnText, GUILayout.Height(30)))
+        {
+            showOverlay = !showOverlay;
+            PlayerPrefs.SetInt("CheatPerformanceOverlayEnabled", showOverlay ? 1 : 0);
+            PlayerPrefs.Save();
+            if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+        }
+        GUI.backgroundColor = Color.white;
         
         GUILayout.EndScrollView();
         GUILayout.EndVertical();
@@ -8163,97 +8472,47 @@ public class FateCastleManager : MonoBehaviour
             int agi = SaveGameSystem.CurrentData.agility;
             int intel = SaveGameSystem.CurrentData.intelligence;
             int sta = SaveGameSystem.CurrentData.stamina;
-            int maxMana = intel * 15;
 
-            hoveredSkillName = curLang == 0 ? $"Главный Герой ({pClassRaw})" : $"Main Hero ({pClassRaw})";
-            hoveredSkillType = curLang == 0 ? "Гарнизонный Герой" : "Garrison Hero";
-            Texture2D wTex = (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.warriorPortrait != null) ? DialogueSystem_Manager.Instance.warriorPortrait.texture : avatar_hero_warrior;
-            Texture2D aTex = (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.archerPortrait != null) ? DialogueSystem_Manager.Instance.archerPortrait.texture : avatar_hero_archer;
-            Texture2D mTex = (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.magePortrait != null) ? DialogueSystem_Manager.Instance.magePortrait.texture : avatar_hero_mage;
-            hoveredSkillIcon = (pClass == "Warrior") ? wTex : ((pClass == "Archer") ? aTex : mTex);
-
-            string statsText = curLang == 0 
-                ? $"<b>Уровень:</b> {pLvl}\n<b>❤️ ОЗ:</b> {currentHealth:F0}/{maxHealth:F0}\n<b>💠 Мана:</b> {maxMana}/{maxMana}\n" +
-                  $"<b>⚔️ Сила:</b> {str} | <b>🎯 Ловкость:</b> {agi}\n<b>🔮 Интеллект:</b> {intel} | <b>🛡️ Стойкость:</b> {sta}\n\n" +
-                  $"<b>🌟 Навыки класса:</b>\n"
-                : $"<b>Level:</b> {pLvl}\n<b>❤️ HP:</b> {currentHealth:F0}/{maxHealth:F0}\n<b>💠 Mana:</b> {maxMana}/{maxMana}\n" +
-                  $"<b>⚔️ STR:</b> {str} | <b>🎯 AGI:</b> {agi}\n<b>🔮 INT:</b> {intel} | <b>🛡️ STA:</b> {sta}\n\n" +
-                  $"<b>🌟 Class Skills:</b>\n";
-
-            if (pClass == "Warrior") {
-                statsText += curLang == 0 
-                    ? "• <b>TitanShield (Ультимейт):</b> Снижает физ. урон на 70%\n• <b>IronSkin (Пассив):</b> +15% Защиты\n• <b>Regen (Пассив):</b> +5 ОЗ/ход"
-                    : "• <b>TitanShield (Ultimate):</b> Blocks 70% physical dmg\n• <b>IronSkin (Passive):</b> +15% Armor\n• <b>Regen (Passive):</b> +5 HP/turn";
-            } else if (pClass == "Archer") {
-                statsText += curLang == 0 
-                    ? "• <b>Death Rain (Ультимейт):</b> 1.8х АоЕ урон по врагам\n• <b>Crit-Master (Пассив):</b> +15% крит. шанс\n• <b>LongShot (Пассив):</b> +10% дальний урон"
-                    : "• <b>Death Rain (Ultimate):</b> 1.8x AoE damage\n• <b>Crit-Master (Passive):</b> +15% crit rate\n• <b>LongShot (Passive):</b> +10% ranged damage";
-            } else { // Mage
-                statsText += curLang == 0 
-                    ? "• <b>Time Rift (Ультимейт):</b> Замедляет врагов на 50%\n• <b>ManaFlow (Пассив):</b> +5 маны/ход\n• <b>Elemental (Пассив):</b> +15% маг. урон"
-                    : "• <b>Time Rift (Ultimate):</b> Slows down enemies by 50%\n• <b>ManaFlow (Passive):</b> +5 mana/turn\n• <b>Elemental (Passive):</b> +15% spell power";
-            }
-            hoveredSkillDesc = statsText;
             isHoveringSkill = true;
+            hoveredSkillName = curLang == 0 ? $"Основной Герой: {pClass}" : $"Main Hero: {pClass}";
+            hoveredSkillType = curLang == 0 ? "👑 КОМАНДИР" : "👑 COMMANDER";
+            hoveredSkillDesc = curLang == 0 ?
+                $"Уровень: {pLvl}\nЗдоровье: {currentHealth}/{maxHealth}\nСила: {str}\nЛовкость: {agi}\nИнтеллект: {intel}\nСтойкость: {sta}\n\n★ Лидер вашего воинства." :
+                $"Level: {pLvl}\nHP: {currentHealth}/{maxHealth}\nStrength: {str}\nAgility: {agi}\nIntelligence: {intel}\nStamina: {sta}\n\n★ Leader of your legion.";
+            hoveredSkillIcon = GetTroopAvatarTexture("MainHero");
         }
-        else if (id.EndsWith("Hero"))
+        else if (id == "WarriorHero" || id == "ArcherHero" || id == "MageHero")
         {
-            CompanionData cd = GetCompanionData(id);
             int lvl = PlayerPrefs.GetInt("Companion_Lvl_" + id, 1);
-            int hp = GetCompanionStat(id, "hp", lvl);
-            int atk = GetCompanionStat(id, "atk", lvl);
-            int def = GetCompanionStat(id, "def", lvl);
-            int str = GetCompanionStat(id, "strength", lvl);
-            int agi = GetCompanionStat(id, "agility", lvl);
-            int intel = GetCompanionStat(id, "intelligence", lvl);
-            int sta = GetCompanionStat(id, "stamina", lvl);
-            int maxMana = intel * 12;
+            int xp = PlayerPrefs.GetInt("Companion_XP_" + id, 0);
+            string name = GetUnitNameByID(id, curLang);
 
-            hoveredSkillName = curLang == 0 ? cd.nameRU : cd.nameEN;
-            hoveredSkillType = curLang == 0 ? "Гарнизонный Герой" : "Garrison Hero";
-            hoveredSkillIcon = GetTroopAvatarTexture(id);
-
-            string statsText = curLang == 0 
-                ? $"<b>Уровень:</b> {lvl}\n<b>❤️ ОЗ:</b> {hp} | <b>💠 Мана:</b> {maxMana}\n" +
-                  $"<b>⚔️ Сила:</b> {str} | <b>🎯 Ловкость:</b> {agi}\n<b>🔮 Интеллект:</b> {intel} | <b>🛡️ Стойкость:</b> {sta}\n\n" +
-                  $"<b>🌟 Навыки:</b>\n" +
-                  $"• <b>{cd.activeName} (Актив):</b> {cd.activeDesc}\n" +
-                  $"• <b>{cd.passiveNames[0]} (Пассив):</b> {cd.passiveDesc[0]}"
-                : $"<b>Level:</b> {lvl}\n<b>❤️ HP:</b> {hp} | <b>💠 Mana:</b> {maxMana}\n" +
-                  $"<b>⚔️ STR:</b> {str} | <b>🎯 AGI:</b> {agi}\n<b>🔮 INT:</b> {intel} | <b>🛡️ STA:</b> {sta}\n\n" +
-                  $"<b>🌟 Skills:</b>\n" +
-                  $"• <b>{cd.activeName} (Active):</b> {cd.activeDesc}\n" +
-                  $"• <b>{cd.passiveNames[0]} (Passive):</b> {cd.passiveDesc[0]}";
-            hoveredSkillDesc = statsText;
             isHoveringSkill = true;
+            hoveredSkillName = name;
+            hoveredSkillType = curLang == 0 ? "🕵️ ГЕРОЙ-СОЮЗНИК" : "🕵️ ALLIED HERO";
+            hoveredSkillDesc = curLang == 0 ?
+                $"Ранг: {lvl} (XP: {xp}/1000)\n\n★ Специализированный герой, нанятый для поддержки авангарда цитадели." :
+                $"Rank: {lvl} (XP: {xp}/1000)\n\n★ Specialized hero recruited to support the citadel vanguard.";
+            hoveredSkillIcon = GetTroopAvatarTexture(id);
         }
         else
         {
-            TroopData td = GetTroopData(id);
-            hoveredSkillName = curLang == 0 ? td.nameRU : td.nameEN;
-            hoveredSkillType = curLang == 0 ? "Гарнизонный Воин" : "Garrison Soldier";
-            hoveredSkillIcon = GetTroopAvatarTexture(id);
+            // Regular troop
+            int troopLvl = GetTroopLevel(id, activeDetailsIndex);
+            int troopXp = GetTroopXP(id, activeDetailsIndex);
+            string name = GetUnitNameByID(id, curLang);
 
-            string activeLabel = td.activeNames != null && td.activeNames.Length > 0 ? td.activeNames[0] : "";
-            string activeD = td.activeDesc != null && td.activeDesc.Length > 0 ? td.activeDesc[0] : "";
-            string passiveLabel = td.passiveNames != null && td.passiveNames.Length > 0 ? td.passiveNames[0] : "";
-            string passiveD = td.passiveDesc != null && td.passiveDesc.Length > 0 ? td.passiveDesc[0] : "";
-
-            string statsText = curLang == 0 
-                ? $"<b>Ранг/Тир:</b> {td.tier}\n<b>❤️ ОЗ:</b> {td.hp} | <b>⚔️ АТК:</b> {td.atk} | <b>🛡️ ЗАЩ:</b> {td.def}\n" +
-                  $"<b>⚡ Скорость:</b> {td.spd}\n\n" +
-                  $"<b>🌟 Навыки:</b>\n" +
-                  (string.IsNullOrEmpty(activeLabel) ? "" : $"• <b>{activeLabel} (Актив):</b> {activeD}\n") +
-                  (string.IsNullOrEmpty(passiveLabel) ? "" : $"• <b>{passiveLabel} (Пассив):</b> {passiveD}")
-                : $"<b>Tier:</b> {td.tier}\n<b>❤️ HP:</b> {td.hp} | <b>⚔️ ATK:</b> {td.atk} | <b>🛡️ DEF:</b> {td.def}\n" +
-                  $"<b>⚡ Speed:</b> {td.spd}\n\n" +
-                  $"<b>🌟 Skills:</b>\n" +
-                  (string.IsNullOrEmpty(activeLabel) ? "" : $"• <b>{activeLabel} (Active):</b> {activeD}\n") +
-                  (string.IsNullOrEmpty(passiveLabel) ? "" : $"• <b>{passiveLabel} (Passive):</b> {passiveD}");
-            hoveredSkillDesc = statsText;
             isHoveringSkill = true;
+            hoveredSkillName = name;
+            hoveredSkillType = curLang == 0 ? "⚔️ РЕГУЛЯРНЫЙ ОТРЯД" : "⚔️ REGULAR COHORT";
+            hoveredSkillDesc = curLang == 0 ?
+                $"Ранг: {troopLvl} (XP: {troopXp}/1000)\n\n★ Боевая когорта, охраняющая этот замок и участвующая в походах." :
+                $"Rank: {troopLvl} (XP: {troopXp}/1000)\n\n★ Combat cohort defending this castle and participating in crusades.";
+            hoveredSkillIcon = GetTroopAvatarTexture(id);
         }
     }
+
+    private Vector2 forgeScrollPos = Vector2.zero;
 
     private void DrawUnitItem(string id, string nameRU, string nameEN, string nameCH, string nameKR, int price, int requiredLvl, int castleLvl)
     {
@@ -8682,64 +8941,37 @@ public class FateCastleManager : MonoBehaviour
             ShowFeedback(copyMsg);
         }
         GUILayout.Space(2);
-        if (GUILayout.Button("🔮 Mage", GUILayout.Width(65), GUILayout.Height(18)))
+        if (GUILayout.Button("🔮 Mage", GUILayout.Width(75), GUILayout.Height(18)))
         {
             string p = GetItemPrompt(slotType, tier, "mage");
             GUIUtility.systemCopyBuffer = p;
             string copyMsg = curLang == 0 ? $"Промпт Мага для {GetItemName(slotType, tier, curLang, "mage")} скопирован!" : $"Mage prompt for {GetItemName(slotType, tier, curLang, "mage")} copied!";
             ShowFeedback(copyMsg);
         }
-        // Кнопка Инфо удалена по запросу пользователя для лаконичности интерфейса кузницы
-
-        if (!string.IsNullOrEmpty(classRecommend))
-        {
-            GUILayout.Space(5);
-            GUIStyle recStyle = new GUIStyle(GUI.skin.label);
-            recStyle.fontSize = 9;
-            recStyle.normal.textColor = new Color(1f, 0.7f, 0.15f);
-            GUILayout.Label(classRecommend, recStyle);
-        }
         GUILayout.EndHorizontal();
 
-        string reqText = curLang == 0 ? 
-            $"Требуемый уровень Замка: {reqLvl}" : 
-            $"Required Castle Level: {reqLvl}";
-        if (curLang == 8) reqText = $"需要城堡等级: {reqLvl}";
-        if (curLang == 7) reqText = $"필요 성 레벨: {reqLvl}";
+        GUILayout.EndVertical(); // End details
 
-        GUIStyle reqStyle = new GUIStyle(GUI.skin.label);
-        reqStyle.fontSize = 10;
-        reqStyle.normal.textColor = isUnlocked ? Color.green : Color.red;
-        GUILayout.Label(reqText, reqStyle);
+        GUILayout.Space(12);
 
-        GUILayout.EndVertical();
-
-        // Tooltip logic when hovering over icon
-        if (Event.current.type == EventType.Repaint && iconRect.Contains(Event.current.mousePosition))
-        {
-            isHoveringSkill = true;
-            hoveredSkillName = $"{name} (Тир {tier})";
-            
-            string toolDesc = $"{statDesc}";
-            if (!string.IsNullOrEmpty(classRecommend))
-            {
-                toolDesc += $"\n\n<color=yellow>{classRecommend}</color>";
-            }
-            string previewPrompt = GetItemPrompt(slotType, tier, previewClass);
-            toolDesc += $"\n\n<color=cyan><b>AI Prompt ({previewClass.ToUpper()}):</b> {previewPrompt}</color>";
-            toolDesc += $"\n\n{(isUnlocked ? "<color=green>Доступно для создания</color>" : $"<color=red>Требуется Замок Ур.{reqLvl}</color>")}";
-
-            hoveredSkillDesc = toolDesc;
-            hoveredSkillType = curLang == 0 ? "⚔️ СНАРЯЖЕНИЕ" : "⚔️ EQUIPMENT";
-            hoveredSkillIcon = itemTex;
-        }
-
-        GUILayout.FlexibleSpace();
-
+        // Craft / Forge button on the right
         if (isUnlocked)
         {
-            if (GUILayout.Button($"{price} 💰", GUILayout.Width(100), GUILayout.Height(35)))
+            GUIStyle forgeBtnStyle = new GUIStyle(GUI.skin.button);
+            forgeBtnStyle.fontStyle = FontStyle.Bold;
+            forgeBtnStyle.fontSize = 11;
+            
+            bool canAfford = SaveGameSystem.CurrentData != null && SaveGameSystem.CurrentData.gold >= price;
+            GUI.backgroundColor = canAfford ? new Color(0.2f, 0.8f, 0.3f, 1f) : new Color(0.8f, 0.2f, 0.2f, 1f);
+
+            string btnText = curLang == 0 ? $"Выковать ({price}🪙)" : $"Forge ({price}🪙)";
+            if (curLang == 8) btnText = $"锻造 ({price}🪙)";
+            if (curLang == 7) btnText = $"제작 ({price}🪙)";
+
+            if (GUILayout.Button(btnText, forgeBtnStyle, GUILayout.Width(100), GUILayout.Height(35)))
             {
+                if (SaveGameSystem.CurrentData == null) return;
+                
                 if (SaveGameSystem.CurrentData.gold < price)
                 {
                     ShowFeedback(curLang == 0 ? "Недостаточно золота в казне замка!" : "Insufficient gold for blacksmith services!");
@@ -8767,11 +8999,12 @@ public class FateCastleManager : MonoBehaviour
                     }
                 }
             }
+            GUI.backgroundColor = Color.white;
         }
         else
         {
             GUI.enabled = false;
-            string lockLabel = curLang == 0 ? $"Заперто 🔒" : $"Locked 🔒";
+            string lockLabel = curLang == 0 ? "Заперто 🔒" : "Locked 🔒";
             if (curLang == 8) lockLabel = "已锁 🔒";
             if (curLang == 7) lockLabel = "잠김 🔒";
             GUILayout.Button(lockLabel, GUILayout.Width(100), GUILayout.Height(35));

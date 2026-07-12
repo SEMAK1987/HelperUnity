@@ -320,6 +320,22 @@ namespace FateContinent
             // СВЕРХВАЖНО: Кэшируем оригинальные красивые материалы регионов перед их деактивацией или перекраской!
             CacheOriginalMaterials();
 
+            // Автоматически скрываем любые 3D-рендеры на анкорах высадки, чтобы они не отображались на континенте как лишние цветные шары/точки!
+            if (landingPoints != null)
+            {
+                foreach (var pt in landingPoints)
+                {
+                    if (pt != null && pt.spawnAnchor != null)
+                    {
+                        var rends = pt.spawnAnchor.GetComponentsInChildren<Renderer>(true);
+                        foreach (var r in rends)
+                        {
+                            r.enabled = false;
+                        }
+                    }
+                }
+            }
+
             // Гарантируем, что визуальная фигурка героя соответствует выбранному классу
             ApplyPlayerVisualClass();
 
@@ -703,6 +719,22 @@ namespace FateContinent
         {
             CacheOriginalMaterials();
 
+            int actualPlayerRegion = 11;
+            try
+            {
+                actualPlayerRegion = FateCastleManager.GetActualRegionIndexFromLanding(activeZoneIndex);
+            }
+            catch
+            {
+                switch (activeZoneIndex)
+                {
+                    case 0: actualPlayerRegion = 11; break;
+                    case 1: actualPlayerRegion = 6; break;
+                    case 2: actualPlayerRegion = 8; break;
+                    case 3: actualPlayerRegion = 3; break;
+                }
+            }
+
             GameObject newContinent = GameObject.Find("New_Kontinent") ?? GameObject.Find("Континент");
             if (newContinent != null)
             {
@@ -710,19 +742,66 @@ namespace FateContinent
                 {
                     string regionName = "Region_" + i.ToString("D2");
                     Transform regTrans = newContinent.transform.Find(regionName);
+                    if (regTrans == null)
+                    {
+                        foreach (Transform child in newContinent.GetComponentsInChildren<Transform>(true))
+                        {
+                            if (child.name == regionName)
+                            {
+                                regTrans = child;
+                                break;
+                            }
+                        }
+                    }
+
                     if (regTrans != null)
                     {
                         Renderer mr = regTrans.GetComponent<Renderer>();
                         if (mr != null)
                         {
-                            // ВОЗВРАЩАЕМ КАК БЫЛО: восстанавливаем оригинальные красивые материалы со всеми текстурами для абсолютно ВСЕХ регионов континента!
-                            if (originalRegionMaterials.ContainsKey(regionName) && originalRegionMaterials[regionName] != null)
+                            if (i == actualPlayerRegion)
                             {
-                                mr.sharedMaterial = originalRegionMaterials[regionName];
+                                // Единственный выбранный квадрат высадки игрока красим в яркий синий неон игрока
+                                Color targetColor = new Color(0.12f, 0.58f, 0.95f, 1.0f);
+                                if (mr.material != null)
+                                {
+                                    mr.material.color = targetColor;
+                                    if (mr.material.HasProperty("_BaseColor"))
+                                    {
+                                        mr.material.SetColor("_BaseColor", targetColor);
+                                    }
+                                    if (mr.material.HasProperty("_Color"))
+                                    {
+                                        mr.material.SetColor("_Color", targetColor);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                // Восстанавливаем оригинальный красивый текстурированный материал для ВСЕХ остальных регионов!
+                                // Благодаря этому континент сохраняет свои оригинальные цвета и текстуры (верните назад как было).
+                                if (originalRegionMaterials != null && originalRegionMaterials.ContainsKey(regionName))
+                                {
+                                    mr.sharedMaterial = originalRegionMaterials[regionName];
+                                    if (mr.sharedMaterial != null)
+                                    {
+                                        // Сбрасываем цвет тинта на стандартный белый, чтобы вернуть оригинальные цвета текстур
+                                        mr.sharedMaterial.color = Color.white;
+                                        if (mr.sharedMaterial.HasProperty("_BaseColor"))
+                                        {
+                                            mr.sharedMaterial.SetColor("_BaseColor", Color.white);
+                                        }
+                                        if (mr.sharedMaterial.HasProperty("_Color"))
+                                        {
+                                            mr.sharedMaterial.SetColor("_Color", Color.white);
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                 }
+                Debug.Log($"[LANDING SYS] Успешно перекрасили регионы. Активный регион высадки: Region_{actualPlayerRegion:D2} (яркий синий). Остальные регионы сброшены на исходные текстуры и материалы.");
             }
         }
 
@@ -770,9 +849,8 @@ namespace FateContinent
         }
 
         /// <summary>
-        /// Динамически заменяет синюю сферу Player_Placeholder на высококачественную 3D-фигурку героя
-        /// в зависимости от выбранного игроком класса (Воин, Стрелок, Маг).
-        /// Приоритет отдается перетащенным в инспектор префабам. В случае их отсутствия используется fallback на Resources.
+        /// Динамически заменяет круг-плейсхолдер на выбранную 3D-модель Героя.
+        /// Скрывает оригинальный синий/красный круг, чтобы он не отображался вокруг фигурки персонажа.
         /// </summary>
         public void ApplyPlayerVisualClass()
         {
@@ -782,75 +860,10 @@ namespace FateContinent
                 return;
             }
 
-            // Получаем класс игрока из системы сохранений (в Play Mode) или из настройки предпросмотра (в Edit Mode)
-            string charClass = "warrior";
-            if (Application.isPlaying)
-            {
-                if (SaveGameSystem.CurrentData != null && !string.IsNullOrEmpty(SaveGameSystem.CurrentData.characterClass))
-                {
-                    charClass = SaveGameSystem.CurrentData.characterClass.ToLower();
-                }
-            }
-            else
-            {
-                charClass = editorPreviewClass.ToString().ToLower();
-            }
+            // Кэшируем оригинальный меш плейсхолдера, если не кэшировали ранее
+            CachePlaceholderMesh();
 
-            bool isWarrior = charClass.Contains("warrior") || charClass.Contains("voin") || charClass.Contains("воин") || charClass.Contains("paladin");
-            bool isArcher = charClass.Contains("archer") || charClass.Contains("strelok") || charClass.Contains("streloc") || charClass.Contains("стрелок") || charClass.Contains("лучник") || charClass.Contains("ranger") || charClass.Contains("bow");
-            bool isMage = charClass.Contains("mage") || charClass.Contains("mag") || charClass.Contains("маг") || charClass.Contains("wizard") || charClass.Contains("mar");
-
-            GameObject heroModelPrefab = null;
-
-            if (isWarrior)
-            {
-                // Сначала проверяем слот в инспекторе
-                if (warriorModelPrefab != null)
-                {
-                    heroModelPrefab = warriorModelPrefab;
-                }
-                else
-                {
-                    heroModelPrefab = Resources.Load<GameObject>("Heroes_pick/Warrior");
-                    if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Воин");
-                    if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Warrior");
-                }
-            }
-            else if (isArcher)
-            {
-                // Сначала проверяем слот в инспекторе
-                if (archerModelPrefab != null)
-                {
-                    heroModelPrefab = archerModelPrefab;
-                }
-                else
-                {
-                    heroModelPrefab = Resources.Load<GameObject>("Heroes_pick/Streloc");
-                    if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes_pick/Strelok");
-                    if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Стрелок");
-                    if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Archer");
-                    if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Strelok");
-                }
-            }
-            else if (isMage)
-            {
-                // Сначала проверяем слот в инспекторе
-                if (mageModelPrefab != null)
-                {
-                    heroModelPrefab = mageModelPrefab;
-                }
-                else
-                {
-                    heroModelPrefab = Resources.Load<GameObject>("Heroes_pick/Mage");
-                    if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes_pick/Mar");
-                    if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Mar");
-                    if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Маг");
-                    if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Mage");
-                    if (heroModelPrefab == null) heroModelPrefab = Resources.Load<GameObject>("Heroes/Mag");
-                }
-            }
-
-            // Перед спавном новой модели сначала аккуратно удаляем все старые, чтобы избежать дублирования
+            // 1. Очищаем любые ранее инстанцированные временные 3D-модели (Player_Model_Visual), если они есть
             var childrenToDestroy = new System.Collections.Generic.List<GameObject>();
             foreach (Transform child in playerTransform)
             {
@@ -872,127 +885,86 @@ namespace FateContinent
                 }
             }
 
-            if (heroModelPrefab != null)
+            // 2. Определяем выбранный класс игрока (в зависимости от playmode или editor preview)
+            string charClass = "warrior";
+            if (Application.isPlaying && SaveGameSystem.CurrentData != null && !string.IsNullOrEmpty(SaveGameSystem.CurrentData.characterClass))
             {
-                // Сначала кэшируем оригинальный меш плейсхолдера, чтобы можно было восстановить при необходимости
-                CachePlaceholderMesh();
-
-                // 1. ПОЛНОСТЬЮ выключаем стандартные рендереры плейсхолдера (круга/сферы)
-                var mainRenderer = playerTransform.GetComponent<Renderer>();
-                if (mainRenderer != null)
-                {
-                    mainRenderer.enabled = false;
-                }
-
-                // Отключаем MeshRenderer напрямую, чтобы круг не мешал
-                var mainMeshRenderer = playerTransform.GetComponent<MeshRenderer>();
-                if (mainMeshRenderer != null)
-                {
-                    mainMeshRenderer.enabled = false;
-                }
-
-                // Убираем sharedMesh, чтобы в Scene view Редактора не рисовался каркас сферы/круга при выделении!
-                var mf = playerTransform.GetComponent<MeshFilter>();
-                if (mf != null)
-                {
-                    mf.sharedMesh = null;
-                }
-
-                // Выключаем SphereCollider сферы, чтобы убрать зеленый каркас в сцене
-                var sc = playerTransform.GetComponent<SphereCollider>();
-                if (sc != null)
-                {
-                    sc.enabled = false;
-                }
-
-                foreach (Transform child in playerTransform)
-                {
-                    if (child.name != "Player_Model_Visual")
-                    {
-                        foreach (var r in child.GetComponentsInChildren<Renderer>(true))
-                        {
-                            r.enabled = false;
-                        }
-                    }
-                }
-
-                // 2. Инстанциируем новую 3D-модель под объектом Player_Placeholder
-                GameObject instantiatedModel = null;
-#if UNITY_EDITOR
-                if (!Application.isPlaying)
-                {
-                    instantiatedModel = UnityEditor.PrefabUtility.InstantiatePrefab(heroModelPrefab) as GameObject;
-                    if (instantiatedModel != null)
-                    {
-                        instantiatedModel.transform.SetParent(playerTransform, false);
-                    }
-                }
-#endif
-                if (instantiatedModel == null)
-                {
-                    instantiatedModel = Instantiate(heroModelPrefab, playerTransform);
-                }
-
-                instantiatedModel.name = "Player_Model_Visual";
-                
-                // Сбрасываем локальные координаты, чтобы модель стояла ровно в центре сферы
-                instantiatedModel.transform.localPosition = Vector3.zero;
-                instantiatedModel.transform.localRotation = Quaternion.identity;
-
-                // Устанавливаем масштаб модели с учётом компенсации масштаба родительского объекта
-                float parentScaleX = playerTransform.localScale.x != 0 ? playerTransform.localScale.x : 1f;
-                float parentScaleY = playerTransform.localScale.y != 0 ? playerTransform.localScale.y : 1f;
-                float parentScaleZ = playerTransform.localScale.z != 0 ? playerTransform.localScale.z : 1f;
-                
-                instantiatedModel.transform.localScale = new Vector3(
-                    customHeroModelScale / parentScaleX,
-                    customHeroModelScale / parentScaleY,
-                    customHeroModelScale / parentScaleZ
-                );
-
-                Debug.Log($"<color=#00FFCC>[LANDING SYS]</color> Успешно заменили круг-сферу на 3D-модель класса: <b>{charClass}</b> (Объект: {heroModelPrefab.name}, компенсированный масштаб: {instantiatedModel.transform.localScale})");
+                charClass = SaveGameSystem.CurrentData.characterClass.ToLower();
             }
             else
             {
-                // Если префабы/модели еще не назначены и файлы не найдены, возвращаем стандартную видимость сферы-круга, чтобы не ломать игру
-                var mainRenderer = playerTransform.GetComponent<Renderer>();
-                if (mainRenderer != null)
-                {
-                    mainRenderer.enabled = true;
-                }
-
-                var mainMeshRenderer = playerTransform.GetComponent<MeshRenderer>();
-                if (mainMeshRenderer != null)
-                {
-                    mainMeshRenderer.enabled = true;
-                }
-
-                // Восстанавливаем оригинальный меш плейсхолдера
-                var mf = playerTransform.GetComponent<MeshFilter>();
-                if (mf != null && isPlaceholderMeshCached)
-                {
-                    mf.sharedMesh = originalPlaceholderMesh;
-                }
-
-                // Включаем SphereCollider обратно
-                var sc = playerTransform.GetComponent<SphereCollider>();
-                if (sc != null)
-                {
-                    sc.enabled = true;
-                }
-
-                foreach (Transform child in playerTransform)
-                {
-                    if (child.name != "Player_Model_Visual")
-                    {
-                        foreach (var r in child.GetComponentsInChildren<Renderer>(true))
-                        {
-                            r.enabled = true;
-                        }
-                    }
-                }
-                Debug.LogWarning($"[LANDING SYS] Модель для класса {charClass} не найдена в слотах инспектора и папке Resources/Heroes_pick/. Используем стандартный шар-плейсхолдер.");
+                charClass = editorPreviewClass.ToString().ToLower();
             }
+
+            // 3. ПОЛНОСТЬЮ СКРЫВАЕМ ВИЗУАЛ ОРИГИНАЛЬНОГО КРУГА (Player_Placeholder сам по себе не должен отображаться)
+            var mainRenderer = playerTransform.GetComponent<Renderer>();
+            if (mainRenderer != null)
+            {
+                mainRenderer.enabled = false; // Отключаем рендеринг шара/круга
+            }
+
+            var mainMeshRenderer = playerTransform.GetComponent<MeshRenderer>();
+            if (mainMeshRenderer != null)
+            {
+                mainMeshRenderer.enabled = false; // Отключаем рендеринг шара/круга
+            }
+
+            // 4. Если в инспекторе назначены префабы 3D-моделей классов, инстанцируем нужный префаб
+            GameObject activePrefab = null;
+            if (charClass.Contains("warrior") || charClass.Contains("воин") || charClass.Contains("voin"))
+                activePrefab = warriorModelPrefab;
+            else if (charClass.Contains("archer") || charClass.Contains("стрелок") || charClass.Contains("strelok"))
+                activePrefab = archerModelPrefab;
+            else if (charClass.Contains("mage") || charClass.Contains("маг") || charClass.Contains("mag"))
+                activePrefab = mageModelPrefab;
+
+            if (activePrefab != null)
+            {
+                GameObject instantiated = Instantiate(activePrefab, playerTransform);
+                instantiated.name = "Player_Model_Visual";
+                instantiated.transform.localPosition = Vector3.zero;
+                instantiated.transform.localRotation = Quaternion.identity;
+                instantiated.transform.localScale = Vector3.one * customHeroModelScale;
+                Debug.Log($"[LANDING SYS] Создали 3D-фигурку класса {charClass} на месте Player_Placeholder из назначенного префаба.");
+            }
+
+            // 5. Также проверяем встроенные дочерние объекты (на случай, если пользователь закинул фигурки прямо под Player_Placeholder)
+            foreach (Transform child in playerTransform)
+            {
+                if (child.name == "Player_Model_Visual") continue;
+
+                string cName = child.name.ToLower();
+                bool isWarriorModel = cName.Contains("warrior") || cName.Contains("voin") || cName.Contains("warrior_") || cName.Contains("voin_");
+                bool isArcherModel = cName.Contains("archer") || cName.Contains("strelok") || cName.Contains("лучник") || cName.Contains("streloc") || cName.Contains("archer_");
+                bool isMageModel = cName.Contains("mage") || cName.Contains("mag") || cName.Contains("маг") || cName.Contains("mage_") || cName.Contains("mag_");
+
+                if (isWarriorModel || isArcherModel || isMageModel)
+                {
+                    bool shouldBeActive = false;
+                    if (isWarriorModel && (charClass.Contains("warrior") || charClass.Contains("воин") || charClass.Contains("voin")))
+                        shouldBeActive = true;
+                    else if (isArcherModel && (charClass.Contains("archer") || charClass.Contains("стрелок") || charClass.Contains("strelok")))
+                        shouldBeActive = true;
+                    else if (isMageModel && (charClass.Contains("mage") || charClass.Contains("маг") || charClass.Contains("mag")))
+                        shouldBeActive = true;
+
+                    child.gameObject.SetActive(shouldBeActive);
+                    Debug.Log($"[LANDING SYS] Нашли дочерний 3D объект {child.name}. Установили активность: {shouldBeActive} на основе класса {charClass}.");
+                }
+                else if (cName.Contains("placeholder") || cName.Contains("circle") || cName.Contains("ring") || cName.Contains("sphere") || cName.Contains("glow"))
+                {
+                    // Скрываем дочерние кольца/свечения/плейсхолдеры, которые мешают просмотру фигурок
+                    child.gameObject.SetActive(false);
+                    var childRends = child.GetComponentsInChildren<Renderer>(true);
+                    foreach (var cr in childRends)
+                    {
+                        cr.enabled = false;
+                    }
+                    Debug.Log($"[LANDING SYS] Скрыли дочерний визуальный элемент плейсхолдера: {child.name}");
+                }
+            }
+
+            Debug.Log($"[LANDING SYS] Успешно применили визуальный 3D класс: {charClass}. Исходный круг-плейсхолдер скрыт.");
         }
     }
 }

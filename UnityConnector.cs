@@ -2,6 +2,7 @@
 // Unity Connector for Quantum AI Assistant
 // Updated: 2026-07-04 (Synced with Stable v18.11.24)
 
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.Networking;
@@ -142,3 +143,4 @@ namespace AI_Assistant_Quantum
         }
     }
 }
+#endif
