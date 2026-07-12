@@ -1221,6 +1221,71 @@ async function startServer() {
     res.json({ success: true, message: "Migration logic identified 42 core scripts for conversion to GDScript." });
   });
 
+  // File Listing and Content Endpoint for Manual Quantum Terminal / Copy Script feature
+  app.get("/api/project/files/list", async (req, res) => {
+    try {
+      const filesList = [
+        // Core C# scripts
+        { path: "src/FateCastleManager.cs", name: "FateCastleManager.cs", desc: "Управление замками, пошаговая экономика, рекрутинг, прокачка и телеметрия ПК" },
+        { path: "src/DialogueSystem_Manager.cs", name: "DialogueSystem_Manager.cs", desc: "Система диалогов, катсцены Аэлиссы, автовыравнивание и выбор вариантов" },
+        { path: "src/SaveGameSystem.cs", name: "SaveGameSystem.cs", desc: "Система сохранений и загрузки RPG-прогресса (3 слота на основе PlayerPrefs)" },
+        { path: "src/SettingsManager.cs", name: "SettingsManager.cs", desc: "Управление настройками, аудиомикшер, антиперегрев GPU и лимит кадров" },
+        { path: "src/Translator.cs", name: "Translator.cs", desc: "Ядро локализации на 9 языков с функцией GetText9" },
+        { path: "src/StrategicCameraController.cs", name: "StrategicCameraController.cs", desc: "Управление камерой тактической карты, зум, авто-границы и скроллинг краев" },
+        { path: "src/LandingPositionManager.cs", name: "LandingPositionManager.cs", desc: "Управление высадкой в 4 зоны, интерактивные маркеры, сохранение зоны" },
+        { path: "src/FateMapManager.cs", name: "FateMapManager.cs", desc: "Отрисовка и инициализация интерактивных колец тактической карты мира" },
+        { path: "UnityConnector.cs", name: "UnityConnector.cs", desc: "Связующее звено между Unity и Blender, синхронизация 3D и импорт геометрии" },
+        { path: "FactionMapMarker.cs", name: "FactionMapMarker.cs", desc: "Маркеры фракций на тактической карте мира" },
+        { path: "blender_connector.py", name: "blender_connector.py", desc: "Python-скрипт Blender для связи с Unity-сервером" },
+        { path: "blender_fate_continent_gen.py", name: "blender_fate_continent_gen.py", desc: "Генератор 3D-моделей континента и рельефа в Blender" },
+        { path: "blender_world_gen.py", name: "blender_world_gen.py", desc: "Альтернативный генератор окружения и процедурных объектов Blender" },
+        { path: "BlenderRiggingOptimizer.py", name: "BlenderRiggingOptimizer.py", desc: "Оптимизация скелета, весов и арматуры 3D персонажей в Blender" }
+      ];
+
+      const enrichedList = await Promise.all(
+        filesList.map(async (file) => {
+          try {
+            const fullPath = path.join(process.cwd(), file.path);
+            if (await fs.pathExists(fullPath)) {
+              const content = await fs.readFile(fullPath, "utf8");
+              const lineCount = content.split(/\r?\n/).length;
+              return { ...file, lineCount, exists: true };
+            }
+            return { ...file, lineCount: 0, exists: false };
+          } catch (e) {
+            return { ...file, lineCount: 0, exists: false };
+          }
+        })
+      );
+
+      res.json(enrichedList);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to list files" });
+    }
+  });
+
+  app.get("/api/project/files/content", async (req, res) => {
+    try {
+      const filePathParam = req.query.path as string;
+      if (!filePathParam) {
+        return res.status(400).json({ error: "Path query parameter is required" });
+      }
+
+      // Secure file path checking to prevent path traversal outside workspace
+      const safePath = path.normalize(filePathParam).replace(/^(\.\.(\/|\\|$))+/, '');
+      const fullPath = path.join(process.cwd(), safePath);
+
+      if (!await fs.pathExists(fullPath)) {
+        return res.status(404).json({ error: "File not found" });
+      }
+
+      const content = await fs.readFile(fullPath, "utf8");
+      res.json({ content });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to read file content" });
+    }
+  });
+
   // Game Design Endpoint
   app.get("/api/game-design", async (req, res) => {
     try {

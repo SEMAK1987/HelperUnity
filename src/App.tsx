@@ -1901,6 +1901,7 @@ export default function App() {
     | "game_design"
     | "game_help"
     | "external_skills_db"
+    | "project_scripts"
   >("chat");
   const [appVersion, setAppVersion] = useState("18.11.23");
 
@@ -1979,6 +1980,126 @@ export default function App() {
   const [vkResults, setVkResults] = useState<any[]>([]);
   const [isGeneratingVK, setIsGeneratingVK] = useState(false);
   const [vkProgress, setVkProgress] = useState(0);
+
+  // Core Project Scripts State
+  const [projectFiles, setProjectFiles] = useState<{ path: string; name: string; desc: string; lineCount?: number }[]>([]);
+  const [selectedFile, setSelectedFile] = useState<{ path: string; name: string; desc: string; lineCount?: number } | null>(null);
+  const [selectedFileContent, setSelectedFileContent] = useState<string>("");
+  const [isReadingFile, setIsReadingFile] = useState<boolean>(false);
+  const [copiedFile, setCopiedFile] = useState<boolean>(false);
+
+  // Helper to force reload the currently selected file content
+  const reloadSelectedFileContent = (quiet: boolean = false) => {
+    if (selectedFile) {
+      if (!quiet) setIsReadingFile(true);
+      fetch(`/api/project/files/content?path=${encodeURIComponent(selectedFile.path)}&t=${Date.now()}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && data.content) {
+            setSelectedFileContent(data.content);
+          } else {
+            setSelectedFileContent("Error: Empty file content received.");
+          }
+        })
+        .catch((err) => {
+          console.error("Error reading project file content:", err);
+          if (!quiet) setSelectedFileContent("Error loading file content from server.");
+        })
+        .finally(() => {
+          if (!quiet) setIsReadingFile(false);
+        });
+    }
+  };
+
+  // Helper to reload both file list (with dynamic line counts) and current file content
+  const reloadProjectFilesAndContent = (quiet: boolean = false) => {
+    if (!quiet) setIsReadingFile(true);
+    fetch("/api/project/files/list")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setProjectFiles(data);
+          if (selectedFile) {
+            const updated = data.find(f => f.path === selectedFile.path);
+            if (updated) {
+              setSelectedFile(updated);
+            }
+          }
+        }
+      })
+      .catch((err) => console.error("Error refreshing project files list:", err))
+      .finally(() => {
+        if (selectedFile) {
+          fetch(`/api/project/files/content?path=${encodeURIComponent(selectedFile.path)}&t=${Date.now()}`)
+            .then((res) => res.json())
+            .then((data) => {
+              if (data && data.content) {
+                setSelectedFileContent(data.content);
+              }
+            })
+            .catch((err) => console.error("Error reloading selected file content:", err))
+            .finally(() => {
+              if (!quiet) setIsReadingFile(false);
+            });
+        } else {
+          if (!quiet) setIsReadingFile(false);
+        }
+      });
+  };
+
+  // Fetch file list when tab changes to project_scripts
+  useEffect(() => {
+    if (activeTab === "project_scripts") {
+      fetch("/api/project/files/list")
+        .then((res) => res.json())
+        .then((data) => {
+          if (Array.isArray(data)) {
+            setProjectFiles(data);
+            if (data.length > 0 && !selectedFile) {
+              setSelectedFile(data[0]);
+            }
+          }
+        })
+        .catch((err) => console.error("Error loading project files list:", err));
+    }
+  }, [activeTab]);
+
+  // Fetch file content when selectedFile changes
+  useEffect(() => {
+    if (selectedFile) {
+      reloadSelectedFileContent(false);
+    }
+  }, [selectedFile]);
+
+  // Background Live Synchronization effect - polls disk content and file list every 3.5 seconds
+  useEffect(() => {
+    if (activeTab === "project_scripts" && selectedFile) {
+      const interval = setInterval(() => {
+        fetch("/api/project/files/list")
+          .then((res) => res.json())
+          .then((data) => {
+            if (Array.isArray(data)) {
+              setProjectFiles(data);
+              const updated = data.find(f => f.path === selectedFile.path);
+              if (updated && updated.lineCount !== selectedFile.lineCount) {
+                setSelectedFile(prev => prev ? { ...prev, lineCount: updated.lineCount } : null);
+              }
+            }
+          })
+          .catch((err) => console.error("Error background auto-syncing files list:", err));
+
+        fetch(`/api/project/files/content?path=${encodeURIComponent(selectedFile.path)}&t=${Date.now()}`)
+          .then((res) => res.json())
+          .then((data) => {
+            if (data && data.content && data.content !== selectedFileContent) {
+              setSelectedFileContent(data.content);
+            }
+          })
+          .catch((err) => console.error("Error background auto-syncing file content:", err));
+      }, 3500);
+      return () => clearInterval(interval);
+    }
+  }, [activeTab, selectedFile, selectedFileContent]);
   const [vkStatus, setVkStatus] = useState("");
   const [showStudioGuide, setShowStudioGuide] = useState(false);
 
@@ -4639,6 +4760,16 @@ export default function App() {
                 }`}
               >
                 <Send className="w-3.5 h-3.5" /> Чат
+              </button>
+              <button
+                onClick={() => setActiveTab("project_scripts")}
+                className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2 ${
+                  activeTab === "project_scripts"
+                    ? "bg-amber-600 text-white shadow-lg shadow-amber-600/20"
+                    : "text-slate-500 hover:text-slate-300"
+                }`}
+              >
+                <Code className="w-3.5 h-3.5" /> Скрипты
               </button>
               <button
                 onClick={() => setActiveTab("dashboard")}
@@ -14752,6 +14883,207 @@ export default function App() {
                         >
                           Настройки
                         </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : activeTab === "project_scripts" ? (
+                <div className="flex-1 overflow-hidden flex flex-col p-8">
+                  <div className="max-w-7xl w-full mx-auto flex-1 flex flex-col min-h-0 space-y-6">
+                    {/* Header Banner */}
+                    <div className="p-6 rounded-3xl bg-gradient-to-r from-amber-600/20 via-yellow-600/10 to-transparent border border-amber-500/20 flex items-center justify-between relative overflow-hidden shrink-0">
+                      <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
+                        <Code2 className="w-48 h-48 text-amber-400" />
+                      </div>
+                      <div className="flex items-center gap-4 relative z-10">
+                        <div className="w-12 h-12 bg-amber-600/30 rounded-2xl flex items-center justify-center border border-amber-500/40 text-amber-400">
+                          <FileCode className="w-6 h-6 animate-pulse" />
+                        </div>
+                        <div>
+                          <h2 className="text-lg font-bold text-white uppercase tracking-tight flex items-center gap-2">
+                            Fate Continent Codesmith • Квантовый Дистрибьютор
+                          </h2>
+                          <p className="text-[10px] text-amber-400/80 font-mono uppercase tracking-widest">
+                            Central Script Replication Node — No Manual Selection Errors
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right font-mono text-[9px] text-slate-500">
+                        <div>VERSION: {appVersion}</div>
+                        <div>ACTIVE INSTANCE: SERVER NODE 3000</div>
+                      </div>
+                    </div>
+
+                    {/* Main Workspace split panel */}
+                    <div className="flex-1 flex gap-6 min-h-0 w-full">
+                      {/* Left Sidebar - File List */}
+                      <div className="w-80 flex flex-col bg-white/5 border border-white/5 rounded-3xl p-4 min-h-0 shrink-0">
+                        <div className="px-2 pb-3 border-b border-white/5 flex items-center justify-between">
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">
+                            Файлы Проекта ({projectFiles.length})
+                          </span>
+                          <span className="text-[9px] bg-amber-500/10 border border-amber-500/30 text-amber-400 px-2 py-0.5 rounded-full font-mono uppercase">
+                            Авто-синхронизация
+                          </span>
+                        </div>
+                        <div className="flex-1 overflow-y-auto mt-3 space-y-1.5 pr-1 scrollbar-thin scrollbar-thumb-amber-500/10 hover:scrollbar-thumb-amber-500/20">
+                          {projectFiles.map((file) => {
+                            const isSelected = selectedFile?.path === file.path;
+                            return (
+                              <button
+                                key={file.path}
+                                onClick={() => setSelectedFile(file)}
+                                className={`w-full text-left p-3.5 rounded-2xl border transition-all duration-200 flex items-start gap-3 group relative ${
+                                  isSelected
+                                    ? "bg-amber-600/20 border-amber-500/50 shadow-lg shadow-amber-600/10"
+                                    : "bg-white/[0.02] border-white/5 hover:bg-white/5 hover:border-white/10"
+                                }`}
+                              >
+                                <div className={`p-2 rounded-xl shrink-0 ${isSelected ? "bg-amber-500 text-white" : "bg-black/30 text-slate-400 group-hover:text-white"}`}>
+                                  <FileCode className="w-4 h-4" />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center justify-between gap-1.5 min-w-0">
+                                    <div className={`text-xs font-bold truncate ${isSelected ? "text-white" : "text-slate-300 group-hover:text-white"}`}>
+                                      {file.name}
+                                    </div>
+                                    {file.lineCount !== undefined && (
+                                      <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white/5 text-amber-400 font-bold shrink-0">
+                                        {file.lineCount} строк
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="text-[9px] text-slate-500 mt-0.5 line-clamp-2">
+                                    {file.desc}
+                                  </div>
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Right Panel - Massive Code Viewer */}
+                      <div className="flex-1 flex flex-col bg-black/40 border border-white/5 rounded-3xl min-h-0 overflow-hidden relative">
+                        {/* Tab header */}
+                        <div className="h-14 border-b border-white/5 px-6 flex items-center justify-between bg-black/20 shrink-0">
+                          <div className="flex items-center gap-3">
+                            <Terminal className="w-4 h-4 text-amber-400" />
+                            <span className="text-xs font-mono font-bold text-white">
+                              {selectedFile ? selectedFile.name : "Выберите файл..."}
+                            </span>
+                            {selectedFile && (
+                              <>
+                                <span className="text-[8px] px-2 py-0.5 rounded bg-white/5 border border-white/10 text-slate-400 font-mono">
+                                  {selectedFile.path.endsWith('.cs') ? "C# Script" : "Python Code"}
+                                </span>
+                                {selectedFile.lineCount !== undefined && (
+                                  <span className="text-[8px] px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-400 font-mono font-bold">
+                                    {selectedFile.lineCount} строк
+                                  </span>
+                                )}
+                              </>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            {selectedFile && (
+                              <>
+                                {/* Refresh/Sync button */}
+                                <button
+                                  onClick={() => {
+                                    reloadProjectFilesAndContent(false);
+                                    showNotification(`Содержимое файла ${selectedFile.name} и список скриптов успешно обновлены!`, "success");
+                                  }}
+                                  className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white rounded-xl text-[10px] font-bold uppercase transition-all border border-white/10"
+                                  title="Синхронизировать с диском вручную"
+                                >
+                                  <RefreshCw className={`w-3.5 h-3.5 ${isReadingFile ? 'animate-spin text-amber-400' : ''}`} /> 
+                                  ОБНОВИТЬ
+                                </button>
+
+                                {/* Download button */}
+                                <button
+                                  onClick={() => {
+                                    const element = document.createElement("a");
+                                    const fileBlob = new Blob([selectedFileContent], { type: "text/plain" });
+                                    element.href = URL.createObjectURL(fileBlob);
+                                    element.download = selectedFile.name;
+                                    document.body.appendChild(element);
+                                    element.click();
+                                    document.body.removeChild(element);
+                                    showNotification(`Файл ${selectedFile.name} успешно скачан!`, "success");
+                                  }}
+                                  className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white rounded-xl text-[10px] font-bold uppercase transition-all border border-white/10"
+                                  title="Скачать файл напрямую"
+                                >
+                                  <Download className="w-3.5 h-3.5" /> СКАЧАТЬ
+                                </button>
+
+                                {/* Giant Copy Button with animation state */}
+                                <button
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(selectedFileContent);
+                                    setCopiedFile(true);
+                                    showNotification("ВЕСЬ скрипт успешно скопирован в буфер обмена! Ошибки ручного выделения исключены.", "success");
+                                    setTimeout(() => setCopiedFile(false), 3000);
+                                  }}
+                                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold uppercase transition-all shadow-lg shadow-amber-600/10 ${
+                                    copiedFile
+                                      ? "bg-green-600 text-white"
+                                      : "bg-amber-600 hover:bg-amber-500 text-white"
+                                  }`}
+                                >
+                                  {copiedFile ? (
+                                    <>
+                                      <Check className="w-4 h-4 animate-bounce" />
+                                      СКОПИРОВАНО!
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Copy className="w-4 h-4" />
+                                      КОПИРОВАТЬ ВЕСЬ СКРИПТ
+                                    </>
+                                  )}
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Code Display Area */}
+                        <div className="flex-1 overflow-auto p-6 font-mono text-xs text-slate-300 relative select-text">
+                          {isReadingFile ? (
+                            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/40 backdrop-blur-sm">
+                              <RefreshCw className="w-8 h-8 text-amber-500 animate-spin" />
+                              <span className="text-[10px] uppercase font-mono tracking-widest text-slate-400">
+                                Квантовое считывание строк кода...
+                              </span>
+                            </div>
+                          ) : selectedFileContent ? (
+                            <pre className="text-slate-300 select-text leading-relaxed whitespace-pre font-mono">
+                              {selectedFileContent}
+                            </pre>
+                          ) : (
+                            <div className="h-full flex items-center justify-center text-slate-500 uppercase font-mono text-[10px] tracking-widest">
+                              Выберите файл из левого списка для отображения кода.
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Bottom Stats Line */}
+                        {selectedFile && !isReadingFile && (
+                          <div className="h-8 border-t border-white/5 bg-black/20 px-6 flex items-center justify-between text-[9px] text-slate-500 font-mono shrink-0">
+                            <div>PATH: {selectedFile.path}</div>
+                            <div className="flex items-center gap-4">
+                              <span>LINES: {selectedFileContent.split('\n').length}</span>
+                              <span>CHARACTERS: {selectedFileContent.length}</span>
+                              <span className="text-green-500 flex items-center gap-1">
+                                <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-500 animate-ping" /> READY
+                              </span>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

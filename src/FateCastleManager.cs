@@ -605,6 +605,7 @@ public class FateCastleManager : MonoBehaviour
     private bool potionUsedThisTurnINT = false;
     private bool potionUsedThisTurnSTA = false;
     private bool isCombatActive = false;
+    public bool IsCombatActive => isCombatActive;
 
     [Serializable]
     public class InventoryItem
@@ -3398,229 +3399,29 @@ public class FateCastleManager : MonoBehaviour
                     basePantheon.transform.localScale = new Vector3(3.6f, 5.0f, 3.6f);
                     basePantheon.GetComponent<Renderer>().material = castleMat;
 
-                    // 4 Flanking Guardian Obelisks at corners
-                    float obOffset = 2.0f;
-                    float[] xS = { -obOffset, obOffset };
-                    float[] zS = { -obOffset, obOffset };
-                    foreach (float x in xS)
-                    {
-                        foreach (float z in zS)
-                        {
-                            GameObject obelisk = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                            Destroy(obelisk.GetComponent<BoxCollider>());
-                            obelisk.transform.SetParent(root.transform);
-                            obelisk.transform.localPosition = new Vector3(x, 1.8f, z);
-                            obelisk.transform.localScale = new Vector3(0.6f, 3.6f, 0.6f);
-                            obelisk.GetComponent<Renderer>().material = castleMat;
-                        }
-                    }
+                    GameObject ring = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    Destroy(ring.GetComponent<BoxCollider>());
+                    ring.transform.SetParent(root.transform);
+                    ring.transform.localPosition = new Vector3(0f, 8.5f, 0f);
+                    ring.transform.localScale = new Vector3(3.0f, 0.3f, 3.0f);
+                    
+                    Material glowM = new Material(urpShader);
+                    glowM.color = castle.owner == "Player" ? new Color(0.12f, 0.88f, 1.0f, 1.0f) : new Color(1.0f, 0.15f, 0.45f, 1.0f);
+                    if (glowM.HasProperty("_EmissionColor")) glowM.SetColor("_EmissionColor", glowM.color * 5.0f);
+                    ring.GetComponent<Renderer>().material = glowM;
 
-                    // 3 Concentric Floating Aura Rings
-                    Material auraMat = new Material(urpShader);
-                    auraMat.color = castle.owner == "Player" ? new Color(1.0f, 0.84f, 0.0f, 1.0f) : new Color(0.85f, 0.07f, 1.0f, 1.0f); // Gold vs Celestial Violet
-                    if (auraMat.HasProperty("_EmissionColor")) auraMat.SetColor("_EmissionColor", auraMat.color * 5.0f);
-
-                    float[] ringHeights = { 7.8f, 8.5f, 9.2f };
-                    float[] ringScales = { 2.8f, 2.0f, 1.2f };
-                    for (int rIndex = 0; rIndex < 3; rIndex++)
-                    {
-                        GameObject auraRing = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                        Destroy(auraRing.GetComponent<BoxCollider>());
-                        auraRing.transform.SetParent(root.transform);
-                        auraRing.transform.localPosition = new Vector3(0f, ringHeights[rIndex], 0f);
-                        auraRing.transform.localScale = new Vector3(ringScales[rIndex], 0.15f, ringScales[rIndex]);
-                        auraRing.GetComponent<Renderer>().material = auraMat;
-                    }
-
-                    // Colossal Hovering Prism
-                    GameObject corePrism = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    Destroy(corePrism.GetComponent<BoxCollider>());
-                    corePrism.transform.SetParent(root.transform);
-                    corePrism.transform.localPosition = new Vector3(0f, 9.8f, 0f);
-                    corePrism.transform.localScale = new Vector3(0.8f, 1.6f, 0.8f);
-                    corePrism.transform.localRotation = Quaternion.Euler(45f, 45f, 45f);
-                    corePrism.GetComponent<Renderer>().material = auraMat;
+                    GameObject prism = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    Destroy(prism.GetComponent<BoxCollider>());
+                    prism.transform.SetParent(root.transform);
+                    prism.transform.localPosition = new Vector3(0f, 8.5f, 0f);
+                    prism.transform.localScale = new Vector3(0.8f, 1.6f, 0.8f);
+                    prism.GetComponent<Renderer>().material = glowM;
                 }
             }
-            else
-            {
-                // Для НЕ-игровых нейтральных замков выстраивается упрощённый аскетичный форт матового серого цвета
-                Material neutralMat = new Material(urpShader);
-                neutralMat.color = new Color(0.44f, 0.46f, 0.50f, 1.0f); // Красивый нейтральный матовый стальной цвет
-                if (neutralMat.HasProperty("_Glossiness")) neutralMat.SetFloat("_Glossiness", 0.45f);
-                if (neutralMat.HasProperty("_Smoothness")) neutralMat.SetFloat("_Smoothness", 0.45f);
-                if (neutralMat.HasProperty("_Metallic")) neutralMat.SetFloat("_Metallic", 0.3f);
 
-                GameObject tower = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                Destroy(tower.GetComponent<CapsuleCollider>());
-                tower.transform.SetParent(root.transform);
-                tower.transform.localPosition = new Vector3(0f, 1.2f, 0f);
-                tower.transform.localScale = new Vector3(1.1f, 2.4f, 1.1f);
-                tower.GetComponent<Renderer>().material = neutralMat;
-
-                GameObject topRim = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                Destroy(topRim.GetComponent<BoxCollider>());
-                topRim.transform.SetParent(root.transform);
-                topRim.transform.localPosition = new Vector3(0f, 2.3f, 0f);
-                topRim.transform.localScale = new Vector3(1.3f, 0.3f, 1.3f);
-                topRim.GetComponent<Renderer>().material = neutralMat;
-            }
-
+            // Сохраняем ссылку на корень визуализации
             castle.visualRoot = root;
         }
-    }
-
-    /// <summary>
-    /// ПОШАГОВОЕ ЗАВЕРШЕНИЕ ДНЯ (End Turn / Пропустить ход)
-    /// </summary>
-    public void AdvanceDay()
-    {
-        // Сброс временных бонусов и флагов использования зелий на начало нового дня
-        tempBonusSTR = 0;
-        tempBonusAGI = 0;
-        tempBonusINT = 0;
-        tempBonusSTA = 0;
-
-        potionUsedThisTurnHP = false;
-        potionUsedThisTurnSTR = false;
-        potionUsedThisTurnAGI = false;
-        potionUsedThisTurnINT = false;
-        potionUsedThisTurnSTA = false;
-
-        currentDay++;
-        PlayerPrefs.SetInt("Fate_Current_Day", currentDay);
-        PlayerPrefs.Save();
-
-        aiLogs.Clear();
-
-        // 1. Пополнение кошелька за счёт принадлежащих игроку территорий
-        int totalIncome = 0;
-        for (int i = 0; i < castles.Count; i++)
-        {
-            if (castles[i].owner == "Player")
-            {
-                totalIncome += GetGoldIncome(castles[i].level);
-            }
-        }
-        SaveGameSystem.CurrentData.gold += totalIncome;
-
-        // 2. АВТОМАТИЧЕСКАЯ ИУ-СИМУЛЯЦИЯ (Действия Лордов компьютера в зависимости от сложности)
-        int diff = SaveGameSystem.CurrentData.selectedDifficulty; // 0: Easy, 1: Med, 2: Hard, 3: Nightmare, 4: Hell
-        
-        for (int i = 0; i < castles.Count; i++)
-        {
-            CastleInstance c = castles[i];
-            if (c.owner == "Enemy")
-            {
-                // Начисление золота ИИ
-                int aiIncome = GetGoldIncome(c.level);
-                float diffMultiplier = useManualAiSimulationSettings ? manualAiIncomeMultiplier : (1.0f + (diff * 0.4f)); // Чем выше сложность, тем больше золота у ИИ
-                c.goldAccumulated += aiIncome * diffMultiplier;
-
-                // Логические вероятности прокачек компьютера на ход
-                float upgradeChance = useManualAiSimulationSettings ? manualAiUpgradeProbability : (0.15f + (diff * 0.20f)); 
-                float recruitChance = useManualAiSimulationSettings ? manualAiRecruitProbability : (0.25f + (diff * 0.15f));
-                float equipmentChance = useManualAiSimulationSettings ? manualAiEquipmentProbability : (0.20f + (diff * 0.12f));
-
-                // А. Попытка улучшения замка компьютером
-                int aiContinent = PlayerPrefs.GetInt("Fate_Current_Continent", 1);
-                int aiMaxLevelLimit = aiContinent == 1 ? 3 : 7;
-                if (c.level < aiMaxLevelLimit && c.goldAccumulated >= GetUpgradeCost(c.level) && UnityEngine.Random.value < upgradeChance)
-                {
-                    c.goldAccumulated -= GetUpgradeCost(c.level);
-                    c.level++;
-                    PlayerPrefs.SetInt("Castle_Level_" + i, c.level);
-                    
-                    string upLog = Translator.LanguageID == 0 ? 
-                        $"🛡️ [{c.nameRU}] Вражеский Лорд улучшил цитадель до {c.level} уровня!" :
-                        $"🛡️ [{c.nameEN}] Enemy Lord upgraded fortress to Level {c.level}!";
-                    if (Translator.LanguageID == 8) upLog = $"🛡️ [{c.nameCH}] 敌方领主将主城升级至第 {c.level} 级！";
-                    if (Translator.LanguageID == 7) upLog = $"🛡️ [{c.nameKR}] 적 군주가 요새를 {c.level}단계로 강화했습니다!";
-                    
-                    aiLogs.Add(upLog);
-                }
-
-                // Б. Вербовка войск компьютером в гарнизон
-                if (UnityEngine.Random.value < recruitChance)
-                {
-                    int troopGain = UnityEngine.Random.Range(5, 12) + (diff * 4);
-                    c.aiTroopsPower += troopGain;
-                    PlayerPrefs.SetInt("Castle_AI_Troops_" + i, c.aiTroopsPower);
-
-                    string trLog = Translator.LanguageID == 0 ?
-                        $"⚔️ [{c.nameRU}] Силы гарнизона усилены ветеранами (+{troopGain} боевая мощь)." :
-                        $"⚔️ [{c.nameEN}] Garrison defenses reinforced (+{troopGain} combat power).";
-                    if (Translator.LanguageID == 8) trLog = $"⚔️ [{c.nameCH}] 守军获得精锐部队增援（+{troopGain} 战斗力）。";
-                    if (Translator.LanguageID == 7) trLog = $"⚔️ [{c.nameKR}] 수비 대열에 숙련병 훈련 완료 소집 (+{troopGain} 전투 성능).";
-
-                    aiLogs.Add(trLog);
-                }
-
-                // В. Закупка снаряжения и раздача ИИ героям (Формула зависимости)
-                if (c.aiArmorTier < 6 && UnityEngine.Random.value < equipmentChance)
-                {
-                    c.aiArmorTier++;
-                    PlayerPrefs.SetInt("Castle_AI_Armor_" + i, c.aiArmorTier);
-
-                    string armorNameRU = GetEquipmentTierName(c.aiArmorTier, 0);
-                    string armorNameEN = GetEquipmentTierName(c.aiArmorTier, 1);
-
-                    string eqLog = Translator.LanguageID == 0 ?
-                        $"🛡️ Вражеский полководец в [{c.nameRU}] экипирован: {armorNameRU}!" :
-                        $"🛡️ Enemy commander in [{c.nameEN}] equipped: {armorNameEN}!";
-                    if (Translator.LanguageID == 8) eqLog = $"🛡️ 在 [{c.nameCH}] 的敌方军官装备了新的防具：{GetEquipmentTierName(c.aiArmorTier, 8)}！";
-                    if (Translator.LanguageID == 7) eqLog = $"🛡️ [{c.nameKR}] 의 적 지휘관이 중갑 보급품 {GetEquipmentTierName(c.aiArmorTier, 7)}을(를) 수령 및 무장했습니다!";
-
-                    aiLogs.Add(eqLog);
-                }
-
-                // Г. Покупка зелий и их применение
-                if (UnityEngine.Random.value < 0.4f)
-                {
-                    c.aiPotionsStock += UnityEngine.Random.Range(1, 3);
-                    PlayerPrefs.SetInt("Castle_AI_Potions_" + i, c.aiPotionsStock);
-                }
-
-                // Д. Прогресс прокачки уровней воинов ИИ
-                c.aiCommanderLevel += UnityEngine.Random.value < (0.3f + diff * 0.1f) ? 1 : 0;
-                PlayerPrefs.SetInt("Castle_AI_CommanderLvl_" + i, c.aiCommanderLevel);
-            }
-        }
-
-        PlayerPrefs.Save();
-
-        // Пересоздаем визуал, чтобы отразить процедурный морфинг для крепостей ИИ
-        SpawnAllCastles();
-
-        // 3. Вызов наглядного системного отчета
-        showNewDayOverlay = true;
-        overlayTimer = 5.5f;
-
-        string finishMsg = Translator.LanguageID == 0 ? 
-            $"Пассивный доход зачислен! Доход: +{totalIncome} 💰. Начался День {currentDay}." : 
-            $"Passive taxes received! Gold flow: +{totalIncome} 💰. Day {currentDay} has arisen!";
-        if (Translator.LanguageID == 8) finishMsg = $"已发放财富岁入！税税金所得：+{totalIncome} 💰。第 {currentDay} 天开始。";
-        if (Translator.LanguageID == 7) finishMsg = $"자원 획득 완료! 이자 배당금: +{totalIncome} 💰. 제 {currentDay} 일이 되었습니다.";
-
-        ShowFeedback(finishMsg);
-    }
-
-    private string GetEquipmentTierName(int tier, int lang)
-    {
-        string[][] names = new string[][] {
-            new string[] { "Бронзовая броня", "Стальной комплект", "Мифриловое вооружение", "Кристальные пластины", "Звездный доспех эгиды", "Легендарный Сет Зенита" },
-            new string[] { "Bronze Aegis", "Iron Garrison Gear", "Mithril Greatplates", "Crystalline Platemail", "Star-Forged Sentinel", "Legendary Zenith Crest" },
-            new string[] { "青铜卫士半身护铠", "强化精制钢重型甲", "秘银高密晶刃防具", "水晶雕琢流光束装", "铸星不灭光环御盾", "巅峰至尊神格圣甲" },
-            new string[] { "청동 에이전트 아머", "강철 가리슨 장비", "미스릴 중장 대갑옷", "크리스탈 유광 플레이트", "정련된 별의 구도자", "전설의 제니스 신성 세트" }
-        };
-
-        int idx = Mathf.Clamp(tier - 1, 0, 5);
-        int langIdx = 1; // Default EN
-        if (lang == 0) langIdx = 0;
-        if (lang == 8) langIdx = 2;
-        if (lang == 7) langIdx = 3;
-
-        return names[langIdx][idx];
     }
 
     private void ShowFeedback(string msg)
@@ -3700,269 +3501,205 @@ public class FateCastleManager : MonoBehaviour
             data.currentXP = 0;
             data.availableSkillPoints = 0;
 
-            // Определяем базовые исходные атрибуты в зависимости �    private void DrawPerformanceTelemetryOverlay(int curLang)
+            string cl = (data.characterClass ?? "warrior").ToLower();
+            if (cl.Contains("warrior") || cl.Contains("воин") || cl.Contains("voin"))
+            {
+                data.strength = 15;
+                data.agility = 10;
+                data.intelligence = 4;
+                data.stamina = 15;
+            }
+            else if (cl.Contains("archer") || cl.Contains("стрелок") || cl.Contains("strelok") || cl.Contains("лучник"))
+            {
+                data.strength = 10;
+                data.agility = 14;
+                data.intelligence = 6;
+                data.stamina = 11;
+            }
+            else
+            {
+                data.strength = 6;
+                data.agility = 10;
+                data.intelligence = 10;
+                data.stamina = 9;
+            }
+
+            RecalculateStats();
+            SaveGameSystem.Save(0);
+            ShowFeedback(Translator.LanguageID == 0 ? "✨ Уровень сброшен до 1 (Минимум)!" : "✨ Level set to 1 (Minimum)!");
+        }
+    }
+
+    private void RecalculateStats()
     {
-        UpdateTelemetryMetrics();
-
-        float panelWidth = 330f;
-        float panelHeight = 185f;
-        float panelX = Screen.width - panelWidth - 20f;
-        float panelY = 20f;
-
-        // Draw elegant Zenith semi-transparent dark panel background using custom dark hudTex (absolutely guarantees NO white screen!)
-        Color origColor = GUI.color;
-        GUI.color = Color.white;
-        if (hudTex != null)
+        RecalculateEquippedBonuses();
+        SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
+        if (data != null)
         {
-            GUI.DrawTexture(new Rect(panelX, panelY, panelWidth, panelHeight), hudTex);
+            float previousMax = data.maxHealth;
+            data.maxHealth = (data.stamina + eqBonusSTA + tempBonusSTA) * 10f;
+            
+            // If MaxHealth increased or current health is uninitialized, set currentHealth to maxHealth
+            if (data.currentHealth <= 0f || data.currentHealth > data.maxHealth)
+            {
+                data.currentHealth = data.maxHealth;
+            }
+            else if (previousMax > 0f)
+            {
+                // Optionally scale current health with the new max
+                float ratio = data.currentHealth / previousMax;
+                data.currentHealth = Mathf.Clamp(data.maxHealth * ratio, 1f, data.maxHealth);
+            }
+        }
+    }
+
+    private void AutoAllocateAllPoints()
+    {
+        SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
+        if (data == null || data.availableSkillPoints <= 0) return;
+
+        string cl = (data.characterClass ?? "warrior").ToLower();
+        int points = data.availableSkillPoints;
+        data.availableSkillPoints = 0;
+
+        if (cl.Contains("warrior") || cl.Contains("воин") || cl.Contains("voin"))
+        {
+            int strAdd = Mathf.FloorToInt(points * 0.5f);
+            int staAdd = Mathf.FloorToInt(points * 0.3f);
+            int agiAdd = Mathf.FloorToInt(points * 0.1f);
+            int intAdd = points - (strAdd + staAdd + agiAdd);
+
+            data.strength += strAdd;
+            data.stamina += staAdd;
+            data.agility += agiAdd;
+            data.intelligence += intAdd;
+        }
+        else if (cl.Contains("archer") || cl.Contains("стрелок") || cl.Contains("strelok") || cl.Contains("лучник"))
+        {
+            int agiAdd = Mathf.FloorToInt(points * 0.5f);
+            int staAdd = Mathf.FloorToInt(points * 0.3f);
+            int strAdd = Mathf.FloorToInt(points * 0.15f);
+            int intAdd = points - (agiAdd + staAdd + strAdd);
+
+            data.agility += agiAdd;
+            data.stamina += staAdd;
+            data.strength += strAdd;
+            data.intelligence += intAdd;
         }
         else
         {
-            GUI.color = new Color(0.04f, 0.08f, 0.14f, 0.90f);
-            GUI.DrawTexture(new Rect(panelX, panelY, panelWidth, panelHeight), Texture2D.whiteTexture);
+            int intAdd = Mathf.FloorToInt(points * 0.5f);
+            int staAdd = Mathf.FloorToInt(points * 0.3f);
+            int agiAdd = Mathf.FloorToInt(points * 0.1f);
+            int strAdd = points - (intAdd + staAdd + agiAdd);
+
+            data.intelligence += intAdd;
+            data.stamina += staAdd;
+            data.agility += agiAdd;
+            data.strength += strAdd;
         }
 
-        // Neon cyan border line at the top
-        GUI.color = new Color(0.0f, 1.0f, 0.8f, 0.85f);
-        GUI.DrawTexture(new Rect(panelX, panelY, panelWidth, 2f), Texture2D.whiteTexture);
-        GUI.color = origColor;
-
-        GUILayout.BeginArea(new Rect(panelX + 12f, panelY + 8f, panelWidth - 24f, panelHeight - 16f));
-
-        GUIStyle headerStyle = new GUIStyle(GUI.skin.label);
-        headerStyle.fontSize = 11;
-        headerStyle.fontStyle = FontStyle.Bold;
-        headerStyle.alignment = TextAnchor.MiddleLeft;
-        headerStyle.normal.textColor = new Color(0.0f, 1.0f, 0.8f, 1.0f);
-        
-        // Multilingual support for Header
-        string headerText = "⚡ GAME TELEMETRY (CHEAT)";
-        switch (curLang)
-        {
-            case 0: headerText = "⚡ МОНИТОРИНГ ИГРЫ (ЧИТ)"; break; // RU
-            case 1: headerText = "⚡ GAME TELEMETRY (CHEAT)"; break; // EN
-            case 2: headerText = "⚡ SPIEL-TELEMETRIE (CHEAT)"; break; // DE
-            case 3: headerText = "⚡ TÉLÉMÉTRIE DU JEU (CHEAT)"; break; // FR
-            case 4: headerText = "⚡ TELEMETRÍA DEL JUEGO (CHEAT)"; break; // ES
-            case 5: headerText = "⚡ TELEMETRIA DO JOGO (CHEAT)"; break; // PT
-            case 6: headerText = "⚡ ゲームテレメトリ (チート)"; break; // JA
-            case 7: headerText = "⚡ 게임 하드웨어 모니터 (치트)"; break; // KR
-            case 8: headerText = "⚡ 游戏硬件监控 (作弊)"; break; // ZH
-        }
-        
-        GUILayout.Label(headerText, headerStyle);
-        GUILayout.Space(2);
-
-        GUI.color = new Color(1f, 1f, 1f, 0.15f);
-        GUILayout.Box("", GUILayout.Height(1));
-        GUI.color = Color.white;
-        GUILayout.Space(4);
-
-        GUIStyle labelStyle = new GUIStyle(GUI.skin.label);
-        labelStyle.fontSize = 11;
-        labelStyle.normal.textColor = new Color(0.85f, 0.9f, 0.95f, 1.0f);
-
-        GUIStyle valueStyle = new GUIStyle(GUI.skin.label);
-        valueStyle.fontSize = 11;
-        valueStyle.fontStyle = FontStyle.Bold;
-        valueStyle.alignment = TextAnchor.Right;
-
-        long allocatedBytes = UnityEngine.Profiling.Profiler.GetTotalAllocatedMemoryLong();
-        if (allocatedBytes <= 0)
-        {
-            allocatedBytes = System.GC.GetTotalMemory(false);
-        }
-        double ramMb = (allocatedBytes / (1024.0 * 1024.0)) + 128.5;
-        if (ramMb < 180.0) ramMb = 180.0 + Mathf.PingPong(Time.time * 2f, 15f);
-
-        // Multilingual labels for metrics
-        string lblFps = "Game FPS:";
-        string lblCpu = "CPU Load:";
-        string lblCpuTemp = "CPU Temp:";
-        string lblRam = "RAM Usage:";
-        string lblGpu = "GPU Load:";
-        string lblGpuTemp = "GPU Temp:";
-
-        switch (curLang)
-        {
-            case 0: // RU
-                lblFps = "Игровой FPS:";
-                lblCpu = "Процессор (CPU):";
-                lblCpuTemp = "Температура CPU:";
-                lblRam = "Память (RAM):";
-                lblGpu = "Видеокарта (GPU):";
-                lblGpuTemp = "Температура GPU:";
-                break;
-            case 2: // DE
-                lblFps = "Spiel-FPS:";
-                lblCpu = "CPU-Auslastung:";
-                lblCpuTemp = "CPU-Temp:";
-                lblRam = "RAM-Verbrauch:";
-                lblGpu = "GPU-Auslastung:";
-                lblGpuTemp = "GPU-Temp:";
-                break;
-            case 3: // FR
-                lblFps = "FPS du jeu :";
-                lblCpu = "Charge CPU :";
-                lblCpuTemp = "Temp CPU :";
-                lblRam = "Mémoire (RAM) :";
-                lblGpu = "Charge GPU :";
-                lblGpuTemp = "Temp GPU :";
-                break;
-            case 4: // ES
-                lblFps = "FPS del juego:";
-                lblCpu = "Carga de CPU:";
-                lblCpuTemp = "Temp de CPU:";
-                lblRam = "Consumo de RAM:";
-                lblGpu = "Carga de GPU:";
-                lblGpuTemp = "Temp de GPU:";
-                break;
-            case 5: // PT
-                lblFps = "FPS do jogo:";
-                lblCpu = "Carga da CPU:";
-                lblCpuTemp = "Temp da CPU:";
-                lblRam = "Consumo de RAM:";
-                lblGpu = "Carga da GPU:";
-                lblGpuTemp = "Temp da GPU:";
-                break;
-            case 6: // JA
-                lblFps = "ゲームFPS:";
-                lblCpu = "CPU負荷:";
-                lblCpuTemp = "CPU温度:";
-                lblRam = "RAM消費:";
-                lblGpu = "GPU負荷:";
-                lblGpuTemp = "GPU温度:";
-                break;
-            case 7: // KR
-                lblFps = "게임 FPS:";
-                lblCpu = "CPU 부하:";
-                lblCpuTemp = "CPU 온도:";
-                lblRam = "RAM 소비량:";
-                lblGpu = "GPU 부하:";
-                lblGpuTemp = "GPU 온도:";
-                break;
-            case 8: // ZH
-                lblFps = "游戏 FPS:";
-                lblCpu = "CPU 负载:";
-                lblCpuTemp = "CPU 温度:";
-                lblRam = "RAM 占用:";
-                lblGpu = "GPU 负载:";
-                lblGpuTemp = "GPU 温度:";
-                break;
-        }
-
-        // 1. FPS
-        float fpsRatio = smoothTelemetryFps / 120f;
-        Color fpsColor = smoothTelemetryFps > 55f ? new Color(0.2f, 1f, 0.5f) : (smoothTelemetryFps > 28f ? Color.yellow : Color.red);
-        DrawTelemetryRow(lblFps, $"{smoothTelemetryFps:F1} FPS", fpsColor, fpsRatio, true, labelStyle, valueStyle);
-
-        // 2. CPU Load
-        float cpuRatio = smoothTelemetryCpuLoad / 100f;
-        Color cpuColor = smoothTelemetryCpuLoad > 75f ? Color.red : (smoothTelemetryCpuLoad > 45f ? Color.yellow : new Color(0.2f, 1f, 0.5f));
-        DrawTelemetryRow(lblCpu, $"{smoothTelemetryCpuLoad:F1}%", cpuColor, cpuRatio, false, labelStyle, valueStyle);
-
-        // 3. CPU Temp
-        float cpuTempRatio = (smoothTelemetryCpuTemp - 30f) / 70f;
-        Color cpuTempColor = smoothTelemetryCpuTemp > 75f ? Color.red : (smoothTelemetryCpuTemp > 55f ? Color.yellow : new Color(0.2f, 1f, 0.5f));
-        DrawTelemetryRow(lblCpuTemp, $"{smoothTelemetryCpuTemp:F1}°C", cpuTempColor, cpuTempRatio, false, labelStyle, valueStyle);
-
-        // 4. RAM Usage
-        float ramRatio = (float)((ramMb - 120f) / 1880f); // Scale nicely for isolated memory pool
-        Color ramColor = ramMb > 1200f ? Color.red : (ramMb > 600f ? Color.yellow : new Color(0.2f, 1f, 0.5f));
-        DrawTelemetryRow(lblRam, $"{ramMb:F1} MB", ramColor, ramRatio, false, labelStyle, valueStyle);
-
-        // 5. GPU Load
-        float gpuRatio = smoothTelemetryGpuLoad / 100f;
-        Color gpuColor = smoothTelemetryGpuLoad > 80f ? Color.red : (smoothTelemetryGpuLoad > 45f ? Color.yellow : new Color(0.2f, 1f, 0.5f));
-        DrawTelemetryRow(lblGpu, $"{smoothTelemetryGpuLoad:F1}%", gpuColor, gpuRatio, false, labelStyle, valueStyle);
-
-        // 6. GPU Temp
-        float gpuTempRatio = (smoothTelemetryGpuTemp - 30f) / 70f;
-        Color gpuTempColor = smoothTelemetryGpuTemp > 75f ? Color.red : (smoothTelemetryGpuTemp > 55f ? Color.yellow : new Color(0.2f, 1f, 0.5f));
-        DrawTelemetryRow(lblGpuTemp, $"{smoothTelemetryGpuTemp:F1}°C", gpuTempColor, gpuTempRatio, false, labelStyle, valueStyle);
-
-        GUILayout.Space(5f);
-        GUI.color = new Color(1f, 1f, 1f, 0.15f);
-        GUILayout.Box("", GUILayout.Height(1));
-        GUI.color = Color.white;
-        GUILayout.Space(2);
-
-        // Process isolation badge footer (clearly lets the user know background programs are excluded)
-        GUIStyle footerStyle = new GUIStyle(GUI.skin.label);
-        footerStyle.fontSize = 8;
-        footerStyle.fontStyle = FontStyle.Normal;
-        footerStyle.alignment = TextAnchor.MiddleCenter;
-        footerStyle.normal.textColor = new Color(0.0f, 0.8f, 1.0f, 0.85f);
-
-        string isolatedText = "• ISOLATED GAME PROCESS ONLY (NO BROWSERS) •";
-        switch (curLang)
-        {
-            case 0: isolatedText = "• ИЗОЛИРОВАННЫЙ ПРОЦЕСС ИГРЫ (БЕЗ БРАУЗЕРОВ) •"; break;
-            case 7: isolatedText = "• 격리된 게임 프로세스 전용 (브라우저 제외) •"; break;
-            case 8: isolatedText = "• 仅隔离游戏进程监控 (无浏览器) •"; break;
-        }
-        GUILayout.Label(isolatedText, footerStyle);
-
-        GUILayout.EndArea();
+        RecalculateStats();
     }
 
-    private void DrawTelemetryRow(string label, string value, Color valColor, float ratio, bool invertColors, GUIStyle lblStyle, GUIStyle valStyle)
+    private void ResetPlayerStats()
     {
-        GUILayout.BeginHorizontal();
-        GUILayout.Label(label, lblStyle, GUILayout.Width(115f));
-        valStyle.normal.textColor = valColor;
-        GUILayout.Label(value, valStyle, GUILayout.Width(60f));
-        
-        GUILayout.Space(10f);
-        
-        // Allocate space for the right-side color bar
-        Rect containerRect = GUILayoutUtility.GetRect(85f, 14f);
-        Rect barRect = new Rect(containerRect.x, containerRect.y + 4f, 80f, 6f);
-        
-        Color origColor = GUI.color;
-        
-        // Segment colors: Green, Yellow, Orange, Red (or vice versa)
-        Color c1 = invertColors ? new Color(0.9f, 0.2f, 0.2f, 0.9f) : new Color(0.1f, 0.8f, 0.2f, 0.9f);
-        Color c2 = invertColors ? new Color(1.0f, 0.5f, 0.0f, 0.9f) : new Color(0.9f, 0.8f, 0.1f, 0.9f);
-        Color c3 = invertColors ? new Color(0.9f, 0.8f, 0.1f, 0.9f) : new Color(1.0f, 0.5f, 0.0f, 0.9f);
-        Color c4 = invertColors ? new Color(0.1f, 0.8f, 0.2f, 0.9f) : new Color(0.9f, 0.2f, 0.2f, 0.9f);
-        
-        float segW = 20f;
-        
-        // Draw 4 distinct color segments representing the load rating
-        GUI.color = c1;
-        GUI.DrawTexture(new Rect(barRect.x, barRect.y, segW, barRect.height), Texture2D.whiteTexture);
-        GUI.color = c2;
-        GUI.DrawTexture(new Rect(barRect.x + segW, barRect.y, segW, barRect.height), Texture2D.whiteTexture);
-        GUI.color = c3;
-        GUI.DrawTexture(new Rect(barRect.x + 2f * segW, barRect.y, segW, barRect.height), Texture2D.whiteTexture);
-        GUI.color = c4;
-        GUI.DrawTexture(new Rect(barRect.x + 3f * segW, barRect.y, segW, barRect.height), Texture2D.whiteTexture);
-        
-        // Draw thin black borders around each color block to give high-end modern appearance
-        GUI.color = new Color(0.0f, 0.0f, 0.0f, 0.6f);
-        GUI.DrawTexture(new Rect(barRect.x, barRect.y, barRect.width, 1f), Texture2D.whiteTexture);
-        GUI.DrawTexture(new Rect(barRect.x, barRect.y + barRect.height - 1f, barRect.width, 1f), Texture2D.whiteTexture);
-        GUI.DrawTexture(new Rect(barRect.x, barRect.y, 1f, barRect.height), Texture2D.whiteTexture);
-        GUI.DrawTexture(new Rect(barRect.x + barRect.width - 1f, barRect.y, 1f, barRect.height), Texture2D.whiteTexture);
-        
-        // Calculate pointer position using clamped ratio
-        float clampedRatio = Mathf.Clamp01(ratio);
-        float arrowX = barRect.x + clampedRatio * barRect.width;
-        
-        // Draw neat high-contrast cyan indicator arrow (▲) pointing upwards from below the bar
-        GUIStyle arrowStyle = new GUIStyle(GUI.skin.label);
-        arrowStyle.fontSize = 8;
-        arrowStyle.alignment = TextAnchor.MiddleCenter;
-        arrowStyle.normal.textColor = new Color(0.0f, 1.0f, 1.0f, 1.0f); // High contrast Cyan
-        
-        GUI.color = Color.white;
-        // Position ▲ perfectly pointing upwards directly at the current value of the bar
-        GUI.Label(new Rect(arrowX - 6f, barRect.y + barRect.height - 2f, 12f, 12f), "▲", arrowStyle);
-        
-        GUI.color = origColor;
-        GUILayout.EndHorizontal();
-    }Screen.width - 240f, 20f, 220f, 42f), $"💰 {goldText}{SaveGameSystem.CurrentData.gold}", s_walletStyle);
+        SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
+        if (data == null) return;
+
+        int startSTR = 10, startAGI = 10, startINT = 10, startSTA = 10;
+        string cl = (data.characterClass ?? "воин").ToLower();
+        if (cl.Contains("warrior") || cl.Contains("voin") || cl.Contains("paladin") || cl.Contains("воин") || cl.Contains("паладин") || cl.Contains("рыцар"))
+        {
+            startSTR = 15; startAGI = 10; startINT = 4; startSTA = 15;
+        }
+        else if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow") || cl.Contains("лучник") || cl.Contains("стрел") || cl.Contains("охотн"))
+        {
+            startSTR = 10; startAGI = 14; startINT = 6; startSTA = 11;
+        }
+        else if (cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff") || cl.Contains("маг") || cl.Contains("колдун") || cl.Contains("волшеб"))
+        {
+            startSTR = 6; startAGI = 10; startINT = 10; startSTA = 9;
+        }
+
+        int reclaimed = 0;
+        if (data.strength > startSTR) reclaimed += (data.strength - startSTR);
+        if (data.agility > startAGI) reclaimed += (data.agility - startAGI);
+        if (data.intelligence > startINT) reclaimed += (data.intelligence - startINT);
+        if (data.stamina > startSTA) reclaimed += (data.stamina - startSTA);
+
+        data.strength = startSTR;
+        data.agility = startAGI;
+        data.intelligence = startINT;
+        data.stamina = startSTA;
+
+        data.availableSkillPoints += reclaimed;
+
+        RecalculateStats();
+        SaveGameSystem.Save(0);
+        ShowFeedback(Translator.LanguageID == 0 ? "♻️ Характеристики сброшены к начальным!" : "♻️ Stats reset to base!");
+    }
+
+    public void AdvanceDay()
+    {
+        currentDay++;
+        PlayerPrefs.SetInt("Fate_Current_Day", currentDay);
+
+        int totalIncome = 0;
+        foreach (var castle in castles)
+        {
+            if (castle.owner == "Player")
+            {
+                totalIncome += GetGoldIncome(castle.level);
+            }
+        }
+
+        SaveGameSystem.SaveData data = SaveGameSystem.CurrentData;
+        if (data != null)
+        {
+            data.gold += totalIncome;
+        }
+
+        tempBonusSTR = 0;
+        tempBonusAGI = 0;
+        tempBonusINT = 0;
+        tempBonusSTA = 0;
+        potionUsedThisTurnHP = false;
+        potionUsedThisTurnSTR = false;
+        potionUsedThisTurnAGI = false;
+        potionUsedThisTurnINT = false;
+        potionUsedThisTurnSTA = false;
+
+        RecalculateStats();
+        SaveGameSystem.Save(0);
+
+        showNewDayOverlay = true;
+
+        string feedbackMsg = Translator.LanguageID == 0 
+            ? $"📅 Наступил День {currentDay}! Собрано налогов: +{totalIncome} 💰" 
+            : $"📅 Day {currentDay} has arrived! Collected taxes: +{totalIncome} 💰";
+        ShowFeedback(feedbackMsg);
+    }
+
+    private void OnGUI()
+    {
+        int curLang = Translator.LanguageID;
+
+        // 1. Кошелек
+        string goldText = curLang == 0 ? "Золото: " : "Gold: ";
+        if (curLang == 8) goldText = "金币: ";
+        if (curLang == 7) goldText = "보유 골드: ";
+
+        if (s_walletStyle == null)
+        {
+            s_walletStyle = new GUIStyle(GUI.skin.box);
+            s_walletStyle.fontSize = 14;
+            s_walletStyle.fontStyle = FontStyle.Bold;
+            s_walletStyle.normal.textColor = new Color(0.95f, 0.75f, 0.1f, 1.0f);
+            s_walletStyle.alignment = TextAnchor.MiddleCenter;
+        }
+
+        GUI.Box(new Rect(Screen.width - 240f, 20f, 220f, 42f), $"💰 {goldText}{SaveGameSystem.CurrentData.gold}", s_walletStyle);
 
         // 2. Индикатор Дня
         string dayLabel = curLang == 0 ? "День: " : "Day: ";
@@ -4174,7 +3911,7 @@ public class FateCastleManager : MonoBehaviour
         GUIStyle valueStyle = new GUIStyle(GUI.skin.label);
         valueStyle.fontSize = 11;
         valueStyle.fontStyle = FontStyle.Bold;
-        valueStyle.alignment = TextAnchor.Right;
+        valueStyle.alignment = TextAnchor.MiddleRight;
 
         long allocatedBytes = UnityEngine.Profiling.Profiler.GetTotalAllocatedMemoryLong();
         if (allocatedBytes <= 0)
