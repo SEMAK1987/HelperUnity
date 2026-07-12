@@ -67,6 +67,19 @@ namespace FateContinent
         public enum EditorPreviewClass { Warrior, Archer, Mage }
 
         private System.Collections.Generic.Dictionary<string, Material> originalRegionMaterials = new System.Collections.Generic.Dictionary<string, Material>();
+        private Mesh originalPlaceholderMesh;
+        private bool isPlaceholderMeshCached = false;
+
+        private void CachePlaceholderMesh()
+        {
+            if (isPlaceholderMeshCached || playerTransform == null) return;
+            var mf = playerTransform.GetComponent<MeshFilter>();
+            if (mf != null)
+            {
+                originalPlaceholderMesh = mf.sharedMesh;
+                isPlaceholderMeshCached = true;
+            }
+        }
 
         private void OnValidate()
         {
@@ -197,9 +210,9 @@ namespace FateContinent
                 // Полностью очищаем старый инвентарь, экипировку и прогресс игрока для чистоты теста
                 SaveGameSystem.ClearCampaignAndPlayerProgression();
 
-                // Заполняем чистые дефолтные характеристики
+                // Заполняем чистые дефолтные характеристики (используем выбранный в инспекторе класс для удобства тестов)
                 SaveGameSystem.ResetData();
-                SaveGameSystem.CurrentData.characterClass = "Warrior";
+                SaveGameSystem.CurrentData.characterClass = editorPreviewClass.ToString();
                 SaveGameSystem.CurrentData.playerLevel = 1;
                 SaveGameSystem.CurrentData.gold = 500;
                 SaveGameSystem.CurrentData.strength = 15;
@@ -690,9 +703,6 @@ namespace FateContinent
         {
             CacheOriginalMaterials();
 
-            int actualPlayerRegion = FateCastleManager.GetActualRegionIndexFromLanding(activeZoneIndex);
-            string actualPlayerRegionName = "Region_" + actualPlayerRegion.ToString("D2");
-
             GameObject newContinent = GameObject.Find("New_Kontinent") ?? GameObject.Find("Континент");
             if (newContinent != null)
             {
@@ -705,43 +715,10 @@ namespace FateContinent
                         Renderer mr = regTrans.GetComponent<Renderer>();
                         if (mr != null)
                         {
-                            if (i == actualPlayerRegion && originalRegionMaterials.ContainsKey(actualPlayerRegionName) && originalRegionMaterials[actualPlayerRegionName] != null)
+                            // ВОЗВРАЩАЕМ КАК БЫЛО: восстанавливаем оригинальные красивые материалы со всеми текстурами для абсолютно ВСЕХ регионов континента!
+                            if (originalRegionMaterials.ContainsKey(regionName) && originalRegionMaterials[regionName] != null)
                             {
-                                mr.sharedMaterial = originalRegionMaterials[actualPlayerRegionName];
-                                Debug.Log($"[LANDING SYS] Восстановили оригинальный красивый материал для региона игрока: {actualPlayerRegionName}");
-                            }
-                            else
-                            {
-                                Color targetColor;
-
-                                if (i == actualPlayerRegion)
-                                {
-                                    // Регион игрока (если не восстановили оригинальный материал): 00008B (Dark Blue)
-                                    targetColor = new Color(0.0f, 0.0f, 0.545f, 1.0f);
-                                }
-                                else
-                                {
-                                    if (PlayerPrefs.HasKey("Region_ColorR_" + i))
-                                    {
-                                        float rVal = PlayerPrefs.GetFloat("Region_ColorR_" + i);
-                                        float gVal = PlayerPrefs.GetFloat("Region_ColorG_" + i);
-                                        float bVal = PlayerPrefs.GetFloat("Region_ColorB_" + i);
-                                        targetColor = new Color(rVal, gVal, bVal, 1.0f);
-                                    }
-                                    else
-                                    {
-                                        if (i == 2 || i == 10) 
-                                        {
-                                            targetColor = new Color(0.584f, 0.647f, 0.651f, 1.0f); // серый/нейтральный
-                                        }
-                                        else
-                                        {
-                                            targetColor = new Color(0.8f, 0.2f, 0.2f, 1.0f); // красный/вражеский
-                                        }
-                                    }
-                                }
-
-                                mr.material.color = targetColor;
+                                mr.sharedMaterial = originalRegionMaterials[regionName];
                             }
                         }
                     }
@@ -897,6 +874,9 @@ namespace FateContinent
 
             if (heroModelPrefab != null)
             {
+                // Сначала кэшируем оригинальный меш плейсхолдера, чтобы можно было восстановить при необходимости
+                CachePlaceholderMesh();
+
                 // 1. ПОЛНОСТЬЮ выключаем стандартные рендереры плейсхолдера (круга/сферы)
                 var mainRenderer = playerTransform.GetComponent<Renderer>();
                 if (mainRenderer != null)
@@ -909,6 +889,20 @@ namespace FateContinent
                 if (mainMeshRenderer != null)
                 {
                     mainMeshRenderer.enabled = false;
+                }
+
+                // Убираем sharedMesh, чтобы в Scene view Редактора не рисовался каркас сферы/круга при выделении!
+                var mf = playerTransform.GetComponent<MeshFilter>();
+                if (mf != null)
+                {
+                    mf.sharedMesh = null;
+                }
+
+                // Выключаем SphereCollider сферы, чтобы убрать зеленый каркас в сцене
+                var sc = playerTransform.GetComponent<SphereCollider>();
+                if (sc != null)
+                {
+                    sc.enabled = false;
                 }
 
                 foreach (Transform child in playerTransform)
@@ -971,6 +965,20 @@ namespace FateContinent
                 if (mainMeshRenderer != null)
                 {
                     mainMeshRenderer.enabled = true;
+                }
+
+                // Восстанавливаем оригинальный меш плейсхолдера
+                var mf = playerTransform.GetComponent<MeshFilter>();
+                if (mf != null && isPlaceholderMeshCached)
+                {
+                    mf.sharedMesh = originalPlaceholderMesh;
+                }
+
+                // Включаем SphereCollider обратно
+                var sc = playerTransform.GetComponent<SphereCollider>();
+                if (sc != null)
+                {
+                    sc.enabled = true;
                 }
 
                 foreach (Transform child in playerTransform)
