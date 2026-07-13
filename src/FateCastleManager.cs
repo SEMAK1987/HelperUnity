@@ -2256,6 +2256,7 @@ public class FateCastleManager : MonoBehaviour
 
     private void Awake()
     {
+        InitializeCachedTextures();
         ValidateTroopSkillAssets();
         if (customCastlePositions == null || customCastlePositions.Length != 12)
         {
@@ -3684,67 +3685,70 @@ public class FateCastleManager : MonoBehaviour
     private void OnGUI()
     {
         int curLang = Translator.LanguageID;
-
-        // 1. Кошелек
-        string goldText = curLang == 0 ? "Золото: " : "Gold: ";
-        if (curLang == 8) goldText = "金币: ";
-        if (curLang == 7) goldText = "보유 골드: ";
-
-        if (s_walletStyle == null)
-        {
-            s_walletStyle = new GUIStyle(GUI.skin.box);
-            s_walletStyle.fontSize = 14;
-            s_walletStyle.fontStyle = FontStyle.Bold;
-            s_walletStyle.normal.textColor = new Color(0.95f, 0.75f, 0.1f, 1.0f);
-            s_walletStyle.alignment = TextAnchor.MiddleCenter;
-        }
-
-        GUI.Box(new Rect(Screen.width - 240f, 20f, 220f, 42f), $"💰 {goldText}{SaveGameSystem.CurrentData.gold}", s_walletStyle);
-
-        // 2. Индикатор Дня
-        string dayLabel = curLang == 0 ? "День: " : "Day: ";
-        if (curLang == 8) dayLabel = "当前天数: ";
-        if (curLang == 7) dayLabel = "일차: ";
-
-        if (s_dStyle == null)
-        {
-            s_dStyle = new GUIStyle(GUI.skin.box);
-            s_dStyle.fontSize = 14;
-            s_dStyle.fontStyle = FontStyle.Bold;
-            s_dStyle.normal.textColor = new Color(0.12f, 0.88f, 1.0f, 1.0f);
-            s_dStyle.alignment = TextAnchor.MiddleCenter;
-        }
-
-        GUI.Box(new Rect(Screen.width - 240f, 65f, 220f, 38f), $"📅 {dayLabel}{currentDay}", s_dStyle);
-
-        // 3. Кнопка "Пропустить ход" UI
-        string nextDayBtnText = curLang == 0 ? "ПРОПУСТИТЬ ХОД" : "END TURN";
-        if (curLang == 8) nextDayBtnText = "结束回合";
-        if (curLang == 7) nextDayBtnText = "턴 넘기기";
-
-        if (s_nextDayStyle == null)
-        {
-            s_nextDayStyle = new GUIStyle(GUI.skin.button);
-            s_nextDayStyle.fontSize = 13;
-            s_nextDayStyle.fontStyle = FontStyle.Bold;
-            s_nextDayStyle.normal.textColor = Color.white;
-            s_nextDayStyle.alignment = TextAnchor.MiddleCenter;
-        }
-
-        // Блокируем кнопку "Пропустить ход", если открыта панель управления персонажем (showStatsPanel), детали или идет диалог
         bool isDialogueOpen = DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.IsDialogueActive;
-        if (!isDetailsOpen && !showStatsPanel && !isDialogueOpen)
-        {
-            GUI.backgroundColor = new Color(0.1f, 0.65f, 0.95f, 1.0f);
-            if (GUI.Button(new Rect(Screen.width - 240f, 107f, 220f, 44f), $"▶ {nextDayBtnText}", s_nextDayStyle))
-            {
-                AdvanceDay();
-            }
-            GUI.backgroundColor = Color.white;
-        }
 
-        // 4. Отрисовка ГЕРОЯ И ЕГО ХАРАКТЕРИСТИК (HUD в верхнем левом углу)
-        DrawHeroHUD(curLang);
+        if (!isDialogueOpen)
+        {
+            // 1. Кошелек
+            string goldText = curLang == 0 ? "Золото: " : "Gold: ";
+            if (curLang == 8) goldText = "金币: ";
+            if (curLang == 7) goldText = "보유 골드: ";
+
+            if (s_walletStyle == null)
+            {
+                s_walletStyle = new GUIStyle(GUI.skin.box);
+                s_walletStyle.fontSize = 14;
+                s_walletStyle.fontStyle = FontStyle.Bold;
+                s_walletStyle.normal.textColor = new Color(0.95f, 0.75f, 0.1f, 1.0f);
+                s_walletStyle.alignment = TextAnchor.MiddleCenter;
+            }
+
+            GUI.Box(new Rect(Screen.width - 240f, 20f, 220f, 42f), $"💰 {goldText}{SaveGameSystem.CurrentData.gold}", s_walletStyle);
+
+            // 2. Индикатор Дня
+            string dayLabel = curLang == 0 ? "День: " : "Day: ";
+            if (curLang == 8) dayLabel = "当前天数: ";
+            if (curLang == 7) dayLabel = "일차: ";
+
+            if (s_dStyle == null)
+            {
+                s_dStyle = new GUIStyle(GUI.skin.box);
+                s_dStyle.fontSize = 14;
+                s_dStyle.fontStyle = FontStyle.Bold;
+                s_dStyle.normal.textColor = new Color(0.12f, 0.88f, 1.0f, 1.0f);
+                s_dStyle.alignment = TextAnchor.MiddleCenter;
+            }
+
+            GUI.Box(new Rect(Screen.width - 240f, 65f, 220f, 38f), $"📅 {dayLabel}{currentDay}", s_dStyle);
+
+            // 3. Кнопка "Пропустить ход" UI
+            string nextDayBtnText = curLang == 0 ? "ПРОПУСТИТЬ ХОД" : "END TURN";
+            if (curLang == 8) nextDayBtnText = "结束回合";
+            if (curLang == 7) nextDayBtnText = "턴 넘기기";
+
+            if (s_nextDayStyle == null)
+            {
+                s_nextDayStyle = new GUIStyle(GUI.skin.button);
+                s_nextDayStyle.fontSize = 13;
+                s_nextDayStyle.fontStyle = FontStyle.Bold;
+                s_nextDayStyle.normal.textColor = Color.white;
+                s_nextDayStyle.alignment = TextAnchor.MiddleCenter;
+            }
+
+            // Блокируем кнопку "Пропустить ход", если открыта панель управления персонажем (showStatsPanel), детали или идет диалог
+            if (!isDetailsOpen && !showStatsPanel)
+            {
+                GUI.backgroundColor = new Color(0.1f, 0.65f, 0.95f, 1.0f);
+                if (GUI.Button(new Rect(Screen.width - 240f, 107f, 220f, 44f), $"▶ {nextDayBtnText}", s_nextDayStyle))
+                {
+                    AdvanceDay();
+                }
+                GUI.backgroundColor = Color.white;
+            }
+
+            // 4. Отрисовка ГЕРОЯ И ЕГО ХАРАКТЕРИСТИК (HUD в верхнем левом углу)
+            DrawHeroHUD(curLang);
+        }
 
         // Overlay нового дня (ИИ отчеты)
         if (showNewDayOverlay)
@@ -3761,6 +3765,21 @@ public class FateCastleManager : MonoBehaviour
                 GUI.enabled = false;
             }
             DrawDetailsWindow(curLang);
+            if (modalActive)
+            {
+                GUI.enabled = true;
+            }
+        }
+
+        // РЕНДЕРИНГ ВНУТРЕННЕГО ВИДА ГОРОДА/ЦИТАДЕЛИ ПРИ АКТИВАЦИИ (v18.11.24)
+        if (isTownViewActive && activeDetailsIndex >= 0 && activeDetailsIndex < castles.Count)
+        {
+            bool modalActive = showCastleCalibrationPanel || showSkillDetailPopup || showTroopDetailPopup || showForgeDetailPopup || showSpyReportPopup || showPurchaseConfirmPopup;
+            if (modalActive)
+            {
+                GUI.enabled = false;
+            }
+            DrawTownViewGUI(curLang);
             if (modalActive)
             {
                 GUI.enabled = true;
@@ -3861,15 +3880,15 @@ public class FateCastleManager : MonoBehaviour
         float panelWidth = 300f;
         float panelHeight = 155f;
         float panelX = Screen.width - panelWidth - 20f;
-        float panelY = 20f;
+        float panelY = 175f; // Сдвинуто вниз под кнопку пропуска хода
 
-        // Draw elegant Zenith semi-transparent dark panel background using GUI.DrawTexture (guarantees NO white screen!)
+        // Делаем черный фон полностью прозрачным, чтобы отображалось только само табло
         Color origColor = GUI.color;
-        GUI.color = new Color(0.04f, 0.08f, 0.14f, 0.90f);
+        GUI.color = new Color(0.04f, 0.08f, 0.14f, 0.0f); // Прозрачный альфа-канал
         GUI.DrawTexture(new Rect(panelX, panelY, panelWidth, panelHeight), Texture2D.whiteTexture);
 
-        // Neon cyan border line at the top
-        GUI.color = new Color(0.0f, 1.0f, 0.8f, 0.85f);
+        // Полоска сверху тоже убирается в прозрачность
+        GUI.color = new Color(0.0f, 1.0f, 0.8f, 0.0f);
         GUI.DrawTexture(new Rect(panelX, panelY, panelWidth, 2f), Texture2D.whiteTexture);
         GUI.color = origColor;
 
@@ -7310,6 +7329,7 @@ public class FateCastleManager : MonoBehaviour
             if (GUILayout.Button(interiorBtnTxt, GUILayout.Height(40)))
             {
                 isTownViewActive = true;
+                isDetailsOpen = false; // Закрываем окно деталей при входе в управление городом
                 isGridInitialized = false;
                 currentTownSubPanel = 0;
                 feedbackMessage = "";
@@ -7855,6 +7875,8 @@ public class FateCastleManager : MonoBehaviour
         if (GUILayout.Button(leaveLabel, GUILayout.Height(45)))
         {
             isTownViewActive = false;
+            isDetailsOpen = false; // Закрываем детали замка при выходе на карту
+            activeDetailsIndex = -1; // Сбрасываем выбранный замок
             currentTownSubPanel = 0; // Сверхнадежно сбрасываем при выходе в обзор города
             clickCooldown = 0.25f;
             GUIUtility.ExitGUI();

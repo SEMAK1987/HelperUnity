@@ -390,7 +390,12 @@ namespace FateContinent
                             Debug.Log($"[LANDING SYS] Геймплей активен: Игрок успешно восстановлен по координатам с оффсетом {new Vector3(ox, oy, oz)}: {playerTransform.position}");
 
                             // Направляем и фокусируем камеру на этой точке
-                            if (mainCameraTransform != null)
+                            if (StrategicCameraController.Instance != null)
+                            {
+                                StrategicCameraController.Instance.FocusOnPoint(point.spawnAnchor.position, cameraOffset);
+                                StrategicCameraController.Instance.isControlEnabled = true;
+                            }
+                            else if (mainCameraTransform != null)
                             {
                                 mainCameraTransform.position = point.spawnAnchor.position + cameraOffset;
                                 mainCameraTransform.LookAt(point.spawnAnchor.position);
@@ -759,43 +764,48 @@ namespace FateContinent
                         Renderer mr = regTrans.GetComponent<Renderer>();
                         if (mr != null)
                         {
-                            if (i == actualPlayerRegion)
+                            // Обязательно работаем через .material (инстанс), чтобы не модифицировать sharedMaterial ассеты на диске
+                            if (mr.material != null)
                             {
-                                // Единственный выбранный квадрат высадки игрока красим в яркий синий неон игрока
-                                Color targetColor = new Color(0.12f, 0.58f, 0.95f, 1.0f);
-                                if (mr.material != null)
+                                Color targetColor = Color.white;
+                                switch (i)
                                 {
-                                    mr.material.color = targetColor;
-                                    if (mr.material.HasProperty("_BaseColor"))
-                                    {
-                                        mr.material.SetColor("_BaseColor", targetColor);
-                                    }
-                                    if (mr.material.HasProperty("_Color"))
-                                    {
-                                        mr.material.SetColor("_Color", targetColor);
-                                    }
+                                    case 11: // Bloody Wastelands (Кровавые Пустоши)
+                                        targetColor = new Color(0.85f, 0.15f, 0.12f, 1.0f); // Насыщенный красный
+                                        break;
+                                    case 6: // Ice Peak (Ледяной Пик)
+                                        targetColor = new Color(0.45f, 0.78f, 0.95f, 1.0f); // Ледяной голубой
+                                        break;
+                                    case 8: // Ancient Ruins (Древние Руины)
+                                        targetColor = new Color(0.15f, 0.65f, 0.32f, 1.0f); // Мшистый зеленый
+                                        break;
+                                    case 3: // Zenith Sanctuary (Святилище Зенита)
+                                        targetColor = new Color(0.55f, 0.18f, 0.88f, 1.0f); // Аметистовый фиолетовый
+                                        break;
+                                    case 1:
+                                    case 5:
+                                    case 9: // Сектора разбойников и угроз
+                                        targetColor = new Color(0.72f, 0.28f, 0.15f, 1.0f); // Грязный оранжево-красный
+                                        break;
+                                    default: // Нейтральные территории
+                                        targetColor = new Color(0.42f, 0.45f, 0.48f, 1.0f); // Каменистый серый
+                                        break;
                                 }
-                            }
-                            else
-                            {
-                                // Восстанавливаем оригинальный красивый текстурированный материал для ВСЕХ остальных регионов!
-                                // Благодаря этому континент сохраняет свои оригинальные цвета и текстуры (верните назад как было).
-                                if (originalRegionMaterials != null && originalRegionMaterials.ContainsKey(regionName))
+
+                                if (i == actualPlayerRegion)
                                 {
-                                    mr.sharedMaterial = originalRegionMaterials[regionName];
-                                    if (mr.sharedMaterial != null)
-                                    {
-                                        // Сбрасываем цвет тинта на стандартный белый, чтобы вернуть оригинальные цвета текстур
-                                        mr.sharedMaterial.color = Color.white;
-                                        if (mr.sharedMaterial.HasProperty("_BaseColor"))
-                                        {
-                                            mr.sharedMaterial.SetColor("_BaseColor", Color.white);
-                                        }
-                                        if (mr.sharedMaterial.HasProperty("_Color"))
-                                        {
-                                            mr.sharedMaterial.SetColor("_Color", Color.white);
-                                        }
-                                    }
+                                    // Синий неон игрока для выбранной зоны
+                                    targetColor = new Color(0.12f, 0.58f, 0.95f, 1.0f);
+                                }
+
+                                mr.material.color = targetColor;
+                                if (mr.material.HasProperty("_BaseColor"))
+                                {
+                                    mr.material.SetColor("_BaseColor", targetColor);
+                                }
+                                if (mr.material.HasProperty("_Color"))
+                                {
+                                    mr.material.SetColor("_Color", targetColor);
                                 }
                             }
                         }
