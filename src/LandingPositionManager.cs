@@ -764,50 +764,21 @@ namespace FateContinent
                         Renderer mr = regTrans.GetComponent<Renderer>();
                         if (mr != null)
                         {
-                            // Обязательно работаем через .material (инстанс), чтобы не модифицировать sharedMaterial ассеты на диске
-                            if (mr.material != null)
-                            {
-                                Color targetColor = Color.white;
-                                switch (i)
+                                // Обязательно работаем через .material (инстанс), чтобы не модифицировать sharedMaterial ассеты на диске
+                                if (mr.material != null)
                                 {
-                                    case 11: // Bloody Wastelands (Кровавые Пустоши)
-                                        targetColor = new Color(0.85f, 0.15f, 0.12f, 1.0f); // Насыщенный красный
-                                        break;
-                                    case 6: // Ice Peak (Ледяной Пик)
-                                        targetColor = new Color(0.45f, 0.78f, 0.95f, 1.0f); // Ледяной голубой
-                                        break;
-                                    case 8: // Ancient Ruins (Древние Руины)
-                                        targetColor = new Color(0.15f, 0.65f, 0.32f, 1.0f); // Мшистый зеленый
-                                        break;
-                                    case 3: // Zenith Sanctuary (Святилище Зенита)
-                                        targetColor = new Color(0.55f, 0.18f, 0.88f, 1.0f); // Аметистовый фиолетовый
-                                        break;
-                                    case 1:
-                                    case 5:
-                                    case 9: // Сектора разбойников и угроз
-                                        targetColor = new Color(0.72f, 0.28f, 0.15f, 1.0f); // Грязный оранжево-красный
-                                        break;
-                                    default: // Нейтральные территории
-                                        targetColor = new Color(0.42f, 0.45f, 0.48f, 1.0f); // Каменистый серый
-                                        break;
-                                }
+                                    Color targetColor = FateCastleManager.GetRegionColor(i, actualPlayerRegion);
 
-                                if (i == actualPlayerRegion)
-                                {
-                                    // Синий неон игрока для выбранной зоны
-                                    targetColor = new Color(0.12f, 0.58f, 0.95f, 1.0f);
+                                    mr.material.color = targetColor;
+                                    if (mr.material.HasProperty("_BaseColor"))
+                                    {
+                                        mr.material.SetColor("_BaseColor", targetColor);
+                                    }
+                                    if (mr.material.HasProperty("_Color"))
+                                    {
+                                        mr.material.SetColor("_Color", targetColor);
+                                    }
                                 }
-
-                                mr.material.color = targetColor;
-                                if (mr.material.HasProperty("_BaseColor"))
-                                {
-                                    mr.material.SetColor("_BaseColor", targetColor);
-                                }
-                                if (mr.material.HasProperty("_Color"))
-                                {
-                                    mr.material.SetColor("_Color", targetColor);
-                                }
-                            }
                         }
                     }
                 }

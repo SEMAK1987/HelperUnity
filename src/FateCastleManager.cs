@@ -2459,6 +2459,48 @@ public class FateCastleManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Возвращает согласованный цвет региона и замка на тактической карте для предотвращения цветовых нестыковок (v18.11.24)
+    /// </summary>
+    public static Color GetRegionColor(int regionIndex, int actualPlayerRegion, string owner = "")
+    {
+        string savedOwner = owner;
+        if (string.IsNullOrEmpty(savedOwner))
+        {
+            string defaultOwner = (regionIndex == actualPlayerRegion) ? "Player" : "Enemy";
+            savedOwner = PlayerPrefs.GetString("Castle_Owner_" + regionIndex, defaultOwner);
+        }
+
+        if (savedOwner == "Player" || regionIndex == actualPlayerRegion)
+        {
+            return new Color(0.12f, 0.58f, 0.95f, 1.0f); // Zenith Neon Blue (Игрок)
+        }
+
+        switch (regionIndex)
+        {
+            case 3: // Zenith Sanctuary (Святилище Зенита)
+                return new Color(0.55f, 0.18f, 0.88f, 1.0f); // Аметистовый фиолетовый
+
+            case 1:
+            case 5:
+            case 11: // Bloody Wastelands (Кровавые Пустоши)
+                return new Color(0.85f, 0.15f, 0.12f, 1.0f); // Насыщенный красный
+
+            case 6: // Ice Peak (Ледяной Пик)
+            case 8: // Ancient Ruins (Древние Руины)
+            case 9: // Forest Dwellers (Лесные Жители)
+                return new Color(0.12f, 0.75f, 0.25f, 1.0f); // Изумрудный зеленый
+
+            case 0:
+            case 2:
+            case 4:
+            case 7:
+            case 10:
+            default: // Нейтральные территории
+                return new Color(0.42f, 0.45f, 0.48f, 1.0f); // Каменистый серый
+        }
+    }
+
     private void Start()
     {
         EventHub.OnCombatEnd += HandleCombatEndEvent;
@@ -3150,36 +3192,8 @@ public class FateCastleManager : MonoBehaviour
             Shader urpShader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("URP/Lit") ?? Shader.Find("Standard");
             Material castleMat = new Material(urpShader);
             
-            // Расцветка замков на тактической карте согласно их фракциям:
-            // owner == "Player" -> Яркий синий неон игрока
-            // i == 2 || i == 10 -> Серый (Нейтралы)
-            // i == 1 || i == 7 -> Красный (Бандиты)
-            // i == 0 || i == 4 || i == 5 || i == 9 -> Зеленый (Лесные жители)
-            // Остальные -> Сине-серый темный (Орден Зенита)
-            Color factionColor;
-            if (castle.owner == "Player")
-            {
-                factionColor = new Color(0.12f, 0.58f, 0.95f, 1.0f); // Zenith Neon Blue (Игрок)
-            }
-            else
-            {
-                if (i == 2 || i == 10)
-                {
-                    factionColor = new Color(0.6f, 0.62f, 0.65f, 1.0f); // Neutral Slate Grey (Нейтралы)
-                }
-                else if (i == 1 || i == 7)
-                {
-                    factionColor = new Color(0.92f, 0.12f, 0.28f, 1.0f); // Aggressive Bandit Crimson (Бандиты)
-                }
-                else if (i == 0 || i == 4 || i == 5 || i == 9)
-                {
-                    factionColor = new Color(0.12f, 0.75f, 0.25f, 1.0f); // Forest Nature Green (Лесные жители)
-                }
-                else
-                {
-                    factionColor = new Color(0.35f, 0.4f, 0.5f, 1.0f); // Unaligned Zenith Outposts (Заставы Зенита)
-                }
-            }
+            // Расцветка замков на тактической карте согласно их фракциям и владельцам через единую функцию (v18.11.24):
+            Color factionColor = GetRegionColor(i, actualPlayerRegion, castle.owner);
             castleMat.color = factionColor;
 
             if (castleMat.HasProperty("_Glossiness")) castleMat.SetFloat("_Glossiness", 0.7f);
