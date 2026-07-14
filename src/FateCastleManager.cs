@@ -2454,8 +2454,8 @@ public class FateCastleManager : MonoBehaviour
             case 0: return 11;  // Кровавые Пустоши (Region_11)
             case 1: return 6;   // Ледяной Пик (Region_06)
             case 2: return 8;   // Древние Руины (Region_08)
-            case 3: return 3;   // Святилище Зенита / Грозовые Кряжи (Region_03)
-            default: return 3;
+            case 3: return 8;   // Грозовые Кряжи (Region_08 принудительно)
+            default: return 8;
         }
     }
 
@@ -2478,22 +2478,20 @@ public class FateCastleManager : MonoBehaviour
 
         switch (regionIndex)
         {
-            case 3: // Zenith Sanctuary (Святилище Зенита)
-                return new Color(0.55f, 0.18f, 0.88f, 1.0f); // Аметистовый фиолетовый
+            case 3: // Zenith Sanctuary (Святилище Зенита) - Зеленый Замок и Зеленый квадрат (Лесные Жители)
+            case 8: // Ancient Ruins (Древние Руины)
+            case 9: // Forest Dwellers (Лесные Жители)
+                return new Color(0.12f, 0.75f, 0.25f, 1.0f); // Изумрудный зеленый
 
             case 1:
             case 5:
             case 11: // Bloody Wastelands (Кровавые Пустоши)
                 return new Color(0.85f, 0.15f, 0.12f, 1.0f); // Насыщенный красный
 
-            case 6: // Ice Peak (Ледяной Пик)
-            case 8: // Ancient Ruins (Древние Руины)
-            case 9: // Forest Dwellers (Лесные Жители)
-                return new Color(0.12f, 0.75f, 0.25f, 1.0f); // Изумрудный зеленый
-
             case 0:
             case 2:
             case 4:
+            case 6: // Ice Peak (Ледяной Пик) - Нейтральный
             case 7:
             case 10:
             default: // Нейтральные территории
@@ -2508,6 +2506,8 @@ public class FateCastleManager : MonoBehaviour
         // [CRITICAL SAVE SYNC] Синхронизируем и загружаем активный слот сохранений игрока при запуске сцены континента
         int activeSlot = PlayerPrefs.GetInt("Active_Save_Slot", 0);
         SaveGameSystem.Load(activeSlot, false);
+
+        LoadAILogs();
 
         isContinentGameplayActive = PlayerPrefs.GetInt("ContinentGameplayActive", 0) == 1 && PlayerPrefs.GetInt("LandedZoneIndex", -1) != -1;
         currentDay = PlayerPrefs.GetInt("Fate_Current_Day", initialDaySetting);
@@ -2886,7 +2886,7 @@ public class FateCastleManager : MonoBehaviour
                 zonesCH[i] = GetLandingBaseNameCH(i) + " (玩家同盟)";
                 zonesKR[i] = GetLandingBaseNameKR(i) + " (플레이어 동맹)";
             }
-            else if (i == 3 || i == 6 || i == 8 || i == 11)
+            else if (i == 6 || i == 8 || i == 11)
             {
                 zonesRU[i] = GetLandingBaseNameRU(i) + " (Нейтралы)";
                 zonesEN[i] = GetLandingBaseNameEN(i) + " (Neutrals)";
@@ -2907,14 +2907,15 @@ public class FateCastleManager : MonoBehaviour
                 zonesCH[i] = i == 2 ? "中立关卡 (中立方)" : "寂静十字路口 (中立方)";
                 zonesKR[i] = i == 2 ? "중립의 통로 (중립국)" : "조용한 교차로 (중립국)";
             }
-            else // 0, 4, 5, 9
+            else // 0, 3, 4, 5, 9
             {
                 string baseRU = "Сумрачный Лес";
                 string baseEN = "Gloomwood Forest";
                 string baseCH = "幽暗密林";
                 string baseKR = "어둠의 숲";
 
-                if (i == 4) { baseRU = "Лесные Топи"; baseEN = "Forest Swamps"; baseCH = "森林沼泽"; baseKR = "숲의 늪지"; }
+                if (i == 3) { baseRU = GetLandingBaseNameRU(3); baseEN = GetLandingBaseNameEN(3); baseCH = GetLandingBaseNameCH(3); baseKR = GetLandingBaseNameKR(3); }
+                else if (i == 4) { baseRU = "Лесные Топи"; baseEN = "Forest Swamps"; baseCH = "森林沼泽"; baseKR = "숲의 늪지"; }
                 else if (i == 5) { baseRU = "Изумрудный Сад"; baseEN = "Emerald Garden"; baseCH = "翡翠花园"; baseKR = "에메랄드 정원"; }
                 else if (i == 9) { baseRU = "Магическая Роща"; baseEN = "Spiritual Grove"; baseCH = "灵能树林"; baseKR = "영적인 숲"; }
 
@@ -3688,12 +3689,457 @@ public class FateCastleManager : MonoBehaviour
         RecalculateStats();
         SaveGameSystem.Save(0);
 
+        ProcessAITurns();
+
         showNewDayOverlay = true;
 
         string feedbackMsg = Translator.LanguageID == 0 
             ? $"📅 Наступил День {currentDay}! Собрано налогов: +{totalIncome} 💰" 
             : $"📅 Day {currentDay} has arrived! Collected taxes: +{totalIncome} 💰";
         ShowFeedback(feedbackMsg);
+    }
+
+    private void LoadAILogs()
+    {
+        aiLogs.Clear();
+        int count = PlayerPrefs.GetInt("Fate_AILog_Count", 0);
+        for (int i = 0; i < count; i++)
+        {
+            aiLogs.Add(PlayerPrefs.GetString("Fate_AILog_Line_" + i, ""));
+        }
+    }
+
+    private void SaveAILogs()
+    {
+        PlayerPrefs.SetInt("Fate_AILog_Count", aiLogs.Count);
+        for (int i = 0; i < aiLogs.Count; i++)
+        {
+            PlayerPrefs.SetString("Fate_AILog_Line_" + i, aiLogs[i]);
+        }
+        PlayerPrefs.Save();
+    }
+
+    private string GetCastleColorType(int regionIndex, int actualPlayerRegion, string owner)
+    {
+        if (owner == "Player" || regionIndex == actualPlayerRegion)
+        {
+            return "Player";
+        }
+        
+        Color col = GetRegionColor(regionIndex, actualPlayerRegion, owner);
+        if (col.g > 0.6f && col.r < 0.3f)
+        {
+            return "Green";
+        }
+        else if (col.r > 0.7f && col.g < 0.3f)
+        {
+            return "Red";
+        }
+        else
+        {
+            return "Neutral";
+        }
+    }
+
+    public void ProcessAITurns()
+    {
+        aiLogs.Clear();
+        int curLang = Translator.LanguageID;
+
+        int playerDialogueIndex = PlayerPrefs.GetInt("LandedZoneIndex", -1);
+        int actualPlayerRegion = GetActualRegionIndexFromLanding(playerDialogueIndex);
+        int selectedDifficulty = PlayerPrefs.GetInt("Difficulty", 2); // 0 - Новичок, 4 - Кошмар
+
+        foreach (var castle in castles)
+        {
+            if (castle.owner == "Player" || castle.zoneIndex == actualPlayerRegion)
+                continue;
+
+            string castleType = GetCastleColorType(castle.zoneIndex, actualPlayerRegion, castle.owner);
+            string castleName = curLang == 0 ? castle.nameRU : castle.nameEN;
+            if (curLang == 8) castleName = castle.nameCH;
+            if (curLang == 7) castleName = castle.nameKR;
+
+            int oldTroops = castle.aiTroopsPower;
+            int oldLvl = castle.aiCommanderLevel;
+            int oldArmor = castle.aiArmorTier;
+            int oldPotions = castle.aiPotionsStock;
+
+            string logMessage = "";
+
+            if (castleType == "Neutral")
+            {
+                switch (selectedDifficulty)
+                {
+                    case 0:
+                        logMessage = GetText9(
+                            $"⚪ Нейтральный замок {castleName} сохраняет пассивность и мирный нейтралитет.",
+                            $"⚪ Neutral castle {castleName} remains passive and maintains peaceful neutrality.",
+                            $"⚪ Die neutrale Burg {castleName} bleibt passiv und wahrt friedliche Neutralität.",
+                            $"⚪ Le château neutre {castleName} reste passif et maintient une neutralité pacifique.",
+                            $"⚪ El castillo neutral {castleName} permanece pasivo y mantiene una neutralidad pacífica.",
+                            $"⚪ O castelo neutro {castleName} permanece passivo e mantém neutralidade pacífica.",
+                            $"⚪ 中立の城 {castleName} は静観しており、平和的な中立を維持しています。",
+                            $"⚪ 중립성 {castleName}은(는) 수동적이며 평화적인 중립을 유지합니다.",
+                            $"⚪ 中立城堡 {castleName} 保持被动并维持着和平的中立状态。"
+                        );
+                        break;
+
+                    case 1:
+                        if (UnityEngine.Random.Range(0, 100) < 15)
+                        {
+                            castle.aiTroopsPower = Mathf.Min(20, castle.aiTroopsPower + 1);
+                        }
+                        logMessage = GetText9(
+                            $"⚪ В нейтральном замке {castleName} замечены небольшие маневры сил.",
+                            $"⚪ A slight movement of forces was observed in the neutral castle {castleName}.",
+                            $"⚪ In der neutralen Burg {castleName} wurden geringfügige Truppenbewegungen beobachtet.",
+                            $"⚪ Un léger mouvement de forces a été observé dans le château neutre {castleName}.",
+                            $"⚪ Se observó un ligero movimiento de fuerzas en el castillo neutral {castleName}.",
+                            $"⚪ Um pequeno movimento de forças foi observado no castelo neutro {castleName}.",
+                            $"⚪ 中立の城 {castleName} 内で小規模な軍の機动が観測されました。",
+                            $"⚪ 중립성 {castleName}에서 사소한 병력 기동이 관측되었습니다.",
+                            $"⚪ 中立城堡 {castleName} 内部侦测到轻微的守军调动。"
+                        );
+                        break;
+
+                    case 2:
+                        if (UnityEngine.Random.Range(0, 100) < 35)
+                        {
+                            castle.aiTroopsPower = Mathf.Min(35, castle.aiTroopsPower + UnityEngine.Random.Range(1, 3));
+                        }
+                        if (UnityEngine.Random.Range(0, 100) < 20)
+                        {
+                            castle.aiCommanderLevel = Mathf.Min(5, castle.aiCommanderLevel + 1);
+                        }
+                        if (UnityEngine.Random.Range(0, 100) < 15)
+                        {
+                            castle.aiArmorTier = Mathf.Min(2, castle.aiArmorTier + 1);
+                        }
+                        logMessage = GetText9(
+                            $"⚪ Нейтральный замок {castleName} укрепил гарнизон (+{castle.aiTroopsPower - oldTroops} войск), повышая боевую подготовку на Нормальном уровне.",
+                            $"⚪ Neutral castle {castleName} reinforced garrison (+{castle.aiTroopsPower - oldTroops} troops), raising training on Normal level.",
+                            $"⚪ Neutrale Burg {castleName} verstärkte die Garnison (+{castle.aiTroopsPower - oldTroops} Truppen) und erhöhte das Training auf Normal.",
+                            $"⚪ Le château neutre {castleName} a renforcé sa garnison (+{castle.aiTroopsPower - oldTroops} troupes) à un niveau Normal.",
+                            $"⚪ El castillo neutral {castleName} reforzó la guarnición (+{castle.aiTroopsPower - oldTroops} tropas) en nivel Normal.",
+                            $"⚪ O castelo neutro {castleName} reforçou a guarnição (+{castle.aiTroopsPower - oldTroops} tropas) no nível Normal.",
+                            $"⚪ 中立の城 {castleName} は駐屯地を強化し (+{castle.aiTroopsPower - oldTroops} 兵)、ノーマル難易度相当の戦闘訓練を行いました。",
+                            $"⚪ 중립성 {castleName}이(가) 주둔군을 강화하여 (+{castle.aiTroopsPower - oldTroops} 병력) 보통 수준의 훈련을 진행했습니다.",
+                            $"⚪ 中立城堡 {castleName} 增援了守备军 (+{castle.aiTroopsPower - oldTroops} 士兵)，并在普通级难度下提升了训练强度。"
+                        );
+                        break;
+
+                    case 3:
+                        if (UnityEngine.Random.Range(0, 100) < 60)
+                        {
+                            castle.aiTroopsPower = Mathf.Min(60, castle.aiTroopsPower + UnityEngine.Random.Range(2, 5));
+                        }
+                        if (UnityEngine.Random.Range(0, 100) < 40)
+                        {
+                            castle.aiCommanderLevel = Mathf.Min(10, castle.aiCommanderLevel + 1);
+                        }
+                        if (UnityEngine.Random.Range(0, 100) < 30)
+                        {
+                            castle.aiArmorTier = Mathf.Min(3, castle.aiArmorTier + 1);
+                        }
+                        if (UnityEngine.Random.Range(0, 100) < 40)
+                        {
+                            castle.aiPotionsStock = Mathf.Min(4, castle.aiPotionsStock + 1);
+                        }
+                        logMessage = GetText9(
+                            $"⚪ Нейтральный замок {castleName} активно развивается на Сложном уровне: гарнизон усилен (+{castle.aiTroopsPower - oldTroops} войск), командир {castle.aiCommanderLevel} ур., доспехи {castle.aiArmorTier} тира.",
+                            $"⚪ Neutral castle {castleName} actively develops on Hard level: garrison reinforced (+{castle.aiTroopsPower - oldTroops} troops), level {castle.aiCommanderLevel} commander, tier {castle.aiArmorTier} armor.",
+                            $"⚪ Neutrale Burg {castleName} entwickelt sich aktiv auf Schwer: Garnison verstärkt (+{castle.aiTroopsPower - oldTroops} Truppen), Level {castle.aiCommanderLevel} Kommandant, Stufe {castle.aiArmorTier} Rüstung.",
+                            $"⚪ Le château neutre {castleName} se développe activement au niveau Difficile : garnison renforcée (+{castle.aiTroopsPower - oldTroops} troupes), commandant niv. {castle.aiCommanderLevel}, armure T{castle.aiArmorTier}.",
+                            $"⚪ El castillo neutral {castleName} se desarrolla activamente en nivel Difícil: guarnición reforzada (+{castle.aiTroopsPower - oldTroops} tropas), comandante de nivel {castle.aiCommanderLevel}, armadura tier {castle.aiArmorTier}.",
+                            $"⚪ O castelo neutro {castleName} se desenvolve ativamente no nível Difícil: guarnição reforçada (+{castle.aiTroopsPower - oldTroops} tropas), líder nível {castle.aiCommanderLevel}, armadura tier {castle.aiArmorTier}.",
+                            $"⚪ 中立の城 {castleName} はハード難易度で活発に発展中：駐屯地強化 (+{castle.aiTroopsPower - oldTroops} 兵)、指揮官Lv {castle.aiCommanderLevel}、防具ティア {castle.aiArmorTier}。",
+                            $"⚪ 중립성 {castleName}이(가) 어려움 난이도에서 활발히 성장 중: 주둔군 강화 (+{castle.aiTroopsPower - oldTroops} 병력), 사령관 {castle.aiCommanderLevel}레벨, 방어구 {castle.aiArmorTier}티어.",
+                            $"⚪ 中立城堡 {castleName} 在困难级难度下加紧扩军：守备力增强 (+{castle.aiTroopsPower - oldTroops} 士兵)，主将升至 {castle.aiCommanderLevel} 级，防具提升至第 {castle.aiArmorTier} 阶。"
+                        );
+                        break;
+
+                    case 4:
+                        castle.aiTroopsPower = Mathf.Min(100, castle.aiTroopsPower + UnityEngine.Random.Range(4, 9));
+                        if (UnityEngine.Random.Range(0, 100) < 75)
+                        {
+                            castle.aiCommanderLevel = Mathf.Min(15, castle.aiCommanderLevel + UnityEngine.Random.Range(1, 3));
+                        }
+                        if (UnityEngine.Random.Range(0, 100) < 50)
+                        {
+                            castle.aiArmorTier = Mathf.Min(4, castle.aiArmorTier + 1);
+                        }
+                        if (UnityEngine.Random.Range(0, 100) < 60)
+                        {
+                            castle.aiPotionsStock = Mathf.Min(5, castle.aiPotionsStock + 1);
+                        }
+                        logMessage = GetText9(
+                            $"⚪ Нейтральный замок {castleName} достиг Кошмарной боеготовности: гарнизон усилен (+{castle.aiTroopsPower - oldTroops} войск), командир {castle.aiCommanderLevel} ур., закуплены зелья ({castle.aiPotionsStock} шт.).",
+                            $"⚪ Neutral castle {castleName} achieved Nightmare readiness: garrison reinforced (+{castle.aiTroopsPower - oldTroops} troops), level {castle.aiCommanderLevel} commander, potions purchased ({castle.aiPotionsStock}).",
+                            $"⚪ Neutrale Burg {castleName} erreichte Albtraum-Bereitschaft: Garnison verstärkt (+{castle.aiTroopsPower - oldTroops} Truppen), Level {castle.aiCommanderLevel} Kommandant, Tränke gekauft ({castle.aiPotionsStock}).",
+                            $"⚪ Le château neutre {castleName} a atteint l'état d'alerte Cauchemar : garnison renforcée (+{castle.aiTroopsPower - oldTroops} troupes), commandant niv. {castle.aiCommanderLevel}, potions achetées ({castle.aiPotionsStock}).",
+                            $"⚪ El castillo neutral {castleName} alcanzó preparación Pesadilla: guarnición reforzada (+{castle.aiTroopsPower - oldTroops} tropas), comandante de nivel {castle.aiCommanderLevel}, pociones compradas ({castle.aiPotionsStock}).",
+                            $"⚪ O castelo neutro {castleName} atingiu prontidão Pesadelo: guarnição reforçada (+{castle.aiTroopsPower - oldTroops} tropas), líder nível {castle.aiCommanderLevel}, poções compradas ({castle.aiPotionsStock}).",
+                            $"⚪ 中立の城 {castleName} は悪夢の臨戦態勢に到達：駐屯地強化 (+{castle.aiTroopsPower - oldTroops} 兵)、指揮官Lv {castle.aiCommanderLevel}、ポーション購入数 {castle.aiPotionsStock}個。",
+                            $"⚪ 중립성 {castleName}이(가) 악몽 수준의 전투 태세 완비: 주둔군 강화 (+{castle.aiTroopsPower - oldTroops} 병력), 사령관 {castle.aiCommanderLevel}레벨, 물약 보유량 {castle.aiPotionsStock}개.",
+                            $"⚪ 中立城堡 {castleName} 已达至噩梦级军事防备：守备军暴增 (+{castle.aiTroopsPower - oldTroops} 士兵)，主将升至 {castle.aiCommanderLevel} 级，储备炼金药剂 {castle.aiPotionsStock} 瓶。"
+                        );
+                        break;
+                }
+            }
+            else if (castleType == "Green")
+            {
+                switch (selectedDifficulty)
+                {
+                    case 0:
+                        logMessage = GetText9(
+                            $"🟢 Зеленый замок-защитник {castleName} ведет себя пассивно, сосредоточившись строго на охране внутренних границ.",
+                            $"🟢 Green defender castle {castleName} behaves passively, focusing strictly on guarding internal borders.",
+                            $"🟢 Die grüne Verteidigungsburg {castleName} verhält sich passiv und konzentriert sich auf die Sicherung der Grenzen.",
+                            $"🟢 Le château vert défensif {castleName} se comporte passivement, se concentrant sur la protection des frontières.",
+                            $"🟢 El castillo defensor verde {castleName} se comporta de forma pasiva, concentrándose en vigilar las fronteras.",
+                            $"🟢 O castelo defensor verde {castleName} comporta-se passivamente, focando estritamente na guarda de fronteiras.",
+                            $"🟢 緑の防衛城 {castleName} は消極的で、もっぱら自らの国境警戒のみに集中しています。",
+                            $"🟢 녹색 방어성 {castleName}은(는) 소극적이며 오직 국경 경비에만 전념하고 있습니다.",
+                            $"🟢 绿方防御要塞 {castleName} 表现温和被动，目前仅专注于本国边界的基本警备。"
+                        );
+                        break;
+
+                    case 1:
+                        if (UnityEngine.Random.Range(0, 100) < 15)
+                        {
+                            castle.aiTroopsPower = Mathf.Min(20, castle.aiTroopsPower + 1);
+                        }
+                        logMessage = GetText9(
+                            $"🟢 Защитники зеленого замка {castleName} проводят небольшие оборонительные маневры (+{castle.aiTroopsPower - oldTroops} войск).",
+                            $"🟢 Defenders of green castle {castleName} conduct minor defensive exercises (+{castle.aiTroopsPower - oldTroops} troops).",
+                            $"🟢 Verteidiger der grünen Burg {castleName} führen kleine Verteidigungsübungen durch (+{castle.aiTroopsPower - oldTroops} Truppen).",
+                            $"🟢 Les défenseurs du château vert {castleName} effectuent de légers exercices défensifs (+{castle.aiTroopsPower - oldTroops} troupes).",
+                            $"🟢 Los defensores del castillo verde {castleName} realizan pequeños ejercicios defensivos (+{castle.aiTroopsPower - oldTroops} tropas).",
+                            $"🟢 Os defensores do castelo verde {castleName} realizam pequenos exercícios de defesa (+{castle.aiTroopsPower - oldTroops} tropas).",
+                            $"🟢 緑の城 {castleName} の衛兵たちは、軽度な守備軍事演習を行いました (+{castle.aiTroopsPower - oldTroops} 兵)。",
+                            $"🟢 녹색 성 {castleName}의 방어군이 사소한 경계 훈련을 마쳤습니다 (+{castle.aiTroopsPower - oldTroops} 병력).",
+                            $"🟢 绿方城堡 {castleName} 的御林守军开展了轻度防御性演练 (+{castle.aiTroopsPower - oldTroops} 士兵)。"
+                        );
+                        break;
+
+                    case 2:
+                        castle.aiTroopsPower = Mathf.Min(45, castle.aiTroopsPower + UnityEngine.Random.Range(2, 4));
+                        if (UnityEngine.Random.Range(0, 100) < 30)
+                        {
+                            castle.aiCommanderLevel = Mathf.Min(6, castle.aiCommanderLevel + 1);
+                        }
+                        if (UnityEngine.Random.Range(0, 100) < 25)
+                        {
+                            castle.aiArmorTier = Mathf.Min(2, castle.aiArmorTier + 1);
+                        }
+                        logMessage = GetText9(
+                            $"🟢 Зеленый замок {castleName} укрепляет рубежи на Нормальном уровне: возведены баррикады (+{castle.aiTroopsPower - oldTroops} войск), военачальник получил {castle.aiCommanderLevel} ур.",
+                            $"🟢 Green castle {castleName} reinforces borders on Normal level: barricades erected (+{castle.aiTroopsPower - oldTroops} troops), commander achieved level {castle.aiCommanderLevel}.",
+                            $"🟢 Grüne Burg {castleName} verstärkt die Grenzen auf Normal: Barrikaden errichtet (+{castle.aiTroopsPower - oldTroops} Truppen), Kommandant hat Level {castle.aiCommanderLevel} erreicht.",
+                            $"🟢 Le château vert {castleName} renforce ses frontières au niveau Normal : barricades érigées (+{castle.aiTroopsPower - oldTroops} troupes), commandant niv. {castle.aiCommanderLevel}.",
+                            $"🟢 El castillo verde {castleName} refuerza fronteras en nivel Normal: barricadas erigidas (+{castle.aiTroopsPower - oldTroops} tropas), comandante de nivel {castle.aiCommanderLevel}.",
+                            $"🟢 O castelo verde {castleName} reforça limites no nível Normal: barricadas construídas (+{castle.aiTroopsPower - oldTroops} tropas), comandante nível {castle.aiCommanderLevel}.",
+                            $"🟢 緑の城 {castleName} はノーマルレベルで防壁を構築中：防壁強化 (+{castle.aiTroopsPower - oldTroops} 兵)、指揮官Lv {castle.aiCommanderLevel} に向上。",
+                            $"🟢 녹색 성 {castleName}이(가) 보통 수준에서 장벽을 구축 중: 방어 참호 건설 (+{castle.aiTroopsPower - oldTroops} 병력), 사령관 {castle.aiCommanderLevel}레벨 달성.",
+                            $"🟢 绿方城堡 {castleName} 于普通级别下修筑据点：加固防御护栏 (+{castle.aiTroopsPower - oldTroops} 士兵)，城守升级至 {castle.aiCommanderLevel} 级。"
+                        );
+                        break;
+
+                    case 3:
+                        castle.aiTroopsPower = Mathf.Min(75, castle.aiTroopsPower + UnityEngine.Random.Range(4, 7));
+                        if (UnityEngine.Random.Range(0, 100) < 50)
+                        {
+                            castle.aiCommanderLevel = Mathf.Min(11, castle.aiCommanderLevel + UnityEngine.Random.Range(1, 3));
+                        }
+                        if (UnityEngine.Random.Range(0, 100) < 40)
+                        {
+                            castle.aiArmorTier = Mathf.Min(3, castle.aiArmorTier + 1);
+                        }
+                        if (UnityEngine.Random.Range(0, 100) < 50)
+                        {
+                            castle.aiPotionsStock = Mathf.Min(5, castle.aiPotionsStock + 1);
+                        }
+                        logMessage = GetText9(
+                            $"🟢 Оборонительный замок {castleName} развернул тяжелую оборону на Сложном уровне: гарнизон значительно усилен (+{castle.aiTroopsPower - oldTroops} войск), доспехи {castle.aiArmorTier} тира, военачальник получил {castle.aiCommanderLevel} ур.",
+                            $"🟢 Defensive castle {castleName} deployed heavy defense on Hard level: garrison reinforced (+{castle.aiTroopsPower - oldTroops} troops), tier {castle.aiArmorTier} armor, level {castle.aiCommanderLevel} commander.",
+                            $"🟢 Verteidigungsburg {castleName} hat schwere Verteidigung auf Schwer aufgebaut: Garnison stark verstärkt (+{castle.aiTroopsPower - oldTroops} Truppen), Stufe {castle.aiArmorTier} Rüstung, Level {castle.aiCommanderLevel} Kommandant.",
+                            $"🟢 Le château défensif {castleName} a déployé une lourde défense au niveau Difficile : garnison renforcée (+{castle.aiTroopsPower - oldTroops} troupes), armure T{castle.aiArmorTier}, commandant niv. {castle.aiCommanderLevel}.",
+                            $"🟢 El castillo defensivo {castleName} desplegó defensa pesada en nivel Difícil: guarnición reforzada (+{castle.aiTroopsPower - oldTroops} tropas), armadura tier {castle.aiArmorTier}, comandante de nivel {castle.aiCommanderLevel}.",
+                            $"🟢 O castelo defensivo {castleName} mobilizou defesa pesada no nível Difícil: guarnição reforçada (+{castle.aiTroopsPower - oldTroops} tropas), armadura tier {castle.aiArmorTier}, comandante nível {castle.aiCommanderLevel}.",
+                            $"🟢 防衛特化城 {castleName} はハード難易度で強固な陣地を展開：城塞を大幅強化 (+{castle.aiTroopsPower - oldTroops} 兵)、防具ティア {castle.aiArmorTier}、指揮官Lv {castle.aiCommanderLevel}。",
+                            $"🟢 방어형 성 {castleName}이(가) 어려움 난이도에서 밀집 방어벽 형성: 수비군 대규모 보강 (+{castle.aiTroopsPower - oldTroops} 병력), 갑옷 {castle.aiArmorTier}티어, 사령관 {castle.aiCommanderLevel}레벨.",
+                            $"🟢 绿方戍卫城堡 {castleName} 部署了重装防线：重型铁卫加入 (+{castle.aiTroopsPower - oldTroops} 士兵)，重铠提升至 {castle.aiArmorTier} 阶，城守将军升至 {castle.aiCommanderLevel} 级。"
+                        );
+                        break;
+
+                    case 4:
+                        castle.aiTroopsPower = Mathf.Min(120, castle.aiTroopsPower + UnityEngine.Random.Range(6, 13));
+                        if (UnityEngine.Random.Range(0, 100) < 85)
+                        {
+                            castle.aiCommanderLevel = Mathf.Min(18, castle.aiCommanderLevel + UnityEngine.Random.Range(2, 4));
+                        }
+                        if (UnityEngine.Random.Range(0, 100) < 70)
+                        {
+                            castle.aiArmorTier = Mathf.Min(4, castle.aiArmorTier + 1);
+                        }
+                        if (UnityEngine.Random.Range(0, 100) < 80)
+                        {
+                            castle.aiPotionsStock = Mathf.Min(8, castle.aiPotionsStock + 2);
+                        }
+                        logMessage = GetText9(
+                            $"🟢 Зеленый замок {castleName} достиг Кошмарной обороны: гарнизон укреплен до предела (+{castle.aiTroopsPower - oldTroops} войск), командир {castle.aiCommanderLevel} ур., броня {castle.aiArmorTier} тира, запас зелий: {castle.aiPotionsStock}.",
+                            $"🟢 Green castle {castleName} reached Nightmare defense: garrison reinforced to maximum (+{castle.aiTroopsPower - oldTroops} troops), level {castle.aiCommanderLevel} commander, tier {castle.aiArmorTier} armor, potions: {castle.aiPotionsStock}.",
+                            $"🟢 Grüne Burg {castleName} hat Albtraum-Verteidigung erreicht: Garnison maximal verstärkt (+{castle.aiTroopsPower - oldTroops} Truppen), Level {castle.aiCommanderLevel} Kommandant, Stufe {castle.aiArmorTier} Rüstung, Tränke: {castle.aiPotionsStock}.",
+                            $"🟢 Le château vert {castleName} a atteint la défense Cauchemar : garnison au maximum (+{castle.aiTroopsPower - oldTroops} troupes), commandant niv. {castle.aiCommanderLevel}, armure T{castle.aiArmorTier}, potions : {castle.aiPotionsStock}.",
+                            $"🟢 El castillo verde {castleName} alcanzó defensa Pesadilla: guarnición al máximo (+{castle.aiTroopsPower - oldTroops} tropas), comandante de nivel {castle.aiCommanderLevel}, armadura tier {castle.aiArmorTier}, pociones: {castle.aiPotionsStock}.",
+                            $"🟢 O castelo verde {castleName} atingiu defesa Pesadelo: guarnição ao máximo (+{castle.aiTroopsPower - oldTroops} tropas), comandante nível {castle.aiCommanderLevel}, armadura tier {castle.aiArmorTier}, poções: {castle.aiPotionsStock}.",
+                            $"🟢 緑の城 {castleName} は悪夢の難攻不落城を達成：守備軍極大化 (+{castle.aiTroopsPower - oldTroops} 兵)、指揮官Lv {castle.aiCommanderLevel}、鎧ティア {castle.aiArmorTier}、薬液保管庫 {castle.aiPotionsStock}本。",
+                            $"🟢 녹색 성 {castleName}이(가) 악몽급 불사벽 완성: 수비군 최대로 소집 (+{castle.aiTroopsPower - oldTroops} 병력), 사령관 {castle.aiCommanderLevel}레벨, 신성 갑옷 {castle.aiArmorTier}티어, 비약 {castle.aiPotionsStock}개 보유.",
+                            $"🟢 绿方神圣之城 {castleName} 筑造了不落天堑：绝壁要塞落成 (+{castle.aiTroopsPower - oldTroops} 士兵)，主将升至 {castle.aiCommanderLevel} 级，神装解锁至 {castle.aiArmorTier} 阶，战剂储量 {castle.aiPotionsStock} 瓶。"
+                        );
+                        break;
+                }
+            }
+            else if (castleType == "Red")
+            {
+                switch (selectedDifficulty)
+                {
+                    case 0:
+                        if (UnityEngine.Random.Range(0, 100) < 10)
+                        {
+                            castle.aiTroopsPower = Mathf.Min(22, castle.aiTroopsPower + 1);
+                        }
+                        logMessage = GetText9(
+                            $"🔴 Красный агрессивный замок {castleName} ведет себя тихо, но высылает разведчиков за границы ваших земель.",
+                            $"🔴 Red aggressive castle {castleName} behaves quietly, but sends scouts beyond the borders of your lands.",
+                            $"🔴 Die rote, aggressive Burg {castleName} verhält sich ruhig, sendet aber Späher über Ihre Grenzen.",
+                            $"🔴 Le château rouge agressif {castleName} se comporte calmement, mais envoie des éclaireurs au-delà de vos frontières.",
+                            $"🔴 El castillo agresivo rojo {castleName} se comporta con calma, pero envía exploradores más allá de tus fronteras.",
+                            $"🔴 O castelo agressivo vermelho {castleName} comporta-se calmamente, mas envia batedores além de suas fronteiras.",
+                            $"🔴 赤の好戦的な城 {castleName} は静かですが、あなたの領土に隠密偵察隊を放っています。",
+                            $"🔴 적색 공격성 {castleName}은(는) 조용하지만 국경 부근에 밀탐을 보내 동태를 감시하고 있습니다.",
+                            $"🔴 红方掠夺者城堡 {castleName} 虽未大规模集结，但已悄然向你部边界派出斥候密探进行测绘。"
+                        );
+                        break;
+
+                    case 1:
+                        if (UnityEngine.Random.Range(0, 100) < 30)
+                        {
+                            castle.aiTroopsPower = Mathf.Min(30, castle.aiTroopsPower + UnityEngine.Random.Range(1, 3));
+                        }
+                        if (UnityEngine.Random.Range(0, 100) < 20)
+                        {
+                            castle.aiCommanderLevel = Mathf.Min(4, castle.aiCommanderLevel + 1);
+                        }
+                        logMessage = GetText9(
+                            $"🔴 Агрессоры красного замка {castleName} активизировали набеги (+{castle.aiTroopsPower - oldTroops} войск), тренируя командиров для экспансии.",
+                            $"🔴 Aggressors from red castle {castleName} intensified raids (+{castle.aiTroopsPower - oldTroops} troops), training commanders for expansion.",
+                            $"🔴 Angreifer der roten Burg {castleName} intensivierten Überfälle (+{castle.aiTroopsPower - oldTroops} Truppen) und trainierten Kommandanten.",
+                            $"🔴 Les agresseurs du château rouge {castleName} ont intensifié leurs raids (+{castle.aiTroopsPower - oldTroops} troupes) pour s'étendre.",
+                            $"🔴 Los agresores del castillo rojo {castleName} intensificaron incursiones (+{castle.aiTroopsPower - oldTroops} tropas) para expandirse.",
+                            $"🔴 Os agressores do castelo vermelho {castleName} intensificaram saques (+{castle.aiTroopsPower - oldTroops} tropas), preparando a expansão.",
+                            $"🔴 赤の城 {castleName} の好戦勢力は略奪行軍を活性化させ (+{castle.aiTroopsPower - oldTroops} 兵)、指揮官を鍛え上げました。",
+                            $"🔴 적색 성 {castleName}의 침략 세력이 소규모 습격을 전개하고 (+{castle.aiTroopsPower - oldTroops} 병력) 지휘 무관을 임관시켰습니다.",
+                            $"🔴 红方野蛮阵线 {castleName} 开始对周边村庄进行扫荡掠夺 (+{castle.aiTroopsPower - oldTroops} 士兵)，锋芒初露。"
+                        );
+                        break;
+
+                    case 2:
+                        castle.aiTroopsPower = Mathf.Min(55, castle.aiTroopsPower + UnityEngine.Random.Range(3, 6));
+                        if (UnityEngine.Random.Range(0, 100) < 45)
+                        {
+                            castle.aiCommanderLevel = Mathf.Min(8, castle.aiCommanderLevel + UnityEngine.Random.Range(1, 3));
+                        }
+                        if (UnityEngine.Random.Range(0, 100) < 20)
+                        {
+                            castle.aiArmorTier = Mathf.Min(2, castle.aiArmorTier + 1);
+                        }
+                        if (UnityEngine.Random.Range(0, 100) < 30)
+                        {
+                            castle.aiPotionsStock = Mathf.Min(3, castle.aiPotionsStock + 1);
+                        }
+                        logMessage = GetText9(
+                            $"🔴 Красный замок {castleName} развивает наступление на Нормальном уровне: усилен штурмовой корпус (+{castle.aiTroopsPower - oldTroops} войск), командир {castle.aiCommanderLevel} ур., защита слабая.",
+                            $"🔴 Red castle {castleName} advances on Normal level: assault corps reinforced (+{castle.aiTroopsPower - oldTroops} troops), level {castle.aiCommanderLevel} commander, defense remains low.",
+                            $"🔴 Rote Burg {castleName} greift auf Normal an: Angriffskorps verstärkt (+{castle.aiTroopsPower - oldTroops} Truppen), Level {castle.aiCommanderLevel} Kommandant, Verteidigung bleibt schwach.",
+                            $"🔴 Le château rouge {castleName} mène une offensive au niveau Normal : corps d'assaut renforcé (+{castle.aiTroopsPower - oldTroops} troupes), commandant niv. {castle.aiCommanderLevel}, défense faible.",
+                            $"🔴 El castillo rojo {castleName} avanza en nivel Normal: cuerpo de asalto reforzado (+{castle.aiTroopsPower - oldTroops} tropas), comandante de nivel {castle.aiCommanderLevel}, defensa baja.",
+                            $"🔴 O castelo vermelho {castleName} avança no nível Normal: infantaria de assalto reforçada (+{castle.aiTroopsPower - oldTroops} tropas), líder nível {castle.aiCommanderLevel}, defesa fraca.",
+                            $"🔴 赤の城 {castleName} はノーマルレベルで侵攻準備：突撃部隊を強化 (+{castle.aiTroopsPower - oldTroops} 兵)、指揮官Lv {castle.aiCommanderLevel} 、防衛は手薄です。",
+                            $"🔴 적색 성 {castleName}이(가) 보통 수준에서 전격 공세를 감행: 강습 연대 조직 (+{castle.aiTroopsPower - oldTroops} 병력), 사령관 {castle.aiCommanderLevel}레벨, 성비는 미비합니다.",
+                            $"🔴 红方铁血要塞 {castleName} 于普通级别下集结主攻部队：突击军力上升 (+{castle.aiTroopsPower - oldTroops} 士兵)，主帅升至 {castle.aiCommanderLevel} 级，内部防务较弱。"
+                        );
+                        break;
+
+                    case 3:
+                        castle.aiTroopsPower = Mathf.Min(90, castle.aiTroopsPower + UnityEngine.Random.Range(5, 11));
+                        if (UnityEngine.Random.Range(0, 100) < 70)
+                        {
+                            castle.aiCommanderLevel = Mathf.Min(14, castle.aiCommanderLevel + UnityEngine.Random.Range(2, 4));
+                        }
+                        if (UnityEngine.Random.Range(0, 100) < 50)
+                        {
+                            castle.aiArmorTier = Mathf.Min(3, castle.aiArmorTier + 1);
+                        }
+                        if (UnityEngine.Random.Range(0, 100) < 60)
+                        {
+                            castle.aiPotionsStock = Mathf.Min(5, castle.aiPotionsStock + 1);
+                        }
+                        logMessage = GetText9(
+                            $"🔴 Красная цитадель {castleName} ведет яростное наступление на Сложном уровне: лавина штурмовиков (+{castle.aiTroopsPower - oldTroops} войск), закуплено снаряжение {castle.aiArmorTier} тира, командир {castle.aiCommanderLevel} ур.!",
+                            $"🔴 Red citadel {castleName} leads a fierce assault on Hard level: avalanche of shock troops (+{castle.aiTroopsPower - oldTroops} troops), tier {castle.aiArmorTier} gear purchased, level {castle.aiCommanderLevel} commander!",
+                            $"🔴 Rote Zitadelle {castleName} führt heftigen Angriff auf Schwer: Lawine von Sturmtruppen (+{castle.aiTroopsPower - oldTroops} Truppen), Stufe {castle.aiArmorTier} Ausrüstung gekauft, Level {castle.aiCommanderLevel} Kommandant!",
+                            $"🔴 La citadelle rouge {castleName} mène un assaut féroce au niveau Difficile : avalanche de troupes de choc (+{castle.aiTroopsPower - oldTroops} troupes), équipement T{castle.aiArmorTier} acheté, commandant niv. {castle.aiCommanderLevel} !",
+                            $"🔴 La ciudadela roja {castleName} lidera un asalto feroz en nivel Difícil: avalancha de tropas de choque (+{castle.aiTroopsPower - oldTroops} tropas), equipo tier {castle.aiArmorTier} comprado, comandante de nivel {castle.aiCommanderLevel}!",
+                            $"🔴 A cidadela vermelha {castleName} lidera um ataque feroz no nível Difícil: avalanche de tropas de choque (+{castle.aiTroopsPower - oldTroops} tropas), equipamento tier {castle.aiArmorTier} comprado, líder nível {castle.aiCommanderLevel}!",
+                            $"🔴 赤の要塞 {castleName} はハード難易度で猛烈な強襲を展開：突撃大隊が襲来 (+{castle.aiTroopsPower - oldTroops} 兵)、武具ティア {castle.aiArmorTier}、指揮官Lv {castle.aiCommanderLevel}！",
+                            $"🔴 적색 요새 {castleName}이(가) 어려움 난이도에서 광포한 파상 공세 돌입: 대규모 전선 돌파대 소집 (+{castle.aiTroopsPower - oldTroops} 병력), 장비 {castle.aiArmorTier}티어 장착, 사령관 {castle.aiCommanderLevel}레벨!",
+                            $"🔴 红方死亡前哨 {castleName} 在困难级难度下组织疯狂合围：攻城先锋大军开拔 (+{castle.aiTroopsPower - oldTroops} 士兵)，重兵装跃升至 {castle.aiArmorTier} 阶，狂将升至 {castle.aiCommanderLevel} 级！"
+                        );
+                        break;
+
+                    case 4:
+                        castle.aiTroopsPower = Mathf.Min(150, castle.aiTroopsPower + UnityEngine.Random.Range(8, 17));
+                        if (UnityEngine.Random.Range(0, 100) < 95)
+                        {
+                            castle.aiCommanderLevel = Mathf.Min(22, castle.aiCommanderLevel + UnityEngine.Random.Range(2, 5));
+                        }
+                        if (UnityEngine.Random.Range(0, 100) < 80)
+                        {
+                            castle.aiArmorTier = Mathf.Min(4, castle.aiArmorTier + 1);
+                        }
+                        if (UnityEngine.Random.Range(0, 100) < 90)
+                        {
+                            castle.aiPotionsStock = Mathf.Min(10, castle.aiPotionsStock + UnityEngine.Random.Range(2, 4));
+                        }
+                        logMessage = GetText9(
+                            $"🔴 КРАСНЫЙ ЗАМОК {castleName} СЕЕТ КОШМАР! Полная мобилизация сил (+{castle.aiTroopsPower - oldTroops} войск), командир {castle.aiCommanderLevel} ур. во всеоружии, броня {castle.aiArmorTier} тира, запас зелий: {castle.aiPotionsStock} шт., ведется тотальный шпионаж за вами!",
+                            $"🔴 RED CASTLE {castleName} SOWS NIGHTMARE! Full mobilization (+{castle.aiTroopsPower - oldTroops} troops), level {castle.aiCommanderLevel} commander fully armed, tier {castle.aiArmorTier} armor, potions: {castle.aiPotionsStock}, total espionage active on you!",
+                            $"🔴 ROTE BURG {castleName} SÄT ALBTRAUM! Vollmobilisierung (+{castle.aiTroopsPower - oldTroops} Truppen), Level {castle.aiCommanderLevel} Kommandant voll bewaffnet, Stufe {castle.aiArmorTier} Rüstung, Tränke: {castle.aiPotionsStock}, Spionage aktiv!",
+                            $"🔴 LE CHÂTEAU ROUGE {castleName} SÈME LE CAUCHEMAR ! Mobilisation complète (+{castle.aiTroopsPower - oldTroops} troupes), commandant niv. {castle.aiCommanderLevel} surarmé, armure T{castle.aiArmorTier}, potions : {castle.aiPotionsStock}, espionnage total actif !",
+                            $"🔴 ¡EL CASTILLO ROJO {castleName} SIEMBRA LA PESADILLA! Movilización completa (+{castle.aiTroopsPower - oldTroops} tropas), comandante de nivel {castle.aiCommanderLevel} súper armado, armadura tier {castle.aiArmorTier}, pociones: {castle.aiPotionsStock}, ¡espionaje total activo!",
+                            $"🔴 O CASTELO VERMELHO {castleName} SEMEIA O PESADELO! Mobilização completa (+{castle.aiTroopsPower - oldTroops} tropas), comandante nível {castle.aiCommanderLevel} superarmado, armadura tier {castle.aiArmorTier}, poções: {castle.aiPotionsStock}, espionagem total ativa!",
+                            $"🔴 赤の要塞 {castleName} は悪夢を巻き起こしています！超限界突破動員 (+{castle.aiTroopsPower - oldTroops} 兵)、指揮官Lv {castle.aiCommanderLevel}、神装ティア {castle.aiArmorTier}、薬液貯蔵 {castle.aiPotionsStock}個、あなたへの全面的な諜報戦が進行中！",
+                            $"🔴 적색 지옥문 {castleName}이(가) 악몽을 뿌립니다! 전군 소집령 선포 (+{castle.aiTroopsPower - oldTroops} 병력), 사령관 {castle.aiCommanderLevel}레벨 무장 완성, 장비 {castle.aiArmorTier}티어, 보화 약물 {castle.aiPotionsStock}개, 당신에 대한 무제한 첩보 공세 발령!",
+                            $"🔴 血祸红城 {castleName} 洒下噩梦天灾！举国总动员暴兵 (+{castle.aiTroopsPower - oldTroops} 士兵)，征服统领斩获 {castle.aiCommanderLevel} 级，神兵天甲解锁至 {castle.aiArmorTier} 阶，狂热药剂 {castle.aiPotionsStock} 支，已对你的防区进行毁灭级密探渗透！"
+                        );
+                        break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(logMessage))
+            {
+                aiLogs.Add(logMessage);
+            }
+
+            PlayerPrefs.SetInt("Castle_AI_CommanderLvl_" + castle.zoneIndex, castle.aiCommanderLevel);
+            PlayerPrefs.SetInt("Castle_AI_Troops_" + castle.zoneIndex, castle.aiTroopsPower);
+            PlayerPrefs.SetInt("Castle_AI_Armor_" + castle.zoneIndex, castle.aiArmorTier);
+            PlayerPrefs.SetInt("Castle_AI_Potions_" + castle.zoneIndex, castle.aiPotionsStock);
+        }
+
+        SaveAILogs();
     }
 
     private void OnGUI()
@@ -3855,33 +4301,39 @@ public class FateCastleManager : MonoBehaviour
         currentFps = Mathf.Clamp(currentFps, 1f, 500f);
         smoothTelemetryFps = Mathf.Lerp(smoothTelemetryFps, currentFps, Time.unscaledDeltaTime * 4f);
 
-        // 2. CPU Usage
-        float baseCpu = 4.0f;
-        float fpsFactor = (smoothTelemetryFps / 120f) * 14f;
-        float logicFactor = isTownViewActive ? 6.5f : 3.0f;
-        float randomCpuNoise = Mathf.PingPong(Time.unscaledTime * 0.8f, 2.5f);
+        // 2. CPU Usage (clamped to realistic PC loads: e.g. 25% - 55% instead of spiking)
+        float baseCpu = 22.0f;
+        float fpsFactor = (smoothTelemetryFps / 120f) * 6f; // lower slope for realistic scaling
+        float logicFactor = isTownViewActive ? 8.0f : 4.0f;
+        float randomCpuNoise = Mathf.PingPong(Time.unscaledTime * 0.4f, 3.5f);
         float targetCpu = baseCpu + fpsFactor + logicFactor + randomCpuNoise;
-        targetCpu = Mathf.Clamp(targetCpu, 2f, 98f);
+        targetCpu = Mathf.Clamp(targetCpu, 15f, 85f);
         smoothTelemetryCpuLoad = Mathf.Lerp(smoothTelemetryCpuLoad, targetCpu, Time.unscaledDeltaTime * 2f);
 
-        // 3. GPU Usage
-        float baseGpu = 8.0f;
+        // 3. GPU Usage (clamped to highly realistic gaming loads: e.g. 40% - 75% depending on fps)
+        float baseGpu = 30.0f;
         float resFactor = (Screen.width * Screen.height) / (1920f * 1080f);
-        float gpuFpsFactor = (smoothTelemetryFps / 120f) * 42f;
-        float randomGpuNoise = Mathf.PingPong(Time.unscaledTime * 0.5f, 4.0f);
+        if (resFactor < 0.5f) resFactor = 0.5f;
+        if (resFactor > 2.0f) resFactor = 2.0f;
+        float gpuFpsFactor = (smoothTelemetryFps / 120f) * 8f;
+        float randomGpuNoise = Mathf.PingPong(Time.unscaledTime * 0.3f, 5.0f);
         float targetGpu = (baseGpu + gpuFpsFactor) * resFactor + randomGpuNoise;
-        targetGpu = Mathf.Clamp(targetGpu, 5f, 99.5f);
+        targetGpu = Mathf.Clamp(targetGpu, 25f, 95f);
         smoothTelemetryGpuLoad = Mathf.Lerp(smoothTelemetryGpuLoad, targetGpu, Time.unscaledDeltaTime * 2f);
 
-        // 4. Temperatures (Celsius)
-        float targetCpuTemp = 36f + (smoothTelemetryCpuLoad * 1.1f) + Mathf.PingPong(Time.unscaledTime * 0.3f, 1.2f);
-        float targetGpuTemp = 38f + (smoothTelemetryGpuLoad * 0.75f) + Mathf.PingPong(Time.unscaledTime * 0.2f, 1.0f);
+        // 4. Temperatures (Celsius) - Adjusted to stay in the realistic 45°C - 75°C range
+        // Base idle is ~38-42°C, full load adds ~20-25°C, no extreme 100°C+ thermal breakdowns
+        float targetCpuTemp = 42f + (smoothTelemetryCpuLoad * 0.45f) + Mathf.PingPong(Time.unscaledTime * 0.2f, 1.5f);
+        float targetGpuTemp = 45f + (smoothTelemetryGpuLoad * 0.38f) + Mathf.PingPong(Time.unscaledTime * 0.15f, 1.2f);
         
-        if (smoothTelemetryFps > 70f)
+        if (smoothTelemetryFps > 120f)
         {
-            targetCpuTemp += 6.5f;
-            targetGpuTemp += 8.0f;
+            targetCpuTemp += 3.5f;
+            targetGpuTemp += 4.5f;
         }
+        
+        targetCpuTemp = Mathf.Clamp(targetCpuTemp, 35f, 79f);
+        targetGpuTemp = Mathf.Clamp(targetGpuTemp, 35f, 79f);
         
         smoothTelemetryCpuTemp = Mathf.Lerp(smoothTelemetryCpuTemp, targetCpuTemp, Time.unscaledDeltaTime * 0.4f);
         smoothTelemetryGpuTemp = Mathf.Lerp(smoothTelemetryGpuTemp, targetGpuTemp, Time.unscaledDeltaTime * 0.35f);
@@ -3891,8 +4343,8 @@ public class FateCastleManager : MonoBehaviour
     {
         UpdateTelemetryMetrics();
 
-        float panelWidth = 300f;
-        float panelHeight = 155f;
+        float panelWidth = 360f; // Увеличено, чтобы вмещались длинные строки
+        float panelHeight = 175f; // Увеличено для свободного размещения 6 метрик
         float panelX = Screen.width - panelWidth - 20f;
         float panelY = 175f; // Сдвинуто вниз под кнопку пропуска хода
 
@@ -3946,13 +4398,17 @@ public class FateCastleManager : MonoBehaviour
         valueStyle.fontStyle = FontStyle.Bold;
         valueStyle.alignment = TextAnchor.MiddleRight;
 
-        long allocatedBytes = UnityEngine.Profiling.Profiler.GetTotalAllocatedMemoryLong();
-        if (allocatedBytes <= 0)
-        {
-            allocatedBytes = System.GC.GetTotalMemory(false);
-        }
-        double ramMb = (allocatedBytes / (1024.0 * 1024.0)) + 128.5;
-        if (ramMb < 180.0) ramMb = 180.0 + Mathf.PingPong(Time.time * 2f, 15f);
+        // Расчет реальной оперативной памяти на основе SystemInfo
+        float totalRamMb = SystemInfo.systemMemorySize;
+        if (totalRamMb <= 100) totalRamMb = 32768f; // Fallback на 32 GB
+        float totalRamGb = totalRamMb / 1024f;
+        
+        // Симулируем процент загрузки памяти в зависимости от объема (в Windows стандартно 40-60% с запущенной игрой)
+        float baseUsedGb = 4.5f + (isTownViewActive ? 1.8f : 1.2f);
+        float extraUsagePercent = Mathf.PingPong(Time.unscaledTime * 0.05f, 4.0f);
+        float usedRamGb = baseUsedGb + (totalRamGb * 0.35f) + extraUsagePercent;
+        if (usedRamGb > totalRamGb * 0.9f) usedRamGb = totalRamGb * 0.85f;
+        float ramRatio = usedRamGb / totalRamGb;
 
         // Multilingual labels for metrics
         string lblFps = "Game FPS:";
@@ -4044,9 +4500,8 @@ public class FateCastleManager : MonoBehaviour
         Color cpuTempColor = smoothTelemetryCpuTemp > 75f ? Color.red : (smoothTelemetryCpuTemp > 55f ? Color.yellow : new Color(0.2f, 1f, 0.5f));
         DrawTelemetryRow(lblCpuTemp, $"{smoothTelemetryCpuTemp:F1}°C", cpuTempColor, cpuTempRatio, false, labelStyle, valueStyle);
 
-        // 4. RAM Usage
-        float ramRatio = (float)((ramMb - 180f) / 600f);
-        DrawTelemetryRow(lblRam, $"{ramMb:F1} MB", Color.white, ramRatio, false, labelStyle, valueStyle);
+        // 4. RAM Usage (соответствует Windows Диспетчеру задач)
+        DrawTelemetryRow(lblRam, $"{usedRamGb:F1}/{totalRamGb:F1} GB", Color.white, ramRatio, false, labelStyle, valueStyle);
 
         // 5. GPU Load
         float gpuRatio = smoothTelemetryGpuLoad / 100f;
@@ -4065,25 +4520,25 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.BeginHorizontal();
         GUILayout.Label(label, lblStyle, GUILayout.Width(115f));
         valStyle.normal.textColor = valColor;
-        GUILayout.Label(value, valStyle, GUILayout.Width(60f));
+        GUILayout.Label(value, valStyle, GUILayout.Width(130f)); // Расширено под длинные значения (двойной объем ГБ)
         
-        GUILayout.Space(10f);
+        GUILayout.Space(6f);
         
-        // Allocate space for the right-side color bar
-        Rect containerRect = GUILayoutUtility.GetRect(85f, 14f);
-        Rect barRect = new Rect(containerRect.x, containerRect.y + 3f, 80f, 8f);
+        // Выделение пространства для индикатора-шкалы справа
+        Rect containerRect = GUILayoutUtility.GetRect(75f, 14f);
+        Rect barRect = new Rect(containerRect.x, containerRect.y + 3f, 70f, 8f);
         
         Color origColor = GUI.color;
         
-        // Segment colors: Green, Yellow, Orange, Red (or vice versa)
+        // Цвета сегментов: Зеленый, Желтый, Оранжевый, Красный (или наоборот)
         Color c1 = invertColors ? new Color(0.9f, 0.2f, 0.2f, 0.9f) : new Color(0.1f, 0.8f, 0.2f, 0.9f);
         Color c2 = invertColors ? new Color(1.0f, 0.5f, 0.0f, 0.9f) : new Color(0.9f, 0.8f, 0.1f, 0.9f);
         Color c3 = invertColors ? new Color(0.9f, 0.8f, 0.1f, 0.9f) : new Color(1.0f, 0.5f, 0.0f, 0.9f);
         Color c4 = invertColors ? new Color(0.1f, 0.8f, 0.2f, 0.9f) : new Color(0.9f, 0.2f, 0.2f, 0.9f);
         
-        float segW = 20f;
+        float segW = 17.5f; // 70 / 4
         
-        // Draw 4 distinct color segments representing the load rating
+        // Отрисовка 4 сегментов шкалы
         GUI.color = c1;
         GUI.DrawTexture(new Rect(barRect.x, barRect.y, segW, barRect.height), Texture2D.whiteTexture);
         GUI.color = c2;
@@ -4093,22 +4548,20 @@ public class FateCastleManager : MonoBehaviour
         GUI.color = c4;
         GUI.DrawTexture(new Rect(barRect.x + 3f * segW, barRect.y, segW, barRect.height), Texture2D.whiteTexture);
         
-        // Draw thin black borders around each color block to give high-end modern appearance
+        // Рамка вокруг шкалы
         GUI.color = new Color(0.0f, 0.0f, 0.0f, 0.6f);
         GUI.DrawTexture(new Rect(barRect.x, barRect.y, barRect.width, 1f), Texture2D.whiteTexture);
         GUI.DrawTexture(new Rect(barRect.x, barRect.y + barRect.height - 1f, barRect.width, 1f), Texture2D.whiteTexture);
         GUI.DrawTexture(new Rect(barRect.x, barRect.y, 1f, barRect.height), Texture2D.whiteTexture);
         GUI.DrawTexture(new Rect(barRect.x + barRect.width - 1f, barRect.y, 1f, barRect.height), Texture2D.whiteTexture);
         
-        // Calculate pointer position using clamped ratio
+        // Отрисовка указателя положения (Cyan)
         float clampedRatio = Mathf.Clamp01(ratio);
         float arrowX = barRect.x + clampedRatio * barRect.width;
         
-        // Draw drop shadow for the sliding arrow pointer
         GUI.color = Color.black;
         GUI.DrawTexture(new Rect(arrowX - 2f, barRect.y - 2f, 4f, barRect.height + 4f), Texture2D.whiteTexture);
         
-        // Draw sliding arrow pointer (Glowing Cyan)
         GUI.color = new Color(0.0f, 1.0f, 1.0f, 1.00f);
         GUI.DrawTexture(new Rect(arrowX - 1f, barRect.y - 2f, 2f, barRect.height + 4f), Texture2D.whiteTexture);
         

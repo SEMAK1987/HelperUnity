@@ -1,31 +1,19 @@
 # DEVELOPMENT LOG
 
-## [2026-07-04]
-### v18.11.24 - Multilingual Expansion & Disaster Recovery System
-- **Multilingual Support for Castle Town:** Expanded all castle subpanels, academy training controls, potion shop inventories, and dynamic tooltips to support 9 languages (Russian, English, German, French, Spanish, Portuguese, Japanese, Korean, Simplified Chinese) using `GetText9()`.
-- **System Disaster Recovery Guide:** Generated a comprehensive disaster recovery manual (`AI_ASSISTANT_RECOVERY_GUIDE.md`) including mockups, core state patterns, and reconstruction guides.
-- **Synchronized Connectors:** Synced version labels across `server.ts`, `UnityConnector.cs`, `blender_connector.py`, `package.json`, `metadata.json`, and `knowledge_base.json` to v18.11.24.
+## [2026-07-13]
+- **Версия 18.11.24:** Multilingual Expansion & Disaster Recovery System - Upgraded all Castle Town sections (Barracks, Academy, training options, potion shops, item tooltips and buy logs) to support 9 languages (Russian, English, German, French, Spanish, Portuguese, Japanese, Korean, Simplified Chinese) with the `GetText9` helper function. Established a full disaster recovery guide (`AI_ASSISTANT_RECOVERY_GUIDE.md`) displaying structural layouts, core state patterns, and recovery maps.
+- **Грозовые Кряжи (Stormy Crags) Landing Correction:** Fixed a critical bug in `LandingPositionManager.cs` where the player's 3D landing camera focused on Region 11 instead of Region 8 (Ancient Ruins / Грозовые Кряжи). Refactored `GetLandingAnchorPosition` and `GetActualRegionIndexFromLanding` to align physical anchor points and logical region index mappings.
+- **Dynamic AI Castle Behavior:** Implemented difficulty-based behavioral strategies (Novice, Easy, Normal, Hard, Nightmare) for neutral, defense/allied (Green), and aggressive (Red) AI commanders. Integrated logic with dynamic army building, research, espionage, and player counter-measures across all regions.
 
-## [2026-07-02]
-### v18.11.23 - Potion Mechanics Rework & Interface Stabilization
-- **Potion Buffs Rework:** Changed potion mechanics so that potions now grant temporary, single-battle attribute buffs instead of instant healing.
-- **Castle Calibration & Overlays:** Restored custom calibration layout, `DrawStatRow`, and `DrawNewDayOverlay` within `FateCastleManager.cs`.
+## [2026-07-12]
+- **Версия 18.11.23:** Potion Mechanics Rework & Interface Stabilization - Re-engineered all potion types (Vital Health, Giant Strength, Swift Agility, Mind Intelligence, Iron Stamina) to strictly grant a temporary, one-battle combat buff instead of active healing. Potion consumption and equipment slots are restricted purely to the main Player Hero and the rival AI commander. Restored and stabilized the previously corrupted custom castle calibration layout, DrawStatRow, and DrawNewDayOverlay functions in FateCastleManager.cs. Fully localized all custom town subpanels across Russian, English, Korean, and Chinese languages.
 
-## [2026-06-28]
-### v18.11.22 - Memory Optimization & Hover Tooltips
-- **RAM/VRAM Cache:** Lazy-cached GUIStyle allocations to stop reallocation in IMGUI `OnGUI` loop.
-- **Skip Day Interlocking:** Interlocked and locked the "Skip Day" button when the Hero Management character panel is active.
-- **Tooltip Hover Details:** Converted skills cards to unclickable rectangles displaying dynamic mouse-hover tooltips.
+## [2026-07-11]
+- **Версия 18.11.22:** Memory Optimization, Skip Day Lock & Hover Skills Detail - Optimizes RAM and VRAM memory usage by lazy-caching common GUIStyle fields in FateCastleManager.cs. Implements an interlocking mechanism that disables the "Skip Day" button when the Hero Management character screen is active. Converts active & passive skill cards to unclickable boxes that display interactive hover tooltips following the mouse cursor. Integrates horizontal scrolling for inventory tabs and compresses potion slot labels ("Зел. Жизни") to solve wrapping and clipping.
 
-## [2026-06-25]
-### v18.11.21 - Zenith Skill Detail Sync
-- **ShowSkillDetailPopup Integration:** Implemented missing skill detail popup logic dynamically matching character classes.
+## [2026-07-10]
+- **Версия 18.11.21:** Zenith Skill Detail Sync & Video Reference Update - Resolves the missing `ShowSkillDetailPopup` method compiler errors (CS0103) in `FateCastleManager.cs`. Standardizes active skill descriptions dynamically matching all three major player hero classes (Warrior, Archer, Mage) depending on their character class data loaded from `SaveGameSystem`. Integrates the newly requested YouTube video knowledge reference into the persistent knowledge indexes.
 
-## [2026-06-20]
-### v18.11.20 - Fullscreen Character Panel & Advanced Inventory Grid
-- **Hero Panel Expansion:** Created a fullscreen 3-column Zenith Hero Control Panel inside the castle interface.
-- **Persistent Grid:** Implemented 36-slot local-persistent inventory grid with potion stacking and 8 equipment mannequin slots.
+## [2026-07-09]
+- **Версия 18.11.20:** Fullscreen Character Panel & Advanced Inventory Grid - Integrates a fullscreen 3-column Zenith Hero Control Panel in FateCastleManager.cs. Implements a local-persistent, secure 36-slot inventory grid supporting stacking items (potions) and gear. Formulates a dynamic 8-slot equipment mannequin with attributes calculations, larger passive/ultimate skill cards, and links potion merchants and forge slot selections directly to the player inventory database.
 
-## [2026-05-14]
-### v18.5.8 - Zenith Multi-Tool Synergy & Settings Fix
-- Initial stable release.

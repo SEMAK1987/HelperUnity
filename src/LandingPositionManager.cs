@@ -375,32 +375,27 @@ namespace FateContinent
                 {
                     playerTransform.gameObject.SetActive(true);
 
-                    if (landingPoints != null && landingPoints.Length > 0)
+                    Quaternion anchorRot;
+                    Vector3 anchorPos = GetLandingAnchorPosition(landedZone, out anchorRot);
+
+                    float ox = PlayerPrefs.GetFloat($"PlayerOffset_X_{landedZone}", 0f);
+                    float oy = PlayerPrefs.GetFloat($"PlayerOffset_Y_{landedZone}", 0.8f); // По умолчанию приподнят на 0.8 метра, чтобы не утонуть в замке!
+                    float oz = PlayerPrefs.GetFloat($"PlayerOffset_Z_{landedZone}", 0f);
+
+                    playerTransform.position = anchorPos + new Vector3(ox, oy, oz);
+                    playerTransform.rotation = anchorRot;
+                    Debug.Log($"[LANDING SYS] Геймплей активен: Игрок успешно восстановлен по координатам с оффсетом {new Vector3(ox, oy, oz)}: {playerTransform.position}");
+
+                    // Направляем и фокусируем камеру на этой точке
+                    if (StrategicCameraController.Instance != null)
                     {
-                        int targetIndex = Mathf.Clamp(landedZone, 0, landingPoints.Length - 1);
-                        LandingPoint point = landingPoints[targetIndex];
-                        if (point.spawnAnchor != null)
-                        {
-                            float ox = PlayerPrefs.GetFloat($"PlayerOffset_X_{landedZone}", 0f);
-                            float oy = PlayerPrefs.GetFloat($"PlayerOffset_Y_{landedZone}", 0.8f); // По умолчанию приподнят на 0.8 метра, чтобы не утонуть в замке!
-                            float oz = PlayerPrefs.GetFloat($"PlayerOffset_Z_{landedZone}", 0f);
-
-                            playerTransform.position = point.spawnAnchor.position + new Vector3(ox, oy, oz);
-                            playerTransform.rotation = point.spawnAnchor.rotation;
-                            Debug.Log($"[LANDING SYS] Геймплей активен: Игрок успешно восстановлен по координатам с оффсетом {new Vector3(ox, oy, oz)}: {playerTransform.position}");
-
-                            // Направляем и фокусируем камеру на этой точке
-                            if (StrategicCameraController.Instance != null)
-                            {
-                                StrategicCameraController.Instance.FocusOnPoint(point.spawnAnchor.position, cameraOffset);
-                                StrategicCameraController.Instance.isControlEnabled = true;
-                            }
-                            else if (mainCameraTransform != null)
-                            {
-                                mainCameraTransform.position = point.spawnAnchor.position + cameraOffset;
-                                mainCameraTransform.LookAt(point.spawnAnchor.position);
-                            }
-                        }
+                        StrategicCameraController.Instance.FocusOnPoint(anchorPos, cameraOffset);
+                        StrategicCameraController.Instance.isControlEnabled = true;
+                    }
+                    else if (mainCameraTransform != null)
+                    {
+                        mainCameraTransform.position = anchorPos + cameraOffset;
+                        mainCameraTransform.LookAt(anchorPos);
                     }
                 }
 
@@ -513,44 +508,40 @@ namespace FateContinent
             }
 
             // 2. Телепортируем игрока на физические координаты 3D Континента с учетом оффсетов
-            if (point.spawnAnchor != null)
+            Quaternion anchorRot;
+            Vector3 anchorPos = GetLandingAnchorPosition(zoneIndex, out anchorRot);
+
+            if (playerTransform != null)
             {
-                if (playerTransform != null)
-                {
-                    float ox = PlayerPrefs.GetFloat($"PlayerOffset_X_{zoneIndex}", 0f);
-                    float oy = PlayerPrefs.GetFloat($"PlayerOffset_Y_{zoneIndex}", 0.8f); // По умолчанию приподнят на 0.8 метра, чтобы не утонуть в замке!
-                    float oz = PlayerPrefs.GetFloat($"PlayerOffset_Z_{zoneIndex}", 0f);
+                float ox = PlayerPrefs.GetFloat($"PlayerOffset_X_{zoneIndex}", 0f);
+                float oy = PlayerPrefs.GetFloat($"PlayerOffset_Y_{zoneIndex}", 0.8f); // По умолчанию приподнят на 0.8 метра, чтобы не утонуть в замке!
+                float oz = PlayerPrefs.GetFloat($"PlayerOffset_Z_{zoneIndex}", 0f);
 
-                    playerTransform.position = point.spawnAnchor.position + new Vector3(ox, oy, oz);
-                    playerTransform.rotation = point.spawnAnchor.rotation;
-                    Debug.Log($"[LANDING SYS] Игрок успешно перенесен в 3D координаты с оффсетом {new Vector3(ox, oy, oz)}: {playerTransform.position}");
-                }
-
-                // Блокируем свободное перемещение камеры на время полета
-                if (StrategicCameraController.Instance != null)
-                {
-                    StrategicCameraController.Instance.isControlEnabled = false;
-                }
-
-                // 3. Перемещаем камеру
-                if (mainCameraTransform != null)
-                {
-                    Vector3 targetCameraPos = point.spawnAnchor.position + cameraOffset;
-                    if (smoothCameraMove)
-                    {
-                        StartCoroutine(SmoothMoveCameraCoroutine(targetCameraPos, point.spawnAnchor.position, targetIndex));
-                    }
-                    else
-                    {
-                        mainCameraTransform.position = targetCameraPos;
-                        mainCameraTransform.LookAt(point.spawnAnchor.position);
-                        CompleteLandingAndStartDialogue(point.spawnAnchor.position);
-                    }
-                }
+                playerTransform.position = anchorPos + new Vector3(ox, oy, oz);
+                playerTransform.rotation = anchorRot;
+                Debug.Log($"[LANDING SYS] Игрок успешно перенесен в 3D координаты с оффсетом {new Vector3(ox, oy, oz)}: {playerTransform.position}");
             }
-            else
+
+            // Блокируем свободное перемещение камеры на время полета
+            if (StrategicCameraController.Instance != null)
             {
-                Debug.LogError($"[LANDING SYS] Критическая ошибка: Spawn Anchor для точки '{point.zoneName}' равен Null! Укажите пустышку Transform в инспекторе.");
+                StrategicCameraController.Instance.isControlEnabled = false;
+            }
+
+            // 3. Перемещаем камеру
+            if (mainCameraTransform != null)
+            {
+                Vector3 targetCameraPos = anchorPos + cameraOffset;
+                if (smoothCameraMove)
+                {
+                    StartCoroutine(SmoothMoveCameraCoroutine(targetCameraPos, anchorPos, targetIndex));
+                }
+                else
+                {
+                    mainCameraTransform.position = targetCameraPos;
+                    mainCameraTransform.LookAt(anchorPos);
+                    CompleteLandingAndStartDialogue(anchorPos);
+                }
             }
         }
 
@@ -575,6 +566,112 @@ namespace FateContinent
                 DialogueSystem_Manager.Instance.StartDialogue(8);
             }
             Debug.Log("[LANDING SYS] Десантирование завершено. Пауза заблокирована. Запускаем Инструктаж о замках (шаг 8).");
+        }
+
+        /// <summary>
+        /// Возвращает физическое положение точки высадки на основе spawnAnchor, объектов сцены или жестких координат.
+        /// Обеспечивает 100% точность для Грозовых Кряжей (индекс 3) на Region_08 (Древние Руины).
+        /// </summary>
+        public Vector3 GetLandingAnchorPosition(int zoneIndex, out Quaternion rotation)
+        {
+            rotation = Quaternion.identity;
+            
+            // Если для Грозовых Кряжей (индекс 3) принудительно задаем 8 регион
+            if (zoneIndex == 3)
+            {
+                // Поищем Region_08 в New_Kontinent или Континент
+                GameObject newContinent = GameObject.Find("New_Kontinent") ?? GameObject.Find("Континент");
+                if (newContinent != null)
+                {
+                    Transform r8 = newContinent.transform.Find("Region_08");
+                    if (r8 == null)
+                    {
+                        foreach (Transform child in newContinent.GetComponentsInChildren<Transform>(true))
+                        {
+                            if (child.name == "Region_08")
+                            {
+                                r8 = child;
+                                break;
+                            }
+                        }
+                    }
+                    if (r8 != null)
+                    {
+                        Debug.Log("[LANDING SYS] Найдена физическая модель Region_08 для Грозовых Кряжей!");
+                        rotation = r8.rotation;
+                        return r8.position;
+                    }
+                }
+                
+                // Вторым приоритетом ищем Shore_SpawnPoint или Ruins_SpawnPoint в сцене
+                GameObject shore = GameObject.Find("Shore_SpawnPoint") ?? GameObject.Find("Ruins_SpawnPoint");
+                if (shore != null)
+                {
+                    rotation = shore.transform.rotation;
+                    return shore.transform.position;
+                }
+                
+                // Третий приоритет - жесткие координаты Region_08 из FateCastleManager
+                return new Vector3(-12.4f, -0.3f, -10.2f);
+            }
+
+            int targetIndex = Mathf.Clamp(zoneIndex, 0, landingPoints.Length - 1);
+            LandingPoint point = (landingPoints != null && landingPoints.Length > targetIndex) ? landingPoints[targetIndex] : null;
+            
+            if (point != null && point.spawnAnchor != null)
+            {
+                rotation = point.spawnAnchor.rotation;
+                return point.spawnAnchor.position;
+            }
+            
+            // Если spawnAnchor равен null, ищем по умолчанию по именам
+            string[] defaultAnchorNames = new string[] { 
+                "Oasis_SpawnPoint", 
+                "Outpost_SpawnPoint", 
+                "Shore_SpawnPoint", 
+                "Citadel_SpawnPoint" 
+            };
+            
+            string targetName = defaultAnchorNames[Mathf.Clamp(zoneIndex, 0, 3)];
+            GameObject foundObj = GameObject.Find(targetName);
+            if (foundObj == null)
+            {
+                string altName = zoneIndex == 0 ? "Wastes_SpawnPoint" :
+                                 zoneIndex == 1 ? "Peak_SpawnPoint" :
+                                 zoneIndex == 2 ? "Ruins_SpawnPoint" : "Crags_SpawnPoint";
+                foundObj = GameObject.Find(altName);
+            }
+            
+            if (foundObj != null)
+            {
+                rotation = foundObj.transform.rotation;
+                return foundObj.transform.position;
+            }
+            
+            // Фолбек на координаты по индексам замков
+            if (FateCastleManager.Instance != null && FateCastleManager.Instance.customCastlePositions != null)
+            {
+                int rIdx = 11;
+                if (zoneIndex == 0) rIdx = 11;
+                else if (zoneIndex == 1) rIdx = 6;
+                else if (zoneIndex == 2) rIdx = 8;
+                else if (zoneIndex == 3) rIdx = 8;
+                
+                if (rIdx >= 0 && rIdx < FateCastleManager.Instance.customCastlePositions.Length)
+                {
+                    return FateCastleManager.Instance.customCastlePositions[rIdx];
+                }
+            }
+            
+            // Окончательный хардкод фолбек
+            switch (zoneIndex)
+            {
+                case 0: return new Vector3(9.9f, 0.8f, -4.5f); // Region_11
+                case 1: return new Vector3(14.8f, 1.2f, 12.5f); // Region_06
+                case 2: return new Vector3(-12.4f, -0.3f, -10.2f); // Region_08
+                case 3: return new Vector3(-12.4f, -0.3f, -10.2f); // Region_08 (Грозовые Кряжи)
+                default: return Vector3.zero;
+            }
         }
 
         private void EnableStrategicCamera(Vector3 anchorPosition)
@@ -802,29 +899,28 @@ namespace FateContinent
             if (isGameplayActive && playerTransform != null && landingPoints != null && landingPoints.Length > 0)
             {
                 int landedZone = PlayerPrefs.GetInt("LandedZoneIndex", 0);
-                int targetIndex = Mathf.Clamp(landedZone, 0, landingPoints.Length - 1);
-                LandingPoint point = landingPoints[targetIndex];
-                if (point.spawnAnchor != null)
-                {
-                    // Считываем текущую позицию игрока относительно spawnAnchor
-                    Vector3 currentOffset = playerTransform.position - point.spawnAnchor.position;
-                    
-                    // Сверяем с сохраненным оффсетом
-                    float savedOx = PlayerPrefs.GetFloat($"PlayerOffset_X_{landedZone}", 0f);
-                    float savedOy = PlayerPrefs.GetFloat($"PlayerOffset_Y_{landedZone}", 0.8f);
-                    float savedOz = PlayerPrefs.GetFloat($"PlayerOffset_Z_{landedZone}", 0f);
+                
+                Quaternion anchorRot;
+                Vector3 anchorPos = GetLandingAnchorPosition(landedZone, out anchorRot);
+                
+                // Считываем текущую позицию игрока относительно anchorPos
+                Vector3 currentOffset = playerTransform.position - anchorPos;
+                
+                // Сверяем с сохраненным оффсетом
+                float savedOx = PlayerPrefs.GetFloat($"PlayerOffset_X_{landedZone}", 0f);
+                float savedOy = PlayerPrefs.GetFloat($"PlayerOffset_Y_{landedZone}", 0.8f);
+                float savedOz = PlayerPrefs.GetFloat($"PlayerOffset_Z_{landedZone}", 0f);
 
-                    // Если игрок переместил объект вручную в редакторе (порог 0.01м), автоматически сохраняем его!
-                    if (Mathf.Abs(currentOffset.x - savedOx) > 0.01f ||
-                        Mathf.Abs(currentOffset.y - savedOy) > 0.01f ||
-                        Mathf.Abs(currentOffset.z - savedOz) > 0.01f)
-                    {
-                        PlayerPrefs.SetFloat($"PlayerOffset_X_{landedZone}", currentOffset.x);
-                        PlayerPrefs.SetFloat($"PlayerOffset_Y_{landedZone}", currentOffset.y);
-                        PlayerPrefs.SetFloat($"PlayerOffset_Z_{landedZone}", currentOffset.z);
-                        PlayerPrefs.Save();
-                        Debug.Log($"[LANDING SYS] Автоматически обнаружено ручное изменение положения игрока в Play Mode! Сохранён новый кастомный оффсет для зоны {landedZone}: {currentOffset}");
-                    }
+                // Если игрок переместил объект вручную в редакторе (порог 0.01м), автоматически сохраняем его!
+                if (Mathf.Abs(currentOffset.x - savedOx) > 0.01f ||
+                    Mathf.Abs(currentOffset.y - savedOy) > 0.01f ||
+                    Mathf.Abs(currentOffset.z - savedOz) > 0.01f)
+                {
+                    PlayerPrefs.SetFloat($"PlayerOffset_X_{landedZone}", currentOffset.x);
+                    PlayerPrefs.SetFloat($"PlayerOffset_Y_{landedZone}", currentOffset.y);
+                    PlayerPrefs.SetFloat($"PlayerOffset_Z_{landedZone}", currentOffset.z);
+                    PlayerPrefs.Save();
+                    Debug.Log($"[LANDING SYS] Автоматически обнаружено ручное изменение положения игрока в Play Mode! Сохранён новый кастомный оффсет для зоны {landedZone}: {currentOffset}");
                 }
             }
         }
@@ -899,6 +995,8 @@ namespace FateContinent
             else if (charClass.Contains("mage") || charClass.Contains("маг") || charClass.Contains("mag"))
                 activePrefab = mageModelPrefab;
 
+            bool hasModel = false;
+
             if (activePrefab != null)
             {
                 GameObject instantiated = Instantiate(activePrefab, playerTransform);
@@ -907,6 +1005,7 @@ namespace FateContinent
                 instantiated.transform.localRotation = Quaternion.identity;
                 instantiated.transform.localScale = Vector3.one * customHeroModelScale;
                 Debug.Log($"[LANDING SYS] Создали 3D-фигурку класса {charClass} на месте Player_Placeholder из назначенного префаба.");
+                hasModel = true;
             }
 
             // 5. Также проверяем встроенные дочерние объекты (на случай, если пользователь закинул фигурки прямо под Player_Placeholder)
@@ -923,11 +1022,20 @@ namespace FateContinent
                 {
                     bool shouldBeActive = false;
                     if (isWarriorModel && (charClass.Contains("warrior") || charClass.Contains("воин") || charClass.Contains("voin")))
+                    {
                         shouldBeActive = true;
+                        hasModel = true;
+                    }
                     else if (isArcherModel && (charClass.Contains("archer") || charClass.Contains("стрелок") || charClass.Contains("strelok")))
+                    {
                         shouldBeActive = true;
+                        hasModel = true;
+                    }
                     else if (isMageModel && (charClass.Contains("mage") || charClass.Contains("маг") || charClass.Contains("mag")))
+                    {
                         shouldBeActive = true;
+                        hasModel = true;
+                    }
 
                     child.gameObject.SetActive(shouldBeActive);
                     Debug.Log($"[LANDING SYS] Нашли дочерний 3D объект {child.name}. Установили активность: {shouldBeActive} на основе класса {charClass}.");
@@ -945,7 +1053,202 @@ namespace FateContinent
                 }
             }
 
+            // Если не нашли ни префаба, ни активных дочерних моделей, создаем красивейший процедурный аватар героя
+            if (!hasModel)
+            {
+                CreateProceduralHeroVisual(playerTransform, charClass);
+            }
+
             Debug.Log($"[LANDING SYS] Успешно применили визуальный 3D класс: {charClass}. Исходный круг-плейсхолдер скрыт.");
+        }
+
+        private void CreateProceduralHeroVisual(Transform parent, string charClass)
+        {
+            GameObject container = new GameObject("Player_Model_Visual");
+            container.transform.SetParent(parent);
+            container.transform.localPosition = Vector3.zero;
+            container.transform.localRotation = Quaternion.identity;
+            container.transform.localScale = Vector3.one * customHeroModelScale;
+
+            // Цветовые константы
+            Color primaryColor = new Color(0.95f, 0.75f, 0.1f);   // Воин: Золотой
+            Color secondaryColor = new Color(0.6f, 0.65f, 0.7f);  // Воин: Серебряный
+            Color weaponColor = new Color(0.9f, 0.9f, 0.9f);
+
+            bool isWarrior = charClass.Contains("warrior") || charClass.Contains("воин") || charClass.Contains("voin");
+            bool isArcher = charClass.Contains("archer") || charClass.Contains("стрелок") || charClass.Contains("strelok");
+            bool isMage = charClass.Contains("mage") || charClass.Contains("маг") || charClass.Contains("mag");
+
+            if (isArcher)
+            {
+                primaryColor = new Color(0.12f, 0.75f, 0.35f);    // Лучник: Лесной зеленый
+                secondaryColor = new Color(0.55f, 0.38f, 0.22f);  // Лучник: Кожаный коричневый
+                weaponColor = new Color(0.1f, 0.8f, 0.75f);       // Бирюзовый лук
+            }
+            else if (isMage)
+            {
+                primaryColor = new Color(0.6f, 0.2f, 0.85f);      // Маг: Космический фиолетовый
+                secondaryColor = new Color(0.15f, 0.1f, 0.35f);   // Маг: Темно-синяя мантия
+                weaponColor = new Color(0f, 0.85f, 1f);           // Светящийся синий кристалл
+            }
+
+            // 1. Пьедестал под фигурку
+            GameObject pedestal = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            DestroyImmediate(pedestal.GetComponent<Collider>());
+            pedestal.transform.SetParent(container.transform);
+            pedestal.transform.localPosition = new Vector3(0f, 0.04f, 0f);
+            pedestal.transform.localScale = new Vector3(0.7f, 0.04f, 0.7f);
+            pedestal.GetComponent<Renderer>().material = CreateProceduralMaterial(new Color(0.2f, 0.22f, 0.25f), 0.8f, 0.8f);
+
+            // 2. Туловище (броня/роба)
+            GameObject torso = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            DestroyImmediate(torso.GetComponent<Collider>());
+            torso.transform.SetParent(container.transform);
+            torso.transform.localPosition = new Vector3(0f, 0.55f, 0f);
+            torso.transform.localScale = new Vector3(0.35f, 0.4f, 0.35f);
+            torso.GetComponent<Renderer>().material = CreateProceduralMaterial(primaryColor, 0.5f, 0.6f);
+
+            // 3. Наплечники
+            GameObject lShoulder = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            DestroyImmediate(lShoulder.GetComponent<Collider>());
+            lShoulder.transform.SetParent(container.transform);
+            lShoulder.transform.localPosition = new Vector3(-0.25f, 0.75f, 0f);
+            lShoulder.transform.localScale = new Vector3(0.15f, 0.15f, 0.15f);
+            lShoulder.GetComponent<Renderer>().material = CreateProceduralMaterial(secondaryColor, 0.9f, 0.8f);
+
+            GameObject rShoulder = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            DestroyImmediate(rShoulder.GetComponent<Collider>());
+            rShoulder.transform.SetParent(container.transform);
+            rShoulder.transform.localPosition = new Vector3(0.25f, 0.75f, 0f);
+            rShoulder.transform.localScale = new Vector3(0.15f, 0.15f, 0.15f);
+            rShoulder.GetComponent<Renderer>().material = CreateProceduralMaterial(secondaryColor, 0.9f, 0.8f);
+
+            // 4. Голова
+            GameObject head = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            DestroyImmediate(head.GetComponent<Collider>());
+            head.transform.SetParent(container.transform);
+            head.transform.localPosition = new Vector3(0f, 1.05f, 0f);
+            head.transform.localScale = new Vector3(0.26f, 0.26f, 0.26f);
+            head.GetComponent<Renderer>().material = CreateProceduralMaterial(new Color(0.96f, 0.8f, 0.68f), 0.1f, 0.2f); // Телесный цвет
+
+            // 5. Корона / Шлем / Шляпа мага
+            if (isWarrior)
+            {
+                // Золотая корона
+                GameObject crown = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                DestroyImmediate(crown.GetComponent<Collider>());
+                crown.transform.SetParent(container.transform);
+                crown.transform.localPosition = new Vector3(0f, 1.22f, 0f);
+                crown.transform.localScale = new Vector3(0.22f, 0.05f, 0.22f);
+                crown.GetComponent<Renderer>().material = CreateProceduralMaterial(primaryColor, 0.95f, 0.9f);
+            }
+            else if (isArcher)
+            {
+                // Капюшон следопыта
+                GameObject hood = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                DestroyImmediate(hood.GetComponent<Collider>());
+                hood.transform.SetParent(container.transform);
+                hood.transform.localPosition = new Vector3(0f, 1.15f, -0.05f);
+                hood.transform.localScale = new Vector3(0.28f, 0.22f, 0.28f);
+                hood.GetComponent<Renderer>().material = CreateProceduralMaterial(primaryColor, 0.1f, 0.1f);
+            }
+            else if (isMage)
+            {
+                // Остроконечная шляпа
+                GameObject cone = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                DestroyImmediate(cone.GetComponent<Collider>());
+                cone.transform.SetParent(container.transform);
+                cone.transform.localPosition = new Vector3(0f, 1.26f, 0f);
+                cone.transform.localScale = new Vector3(0.18f, 0.15f, 0.18f);
+                cone.GetComponent<Renderer>().material = CreateProceduralMaterial(secondaryColor, 0.1f, 0.2f);
+            }
+
+            // 6. Оружие
+            if (isWarrior)
+            {
+                // Меч
+                GameObject sword = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                DestroyImmediate(sword.GetComponent<Collider>());
+                sword.transform.SetParent(container.transform);
+                sword.transform.localPosition = new Vector3(0.32f, 0.65f, 0.22f);
+                sword.transform.localRotation = Quaternion.Euler(30f, 0f, -15f);
+                sword.transform.localScale = new Vector3(0.025f, 0.35f, 0.025f);
+                sword.GetComponent<Renderer>().material = CreateProceduralMaterial(weaponColor, 0.95f, 0.9f);
+
+                // Щит
+                GameObject shield = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                DestroyImmediate(shield.GetComponent<Collider>());
+                shield.transform.SetParent(container.transform);
+                shield.transform.localPosition = new Vector3(-0.32f, 0.55f, 0.15f);
+                shield.transform.localRotation = Quaternion.Euler(0f, 0f, 90f);
+                shield.transform.localScale = new Vector3(0.22f, 0.02f, 0.22f);
+                shield.GetComponent<Renderer>().material = CreateProceduralMaterial(new Color(0.4f, 0.25f, 0.1f), 0.5f, 0.4f);
+            }
+            else if (isArcher)
+            {
+                // Лук
+                GameObject bow = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                DestroyImmediate(bow.GetComponent<Collider>());
+                bow.transform.SetParent(container.transform);
+                bow.transform.localPosition = new Vector3(0.28f, 0.55f, 0.15f);
+                bow.transform.localRotation = Quaternion.Euler(15f, 0f, 45f);
+                bow.transform.localScale = new Vector3(0.02f, 0.4f, 0.02f);
+                bow.GetComponent<Renderer>().material = CreateProceduralMaterial(weaponColor, 0.7f, 0.8f);
+            }
+            else if (isMage)
+            {
+                // Посох
+                GameObject staff = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                DestroyImmediate(staff.GetComponent<Collider>());
+                staff.transform.SetParent(container.transform);
+                staff.transform.localPosition = new Vector3(0.28f, 0.7f, 0.15f);
+                staff.transform.localRotation = Quaternion.Euler(10f, 0f, -5f);
+                staff.transform.localScale = new Vector3(0.022f, 0.6f, 0.022f);
+                staff.GetComponent<Renderer>().material = CreateProceduralMaterial(new Color(0.45f, 0.3f, 0.15f), 0.1f, 0.1f);
+
+                // Светящийся Кристалл
+                GameObject crystal = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                DestroyImmediate(crystal.GetComponent<Collider>());
+                crystal.transform.SetParent(container.transform);
+                crystal.transform.localPosition = new Vector3(0.28f, 1.34f, 0.15f);
+                crystal.transform.localScale = new Vector3(0.12f, 0.12f, 0.12f);
+                crystal.GetComponent<Renderer>().material = CreateProceduralMaterial(weaponColor, 0.3f, 0.9f, true);
+            }
+
+            Debug.Log($"[LANDING SYS] Создана великолепная процедурная 3D-модель класса {charClass} для героя!");
+        }
+
+        private Material CreateProceduralMaterial(Color color, float metallic, float smoothness, bool emissive = false)
+        {
+            Shader targetShader = Shader.Find("Universal Render Pipeline/Lit");
+            if (targetShader == null) targetShader = Shader.Find("Standard");
+            if (targetShader == null) targetShader = Shader.Find("Diffuse");
+            if (targetShader == null) targetShader = Shader.Find("Mobile/Diffuse");
+
+            Material mat = new Material(targetShader != null ? targetShader : Shader.Find("Standard"));
+            mat.name = "M_Procedural_Hero_" + ColorUtility.ToHtmlStringRGBA(color);
+
+            if (mat.HasProperty("_Color")) mat.SetColor("_Color", color);
+            if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", color);
+
+            if (mat.HasProperty("_Metallic")) mat.SetFloat("_Metallic", metallic);
+            if (mat.HasProperty("_Smoothness")) mat.SetFloat("_Smoothness", smoothness);
+            if (mat.HasProperty("_Glossiness")) mat.SetFloat("_Glossiness", smoothness);
+
+            if (emissive)
+            {
+                if (mat.HasProperty("_EmissionColor"))
+                {
+                    mat.SetColor("_EmissionColor", color * 2.0f);
+                    mat.EnableKeyword("_EMISSION");
+                }
+                if (mat.HasProperty("_EmissiveColor"))
+                {
+                    mat.SetColor("_EmissiveColor", color * 2.0f);
+                }
+            }
+
+            return mat;
         }
     }
 }
