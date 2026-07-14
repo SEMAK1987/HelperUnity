@@ -12193,4 +12193,193 @@ public class InteractiveCastle : MonoBehaviour
             mat.color = col;
         }
     }
+
+    public void OpenSkillDetailPopup(string sName, string sDesc, Texture2D icon, string skillType)
+    {
+        selectedSkillName = sName;
+        selectedSkillDesc = sDesc;
+        selectedSkillIcon = icon;
+        selectedSkillType = skillType;
+        showSkillDetailPopup = true;
+    }
+
+    private void LoadClassSkillsIcons()
+    {
+        string cl = "warrior";
+        if (SaveGameSystem.CurrentData != null && !string.IsNullOrEmpty(SaveGameSystem.CurrentData.characterClass))
+        {
+            cl = SaveGameSystem.CurrentData.characterClass.ToLower();
+        }
+
+        if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("стрелок"))
+        {
+            activeSkillPassive1 = archerSkillPassive1;
+            activeSkillPassive2 = archerSkillPassive2;
+            activeSkillPassive3 = archerSkillPassive3;
+            activeSkillUltimate = archerSkillUltimate;
+        }
+        else if (cl.Contains("mage") || cl.Contains("mag") || cl.Contains("маг"))
+        {
+            activeSkillPassive1 = mageSkillPassive1;
+            activeSkillPassive2 = mageSkillPassive2;
+            activeSkillPassive3 = mageSkillPassive3;
+            activeSkillUltimate = mageSkillUltimate;
+        }
+        else
+        {
+            activeSkillPassive1 = warriorSkillPassive1;
+            activeSkillPassive2 = warriorSkillPassive2;
+            activeSkillPassive3 = warriorSkillPassive3;
+            activeSkillUltimate = warriorSkillUltimate;
+        }
+    }
+
+    private void SetHoveredSkill(int skillIndex, int curLang)
+    {
+        string cl = "warrior";
+        if (SaveGameSystem.CurrentData != null && !string.IsNullOrEmpty(SaveGameSystem.CurrentData.characterClass))
+        {
+            cl = SaveGameSystem.CurrentData.characterClass.ToLower();
+        }
+
+        bool isArcher = cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("стрелок");
+        bool isMage = cl.Contains("mage") || cl.Contains("mag") || cl.Contains("маг");
+
+        if (isArcher)
+        {
+            if (skillIndex == 1)
+            {
+                hoveredSkillName = curLang == 0 ? "Ветряной Щит" : "Wind Barrier";
+                hoveredSkillDesc = curLang == 0 ? "Ветряной барьер отклоняет стрелы и увеличивает уклонение на 15%." : "Wind barrier deflects incoming arrows and grants +15% evasion.";
+                hoveredSkillType = "Passive";
+                hoveredSkillIcon = archerSkillPassive1;
+            }
+            else if (skillIndex == 2)
+            {
+                hoveredSkillName = curLang == 0 ? "Критическая Метка" : "Critical Mark";
+                hoveredSkillDesc = curLang == 0 ? "Помечает цели, увеличивая шанс критического урона союзников на 10%." : "Marks target to increase critical chance for all allies by +10%.";
+                hoveredSkillType = "Passive";
+                hoveredSkillIcon = archerSkillPassive2;
+            }
+            else if (skillIndex == 3)
+            {
+                hoveredSkillName = curLang == 0 ? "Орлиный Взгляд" : "Eagle Eye";
+                hoveredSkillDesc = curLang == 0 ? "Увеличивает дальность стрельбы на 20% и точность попадания." : "Increases attack range by +20% and critical strike accuracy.";
+                hoveredSkillType = "Passive";
+                hoveredSkillIcon = archerSkillPassive3;
+            }
+            else if (skillIndex == 4)
+            {
+                hoveredSkillName = curLang == 0 ? "Стрела Затмения" : "Eclipse Arrow";
+                hoveredSkillDesc = curLang == 0 ? "Суперудар: Выпускает сокрушительную стрелу, пробивающую броню на 50%." : "Ultimate: Fires a piercing shadow arrow that ignores 50% of armor.";
+                hoveredSkillType = "Ultimate";
+                hoveredSkillIcon = archerSkillUltimate;
+            }
+        }
+        else if (isMage)
+        {
+            if (skillIndex == 1)
+            {
+                hoveredSkillName = curLang == 0 ? "Щит Возмездия" : "Shield of Retribution";
+                hoveredSkillDesc = curLang == 0 ? "Возвращает 15% полученного урона в виде электрического разряда." : "Surrounds hero with plasma reflecting 15% of damage back to attackers.";
+                hoveredSkillType = "Passive";
+                hoveredSkillIcon = mageSkillPassive1;
+            }
+            else if (skillIndex == 2)
+            {
+                hoveredSkillName = curLang == 0 ? "Ткач Заклинаний" : "Spellweaver";
+                hoveredSkillDesc = curLang == 0 ? "Снижает расход маны на все заклинания на 20%." : "Reduces mana consumption for all active wizard spells by 20%.";
+                hoveredSkillType = "Passive";
+                hoveredSkillIcon = mageSkillPassive2;
+            }
+            else if (skillIndex == 3)
+            {
+                hoveredSkillName = curLang == 0 ? "Источник Разума" : "Mind Spring";
+                hoveredSkillDesc = curLang == 0 ? "Каждый ход восстанавливает 8 единиц маны и увеличивает интеллект." : "Generates +8 Mana per battle turn and increases spell power.";
+                hoveredSkillType = "Passive";
+                hoveredSkillIcon = mageSkillPassive3;
+            }
+            else if (skillIndex == 4)
+            {
+                hoveredSkillName = curLang == 0 ? "Метеоритный Дождь" : "Meteor Storm";
+                hoveredSkillDesc = curLang == 0 ? "Суперудар: Призывает огненные метеоры, наносящие огромный массовый урон." : "Ultimate: Calls down a cosmic meteor shower dealing massive AoE spell damage.";
+                hoveredSkillType = "Ultimate";
+                hoveredSkillIcon = mageSkillUltimate;
+            }
+        }
+        else // Warrior
+        {
+            if (skillIndex == 1)
+            {
+                hoveredSkillName = curLang == 0 ? "Закалка Металла" : "Metal Tempering";
+                hoveredSkillDesc = curLang == 0 ? "Повышает показатель брони героя на 15% и дает устойчивость к оглушению." : "Increases physical armor rating by 15% and grants stun resistance.";
+                hoveredSkillType = "Passive";
+                hoveredSkillIcon = warriorSkillPassive1;
+            }
+            else if (skillIndex == 2)
+            {
+                hoveredSkillName = curLang == 0 ? "Брат Гвардии" : "Brotherhood of Guard";
+                hoveredSkillDesc = curLang == 0 ? "Повышает защиту стоящих рядом союзных воинов на 10%." : "Increases armor of adjacent friendly infantry cohorts by 10%.";
+                hoveredSkillType = "Passive";
+                hoveredSkillIcon = warriorSkillPassive2;
+            }
+            else if (skillIndex == 3)
+            {
+                hoveredSkillName = curLang == 0 ? "Угроза" : "Threat";
+                hoveredSkillDesc = curLang == 0 ? "Ускоряет накопление боевого духа и провокацию на 10%." : "Increases threat generation and physical action point speed by 10%.";
+                hoveredSkillType = "Passive";
+                hoveredSkillIcon = warriorSkillPassive3;
+            }
+            else if (skillIndex == 4)
+            {
+                hoveredSkillName = curLang == 0 ? "Щит Титанов" : "Titan Shield";
+                hoveredSkillDesc = curLang == 0 ? "Суперудар: Снижает входящий физический урон на 70%." : "Ultimate: Activates indestructible titan wall blocking 70% of physical dmg.";
+                hoveredSkillType = "Ultimate";
+                hoveredSkillIcon = warriorSkillUltimate;
+            }
+        }
+    }
+
+    private void SetHoveredItem(InventoryItem item, int curLang)
+    {
+        if (item == null) return;
+
+        hoveredSkillName = item.name;
+        hoveredSkillIcon = GetItemIconTexture(item);
+
+        if (item.slotType == 0) // Potion
+        {
+            hoveredSkillType = "Potion";
+            string statName = "HP";
+            string idLower = item.id.ToLower();
+            if (idLower.Contains("str") || idLower.Contains("силы")) statName = curLang == 0 ? "СИЛА" : "STR";
+            else if (idLower.Contains("int") || idLower.Contains("инт")) statName = curLang == 0 ? "ИНТЕЛЛЕКТ" : "INT";
+            else if (idLower.Contains("agi") || idLower.Contains("ловк")) statName = curLang == 0 ? "ЛОВКОСТЬ" : "AGI";
+            else if (idLower.Contains("sta") || idLower.Contains("вынос") || idLower.Contains("def") || idLower.Contains("защит")) statName = curLang == 0 ? "ВЫНОСЛИВОСТЬ" : "STA";
+
+            hoveredSkillDesc = curLang == 0 
+                ? $"Эликсир. Дарует временное усиление (+{item.statBonus} {statName}) на один бой.\nКоличество в инвентаре: {item.count}."
+                : $"Elixir. Grants temporary battle enhancement (+{item.statBonus} {statName}) for one fight.\nIn possession: {item.count}.";
+        }
+        else // Gear
+        {
+            string slotName = "Equipment";
+            switch (item.slotType)
+            {
+                case 1: slotName = curLang == 0 ? "Шлем (Голова)" : "Helmet (Head Slot)"; break;
+                case 2: slotName = curLang == 0 ? "Амулет (Шея)" : "Amulet (Neck Slot)"; break;
+                case 3: slotName = curLang == 0 ? "Наплечники" : "Pauldrons (Shoulders Slot)"; break;
+                case 4: slotName = curLang == 0 ? "Доспех (Грудь)" : "Armor (Chest Slot)"; break;
+                case 5: slotName = curLang == 0 ? "Кольцо" : "Ring Slot"; break;
+                case 6: slotName = curLang == 0 ? "Пояс" : "Belt Slot"; break;
+                case 7: slotName = curLang == 0 ? "Сапоги (Ноги)" : "Boots (Feet Slot)"; break;
+                case 8: slotName = curLang == 0 ? "Оружие" : "Weapon Slot"; break;
+            }
+
+            hoveredSkillType = $"🛡️ {slotName.ToUpper()} (TIER {item.level})";
+            hoveredSkillDesc = curLang == 0
+                ? $"Снаряжение {item.level}-го ранга.\nПостоянный бонус характеристик: +{item.statBonus} к основному показателю класса при надевании."
+                : $"Tier {item.level} gear.\nPermanent stat modifier: +{item.statBonus} to class primary attribute while equipped.";
+        }
+    }
 }
