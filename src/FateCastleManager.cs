@@ -586,6 +586,15 @@ public class FateCastleManager : MonoBehaviour
     private GUIStyle s_tabBtnStyle;
     private GUIStyle s_slotGridStyle;
 
+    // Cached GUIStyles for Spy Report (v18.11.25)
+    private GUIStyle s_spyTitleStyle;
+    private GUIStyle s_spySectionTitleStyle;
+    private GUIStyle s_spyDetailLabelStyle;
+    private GUIStyle s_spySubHeaderStyle;
+    private GUIStyle s_spyCardBgStyle;
+    private GUIStyle s_spyBoxLabelStyle;
+    private GUIStyle s_spyBarTextStyle;
+
     // Inventory & Equipment System variables (v18.11.20)
     private int eqBonusSTR = 0;
     private int eqBonusAGI = 0;
@@ -6117,368 +6126,462 @@ public class FateCastleManager : MonoBehaviour
         return null;
     }
 
-    private void LoadClassSkillsIcons()
+    // [Removed duplicate first copy to resolve duplicate signature conflicts]
+
+    /*
+    private void StaleSpyReportWindowFunction(int windowID)
     {
-        string cl = SaveGameSystem.CurrentData != null && SaveGameSystem.CurrentData.characterClass != null 
-            ? SaveGameSystem.CurrentData.characterClass.ToLower() 
-            : "warrior";
-            
-        if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow"))
+        int curLang = Translator.LanguageID;
+        
+        // Find all spied enemy castles
+        List<CastleInstance> spiedCastles = new List<CastleInstance>();
+        for (int i = 0; i < castles.Count; i++)
         {
-            activeSkillPassive1 = archerSkillPassive1 != null ? archerSkillPassive1 : Resources.Load<Texture2D>("Skills/Archer/passive1");
-            activeSkillPassive2 = archerSkillPassive2 != null ? archerSkillPassive2 : Resources.Load<Texture2D>("Skills/Archer/passive2");
-            activeSkillPassive3 = archerSkillPassive3 != null ? archerSkillPassive3 : Resources.Load<Texture2D>("Skills/Archer/passive3");
-            activeSkillUltimate = archerSkillUltimate != null ? archerSkillUltimate : Resources.Load<Texture2D>("Skills/Archer/ultimate");
+            if (castles[i].owner == "Enemy" && PlayerPrefs.GetInt("Castle_Spied_" + castles[i].zoneIndex, 0) == 1)
+            {
+                spiedCastles.Add(castles[i]);
+            }
         }
-        else if (cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff"))
+
+        if (spiedCastles.Count == 0)
         {
-            activeSkillPassive1 = mageSkillPassive1 != null ? mageSkillPassive1 : Resources.Load<Texture2D>("Skills/Mage/passive1");
-            activeSkillPassive2 = mageSkillPassive2 != null ? mageSkillPassive2 : Resources.Load<Texture2D>("Skills/Mage/passive2");
-            activeSkillPassive3 = mageSkillPassive3 != null ? mageSkillPassive3 : Resources.Load<Texture2D>("Skills/Mage/passive3");
-            activeSkillUltimate = mageSkillUltimate != null ? mageSkillUltimate : Resources.Load<Texture2D>("Skills/Mage/ultimate");
+            GUILayout.BeginVertical();
+            GUILayout.FlexibleSpace();
+            GUIStyle emptyS = new GUIStyle(GUI.skin.label);
+            emptyS.alignment = TextAnchor.MiddleCenter;
+            emptyS.fontSize = 14;
+            emptyS.normal.textColor = Color.gray;
+            GUILayout.Label(GetText9(
+                "Нет активных отчетов. Зашлите шпионов в другие замки!",
+                "No active reports. Infiltrate spies into enemy castles!",
+                "Keine Berichte. Senden Sie Spione in feindliche Burgen!",
+                "Aucun rapport. Infiltrez des espions dans les châteaux !",
+                "Sin informes activos. ¡Infiltra espías en castillos enemigos!",
+                "Sem relatórios. Infiltre espiões em castelhos inimigos!",
+                "アクティブな報告書はありません。敵の城にスパイを放ちましょう！",
+                "활성화된 보고서가 없습니다. 적의 성에 간첩을 파견하십시오!",
+                "暂无活跃情报。请先在其它敌方城堡部署探子！"
+            ), emptyS);
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button(GetText9("Закрыть", "Close", "Schließen", "Fermer", "Cerrar", "Fechar", "閉じる", "닫기", "关闭"), GUILayout.Height(30)))
+            {
+                showSpyReportPopup = false;
+            }
+            GUILayout.EndVertical();
+            return;
+        }
+
+        // Set default activeSpyReportZoneIndex if not set or invalid
+        if (activeSpyReportZoneIndex == -1)
+        {
+            activeSpyReportZoneIndex = spiedCastles[0].zoneIndex;
         }
         else
         {
-            activeSkillPassive1 = warriorSkillPassive1 != null ? warriorSkillPassive1 : Resources.Load<Texture2D>("Skills/Warrior/passive1");
-            activeSkillPassive2 = warriorSkillPassive2 != null ? warriorSkillPassive2 : Resources.Load<Texture2D>("Skills/Warrior/passive2");
-            activeSkillPassive3 = warriorSkillPassive3 != null ? warriorSkillPassive3 : Resources.Load<Texture2D>("Skills/Warrior/passive3");
-            activeSkillUltimate = warriorSkillUltimate != null ? warriorSkillUltimate : Resources.Load<Texture2D>("Skills/Warrior/ultimate");
+            bool found = false;
+            for (int i = 0; i < spiedCastles.Count; i++)
+            {
+                if (spiedCastles[i].zoneIndex == activeSpyReportZoneIndex)
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+            {
+                activeSpyReportZoneIndex = spiedCastles[0].zoneIndex;
+            }
         }
-    }
 
-    private void DrawSkillRow(int curLang, Texture2D icon, string emoji, string header, string desc, string skillType)
-    {
+        CastleInstance castle = null;
+        for (int i = 0; i < castles.Count; i++)
+        {
+            if (castles[i].zoneIndex == activeSpyReportZoneIndex)
+            {
+                castle = castles[i];
+                break;
+            }
+        }
+
+        if (castle == null) return;
+
+        // Draw tabs for each spied castle so player can select which one to view!
+        GUILayout.Label(GetText9(
+            "Выберите вражескую цитадель:", "Select Enemy Stronghold:",
+            "Wählen Sie die feindliche Burg:", "Sélectionnez le château ennemi :",
+            "Seleccionar fortaleza enemiga:", "Selecionar fortaleza inimiga:",
+            "対象の敵城を選択してください:", "적 성채 선택:",
+            "选择目标城堡进行查看:"
+        ), GUI.skin.label);
+
         GUILayout.BeginHorizontal();
-        if (icon != null)
+        for (int i = 0; i < spiedCastles.Count; i++)
         {
-            GUILayout.Label(icon, GUILayout.Width(24), GUILayout.Height(24));
+            string tabName = curLang == 0 ? spiedCastles[i].nameRU : spiedCastles[i].nameEN;
+            if (curLang == 8) tabName = spiedCastles[i].nameCH;
+            if (curLang == 7) tabName = spiedCastles[i].nameKR;
+
+            if (tabName.Length > 15) tabName = tabName.Substring(0, 14) + "..";
+
+            GUI.backgroundColor = (spiedCastles[i].zoneIndex == activeSpyReportZoneIndex) ? new Color(1.0f, 0.85f, 0.15f, 1.0f) : Color.white;
+            if (GUILayout.Button($"🏰 {tabName}", GUILayout.Height(28)))
+            {
+                activeSpyReportZoneIndex = spiedCastles[i].zoneIndex;
+                if (SettingsManager.Instance != null)
+                {
+                    SettingsManager.Instance.PlayHoverSound(0);
+                }
+            }
+        }
+        GUI.backgroundColor = Color.white;
+        GUILayout.EndHorizontal();
+
+        GUILayout.Space(8);
+
+        // Retrieve saved spy details level (playerMaxCastleLvl when spied)
+        int spyInfoLvl = PlayerPrefs.GetInt("Castle_Spied_Lvl_" + castle.zoneIndex, 2);
+
+        // Display current target details
+        string castleLabel = curLang == 0 ? castle.nameRU : castle.nameEN;
+        if (curLang == 8) castleLabel = castle.nameCH;
+        if (curLang == 7) castleLabel = castle.nameKR;
+
+        GUIStyle subHeader = new GUIStyle(GUI.skin.box);
+        subHeader.normal.textColor = Color.yellow;
+        subHeader.fontStyle = FontStyle.Bold;
+        subHeader.fontSize = 14;
+        subHeader.alignment = TextAnchor.MiddleCenter;
+
+        GUILayout.Box($"🕵️ {castleLabel.ToUpper()} [Intel Level {spyInfoLvl}]", subHeader, GUILayout.Height(30));
+
+        GUILayout.Space(6);
+
+        // Scrollview for details
+        spyScrollPos = GUILayout.BeginScrollView(spyScrollPos, GUILayout.ExpandHeight(true));
+
+        GUIStyle sectionTitleS = new GUIStyle(GUI.skin.label);
+        sectionTitleS.fontSize = 14;
+        sectionTitleS.fontStyle = FontStyle.Bold;
+        sectionTitleS.normal.textColor = new Color(0.2f, 0.8f, 1.0f, 1.0f);
+
+        GUIStyle detailLabelS = new GUIStyle(GUI.skin.label);
+        detailLabelS.fontSize = 12;
+        detailLabelS.normal.textColor = Color.white;
+
+        // Determine commander class name based on zone index
+        string cmdClassRU = "Рыцарь-Воин";
+        string cmdClassEN = "Knight-Warrior";
+        string cmdClassDE = "Ritter-Krieger";
+        string cmdClassFR = "Chevalier-Guerrier";
+        string cmdClassES = "Caballero Guerrero";
+        string cmdClassPT = "Cavaleiro Guerreiro";
+        string cmdClassJA = "ナイトウォーリアー";
+        string cmdClassKO = "나이트 워리어";
+        string cmdClassZH = "重装骑士领主";
+
+        if (castle.zoneIndex == 3)
+        {
+            cmdClassRU = "Архимаг Зенита";
+            cmdClassEN = "Zenith Arch-Mage";
+            cmdClassDE = "Zenith Erzmagier";
+            cmdClassFR = "Archimage de Zénith";
+            cmdClassES = "Archimago del Cénit";
+            cmdClassPT = "Arquimago do Zênite";
+            cmdClassJA = "ゼニス・アークメイジ";
+            cmdClassKO = "제니스 아크메이지";
+            cmdClassZH = "至高神庭奥术大法师";
+        }
+        else if (castle.zoneIndex == 6)
+        {
+            cmdClassRU = "Паладин Света";
+            cmdClassEN = "Holy Paladin";
+            cmdClassDE = "Heiliger Paladin";
+            cmdClassFR = "Paladin Sacré";
+            cmdClassES = "Paladín Sagrado";
+            cmdClassPT = "Paladino Sagrado";
+            cmdClassJA = "ホーリーパラディン";
+            cmdClassKO = "홀리 팔라딘";
+            cmdClassZH = "圣光大审判骑士长";
+        }
+        else if (castle.zoneIndex == 11)
+        {
+            cmdClassRU = "Следопыт Пустошей";
+            cmdClassEN = "Wasteland Ranger";
+            cmdClassDE = "Wüstenläufer";
+            cmdClassFR = "Ranger des Terres Dévastées";
+            cmdClassES = "Ranger de los Páramos";
+            cmdClassPT = "Patrulheiro do Ermo";
+            cmdClassJA = "荒野のレンジャー";
+            cmdClassKO = "황무지 순찰대";
+            cmdClassZH = "荒野游侠神射手";
+        }
+
+        string cmdClass = GetText9(cmdClassRU, cmdClassEN, cmdClassDE, cmdClassFR, cmdClassES, cmdClassPT, cmdClassJA, cmdClassKO, cmdClassZH);
+
+        // Worn gear representation
+        string gearWeapon = "???";
+        string gearArmor = "???";
+        string gearBoots = "???";
+        string gearShield = "???";
+
+        if (spyInfoLvl >= 3)
+        {
+            if (castle.aiArmorTier == 1)
+            {
+                gearWeapon = GetText9("Бронзовый Меч", "Bronze Sword", "Bronzeschwert", "Épée de bronze", "Espada de bronce", "Espada de Bronze", "ブロンズソード", "청동 검", "青铜阔剑");
+                gearArmor = GetText9("Кожаный Нагрудник", "Leather Chest", "Lederbrustplatte", "Plastron de cuir", "Peto de cuero", "Colete de Couro", "レザーチェスト", "가죽 갑옷", "皮质护胸甲");
+            }
+            else if (castle.aiArmorTier == 2)
+            {
+                gearWeapon = GetText9("Стальной Молот", "Steel Mace", "Stahlstreitkolben", "Masse d'acier", "Maza de acero", "Maça de Aço", "スチールメイス", "강철 메이스", "精钢战锤");
+                gearArmor = GetText9("Кольчужный Доспех", "Chainmail", "Kettenhemd", "Cotte de mailles", "Cota de malla", "Cota de Malha", "チェインメイル", "사슬 갑옷", "精炼锁子甲");
+            }
+            else if (castle.aiArmorTier == 3)
+            {
+                gearWeapon = GetText9("Мифриловый Двуручник", "Mithril Greatsword", "Mithril-Zweihänder", "Espadon de mithril", "Espadón de mitril", "Montante de Mitril", "ミスリル・グレートソード", "미스릴 대검", "秘银双手巨剑");
+                gearArmor = GetText9("Латы Рыцаря", "Plate Armor", "Plattenrüstung", "Harnois de plaques", "Armadura de placas", "Armadura de Placa", "プレートアーマー", "판금 갑옷", "圣殿骑士重铠");
+            }
+            else
+            {
+                gearWeapon = GetText9("Клинок Зенита", "Divine Zenith Blade", "Göttliche Zenith-Klinge", "Lame de Zénith Divine", "Espada del Cénit Divina", "Espada do Zênite Divina", "神聖ゼニスブレード", "신성 제니스 블레이드", "至臻封神裁决之刃");
+                gearArmor = GetText9("Броня Небожителя", "Celestial Armor", "Himmlische Rüstung", "Armure Céleste", "Armadura Celestial", "Armadura Celestial", "セレスティアルアーマー", "천상 갑옷", "圣光天神不灭金铠");
+            }
+
+            if (spyInfoLvl < 4)
+            {
+                gearBoots = "???";
+                gearShield = "???";
+            }
+            else
+            {
+                gearBoots = GetText9("Кованые Сапоги", "Plated Sabatons", "Plattenschuhe", "Sabatons de plaques", "Sabatones de placas", "Soleretes de Placa", "サバトン", "철 판금 장화", "精铁重装护足");
+                gearShield = GetText9("Башенный Щит", "Tower Shield", "Turmschild", "Écu pavois", "Escudo de torre", "Escudo Torre", "タワーシールド", "타워 실드", "巨龙不灭重型塔盾");
+            }
+        }
+
+        // Fetch textures for Main Commander
+        Texture2D mainCmdAvatar = null;
+        if (castle.zoneIndex == 3) mainCmdAvatar = GetTroopAvatarTexture("MageHero");
+        else if (castle.zoneIndex == 11) mainCmdAvatar = GetTroopAvatarTexture("ArcherHero");
+        else mainCmdAvatar = GetTroopAvatarTexture("WarriorHero");
+
+        // 1. MAIN HERO DETAILS CARD Layout (Bento Grid)
+        GUILayout.BeginVertical(GUI.skin.box);
+        GUILayout.Label(GetText9(
+            "👤 Главный Военачальник Гарнизона", "👤 Garrison Arch-Commander",
+            "👤 Garnisonskommandant", "👤 Commandant de la garnison",
+            "👤 Comandante de la guarnición", "👤 Comandante da guarnição",
+            "👤 敵要塞最高司令官", "👤 가리온 요새 수석 사령관",
+            "👤 要塞守御主将指挥官"
+        ), sectionTitleS);
+
+        GUILayout.BeginHorizontal();
+
+        // Left Sub-column: Avatar, level, and XP bar
+        GUILayout.BeginVertical(GUILayout.Width(250f));
+        
+        Rect avatarRect = GUILayoutUtility.GetRect(100f, 100f, GUILayout.Width(100f), GUILayout.Height(100f));
+        GUI.color = new Color(0.08f, 0.08f, 0.15f, 1f);
+        GUI.Box(avatarRect, "", GUI.skin.box);
+        GUI.color = Color.white;
+        
+        bool revealAvatar = (spyInfoLvl >= 2);
+        if (revealAvatar && mainCmdAvatar != null)
+        {
+            GUI.DrawTexture(avatarRect, mainCmdAvatar, ScaleMode.ScaleToFit);
         }
         else
         {
-            GUIStyle fallbackEmojiStyle = new GUIStyle(GUI.skin.label);
-            fallbackEmojiStyle.alignment = TextAnchor.MiddleCenter;
-            fallbackEmojiStyle.fontSize = 14;
-            GUILayout.Label(emoji, fallbackEmojiStyle, GUILayout.Width(24), GUILayout.Height(24));
+            GUIStyle qStyle = new GUIStyle(GUI.skin.label);
+            qStyle.fontSize = 42;
+            qStyle.fontStyle = FontStyle.Bold;
+            qStyle.alignment = TextAnchor.MiddleCenter;
+            qStyle.normal.textColor = Color.gray;
+            GUI.Label(avatarRect, "?", qStyle);
         }
+
         GUILayout.Space(6);
-        string text = $"<b>{header}</b>: {desc}";
-        
-        GUIStyle skStyle = new GUIStyle(GUI.skin.button);
-        skStyle.fontSize = 11;
-        skStyle.richText = true;
-        skStyle.wordWrap = true;
-        skStyle.alignment = TextAnchor.MiddleLeft;
-        skStyle.normal.textColor = new Color(0.9f, 0.95f, 1.0f);
-        skStyle.hover.textColor = Color.yellow;
-        skStyle.padding = new RectOffset(4, 4, 2, 2);
 
-        if (GUILayout.Button(text, skStyle, GUILayout.MinHeight(26)))
+        if (spyInfoLvl >= 2)
         {
-            selectedSkillName = header;
-            selectedSkillDesc = desc;
-            selectedSkillIcon = icon;
-            selectedSkillType = skillType;
-            showSkillDetailPopup = true;
-            if (SettingsManager.Instance != null)
-            {
-                SettingsManager.Instance.PlayHoverSound(0);
-            }
+            float xpProgress = 0.65f;
+            Rect xpBarRect = GUILayoutUtility.GetRect(120f, 14f, GUILayout.Width(120f), GUILayout.Height(14f));
+            GUI.color = Color.black;
+            GUI.DrawTexture(xpBarRect, Texture2D.whiteTexture);
+            GUI.color = new Color(0.2f, 0.6f, 1f, 0.8f);
+            GUI.DrawTexture(new Rect(xpBarRect.x + 1, xpBarRect.y + 1, (xpBarRect.width - 2) * xpProgress, xpBarRect.height - 2), Texture2D.whiteTexture);
+            GUI.color = Color.white;
+            
+            GUIStyle barText = new GUIStyle(GUI.skin.label);
+            barText.fontSize = 9;
+            barText.alignment = TextAnchor.MiddleCenter;
+            GUI.Label(xpBarRect, $"XP: 65% ({(castle.aiCommanderLevel * 500)}/{(castle.aiCommanderLevel * 1000)})", barText);
         }
-        GUILayout.EndHorizontal();
+        else
+        {
+            GUILayout.Label("XP: ???", detailLabelS);
+        }
+
         GUILayout.Space(4);
-    }
+        string displayCmdClass = (revealAvatar) ? cmdClass : "???";
+        string displayCmdLvl = (revealAvatar) ? $"Lvl {castle.aiCommanderLevel}" : "???";
 
-    public void OpenSkillDetailPopup(string skillName, string skillDesc, Texture2D skillIcon, string skillType)
-    {
-        selectedSkillName = skillName;
-        selectedSkillDesc = skillDesc;
-        selectedSkillIcon = skillIcon;
-        selectedSkillType = skillType;
-        showSkillDetailPopup = true;
-        if (SettingsManager.Instance != null)
-        {
-            SettingsManager.Instance.PlayHoverSound(0);
-        }
-    }
-
-    public void ShowSkillDetailPopup(int oneBasedIndex, int curLang)
-    {
-        int index = oneBasedIndex - 1;
-        string sName = "";
-        string sDesc = "";
-        Texture2D icon = null;
-        string skillType = "Passive";
-
-        string cl = SaveGameSystem.CurrentData != null && SaveGameSystem.CurrentData.characterClass != null 
-            ? SaveGameSystem.CurrentData.characterClass.ToLower() 
-            : "warrior";
-
-        if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow") || cl.Contains("лучник") || cl.Contains("стрел") || cl.Contains("охотн"))
-        {
-            if (index == 0) { sName = curLang == 0 ? "Крит-Мастер" : "Crit-Master"; sDesc = curLang == 0 ? "Повышает вероятность нанесения критического урона на 15%" : "+15% critical hit probability"; icon = activeSkillPassive1; }
-            else if (index == 1) { sName = "LongShot"; sDesc = curLang == 0 ? "Дальний выстрел: Усиливает урон на расстоянии на 10%" : "+10% damage over wide distance range"; icon = activeSkillPassive2; }
-            else if (index == 2) { sName = "Evasion"; sDesc = curLang == 0 ? "Поворотливость: Дарует 10% шанс полного уклонения от вражеских атак" : "+10% complete dodge probability"; icon = activeSkillPassive3; }
-            else if (index == 3) { sName = curLang == 0 ? "Ливень Смерти" : "Death Rain"; sDesc = curLang == 0 ? "Суперудар (CD 3х): Смертоносный град стрел наносит масштабный урон 1.8х по всем врагам в зоне" : "Ultimate (CD 3t): AoE volley dealing massive x1.8 damage to enemies"; icon = activeSkillUltimate; skillType = "Ultimate"; }
-        }
-        else if (cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff") || cl.Contains("маг") || cl.Contains("колдун") || cl.Contains("волшеб"))
-        {
-            if (index == 0) { sName = "ManaFlow"; sDesc = curLang == 0 ? "Поток маны: Позволяет восстанавливать 5 очков маны за каждый совершённый ход" : "+5 mana points gain per turn"; icon = activeSkillPassive1; }
-            else if (index == 1) { sName = "Elemental"; sDesc = curLang == 0 ? "Сила стихий: Усиливает разрушительный потенциал ваших заклинаний на 15%" : "+15% magic spell power booster"; icon = activeSkillPassive2; }
-            else if (index == 2) { sName = "Resist"; sDesc = curLang == 0 ? "Сопротивление: Наделяет мистическим барьером, поглощающим 15% магического урона" : "+15% spell resistance shield"; icon = activeSkillPassive3; }
-            else if (index == 3) { sName = "Time Rift"; sDesc = curLang == 0 ? "Суперудар (CD 4х): Изменяет пространственно-временной континуум, полностью замедляя противников на 2 хода" : "Ultimate (CD 4t): Slows down all active enemy actions for 2 turns"; icon = activeSkillUltimate; skillType = "Ultimate"; }
-        }
-        else // Warrior
-        {
-            if (index == 0) { sName = "IronSkin"; sDesc = curLang == 0 ? "Прочная кожа: Успешно увеличивает показатель защиты и стойкости на 15%" : "+15% Armor/Defense bonus"; icon = activeSkillPassive1; }
-            else if (index == 1) { sName = "Regen"; sDesc = curLang == 0 ? "Регенерация: Обеспечивает исцеление вашего героя на 5 ОЗ каждый игровой ход" : "+5 HP recovery per turn"; icon = activeSkillPassive2; }
-            else if (index == 2) { sName = "Threat"; sDesc = curLang == 0 ? "Угроза: Ускоряет накопление боевого духа и провокацию на 10%" : "+10% aggro multiplier bonus"; icon = activeSkillPassive3; }
-            else if (index == 3) { sName = "TitanShield"; sDesc = curLang == 0 ? "Суперудар (CD 4х): Активирует нерушимый щит Титанов, снижая входящий физический урон на 70%" : "Ultimate (CD 4t): Blocks 70% of incoming physical damage"; icon = activeSkillUltimate; skillType = "Ultimate"; }
-        }
-
-        OpenSkillDetailPopup(sName, sDesc, icon, skillType);
-    }
-
-    private void SetHoveredSkill(int oneBasedIndex, int curLang)
-    {
-        isHoveringSkill = true;
-        int index = oneBasedIndex - 1;
+        GUILayout.Label($"<b>{GetText9("Класс:", "Class:", "Klasse:", "Classe :", "Clase:", "Classe:", "クラス:", "클래스:", "职业:")}</b> {displayCmdClass}", detailLabelS);
+        GUILayout.Label($"<b>{GetText9("Уровень:", "Level:", "Stufe:", "Niveau :", "Nivel:", "Nível:", "レベル:", "레벨:", "级别:")}</b> {displayCmdLvl}", detailLabelS);
         
-        string cl = SaveGameSystem.CurrentData != null && SaveGameSystem.CurrentData.characterClass != null 
-            ? SaveGameSystem.CurrentData.characterClass.ToLower() 
-            : "warrior";
+        // RPG Attributes (STR, AGI, INT, STA)
+        int baseStr = 5, baseAgi = 5, baseInt = 5, baseSta = 5;
+        if (castle.zoneIndex == 3) { baseStr = 6; baseAgi = 10; baseInt = 18; baseSta = 10; } // Mage
+        else if (castle.zoneIndex == 11) { baseStr = 10; baseAgi = 16; baseInt = 8; baseSta = 12; } // Archer
+        else { baseStr = 16; baseAgi = 11; baseInt = 5; baseSta = 16; } // Warrior
 
-        int skillBonusLevel = SaveGameSystem.CurrentData != null ? SaveGameSystem.CurrentData.playerLevel / 10 : 0;
+        baseStr += castle.aiCommanderLevel * 2;
+        baseAgi += castle.aiCommanderLevel * 2;
+        baseInt += castle.aiCommanderLevel * 2;
+        baseSta += castle.aiCommanderLevel * 2;
 
-        if (cl.Contains("archer") || cl.Contains("strelok") || cl.Contains("ranger") || cl.Contains("bow") || cl.Contains("лучник") || cl.Contains("стрел") || cl.Contains("охотн"))
-        {
-            if (index == 0) 
-            { 
-                hoveredSkillName = curLang == 0 ? "Крит-Мастер" : "Crit-Master"; 
-                hoveredSkillDesc = curLang == 0 
-                    ? $"Повышает вероятность нанесения критического урона на {15 + 2 * skillBonusLevel}% (База 15% + {2 * skillBonusLevel}% за уровень)" 
-                    : $"+{15 + 2 * skillBonusLevel}% critical hit probability (Base 15% + {2 * skillBonusLevel}% from level)"; 
-                hoveredSkillIcon = activeSkillPassive1; 
-                hoveredSkillType = "Passive"; 
-            }
-            else if (index == 1) 
-            { 
-                hoveredSkillName = "LongShot"; 
-                hoveredSkillDesc = curLang == 0 
-                    ? $"Дальний выстрел: Усиливает урон на расстоянии на {10 + skillBonusLevel}% (База 10% + {skillBonusLevel}% за уровень)" 
-                    : $"+{10 + skillBonusLevel}% damage over wide distance range (Base 10% + {skillBonusLevel}% from level)"; 
-                hoveredSkillIcon = activeSkillPassive2; 
-                hoveredSkillType = "Passive"; 
-            }
-            else if (index == 2) 
-            { 
-                hoveredSkillName = "Evasion"; 
-                hoveredSkillDesc = curLang == 0 
-                    ? $"Поворотливость: Дарует {10 + skillBonusLevel}% шанс полного уклонения от вражеских атак (База 10% + {skillBonusLevel}% за уровень)" 
-                    : $"+{10 + skillBonusLevel}% complete dodge probability (Base 10% + {skillBonusLevel}% from level)"; 
-                hoveredSkillIcon = activeSkillPassive3; 
-                hoveredSkillType = "Passive"; 
-            }
-            else if (index == 3) 
-            { 
-                hoveredSkillName = curLang == 0 ? "Ливень Смерти" : "Death Rain"; 
-                hoveredSkillDesc = curLang == 0 
-                    ? $"Суперудар (CD 3х): Смертоносный град стрел наносит масштабный урон {1.8f + 0.1f * skillBonusLevel:F1}х по всем врагам в зоне (База 1.8х + {0.1f * skillBonusLevel:F1}х за уровень)" 
-                    : $"Ultimate (CD 3t): AoE volley dealing massive {1.8f + 0.1f * skillBonusLevel:F1}x damage to enemies (Base 1.8x + {0.1f * skillBonusLevel:F1}x from level)"; 
-                hoveredSkillIcon = activeSkillUltimate; 
-                hoveredSkillType = "Ultimate"; 
-            }
-        }
-        else if (cl.Contains("mage") || cl.Contains("wizard") || cl.Contains("mag") || cl.Contains("staff") || cl.Contains("маг") || cl.Contains("колдун") || cl.Contains("волшеб"))
-        {
-            if (index == 0) 
-            { 
-                hoveredSkillName = "ManaFlow"; 
-                hoveredSkillDesc = curLang == 0 
-                    ? $"Поток маны: Позволяет восстанавливать {5 + skillBonusLevel} очков маны за каждый совершённый ход (База 5 + {skillBonusLevel} за уровень)" 
-                    : $"+{5 + skillBonusLevel} mana points gain per turn (Base 5 + {skillBonusLevel} from level)"; 
-                hoveredSkillIcon = activeSkillPassive1; 
-                hoveredSkillType = "Passive"; 
-            }
-            else if (index == 1) 
-            { 
-                hoveredSkillName = "Elemental"; 
-                hoveredSkillDesc = curLang == 0 
-                    ? $"Сила стихий: Усиливает разрушительный потенциал ваших заклинаний на {15 + 2 * skillBonusLevel}% (База 15% + {2 * skillBonusLevel}% за уровень)" 
-                    : $"+{15 + 2 * skillBonusLevel}% magic spell power booster (Base 15% + {2 * skillBonusLevel}% from level)"; 
-                hoveredSkillIcon = activeSkillPassive2; 
-                hoveredSkillType = "Passive"; 
-            }
-            else if (index == 2) 
-            { 
-                hoveredSkillName = "Resist"; 
-                hoveredSkillDesc = curLang == 0 
-                    ? $"Сопротивление: Наделяет мистическим барьером, поглощающим {15 + skillBonusLevel}% магического урона (База 15% + {skillBonusLevel}% за уровень)" 
-                    : $"+{15 + skillBonusLevel}% spell resistance shield (Base 15% + {skillBonusLevel}% from level)"; 
-                hoveredSkillIcon = activeSkillPassive3; 
-                hoveredSkillType = "Passive"; 
-            }
-            else if (index == 3) 
-            { 
-                hoveredSkillName = "Time Rift"; 
-                hoveredSkillDesc = curLang == 0 
-                    ? $"Суперудар (CD 4х): Изменяет пространственно-временной континуум, замедляя противников на {2 + (skillBonusLevel >= 3 ? 1 : 0)} хода (Эффект замедления: {50 + 5 * skillBonusLevel}%)" 
-                    : $"Ultimate (CD 4t): Slows down enemy actions for {2 + (skillBonusLevel >= 3 ? 1 : 0)} turns (Slow rate: {50 + 5 * skillBonusLevel}%)"; 
-                hoveredSkillIcon = activeSkillUltimate; 
-                hoveredSkillType = "Ultimate"; 
-            }
-        }
-        else // Warrior
-        {
-            if (index == 0) 
-            { 
-                hoveredSkillName = "IronSkin"; 
-                hoveredSkillDesc = curLang == 0 
-                    ? $"Прочная кожа: Увеличивает показатель защиты и стойкости на {15 + 2 * skillBonusLevel}% (База 15% + {2 * skillBonusLevel}% за уровень)" 
-                    : $"+{15 + 2 * skillBonusLevel}% Armor/Defense bonus (Base 15% + {2 * skillBonusLevel}% from level)"; 
-                hoveredSkillIcon = activeSkillPassive1; 
-                hoveredSkillType = "Passive"; 
-            }
-            else if (index == 1) 
-            { 
-                hoveredSkillName = "Regen"; 
-                hoveredSkillDesc = curLang == 0 
-                    ? $"Регенерация: Обеспечивает исцеление вашего героя на {5 + skillBonusLevel} ОЗ каждый игровой ход (База 5 + {skillBonusLevel} за уровень)" 
-                    : $"+{5 + skillBonusLevel} HP recovery per turn (Base 5 + {skillBonusLevel} from level)"; 
-                hoveredSkillIcon = activeSkillPassive2; 
-                hoveredSkillType = "Passive"; 
-            }
-            else if (index == 2) 
-            { 
-                hoveredSkillName = "Threat"; 
-                hoveredSkillDesc = curLang == 0 
-                    ? $"Угроза: Ускоряет накопление боевого духа и провокацию на {10 + skillBonusLevel}% (База 10% + {skillBonusLevel}% за уровень)" 
-                    : $"+{10 + skillBonusLevel}% aggro multiplier bonus (Base 10% + {skillBonusLevel}% from level)"; 
-                hoveredSkillIcon = activeSkillPassive3; 
-                hoveredSkillType = "Passive"; 
-            }
-            else if (index == 3) 
-            { 
-                hoveredSkillName = "TitanShield"; 
-                int shieldRed = Mathf.Min(90, 70 + skillBonusLevel);
-                hoveredSkillDesc = curLang == 0 
-                    ? $"Суперудар (CD 4х): Активирует щит Титанов, снижая входящий физический урон на {shieldRed}% (База 70% + {skillBonusLevel}% за уровень)" 
-                    : $"Ultimate (CD 4t): Blocks {shieldRed}% of incoming physical damage (Base 70% + {skillBonusLevel}% from level)"; 
-                hoveredSkillIcon = activeSkillUltimate; 
-                hoveredSkillType = "Ultimate"; 
-            }
-        }
-    }
+        string strVal = (spyInfoLvl >= 3) ? baseStr.ToString() : "??";
+        string agiVal = (spyInfoLvl >= 3) ? baseAgi.ToString() : "??";
+        string intVal = (spyInfoLvl >= 3) ? baseInt.ToString() : "??";
+        string staVal = (spyInfoLvl >= 3) ? baseSta.ToString() : "??";
 
-    private void SetHoveredItem(InventoryItem item, int curLang)
-    {
-        if (item == null || string.IsNullOrEmpty(item.id)) return;
+        GUILayout.Space(4);
+        GUILayout.Label($"💪 {GetText9("Сила:", "Strength:", "Stärke:", "Force:", "Fuerza:", "Força:", "力:", "힘:", "力量:")} <color=#FF5555>{strVal}</color>", detailLabelS);
+        GUILayout.Label($"⚡ {GetText9("Ловкость:", "Agility:", "Agilität:", "Agilité:", "Agilidad:", "Agilidade:", "素早さ:", "민첩:", "敏捷:")} <color=#55FF55>{agiVal}</color>", detailLabelS);
+        GUILayout.Label($"🔮 {GetText9("Интеллект:", "Intelligence:", "Intelligenz:", "Intelligence:", "Inteligencia:", "Inteligência:", "知力:", "지능:", "智力:")} <color=#5555FF>{intVal}</color>", detailLabelS);
+        GUILayout.Label($"🛡️ {GetText9("Выносливость:", "Stamina:", "Ausdauer:", "Stamina:", "Aguante:", "Stamina:", "耐久:", "체력:", "耐力:")} <color=#FFFF55>{staVal}</color>", detailLabelS);
         
-        isHoveringSkill = true; // reuse same logic to display the tooltip box!
-        hoveredSkillIcon = GetItemIconTexture(item);
-        hoveredSkillName = GetLocalizedItemName(item, curLang);
+        GUILayout.EndVertical(); // end left details
+
+        // Right Sub-column: Equipped Gear (left) & Skills (right)
+        GUILayout.BeginVertical(GUILayout.Width(510f));
+        GUILayout.BeginHorizontal();
+
+        // 1. Gear column (240f)
+        GUILayout.BeginVertical(GUILayout.Width(240f));
+        GUILayout.Label($"<b>{GetText9("⚔️ Экипировка:", "⚔️ Equipped Gear:", "⚔️ Ausrüstung:", "⚔️ Équipement :", "⚔️ Equipo:", "⚔️ Equipamento:", "⚔️ 装備:", "⚔️ 장착 장비:", "穿戴装备:")}</b>", detailLabelS);
         
-        if (item.slotType == 0) // Potion
+        string[] gearSlots = {
+            GetText9("Оружие", "Weapon", "Waffe", "Arme", "Arma", "Arma", "武器", "무기", "主手武器"),
+            GetText9("Доспех", "Armor", "Rüstung", "Armure", "Armadura", "Armadura", "鎧", "갑옷", "防具重铠"),
+            GetText9("Сапоги", "Boots", "Stiefel", "Bottes", "Botas", "Botas", "靴", "장화", "腿部足具"),
+            GetText9("Щит", "Shield", "Schild", "Bouclier", "Escudo", "Escudo", "盾", "방패", "副手重盾")
+        };
+        string[] gearNames = { gearWeapon, gearArmor, gearBoots, gearShield };
+
+        for (int s = 0; s < 4; s++)
         {
-            hoveredSkillType = "Potion";
+            GUILayout.BeginHorizontal(GUI.skin.box);
             
-            if (item.id.Contains("hp"))
-            {
-                int boost = GetPotionValueForLevel(item.level, true);
-                if (curLang == 0)
-                    hoveredSkillDesc = $"Временно увеличивает Макс. ОЗ (HP) на <color=#33FF33>+{boost}</color> до конца текущего дня (без мгновенного восстановления ОЗ).";
-                else if (curLang == 8)
-                    hoveredSkillDesc = $"临时增加最大生命值 (HP) <color=#33FF33>+{boost}</color>，持续到当天结束（不进行即时治疗）。";
-                else if (curLang == 7)
-                    hoveredSkillDesc = $"하루가 끝날 때까지 최대 HP를 일시적으로 <color=#33FF33>+{boost}</color>만큼 증가시킵니다 (즉시 회복 없음).";
-                else if (curLang == 2)
-                    hoveredSkillDesc = $"Erhöht die max. LP (HP) vorübergehend um <color=#33FF33>+{boost}</color> bis zum Ende des Tages (ohne sofortige Heilung).";
-                else if (curLang == 3)
-                    hoveredSkillDesc = $"Augmente temporairement les PV max de <color=#33FF33>+{boost}</color> jusqu'à la fin de la journée (sans soins instantanés).";
-                else if (curLang == 4)
-                    hoveredSkillDesc = $"Aumenta temporalmente los PS máx. (HP) en <color=#33FF33>+{boost}</color> hasta el final del día (sin curación instantánea).";
-                else if (curLang == 5)
-                    hoveredSkillDesc = $"Aumenta temporariamente os PV máx. (HP) em <color=#33FF33>+{boost}</color> até o fim do dia (sem cura instantânea).";
-                else if (curLang == 6)
-                    hoveredSkillDesc = $"一日の終わりまで最大HPを一時的に <color=#33FF33>+{boost}</color> 増やす（即時回復なし）。";
-                else
-                    hoveredSkillDesc = $"Temporarily increases Max HP by <color=#33FF33>+{boost}</color> until the end of the day (without instant healing).";
-            }
-            else if (item.id.Contains("str"))
-            {
-                int boost = GetPotionValueForLevel(item.level, false);
-                hoveredSkillDesc = curLang == 0
-                    ? $"Временно увеличивает Силу на <color=#FF6600>+{boost} STR</color> до конца текущего дня."
-                    : $"Temporarily boosts Strength by <color=#FF6600>+{boost} STR</color> until the end of the day.";
-            }
-            else if (item.id.Contains("int"))
-            {
-                int boost = GetPotionValueForLevel(item.level, false);
-                hoveredSkillDesc = curLang == 0
-                    ? $"Временно увеличивает Интеллект на <color=#CC33FF>+{boost} INT</color> до конца текущего дня."
-                    : $"Temporarily boosts Intelligence by <color=#CC33FF>+{boost} INT</color> until the end of the day.";
-            }
-            else if (item.id.Contains("agi"))
-            {
-                int boost = GetPotionValueForLevel(item.level, false);
-                hoveredSkillDesc = curLang == 0
-                    ? $"Временно увеличивает Ловкость на <color=#33FF33>+{boost} AGI</color> до конца текущего дня."
-                    : $"Temporarily boosts Agility by <color=#33FF33>+{boost} AGI</color> until the end of the day.";
-            }
-            else if (item.id.Contains("sta") || item.id.Contains("def"))
-            {
-                int boost = GetPotionValueForLevel(item.level, false);
-                hoveredSkillDesc = curLang == 0
-                    ? $"Временно увеличивает Выносливость на <color=#33CCFF>+{boost} STA</color> до конца текущего дня."
-                    : $"Temporarily boosts Stamina by <color=#33CCFF>+{boost} STA</color> until the end of the day.";
-            }
-            else
-            {
-                hoveredSkillDesc = curLang == 0 ? "Таинственное зелье." : "A mysterious elixir.";
-            }
-        }
-        else // Equipment
-        {
-            int tier = item.level;
-            if (curLang == 0)
-            {
-                hoveredSkillType = $"🛡️ СНАРЯЖЕНИЕ (T{tier})";
-            }
-            else
-            {
-                hoveredSkillType = $"🛡️ EQUIPMENT (Tier {tier})";
-            }
+            Rect slotRect = GUILayoutUtility.GetRect(24f, 24f, GUILayout.Width(24f), GUILayout.Height(24f));
+            GUI.color = new Color(0.2f, 0.2f, 0.25f, 1f);
+            GUI.DrawTexture(slotRect, Texture2D.whiteTexture);
+            GUI.color = Color.white;
             
-            string statReport = "";
-            switch (item.slotType)
+            GUIStyle slotEmojiS = new GUIStyle(GUI.skin.label);
+            slotEmojiS.alignment = TextAnchor.MiddleCentering();
+            slotEmojiS.fontSize = 11;
+            string iconEmoji = "❓";
+            if (spyInfoLvl >= (s < 2 ? 3 : 4))
             {
-                case 1: // Head (Helmet)
-                    statReport = curLang == 0 
-                        ? $"Выносливость: <color=#33FF33>+{tier * 2} STA</color> (Повышает здоровье на +{tier * 20} HP)"
-                        : $"Stamina: <color=#33FF33>+{tier * 2} STA</color> (+{tier * 20} Max HP)";
-                    break;
-                case 2: // Neck (Amulet)
-                    statReport = curLang == 0
-                        ? $"Интеллект: <color=#33FF33>+{tier * 2} INT</color> (Повышает ману на +{tier * 20} MP)"
-                        : $"Intelligence: <color=#33FF33>+{tier * 2} INT</color> (+{tier * 20} Max Mana)";
-                    break;
-                case 3: // Shoulders (Pauldrons)
-                    statReport = curLang == 0
-                        ? $"Сила: <color=#33FF33>+{tier} STR</color> (Урон +{tier * 2.5f})\nВыносливость: <color=#33FF33>+{tier} STA</color> (Здоровье +{tier * 10} HP)"
-                        : $"Strength: <color=#33FF33>+{tier} STR</color> (+{tier * 2.5f} Dmg)\nStamina: <color=#33FF33>+{tier} STA</color> (+{tier * 10} HP)";
-                    break;
-                case 4: // Chest (Armor)
-                    statReport = curLang == 0
-                        ? $"Выносливость: <color=#33FF33>+{tier * 3} STA</color> (Повышает здоровье на +{tier * 30} HP)"
-                        : $"Stamina: <color=#33FF33>+{tier * 3} STA</color> (+{tier * 30} Max HP)";
-                    break;
-                case 5: // Ring
-                    statReport = curLang == 0
-                        ? $"Интеллект: <color=#33FF33>+{tier} INT</color> (Мана +{tier * 10} MP)\nЛовкость: <color=#33FF33>+{tier} AGI</color> (Защита +{tier * 1.5f})"
-                        : $"Intelligence: <color=#33FF33>+{tier} INT</color> (+{tier * 10} MP)\nAgility: <color=#33FF33>+{tier} AGI</color> (+{tier * 1.5f} Def)";
-                    break;
-                case 6: // Belt
-                    statReport = curLang == 0
-                        ? $"Выносливость: <color=#33FF33>+{tier} STA</color> (Здоровье +{tier * 10} HP)\nЛовкость: <color=#33FF33>+{tier} AGI</color> (Защита +{tier * 1.5f})"
+                if (s == 0) iconEmoji = "🗡️";
+                else if (s == 1) iconEmoji = "👕";
+                else if (s == 2) iconEmoji = "👢";
+                else if (s == 3) iconEmoji = "🛡️";
+            }
+            GUI.Label(slotRect, iconEmoji, slotEmojiS);
+            
+            string gearDisplayName = gearNames[s];
+            if (string.IsNullOrEmpty(gearDisplayName)) gearDisplayName = "???";
+            
+            GUILayout.BeginVertical();
+            GUIStyle gearSlotLbl = new GUIStyle(GUI.skin.label);
+            gearSlotLbl.fontSize = 9;
+            gearSlotLbl.normal.textColor = Color.cyan;
+            GUILayout.Label(gearSlots[s], gearSlotLbl);
+            
+            GUIStyle gearNameLbl = new GUIStyle(GUI.skin.label);
+            gearNameLbl.fontSize = 10;
+            gearNameLbl.normal.textColor = gearDisplayName.Contains("???") ? Color.gray : Color.yellow;
+            GUILayout.Label(gearDisplayName, gearNameLbl);
+            GUILayout.EndVertical();
+            
+            GUILayout.EndHorizontal();
+        }
+        GUILayout.EndVertical(); // end Gear
+
+        // 2. Skills column (250f)
+        GUILayout.BeginVertical(GUILayout.Width(250f));
+        GUILayout.Label($"<b>{GetText9("✨ Навыки и Способности:", "✨ Commander Skills:", "✨ Kommandanten-Fähigkeiten:", "✨ Compétences :", "✨ Habilidades:", "✨ Habilidades:", "✨ 特性・スキル:", "✨ 사령관 능력:", "将领特技和技能:")}</b>", detailLabelS);
+
+        Texture2D sActive = null;
+        Texture2D sPassive1 = null;
+        Texture2D sPassive2 = null;
+        string skillActiveName = "";
+        string skillP1Name = "";
+        string skillP2Name = "";
+
+        if (castle.zoneIndex == 3)
+        {
+            sActive = skill_hero_mage_active;
+            sPassive1 = skill_hero_mage_passive1;
+            sPassive2 = skill_hero_mage_passive2;
+            skillActiveName = GetText9("Аркановый Разлом", "Arcane Rift", "Arkanriss", "Faille Arcanique", "Fisura Arcana", "Fenda Arcana", "アルケインリフト", "비전 균열", "奥术崩裂秘法");
+            skillP1Name = GetText9("Медитация", "Mana Meditation", "Mana-Meditation", "Méditation", "Meditación", "Meditação", "瞑想", "마나 명상", "冥想魂归");
+            skillP2Name = GetText9("Светящийся Щит", "Glow Shield", "Leuchtschild", "Bouclier Lumineux", "Escudo Luminoso", "Escudo Luminoso", "グロウシールド", "빛의 방패", "不灭护体圣盾");
+        }
+        else if (castle.zoneIndex == 11)
+        {
+            sActive = skill_hero_archer_active;
+            sPassive1 = skill_hero_archer_passive1;
+            sPassive2 = skill_hero_archer_passive2;
+            skillActiveName = GetText9("Ливень Стрел", "Arrow Rain", "Pfeilregen", "Pluie de flèches", "Lluvia de flechas", "Chuva de Flechas", "アローレイン", "화살 비", "漫天诸神箭雨");
+            skillP1Name = GetText9("Орлиный Взгляд", "Eagle Eye", "Adlerauge", "Œil d'aigle", "Ojo de águila", "Olho de Águia", "イーグルアイ", "매의 눈", "鹰眼极致锁敌");
+            skillP2Name = GetText9("Быстрые Шаги", "Swift Steps", "Schnelle Schritte", "Pas rapides", "Pasos rápidos", "Passos Rápidos", "スウィフトステップ", "신속한 걸음", "幻影突袭疾行");
+        }
+        else
+        {
+            sActive = skill_hero_warrior_active;
+            sPassive1 = skill_hero_warrior_passive1;
+            sPassive2 = skill_hero_warrior_passive2;
+            skillActiveName = GetText9("Круговой Удар", "Whirlwind Strike", "Wirbelwindangriff", "Frappe Tourbillonnante", "Ataque Torbellino", "Golpe Furacão", "旋風斬り", "회오리 베기", "烈焰狂风旋风斩");
+            skillP1Name = GetText9("Закалка Стали", "Steel Hardening", "Stahlhärtung", "Durcissement de l'acier", "Templado de acero", "Endurecimento do Aço", "鋼鉄強化", "강철 단련", "金刚不坏之躯");
+            skillP2Name = GetText9("Берсерк", "Combat Rage", "Kampfwut", "Rage de combat", "Furia de combate", "Fúria de Combate", "バーサーカー", "광폭화", "狂热战神觉醒");
+        }
+
+        Texture2D[] skillIcons = { sActive, sPassive1, sPassive2 };
+        string[] skillNames = { skillActiveName, skillP1Name, skillP2Name };
+        string[] skillTypes = {
+            GetText9("Активный", "Active Ultimate", "Aktive Fähigkeit", "Ultime Actif", "Última Activa", "Ativa Suprema", "アクティブ・アルティメット", "액티브 궁극기", "终极主动觉醒技"),
+            GetText9("П�        GUI.backgroundColor = Color.white;
+    }          GUIStyle armyCountS = new GUIStyle(GUI.skin.label);
+            armyCountS.fontSize = 11;
+            armyCountS.fontStyle = FontStyle.Bold;
+            armyCountS.normal.textColor = Color.green;
+            GUILayout.Label($"{GetText9("Численность:", "Strength:", "Stärke:", "Effectif :", "Efectivo:", "Efectivo:", "将兵数:", "부대 규모:", "总人数:")} {power / 4} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "名战士")}", armyCountS);
+            
+            string sec2ArmyComp = (spyInfoLvl >= 4)
+                ? GetText9("Состав: 40% Маги, 60% Паладины", "Comp: 40% Mages, 60% Paladins", "Zus.: 40% Magier, 60% Paladine", "Comp : 40% Mages, 60% Paladins", "Comp: 40% Magos, 60% Paladines", "Comp: 40% Magos, 60% Paladinos", "構成: 40% 魔術師、60% パラディン", "구성: 마법사 40%, 성기사 60%", "编制: 40% 秘术祭司, 60% 圣光骑士")
+                : GetText9("Состав: Т2/Т3 Войска", "Composition: T2/T3 Troops", "Zusammensetzung: T2/T3", "Composition : T2/T3", "Composición: T2/T3", "Composição: T2/T3", "構成: T2/T3 兵", "구성: T2/T3 병력", "编制: 包含 T2/T3 精锐连队");
+            GUILayout.Label(sec2ArmyComp, detailLabelS);
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
+        }
+        GUILayout.EndVertical();
+
+        GUILayout.EndHorizontal();
+        GUILayout.EndVertical(); // end armies on heroes
+
+        GUILayout.EndScrollView();
+
+        GUILayout.Space(10);
+        GUI.backgroundColor = Color.red;
+        if (GUILayout.Button(GetText9("Закрыть Отчет", "Close Report", "Bericht schließen", "Fermer le rapport", "Cerrar informe", "Fechar relatório", "報告書を閉じる", "보고서 닫기", "关闭情报窗口"), GUILayout.Height(30)))
+        {
+            showSpyReportPopup = false;
+        }
+        GUI.backgroundColor = Color.white;
+    }ier} AGI</color> (Защита +{tier * 1.5f})"
                         : $"Stamina: <color=#33FF33>+{tier} STA</color> (+{tier * 10} HP)\nAgility: <color=#33FF33>+{tier} AGI</color> (+{tier * 1.5f} Def)";
                     break;
                 case 7: // Boots
@@ -6495,16 +6598,17 @@ public class FateCastleManager : MonoBehaviour
             hoveredSkillDesc = statReport;
         }
     }
+    */
 
     private void DrawSpyReportPopup(int curLang)
     {
-        // Calculate size of the window
-        float panelWidth = 520f;
-        float panelHeight = 580f;
+        // Calculate size of the window (spacious desktop dimensions for side-by-side bento layout)
+        float panelWidth = 840f;
+        float panelHeight = 660f;
         float px = (Screen.width - panelWidth) / 2f;
         float py = (Screen.height - panelHeight) / 2f;
 
-        GUI.backgroundColor = new Color(0.02f, 0.05f, 0.15f, 0.98f);
+        GUI.backgroundColor = new Color(0.01f, 0.04f, 0.12f, 0.99f);
         
         GUIStyle windowStyle = new GUIStyle(GUI.skin.window);
         windowStyle.fontSize = 15;
@@ -6514,11 +6618,710 @@ public class FateCastleManager : MonoBehaviour
             "🕵️ Отчет Шпионской Сети", "🕵️ Spy Network Intelligence Report",
             "🕵️ Spionagebericht", "🕵️ Rapport d'Espionnage",
             "🕵️ Informe de Espionaje", "🕵️ Relatório de Espionagem",
-            "🕵️ スパイ密偵調査報告書", "🕵️ 스파이 네트워크 첩보 보고서",
+            "🕵️ スパイ密偵調査報告書", "🕵️ 스파и-네트워크 첩보 보고서", // Keep title matching Translator table standard
             "🕵️ 谍报密探军情报告"
         );
+        // Note: the original had "🕵️ 스파이 네트워크 첩보 보고서", let's adjust if needed, but we will use the clean GetText9 version
 
-        GUI.Window(101, new Rect(px, py, panelWidth, panelHeight), SpyReportWindowFunction, spyReportTitle, windowStyle);
+        GUI.Window(101, new Rect(px, py, panelWidth, panelHeight), SpyReportWindowFunctionBento, spyReportTitle, windowStyle);
+        GUI.backgroundColor = Color.white;
+    }
+
+    private void InitSpyStyles()
+    {
+        if (s_spyTitleStyle == null)
+        {
+            s_spyTitleStyle = new GUIStyle(GUI.skin.label);
+            s_spyTitleStyle.fontSize = 15;
+            s_spyTitleStyle.fontStyle = FontStyle.Bold;
+            s_spyTitleStyle.normal.textColor = Color.yellow;
+            s_spyTitleStyle.alignment = TextAnchor.MiddleLeft;
+
+            s_spySectionTitleStyle = new GUIStyle(GUI.skin.label);
+            s_spySectionTitleStyle.fontSize = 13;
+            s_spySectionTitleStyle.fontStyle = FontStyle.Bold;
+            s_spySectionTitleStyle.normal.textColor = new Color(0.2f, 0.8f, 1.0f, 1.0f); // neon cyan
+
+            s_spyDetailLabelStyle = new GUIStyle(GUI.skin.label);
+            s_spyDetailLabelStyle.fontSize = 12;
+            s_spyDetailLabelStyle.normal.textColor = Color.white;
+            s_spyDetailLabelStyle.richText = true;
+
+            s_spySubHeaderStyle = new GUIStyle(GUI.skin.box);
+            s_spySubHeaderStyle.normal.textColor = Color.yellow;
+            s_spySubHeaderStyle.fontStyle = FontStyle.Bold;
+            s_spySubHeaderStyle.fontSize = 14;
+            s_spySubHeaderStyle.alignment = TextAnchor.MiddleCenter;
+
+            s_spyCardBgStyle = new GUIStyle(GUI.skin.box);
+            s_spyCardBgStyle.padding = new RectOffset(10, 10, 10, 10);
+            
+            s_spyBoxLabelStyle = new GUIStyle(GUI.skin.box);
+            s_spyBoxLabelStyle.alignment = TextAnchor.MiddleCenter;
+            s_spyBoxLabelStyle.fontSize = 10;
+            s_spyBoxLabelStyle.normal.textColor = Color.white;
+
+            s_spyBarTextStyle = new GUIStyle(GUI.skin.label);
+            s_spyBarTextStyle.fontSize = 9;
+            s_spyBarTextStyle.fontStyle = FontStyle.Bold;
+            s_spyBarTextStyle.alignment = TextAnchor.MiddleCenter;
+            s_spyBarTextStyle.normal.textColor = Color.white;
+        }
+    }
+
+    private void SpyReportWindowFunctionBento(int windowID)
+    {
+        int curLang = Translator.LanguageID;
+        InitSpyStyles();
+        
+        // Find all spied enemy castles
+        List<CastleInstance> spiedCastles = new List<CastleInstance>();
+        for (int i = 0; i < castles.Count; i++)
+        {
+            if (castles[i].owner == "Enemy" && PlayerPrefs.GetInt("Castle_Spied_" + castles[i].zoneIndex, 0) == 1)
+            {
+                spiedCastles.Add(castles[i]);
+            }
+        }
+
+        if (spiedCastles.Count == 0)
+        {
+            GUILayout.BeginVertical();
+            GUILayout.FlexibleSpace();
+            GUIStyle emptyS = new GUIStyle(GUI.skin.label);
+            emptyS.alignment = TextAnchor.MiddleCenter;
+            emptyS.fontSize = 14;
+            emptyS.normal.textColor = Color.gray;
+            GUILayout.Label(GetText9(
+                "Нет активных отчетов. Зашлите шпионов в другие замки!",
+                "No active reports. Infiltrate spies into enemy castles!",
+                "Keine Berichte. Senden Sie Spione in feindliche Burgen!",
+                "Aucun rapport. Infiltrez des espions dans les châteaux !",
+                "Sin informes activos. ¡Infiltra espías en castillos enemigos!",
+                "Sem relatórios. Infiltre espiões em castelhos inimigos!",
+                "アクティブな報告書はありません。敵の城にスパイを放ちましょう！",
+                "활성화된 보고서가 없습니다. 적의 성에 간첩을 파견하십시오!",
+                "暂无分城情报。请先派遣刺探部署守军探子！"
+            ), emptyS);
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button(GetText9("Закрыть", "Close", "Schließen", "Fermer", "Cerrar", "Fechar", "閉じる", "닫기", "关闭"), GUILayout.Height(30)))
+            {
+                showSpyReportPopup = false;
+            }
+            GUILayout.EndVertical();
+            return;
+        }
+
+        // Set default activeSpyReportZoneIndex if not set or invalid
+        if (activeSpyReportZoneIndex == -1)
+        {
+            activeSpyReportZoneIndex = spiedCastles[0].zoneIndex;
+        }
+        else
+        {
+            bool found = false;
+            for (int i = 0; i < spiedCastles.Count; i++)
+            {
+                if (spiedCastles[i].zoneIndex == activeSpyReportZoneIndex)
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+            {
+                activeSpyReportZoneIndex = spiedCastles[0].zoneIndex;
+            }
+        }
+
+        CastleInstance castle = null;
+        for (int i = 0; i < castles.Count; i++)
+        {
+            if (castles[i].zoneIndex == activeSpyReportZoneIndex)
+            {
+                castle = castles[i];
+                break;
+            }
+        }
+
+        if (castle == null) return;
+
+        // Draw tabs for selecting stronghold
+        GUILayout.Label(GetText9(
+            "Выберите вражескую цитадель для просмотра разведданных:", 
+            "Select enemy stronghold to view intel reports:",
+            "Feindliche Burg für Spionagebericht auswählen:", 
+            "Sélectionnez la forteresse ennemie pour voir les rapports :",
+            "Seleccionar fortaleza enemiga para ver informes:", 
+            "Selecionar fortaleza inimiga para ver relatórios:",
+            "諜報データを確認する敵の城塞を選択してください:", 
+            "첩보 보고서를 확인하려면 적 성채를 선택하십시오:",
+            "选择敌方城堡查看获取的密探军报:"
+        ), s_spyDetailLabelStyle);
+
+        GUILayout.BeginHorizontal();
+        for (int i = 0; i < spiedCastles.Count; i++)
+        {
+            string tabName = curLang == 0 ? spiedCastles[i].nameRU : spiedCastles[i].nameEN;
+            if (curLang == 8) tabName = spiedCastles[i].nameCH;
+            if (curLang == 7) tabName = spiedCastles[i].nameKR;
+
+            if (tabName.Length > 20) tabName = tabName.Substring(0, 19) + "..";
+
+            GUI.backgroundColor = (spiedCastles[i].zoneIndex == activeSpyReportZoneIndex) ? new Color(1.0f, 0.85f, 0.15f, 1.0f) : Color.white;
+            if (GUILayout.Button($"🏰 {tabName}", GUILayout.Height(28)))
+            {
+                activeSpyReportZoneIndex = spiedCastles[i].zoneIndex;
+                if (SettingsManager.Instance != null)
+                {
+                    SettingsManager.Instance.PlayHoverSound(0);
+                }
+            }
+        }
+        GUI.backgroundColor = Color.white;
+        GUILayout.EndHorizontal();
+
+        GUILayout.Space(8);
+
+        // Retrieve saved spy details level (playerMaxCastleLvl when spied)
+        int spyInfoLvl = PlayerPrefs.GetInt("Castle_Spied_Lvl_" + castle.zoneIndex, 2);
+
+        // Header Title Card
+        string castleLabel = curLang == 0 ? castle.nameRU : castle.nameEN;
+        if (curLang == 8) castleLabel = castle.nameCH;
+        if (curLang == 7) castleLabel = castle.nameKR;
+
+        string starsStr = new string('⭐', spyInfoLvl) + new string('☆', Mathf.Max(0, 4 - spyInfoLvl));
+        string accuracyText = spyInfoLvl == 1 ? "25% (" + GetText9("Низкая", "Low", "Niedrig", "Basse", "Baja", "Baixa", "低", "낮음", "极低精度") + ")" :
+                             spyInfoLvl == 2 ? "50% (" + GetText9("Базовая", "Medium", "Mittel", "Moyenne", "Media", "Média", "中", "보통", "基础精度") + ")" :
+                             spyInfoLvl == 3 ? "75% (" + GetText9("Высокая", "High", "Hoch", "Haute", "Alta", "Alta", "高", "높음", "详尽高精") + ")" :
+                             "100% (" + GetText9("Максимальная", "Absolute", "Absolut", "Absolue", "Absoluta", "Absoluta", "絶対", "최대", "绝对精准") + ")";
+
+        string headerBoxText = $"🕵️ {castleLabel.ToUpper()} — {GetText9("ТОЧНОСТЬ:", "INTEL ACCURACY:", "GENAUIGKEIT:", "PRÉCISION :", "PRECISIÓN:", "PRECISÃO:", "精度:", "정밀도:", "情报获取精度:")} {accuracyText}  [{starsStr}]";
+        GUILayout.Box(headerBoxText, s_spySubHeaderStyle, GUILayout.Height(30));
+
+        GUILayout.Space(6);
+
+        // Scrollview for bento-grid
+        spyScrollPos = GUILayout.BeginScrollView(spyScrollPos, GUILayout.ExpandHeight(true));
+
+        GUILayout.BeginHorizontal();
+
+        // ==================== LEFT COLUMN: ARCH-COMMANDER PROFILE (Width: 395f) ====================
+        GUILayout.BeginVertical(GUILayout.Width(395f));
+
+        // Bento Card 1: Commander Profile
+        GUILayout.BeginVertical(s_spyCardBgStyle);
+        GUILayout.Label(GetText9(
+            "👤 Главный Военачальник Гарнизона", "👤 Garrison Arch-Commander",
+            "👤 Garnisonskommandant", "👤 Commandant de la garnison",
+            "👤 Comandante de la guarnición", "👤 Comandante da guarnição",
+            "👤 敵要塞最高司令官", "👤 가리온 요새 수석 사령관",
+            "👤 要塞守御主将指挥官"
+        ), s_spySectionTitleStyle);
+        GUILayout.Space(6);
+
+        GUILayout.BeginHorizontal();
+        
+        // Avatar Box
+        Rect avatarRect = GUILayoutUtility.GetRect(96f, 96f, GUILayout.Width(96f), GUILayout.Height(96f));
+        GUI.color = new Color(0.08f, 0.08f, 0.15f, 1f);
+        GUI.Box(avatarRect, "", GUI.skin.box);
+        GUI.color = Color.white;
+
+        bool revealAvatar = (spyInfoLvl >= 2);
+        Texture2D mainCmdAvatar = null;
+        if (castle.zoneIndex == 3) mainCmdAvatar = GetTroopAvatarTexture("mage");
+        else if (castle.zoneIndex == 11) mainCmdAvatar = GetTroopAvatarTexture("archer");
+        else mainCmdAvatar = GetTroopAvatarTexture("warrior");
+
+        if (revealAvatar && mainCmdAvatar != null)
+        {
+            GUI.DrawTexture(avatarRect, mainCmdAvatar, ScaleMode.ScaleToFit);
+        }
+        else
+        {
+            GUIStyle qStyle = new GUIStyle(GUI.skin.label);
+            qStyle.fontSize = 42;
+            qStyle.fontStyle = FontStyle.Bold;
+            qStyle.alignment = TextAnchor.MiddleCenter;
+            qStyle.normal.textColor = Color.gray;
+            GUI.Label(avatarRect, "?", qStyle);
+        }
+
+        // Commander identity fields
+        GUILayout.BeginVertical();
+        string cmdClassRU = "Рыцарь-Воин";
+        string cmdClassEN = "Knight-Warrior";
+        string cmdClassDE = "Ritter-Krieger";
+        string cmdClassFR = "Chevalier-Guerrier";
+        string cmdClassES = "Caballero Guerrero";
+        string cmdClassPT = "Cavaleiro Guerreiro";
+        string cmdClassJA = "ナイトウォーリアー";
+        string cmdClassKO = "나이트 워리어";
+        string cmdClassZH = "重装骑士领主";
+
+        if (castle.zoneIndex == 3)
+        {
+            cmdClassRU = "Архимаг Зенита";
+            cmdClassEN = "Zenith Arch-Mage";
+            cmdClassDE = "Zenith Erzmagier";
+            cmdClassFR = "Archimage de Zénith";
+            cmdClassES = "Archimago del Cénit";
+            cmdClassPT = "Arquimago do Zênite";
+            cmdClassJA = "ゼニス・アークメイジ";
+            cmdClassKO = "제니스 아크메이지";
+            cmdClassZH = "至高神庭奥术大法师";
+        }
+        else if (castle.zoneIndex == 6)
+        {
+            cmdClassRU = "Паладин Света";
+            cmdClassEN = "Holy Paladin";
+            cmdClassDE = "Heiliger Paladin";
+            cmdClassFR = "Paladin Sacré";
+            cmdClassES = "Paladín Sagrado";
+            cmdClassPT = "Paladino Sagrado";
+            cmdClassJA = "ホーリーパラディン";
+            cmdClassKO = "홀리 팔라딘";
+            cmdClassZH = "圣光大审判骑士长";
+        }
+        else if (castle.zoneIndex == 11)
+        {
+            cmdClassRU = "Следопыт Пустошей";
+            cmdClassEN = "Wasteland Ranger";
+            cmdClassDE = "Wüstenläufer";
+            cmdClassFR = "Ranger des Terres Dévastées";
+            cmdClassES = "Ranger de los Páramos";
+            cmdClassPT = "Patrulheiro do Ermo";
+            cmdClassJA = "荒野のレンジャー";
+            cmdClassKO = "황무지 순찰대";
+            cmdClassZH = "荒野游侠神射手";
+        }
+
+        string cmdClass = GetText9(cmdClassRU, cmdClassEN, cmdClassDE, cmdClassFR, cmdClassES, cmdClassPT, cmdClassJA, cmdClassKO, cmdClassZH);
+        string displayCmdClass = (revealAvatar) ? cmdClass : "???";
+        string displayCmdLvl = (revealAvatar) ? $"{GetText9("Ур.", "Lvl", "St.", "Niv", "Niv", "Nív", "Lv", "레벨", "级")} {castle.aiCommanderLevel}" : "???";
+
+        GUILayout.Label($"<b>{GetText9("Класс:", "Class:", "Klasse:", "Classe :", "Clase:", "Classe:", "クラス:", "클래스:", "职业:")}</b> <color=yellow>{displayCmdClass}</color>", s_spyDetailLabelStyle);
+        GUILayout.Label($"<b>{GetText9("Уровень:", "Level:", "Stufe:", "Niveau :", "Nivel:", "Nível:", "レベル:", "레벨:", "等级:")}</b> <color=#FF8800>{displayCmdLvl}</color>", s_spyDetailLabelStyle);
+        
+        // Experience Bar
+        GUILayout.Space(4);
+        if (spyInfoLvl >= 2)
+        {
+            float xpProgress = 0.65f;
+            Rect xpBarRect = GUILayoutUtility.GetRect(240f, 15f, GUILayout.Width(240f), GUILayout.Height(15f));
+            GUI.color = Color.black;
+            GUI.DrawTexture(xpBarRect, Texture2D.whiteTexture);
+            GUI.color = new Color(0.12f, 0.58f, 0.95f, 0.85f); // blue-cyan neon fill
+            GUI.DrawTexture(new Rect(xpBarRect.x + 1, xpBarRect.y + 1, (xpBarRect.width - 2) * xpProgress, xpBarRect.height - 2), Texture2D.whiteTexture);
+            GUI.color = Color.white;
+            GUI.Label(xpBarRect, $"XP: 65% ({castle.aiCommanderLevel * 650} / {castle.aiCommanderLevel * 1000})", s_spyBarTextStyle);
+        }
+        else
+        {
+            GUILayout.Label("XP: <color=gray>??? [Low Intel]</color>", s_spyDetailLabelStyle);
+        }
+        GUILayout.EndVertical();
+        GUILayout.EndHorizontal();
+
+        GUILayout.EndVertical(); // End Bento Card 1
+
+        GUILayout.Space(6);
+
+        // Bento Card 2: RPG Attributes
+        GUILayout.BeginVertical(s_spyCardBgStyle);
+        GUILayout.Label(GetText9(
+            "⚔️ Основные Характеристики", "⚔️ RPG Core Attributes",
+            "⚔️ RPG-Attribute", "⚔️ Attributs RPG core",
+            "⚔️ Atributos RPG básicos", "⚔️ Atributos RPG básicos",
+            "⚔️ 能力値・ステータス", "⚔️ 핵심 사령관 스탯",
+            "⚔️ 将领核心战斗属性总览"
+        ), s_spySectionTitleStyle);
+        GUILayout.Space(4);
+
+        int baseStr = 6, baseAgi = 6, baseInt = 6, baseSta = 6;
+        if (castle.zoneIndex == 3) { baseStr = 7; baseAgi = 11; baseInt = 19; baseSta = 11; } // Mage
+        else if (castle.zoneIndex == 11) { baseStr = 11; baseAgi = 17; baseInt = 9; baseSta = 13; } // Archer
+        else { baseStr = 17; baseAgi = 12; baseInt = 6; baseSta = 17; } // Warrior
+
+        baseStr += castle.aiCommanderLevel * 2;
+        baseAgi += castle.aiCommanderLevel * 2;
+        baseInt += castle.aiCommanderLevel * 2;
+        baseSta += castle.aiCommanderLevel * 2;
+
+        string strVal = (spyInfoLvl >= 3) ? baseStr.ToString() : "??";
+        string agiVal = (spyInfoLvl >= 3) ? baseAgi.ToString() : "??";
+        string intVal = (spyInfoLvl >= 3) ? baseInt.ToString() : "??";
+        string staVal = (spyInfoLvl >= 3) ? baseSta.ToString() : "??";
+
+        GUILayout.BeginHorizontal();
+        GUILayout.BeginVertical(GUILayout.Width(180f));
+        GUILayout.Label($"💪 {GetText9("Сила:", "Strength:", "Stärke:", "Force:", "Fuerza:", "Força:", "力:", "힘:", "力量:")} <color=#FF5555>{strVal}</color>", s_spyDetailLabelStyle);
+        GUILayout.Label($"⚡ {GetText9("Ловкость:", "Agility:", "Agilität:", "Agilité:", "Agilidad:", "Agilidade:", "素早さ:", "민첩:", "敏捷:")} <color=#55FF55>{agiVal}</color>", s_spyDetailLabelStyle);
+        GUILayout.EndVertical();
+
+        GUILayout.BeginVertical(GUILayout.Width(180f));
+        GUILayout.Label($"🔮 {GetText9("Интеллект:", "Intelligence:", "Intelligenz:", "Intelligence:", "Inteligencia:", "Inteligência:", "知力:", "지능:", "智力:")} <color=#5555FF>{intVal}</color>", s_spyDetailLabelStyle);
+        GUILayout.Label($"🛡️ {GetText9("Выносливость:", "Stamina:", "Ausdauer:", "Stamina:", "Aguante:", "Stamina:", "耐久:", "체력:", "耐力:")} <color=#FFFF55>{staVal}</color>", s_spyDetailLabelStyle);
+        GUILayout.EndVertical();
+        GUILayout.EndHorizontal();
+
+        GUILayout.EndVertical(); // End Bento Card 2
+
+        GUILayout.Space(6);
+
+        // Bento Card 3: Equipped Gear
+        GUILayout.BeginVertical(s_spyCardBgStyle);
+        GUILayout.Label(GetText9(
+            "🛡️ Надетое Снаряжение", "🛡️ Equipped Mannequin & Gear",
+            "🛡️ Ausrüstung slots", "🛡️ Équipement équipé",
+            "🛡️ Equipo equipado", "🛡️ Equipamento equipado",
+            "🛡️ 現在の装備・防具", "🛡️ 장착한 방어구 및 무기",
+            "🛡️ 主将防身重装与传世神兵"
+        ), s_spySectionTitleStyle);
+        GUILayout.Space(4);
+
+        string gearWeapon = "???";
+        string gearArmor = "???";
+        string gearBoots = "???";
+        string gearShield = "???";
+
+        if (spyInfoLvl >= 3)
+        {
+            if (castle.aiArmorTier == 1)
+            {
+                gearWeapon = GetText9("Бронзовый Меч", "Bronze Sword", "Bronzeschwert", "Épée de bronze", "Espada de bronce", "Espada de Bronze", "ブロンズソード", "청동 검", "青铜阔剑");
+                gearArmor = GetText9("Кожаный Нагрудник", "Leather Chest", "Lederbrustplatte", "Plastron de cuir", "Peto de cuero", "Colete de Couro", "レザーチェスト", "가죽 갑옷", "皮质护胸甲");
+            }
+            else if (castle.aiArmorTier == 2)
+            {
+                gearWeapon = GetText9("Стальной Молот", "Steel Mace", "Stahlstreitkolben", "Masse d'acier", "Maza de acero", "Maça de Aço", "スチールメイス", "강철 메이스", "精钢战锤");
+                gearArmor = GetText9("Кольчужный Доспех", "Chainmail", "Kettenhemd", "Cotte de mailles", "Cota de malla", "Cota de Malha", "チェインメイル", "사슬 갑옷", "精炼锁子甲");
+            }
+            else if (castle.aiArmorTier == 3)
+            {
+                gearWeapon = GetText9("Мифриловый Двуручник", "Mithril Greatsword", "Mithril-Zweihänder", "Espadon de mithril", "Espadón de mitril", "Montante de Mitril", "ミスリル・グレートソード", "미스릴 대검", "秘银双手巨剑");
+                gearArmor = GetText9("Латы Рыцаря", "Plate Armor", "Plattenrüstung", "Harnois de plaques", "Armadura de placas", "Armadura de Placa", "プレートアーマー", "판금 갑옷", "圣殿骑士重铠");
+            }
+            else
+            {
+                gearWeapon = GetText9("Клинок Зенита", "Divine Zenith Blade", "Göttliche Zenith-Klinge", "Lame de Zénith Divine", "Espada del Cénit Divina", "Espada do Zênite Divina", "神聖ゼニスブレード", "신성 제니스 블레이드", "至臻封神裁决之刃");
+                gearArmor = GetText9("Броня Небожителя", "Celestial Armor", "Himmlische Rüstung", "Armure Céleste", "Armadura Celestial", "Armadura Celestial", "セレスティアルアーマー", "천상 갑옷", "圣光天神不灭金铠");
+            }
+
+            if (spyInfoLvl < 4)
+            {
+                gearBoots = "???";
+                gearShield = "???";
+            }
+            else
+            {
+                gearBoots = GetText9("Кованые Сапоги", "Plated Sabatons", "Plattenschuhe", "Sabatons de plaques", "Sabatones de placas", "Soleretes de Placa", "サバトン", "철 판금 장화", "精铁重装护足");
+                gearShield = GetText9("Башенный Щит", "Tower Shield", "Turmschild", "Écu pavois", "Escudo de torre", "Escudo Torre", "タワーシールド", "타워 실드", "巨龙不灭重型塔盾");
+            }
+        }
+
+        string[] gearSlots = {
+            GetText9("Оружие", "Weapon", "Waffe", "Arme", "Arma", "Arma", "武器", "무기", "武器"),
+            GetText9("Доспех", "Armor", "Rüstung", "Armure", "Armadura", "Armadura", "鎧", "갑옷", "铠甲"),
+            GetText9("Сапоги", "Boots", "Stiefel", "Bottes", "Botas", "Botas", "靴", "장화", "战靴"),
+            GetText9("Щит", "Shield", "Schild", "Bouclier", "Escudo", "Escudo", "盾", "방패", "副盾")
+        };
+        string[] gearNames = { gearWeapon, gearArmor, gearBoots, gearShield };
+
+        for (int s = 0; s < 4; s++)
+        {
+            GUILayout.BeginHorizontal(GUI.skin.box);
+            Rect slotRect = GUILayoutUtility.GetRect(24f, 24f, GUILayout.Width(24f), GUILayout.Height(24f));
+            GUI.color = new Color(0.1f, 0.12f, 0.2f, 1f);
+            GUI.DrawTexture(slotRect, Texture2D.whiteTexture);
+            GUI.color = Color.white;
+
+            string slotEmoji = "❓";
+            if (spyInfoLvl >= (s < 2 ? 3 : 4))
+            {
+                if (s == 0) slotEmoji = "🗡️";
+                else if (s == 1) slotEmoji = "👕";
+                else if (s == 2) slotEmoji = "👢";
+                else if (s == 3) slotEmoji = "🛡️";
+            }
+            
+            GUIStyle sEmojiS = new GUIStyle(GUI.skin.label);
+            sEmojiS.alignment = TextAnchor.MiddleCenter;
+            sEmojiS.fontSize = 12;
+            GUI.Label(slotRect, slotEmoji, sEmojiS);
+
+            string gDisp = gearNames[s];
+            string colorHex = gDisp.Contains("???") ? "#777777" : (castle.aiArmorTier == 4 ? "#FF00FF" : (castle.aiArmorTier == 3 ? "#FF9900" : "#00FFFF"));
+
+            GUILayout.BeginVertical();
+            GUIStyle sLbl = new GUIStyle(GUI.skin.label);
+            sLbl.fontSize = 9;
+            sLbl.normal.textColor = Color.gray;
+            GUILayout.Label(gearSlots[s], sLbl);
+
+            GUIStyle nameLbl = new GUIStyle(GUI.skin.label);
+            nameLbl.fontSize = 11;
+            nameLbl.normal.textColor = Color.white;
+            GUILayout.Label($"<color={colorHex}>{gDisp}</color>", s_spyDetailLabelStyle);
+            GUILayout.EndVertical();
+
+            GUILayout.EndHorizontal();
+        }
+
+        GUILayout.EndVertical(); // End Bento Card 3
+
+        GUILayout.EndVertical(); // End Left Column
+
+
+        // ==================== RIGHT COLUMN: SECONDARY HEROES & GARRISON (Width: 395f) ====================
+        GUILayout.BeginVertical(GUILayout.Width(395f));
+
+        // Bento Card 4: Secondary Garrison Commanders
+        GUILayout.BeginVertical(s_spyCardBgStyle);
+        GUILayout.Label(GetText9(
+            "👥 Вторичные Военачальники Крепости", "👥 Secondary Garrison Commanders",
+            "👥 Sekundäre Garnisonskommandanten", "👥 Commandants de garnison secondaires",
+            "👥 Comandantes de guarnición secundarios", "👥 Comandantes da guarnição secundários",
+            "👥 駐屯副将・随行英雄リスト", "👥 가리온성 주둔 부장 사령관",
+            "👥 麾下驻防守城副将总览"
+        ), s_spySectionTitleStyle);
+        GUILayout.Space(6);
+
+        int simpleHeroCount = castle.level >= 4 ? 2 : (castle.level >= 2 ? 1 : 0);
+
+        if (spyInfoLvl == 1)
+        {
+            GUILayout.Label($" • {GetText9("Количество военачальников:", "Commanders count:", "Anzahl Kommandanten:", "Nombre de commandants :", "Cantidad de comandantes:", "Quantidade de comandantes:", "随行将領数:", "부장 영웅 수:", "麾下副将将领数:")} <color=gray>??? [Low Intel]</color>", s_spyDetailLabelStyle);
+        }
+        else
+        {
+            if (simpleHeroCount == 0)
+            {
+                GUILayout.Label($" • <color=gray>{GetText9("Вторичных военачальников нет", "No secondary commanders", "Keine sekundären Kommandanten", "Aucun commandant secondaire", "Sin comandantes secundarios", "Sem comandantes secundários", "副将・随行英雄はいません", "성내에 배속된 부장이 없습니다", "本城堡未部署驻防副将")}</color>", s_spyDetailLabelStyle);
+            }
+            else
+            {
+                for (int h = 0; h < simpleHeroCount; h++)
+                {
+                    GUILayout.BeginHorizontal(GUI.skin.box);
+                    
+                    // Mini avatar box
+                    Rect miniAvRect = GUILayoutUtility.GetRect(36f, 36f, GUILayout.Width(36f), GUILayout.Height(36f));
+                    GUI.color = new Color(0.1f, 0.1f, 0.18f, 1f);
+                    GUI.DrawTexture(miniAvRect, Texture2D.whiteTexture);
+                    GUI.color = Color.white;
+
+                    Texture2D subHeroAv = null;
+                    string subClassName = "";
+                    if (h == 0)
+                    {
+                        subHeroAv = GetTroopAvatarTexture(castle.zoneIndex == 3 ? "paladin" : "archer");
+                        subClassName = castle.zoneIndex == 3 ? GetText9("Защитник Света", "Shield of Light", "Schild des Lichts", "Bouclier de Lumière", "Escudo de Luz", "Escudo de Luz", "光の盾", "빛의 성방패", "誓约守卫圣骑士") :
+                                                              GetText9("Дозорный", "Scout Ranger", "Späher", "Ranger Éclaireur", "Explorador", "Explorador", "偵察兵", "정찰 순찰자", "远哨穿林神射手");
+                    }
+                    else
+                    {
+                        subHeroAv = GetTroopAvatarTexture(castle.zoneIndex == 11 ? "necromancer" : "mage");
+                        subClassName = castle.zoneIndex == 11 ? GetText9("Чернокнижник", "Void Warlock", "Hexenmeister", "Démoniste du Vide", "Brujo del Vacío", "Bruxo do Vazio", "ウォーロック", "공허 흑마법사", "暗影死灵大法师") :
+                                                               GetText9("Чародей", "Elemental Spellweaver", "Elementarmagier", "Sorcier", "Hechicero", "Feiticeiro", "スペルウィーバー", "원소 마법사", "秘教自然大法师");
+                    }
+
+                    if (spyInfoLvl >= 3 && subHeroAv != null)
+                    {
+                        GUI.DrawTexture(miniAvRect, subHeroAv, ScaleMode.ScaleToFit);
+                    }
+                    else
+                    {
+                        GUI.Label(miniAvRect, "?", s_spyBoxLabelStyle);
+                    }
+
+                    GUILayout.BeginVertical();
+                    string secHeroName = h == 0 ? GetText9("Лейтенант Вальд", "Lieutenant Vald", "Leutnant Vald", "Lieutenant Vald", "Teniente Vald", "Tenente Vald", "ヴァルド副官", "발드 부관", "驻城校尉 华德") :
+                                                 GetText9("Советник Элдрик", "Advisor Eldric", "Berater Eldric", "Conseiller Eldric", "Asesor Eldric", "Assessor Eldric", "エルドリック顧問", "엘드릭 고문", "军师法师 埃尔德里克");
+
+                    string subHeroLvlStr = (spyInfoLvl >= 3) ? $"{GetText9("Ур.", "Lvl", "St.", "Niv", "Niv", "Nív", "Lv", "레벨", "级")} {Mathf.Max(1, castle.aiCommanderLevel - 2)}" : "???";
+
+                    GUILayout.Label($"<b>{secHeroName}</b> ({subHeroLvlStr})", s_spyDetailLabelStyle);
+                    
+                    if (spyInfoLvl >= 3)
+                    {
+                        GUILayout.Label($"🏷️ {GetText9("Класс:", "Class:", "Klasse:", "Classe :", "Clase:", "Classe:", "クラス:", "클래스:", "职业:")} <color=cyan>{subClassName}</color>", s_spyDetailLabelStyle);
+                    }
+                    else
+                    {
+                        GUILayout.Label($"🏷️ {GetText9("Класс:", "Class:", "Klasse:", "Classe :", "Clase:", "Classe:", "クラス:", "클래스:", "职业:")} <color=gray>??? [Locked]</color>", s_spyDetailLabelStyle);
+                    }
+                    GUILayout.EndVertical();
+
+                    GUILayout.EndHorizontal();
+                }
+            }
+        }
+
+        GUILayout.EndVertical(); // End Bento Card 4
+
+        GUILayout.Space(6);
+
+        // Bento Card 5: Garrison Troops & Cohorts
+        GUILayout.BeginVertical(s_spyCardBgStyle);
+        GUILayout.Label(GetText9(
+            "⚔️ Гарнизон и Регулярные Войска", "⚔️ Static Garrison & Regular Army",
+            "⚔️ Garrison & Truppen", "⚔️ Garrison et armée régulière",
+            "⚔️ Guarnición y ejército regular", "⚔️ Guarnição e exército regular",
+            "⚔️ 要塞防衛駐屯兵団・配下軍勢", "⚔️ 수비대 주둔 병력 목록",
+            "⚔️ 城堡城防防御常备军队与兵种编制"
+        ), s_spySectionTitleStyle);
+        GUILayout.Space(6);
+
+        int totalTroops = 100 * castle.level + (castle.aiCommanderLevel * 30);
+        
+        if (spyInfoLvl == 1)
+        {
+            GUILayout.Label($"📈 {GetText9("Общая численность:", "Total Garrison:", "Garnisonsstärke:", "Effectif total :", "Fuerza total:", "Força total:", "総防衛兵力:", "총 수비대 병력:", "驻防守军总兵力:")} <color=yellow>~{totalTroops - 50} - {totalTroops + 80} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "人")}</color>", s_spyDetailLabelStyle);
+            GUILayout.Label($"⚠️ <color=gray>{GetText9("Детальный состав засекречен. Повысьте уровень шпионажа!", "Detailed composition classified. Raise intelligence level!", "Details klassifiziert. Erhöhen Sie das Spionageniveau!", "Composition détaillée secrète. Augmentez le niveau !", "Composición clasificada. ¡Aumenta el nivel de espionaje!", "Composição secreta. Aumente o nível de espionagem!", "詳細な内訳データは不明です。スパイ活動を強化してください！", "상세 병력 편성 잠금. 첩보 능력을 더 강화하십시오!", "编制详情受战雾阻挡，建议往城堡派遣更高阶 the 探子！")}</color>", s_spyDetailLabelStyle);
+        }
+        else if (spyInfoLvl == 2)
+        {
+            GUILayout.Label($"📈 {GetText9("Общая численность:", "Total Garrison:", "Garnisonsstärke:", "Effectif total :", "Fuerza total:", "Força total:", "総防衛兵力:", "총 수비대 병력:", "驻防守军总兵力:")} <color=yellow>{totalTroops} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "人")}</color>", s_spyDetailLabelStyle);
+            GUILayout.Space(4);
+            GUILayout.Label($"• T1 {GetText9("Ополченцы:", "Recruits:", "Rekruten:", "Recrues :", "Reclutas:", "Recrutas:", "T1 軽装歩兵:", "T1 초급 보병:", "T1 常备民兵:")} <color=cyan>~{(int)(totalTroops * 0.7f)}</color>", s_spyDetailLabelStyle);
+            GUILayout.Label($"• T2 {GetText9("Гвардейцы:", "Guards:", "Wachen:", "Gardes :", "Guardias:", "Guardas:", "T2 常備重装兵:", "T2 정예 경비대:", "T2 坚毅卫队:")} <color=cyan>~{(int)(totalTroops * 0.3f)}</color>", s_spyDetailLabelStyle);
+        }
+        else if (spyInfoLvl == 3)
+        {
+            GUILayout.Label($"📈 {GetText9("Общая численность:", "Total Garrison:", "Garnisonsstärke:", "Effectif total :", "Fuerza total:", "Força total:", "総防衛兵力:", "총 수비대 병력:", "驻防守军总兵力:")} <color=yellow>{totalTroops} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "人")}</color>", s_spyDetailLabelStyle);
+            GUILayout.Space(4);
+            int countT1 = (int)(totalTroops * 0.6f);
+            int countT2 = (int)(totalTroops * 0.3f);
+            int countT3 = totalTroops - countT1 - countT2;
+
+            GUILayout.Label($"⚔️ T1 {GetText9("Пехота / Луки:", "Infantry / Archers:", "Infanterie / Bögen:", "Infanterie / Arcs :", "Infantería / Arcos:", "Infantaria / Arcos:", "T1 軽装兵 / 射手:", "T1 보병 / 궁수:", "T1 步射军团:")} <color=cyan>{countT1} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "人")}</color>", s_spyDetailLabelStyle);
+            GUILayout.Label($"🐎 T2 {GetText9("Кавалерия / Рыцари:", "Cavalry / Knights:", "Kavallerie / Ritter:", "Cavalerie / Chevaliers :", "Caballería / Caballeros:", "Cavalaria / Cavaleiros:", "T2 騎兵 / 騎士:", "T2 기병 / 기사:", "T2 铁骑骑士团:")} <color=cyan>{countT2} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "人")}</color>", s_spyDetailLabelStyle);
+            GUILayout.Label($"🪄 T3 {GetText9("Маги / Клирики:", "Mages / Clerics:", "Magier / Kleriker:", "Mages / Clercs :", "Magos / Clérigos:", "Magos / Clérigos:", "T3 魔術師 / 神官:", "T3 성직 마법사:", "T3 祭司法师团:")} <color=cyan>{countT3} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "人")}</color>", s_spyDetailLabelStyle);
+        }
+        else
+        {
+            // spyInfoLvl >= 4: ABSOLUTE MAX INTEL DETAILED LIST (Matches fourth screenshot perfectly!)
+            GUILayout.Label($"📈 {GetText9("Точная численность:", "Exact Garrison Strength:", "Genaue Garnisonsstärke:", "Effectif exact :", "Fuerza exacta:", "Força exata:", "正確な駐屯軍勢:", "정밀 사령부 주둔병력:", "城堡常备守军各师团精确人数:")} <color=#55FF55>{totalTroops} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "名将士")}</color>", s_spyDetailLabelStyle);
+            GUILayout.Space(6);
+
+            // Dynamically define what cohorts guard based on castle zone & level
+            string[] troopIds;
+            string[] troopNames;
+            string[] troopAbilities;
+            int[] troopCounts;
+            int[] troopLvls;
+
+            if (castle.zoneIndex == 3) // Mage Castle
+            {
+                troopIds = new string[] { "mage", "necromancer", "paladin", "dragon" };
+                troopNames = new string[] {
+                    GetText9("Орден Магов", "Order of Mages", "Orden der Magier", "Ordre des Mages", "Orden de Magos", "Ordem de Magos", "ウィザード魔導団", "마법 결사대", "奥术编队法师"),
+                    GetText9("Чернокнижники", "Acolyte Necromancers", "Nekromanten", "Nécromanciens", "Nigromantes", "Necromantes", "ネクロマンサー", "사령마법 학도", "暗黑死灵祭司"),
+                    GetText9("Охранные Рыцари", "Temple Guardians", "Tempelwächter", "Gardiens du Temple", "Guardianes de Templo", "Guardas de Templo", "テンプルガー디アン", "사원 수호 성기사", "誓约守卫骑士"),
+                    GetText9("Дракон Пустоты", "Ethereal Drake", "Ätherischer Drache", "Dragon Éthéré", "Dragón Etéreo", "Dragão Etéreo", "エテールドラゴン", "에테르 공허룡", "终焉虚空巨龙")
+                };
+                troopAbilities = new string[] {
+                    GetText9("Сжигание Маны, Огненный Шар", "Mana Burn, Fireball", "Mana-Burn, Fireball", "Brûlure de mana", "Quemadura de maná", "Queima de mana", "マナバーン、ファイアボール", "마나 연소, 파이어볼", "法力燃烧, 爆裂火球"),
+                    GetText9("Поднятие Мертвых, Проклятие", "Raise Dead, Decay Curse", "Tote erwecken, Fluch", "Animation des morts", "Levantar muertos", "Ressuscitar mortos", "レイズデッド、カース", "시체 되살리기, 부패 저주", "亡者复苏, 衰弱诅咒"),
+                    GetText9("Святая Аура, Железный Щит", "Holy Devotion, Iron Wall", "Heilige Hingabe, Wand", "Dévotion sacrée", "Devoción sagrada", "Devoção sagrada", "ホーリーシールド、アイアンウォール", "성스러운 오ра, 철벽 방어", "圣光护体, 圣印铁壁"),
+                    GetText9("Дыхание Бездны, Фазовый Сдвиг", "Void Breath, Phase Shift", "Abgrundodem, Phasenverschiebung", "Souffle du Vide", "Aliento del Vacío", "Sopro do Vazio", "ボイドブレス、フェーズシフト", "공허의 숨결, 차원 이탈", "毁灭虚空吐息, 空间跳跃")
+                };
+                troopCounts = new int[] { (int)(totalTroops * 0.45f), (int)(totalTroops * 0.25f), (int)(totalTroops * 0.2f), Mathf.Max(1, totalTroops / 150) };
+                troopLvls = new int[] { 3, 3, 2, 4 };
+            }
+            else if (castle.zoneIndex == 11) // Archer Castle
+            {
+                troopIds = new string[] { "archer", "centaur", "griffin", "wasteland_serpent" };
+                troopNames = new string[] {
+                    GetText9("Стрелки Пустошей", "Wasteland Marksmen", "Scharfschützen", "Tireurs d'élite", "Tiradores de Élite", "Atiradores de Elite", "荒野のスナイパー", "황무지 명사수대", "荒野疾风巡林射手"),
+                    GetText9("Кентавры-Рейнджеры", "Centaur Rangers", "Zentauren-Waldläufer", "Rangers Centaures", "Exploradores Centauros", "Exploradores Centauros", "ケンタウルスレンジャー", "켄타우로스 순찰대", "半人马追猎射手"),
+                    GetText9("Королевские Грифоны", "Royal Sky-Griffins", "Königliche Greifen", "Griffons Royaux", "Grifos Reales", "Grifos Reais", "ロイヤルグリフォン", "황실 스카이 그리핀", "帝国皇家铁羽狮鹫"),
+                    GetText9("Песчаный Змей", "Apex Dunes Serpent", "Wüstenriesenschlange", "Serpent des Dunes", "Serpiente de las Dunas", "Serpente das Dunas", "サンドワーム", "황사 사막독사", "极度深渊沙海巨蟒")
+                };
+                troopAbilities = new string[] {
+                    GetText9("Критический Выстрел, Точность", "Eagle Strike, True Shot", "Adlerschlag, Volltreffer", "Coup de l'aigle", "Golpe de águila", "Golpe de águia", "イーグルストライк、必中撃", "독수리 일격, 명사수", "极寒锁敌, 破甲重箭"),
+                    GetText9("Стрельба на Ходу, Быстрый Бег", "Run & Gun, Swift Fleeting", "Schießen im Lauf, Flucht", "Tir en mouvement", "Disparar en carrera", "Atirar em movimento", "ヒット＆ラン、韋駄天", "기동 사격, 신속 이동", "游击飞射, 迅捷疾行"),
+                    GetText9("Пикирующий Удар, Сбивание ног", "Diving Slash, Air Dominance", "Sturzflug, Luftherrschaft", "Choc en piqué", "Corte en picado", "Corte em mergulho", "ダイブスラッシュ、空中支配", "급강하 타격, 공중 제압", "俯冲爪击, 气流压制"),
+                    GetText9("Ядовитый Плевок, Подземный Удар", "Viper Spit, Burrow Strike", "Giftspeichel, Tunnelangriff", "Crachat venimeux", "Escupitajo venenoso", "Cuspido venenoso", "バイパースピット、潜地襲撃", "독사 침뱉기, 잠행 습격", "剧毒腐蚀撕咬, 潜地突袭")
+                };
+                troopCounts = new int[] { (int)(totalTroops * 0.5f), (int)(totalTroops * 0.25f), (int)(totalTroops * 0.2f), Mathf.Max(1, totalTroops / 150) };
+                troopLvls = new int[] { 3, 2, 3, 4 };
+            }
+            else // Warrior / Paladin Castles
+            {
+                troopIds = new string[] { "warrior", "paladin", "cavalry", "overlord" };
+                troopNames = new string[] {
+                    GetText9("Гвардия Цитадели", "Citadel Heavy Infantry", "Schwere Infanterie", "Infanterie Lourde", "Infantería Pesada", "Infantaria Pesada", "要塞重装歩兵", "성채 중갑 보병대", "城堡重装大剑步兵"),
+                    GetText9("Храмовники Света", "Templars of Light", "Licht-Templer", "Templiers de Lumière", "Templarios de la Luz", "Templários da Luz", "光の神殿騎士団", "빛의 성전 기사단", "圣光荣耀重铠骑兵"),
+                    GetText9("Авангардная Кавалерия", "Royal Vanguard Cavalry", "Vanguard-Kavallerie", "Cavalerie d'Avant-garde", "Caballería de Vanguardia", "Cavalaria de Vanguarda", "ヴァンガード重騎兵", "왕실 선봉 기병대", "皇家帝国铁甲游骑"),
+                    GetText9("Вождь Легиона", "Legion Iron Overlord", "Eisen-Overlord", "Suprême de Fer", "Señor de Hierro", "Senhor de Ferro", "アイアンオーバーロード", "군단 철혈 지배자", "深渊熔岩军团霸主")
+                };
+                troopAbilities = new string[] {
+                    GetText9("Железный Щит, Гневная Атака", "Phalanx Shield, Angry Bash", "Phalanx-Schild, Hieb", "Bouclier de phalange", "Escudo de falange", "Escudo de falange", "ファランクスシールド、バッシュ", "방진 방패, 성난 후려치기", "方阵壁垒, 怒火狂击"),
+                    GetText9("Молитва Жизни, Изгнание", "Lay on Hands, Exorcism Aura", "Händeauflegen, Aura", "Imposition des mains", "Imposición de manos", "Imposição das mãos", "レイオンハンズ、除霊の輝き", "안수기도, 퇴마 수호", "圣光救赎, 驱邪圣怒"),
+                    GetText9("Рыцарский Таран, Смятие рядов", "Heavy Trample, Lance Charge", "Ritter-Trampeln, Ansturm", "Piétinement lourd", "Atropello pesado", "Atropelamento pesado", "ヘбиートランプル、チャージ", "묵직한 짓밟기, 랜스 돌격", "战马践踏, 骑枪突击"),
+                    GetText9("Раскол Земли, Свирепый Крик", "Earthquake Shock, Battle Cry", "Earthquake Shock, Battle Cry", "Secousse sismique", "Sacudida sísmica", "Choque de terremoto", "アースクエイク、咆哮", "대지 균열, 전쟁의 함성", "地裂山崩震荡, 战神狂哮")
+                };
+                troopCounts = new int[] { (int)(totalTroops * 0.45f), (int)(totalTroops * 0.25f), (int)(totalTroops * 0.25f), Mathf.Max(1, totalTroops / 150) };
+                troopLvls = new int[] { 2, 3, 3, 4 };
+            }
+
+            for (int t = 0; t < troopIds.Length; t++)
+            {
+                GUILayout.BeginHorizontal(GUI.skin.box);
+                
+                // Avatar representation for troop row
+                Rect tAvRect = GUILayoutUtility.GetRect(40f, 40f, GUILayout.Width(40f), GUILayout.Height(40f));
+                GUI.color = new Color(0.12f, 0.12f, 0.22f, 1f);
+                GUI.DrawTexture(tAvRect, Texture2D.whiteTexture);
+                GUI.color = Color.white;
+
+                Texture2D tAv = GetTroopAvatarTexture(troopIds[t]);
+                if (tAv != null)
+                {
+                    GUI.DrawTexture(tAvRect, tAv, ScaleMode.ScaleToFit);
+                }
+                else
+                {
+                    GUI.Label(tAvRect, "⚔️", s_spyBoxLabelStyle);
+                }
+
+                GUILayout.BeginVertical();
+                GUILayout.BeginHorizontal();
+                GUILayout.Label($"<b>{troopNames[t]}</b>", s_spyDetailLabelStyle);
+                GUILayout.FlexibleSpace();
+                GUILayout.Label($"<color=#55FF55>x{troopCounts[t]} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "名将士")}</color>", s_spyDetailLabelStyle);
+                GUILayout.EndHorizontal();
+
+                GUIStyle tSubStyle = new GUIStyle(GUI.skin.label);
+                tSubStyle.fontSize = 10;
+                tSubStyle.normal.textColor = Color.gray;
+                GUILayout.Label($"{GetText9("Ранг:", "Rank:", "Rang:", "Rang :", "Rango:", "Rango:", "兵級:", "클래스 티어:", "兵种等级:")} T{troopLvls[t]}  •  💡 {GetText9("Умения:", "Traits:", "Fähigkeiten:", "Spécialités :", "Habilidades:", "Habilidades:", "特技:", "부대 특성:", "主要能力:")} <color=orange>{troopAbilities[t]}</color>", tSubStyle);
+                GUILayout.EndVertical();
+
+                GUILayout.EndHorizontal();
+            }
+        }
+
+        GUILayout.EndVertical(); // End Bento Card 5
+
+        GUILayout.EndVertical(); // End Right Column
+
+        GUILayout.EndHorizontal();
+
+        GUILayout.EndScrollView();
+
+        GUILayout.Space(10);
+        
+        // Footer: Close Button
+        GUI.backgroundColor = Color.red;
+        if (GUILayout.Button(GetText9("Закрыть Отчет", "Close Report", "Bericht schließen", "Fermer le rapport", "Cerrar informe", "Fechar relatório", "報告書を閉じる", "보고서 닫기", "关闭情报窗口"), GUILayout.Height(32)))
+        {
+            showSpyReportPopup = false;
+        }
         GUI.backgroundColor = Color.white;
     }
 
