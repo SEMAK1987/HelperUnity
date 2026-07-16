@@ -1,4 +1,4 @@
-# 🤖 AI Assistant - Disaster Recovery & Replica Reconstruction Guide (v18.11.24)
+# 🤖 AI Assistant - Disaster Recovery & Replica Reconstruction Guide (v18.11.26)
 
 ## 📌 Introduction & Purpose
 This document serves as a complete **Disaster Recovery Blueprint** for the **Unity & Blender AI Assistant (Fate Continent Assistant)**. If the application environment is lost, corrupted, or needs to be redeployed on a different server or account, this guide contains the exact visual and functional specifications, UI layouts, styling guidelines, and architectural details to rebuild the application from scratch to match the attached screenshot.
@@ -87,15 +87,16 @@ To run this application, the following backend routes and socket bridges must be
 4. **/api/database/update**
    - Reads, validates, and persists user configurations in local JSON files like `knowledge_base.json` or `ccgs_project_blueprint.json`.
 
-### 5. Espionage & Intel Report Mechanics (v18.11.24)
+### 5. Espionage & Intel Report Mechanics (v18.11.26)
 - **Spy Network Button**: Renders next to the player's primary hero status card (HUD) once at least one enemy castle has been successfully spied.
 - **Scouting Cost & Formula**:
   - Requires Castle Level 2 to unlock. Cost = `100 * Level` gold (integers).
   - Success chance: `60 + (PlayerCastleLevel - 2) * 15`, capped at `100%`.
-- **Information Depth Levels**:
-  - **Level 2 (Default)**: Basic Garrison power count, secondary hero count, commander class and level.
-  - **Level 3**: Garrison breakdown by T1, T2, and elite troops (T3+), commander worn weapon & armor details, secondary heroes details.
-  - **Level 4 (Max Info)**: Full garrison listing of all tiers (T1-T4), detailed listing of secondary heroes with names and levels, exact commander equipment slots (weapon, armor, boots, shield), precise listing of troops currently attached to both main and secondary heroes.
+- **Information Depth Levels & Visual Grids**:
+  - **Level 2 (Default)**: Basic Garrison power count, secondary hero count, commander class and level. Displays experience progress bars and active/passive skill cards.
+  - **Level 3**: Garrison breakdown by T1, T2, and elite troops (T3+), commander worn weapon & armor details, secondary heroes details. Adds high-density visual grids for inventory slots and equipment slots.
+  - **Level 4 (Max Info)**: Full garrison listing of all tiers (T1-T4), detailed listing of secondary heroes with names and levels, exact commander equipment slots (helmet, armor, boots, shield, ring, belt, shoulders, weapon) shown on an anatomical grid of square buttons, and precise listing of troop cohorts with experience ranks.
+- **Spy Report Persistence**: Scouting a new castle discards the previous spy report context while keeping the current spy results cleanly cached in local PlayerPrefs.
 - **Multilingual Support**: Supports 9 languages (RU, EN, DE, FR, ES, PT, JA, KO, ZH) natively using language-adaptive prefixes and `GetText9` helpers.
 
 ---

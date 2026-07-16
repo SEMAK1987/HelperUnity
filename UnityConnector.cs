@@ -1,6 +1,6 @@
-// [MULTILINGUAL EXPANSION & DISASTER RECOVERY v18.11.24]
+// [TACTICAL LANDING LEVEL SYNC v18.11.26]
 // Unity Connector for Quantum AI Assistant
-// Updated: 2026-07-04 (Synced with Stable v18.11.24)
+// Updated: 2026-07-16 (Synced with Stable v18.11.26)
 
 #if UNITY_EDITOR
 using UnityEngine;
@@ -16,7 +16,7 @@ namespace AI_Assistant_Quantum
         private string prompt = "";
         private string serverUrl = "http://localhost:3000";
         private Mode mode = Mode.Online;
-        private string status = "Ready for Quantum Manifestation v18.11.24";
+        private string status = "Ready for Quantum Manifestation v18.11.26";
         private bool isProcessing = false;
 
         public enum Mode { Online, Offline, NoInternet }
@@ -29,7 +29,7 @@ namespace AI_Assistant_Quantum
 
         private void OnGUI()
         {
-            GUILayout.Label("v18.11.24 - Multilingual Expansion & Disaster Recovery", EditorStyles.boldLabel);
+            GUILayout.Label("v18.11.25 - Tactical Landing Level Sync", EditorStyles.boldLabel);
             
             serverUrl = EditorGUILayout.TextField("Server URL", serverUrl);
             mode = (Mode)EditorGUILayout.EnumPopup("Mode", mode);

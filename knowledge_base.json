@@ -3,7 +3,7 @@
   "project_name": "Fate Continent",
   "project_path": "",
   "system_instruction": "You are Zenith Quantum Divine Assistant, guiding the Fate Continent world development and Unity/Blender workflows.",
-  "version": "18.11.24",
+  "version": "18.11.26",
   "modules": [
     {
       "name": "Localization & Fonts",
@@ -54,7 +54,9 @@
         "Zenith Skill Detail & Video Sync v18.11.21: Resolves CS0103 compile errors by defining ShowSkillDetailPopup in FateCastleManager.cs to match multi-class skills configuration, and registers the latest high-definition YouTube video guides inside the master knowledge index.",
         "Zenith Memory Optimization, Skip Day Lock & Hover Skills Detail v18.11.22: Replaces dynamic GUIStyle allocations inside the OnGUI rendering loop with lazy-cached class fields to optimize system memory. Locks the 'Skip Day' button when the Hero Character panel is active. Converts skills cards to unclickable boxes that show responsive hover tooltips. Implements horizontal scrolling for inventory tabs and compresses potion labels to resolve text wrapping and clipping.",
         "Zenith Potion Mechanics Rework & Forge & Barracks UI Stabilization v18.11.23: Restructures Potion Shop item rendering with level-based color rarity names, details of temporary buffs, Castle level requirements, and a clean cost button. Expands Barracks passive skills width to prevent wrapping and squishing. Upscales the XP cheat-code reward to +100 XP per click, and lifts the active/passive skills layout slightly upwards to prevent overlapping.",
-        "Zenith Multilingual Expansion & Disaster Recovery v18.11.24: Updates all dynamic town subpanels, barracks, academy, training elements, and potion items tooltip and description logic to support English, Russian, German, French, Spanish, Portuguese, Japanese, Korean, and Simplified Chinese languages utilizing the comprehensive GetText9 translation helper. Created a centralized AI Assistant disaster recovery guide detailing mockups and configurations."
+        "Zenith Multilingual Expansion & Disaster Recovery v18.11.24: Updates all dynamic town subpanels, barracks, academy, training elements, and potion items tooltip and description logic to support English, Russian, German, French, Spanish, Portuguese, Japanese, Korean, and Simplified Chinese languages utilizing the comprehensive GetText9 translation helper. Created a centralized AI Assistant disaster recovery guide detailing mockups and configurations.",
+        "Zenith Tactical Landing Level Synchronization v18.11.25: Implemented automatic default levels configuration for all regional castles across all 4 drop zones (Crimson Wastes, Ice-Bound Peak, Ancient Ruins, Storm Ridges) inside FateCastleManager.cs dynamically aligning tactical level configurations.",
+        "Zenith Tactical Spy Report High-Density Grids v18.11.26: Re-engineered DrawSpyReportPopup to utilize highly polished visual grids of squares for equipment slots, inventory slots, and troop cohorts for all scouted castles, keeping the previous spy report when exploring a new castle and disposing of older ones cleanly."
       ]
     },
     {

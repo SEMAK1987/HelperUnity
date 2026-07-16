@@ -1,7 +1,7 @@
 bl_info = {
     "name": "AI Assistant Link",
-    "author": "Omniversal World Architect v18.11.24",
-    "version": (18, 11, 24),
+    "author": "Omniversal World Architect v18.11.26",
+    "version": (18, 11, 26),
     "blender": (2, 80, 0),
     "location": "View3D > N-Panel > AI Assistant",
     "description": "Direct bridge to the World Architect Divine Architect Supreme with project level GOD Synergy.",
@@ -101,7 +101,7 @@ class AI_ASSISTANT_PT_Panel(bpy.types.Panel):
         props = context.scene.ai_assistant_props
         
         col = layout.column(align=True)
-        col.label(text="v18.11.24 - Multilingual Expansion & Disaster Recovery (Sync Active)")
+        col.label(text="v18.11.25 - Tactical Landing Level Sync (Sync Active)")
         col.prop(props, "server_url")
         col.prop(props, "mode")
         

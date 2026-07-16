@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.24. Multilingual Expansion & Interface Disaster Recovery System.",
+  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.11.26. Tactical Spy Report High-Density Grids.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
