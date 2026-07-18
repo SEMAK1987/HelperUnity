@@ -1,6 +1,6 @@
-// [TACTICAL LANDING LEVEL SYNC v18.11.26]
+// [TACTICAL CAMERA & LANDING COORDS SYNC v18.11.27]
 // Unity Connector for Quantum AI Assistant
-// Updated: 2026-07-16 (Synced with Stable v18.11.26)
+// Updated: 2026-07-18 (Synced with Stable v18.11.27)
 
 #if UNITY_EDITOR
 using UnityEngine;
@@ -16,7 +16,7 @@ namespace AI_Assistant_Quantum
         private string prompt = "";
         private string serverUrl = "http://localhost:3000";
         private Mode mode = Mode.Online;
-        private string status = "Ready for Quantum Manifestation v18.11.26";
+        private string status = "Ready for Quantum Manifestation v18.11.27";
         private bool isProcessing = false;
 
         public enum Mode { Online, Offline, NoInternet }
@@ -29,7 +29,7 @@ namespace AI_Assistant_Quantum
 
         private void OnGUI()
         {
-            GUILayout.Label("v18.11.25 - Tactical Landing Level Sync", EditorStyles.boldLabel);
+            GUILayout.Label("v18.11.27 - Tactical Camera & Landing Coords Sync", EditorStyles.boldLabel);
             
             serverUrl = EditorGUILayout.TextField("Server URL", serverUrl);
             mode = (Mode)EditorGUILayout.EnumPopup("Mode", mode);

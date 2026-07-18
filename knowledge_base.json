@@ -3,7 +3,7 @@
   "project_name": "Fate Continent",
   "project_path": "",
   "system_instruction": "You are Zenith Quantum Divine Assistant, guiding the Fate Continent world development and Unity/Blender workflows.",
-  "version": "18.11.26",
+  "version": "18.11.27",
   "modules": [
     {
       "name": "Localization & Fonts",
@@ -56,7 +56,8 @@
         "Zenith Potion Mechanics Rework & Forge & Barracks UI Stabilization v18.11.23: Restructures Potion Shop item rendering with level-based color rarity names, details of temporary buffs, Castle level requirements, and a clean cost button. Expands Barracks passive skills width to prevent wrapping and squishing. Upscales the XP cheat-code reward to +100 XP per click, and lifts the active/passive skills layout slightly upwards to prevent overlapping.",
         "Zenith Multilingual Expansion & Disaster Recovery v18.11.24: Updates all dynamic town subpanels, barracks, academy, training elements, and potion items tooltip and description logic to support English, Russian, German, French, Spanish, Portuguese, Japanese, Korean, and Simplified Chinese languages utilizing the comprehensive GetText9 translation helper. Created a centralized AI Assistant disaster recovery guide detailing mockups and configurations.",
         "Zenith Tactical Landing Level Synchronization v18.11.25: Implemented automatic default levels configuration for all regional castles across all 4 drop zones (Crimson Wastes, Ice-Bound Peak, Ancient Ruins, Storm Ridges) inside FateCastleManager.cs dynamically aligning tactical level configurations.",
-        "Zenith Tactical Spy Report High-Density Grids v18.11.26: Re-engineered DrawSpyReportPopup to utilize highly polished visual grids of squares for equipment slots, inventory slots, and troop cohorts for all scouted castles, keeping the previous spy report when exploring a new castle and disposing of older ones cleanly."
+        "Zenith Tactical Spy Report High-Density Grids v18.11.26: Re-engineered DrawSpyReportPopup to utilize highly polished visual grids of squares for equipment slots, inventory slots, and troop cohorts for all scouted castles, keeping the previous spy report when exploring a new castle and disposing of older ones cleanly.",
+        "Zenith Tactical Landing Coordinates & Camera Focus Synchronization v18.11.27: Fully calibrated and synchronized the landing camera focal points and physical player spawn anchors to match the user-specified coordinates from screenshots for all 4 landing zones: Кровавые Пустоши (Region_03: -8.5, 0.4, 2.0), Ледяной Пик (Region_06: -2.1, 0.5, -5.23), Древние Руины (Region_11: -7.7, 1.6, -12.21), and Грозовые Кряжи (Region_08: 8.51, 0.5, -10.2). Enforced default 0f player height offset to align players exactly on top of cells and castles."
       ]
     },
     {

@@ -1,6 +1,9 @@
 # DEVELOPMENT LOG
 
-## [2026-07-16]
-- **Версия 18.11.26**: Tactical Spy Report High-Density Grids. Re-engineered `DrawSpyReportPopup` to utilize high-density visual grids of squares for equipment slots, inventory items, and garrison cohorts. Enabled single-scout persistence that properly replaces older scout records with the current scouted castle's info while keeping scouted castles intact.
-- **Версия 18.11.25**: Tactical Landing Regions Level Synchronization. Configured start levels for all regional castles across all 4 drop zones (Crimson Wastes, Ice-Bound Peak, Ancient Ruins, Storm Ridges) inside `FateCastleManager.cs` dynamically to align difficulty balance.
-- **Версия 18.11.24**: Multilingual Expansion & Disaster Recovery System. Upgraded dynamic panels to support 9 languages via `GetText9` translation helper and established a disaster recovery blueprint.
+## [2026-07-18]
+- **v18.11.27**: Tactical Landing Coordinates & Camera Focus Synchronization. Fully calibrated and synchronized the landing camera focal points and physical player spawn anchors to match the user-specified coordinates from screenshots for all 4 landing zones: Кровавые Пустоши (Region_03: -8.5, 0.4, 2.0), Ледяной Пик (Region_06: -2.1, 0.5, -5.23), Древние Руины (Region_11: -7.7, 1.6, -12.21), and Грозовые Кряжи (Region_08: 8.51, 0.5, -10.2). Enforced default 0f player height offset to align players exactly on top of cells and castles.
+- **v18.11.26**: Tactical Spy Report High-Density Grids. Re-engineered DrawSpyReportPopup to utilize highly polished visual grids of squares for equipment slots, inventory slots, and troop cohorts for all scouted castles, keeping the previous spy report when exploring a new castle and disposing of older ones cleanly.
+- **v18.11.25**: Tactical Landing Regions Level Synchronization. Synchronized and calibrated start levels for all regional castles across all 4 landing zones inside FateCastleManager.cs.
+
+## [2026-05-14]
+- **v18.5.8**: Zenith Multi-Tool Synergy & Settings Fix.

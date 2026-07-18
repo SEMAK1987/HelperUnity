@@ -1,4 +1,4 @@
-# 🤖 AI Assistant - Disaster Recovery & Replica Reconstruction Guide (v18.11.26)
+# 🤖 AI Assistant - Disaster Recovery & Replica Reconstruction Guide (v18.11.27)
 
 ## 📌 Introduction & Purpose
 This document serves as a complete **Disaster Recovery Blueprint** for the **Unity & Blender AI Assistant (Fate Continent Assistant)**. If the application environment is lost, corrupted, or needs to be redeployed on a different server or account, this guide contains the exact visual and functional specifications, UI layouts, styling guidelines, and architectural details to rebuild the application from scratch to match the attached screenshot.
@@ -13,7 +13,7 @@ The interface utilizes a custom high-density futuristic design theme: **Zenith C
 The left panel has a width of `320px` and is packed with system telemetries and status lists:
 - **Header Info Block**:
   - **App Name**: `AI ASSISTANT` (Font: Space Grotesk, Semi-bold, white, capitalized).
-  - **Version badge**: `V18.11.24` (Subtle grey text below the title).
+  - **Version badge**: `V18.11.27` (Subtle grey text below the title).
   - **System Badge**: A glowing cyan chip icon on the left.
 - **Server Metrics Status Rows**:
   - **СЕРВЕР (Server status)**: `● СВЯЗЬ ОК` (glowing bright green circle with text).
@@ -53,11 +53,11 @@ The left panel has a width of `320px` and is packed with system telemetries and 
 
 ### 3. Central Chat & Neural Hub
 - **Ambient Center Icon**: A large glowing circle containing a digital microchip graphic (`Cpu`).
-- **Main Heading Text**: `UNITY AI ASSISTANT V18.11.24` (Extra bold display font, white, centered).
+- **Main Heading Text**: `UNITY AI ASSISTANT V18.11.27` (Extra bold display font, white, centered).
 - **Sub-heading Description**:
   - *"Я полностью осведомлен о вашем проекте по пути..."*
   - Animated loading label: `Загрузка...`
-  - Subtext: *"Задавайте любые вопросы по Unity, Blender, Photoshop или GIMP. Модули Menu Studio Visuals Mastery, Omni-Answer Engine и проект 'Континент судьбы' (v18.8.0) активированы."*
+  - Subtext: *"Задавайте любые вопросы по Unity, Blender, Photoshop или GIMP. Модули Menu Studio Visuals Mastery, Omni-Answer Engine и проект 'Континент судьбы' (v18.11.27) активированы."*
 - **Warning pill**: `ВНИМАНИЕ: PROFESSIONAL MULTI-TOOL MASTERY` (High-contrast amber border pill with capitalized text).
 
 ### 4. Interactive Input Block (Footer Input)
@@ -87,7 +87,7 @@ To run this application, the following backend routes and socket bridges must be
 4. **/api/database/update**
    - Reads, validates, and persists user configurations in local JSON files like `knowledge_base.json` or `ccgs_project_blueprint.json`.
 
-### 5. Espionage & Intel Report Mechanics (v18.11.26)
+### 5. Espionage & Intel Report Mechanics (v18.11.27)
 - **Spy Network Button**: Renders next to the player's primary hero status card (HUD) once at least one enemy castle has been successfully spied.
 - **Scouting Cost & Formula**:
   - Requires Castle Level 2 to unlock. Cost = `100 * Level` gold (integers).
