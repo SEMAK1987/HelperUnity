@@ -132,7 +132,7 @@ public class FateCastleManager : MonoBehaviour
     public bool useManualCastlePositions = true;
     
     [Tooltip("If checked, the script will strictly load customCastlePositions from the C# code, ignoring PlayerPrefs local registry configurations.")]
-    public bool preferScriptCoordinates = false;
+    public bool preferScriptCoordinates = true;
     
     [Tooltip("Manual 3D positions for the 12 castles (matched to the 12 region cells of New_Kontinent)")]
     public Vector3[] customCastlePositions = new Vector3[12]
@@ -140,15 +140,15 @@ public class FateCastleManager : MonoBehaviour
         new Vector3(-15f, 0f, 10f),    // Region_00
         new Vector3(-5f, 0f, 10f),     // Region_01
         new Vector3(5f, 0f, 10f),      // Region_02
-        new Vector3(-5.3f, -0.4f, 4.2f), // Region_03 (Святилище Зенита)
+        new Vector3(-8.5f, 0.4f, 2.0f), // Region_03 (Кровавые Пустоши)
         new Vector3(-15f, 0f, 0f),     // Region_04
         new Vector3(-5f, 0f, 0f),      // Region_05
-        new Vector3(14.8f, 1.2f, 12.5f), // Region_06 (Ледяной Пик)
+        new Vector3(-2.1f, 0.5f, -5.23f), // Region_06 (Ледяной Пик)
         new Vector3(15f, 0f, 0f),      // Region_07
-        new Vector3(-12.4f, -0.3f, -10.2f), // Region_08 (Древние Руины)
+        new Vector3(8.51f, 0.5f, -10.2f), // Region_08 (Грозовые Кряжи)
         new Vector3(-5f, 0f, -10f),    // Region_09
         new Vector3(5f, 0f, -10f),     // Region_10
-        new Vector3(9.9f, 0.8f, -4.5f) // Region_11 (Кровавые Пустоши)
+        new Vector3(-7.7f, 1.6f, -12.21f) // Region_11 (Древние Руины)
     };
 
     [Tooltip("Manual offset added to the spawn anchor of each landing point if not using customCastlePositions")]
@@ -2063,15 +2063,15 @@ public class FateCastleManager : MonoBehaviour
         if (customCastlePositions[0] == Vector3.zero) customCastlePositions[0] = new Vector3(-15f, 0f, 10f);
         if (customCastlePositions[1] == Vector3.zero) customCastlePositions[1] = new Vector3(-5f, 0f, 10f);
         if (customCastlePositions[2] == Vector3.zero) customCastlePositions[2] = new Vector3(5f, 0f, 10f);
-        if (customCastlePositions[3] == Vector3.zero) customCastlePositions[3] = new Vector3(-5.3f, -0.4f, 4.2f);
+        if (customCastlePositions[3] == Vector3.zero || customCastlePositions[3] == new Vector3(-5.3f, -0.4f, 4.2f)) customCastlePositions[3] = new Vector3(-8.5f, 0.4f, 2.0f);
         if (customCastlePositions[4] == Vector3.zero) customCastlePositions[4] = new Vector3(-15f, 0f, 0f);
         if (customCastlePositions[5] == Vector3.zero) customCastlePositions[5] = new Vector3(-5f, 0f, 0f);
-        if (customCastlePositions[6] == Vector3.zero) customCastlePositions[6] = new Vector3(14.8f, 1.2f, 12.5f);
+        if (customCastlePositions[6] == Vector3.zero || customCastlePositions[6] == new Vector3(14.8f, 1.2f, 12.5f)) customCastlePositions[6] = new Vector3(-2.1f, 0.5f, -5.23f);
         if (customCastlePositions[7] == Vector3.zero) customCastlePositions[7] = new Vector3(15f, 0f, 0f);
-        if (customCastlePositions[8] == Vector3.zero) customCastlePositions[8] = new Vector3(-12.4f, -0.3f, -10.2f);
+        if (customCastlePositions[8] == Vector3.zero || customCastlePositions[8] == new Vector3(-12.4f, -0.3f, -10.2f)) customCastlePositions[8] = new Vector3(8.51f, 0.5f, -10.2f);
         if (customCastlePositions[9] == Vector3.zero) customCastlePositions[9] = new Vector3(-5f, 0f, -10f);
         if (customCastlePositions[10] == Vector3.zero) customCastlePositions[10] = new Vector3(5f, 0f, -10f);
-        if (customCastlePositions[11] == Vector3.zero) customCastlePositions[11] = new Vector3(9.9f, 0.8f, -4.5f);
+        if (customCastlePositions[11] == Vector3.zero || customCastlePositions[11] == new Vector3(9.9f, 0.8f, -4.5f)) customCastlePositions[11] = new Vector3(-7.7f, 1.6f, -12.21f);
         
         if (castleManualOffsets == null || castleManualOffsets.Length != 12)
         {
@@ -2271,6 +2271,30 @@ public class FateCastleManager : MonoBehaviour
 
     private void Awake()
     {
+        // Автоматическая очистка старых закэшированных координат PlayerPrefs при обновлении до версии v18.11.26_v5
+        if (PlayerPrefs.GetString("Fate_Coords_Version", "") != "18.11.26_v5")
+        {
+            Debug.Log("[CASTLE MGR] Обнаружена новая версия v18.11.26_v5! Очищаем устаревшие локальные кэши координат в PlayerPrefs для предотвращения багов сопоставления.");
+            for (int i = 0; i < 12; i++)
+            {
+                PlayerPrefs.DeleteKey("Castle_PosX_" + i);
+                PlayerPrefs.DeleteKey("Castle_PosY_" + i);
+                PlayerPrefs.DeleteKey("Castle_PosZ_" + i);
+                PlayerPrefs.DeleteKey("Castle_ManualOffset_PosX_" + i);
+                PlayerPrefs.DeleteKey("Castle_ManualOffset_PosY_" + i);
+                PlayerPrefs.DeleteKey("Castle_ManualOffset_PosZ_" + i);
+            }
+            // Очищаем старые оффсеты игрока для всех 4 зон высадки, так как регионы изменились
+            for (int j = 0; j < 4; j++)
+            {
+                PlayerPrefs.DeleteKey("PlayerOffset_X_" + j);
+                PlayerPrefs.DeleteKey("PlayerOffset_Y_" + j);
+                PlayerPrefs.DeleteKey("PlayerOffset_Z_" + j);
+            }
+            PlayerPrefs.SetString("Fate_Coords_Version", "18.11.26_v5");
+            PlayerPrefs.Save();
+        }
+
         InitializeCachedTextures();
         ValidateTroopSkillAssets();
         if (customCastlePositions == null || customCastlePositions.Length != 12)
@@ -2280,15 +2304,15 @@ public class FateCastleManager : MonoBehaviour
         if (customCastlePositions[0] == Vector3.zero) customCastlePositions[0] = new Vector3(-15f, 0f, 10f);
         if (customCastlePositions[1] == Vector3.zero) customCastlePositions[1] = new Vector3(-5f, 0f, 10f);
         if (customCastlePositions[2] == Vector3.zero) customCastlePositions[2] = new Vector3(5f, 0f, 10f);
-        if (customCastlePositions[3] == Vector3.zero) customCastlePositions[3] = new Vector3(-5.3f, -0.4f, 4.2f);
+        if (customCastlePositions[3] == Vector3.zero || customCastlePositions[3] == new Vector3(-5.3f, -0.4f, 4.2f)) customCastlePositions[3] = new Vector3(-8.5f, 0.4f, 2.0f);
         if (customCastlePositions[4] == Vector3.zero) customCastlePositions[4] = new Vector3(-15f, 0f, 0f);
         if (customCastlePositions[5] == Vector3.zero) customCastlePositions[5] = new Vector3(-5f, 0f, 0f);
-        if (customCastlePositions[6] == Vector3.zero) customCastlePositions[6] = new Vector3(14.8f, 1.2f, 12.5f);
+        if (customCastlePositions[6] == Vector3.zero || customCastlePositions[6] == new Vector3(14.8f, 1.2f, 12.5f)) customCastlePositions[6] = new Vector3(-2.1f, 0.5f, -5.23f);
         if (customCastlePositions[7] == Vector3.zero) customCastlePositions[7] = new Vector3(15f, 0f, 0f);
-        if (customCastlePositions[8] == Vector3.zero) customCastlePositions[8] = new Vector3(-12.4f, -0.3f, -10.2f);
+        if (customCastlePositions[8] == Vector3.zero || customCastlePositions[8] == new Vector3(-12.4f, -0.3f, -10.2f)) customCastlePositions[8] = new Vector3(8.51f, 0.5f, -10.2f);
         if (customCastlePositions[9] == Vector3.zero) customCastlePositions[9] = new Vector3(-5f, 0f, -10f);
         if (customCastlePositions[10] == Vector3.zero) customCastlePositions[10] = new Vector3(5f, 0f, -10f);
-        if (customCastlePositions[11] == Vector3.zero) customCastlePositions[11] = new Vector3(9.9f, 0.8f, -4.5f);
+        if (customCastlePositions[11] == Vector3.zero || customCastlePositions[11] == new Vector3(9.9f, 0.8f, -4.5f)) customCastlePositions[11] = new Vector3(-7.7f, 1.6f, -12.21f);
         
         if (castleManualOffsets == null || castleManualOffsets.Length != 12)
         {
@@ -2485,21 +2509,21 @@ public class FateCastleManager : MonoBehaviour
 
         switch (regionIndex)
         {
-            case 3: // Zenith Sanctuary (Святилище Зенита) - Зеленый Замок и Зеленый квадрат (Лесные Жители)
-            case 8: // Ancient Ruins (Древние Руины)
-            case 9: // Forest Dwellers (Лесные Жители)
+            case 9:  // Forest Dwellers (Лесные Жители)
+            case 11: // Ancient Ruins (Древние Руины - Region_11)
                 return new Color(0.12f, 0.75f, 0.25f, 1.0f); // Изумрудный зеленый
 
             case 1:
+            case 3:  // Bloody Wastelands (Кровавые Пустоши - Region_03)
             case 5:
-            case 11: // Bloody Wastelands (Кровавые Пустоши)
                 return new Color(0.85f, 0.15f, 0.12f, 1.0f); // Насыщенный красный
 
             case 0:
             case 2:
             case 4:
-            case 6: // Ice Peak (Ледяной Пик) - Нейтральный
+            case 6:  // Ice Peak (Ледяной Пик - Region_06) - Нейтральный
             case 7:
+            case 8:  // Storm Ridges (Грозовые Кряжи - Region_08) - Нейтральный
             case 10:
             default: // Нейтральные территории
                 return new Color(0.42f, 0.45f, 0.48f, 1.0f); // Каменистый серый

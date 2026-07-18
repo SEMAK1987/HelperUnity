@@ -2,8 +2,9 @@
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** v18.11.26
+- **Version:** v18.11.27
 - **Engine:** Unity 6 (6000.3.10f1)
+- **v18.11.27 Update:** Tactical Landing Coordinates & Camera Focus Synchronization - Fully calibrated and synchronized the landing camera focal points and physical player spawn anchors to match the user-specified coordinates from screenshots for all 4 landing zones: Кровавые Пустоши (Region_03: -8.5, 0.4, 2.0), Ледяной Пик (Region_06: -2.1, 0.5, -5.23), Древние Руины (Region_11: -7.7, 1.6, -12.21), and Грозовые Кряжи (Region_08: 8.51, 0.5, -10.2). Enforced default 0f player height offset to align players exactly on top of cells and castles.
 - **v18.11.26 Update:** Tactical Spy Report High-Density Grids - Re-engineered `DrawSpyReportPopup` to utilize highly polished visual grids of squares for equipment slots, inventory slots, and troop cohorts for all scouted castles, keeping the previous spy report when exploring a new castle and disposing of older ones cleanly.
 - **v18.11.25 Update:** Tactical Landing Regions Level Synchronization - Synchronized and calibrated start levels for all regional castles across all 4 landing zones (Crimson Wastes, Ice-Bound Peak, Ancient Ruins, Storm Ridges) inside `FateCastleManager.cs` dynamically depending on selected tactical drop zones to align difficulty balance.
 - **v18.11.24 Update:** Multilingual Expansion & Disaster Recovery System - Upgraded all Castle Town sections (Barracks, Academy, training options, potion shops, item tooltips and buy logs) to support 9 languages (Russian, English, German, French, Spanish, Portuguese, Japanese, Korean, Simplified Chinese) with the `GetText9` helper function. Established a full disaster recovery guide (`AI_ASSISTANT_RECOVERY_GUIDE.md`) displaying structural layouts, core state patterns, and recovery maps.
@@ -43,7 +44,7 @@
 - **Audio Rule (CRITICAL):** Используйте только `SettingsManager.cs` для управления звуком и музыкой (включая hover-эффекты и списки воспроизведения). Скрипты `AudioHandler` и `AudioManager` должны быть полностью удалены для чистоты проекта. Музыкальные клипы продлеваются через Suno/Udio и настраиваются на бесшовное зацикливание (`loop = true`). Звуковые файлы берем с Pixabay/Freesound по CC0-лицензии и подключаем напрямую к SettingsManager или через AudioMixer.
 
 ## 🚀 Протокол «Пошаговое Мастерство» (Step-by-Step Mastery)
-1. **Отслеживание прогресса:** Текущая версия v18.11.24 (Multilingual Expansion & Disaster Recovery System).
+1. **Отслеживание прогресса:** Текущая версия v18.11.27 (Tactical Landing Coordinates & Camera Focus Synchronization).
 2. **Инструкции Настройки Компонентов (Verified Inspector Settings):**
    - **FateMapManager (FATE_WORLD_MAP):**
      - *Maps List:* [+] Слот для глобальной карты (Map Name = "Континент Судьбы", Map Background = фоновый спрайт карты).

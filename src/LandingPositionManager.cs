@@ -379,7 +379,7 @@ namespace FateContinent
                     Vector3 anchorPos = GetLandingAnchorPosition(landedZone, out anchorRot);
 
                     float ox = PlayerPrefs.GetFloat($"PlayerOffset_X_{landedZone}", 0f);
-                    float oy = PlayerPrefs.GetFloat($"PlayerOffset_Y_{landedZone}", 0.8f); // По умолчанию приподнят на 0.8 метра, чтобы не утонуть в замке!
+                    float oy = PlayerPrefs.GetFloat($"PlayerOffset_Y_{landedZone}", 0.0f); // По умолчанию 0, чтобы стоять точно на квадрате!
                     float oz = PlayerPrefs.GetFloat($"PlayerOffset_Z_{landedZone}", 0f);
 
                     playerTransform.position = anchorPos + new Vector3(ox, oy, oz);
@@ -514,7 +514,7 @@ namespace FateContinent
             if (playerTransform != null)
             {
                 float ox = PlayerPrefs.GetFloat($"PlayerOffset_X_{zoneIndex}", 0f);
-                float oy = PlayerPrefs.GetFloat($"PlayerOffset_Y_{zoneIndex}", 0.8f); // По умолчанию приподнят на 0.8 метра, чтобы не утонуть в замке!
+                float oy = PlayerPrefs.GetFloat($"PlayerOffset_Y_{zoneIndex}", 0.0f); // По умолчанию 0, чтобы стоять точно на квадрате!
                 float oz = PlayerPrefs.GetFloat($"PlayerOffset_Z_{zoneIndex}", 0f);
 
                 playerTransform.position = anchorPos + new Vector3(ox, oy, oz);
@@ -576,93 +576,23 @@ namespace FateContinent
         {
             rotation = Quaternion.identity;
             
-            // Жесткое сопоставление зоны высадки с реальным индексом региона:
+            // Жестко заданные точные неизменные координаты высадки для регионов (по запросу пользователя):
             // 0 -> Кровавые Пустоши (Region_03)
             // 1 -> Ледяной Пик (Region_06)
             // 2 -> Древние Руины (Region_11)
             // 3 -> Грозовые Кряжи (Region_08)
-            int rIdx = 8;
-            if (zoneIndex == 0) rIdx = 3;
-            else if (zoneIndex == 1) rIdx = 6;
-            else if (zoneIndex == 2) rIdx = 11;
-            else if (zoneIndex == 3) rIdx = 8;
-
-            // 1. Сначала проверим калиброванные координаты из FateCastleManager для всех зон, чтобы избежать (0,0,0) mesh-pivot багов
-            if (FateCastleManager.Instance != null && FateCastleManager.Instance.customCastlePositions != null)
-            {
-                if (rIdx >= 0 && rIdx < FateCastleManager.Instance.customCastlePositions.Length)
-                {
-                    Vector3 pos = FateCastleManager.Instance.customCastlePositions[rIdx];
-                    if (pos != Vector3.zero && Vector3.Distance(pos, Vector3.zero) > 1.0f)
-                    {
-                        Debug.Log($"[LANDING SYS] Успешно наведена по калиброванным координатам Region_{rIdx:D2} из FateCastleManager для zoneIndex {zoneIndex}: {pos}!");
-                        return pos;
-                    }
-                }
-            }
-
-            // Дефолтный жесткий фолбек для Грозовых Кряжей (индекс 3), если FateCastleManager не готов
-            if (zoneIndex == 3)
-            {
-                return new Vector3(-12.4f, -0.3f, -10.2f);
-            }
-
-            int targetIndex = Mathf.Clamp(zoneIndex, 0, landingPoints.Length - 1);
-            LandingPoint point = (landingPoints != null && landingPoints.Length > targetIndex) ? landingPoints[targetIndex] : null;
-            
-            if (point != null && point.spawnAnchor != null)
-            {
-                rotation = point.spawnAnchor.rotation;
-                return point.spawnAnchor.position;
-            }
-            
-            // Если spawnAnchor равен null, ищем по умолчанию по именам
-            string[] defaultAnchorNames = new string[] { 
-                "Oasis_SpawnPoint", 
-                "Outpost_SpawnPoint", 
-                "Shore_SpawnPoint", 
-                "Citadel_SpawnPoint" 
-            };
-            
-            string targetName = defaultAnchorNames[Mathf.Clamp(zoneIndex, 0, 3)];
-            GameObject foundObj = GameObject.Find(targetName);
-            if (foundObj == null)
-            {
-                string altName = zoneIndex == 0 ? "Wastes_SpawnPoint" :
-                                 zoneIndex == 1 ? "Peak_SpawnPoint" :
-                                 zoneIndex == 2 ? "Ruins_SpawnPoint" : "Crags_SpawnPoint";
-                foundObj = GameObject.Find(altName);
-            }
-            
-            if (foundObj != null)
-            {
-                rotation = foundObj.transform.rotation;
-                return foundObj.transform.position;
-            }
-            
-            // Фолбек на координаты по индексам замков
-            if (FateCastleManager.Instance != null && FateCastleManager.Instance.customCastlePositions != null)
-            {
-                int fallbackRegionIdx = 8;
-                if (zoneIndex == 0) fallbackRegionIdx = 3;
-                else if (zoneIndex == 1) fallbackRegionIdx = 6;
-                else if (zoneIndex == 2) fallbackRegionIdx = 11;
-                else if (zoneIndex == 3) fallbackRegionIdx = 8;
-                
-                if (fallbackRegionIdx >= 0 && fallbackRegionIdx < FateCastleManager.Instance.customCastlePositions.Length)
-                {
-                    return FateCastleManager.Instance.customCastlePositions[fallbackRegionIdx];
-                }
-            }
-            
-            // Окончательный хардкод фолбек
             switch (zoneIndex)
             {
-                case 0: return new Vector3(-5.3f, -0.4f, 4.2f);    // Region_03 (Кровавые Пустоши)
-                case 1: return new Vector3(14.8f, 1.2f, 12.5f);  // Region_06 (Ледяной Пик)
-                case 2: return new Vector3(9.9f, 0.8f, -4.5f);     // Region_11 (Древние Руины)
-                case 3: return new Vector3(-12.4f, -0.3f, -10.2f); // Region_08 (Грозовые Кряжи)
-                default: return Vector3.zero;
+                case 0: 
+                    return new Vector3(-8.5f, 0.4f, 2.0f);    // Region_03 (Кровавые Пустоши)
+                case 1: 
+                    return new Vector3(-2.1f, 0.5f, -5.23f);  // Region_06 (Ледяной Пик)
+                case 2: 
+                    return new Vector3(-7.7f, 1.6f, -12.21f); // Region_11 (Древние Руины)
+                case 3: 
+                    return new Vector3(8.51f, 0.5f, -10.2f);  // Region_08 (Грозовые Кряжи)
+                default: 
+                    return new Vector3(8.51f, 0.5f, -10.2f);
             }
         }
 
