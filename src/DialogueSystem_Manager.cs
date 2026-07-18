@@ -1054,13 +1054,11 @@ namespace FateContinent
                     StrategicCameraController.Instance.isControlEnabled = true;
                     // Сфокусируем камеру на выбранном замке
                     int playerZone = selectedZoneIndex;
-                    if (LandingPositionManager.Instance != null && playerZone < LandingPositionManager.Instance.landingPoints.Length)
+                    if (LandingPositionManager.Instance != null)
                     {
-                        var anchor = LandingPositionManager.Instance.landingPoints[playerZone].spawnAnchor;
-                        if (anchor != null)
-                        {
-                            StrategicCameraController.Instance.FocusOnPoint(anchor.position, LandingPositionManager.Instance.cameraOffset);
-                        }
+                        Quaternion dummyRot;
+                        Vector3 anchorPos = LandingPositionManager.Instance.GetLandingAnchorPosition(playerZone, out dummyRot);
+                        StrategicCameraController.Instance.FocusOnPoint(anchorPos, LandingPositionManager.Instance.cameraOffset);
                     }
                 }
                 if (GamePause_Manager.Instance != null)

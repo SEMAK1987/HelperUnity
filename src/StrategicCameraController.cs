@@ -175,6 +175,11 @@ namespace FateContinent
             if (!autoFitToContinent) return;
 
             GameObject continent = GameObject.Find("New_Kontinent");
+            float minX = -25f;
+            float maxX = 25f;
+            float minZ = -25f;
+            float maxZ = 25f;
+
             if (continent != null)
             {
                 Renderer[] renderers = continent.GetComponentsInChildren<Renderer>();
@@ -203,11 +208,37 @@ namespace FateContinent
 
                     if (hasValidBound)
                     {
-                        xBounds = new Vector2(combinedBounds.min.x - autoFitPadding, combinedBounds.max.x + autoFitPadding);
-                        zBounds = new Vector2(combinedBounds.min.z - autoFitPadding, combinedBounds.max.z + autoFitPadding);
+                        minX = combinedBounds.min.x - autoFitPadding;
+                        maxX = combinedBounds.max.x + autoFitPadding;
+                        minZ = combinedBounds.min.z - autoFitPadding;
+                        maxZ = combinedBounds.max.z + autoFitPadding;
                     }
                 }
             }
+
+            // Гарантируем, что границы всегда вмещают все калиброванные позиции замков из FateCastleManager
+            if (FateCastleManager.Instance != null && FateCastleManager.Instance.customCastlePositions != null)
+            {
+                foreach (var pos in FateCastleManager.Instance.customCastlePositions)
+                {
+                    if (pos != Vector3.zero && Vector3.Distance(pos, Vector3.zero) > 1f)
+                    {
+                        if (pos.x - 5f < minX) minX = pos.x - 5f;
+                        if (pos.x + 5f > maxX) maxX = pos.x + 5f;
+                        if (pos.z - 5f < minZ) minZ = pos.z - 5f;
+                        if (pos.z + 5f > maxZ) maxZ = pos.z + 5f;
+                    }
+                }
+            }
+
+            // Устанавливаем жесткий разумный минимум для границ игровой зоны, чтобы камера не залипала в центре (0,0,0)
+            minX = Mathf.Min(minX, -25f);
+            maxX = Mathf.Max(maxX, 25f);
+            minZ = Mathf.Min(minZ, -25f);
+            maxZ = Mathf.Max(maxZ, 25f);
+
+            xBounds = new Vector2(minX, maxX);
+            zBounds = new Vector2(minZ, maxZ);
         }
 
         /// <summary>

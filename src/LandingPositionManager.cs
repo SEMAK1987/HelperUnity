@@ -570,48 +570,40 @@ namespace FateContinent
 
         /// <summary>
         /// Возвращает физическое положение точки высадки на основе spawnAnchor, объектов сцены или жестких координат.
-        /// Обеспечивает 100% точность для Грозовых Кряжей (индекс 3) на Region_08 (Древние Руины).
+        /// Обеспечивает 100% точность для всех зон на основе жесткого сопоставления регионов.
         /// </summary>
         public Vector3 GetLandingAnchorPosition(int zoneIndex, out Quaternion rotation)
         {
             rotation = Quaternion.identity;
             
-            // Если для Грозовых Кряжей (индекс 3) принудительно задаем 8 регион
+            // Жесткое сопоставление зоны высадки с реальным индексом региона:
+            // 0 -> Кровавые Пустоши (Region_03)
+            // 1 -> Ледяной Пик (Region_06)
+            // 2 -> Древние Руины (Region_11)
+            // 3 -> Грозовые Кряжи (Region_08)
+            int rIdx = 8;
+            if (zoneIndex == 0) rIdx = 3;
+            else if (zoneIndex == 1) rIdx = 6;
+            else if (zoneIndex == 2) rIdx = 11;
+            else if (zoneIndex == 3) rIdx = 8;
+
+            // 1. Сначала проверим калиброванные координаты из FateCastleManager для всех зон, чтобы избежать (0,0,0) mesh-pivot багов
+            if (FateCastleManager.Instance != null && FateCastleManager.Instance.customCastlePositions != null)
+            {
+                if (rIdx >= 0 && rIdx < FateCastleManager.Instance.customCastlePositions.Length)
+                {
+                    Vector3 pos = FateCastleManager.Instance.customCastlePositions[rIdx];
+                    if (pos != Vector3.zero && Vector3.Distance(pos, Vector3.zero) > 1.0f)
+                    {
+                        Debug.Log($"[LANDING SYS] Успешно наведена по калиброванным координатам Region_{rIdx:D2} из FateCastleManager для zoneIndex {zoneIndex}: {pos}!");
+                        return pos;
+                    }
+                }
+            }
+
+            // Дефолтный жесткий фолбек для Грозовых Кряжей (индекс 3), если FateCastleManager не готов
             if (zoneIndex == 3)
             {
-                // Поищем Region_08 в New_Kontinent или Континент
-                GameObject newContinent = GameObject.Find("New_Kontinent") ?? GameObject.Find("Континент");
-                if (newContinent != null)
-                {
-                    Transform r8 = newContinent.transform.Find("Region_08");
-                    if (r8 == null)
-                    {
-                        foreach (Transform child in newContinent.GetComponentsInChildren<Transform>(true))
-                        {
-                            if (child.name == "Region_08")
-                            {
-                                r8 = child;
-                                break;
-                            }
-                        }
-                    }
-                    if (r8 != null)
-                    {
-                        Debug.Log("[LANDING SYS] Найдена физическая модель Region_08 для Грозовых Кряжей!");
-                        rotation = r8.rotation;
-                        return r8.position;
-                    }
-                }
-                
-                // Вторым приоритетом ищем Shore_SpawnPoint или Ruins_SpawnPoint в сцене
-                GameObject shore = GameObject.Find("Shore_SpawnPoint") ?? GameObject.Find("Ruins_SpawnPoint");
-                if (shore != null)
-                {
-                    rotation = shore.transform.rotation;
-                    return shore.transform.position;
-                }
-                
-                // Третий приоритет - жесткие координаты Region_08 из FateCastleManager
                 return new Vector3(-12.4f, -0.3f, -10.2f);
             }
 
@@ -651,24 +643,24 @@ namespace FateContinent
             // Фолбек на координаты по индексам замков
             if (FateCastleManager.Instance != null && FateCastleManager.Instance.customCastlePositions != null)
             {
-                int rIdx = 11;
-                if (zoneIndex == 0) rIdx = 11;
-                else if (zoneIndex == 1) rIdx = 6;
-                else if (zoneIndex == 2) rIdx = 8;
-                else if (zoneIndex == 3) rIdx = 8;
+                int fallbackRegionIdx = 8;
+                if (zoneIndex == 0) fallbackRegionIdx = 3;
+                else if (zoneIndex == 1) fallbackRegionIdx = 6;
+                else if (zoneIndex == 2) fallbackRegionIdx = 11;
+                else if (zoneIndex == 3) fallbackRegionIdx = 8;
                 
-                if (rIdx >= 0 && rIdx < FateCastleManager.Instance.customCastlePositions.Length)
+                if (fallbackRegionIdx >= 0 && fallbackRegionIdx < FateCastleManager.Instance.customCastlePositions.Length)
                 {
-                    return FateCastleManager.Instance.customCastlePositions[rIdx];
+                    return FateCastleManager.Instance.customCastlePositions[fallbackRegionIdx];
                 }
             }
             
             // Окончательный хардкод фолбек
             switch (zoneIndex)
             {
-                case 0: return new Vector3(9.9f, 0.8f, -4.5f); // Region_11
-                case 1: return new Vector3(14.8f, 1.2f, 12.5f); // Region_06
-                case 2: return new Vector3(-12.4f, -0.3f, -10.2f); // Region_08
+                case 0: return new Vector3(-5.3f, -0.4f, 4.2f);    // Region_03 (Кровавые Пустоши)
+                case 1: return new Vector3(14.8f, 1.2f, 12.5f);  // Region_06 (Ледяной Пик)
+                case 2: return new Vector3(9.9f, 0.8f, -4.5f);     // Region_11 (Древние Руины)
                 case 3: return new Vector3(-12.4f, -0.3f, -10.2f); // Region_08 (Грозовые Кряжи)
                 default: return Vector3.zero;
             }
@@ -821,7 +813,7 @@ namespace FateContinent
         {
             CacheOriginalMaterials();
 
-            int actualPlayerRegion = 11;
+            int actualPlayerRegion = 8;
             try
             {
                 actualPlayerRegion = FateCastleManager.GetActualRegionIndexFromLanding(activeZoneIndex);
@@ -830,10 +822,10 @@ namespace FateContinent
             {
                 switch (activeZoneIndex)
                 {
-                    case 0: actualPlayerRegion = 11; break;
-                    case 1: actualPlayerRegion = 6; break;
-                    case 2: actualPlayerRegion = 8; break;
-                    case 3: actualPlayerRegion = 3; break;
+                    case 0: actualPlayerRegion = 3; break;  // Кровавые Пустоши -> Region_03
+                    case 1: actualPlayerRegion = 6; break;  // Ледяной Пик -> Region_06
+                    case 2: actualPlayerRegion = 11; break; // Древние Руины -> Region_11
+                    case 3: actualPlayerRegion = 8; break;  // Грозовые Кряжи -> Region_08
                 }
             }
 
