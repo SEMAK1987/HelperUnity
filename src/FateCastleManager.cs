@@ -7028,7 +7028,7 @@ public class FateCastleManager : MonoBehaviour
             cmdClassDE = "Heiliger Paladin";
             cmdClassFR = "Paladin Sacré";
             cmdClassES = "Paladín Sagrado";
-            cmdClassPT = "Paladino Sagrado";
+            cmdClassPT = "Paladino Sacrado";
             cmdClassJA = "ホーリーパラディン";
             cmdClassKO = "홀리 팔라딘";
             cmdClassZH = "圣光大审判骑士长";
@@ -7430,16 +7430,33 @@ public class FateCastleManager : MonoBehaviour
 
         int power = castle.aiTroopsPower;
 
-        // Specific integer calculations for troops
-        int t1Count = power / 2;
-        int t2Count = power / 4;
-        int t3Count = power / 8;
-        int t4Count = power / 16;
+        // Specific integer calculations for troops based on actual castle level requirements (strictly T1, T2, T3)
+        int t1Count = 0;
+        int t2Count = 0;
+        int t3Count = 0;
+        int t4Count = 0; // Represents T3 Cavalry instead of T6 Dragon for AI balance
 
-        if (t1Count < 0) t1Count = 0;
-        if (t2Count < 0) t2Count = 0;
-        if (t3Count < 0) t3Count = 0;
-        if (t4Count < 0) t4Count = 0;
+        if (castle.level == 1)
+        {
+            t1Count = Mathf.Max(0, Mathf.RoundToInt(power * 0.65f));
+            t2Count = Mathf.Max(0, Mathf.RoundToInt(power * 0.35f));
+            t3Count = 0;
+            t4Count = 0;
+        }
+        else if (castle.level == 2)
+        {
+            t1Count = Mathf.Max(0, Mathf.RoundToInt(power * 0.50f));
+            t2Count = Mathf.Max(0, Mathf.RoundToInt(power * 0.35f));
+            t3Count = Mathf.Max(0, Mathf.RoundToInt(power * 0.15f));
+            t4Count = 0;
+        }
+        else // castle.level >= 3
+        {
+            t1Count = Mathf.Max(0, Mathf.RoundToInt(power * 0.50f));
+            t2Count = Mathf.Max(0, Mathf.RoundToInt(power * 0.30f));
+            t3Count = Mathf.Max(0, Mathf.RoundToInt(power * 0.12f));
+            t4Count = Mathf.Max(0, Mathf.RoundToInt(power * 0.08f));
+        }
 
         // Display high-density interactive cards of troops based on Espionage Levels
         if (spyInfoLvl == 1)
@@ -7458,34 +7475,44 @@ public class FateCastleManager : MonoBehaviour
             GUILayout.Space(4);
 
             // Draw T1 (Faction Warrior) in Garrison
-            DrawSpyReportTroopCard("warrior", 
-                GetText9("Регулярный Гарнизон", "Regular Garrison", "Reguläre Garnison", "Garnison régulière", "Guarnición regular", "Guarnição regular", "正規守備兵", "정규 주둔군", "要塞核心守备"), 
-                $"{t1Count} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
-                2, 2, 3, spyInfoLvl, curLang, detailLabelS);
-
-            GUILayout.Space(4);
+            if (t1Count > 0)
+            {
+                DrawSpyReportTroopCard("warrior", 
+                    GetText9("Регулярный Гарнизон", "Regular Garrison", "Reguläre Garnison", "Garnison régulière", "Guarnición regular", "Guarnição regular", "正規守備兵", "정규 주둔군", "要塞核心守备"), 
+                    $"{t1Count} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
+                    2, 2, 3, spyInfoLvl, curLang, detailLabelS);
+                GUILayout.Space(4);
+            }
 
             // Draw T2 (Elven Archer) in Garrison
-            DrawSpyReportTroopCard("archer", 
-                GetText9("Регулярный Гарнизон", "Regular Garrison", "Reguläre Garnison", "Garnison régulière", "Guarnición regular", "Guarnição regular", "正規守備兵", "정규 주둔군", "要塞核心守备"), 
-                $"{t2Count} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
-                3, 3, 3, spyInfoLvl, curLang, detailLabelS);
+            if (t2Count > 0)
+            {
+                DrawSpyReportTroopCard("archer", 
+                    GetText9("Регулярный Гарнизон", "Regular Garrison", "Reguläre Garnison", "Garnison régulière", "Guarnición regular", "Guarnição regular", "正規守備兵", "정규 주둔군", "要塞核心守备"), 
+                    $"{t2Count} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
+                    3, 3, 3, spyInfoLvl, curLang, detailLabelS);
+                GUILayout.Space(4);
+            }
 
-            GUILayout.Space(4);
+            // Draw T3 (Holy Paladin) in Garrison (Unlocked at castle level >= 2)
+            if (castle.level >= 2 && t3Count > 0)
+            {
+                DrawSpyReportTroopCard("paladin", 
+                    GetText9("Регулярный Гарнизон", "Regular Garrison", "Reguläre Garnison", "Garnison régulière", "Guarnición regular", "Guarnição regular", "正規守備兵", "정규 주둔군", "要塞核心守备"), 
+                    $"{t3Count} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
+                    4, 4, 4, spyInfoLvl, curLang, detailLabelS);
+                GUILayout.Space(4);
+            }
 
-            // Draw T3 (Holy Paladin) in Garrison
-            DrawSpyReportTroopCard("paladin", 
-                GetText9("Регулярный Гарнизон", "Regular Garrison", "Reguläre Garnison", "Garnison régulière", "Guarnición regular", "Guarnição regular", "正規守備兵", "정규 주둔군", "要塞核心守备"), 
-                $"{t3Count} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
-                4, 4, 4, spyInfoLvl, curLang, detailLabelS);
-
-            GUILayout.Space(4);
-
-            // Draw T4 (Void Dragon) in Garrison
-            DrawSpyReportTroopCard("dragon", 
-                GetText9("Регулярный Гарнизон", "Regular Garrison", "Reguläre Garnison", "Garnison régulière", "Guarnición regular", "Guarnição regular", "正規守備兵", "정규 주둔군", "要塞核心守备"), 
-                $"{t4Count} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
-                4, 4, 4, spyInfoLvl, curLang, detailLabelS);
+            // Draw T4 (Imperial Cavalry) in Garrison (Unlocked at castle level >= 3)
+            if (castle.level >= 3 && t4Count > 0)
+            {
+                DrawSpyReportTroopCard("cavalry", 
+                    GetText9("Регулярный Гарнизон", "Regular Garrison", "Reguläre Garnison", "Garnison régulière", "Guarnición regular", "Guarnição regular", "正規守備兵", "정규 주둔군", "要塞核心守备"), 
+                    $"{t4Count} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
+                    4, 4, 4, spyInfoLvl, curLang, detailLabelS);
+                GUILayout.Space(4);
+            }
 
             // 3.2. TROOPS LED BY MAIN COMMANDER SUBSECTION
             GUILayout.Space(12);
@@ -7493,26 +7520,44 @@ public class FateCastleManager : MonoBehaviour
             GUILayout.Space(4);
 
             // Draw T1 (Faction Warrior) on Main Hero
-            DrawSpyReportTroopCard("warrior", 
-                GetText9("Авангард Главного Героя", "Main Hero Vanguard", "Vanguard des Haupthelden", "Avant-garde du héros principal", "Vanguardia del héroe principal", "Vanguarda do herói principal", "主将の先遣部隊", "수석 아방가르드", "守将核心前锋部众"), 
-                $"{t1Count / 2} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
-                2, 2, 3, spyInfoLvl, curLang, detailLabelS);
-
-            GUILayout.Space(4);
+            if (t1Count / 2 > 0)
+            {
+                DrawSpyReportTroopCard("warrior", 
+                    GetText9("Авангард Главного Героя", "Main Hero Vanguard", "Vanguard des Haupthelden", "Avant-garde du héros principal", "Vanguardia del héroе principal", "Vanguarda do herói principal", "主将の先遣部隊", "수석 авангард", "守将核心前锋部众"), 
+                    $"{t1Count / 2} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
+                    2, 2, 3, spyInfoLvl, curLang, detailLabelS);
+                GUILayout.Space(4);
+            }
 
             // Draw T2 (Elven Archer) on Main Hero
-            DrawSpyReportTroopCard("archer", 
-                GetText9("Авангард Главного Героя", "Main Hero Vanguard", "Vanguard des Haupthelden", "Avant-garde du héros principal", "Vanguardia del héroe principal", "Vanguarda do herói principal", "主将の先遣部隊", "수석 아방가르드", "守将核心前锋部众"), 
-                $"{t2Count / 2} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
-                3, 3, 3, spyInfoLvl, curLang, detailLabelS);
+            if (t2Count / 2 > 0)
+            {
+                DrawSpyReportTroopCard("archer", 
+                    GetText9("Авангард Главного Героя", "Main Hero Vanguard", "Vanguard des Haupthelden", "Avant-garde du héros principal", "Vanguardia del héroе principal", "Vanguarda do herói principal", "主将の先遣部隊", "수석 авангард", "守将核心前锋部众"), 
+                    $"{t2Count / 2} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
+                    3, 3, 3, spyInfoLvl, curLang, detailLabelS);
+                GUILayout.Space(4);
+            }
 
-            GUILayout.Space(4);
+            // Draw T3 (Holy Paladin) on Main Hero (Unlocked at castle level >= 2)
+            if (castle.level >= 2 && t3Count / 2 > 0)
+            {
+                DrawSpyReportTroopCard("paladin", 
+                    GetText9("Авангард Главного Героя", "Main Hero Vanguard", "Vanguard des Haupthelden", "Avant-garde du héros principal", "Vanguardia del héroе principal", "Vanguarda do herói principal", "主将の先遣部隊", "수석 авангард", "守将核心前锋部众"), 
+                    $"{t3Count / 2} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
+                    4, 4, 4, spyInfoLvl, curLang, detailLabelS);
+                GUILayout.Space(4);
+            }
 
-            // Draw T3 (Holy Paladin) on Main Hero
-            DrawSpyReportTroopCard("paladin", 
-                GetText9("Авангард Главного Героя", "Main Hero Vanguard", "Vanguard des Haupthelden", "Avant-garde du héros principal", "Vanguardia del héroe principal", "Vanguarda do herói principal", "主将の先遣部隊", "수석 아방가르드", "守将核心前锋部众"), 
-                $"{t3Count / 2} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
-                4, 4, 4, spyInfoLvl, curLang, detailLabelS);
+            // Draw T4 (Imperial Cavalry) on Main Hero (Unlocked at castle level >= 3)
+            if (castle.level >= 3 && t4Count / 2 > 0)
+            {
+                DrawSpyReportTroopCard("cavalry", 
+                    GetText9("Авангард Главного Героя", "Main Hero Vanguard", "Vanguard des Haupthelden", "Avant-garde du héros principal", "Vanguardia del héroе principal", "Vanguarda do herói principal", "主将の先遣部隊", "수석 авангард", "守将核心前锋部众"), 
+                    $"{t4Count / 2} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
+                    4, 4, 4, spyInfoLvl, curLang, detailLabelS);
+                GUILayout.Space(4);
+            }
 
             // 3.3. TROOPS LED BY SECONDARY HEROES SUBSECTION (If any secondary heroes exist)
             if (simpleHeroCount >= 1)
@@ -7522,26 +7567,44 @@ public class FateCastleManager : MonoBehaviour
                 GUILayout.Space(4);
 
                 // Draw T1 (Faction Warrior) on Secondary Hero
-                DrawSpyReportTroopCard("warrior", 
-                    GetText9("Когорта Вторичного Героя", "Secondary Hero Cohort", "Kohorte des sekundären Helden", "Cohorte du héros secondaire", "Cohorte del héroe secundario", "Coorte do herói secundário", "副将の兵員団", "부장 부대원", "麾下守城步兵连队"), 
-                    $"{t1Count / 4} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
-                    2, 2, 3, spyInfoLvl, curLang, detailLabelS);
-
-                GUILayout.Space(4);
+                if (t1Count / 4 > 0)
+                {
+                    DrawSpyReportTroopCard("warrior", 
+                        GetText9("Когорта Вторичного Героя", "Secondary Hero Cohort", "Kohorte des sekundären Helden", "Cohorte du héros secondaire", "Cohorte del héroe secundario", "Coorte do herói secundário", "副将の兵員団", "부장 부대원", "麾下守城步兵连队"), 
+                        $"{t1Count / 4} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
+                        2, 2, 3, spyInfoLvl, curLang, detailLabelS);
+                    GUILayout.Space(4);
+                }
 
                 // Draw T2 (Elven Archer) on Secondary Hero
-                DrawSpyReportTroopCard("archer", 
-                    GetText9("Когорта Вторичного Героя", "Secondary Hero Cohort", "Kohorte des sekundären Helden", "Cohorte du héros secondaire", "Cohorte del héroe secundario", "Coorte do herói secundário", "副将の兵員団", "부장 부대원", "麾下守城弓兵连队"), 
-                    $"{t2Count / 4} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
-                    3, 3, 3, spyInfoLvl, curLang, detailLabelS);
+                if (t2Count / 4 > 0)
+                {
+                    DrawSpyReportTroopCard("archer", 
+                        GetText9("Когорта Вторичного Героя", "Secondary Hero Cohort", "Kohorte des sekundären Helden", "Cohorte du héros secondaire", "Cohorte del héroe secundario", "Coorte do herói secundário", "副将の兵員団", "부장 부대원", "麾下守城弓兵连队"), 
+                        $"{t2Count / 4} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
+                        3, 3, 3, spyInfoLvl, curLang, detailLabelS);
+                    GUILayout.Space(4);
+                }
 
-                GUILayout.Space(4);
+                // Draw T3 (Holy Paladin) on Secondary Hero (Unlocked at castle level >= 2)
+                if (castle.level >= 2 && t3Count / 4 > 0)
+                {
+                    DrawSpyReportTroopCard("paladin", 
+                        GetText9("Когорта Вторичного Героя", "Secondary Hero Cohort", "Kohorte des sekundären Helden", "Cohorte du héros secondaire", "Cohorte del héroе secundario", "Coorte do herói secundário", "副将の兵员団", "부장 부대원", "麾下守城重盾骑士连队"), 
+                        $"{t3Count / 4} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
+                        4, 4, 4, spyInfoLvl, curLang, detailLabelS);
+                    GUILayout.Space(4);
+                }
 
-                // Draw T3 (Holy Paladin) on Secondary Hero
-                DrawSpyReportTroopCard("paladin", 
-                    GetText9("Когорта Вторичного Героя", "Secondary Hero Cohort", "Kohorte des sekundären Helden", "Cohorte du héros secondaire", "Cohorte del héroe secundario", "Coorte do herói secundário", "副将の兵员団", "부장 부대원", "麾下守城重盾骑士连队"), 
-                    $"{t3Count / 4} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
-                    4, 4, 4, spyInfoLvl, curLang, detailLabelS);
+                // Draw T4 (Imperial Cavalry) on Secondary Hero (Unlocked at castle level >= 3)
+                if (castle.level >= 3 && t4Count / 4 > 0)
+                {
+                    DrawSpyReportTroopCard("cavalry", 
+                        GetText9("Когорта Вторичного Героя", "Secondary Hero Cohort", "Kohorte des sekundären Helden", "Cohorte du héros secondaire", "Cohorte del héroе secundario", "Coorte do herói secundário", "副将の兵员団", "부장 부대원", "麾下守城重装骑兵连队"), 
+                        $"{t4Count / 4} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
+                        4, 4, 4, spyInfoLvl, curLang, detailLabelS);
+                    GUILayout.Space(4);
+                }
             }
         }
 
