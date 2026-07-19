@@ -6734,9 +6734,13 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.BeginHorizontal();
         
         // ----------------------------------------------------
-        // COLUMN 1: Avatar and basic info
+        // COLUMN 1: Avatar, basic info, and real-time HP/MP/EXP status bars (Split Layout)
         // ----------------------------------------------------
-        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(200));
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(355));
+        GUILayout.BeginHorizontal();
+        
+        // Left side of Column 1: Portrait and basic labels
+        GUILayout.BeginVertical(GUILayout.Width(130));
         GUILayout.Label($"<b>{GetText9("👤 КЛАСС:", "👤 CLASS:", "👤 KLASSE:", "👤 CLASSE:", "👤 CLASE:", "👤 CLASSE:", "👤 クラス:", "👤 클래스:", "👤 职业:")}</b>\n{displayCmdClass}", detailLabelS);
         GUILayout.Space(6);
         GUILayout.Label($"<b>{GetText9("⭐ УРОВЕНЬ:", "⭐ LEVEL:", "⭐ STUFE:", "⭐ NIVEAU:", "⭐ NIVEL:", "⭐ NÍVEL:", "⭐ レベル:", "⭐ 레벨:", "⭐ 级别:")}</b>\n{displayCmdLvl}", detailLabelS);
@@ -6749,16 +6753,96 @@ public class FateCastleManager : MonoBehaviour
         Texture2D commanderAvatar = GetAICommanderAvatar(aiClass);
         if (commanderAvatar != null)
         {
-            GUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
             GUI.backgroundColor = new Color(0.12f, 0.75f, 0.95f, 0.35f);
             GUILayout.Box("", GUI.skin.box, GUILayout.Width(110), GUILayout.Height(110));
             Rect avRect = GUILayoutUtility.GetLastRect();
             GUI.backgroundColor = Color.white;
             GUI.DrawTexture(new Rect(avRect.x + 4, avRect.y + 4, avRect.width - 8, avRect.height - 8), commanderAvatar, ScaleMode.ScaleToFit);
-            GUILayout.FlexibleSpace();
-            GUILayout.EndHorizontal();
         }
+        GUILayout.EndVertical();
+        
+        GUILayout.Space(12);
+        
+        // Right side of Column 1: HP, MP, and EXP Progress Bars (Dynamic Stats)
+        GUILayout.BeginVertical();
+        GUILayout.Space(10);
+        GUILayout.Label($"<b>{GetText9("📊 СТАТУС ХАРАКТЕРИСТИК", "📊 STATS STATUS", "📊 STATUS-WERT", "📊 STATUT DES STATS", "📊 ESTADO DE ATRIBUTOS", "📊 ESTADO DOS ATRIBUTOS", "📊 ステータス情報", "📊 상태 능력치", "📊 主帅生命值与法力值:")}</b>", detailLabelS);
+        GUILayout.Space(10);
+        
+        int aiLvl = castle.aiCommanderLevel;
+        int baseInt = 10, baseSta = 10;
+        if (aiClass == "warrior") { baseInt = 4; baseSta = 15; }
+        else if (aiClass == "archer") { baseInt = 6; baseSta = 11; }
+        else if (aiClass == "mage") { baseInt = 10; baseSta = 9; }
+
+        int curSta = baseSta + Mathf.RoundToInt(aiLvl * 1.5f);
+        int curInt = baseInt + Mathf.RoundToInt(aiLvl * 1.2f);
+        
+        int maxHp = curSta * 12;
+        int maxMp = curInt * 10;
+        
+        string hpText = (spyInfoLvl >= 2) ? $"{maxHp} / {maxHp} HP" : "??? / ??? HP";
+        string mpText = (spyInfoLvl >= 2) ? $"{maxMp} / {maxMp} MP" : "??? / ??? MP";
+        string expText = (spyInfoLvl >= 2) ? $"{Mathf.RoundToInt(aiLvl * 150)} / {aiLvl * 500} XP" : "??? / ??? XP";
+        
+        float hpPct = (spyInfoLvl >= 2) ? 1.0f : 0.0f;
+        float mpPct = (spyInfoLvl >= 2) ? 1.0f : 0.0f;
+        float expPct = (spyInfoLvl >= 2) ? 0.45f : 0.0f;
+
+        GUIStyle barTextS = new GUIStyle(GUI.skin.label);
+        barTextS.alignment = TextAnchor.MiddleCenter;
+        barTextS.fontSize = 9;
+        barTextS.normal.textColor = Color.white;
+        barTextS.fontStyle = FontStyle.Bold;
+
+        // Health Bar (Red/Green)
+        GUILayout.Label($"<b>{GetText9("❤️ ЖИЗНЬ (HP):", "❤️ HEALTH (HP):", "❤️ LEBEN (HP):", "❤️ VIE (HP):", "❤️ SALUD (HP):", "❤️ SAÚDE (HP):", "❤️ HP:", "❤️ 체력 (HP):", "❤️ 生命值 (HP):")}</b>", detailLabelS);
+        GUI.backgroundColor = new Color(0.1f, 0.12f, 0.15f, 1.0f);
+        GUILayout.Box("", GUI.skin.box, GUILayout.Width(170), GUILayout.Height(18));
+        Rect hpRect = GUILayoutUtility.GetLastRect();
+        GUI.backgroundColor = Color.white;
+        if (spyInfoLvl >= 2)
+        {
+            GUI.color = new Color(0.85f, 0.15f, 0.15f, 0.85f);
+            GUI.DrawTexture(new Rect(hpRect.x + 2, hpRect.y + 2, (hpRect.width - 4) * hpPct, hpRect.height - 4), Texture2D.whiteTexture);
+            GUI.color = Color.white;
+        }
+        GUI.Label(hpRect, hpText, barTextS);
+
+        GUILayout.Space(8);
+
+        // Mana Bar (Blue)
+        GUILayout.Label($"<b>{GetText9("🔮 МАНА (MP):", "🔮 MANA (MP):", "🔮 MANA (MP):", "🔮 MANA (MP):", "🔮 MANA (MP):", "🔮 MANA (MP):", "🔮 MP:", "🔮 마나 (MP):", "🔮 法力值 (MP):")}</b>", detailLabelS);
+        GUI.backgroundColor = new Color(0.1f, 0.12f, 0.15f, 1.0f);
+        GUILayout.Box("", GUI.skin.box, GUILayout.Width(170), GUILayout.Height(18));
+        Rect mpRect = GUILayoutUtility.GetLastRect();
+        GUI.backgroundColor = Color.white;
+        if (spyInfoLvl >= 2)
+        {
+            GUI.color = new Color(0.15f, 0.45f, 0.85f, 0.85f);
+            GUI.DrawTexture(new Rect(mpRect.x + 2, mpRect.y + 2, (mpRect.width - 4) * mpPct, mpRect.height - 4), Texture2D.whiteTexture);
+            GUI.color = Color.white;
+        }
+        GUI.Label(mpRect, mpText, barTextS);
+
+        GUILayout.Space(8);
+
+        // Experience Bar (Gold)
+        GUILayout.Label($"<b>{GetText9("✨ ОПЫТ (EXP):", "✨ EXP (EXP):", "✨ EXP (EXP):", "✨ EXP (EXP):", "✨ EXP (EXP):", "✨ EXP (EXP):", "✨ EXP:", "✨ 경험치 (EXP):", "✨ 经验值 (EXP):")}</b>", detailLabelS);
+        GUI.backgroundColor = new Color(0.1f, 0.12f, 0.15f, 1.0f);
+        GUILayout.Box("", GUI.skin.box, GUILayout.Width(170), GUILayout.Height(18));
+        Rect expRect = GUILayoutUtility.GetLastRect();
+        GUI.backgroundColor = Color.white;
+        if (spyInfoLvl >= 2)
+        {
+            GUI.color = new Color(0.85f, 0.65f, 0.15f, 0.85f);
+            GUI.DrawTexture(new Rect(expRect.x + 2, expRect.y + 2, (expRect.width - 4) * expPct, expRect.height - 4), Texture2D.whiteTexture);
+            GUI.color = Color.white;
+        }
+        GUI.Label(expRect, expText, barTextS);
+        
+        GUILayout.EndVertical();
+        GUILayout.EndHorizontal();
         GUILayout.EndVertical();
         
         GUILayout.Space(12);
@@ -6766,7 +6850,7 @@ public class FateCastleManager : MonoBehaviour
         // ----------------------------------------------------
         // COLUMN 2: Anatomical Equipment Mannequin (mimics player layout)
         // ----------------------------------------------------
-        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(350));
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(340));
         GUILayout.Label($"<b>{GetText9("🛡️ СНАРЯЖЕНИЕ:", "🛡️ EQUIPMENT:", "🛡️ AUSRÜSTUNG:", "🛡️ ÉQUIPEMENT:", "🛡️ EQUIPO:", "🛡️ EQUIPAMENTO:", "🛡️ 装備品:", "🛡️ 장비 장착:", "🛡️ 主帅穿戴神装:")}</b>", detailLabelS);
         GUILayout.Space(6);
         
@@ -6826,12 +6910,12 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.Space(12);
         
         // ----------------------------------------------------
-        // COLUMN 3: Commander Skills with hovering description details
+        // COLUMN 3: Commander Skills (arranged in 2x2 grid, larger)
         // ----------------------------------------------------
-        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(220));
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(250));
         GUILayout.Label($"<b>{GetText9("⚡ НАВЫКИ:", "⚡ SKILLS:", "⚡ FÄHIGKEITEN:", "⚡ COMPÉTENCES:", "⚡ HABILIDADES:", "⚡ HABILIDADES:", "⚡ スキル:", "⚡ 기술:", "⚡ 核心技能:")}</b>", detailLabelS);
         GUILayout.Label(GetText9("(наведите для деталей)", "(hover for details)", "(zeigen für Details)", "(survoler)", "(puntero)", "(foque)", "(ホバー表示)", "(마우스 오버)", "(悬停查看)"), detailLabelS);
-        GUILayout.Space(10);
+        GUILayout.Space(12);
         
         if (spyInfoLvl >= 3)
         {
@@ -6856,48 +6940,48 @@ public class FateCastleManager : MonoBehaviour
                 sk4 = archerSkillUltimate;
             }
 
-            float sBoxW = 60f;
-            float sBoxH = 40f;
+            float sBoxW = 85f;
+            float sBoxH = 85f;
 
-            // Skill 1
+            // Row 1 (Skill 1 and Skill 2)
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
+            
+            // Skill 1
             GUILayout.Box(sk1 != null ? sk1 : Texture2D.whiteTexture, GUILayout.Width(sBoxW), GUILayout.Height(sBoxH));
             if (Event.current.type == EventType.Repaint && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
             {
                 SetHoveredSkill(1, curLang, aiClass, castle.aiCommanderLevel);
             }
-            GUILayout.FlexibleSpace();
-            GUILayout.EndHorizontal();
-            GUILayout.Space(5);
+            
+            GUILayout.Space(12);
 
             // Skill 2
-            GUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
             GUILayout.Box(sk2 != null ? sk2 : Texture2D.whiteTexture, GUILayout.Width(sBoxW), GUILayout.Height(sBoxH));
             if (Event.current.type == EventType.Repaint && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
             {
                 SetHoveredSkill(2, curLang, aiClass, castle.aiCommanderLevel);
             }
+            
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
-            GUILayout.Space(5);
+            
+            GUILayout.Space(12);
 
-            // Skill 3
+            // Row 2 (Skill 3 and Skill 4 Ultimate)
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
+            
+            // Skill 3
             GUILayout.Box(sk3 != null ? sk3 : Texture2D.whiteTexture, GUILayout.Width(sBoxW), GUILayout.Height(sBoxH));
             if (Event.current.type == EventType.Repaint && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
             {
                 SetHoveredSkill(3, curLang, aiClass, castle.aiCommanderLevel);
             }
-            GUILayout.FlexibleSpace();
-            GUILayout.EndHorizontal();
-            GUILayout.Space(5);
+            
+            GUILayout.Space(12);
 
             // Skill 4 (Ultimate)
-            GUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
             GUI.backgroundColor = new Color(1.0f, 0.4f, 0.4f, 0.9f);
             GUILayout.Box(sk4 != null ? sk4 : Texture2D.whiteTexture, GUILayout.Width(sBoxW), GUILayout.Height(sBoxH));
             if (Event.current.type == EventType.Repaint && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
@@ -6905,6 +6989,7 @@ public class FateCastleManager : MonoBehaviour
                 SetHoveredSkill(4, curLang, aiClass, castle.aiCommanderLevel);
             }
             GUI.backgroundColor = Color.white;
+            
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
         }
