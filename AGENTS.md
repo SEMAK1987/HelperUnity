@@ -1,9 +1,10 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.11.29)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.11.30)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** v18.11.29
+- **Version:** v18.11.30
 - **Engine:** Unity 6 (6000.3.10f1)
+- **v18.11.30 Update:** Max Level XP Calibration & Slot Re-locking Reset - Programmed `GainXP` and `SetMaxLevel` inside `FateCastleManager.cs` to set the player's XP exactly to `999999/999999 XP` at maximum level 9999, capping experience gain completely. Modified `GetUnlockedSlotsCount` to cap free level-up slots to 12 (up to level 120) so that resetting the inventory using the "СБРОС ИНВ." button successfully locks and blocks slots back to the pristine starting state of 12 slots with their starting cost returning.
 - **v18.11.29 Update:** Slot Purchases Recovery & Cheat Full Inventory Unlock - Re-engineered `ResetInventoryAndEquipment` inside `FateCastleManager.cs` to fully clear the `"Player_Inventory_Purchased_Slots"` key, allowing purchased slots to reset/lock back to the starting layout of 12. Added an "ОТКРЫТЬ ВЕСЬ ИНВ." button to the Zenith Hero Control Panel's cheat tools, setting purchased slot count to 999 to instantly unlock all inventory space and tabs.
 - **v18.11.28 Update:** Espionage Infiltration Progression & Cheat Inventory Reset - Re-engineered the scouting system in `FateCastleManager.cs` to enable players to spy again and upgrade their espionage intelligence levels when they upgrade their player castles to higher levels. Displays a beautiful colored status badge with deep localization in 9 languages. Added a highly polished "СБРОС ИНВ." button inside the Cheats / Attributes Column 1 of the fullscreen Zenith Hero Control Panel to revert player inventory and equipment mannequin to the pristine starting state.
 - **v18.11.27 Update:** Tactical Landing Coordinates & Camera Focus Synchronization - Fully calibrated and synchronized the landing camera focal points and physical player spawn anchors to match the user-specified coordinates from screenshots for all 4 landing zones: Кровавые Пустоши (Region_03: -8.5, 0.4, 2.0), Ледяной Пик (Region_06: -2.1, 0.5, -5.23), Древние Руины (Region_11: -7.7, 1.6, -12.21), and Грозовые Кряжи (Region_08: 8.51, 0.5, -10.2). Enforced default 0f player height offset to align players exactly on top of cells and castles.

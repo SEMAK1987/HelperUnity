@@ -35,10 +35,13 @@ namespace FateContinent
 
         public void InitializeStats()
         {
-            // Базовая инициализация. Значения могут рассчитываться по формулам из BalanceConfig
-            MaxHP = BaseHP;
+            // Базовая инициализация с прибавкой к HP и MP за каждые 10 уровней без распределения очков (без +)
+            float levelBonusHP = (Level / 10) * 20f;
+            float levelBonusMP = (Level / 10) * 10f;
+
+            MaxHP = BaseHP + levelBonusHP;
             CurrentHP = MaxHP;
-            CurrentMP = BaseMP;
+            CurrentMP = BaseMP + levelBonusMP;
             Def = BaseDEF;
             BaseDefStatic = BaseDEF;
         }

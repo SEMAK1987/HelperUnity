@@ -1,5 +1,9 @@
 # DEVELOPMENT LOG: Fate Continent (Континент Судьбы)
 
+## [v18.11.30] - 2026-07-19
+- **Max Level XP Calibration:** Calibrated `GainXP` and `SetMaxLevel` inside `FateCastleManager.cs` to set the player's XP exactly to `999999/999999 XP` at maximum level 9999. Experience gain is now permanently capped and locked at level 9999 to prevent overflow.
+- **Inventory Slot Re-locking & Reset Calibration:** Modified `GetUnlockedSlotsCount()` to cap free level-up slots at 12 (up to level 120). This ensures that when resetting the inventory using the "СБРОС ИНВ." button, any slots beyond level 120 or purchased slots correctly lock back and block, returning the purchase price of the cells to their starting cost for gold.
+
 ## [v18.11.29] - 2026-07-19
 - **Slot Purchases Recovery:** Re-engineered `ResetInventoryAndEquipment` inside `FateCastleManager.cs` to delete the PlayerPrefs key `"Player_Inventory_Purchased_Slots"`, allowing purchased slots to lock/close back up perfectly to the starting pristine layout of 12 slots when resetting the inventory.
 - **Cheat Full Inventory Unlock:** Integrated an "ОТКРЫТЬ ВЕСЬ ИНВ." button inside the Zenith Hero Control Panel's cheat tools. Sets player purchased slots to 999 to instantly unlock all inventory space and tabs.

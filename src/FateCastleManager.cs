@@ -715,7 +715,8 @@ public class FateCastleManager : MonoBehaviour
         int freeSlotsByLevel = 0;
         if (SaveGameSystem.CurrentData != null)
         {
-            freeSlotsByLevel = SaveGameSystem.CurrentData.playerLevel / 10;
+            // Cap the free level-up slots to a maximum of 12 (1 free slot per 10 levels, up to level 120)
+            freeSlotsByLevel = Mathf.Min(SaveGameSystem.CurrentData.playerLevel / 10, 12);
         }
         return Mathf.Clamp(purchased + freeSlotsByLevel, 12, 999);
     }
@@ -3495,7 +3496,7 @@ public class FateCastleManager : MonoBehaviour
         if (data.playerLevel >= 9999)
         {
             data.playerLevel = 9999;
-            data.currentXP = 0;
+            data.currentXP = 999999;
             RecalculateStats();
             PlayerPrefs.Save();
             return;
@@ -3508,7 +3509,7 @@ public class FateCastleManager : MonoBehaviour
             if (data.playerLevel >= 9999)
             {
                 data.playerLevel = 9999;
-                data.currentXP = 0;
+                data.currentXP = 999999;
                 break;
             }
             data.currentXP -= xpNeeded;
@@ -3526,6 +3527,11 @@ public class FateCastleManager : MonoBehaviour
             }
             xpNeeded = data.playerLevel * 100;
         }
+        if (data.playerLevel >= 9999)
+        {
+            data.playerLevel = 9999;
+            data.currentXP = 999999;
+        }
         RecalculateStats();
         PlayerPrefs.Save();
     }
@@ -3541,7 +3547,7 @@ public class FateCastleManager : MonoBehaviour
                 data.playerLevel = 9999;
                 data.availableSkillPoints += lvls * 5;
             }
-            data.currentXP = 0;
+            data.currentXP = 999999;
             RecalculateStats();
             SaveGameSystem.Save(0);
             ShowFeedback(Translator.LanguageID == 0 ? "✨ Уровень повышен до 9999 (Максимум)!" : "✨ Level set to 9999 (Maximum)!");
@@ -3593,7 +3599,8 @@ public class FateCastleManager : MonoBehaviour
         if (data != null)
         {
             float previousMax = data.maxHealth;
-            data.maxHealth = (data.stamina + eqBonusSTA + tempBonusSTA) * 10f;
+            float levelBonusHP = (data.playerLevel / 10) * 20f;
+            data.maxHealth = (data.stamina + eqBonusSTA + tempBonusSTA) * 10f + levelBonusHP;
             
             // If MaxHealth increased or current health is uninitialized, set currentHealth to maxHealth
             if (data.currentHealth <= 0f || data.currentHealth > data.maxHealth)
@@ -4837,7 +4844,9 @@ public class FateCastleManager : MonoBehaviour
         
         // РИСОВАНИЕ БАРОВ ХАРАКТЕРИСТИК (ЗДОРОВЬЕ / МАНА / ОПЫТ)
         // 1. Здоровье (Красный)
-        float maxHp = (data.stamina + eqBonusSTA + tempBonusSTA) * 10f;
+        float levelBonusHP = (data.playerLevel / 10) * 20f;
+        float levelBonusMP = (data.playerLevel / 10) * 10f;
+        float maxHp = (data.stamina + eqBonusSTA + tempBonusSTA) * 10f + levelBonusHP;
         if (data.currentHealth > maxHp) data.currentHealth = maxHp;
         float hpPct = maxHp > 0f ? (data.currentHealth / maxHp) : 1f;
         
@@ -4858,7 +4867,7 @@ public class FateCastleManager : MonoBehaviour
         GUI.Label(new Rect(110f, 47f, 230f, 13f), $"HP: {Mathf.CeilToInt(data.currentHealth)} / {maxHp}", textOverBarStyle);
         
         // 2. Мана (Красивый сине-фиолетовый энергетический бар)
-        float maxMana = (data.intelligence + eqBonusINT + tempBonusINT) * 10f;
+        float maxMana = (data.intelligence + eqBonusINT + tempBonusINT) * 10f + levelBonusMP;
         float manaPct = 1.0f; // Всегда полная мана для заклинаний
         
         GUIStyle mpStyle = new GUIStyle(GUI.skin.box);
@@ -4869,15 +4878,16 @@ public class FateCastleManager : MonoBehaviour
         GUI.Label(new Rect(110f, 64f, 230f, 13f), $"MP: {maxMana} / {maxMana}", textOverBarStyle);
         
         // 3. Опыт (Яркий неоново-бирюзовый цвет)
-        int xpNeeded = data.playerLevel * 100;
-        float xpPct = xpNeeded > 0 ? Mathf.Clamp01((float)data.currentXP / xpNeeded) : 0f;
+        int xpNeeded = data.playerLevel >= 9999 ? 999999 : data.playerLevel * 100;
+        int currentXPDisplay = data.playerLevel >= 9999 ? 999999 : data.currentXP;
+        float xpPct = xpNeeded > 0 ? Mathf.Clamp01((float)currentXPDisplay / xpNeeded) : 0f;
         
         GUIStyle xpStyle = new GUIStyle(GUI.skin.box);
         xpStyle.normal.background = xpTex;
         
         GUI.Box(new Rect(110f, 82f, 230f, 13f), "", barBgStyle);
         GUI.Box(new Rect(110f, 82f, 230f * xpPct, 13f), "", xpStyle);
-        GUI.Label(new Rect(110f, 81f, 230f, 13f), $"{levelText}: {data.playerLevel} ({data.currentXP} / {xpNeeded} XP)", textOverBarStyle);
+        GUI.Label(new Rect(110f, 81f, 230f, 13f), $"{levelText}: {data.playerLevel} ({currentXPDisplay} / {xpNeeded} XP)", textOverBarStyle);
         
         // 5. КНОПКА ШПИОНАЖА (Около героя, справа от статистики)
         bool hasSpiedCastles = false;
@@ -5108,10 +5118,13 @@ public class FateCastleManager : MonoBehaviour
         int totalINT = data.intelligence + eqBonusINT + tempBonusINT;
         int totalSTA = data.stamina + eqBonusSTA + tempBonusSTA;
 
+        float levelBonusHP = (data.playerLevel / 10) * 20f;
+        float levelBonusMP = (data.playerLevel / 10) * 10f;
+
         float combatAtk = totalSTR * 2.5f + totalAGI * 0.5f;
         float combatDef = totalAGI * 1.5f + totalSTR * 0.5f;
-        float maxHp = totalSTA * 10f;
-        float maxMp = totalINT * 10f;
+        float maxHp = totalSTA * 10f + levelBonusHP;
+        float maxMp = totalINT * 10f + levelBonusMP;
         
         GUIStyle derivedStyle = new GUIStyle(GUI.skin.box);
         derivedStyle.normal.textColor = new Color(0.85f, 0.9f, 0.98f);
@@ -5122,12 +5135,12 @@ public class FateCastleManager : MonoBehaviour
         string statsReport = curLang == 0 
             ? $"⚔️ Базовая Атака: {combatAtk} (База {data.strength * 2.5f + data.agility * 0.5f} + Экв. +{eqBonusSTR * 2.5f + eqBonusAGI * 0.5f} + Зелья +{tempBonusSTR * 2.5f + tempBonusAGI * 0.5f})\n" +
               $"🛡️ Защита брони: {combatDef} (База {data.agility * 1.5f + data.strength * 0.5f} + Экв. +{eqBonusAGI * 1.5f + eqBonusSTR * 0.5f} + Зелья +{tempBonusAGI * 1.5f + tempBonusSTR * 0.5f})\n" +
-              $"❤️ Макс. ОЗ (HP): {maxHp} (База {data.stamina * 10f} + Экв. +{eqBonusSTA * 10f} + Зелья +{tempBonusSTA * 10f})\n" +
-              $"🔮 Макс. ОМ (MP): {maxMp} (База {data.intelligence * 10f} + Экв. +{eqBonusINT * 10f} + Зелья +{tempBonusINT * 10f})"
+              $"❤️ Макс. ОЗ (HP): {maxHp} (База {data.stamina * 10f} + Экв. +{eqBonusSTA * 10f} + Зелья +{tempBonusSTA * 10f} + Лвл +{levelBonusHP})\n" +
+              $"🔮 Макс. ОМ (MP): {maxMp} (База {data.intelligence * 10f} + Экв. +{eqBonusINT * 10f} + Зелья +{tempBonusINT * 10f} + Лвл +{levelBonusMP})"
             : $"⚔️ Combat Damage: {combatAtk} (Potion +{tempBonusSTR * 2.5f + tempBonusAGI * 0.5f})\n" +
               $"🛡️ Armor Defense: {combatDef} (Potion +{tempBonusAGI * 1.5f + tempBonusSTR * 0.5f})\n" +
-              $"❤️ Max Health (HP): {maxHp} (Potion +{tempBonusSTA * 10f})\n" +
-              $"🔮 Max Mana (MP): {maxMp} (Potion +{tempBonusINT * 10f})";
+              $"❤️ Max Health (HP): {maxHp} (Potion +{tempBonusSTA * 10f} + Lvl +{levelBonusHP})\n" +
+              $"🔮 Max Mana (MP): {maxMp} (Potion +{tempBonusINT * 10f} + Lvl +{levelBonusMP})";
             
         GUILayout.Label(statsReport, derivedStyle);
         GUILayout.Space(12);
@@ -5230,8 +5243,9 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.Space(12);
 
         // РЕНДЕРИНГ ОПЫТА И УРОВНЯ ОСНОВНОГО ГЕРОЯ ПОД КНОПКАМИ ЧИТОВ (v18.11.24)
-        int neededXpForProgress = data.playerLevel * 100;
-        float progressPct = neededXpForProgress > 0 ? Mathf.Clamp01((float)data.currentXP / neededXpForProgress) : 0f;
+        int neededXpForProgress = data.playerLevel >= 9999 ? 999999 : data.playerLevel * 100;
+        int currentXPDisplay = data.playerLevel >= 9999 ? 999999 : data.currentXP;
+        float progressPct = neededXpForProgress > 0 ? Mathf.Clamp01((float)currentXPDisplay / neededXpForProgress) : 0f;
 
         GUIStyle progressTitleStyle = new GUIStyle(GUI.skin.label);
         progressTitleStyle.alignment = TextAnchor.MiddleCenter;
@@ -5247,10 +5261,10 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.Label(lvlString, progressTitleStyle);
 
         string xpString = curLang == 0
-            ? $"✨ Опыт: {data.currentXP} / {neededXpForProgress} XP"
-            : $"✨ Experience: {data.currentXP} / {neededXpForProgress} XP";
-        if (curLang == 8) xpString = $"✨ 经验值: {data.currentXP} / {neededXpForProgress} XP";
-        if (curLang == 7) xpString = $"✨ 경험치: {data.currentXP} / {neededXpForProgress} XP";
+            ? $"✨ Опыт: {currentXPDisplay} / {neededXpForProgress} XP"
+            : $"✨ Experience: {currentXPDisplay} / {neededXpForProgress} XP";
+        if (curLang == 8) xpString = $"✨ 经验值: {currentXPDisplay} / {neededXpForProgress} XP";
+        if (curLang == 7) xpString = $"✨ 경험치: {currentXPDisplay} / {neededXpForProgress} XP";
 
         GUIStyle xpValStyle = new GUIStyle(GUI.skin.label);
         xpValStyle.alignment = TextAnchor.MiddleCenter;
@@ -6221,6 +6235,22 @@ public class FateCastleManager : MonoBehaviour
         return null;
     }
 
+    private Texture2D GetAICommanderAvatar(string aiClass)
+    {
+        if (aiClass == "mage")
+        {
+            return avatar_hero_mage != null ? avatar_hero_mage : (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.magePortrait != null ? DialogueSystem_Manager.Instance.magePortrait.texture : null);
+        }
+        else if (aiClass == "archer")
+        {
+            return avatar_hero_archer != null ? avatar_hero_archer : (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.archerPortrait != null ? DialogueSystem_Manager.Instance.archerPortrait.texture : null);
+        }
+        else
+        {
+            return avatar_hero_warrior != null ? avatar_hero_warrior : (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.warriorPortrait != null ? DialogueSystem_Manager.Instance.warriorPortrait.texture : null);
+        }
+    }
+
     private void DrawSpyReportPopup(int curLang)
     {
         Rect rect = new Rect(Screen.width * 0.05f, Screen.height * 0.05f, Screen.width * 0.9f, Screen.height * 0.9f);
@@ -6268,6 +6298,12 @@ public class FateCastleManager : MonoBehaviour
                 item.name = GetText9("Наплечники", "Shoulders", "Schultern", "Épaules", "Hombros", "Ombros", "ショルダー", "어깨", "护肩");
                 item.statBonus = castle.aiArmorTier * 2;
             }
+            else if (slotType == 4)
+            {
+                item.id = "armor_" + castle.aiArmorTier;
+                item.name = GetText9("Доспех", "Armor", "Rüstung", "Armure", "Armadura", "Armadura", "アーマー", "갑옷", "重型铠甲");
+                item.statBonus = castle.aiArmorTier * 4;
+            }
             else if (slotType == 5)
             {
                 item.id = "ring_" + castle.aiArmorTier;
@@ -6279,6 +6315,12 @@ public class FateCastleManager : MonoBehaviour
                 item.id = "belt_" + castle.aiArmorTier;
                 item.name = GetText9("Пояс", "Belt", "Gürtel", "Ceinture", "Cinturón", "Cinto", "ベルト", "벨트", "坚韧腰带");
                 item.statBonus = castle.aiArmorTier * 2;
+            }
+            else if (slotType == 8)
+            {
+                item.id = "weapon_" + castle.aiArmorTier;
+                item.name = GetText9("Оружие", "Weapon", "Waffe", "Arme", "Arma", "Arma", "武器", "무기", "主战神兵");
+                item.statBonus = castle.aiArmorTier * 5;
             }
             else if (slotType == 7)
             {
@@ -6685,25 +6727,115 @@ public class FateCastleManager : MonoBehaviour
         string displayCmdClass = (spyInfoLvl >= 2) ? cmdClass : "???";
         string displayCmdLvl = (spyInfoLvl >= 2) ? $"Lvl {castle.aiCommanderLevel}" : "???";
 
-        GUILayout.Label($" • {GetText9("Класс:", "Class:", "Klasse:", "Classe :", "Clase:", "Classe:", "クラス:", "클래스:", "职业:")} {displayCmdClass}", detailLabelS);
-        GUILayout.Label($" • {GetText9("Уровень:", "Level:", "Stufe:", "Niveau :", "Nivel:", "Nível:", "レベル:", "레벨:", "级别:")} {displayCmdLvl}", detailLabelS);
-        GUILayout.Label($" • {GetText9("Экипировка (Оружие):", "Equipment (Weapon):", "Ausrüstung (Waffe):", "Équipement (Arme) :", "Equipo (Arma):", "Equipamento (Arma):", "装備 (武器):", "장비 (무기):", "穿戴装备 (主手武器):")} {gearWeapon}", detailLabelS);
-        GUILayout.Label($" • {GetText9("Экипировка (Доспех):", "Equipment (Armor):", "Ausrüstung (Rüstung):", "Équipement (Armure) :", "Equipo (Armadura):", "Equipamento (Armadura):", "装備 (鎧):", "장비 (갑옷):", "穿戴装备 (胸部防具):")} {gearArmor}", detailLabelS);
-        GUILayout.Label($" • {GetText9("Экипировка (Сапоги):", "Equipment (Boots):", "Ausrüstung (Stiefel):", "Équipement (Bottes) :", "Equipo (Botas):", "Equipamento (Botas):", "装備 (靴):", "장비 (장화):", "穿戴装备 (腿部足具):")} {gearBoots}", detailLabelS);
-        GUILayout.Label($" • {GetText9("Экипировка (Щит):", "Equipment (Shield):", "Ausrüstung (Schild):", "Équipement (Bouclier) :", "Equipo (Escudo):", "Equipamento (Escudo):", "装備 (盾):", "장비 (방패):", "穿戴装备 (副手重盾):")} {gearShield}", detailLabelS);
+        GUILayout.Space(4);
 
-        // Вкладка навыков вражеского командира (v18.11.26)
+        // Draw the amazing 3-column high-density bento grid under Garrison Commander
+        GUILayout.BeginVertical(GUI.skin.box);
+        GUILayout.BeginHorizontal();
+        
+        // ----------------------------------------------------
+        // COLUMN 1: Avatar and basic info
+        // ----------------------------------------------------
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(200));
+        GUILayout.Label($"<b>{GetText9("👤 КЛАСС:", "👤 CLASS:", "👤 KLASSE:", "👤 CLASSE:", "👤 CLASE:", "👤 CLASSE:", "👤 クラス:", "👤 클래스:", "👤 职业:")}</b>\n{displayCmdClass}", detailLabelS);
+        GUILayout.Space(6);
+        GUILayout.Label($"<b>{GetText9("⭐ УРОВЕНЬ:", "⭐ LEVEL:", "⭐ STUFE:", "⭐ NIVEAU:", "⭐ NIVEL:", "⭐ NÍVEL:", "⭐ レベル:", "⭐ 레벨:", "⭐ 级别:")}</b>\n{displayCmdLvl}", detailLabelS);
+        GUILayout.Space(10);
+        
+        string aiClass = "warrior";
+        if (castle.zoneIndex == 3) aiClass = "mage";
+        else if (castle.zoneIndex == 11) aiClass = "archer";
+        
+        Texture2D commanderAvatar = GetAICommanderAvatar(aiClass);
+        if (commanderAvatar != null)
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            GUI.backgroundColor = new Color(0.12f, 0.75f, 0.95f, 0.35f);
+            GUILayout.Box("", GUI.skin.box, GUILayout.Width(110), GUILayout.Height(110));
+            Rect avRect = GUILayoutUtility.GetLastRect();
+            GUI.backgroundColor = Color.white;
+            GUI.DrawTexture(new Rect(avRect.x + 4, avRect.y + 4, avRect.width - 8, avRect.height - 8), commanderAvatar, ScaleMode.ScaleToFit);
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+        }
+        GUILayout.EndVertical();
+        
+        GUILayout.Space(12);
+        
+        // ----------------------------------------------------
+        // COLUMN 2: Anatomical Equipment Mannequin (mimics player layout)
+        // ----------------------------------------------------
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(350));
+        GUILayout.Label($"<b>{GetText9("🛡️ СНАРЯЖЕНИЕ:", "🛡️ EQUIPMENT:", "🛡️ AUSRÜSTUNG:", "🛡️ ÉQUIPEMENT:", "🛡️ EQUIPO:", "🛡️ EQUIPAMENTO:", "🛡️ 装備品:", "🛡️ 장비 장착:", "🛡️ 主帅穿戴神装:")}</b>", detailLabelS);
+        GUILayout.Space(6);
+        
+        GUIStyle spyEquipStyle = new GUIStyle(GUI.skin.button);
+        spyEquipStyle.fontSize = 8;
+        spyEquipStyle.richText = true;
+        spyEquipStyle.alignment = TextAnchor.MiddleCenter;
+        spyEquipStyle.normal.textColor = Color.yellow;
+        
+        // Row 1: Head (Helmet - Slot 1)
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        DrawEnemyEquippedSlotButton(castle, 1, "Шлем", "Helmet", curLang, spyInfoLvl, spyEquipStyle, 44, 110);
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+        GUILayout.Space(3);
+
+        // Row 2: Neck (Amulet - Slot 2)
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        DrawEnemyEquippedSlotButton(castle, 2, "Амулет", "Amulet", curLang, spyInfoLvl, spyEquipStyle, 44, 110);
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+        GUILayout.Space(3);
+
+        // Row 3: Torso and Arms (Weapon - Slot 8 | Armor - Slot 4 | Shoulders - Slot 3)
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        DrawEnemyEquippedSlotButton(castle, 8, "Оружие", "Weapon", curLang, spyInfoLvl, spyEquipStyle, 48, 100);
+        GUILayout.Space(3);
+        DrawEnemyEquippedSlotButton(castle, 4, "Доспех", "Armor", curLang, spyInfoLvl, spyEquipStyle, 48, 100);
+        GUILayout.Space(3);
+        DrawEnemyEquippedSlotButton(castle, 3, "Наплечники", "Shoulders", curLang, spyInfoLvl, spyEquipStyle, 48, 100);
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+        GUILayout.Space(3);
+
+        // Row 4: Legs & Accessories (Ring - Slot 5 | Belt - Slot 6)
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        DrawEnemyEquippedSlotButton(castle, 5, "Кольцо", "Ring", curLang, spyInfoLvl, spyEquipStyle, 44, 100);
+        GUILayout.Space(3);
+        DrawEnemyEquippedSlotButton(castle, 6, "Пояс", "Belt", curLang, spyInfoLvl, spyEquipStyle, 44, 110);
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+        GUILayout.Space(3);
+
+        // Row 5: Feet (Boots - Slot 7)
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        DrawEnemyEquippedSlotButton(castle, 7, "Сапоги", "Boots", curLang, spyInfoLvl, spyEquipStyle, 44, 110);
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+        
+        GUILayout.EndVertical();
+        
+        GUILayout.Space(12);
+        
+        // ----------------------------------------------------
+        // COLUMN 3: Commander Skills with hovering description details
+        // ----------------------------------------------------
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(220));
+        GUILayout.Label($"<b>{GetText9("⚡ НАВЫКИ:", "⚡ SKILLS:", "⚡ FÄHIGKEITEN:", "⚡ COMPÉTENCES:", "⚡ HABILIDADES:", "⚡ HABILIDADES:", "⚡ スキル:", "⚡ 기술:", "⚡ 核心技能:")}</b>", detailLabelS);
+        GUILayout.Label(GetText9("(наведите для деталей)", "(hover for details)", "(zeigen für Details)", "(survoler)", "(puntero)", "(foque)", "(ホバー表示)", "(마우스 오버)", "(悬停查看)"), detailLabelS);
+        GUILayout.Space(10);
+        
         if (spyInfoLvl >= 3)
         {
             LoadClassSkillsIcons();
-            string aiClass = "warrior";
-            if (castle.zoneIndex == 3) aiClass = "mage";
-            else if (castle.zoneIndex == 11) aiClass = "archer";
-
-            GUILayout.Space(6);
-            GUILayout.Label($" • {GetText9("Навыки Командира (Наведите для деталей):", "Commander Skills (Hover for details):", "Kommandantenfähigkeiten (Für Details zeigen):", "Compétences du commandant (Survoler pour détails) :", "Habilidades del comandante (Puntero para detalles):", "Habilidades do Comandante (Foque para detalhes):", "指揮官のスキル (マウスホバーで詳細表示):", "사령관 기술 (자세히 보려면 마우스 오버):", "主帅核心技能 (悬停查看详情):")}", detailLabelS);
-            GUILayout.BeginHorizontal();
-            
             Texture2D sk1 = warriorSkillPassive1;
             Texture2D sk2 = warriorSkillPassive2;
             Texture2D sk3 = warriorSkillPassive3;
@@ -6724,34 +6856,48 @@ public class FateCastleManager : MonoBehaviour
                 sk4 = archerSkillUltimate;
             }
 
-            float sBoxW = 75f;
-            float sBoxH = 50f;
+            float sBoxW = 60f;
+            float sBoxH = 40f;
 
             // Skill 1
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
             GUILayout.Box(sk1 != null ? sk1 : Texture2D.whiteTexture, GUILayout.Width(sBoxW), GUILayout.Height(sBoxH));
             if (Event.current.type == EventType.Repaint && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
             {
                 SetHoveredSkill(1, curLang, aiClass, castle.aiCommanderLevel);
             }
-            GUILayout.Space(4);
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+            GUILayout.Space(5);
 
             // Skill 2
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
             GUILayout.Box(sk2 != null ? sk2 : Texture2D.whiteTexture, GUILayout.Width(sBoxW), GUILayout.Height(sBoxH));
             if (Event.current.type == EventType.Repaint && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
             {
                 SetHoveredSkill(2, curLang, aiClass, castle.aiCommanderLevel);
             }
-            GUILayout.Space(4);
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+            GUILayout.Space(5);
 
             // Skill 3
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
             GUILayout.Box(sk3 != null ? sk3 : Texture2D.whiteTexture, GUILayout.Width(sBoxW), GUILayout.Height(sBoxH));
             if (Event.current.type == EventType.Repaint && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
             {
                 SetHoveredSkill(3, curLang, aiClass, castle.aiCommanderLevel);
             }
-            GUILayout.Space(4);
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+            GUILayout.Space(5);
 
             // Skill 4 (Ultimate)
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
             GUI.backgroundColor = new Color(1.0f, 0.4f, 0.4f, 0.9f);
             GUILayout.Box(sk4 != null ? sk4 : Texture2D.whiteTexture, GUILayout.Width(sBoxW), GUILayout.Height(sBoxH));
             if (Event.current.type == EventType.Repaint && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
@@ -6759,9 +6905,23 @@ public class FateCastleManager : MonoBehaviour
                 SetHoveredSkill(4, curLang, aiClass, castle.aiCommanderLevel);
             }
             GUI.backgroundColor = Color.white;
-
+            GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
         }
+        else
+        {
+            GUILayout.FlexibleSpace();
+            GUIStyle lockedS = new GUIStyle(GUI.skin.label);
+            lockedS.alignment = TextAnchor.MiddleCenter;
+            lockedS.normal.textColor = Color.gray;
+            lockedS.fontSize = 12;
+            GUILayout.Label("🔒 ???", lockedS);
+            GUILayout.FlexibleSpace();
+        }
+        GUILayout.EndVertical();
+        
+        GUILayout.EndHorizontal();
+        GUILayout.EndVertical();
 
         GUILayout.Space(10);
 

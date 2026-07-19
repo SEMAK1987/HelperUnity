@@ -1,6 +1,6 @@
-// [SLOT PURCHASES & FULL INV UNLOCK SYNC v18.11.29]
+// [MAX LEVEL & SLOT RE-LOCKING SYNC v18.11.30]
 // Unity Connector for Quantum AI Assistant
-// Updated: 2026-07-19 (Synced with Stable v18.11.29)
+// Updated: 2026-07-19 (Synced with Stable v18.11.30)
 
 #if UNITY_EDITOR
 using UnityEngine;
@@ -16,7 +16,7 @@ namespace AI_Assistant_Quantum
         private string prompt = "";
         private string serverUrl = "http://localhost:3000";
         private Mode mode = Mode.Online;
-        private string status = "Ready for Quantum Manifestation v18.11.29";
+        private string status = "Ready for Quantum Manifestation v18.11.30";
         private bool isProcessing = false;
 
         public enum Mode { Online, Offline, NoInternet }
