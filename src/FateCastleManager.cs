@@ -6638,6 +6638,143 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.EndVertical();
     }
 
+    private void SetHoveredTroopSkill(string name, string desc, Texture2D icon, string typeText)
+    {
+        isHoveringSkill = true;
+        hoveredSkillName = name;
+        hoveredSkillDesc = desc;
+        hoveredSkillType = typeText;
+        hoveredSkillIcon = icon;
+    }
+
+    private void DrawSpyReportTroopCard(string troopId, string locationLabel, string countStr, int countUnlockLvl, int statsUnlockLvl, int skillsUnlockLvl, int spyInfoLvl, int curLang, GUIStyle detailLabelS)
+    {
+        GUILayout.BeginHorizontal(GUI.skin.box, GUILayout.Height(64));
+        
+        // ----------------------------------------------------
+        // COLUMN 1: Avatar, Name & Location
+        // ----------------------------------------------------
+        GUILayout.BeginHorizontal(GUILayout.Width(250));
+        
+        // Avatar Box
+        Texture2D avatar = GetTroopAvatarTexture(troopId);
+        GUI.backgroundColor = new Color(0.12f, 0.75f, 0.95f, 0.35f);
+        GUILayout.Box("", GUI.skin.box, GUILayout.Width(50), GUILayout.Height(50));
+        Rect avRect = GUILayoutUtility.GetLastRect();
+        GUI.backgroundColor = Color.white;
+        if (avatar != null)
+        {
+            GUI.DrawTexture(new Rect(avRect.x + 3, avRect.y + 3, avRect.width - 6, avRect.height - 6), avatar, ScaleMode.ScaleToFit);
+        }
+        
+        GUILayout.Space(8);
+        
+        // Name, Location, Count/Tier
+        GUILayout.BeginVertical();
+        TroopData td = GetTroopData(troopId);
+        string name = curLang == 0 ? td.nameRU : td.nameEN;
+        if (curLang == 8) name = td.nameEN; // default to EN for others, or construct
+        GUILayout.Label($"<b>{name}</b>", detailLabelS);
+        
+        // Location Badge / Text (Regular Garrison vs Commander Army)
+        GUILayout.Label($"<color=#7ed3fc>📍 {locationLabel}</color>", detailLabelS);
+        
+        string displayCount = (spyInfoLvl >= countUnlockLvl) ? countStr : "???";
+        GUILayout.Label($"<b>{GetText9("Численность:", "Strength:", "Stärke:", "Effectif:", "Efectivos:", "Efectivos:", "兵員数:", "병력 수:", "编制数量:")} {displayCount}</b>", detailLabelS);
+        GUILayout.EndVertical();
+        
+        GUILayout.EndHorizontal();
+
+        GUILayout.Space(12);
+
+        // ----------------------------------------------------
+        // COLUMN 2: Tier & Attributes (HP, ATK, DEF, SPD)
+        // ----------------------------------------------------
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(190));
+        if (spyInfoLvl < statsUnlockLvl)
+        {
+            GUILayout.FlexibleSpace();
+            GUIStyle lockedS = new GUIStyle(GUI.skin.label);
+            lockedS.alignment = TextAnchor.MiddleCenter;
+            lockedS.normal.textColor = Color.gray;
+            lockedS.fontSize = 9;
+            GUILayout.Label($"🔒 {GetText9("Характеристики Скрыты", "Stats Hidden", "Werte verdeckt", "Stats Masquées", "Atributos Ocultos", "Atributos Ocultos", "ステータス非開示", "능력치 비공개", "核心属性已屏蔽")}\n(Intel Lvl {statsUnlockLvl})", lockedS);
+            GUILayout.FlexibleSpace();
+        }
+        else
+        {
+            GUILayout.Label($"<b>{GetText9("Тир:", "Tier:", "Stufe:", "Tier:", "Nivel:", "Nível:", "ティア:", "티어:", "兵种等阶:")} {td.tier}</b>", detailLabelS);
+            GUILayout.Space(2);
+            GUILayout.BeginHorizontal();
+            GUILayout.Label($"❤️ <b>HP:</b> {td.hp}", detailLabelS, GUILayout.Width(90));
+            GUILayout.Label($"⚔️ <b>ATK:</b> {td.atk}", detailLabelS, GUILayout.Width(90));
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            GUILayout.Label($"🛡️ <b>DEF:</b> {td.def}", detailLabelS, GUILayout.Width(90));
+            GUILayout.Label($"⚡ <b>SPD:</b> {td.spd}", detailLabelS, GUILayout.Width(90));
+            GUILayout.EndHorizontal();
+        }
+        GUILayout.EndVertical();
+
+        GUILayout.Space(12);
+
+        // ----------------------------------------------------
+        // COLUMN 3: Troop Core Skills & Actions
+        // ----------------------------------------------------
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(180));
+        GUILayout.Label($"<b>{GetText9("⚡ Навыки Отряда:", "⚡ Cohort Skills:", "⚡ Truppenfähigkeiten:", "⚡ Compétences :", "⚡ Habilidades:", "⚡ Habilidades:", "⚡ 特殊スキル:", "⚡ 부대 고유 기술:", "⚡ 战队特异技能:")}</b>", detailLabelS);
+        GUILayout.Space(2);
+        
+        if (spyInfoLvl < skillsUnlockLvl)
+        {
+            GUIStyle lockedS = new GUIStyle(GUI.skin.label);
+            lockedS.normal.textColor = Color.gray;
+            lockedS.fontSize = 9;
+            GUILayout.Label($"🔒 ??? (Intel Lvl {skillsUnlockLvl})", lockedS);
+        }
+        else
+        {
+            GUILayout.BeginHorizontal();
+            
+            // Active Skill
+            Texture2D activeIcon = GetTroopActiveSkillIcon(troopId);
+            string activeName = (td.activeNames != null && td.activeNames.Length > 0) ? td.activeNames[0] : "";
+            string activeDesc = (td.activeDesc != null && td.activeDesc.Length > 0) ? td.activeDesc[0] : "";
+            
+            GUI.backgroundColor = new Color(1.0f, 0.4f, 0.4f, 0.9f); // Highlight active skill in red-ish
+            GUILayout.Box(activeIcon != null ? activeIcon : Texture2D.whiteTexture, GUILayout.Width(28), GUILayout.Height(28));
+            GUI.backgroundColor = Color.white;
+            
+            if (Event.current.type == EventType.Repaint && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
+            {
+                SetHoveredTroopSkill(activeName, activeDesc, activeIcon, GetText9("Активный", "Active", "Aktiv", "Actif", "Activa", "Ativo", "アクティブ", "액티브", "主动技能"));
+            }
+            
+            // Passive Skills
+            int pCount = (td.passiveNames != null) ? td.passiveNames.Length : 0;
+            for (int i = 0; i < pCount; i++)
+            {
+                GUILayout.Space(4);
+                Texture2D passiveIcon = GetTroopPassiveSkillIcon(troopId, i);
+                string pName = td.passiveNames[i];
+                string pDesc = td.passiveDesc[i];
+                
+                GUILayout.Box(passiveIcon != null ? passiveIcon : Texture2D.whiteTexture, GUILayout.Width(28), GUILayout.Height(28));
+                if (Event.current.type == EventType.Repaint && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
+                {
+                    SetHoveredTroopSkill(pName, pDesc, passiveIcon, GetText9("Пассивный", "Passive", "Passiv", "Passif", "Pasiva", "Passivo", "パッシブ", "패시브", "被动技能"));
+                }
+            }
+            
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+        }
+        GUILayout.EndVertical();
+
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+    }
+
     private void SpyReportWindowFunction(int windowID)
     {
         int curLang = Translator.LanguageID;
@@ -7282,16 +7419,15 @@ public class FateCastleManager : MonoBehaviour
 
         GUILayout.Space(10);
 
-        // 3. TROOPS IN CASTLE (GARRISON)
+        // 3. TROOPS & GARRISON COMPOSITION (COMBINED & DETAILED WITH HIGH-DENSITY CARD WIDGETS)
         GUILayout.Label(GetText9(
-            "⚔️ Регулярный Гарнизон Замка", "⚔️ Active Fortress Garrison Troops",
-            "⚔️ Aktive Garnisonstruppen", "⚔️ Troupes actives de la garnison",
-            "⚔️ Tropas activas de la guarnición", "⚔️ Tropas ativas da guarnição",
-            "⚔️ 要塞駐屯軍正規兵員", "⚔️ 요새 활성 주둔군 병력 수",
-            "⚔️ 守城防御正规驻军"
+            "⚔️ Дислокация Войск и Гарнизона Замка", "⚔️ Troop Allocation & Fortress Garrison",
+            "⚔️ Truppenaufteilung & Festungsgarnison", "⚔️ Allocation des troupes & Garnison de la forteresse",
+            "⚔️ Distribución de tropas y guarnición del castillo", "⚔️ Distribuição de Tropas e Guarnição do Castelo",
+            "⚔️ 駐屯軍兵力及び将領直属连隊総合明細", "⚔️ 주둔군 및 사령관 지휘부대 종합 현황",
+            "⚔️ 守城防御守军及部将麾下军团总览"
         ), sectionTitleS);
 
-        string troopsInfo = "";
         int power = castle.aiTroopsPower;
 
         // Specific integer calculations for troops
@@ -7305,69 +7441,109 @@ public class FateCastleManager : MonoBehaviour
         if (t3Count < 0) t3Count = 0;
         if (t4Count < 0) t4Count = 0;
 
+        // Display high-density interactive cards of troops based on Espionage Levels
         if (spyInfoLvl == 1)
         {
             int minPower = Mathf.RoundToInt(power * 0.8f);
             int maxPower = Mathf.RoundToInt(power * 1.2f);
-            troopsInfo = $" • {GetText9("Общая численность (оценка):", "Total Strength (approx):", "Gefährliche Stärke (ca.):", "Force totale (approx) :", "Fuerza total (aprox.):", "Força total (aprox.):", "総員 (推定):", "총 병력 (추정):", "守城军总兵力 (约):")} ~{minPower}..{maxPower} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}\n" +
-                         $" • {GetText9("Состав войск:", "Troops Composition:", "Truppenzusammensetzung:", "Composition des troupes :", "Composición de tropas:", "Composição de tropas:", "部隊構成:", "부대 구성:", "守军配置:")} ???";
-        }
-        else if (spyInfoLvl == 2)
-        {
-            troopsInfo = $" • {GetText9("Общая численность:", "Total Garrison Strength:", "Gesamte Garnisonsstärke:", "Force totale de la garnison :", "Fuerza total de la guarnición:", "Força total da guarnição:", "要塞駐屯軍総員:", "총 주둔 부대 전투력:", "守城军团总兵力:")} {power} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}\n" +
-                         $" • {GetText9("Состав войск:", "Troops Composition:", "Truppenzusammensetzung:", "Composition des troupes :", "Composición de tropas:", "Composição de tropas:", "部隊構成:", "부대 구성:", "守军配置:")} ???";
-        }
-        else if (spyInfoLvl == 3)
-        {
-            troopsInfo = $" • {GetText9("Общая численность:", "Total Garrison Strength:", "Gesamte Garnisonsstärke:", "Force totale de la garnison :", "Fuerza total de la guarnición:", "Força total da guarnição:", "要塞駐屯軍総員:", "총 주둔 부대 전투력:", "守城军团总兵力:")} {power} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}\n" +
-                         $" • {GetText9("Пехота (Т1):", "Infantry (T1):", "Infanterie (T1):", "Infanterie (T1) :", "Infantería (T1):", "Infantaria (T1):", "歩兵 (T1):", "보병 (T1):", "初阶前排步兵 (T1):")} {t1Count}\n" +
-                         $" • {GetText9("Лучники (Т2):", "Archers (T2):", "Bogenschützen (T2):", "Archers (T2) :", "Arqueros (T2):", "Arqueiros (T2):", "弓兵 (T2):", "궁수 (T2):", "中阶射手后排 (T2):")} {t2Count}\n" +
-                         $" • {GetText9("Элитные отряды (Т3+):", "Elite Cohorts (T3+):", "Elitekohorten (T3+):", "Cohortes d'élite (T3+) :", "Cohortes de élite (T3+):", "Coortes de Elite (T3+):", "精鋭部隊 (T3+):", "정예 부대 (T3+):", "高阶精锐军团 (T3+):")} ???";
+            string lowIntelTxt = $" • {GetText9("Общая численность (оценка):", "Total Strength (approx):", "Gefährliche Stärke (ca.):", "Force totale (approx) :", "Fuerza total (aprox.):", "Força total (aprox.):", "総員 (推定):", "총 병력 (추정):", "守城军总兵力 (约):")} ~{minPower}..{maxPower} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}\n" +
+                                 $" • {GetText9("Состав войск скрыт: зашлите больше шпионов для разблокировки подробностей", "Troop composition hidden: send more spies to unlock details", "Truppenzusammensetzung verdeckt: Senden Sie mehr Spione", "Composition masquée : envoyez plus d'espions", "Composición oculta: envía más espías", "Composição oculta: envie mais espiões", "部隊構成非開示: スパイを増やしてください", "부대 구성 잠금됨: 더 많은 스파이를 파견하십시오", "守军配置受限: 部署多名间谍以解锁核心军情")}";
+            GUILayout.Label(lowIntelTxt, detailLabelS);
         }
         else
         {
-            // spyInfoLvl >= 4: Full breakdown of every troop tier
-            troopsInfo = $" • {GetText9("Общая численность:", "Total Garrison Strength:", "Gesamte Garnisonsstärke:", "Force totale de la garnison :", "Fuerza total de la guarnición:", "Força total da guarnição:", "要塞駐屯軍総員:", "총 주둔 부대 전투력:", "守城军团总兵力:")} {power} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}\n" +
-                         $" • {GetText9("Боец фракции (Т1):", "Faction Warriors (T1):", "Fraktionskrieger (T1):", "Guerriers de faction (T1) :", "Guerreros de facción (T1):", "Guerreiros de facção (T1):", "勢力戦士 (T1):", "분파 전사 (T1):", "阵营重装刀盾兵 (T1):")} {t1Count}\n" +
-                         $" • {GetText9("Эльфийский Лучник (Т2):", "Elven Archers (T2):", "Elfenbogenschützen (T2):", "Archers elfes (T2) :", "Arqueros elfos (T2):", "Arqueiros élficos (T2):", "エルフ弓兵 (T2):", "엘프 궁수 (T2):", "暗夜精灵神射手 (T2):")} {t2Count}\n" +
-                         $" • {GetText9("Паладин Света (Т3):", "Holy Paladins (T3):", "Heilige Paladine (T3):", "Paladins sacrés (T3) :", "Paladines sagrados (T3):", "Paladinos sagrados (T3):", "ホーリーパラディン (T3):", "성기사 (T3):", "神圣秩序圣骑士 (T3):")} {t3Count}\n" +
-                         $" • {GetText9("Легендарный Дракон (Т4):", "Void Dragons (T4):", "Void-Drachen (T4):", "Dragons du Néant (T4) :", "Dragones del Vacío (T4):", "Dragões do Vazio (T4):", "ヴォイドドラゴン (T4):", "공허의 드래곤 (T4):", "灭世虚空古巨龙 (T4):")} {t4Count}";
-        }
-        GUILayout.Label(troopsInfo, detailLabelS);
+            // 3.1. REGULAR FORTRESS GARRISON SUBSECTION
+            GUILayout.Space(6);
+            GUILayout.Label($"<b>📌 {GetText9("РЕГУЛЯРНЫЙ ГАРНИЗОН ЗАМКА", "REGULAR FORTRESS GARRISON", "REGULÄRE FESTUNGSGARNISON", "GARNISON RÉGULIÈRE", "GUARNICIÓN REGULAR DEL CASTILLO", "GUARNIÇÃO REGULAR DO CASTELO", "要塞常駐の正規守備兵員", "성채 상시 대기 정규 주둔군", "常备城堡守城防御主力军")}</b>", detailLabelS);
+            GUILayout.Space(4);
 
-        GUILayout.Space(10);
+            // Draw T1 (Faction Warrior) in Garrison
+            DrawSpyReportTroopCard("warrior", 
+                GetText9("Регулярный Гарнизон", "Regular Garrison", "Reguläre Garnison", "Garnison régulière", "Guarnición regular", "Guarnição regular", "正規守備兵", "정규 주둔군", "要塞核心守备"), 
+                $"{t1Count} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
+                2, 2, 3, spyInfoLvl, curLang, detailLabelS);
 
-        // 4. TROOPS ON HEROES
-        GUILayout.Label(GetText9(
-            "⛺ Армии под началом Военачальников", "⛺ Cohorts Led by Garrison Commanders",
-            "⛺ Kohorten unter Kommandanten", "⛺ Cohortes dirigées par les commandants",
-            "⛺ Cohortes lideradas por comandantes", "⛺ Coortes sob Comando dos Líderes",
-            "⛺ 各将領直属配下軍隊総数", "⛺ 사령관 지휘부대 현황",
-            "⛺ 各部将直属统帅连队"
-        ), sectionTitleS);
+            GUILayout.Space(4);
 
-        string heroesTroops = "";
-        if (spyInfoLvl == 1)
-        {
-            heroesTroops = $" • {GetText9("Войска у Главного Героя:", "Troops on Main Hero:", "Truppen des Haupthelden:", "Troupes du héros principal :", "Tropas del héroe principal:", "Tropas do herói principal:", "主将の配下部隊:", "수석 사령관 지휘부대:", "主将统领军队:")} ???\n" +
-                           $" • {GetText9("Войска у Вторичных Героев:", "Troops on Secondary Heroes:", "Truppen der sekundären Helden:", "Troupes des héros secondaires :", "Tropas de héroes secundarios:", "Tropas dos heróis secundários:", "副заводские войска:", "보좌 사령관 지휘부대:", "副将统领军队:")} ???";
+            // Draw T2 (Elven Archer) in Garrison
+            DrawSpyReportTroopCard("archer", 
+                GetText9("Регулярный Гарнизон", "Regular Garrison", "Reguläre Garnison", "Garnison régulière", "Guarnición regular", "Guarnição regular", "正規守備兵", "정규 주둔군", "要塞核心守备"), 
+                $"{t2Count} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
+                3, 3, 3, spyInfoLvl, curLang, detailLabelS);
+
+            GUILayout.Space(4);
+
+            // Draw T3 (Holy Paladin) in Garrison
+            DrawSpyReportTroopCard("paladin", 
+                GetText9("Регулярный Гарнизон", "Regular Garrison", "Reguläre Garnison", "Garnison régulière", "Guarnición regular", "Guarnição regular", "正規守備兵", "정규 주둔군", "要塞核心守备"), 
+                $"{t3Count} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
+                4, 4, 4, spyInfoLvl, curLang, detailLabelS);
+
+            GUILayout.Space(4);
+
+            // Draw T4 (Void Dragon) in Garrison
+            DrawSpyReportTroopCard("dragon", 
+                GetText9("Регулярный Гарнизон", "Regular Garrison", "Reguläre Garnison", "Garnison régulière", "Guarnición regular", "Guarnição regular", "正規守備兵", "정규 주둔군", "要塞核心守备"), 
+                $"{t4Count} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
+                4, 4, 4, spyInfoLvl, curLang, detailLabelS);
+
+            // 3.2. TROOPS LED BY MAIN COMMANDER SUBSECTION
+            GUILayout.Space(12);
+            GUILayout.Label($"<b>👑 {GetText9("ВОЙСКА ПОД НАЧАЛОМ ГЛАВНОГО ГЕРОЯ", "TROOPS LED BY MAIN HERO", "TRUPPEN DES HAUPTHELDEN", "TROUPES DU HÉROS PRINCIPAL", "TROPAS DEL HÉROE PRINCIPAL", "TROPAS DO HERÓI PRINCIPAL", "主将の直属配下兵員", "수석 사령관 직속 부대", "主战守将统领前锋连队")}</b>", detailLabelS);
+            GUILayout.Space(4);
+
+            // Draw T1 (Faction Warrior) on Main Hero
+            DrawSpyReportTroopCard("warrior", 
+                GetText9("Авангард Главного Героя", "Main Hero Vanguard", "Vanguard des Haupthelden", "Avant-garde du héros principal", "Vanguardia del héroe principal", "Vanguarda do herói principal", "主将の先遣部隊", "수석 아방가르드", "守将核心前锋部众"), 
+                $"{t1Count / 2} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
+                2, 2, 3, spyInfoLvl, curLang, detailLabelS);
+
+            GUILayout.Space(4);
+
+            // Draw T2 (Elven Archer) on Main Hero
+            DrawSpyReportTroopCard("archer", 
+                GetText9("Авангард Главного Героя", "Main Hero Vanguard", "Vanguard des Haupthelden", "Avant-garde du héros principal", "Vanguardia del héroe principal", "Vanguarda do herói principal", "主将の先遣部隊", "수석 아방가르드", "守将核心前锋部众"), 
+                $"{t2Count / 2} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
+                3, 3, 3, spyInfoLvl, curLang, detailLabelS);
+
+            GUILayout.Space(4);
+
+            // Draw T3 (Holy Paladin) on Main Hero
+            DrawSpyReportTroopCard("paladin", 
+                GetText9("Авангард Главного Героя", "Main Hero Vanguard", "Vanguard des Haupthelden", "Avant-garde du héros principal", "Vanguardia del héroe principal", "Vanguarda do herói principal", "主将の先遣部隊", "수석 아방가르드", "守将核心前锋部众"), 
+                $"{t3Count / 2} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
+                4, 4, 4, spyInfoLvl, curLang, detailLabelS);
+
+            // 3.3. TROOPS LED BY SECONDARY HEROES SUBSECTION (If any secondary heroes exist)
+            if (simpleHeroCount >= 1)
+            {
+                GUILayout.Space(12);
+                GUILayout.Label($"<b>👥 {GetText9("ВОЙСКА ПОД НАЧАЛОМ ВТОРИЧНЫХ ГЕРОЕВ", "TROOPS LED BY SECONDARY HEROES", "TRUPPEN DER SEKUNDÄREN HELDEN", "TROUPES DES HÉROS SECONDAIRES", "TROPAS DE HÉROES SECUNDARIOS", "TROPAS DOS HERÓIS SECUNDÁRIOS", "副将直属配下兵員", "부장 직속 부대 목록", "麾下驻城守城连队部众")}</b>", detailLabelS);
+                GUILayout.Space(4);
+
+                // Draw T1 (Faction Warrior) on Secondary Hero
+                DrawSpyReportTroopCard("warrior", 
+                    GetText9("Когорта Вторичного Героя", "Secondary Hero Cohort", "Kohorte des sekundären Helden", "Cohorte du héros secondaire", "Cohorte del héroe secundario", "Coorte do herói secundário", "副将の兵員団", "부장 부대원", "麾下守城步兵连队"), 
+                    $"{t1Count / 4} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
+                    2, 2, 3, spyInfoLvl, curLang, detailLabelS);
+
+                GUILayout.Space(4);
+
+                // Draw T2 (Elven Archer) on Secondary Hero
+                DrawSpyReportTroopCard("archer", 
+                    GetText9("Когорта Вторичного Героя", "Secondary Hero Cohort", "Kohorte des sekundären Helden", "Cohorte du héros secondaire", "Cohorte del héroe secundario", "Coorte do herói secundário", "副将の兵員団", "부장 부대원", "麾下守城弓兵连队"), 
+                    $"{t2Count / 4} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
+                    3, 3, 3, spyInfoLvl, curLang, detailLabelS);
+
+                GUILayout.Space(4);
+
+                // Draw T3 (Holy Paladin) on Secondary Hero
+                DrawSpyReportTroopCard("paladin", 
+                    GetText9("Когорта Вторичного Героя", "Secondary Hero Cohort", "Kohorte des sekundären Helden", "Cohorte du héros secondaire", "Cohorte del héroe secundario", "Coorte do herói secundário", "副将の兵员団", "부장 부대원", "麾下守城重盾骑士连队"), 
+                    $"{t3Count / 4} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}", 
+                    4, 4, 4, spyInfoLvl, curLang, detailLabelS);
+            }
         }
-        else if (spyInfoLvl == 2)
-        {
-            heroesTroops = $" • {GetText9("Войска у Главного Героя:", "Troops on Main Hero:", "Truppen des Haupthelden:", "Troupes du héros principal :", "Tropas del héroe principal:", "Tropas do herói principal:", "主将の配下部隊:", "수석 사령관 지휘부대:", "主将统领军队:")} {power / 2} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}\n" +
-                           $" • {GetText9("Войска у Вторичных Героев:", "Troops on Secondary Heroes:", "Truppen der sekundären Helden:", "Troupes des héros secondaires :", "Tropas de héroes secundarios:", "Tropas dos heróis secundários:", "副将の配下部隊:", "보좌 사령관 지휘부대:", "副将统领军队:")} ???";
-        }
-        else if (spyInfoLvl == 3)
-        {
-            heroesTroops = $" • {GetText9("Войска у Главного Героя:", "Troops on Main Hero:", "Truppen des Haupthelden:", "Troupes du héros principal :", "Tropas del héroe principal:", "Tropas do herói principal:", "主将の配下部隊:", "수석 사령관 지휘부대:", "主将统领军队:")} {power / 2} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}\n" +
-                           $" • {GetText9("Войска у Вторичных Героев:", "Troops on Secondary Heroes:", "Truppen der sekundären Helden:", "Troupes des héros secondaires :", "Tropas de héroes secundarios:", "Tropas dos heróis secundários:", "副将の配下部隊:", "보좌 사령관 지휘부대:", "副将统领军队:")} {power / 4} {GetText9("воинов", "warriors", "Krieger", "guerriers", "guerreros", "guerreiros", "名", "명", "兵")}";
-        }
-        else
-        {
-            heroesTroops = $" • {GetText9("Войска у Главного Героя:", "Troops on Main Hero:", "Truppen des Haupthelden:", "Troupes du héros principal :", "Tropas del héroe principal:", "Tropas do herói principal:", "主将の配下部隊:", "수석 사령관 지휘부대:", "主将统领军队:")} {power / 2} {GetText9("воинов (Т1/Т2)", "warriors (T1/T2)", "Krieger (T1/T2)", "guerriers (T1/T2)", "guerreros (T1/T2)", "guerreiros (T1/T2)", "名 (T1/T2)", "명 (T1/T2)", "名步射兵 (T1/T2)")}\n" +
-                           $" • {GetText9("Войска у Вторичных Героев:", "Troops on Secondary Heroes:", "Truppen der sekundären Helden:", "Troupes des héros secondaires :", "Tropas de héroes secundarios:", "Tropas dos heróis secundários:", "副将の配下部隊:", "보좌 사령관 지휘부대:", "副将统领军队:")} {power / 4} {GetText9("воинов (Т2/Т3)", "warriors (T2/T3)", "Krieger (T2/T3)", "guerriers (T2/T3)", "guerreros (T2/T3)", "guerreiros (T2/T3)", "名 (T2/T3)", "명 (T2/T3)", "名射骑兵 (T2/T3)")}";
-        }
-        GUILayout.Label(heroesTroops, detailLabelS);
 
         GUILayout.EndScrollView();
 
