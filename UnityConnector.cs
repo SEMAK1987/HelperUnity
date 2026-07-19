@@ -1,6 +1,6 @@
-// [TACTICAL CAMERA & LANDING COORDS SYNC v18.11.27]
+// [SLOT PURCHASES & FULL INV UNLOCK SYNC v18.11.29]
 // Unity Connector for Quantum AI Assistant
-// Updated: 2026-07-18 (Synced with Stable v18.11.27)
+// Updated: 2026-07-19 (Synced with Stable v18.11.29)
 
 #if UNITY_EDITOR
 using UnityEngine;
@@ -16,7 +16,7 @@ namespace AI_Assistant_Quantum
         private string prompt = "";
         private string serverUrl = "http://localhost:3000";
         private Mode mode = Mode.Online;
-        private string status = "Ready for Quantum Manifestation v18.11.27";
+        private string status = "Ready for Quantum Manifestation v18.11.29";
         private bool isProcessing = false;
 
         public enum Mode { Online, Offline, NoInternet }

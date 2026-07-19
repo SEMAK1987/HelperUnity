@@ -3696,6 +3696,36 @@ public class FateCastleManager : MonoBehaviour
         ShowFeedback(Translator.LanguageID == 0 ? "♻️ Характеристики сброшены к начальным!" : "♻️ Stats reset to base!");
     }
 
+    private void ResetInventoryAndEquipment()
+    {
+        // Clear equipment mannequin slots (9 slots total, index 0 to 8)
+        if (playerEquipment == null) playerEquipment = new EquipmentData();
+        for (int i = 0; i < 9; i++)
+        {
+            playerEquipment.slots[i] = new InventoryItem();
+        }
+        SaveEquipment();
+
+        // Clear player inventory (36 slots visible, up to 999 max slot size) and reset slot purchases to default (12)
+        PlayerPrefs.DeleteKey("Player_Inventory_JSON_v18");
+        PlayerPrefs.DeleteKey("Player_Inventory_Purchased_Slots");
+        PlayerPrefs.Save();
+
+        currentInventoryTab = 0;
+
+        playerInventory = new InventoryData();
+        for (int i = 0; i < 999; i++)
+        {
+            playerInventory.items[i] = new InventoryItem();
+        }
+        
+        // LoadInventory will detect that the save key is missing and rebuild the starting starter gear and potions perfectly!
+        LoadInventory();
+        
+        RecalculateStats();
+        ShowFeedback(Translator.LanguageID == 0 ? "♻️ Весь инвентарь, снаряжение и ячейки сброшены к начальным!" : "♻️ Full inventory, gear, and slot purchases reset!");
+    }
+
     public void AdvanceDay()
     {
         currentDay++;
@@ -5110,6 +5140,13 @@ public class FateCastleManager : MonoBehaviour
         {
             ResetPlayerStats();
         }
+
+        GUI.backgroundColor = new Color(0.85f, 0.35f, 0.15f);
+        string resetInvLabel = curLang == 0 ? "СБРОС ИНВ." : "RESET INV";
+        if (GUILayout.Button($"🎒 {resetInvLabel}", GUILayout.Height(32)))
+        {
+            ResetInventoryAndEquipment();
+        }
         
         GUI.backgroundColor = new Color(0.15f, 0.8f, 0.35f);
         string addXpText = curLang == 0 ? "ОПЫТ +100" : "+100 XP";
@@ -5171,6 +5208,20 @@ public class FateCastleManager : MonoBehaviour
         if (GUILayout.Button($"💰 {addGoldText}", GUILayout.Height(32)))
         {
             SaveGameSystem.CurrentData.gold += 1000;
+            if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+        }
+        GUI.backgroundColor = Color.white;
+        GUILayout.EndHorizontal();
+
+        GUILayout.Space(6);
+
+        GUILayout.BeginHorizontal();
+        GUI.backgroundColor = new Color(0.12f, 0.6f, 0.9f);
+        string unlockAllInvLabel = curLang == 0 ? "ОТКРЫТЬ ВЕСЬ ИНВ." : "UNLOCK ALL INV";
+        if (GUILayout.Button($"🔓 {unlockAllInvLabel}", GUILayout.Height(32)))
+        {
+            SetPurchasedSlotsCount(999);
+            ShowFeedback(curLang == 0 ? "🔓 Все 999 ячеек инвентаря успешно разблокированы!" : "🔓 All 999 inventory slots successfully unlocked!");
             if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
         }
         GUI.backgroundColor = Color.white;
@@ -6444,6 +6495,81 @@ public class FateCastleManager : MonoBehaviour
 
         GUILayout.Space(6);
 
+        // Detailed espionage level description badge (v18.11.27)
+        GUIStyle spyLvlBadgeStyle = new GUIStyle(GUI.skin.box);
+        spyLvlBadgeStyle.alignment = TextAnchor.MiddleLeft;
+        spyLvlBadgeStyle.padding = new RectOffset(10, 10, 6, 6);
+        
+        string lvlDesc = "";
+        Color badgeColor = Color.white;
+        if (spyInfoLvl <= 1)
+        {
+            badgeColor = new Color(0.9f, 0.4f, 0.4f); // Reddish
+            lvlDesc = GetText9(
+                "⚠️ УРОВЕНЬ ШПИОНАЖА: 1 (Минимальный) • Данные военачальников и войск скрыты знаками '???'",
+                "⚠️ ESPIONAGE LEVEL: 1 (Minimal) • Commanders and troops data are hidden with '???'",
+                "⚠️ SPIONAGE-STUFE: 1 (Minimal) • Kommandanten- und Truppendaten sind mit '???' ausgeblendet",
+                "⚠️ NIVEAU D'ESPIONNAGE : 1 (Minimal) • Les données des commandants et des troupes sont masquées par des '???'",
+                "⚠️ NIVEL DE ESPIONAJE: 1 (Mínimo) • Los datos de comandantes y tropas están ocultos con '???'",
+                "⚠️ NÍVEL DE ESPIONAGEM: 1 (Mínimo) • Dados de comandantes e tropas ocultos com '???'",
+                "⚠️ 偵察レベル: 1 (最低) • 司令官および兵士のデータは '???' で隠されています",
+                "⚠️ 정찰 레벨: 1 (최소) • 사령관 및 부대 데이터가 '???'로 숨겨져 있습니다",
+                "⚠️ 探报情报等级: 1级 (初级) • 领主守将及戍卫守军的核心机密数据仍被 '???' 深度遮蔽"
+            );
+        }
+        else if (spyInfoLvl == 2)
+        {
+            badgeColor = new Color(0.95f, 0.65f, 0.2f); // Orange
+            lvlDesc = GetText9(
+                "🔍 УРОВЕНЬ ШПИОНАЖА: 2 (Низкий) • Виден класс, уровень героя, базовая численность гарнизона",
+                "🔍 ESPIONAGE LEVEL: 2 (Low) • Hero class, level, and basic garrison size are visible",
+                "🔍 SPIONAGE-STUFE: 2 (Niedrig) • Heldenklasse, Stufe und Basis-Garnisonsgröße sind sichtbar",
+                "🔍 NIVEAU D'ESPIONNAGE : 2 (Faible) • La classe de héros, le niveau et la taille de base sont visibles",
+                "🔍 NIVEL DE ESPIONAJE: 2 (Bajo) • Clase de héroe, nivel y tamaño de guarnición base visibles",
+                "🔍 NÍVEL DE ESPIONAGEM: 2 (Baixo) • Classe, nível do herói e tamanho básico da guarnição visíveis",
+                "🔍 偵察レベル: 2 (低) • ヒーロークラス、レベル、基本駐屯地サイズが表示されます",
+                "🔍 정찰 레벨: 2 (낮음) • 영웅 클래스, 레벨 및 기본 주둔지 규모가 표시됩니다",
+                "🔍 探报情报等级: 2级 (中级) • 对方守将职业、等级和常备守军规模已可清晰判定"
+            );
+        }
+        else if (spyInfoLvl == 3)
+        {
+            badgeColor = new Color(0.2f, 0.8f, 0.95f); // Cyan
+            lvlDesc = GetText9(
+                "⚡ УРОВЕНЬ ШПИОНАЖА: 3 (Средний) • Полная статистика героя, точный состав гарнизона",
+                "⚡ ESPIONAGE LEVEL: 3 (Medium) • Full hero statistics, accurate garrison composition revealed",
+                "⚡ SPIONAGE-STUFE: 3 (Mittel) • Vollständige Helden-Statistiken, genaue Zusammensetzung sichtbar",
+                "⚡ NIVEAU D'ESPIONNAGE : 3 (Moyen) • Statistiques complètes du héros et composition précise révélées",
+                "⚡ NIVEL DE ESPIONAJE: 3 (Medio) • Estadísticas completas de héroe, composición exacta de guarnición",
+                "⚡ NÍVEL DE ESPIONAGEM: 3 (Médio) • Estatísticas completas, composição exata da guarnição revelada",
+                "⚡ 偵察レベル: 3 (中) • ヒーローの全ステータス、正確な駐屯地構成が明らかになります",
+                "⚡ 정찰 레벨: 3 (보통) • 영웅 전체 능력치, 주둔 부대의 상세 구성이 파악되었습니다",
+                "⚡ 探报情报等级: 3级 (高级) • 守将完整属性、配备神器及城防守备兵力构成已完全洞悉"
+            );
+        }
+        else
+        {
+            badgeColor = new Color(0.2f, 0.9f, 0.4f); // Green
+            lvlDesc = GetText9(
+                "✨ УРОВЕНЬ ШПИОНАЖА: 4+ (Максимальный) • Раскрыты все подробности, экипировка и когорты",
+                "✨ ESPIONAGE LEVEL: 4+ (Maximum) • All details, full equipment, and cohort distributions revealed",
+                "✨ SPIONAGE-STUFE: 4+ (Maximal) • Alle Details, Ausrüstung und Kohorten-Verteilung enthüllt",
+                "✨ NIVEAU D'ESPIONNAGE : 4+ (Maximal) • Tous les détails, l'équipement complet et les cohortes révélés",
+                "✨ NIVEL DE ESPIONAJE: 4+ (Máximo) • Todos los detalles, equipo completo y cohortes revelados",
+                "✨ NÍVEL DE ESPIONAGEM: 4+ (Máximo) • Todos os detalhes, equipamentos e coortes revelados",
+                "✨ 偵察レベル: 4+ (最高) • すべての詳細、フル装備、コホート編成が完全に開示されています",
+                "✨ 정찰 레벨: 4+ (최대) • 모든 상세 정보, 장착 장비 및 각 부대 분포가 완전 개방되었습니다",
+                "✨ 探报情报等级: 4级+ (神级) • 守城守军、副将大队、神装兵种配置等最高军情机密已悉数破译"
+            );
+        }
+
+        Color prevColor = GUI.color;
+        GUI.color = badgeColor;
+        GUILayout.Box(lvlDesc, spyLvlBadgeStyle, GUILayout.Height(36));
+        GUI.color = prevColor;
+
+        GUILayout.Space(6);
+
         // Scrollview for details
         spyScrollPos = GUILayout.BeginScrollView(spyScrollPos, GUILayout.ExpandHeight(true));
 
@@ -7682,6 +7808,17 @@ public class FateCastleManager : MonoBehaviour
             GUILayout.Label(spyTitle, GUI.skin.label);
             GUILayout.Space(4);
 
+            int playerCastleLvl = 1;
+            for (int i = 0; i < castles.Count; i++)
+            {
+                if (castles[i].owner == "Player")
+                {
+                    if (castles[i].level > playerCastleLvl)
+                        playerCastleLvl = castles[i].level;
+                }
+            }
+
+            int currentSpyLvl = PlayerPrefs.GetInt("Castle_Spied_Lvl_" + castle.zoneIndex, 0);
             bool isAlreadySpied = (PlayerPrefs.GetInt("Castle_Spied_" + castle.zoneIndex, 0) == 1);
 
             if (isAlreadySpied)
@@ -7691,15 +7828,15 @@ public class FateCastleManager : MonoBehaviour
                 spiedLabelS.fontStyle = FontStyle.Bold;
                 spiedLabelS.alignment = TextAnchor.MiddleCenter;
                 string spiedTxt = GetText9(
-                    "✓ Замок успешно разведан. Данные доступны в отчетах!",
-                    "✓ Castle successfully scouted. Data available in Reports!",
-                    "✓ Burg erfolgreich ausspioniert. Bericht verfügbar!",
-                    "✓ Château espionné avec succès. Rapport disponible !",
-                    "✓ Castillo espiado con éxito. ¡Informe disponible!",
-                    "✓ Castelo espionado com sucesso. Relatório disponível!",
-                    "✓ 城の偵察に成功しました。諜報報告書を参照してください！",
-                    "✓ 성채 정찰 완료. 첩보 보고서 참조!",
-                    "✓ 该领地已被我方探子渗透。最新军事情报已载入谍报窗口！"
+                    $"✓ Замок разведан (Ур. Разведки: {currentSpyLvl})",
+                    $"✓ Castle scouted (Intel Level: {currentSpyLvl})",
+                    $"✓ Burg ausspioniert (Spionage-Stufe: {currentSpyLvl})",
+                    $"✓ Château espionné (Niveau d'espionnage : {currentSpyLvl})",
+                    $"✓ Castillo espiado (Nivel de espionaje: {currentSpyLvl})",
+                    $"✓ Castelo espionado (Nível de espionagem: {currentSpyLvl})",
+                    $"✓ 城の偵察に成功 (偵察レベル: {currentSpyLvl})",
+                    $"✓ 성채 정찰 완료 (정찰 레벨: {currentSpyLvl})",
+                    $"✓ 该领地已被我方探子渗透 (情报等级: {currentSpyLvl})"
                 );
                 GUILayout.Label(spiedTxt, spiedLabelS);
                 GUILayout.Space(6);
@@ -7723,19 +7860,86 @@ public class FateCastleManager : MonoBehaviour
                     if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
                 }
                 GUI.backgroundColor = Color.white;
+
+                // Show upgrade option if player's current maximum castle level is higher than currently saved spy level (v18.11.27)
+                if (playerCastleLvl > currentSpyLvl)
+                {
+                    GUILayout.Space(10);
+                    GUIStyle upgradeS = new GUIStyle(GUI.skin.label);
+                    upgradeS.normal.textColor = Color.yellow;
+                    upgradeS.alignment = TextAnchor.MiddleCenter;
+                    upgradeS.fontStyle = FontStyle.Bold;
+                    string upgradeMsg = GetText9(
+                        $"💡 Доступно улучшение разведки до уровня {playerCastleLvl}!",
+                        $"💡 Espionage upgrade to Level {playerCastleLvl} is available!",
+                        $"💡 Spionage-Upgrade auf Stufe {playerCastleLvl} verfügbar!",
+                        $"💡 Amélioration d'espionnage au niveau {playerCastleLvl} disponible !",
+                        $"💡 ¡Mejora de espionaje al nivel {playerCastleLvl} disponible!",
+                        $"💡 Melhoria de espionagem para o nível {playerCastleLvl} disponível!",
+                        $"💡 偵察レベル{playerCastleLvl}へのアップグレードが可能です！",
+                        $"💡 정찰 레벨 {playerCastleLvl}(으)로 업그레이드 가능!",
+                        $"💡 可以通过升级我方城堡将情报等级提升至 {playerCastleLvl} 级！"
+                    );
+                    GUILayout.Label(upgradeMsg, upgradeS);
+                    GUILayout.Space(4);
+
+                    int successChance = GetSpySuccessChance(playerCastleLvl, castle.level);
+                    int spyCost = castle.level * 100;
+
+                    if (successChance > 0)
+                    {
+                        GUI.backgroundColor = new Color(0.95f, 0.6f, 0.1f);
+                        string upgradeBtnText = GetText9(
+                            $"Улучшить разведку ({spyCost} 💰) | Шанс: {successChance}%",
+                            $"Upgrade Espionage ({spyCost} 💰) | Chance: {successChance}%",
+                            $"Spionage aufwerten ({spyCost} 💰) | Chance: {successChance}%",
+                            $"Améliorer l'espionnage ({spyCost} 💰) | Chance: {successChance}%",
+                            $"Mejorar espionaje ({spyCost} 💰) | Chance: {successChance}%",
+                            $"Melhorar espionagem ({spyCost} 💰) | Chance: {successChance}%",
+                            $"偵察を強化する ({spyCost} 💰) | 確率: {successChance}%",
+                            $"정찰 업그레이드 ({spyCost} 💰) | 확률: {successChance}%",
+                            $"升级情报等级 ({spyCost} 💰) | 成功率: {successChance}%"
+                        );
+
+                        if (GUILayout.Button(upgradeBtnText, GUILayout.Height(30)))
+                        {
+                            if (SaveGameSystem.CurrentData.gold < spyCost)
+                            {
+                                ShowFeedback(curLang == 0 ? "Недостаточно золота!" : "Not enough gold!");
+                            }
+                            else
+                            {
+                                SaveGameSystem.CurrentData.gold -= spyCost;
+                                int roll = UnityEngine.Random.Range(1, 101);
+                                if (roll <= successChance)
+                                {
+                                    PlayerPrefs.SetInt("Castle_Spied_Lvl_" + castle.zoneIndex, playerCastleLvl);
+                                    PlayerPrefs.Save();
+                                    ShowFeedback(curLang == 0 ? "Разведка успешно обновлена до более высокого уровня!" : "Espionage successfully upgraded to a higher level!");
+                                    if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+                                }
+                                else
+                                {
+                                    ShowFeedback(curLang == 0 ? "Шпион был обнаружен при попытке углубленной разведки!" : "The spy was detected during the deep infiltration attempt!");
+                                }
+                            }
+                        }
+                        GUI.backgroundColor = Color.white;
+                    }
+                    else
+                    {
+                        GUIStyle lockS = new GUIStyle(GUI.skin.label);
+                        lockS.normal.textColor = Color.gray;
+                        lockS.alignment = TextAnchor.MiddleCenter;
+                        string lockTxt = curLang == 0 ?
+                            $"🔒 Улучшение недоступно (нужен выше уровень Цитадели)" :
+                            $"🔒 Upgrade locked (higher Citadel level required)";
+                        GUILayout.Label(lockTxt, lockS);
+                    }
+                }
             }
             else
             {
-                int playerCastleLvl = 1;
-                for (int i = 0; i < castles.Count; i++)
-                {
-                    if (castles[i].owner == "Player")
-                    {
-                        if (castles[i].level > playerCastleLvl)
-                            playerCastleLvl = castles[i].level;
-                    }
-                }
-
                 int successChance = GetSpySuccessChance(playerCastleLvl, castle.level);
                 int spyCost = castle.level * 100;
 
