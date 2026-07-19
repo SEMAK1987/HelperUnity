@@ -4372,10 +4372,13 @@ public class FateCastleManager : MonoBehaviour
         }
 
         // DRAW SKILL AND ITEM HOVER TOOLTIP ON TOP OF EVERYTHING
-        DrawHoverTooltip(curLang);
+        if (!showSpyReportPopup)
+        {
+            DrawHoverTooltip(curLang);
+        }
     }
 
-    private void DrawHoverTooltip(int curLang)
+    private void DrawHoverTooltip(int curLang, bool insideWindow = false)
     {
         if (isHoveringSkill)
         {
@@ -4393,9 +4396,12 @@ public class FateCastleManager : MonoBehaviour
             float tooltipX = mousePos.x + 15f;
             float tooltipY = mousePos.y + 15f;
             
-            // Constrain within the game screen boundaries
-            if (tooltipX + tooltipWidth > Screen.width) tooltipX = Screen.width - tooltipWidth - 10f;
-            if (tooltipY + tooltipHeight > Screen.height) tooltipY = Screen.height - tooltipHeight - 10f;
+            // Constrain within boundaries (window or full screen)
+            float limitWidth = insideWindow ? (Screen.width * 0.9f) : Screen.width;
+            float limitHeight = insideWindow ? (Screen.height * 0.9f) : Screen.height;
+            
+            if (tooltipX + tooltipWidth > limitWidth) tooltipX = limitWidth - tooltipWidth - 10f;
+            if (tooltipY + tooltipHeight > limitHeight) tooltipY = limitHeight - tooltipHeight - 10f;
             
             Rect tooltipRect = new Rect(tooltipX, tooltipY, tooltipWidth, tooltipHeight);
             
@@ -6353,12 +6359,12 @@ public class FateCastleManager : MonoBehaviour
             case 6: customTex = icon_belt; break;
             case 7: customTex = icon_boots; break;
             case 8:
-                string cl = "warrior";
-                if (castle.zoneIndex == 3) cl = "mage";
-                else if (castle.zoneIndex == 11) cl = "archer";
+                string clClass = "warrior";
+                if (castle.zoneIndex == 3) clClass = "mage";
+                else if (castle.zoneIndex == 11) clClass = "archer";
 
-                if (cl.Contains("archer")) customTex = weapon_archer_bow;
-                else if (cl.Contains("mage")) customTex = weapon_mage_staff;
+                if (clClass.Contains("archer")) customTex = weapon_archer_bow;
+                else if (clClass.Contains("mage")) customTex = weapon_mage_staff;
                 else customTex = weapon_warrior_sword;
                 break;
         }
@@ -6371,22 +6377,26 @@ public class FateCastleManager : MonoBehaviour
         {
             if (Event.current.type == EventType.Repaint && btnRect.Contains(Event.current.mousePosition))
             {
-                SetHoveredItem(item, curLang);
+                string clClass = "warrior";
+                if (castle.zoneIndex == 3) clClass = "mage";
+                else if (castle.zoneIndex == 11) clClass = "archer";
+                SetHoveredItem(item, curLang, clClass);
             }
         }
 
         if (customTex != null)
         {
-            float padding = 4f;
-            Rect iconRect = new Rect(btnRect.x + padding, btnRect.y + padding, btnRect.width - padding * 2, btnRect.height - padding * 2 - 12f);
+            float padding = 5f;
+            Rect iconRect = new Rect(btnRect.x + padding, btnRect.y + padding, btnRect.width - padding * 2, btnRect.height - padding * 2 - 20f);
             GUI.DrawTexture(iconRect, customTex, ScaleMode.ScaleToFit, true);
         }
         
-        Rect labelRect = new Rect(btnRect.x, btnRect.y + btnRect.height - 15f, btnRect.width, 14f);
+        Rect labelRect = new Rect(btnRect.x, btnRect.y + btnRect.height - 20f, btnRect.width, 18f);
         GUIStyle overlayStyle = new GUIStyle(GUI.skin.label);
         overlayStyle.alignment = TextAnchor.MiddleCenter;
-        overlayStyle.fontSize = 8;
+        overlayStyle.fontSize = 10;
         overlayStyle.richText = true;
+        overlayStyle.normal.textColor = new Color(0.6f, 0.6f, 0.6f, 0.9f); // Elegant default gray
         
         string slotLabelText = "";
         if (item != null)
@@ -6397,12 +6407,12 @@ public class FateCastleManager : MonoBehaviour
             else if (item.level >= 2) colorTag = "<color=cyan>";
 
             string displayItemName = item.name;
-            if (displayItemName.Length > 10) displayItemName = displayItemName.Substring(0, 9) + "..";
+            if (displayItemName.Length > 12) displayItemName = displayItemName.Substring(0, 11) + "..";
             slotLabelText = $"{colorTag}{displayItemName}</color>";
         }
         else
         {
-            slotLabelText = $"<color=gray>[{defaultNameRU}]</color>";
+            slotLabelText = $"[{defaultNameRU}]";
         }
         GUI.Label(labelRect, slotLabelText, overlayStyle);
 
@@ -6845,17 +6855,17 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.EndHorizontal();
         GUILayout.EndVertical();
         
-        GUILayout.Space(12);
+        GUILayout.Space(30);
         
         // ----------------------------------------------------
         // COLUMN 2: Anatomical Equipment Mannequin (mimics player layout)
         // ----------------------------------------------------
-        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(340));
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(400));
         GUILayout.Label($"<b>{GetText9("🛡️ СНАРЯЖЕНИЕ:", "🛡️ EQUIPMENT:", "🛡️ AUSRÜSTUNG:", "🛡️ ÉQUIPEMENT:", "🛡️ EQUIPO:", "🛡️ EQUIPAMENTO:", "🛡️ 装備品:", "🛡️ 장비 장착:", "🛡️ 主帅穿戴神装:")}</b>", detailLabelS);
-        GUILayout.Space(6);
+        GUILayout.Space(8);
         
         GUIStyle spyEquipStyle = new GUIStyle(GUI.skin.button);
-        spyEquipStyle.fontSize = 8;
+        spyEquipStyle.fontSize = 9;
         spyEquipStyle.richText = true;
         spyEquipStyle.alignment = TextAnchor.MiddleCenter;
         spyEquipStyle.normal.textColor = Color.yellow;
@@ -6863,56 +6873,56 @@ public class FateCastleManager : MonoBehaviour
         // Row 1: Head (Helmet - Slot 1)
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        DrawEnemyEquippedSlotButton(castle, 1, "Шлем", "Helmet", curLang, spyInfoLvl, spyEquipStyle, 44, 110);
+        DrawEnemyEquippedSlotButton(castle, 1, "Шлем", "Helmet", curLang, spyInfoLvl, spyEquipStyle, 70, 130);
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
-        GUILayout.Space(3);
+        GUILayout.Space(5);
 
         // Row 2: Neck (Amulet - Slot 2)
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        DrawEnemyEquippedSlotButton(castle, 2, "Амулет", "Amulet", curLang, spyInfoLvl, spyEquipStyle, 44, 110);
+        DrawEnemyEquippedSlotButton(castle, 2, "Амулет", "Amulet", curLang, spyInfoLvl, spyEquipStyle, 70, 130);
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
-        GUILayout.Space(3);
+        GUILayout.Space(5);
 
         // Row 3: Torso and Arms (Weapon - Slot 8 | Armor - Slot 4 | Shoulders - Slot 3)
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        DrawEnemyEquippedSlotButton(castle, 8, "Оружие", "Weapon", curLang, spyInfoLvl, spyEquipStyle, 48, 100);
-        GUILayout.Space(3);
-        DrawEnemyEquippedSlotButton(castle, 4, "Доспех", "Armor", curLang, spyInfoLvl, spyEquipStyle, 48, 100);
-        GUILayout.Space(3);
-        DrawEnemyEquippedSlotButton(castle, 3, "Наплечники", "Shoulders", curLang, spyInfoLvl, spyEquipStyle, 48, 100);
+        DrawEnemyEquippedSlotButton(castle, 8, "Оружие", "Weapon", curLang, spyInfoLvl, spyEquipStyle, 76, 120);
+        GUILayout.Space(5);
+        DrawEnemyEquippedSlotButton(castle, 4, "Доспех", "Armor", curLang, spyInfoLvl, spyEquipStyle, 76, 120);
+        GUILayout.Space(5);
+        DrawEnemyEquippedSlotButton(castle, 3, "Наплечники", "Shoulders", curLang, spyInfoLvl, spyEquipStyle, 76, 120);
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
-        GUILayout.Space(3);
+        GUILayout.Space(5);
 
         // Row 4: Legs & Accessories (Ring - Slot 5 | Belt - Slot 6)
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        DrawEnemyEquippedSlotButton(castle, 5, "Кольцо", "Ring", curLang, spyInfoLvl, spyEquipStyle, 44, 100);
-        GUILayout.Space(3);
-        DrawEnemyEquippedSlotButton(castle, 6, "Пояс", "Belt", curLang, spyInfoLvl, spyEquipStyle, 44, 110);
+        DrawEnemyEquippedSlotButton(castle, 5, "Кольцо", "Ring", curLang, spyInfoLvl, spyEquipStyle, 70, 120);
+        GUILayout.Space(5);
+        DrawEnemyEquippedSlotButton(castle, 6, "Пояс", "Belt", curLang, spyInfoLvl, spyEquipStyle, 70, 130);
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
-        GUILayout.Space(3);
+        GUILayout.Space(5);
 
         // Row 5: Feet (Boots - Slot 7)
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        DrawEnemyEquippedSlotButton(castle, 7, "Сапоги", "Boots", curLang, spyInfoLvl, spyEquipStyle, 44, 110);
+        DrawEnemyEquippedSlotButton(castle, 7, "Сапоги", "Boots", curLang, spyInfoLvl, spyEquipStyle, 70, 130);
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
         
         GUILayout.EndVertical();
         
-        GUILayout.Space(12);
+        GUILayout.Space(30);
         
         // ----------------------------------------------------
         // COLUMN 3: Commander Skills (arranged in 2x2 grid, larger)
         // ----------------------------------------------------
-        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(250));
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(300));
         GUILayout.Label($"<b>{GetText9("⚡ НАВЫКИ:", "⚡ SKILLS:", "⚡ FÄHIGKEITEN:", "⚡ COMPÉTENCES:", "⚡ HABILIDADES:", "⚡ HABILIDADES:", "⚡ スキル:", "⚡ 기술:", "⚡ 核心技能:")}</b>", detailLabelS);
         GUILayout.Label(GetText9("(наведите для деталей)", "(hover for details)", "(zeigen für Details)", "(survoler)", "(puntero)", "(foque)", "(ホバー表示)", "(마우스 오버)", "(悬停查看)"), detailLabelS);
         GUILayout.Space(12);
@@ -6940,8 +6950,8 @@ public class FateCastleManager : MonoBehaviour
                 sk4 = archerSkillUltimate;
             }
 
-            float sBoxW = 85f;
-            float sBoxH = 85f;
+            float sBoxW = 110f;
+            float sBoxH = 110f;
 
             // Row 1 (Skill 1 and Skill 2)
             GUILayout.BeginHorizontal();
@@ -6954,7 +6964,7 @@ public class FateCastleManager : MonoBehaviour
                 SetHoveredSkill(1, curLang, aiClass, castle.aiCommanderLevel);
             }
             
-            GUILayout.Space(12);
+            GUILayout.Space(14);
 
             // Skill 2
             GUILayout.Box(sk2 != null ? sk2 : Texture2D.whiteTexture, GUILayout.Width(sBoxW), GUILayout.Height(sBoxH));
@@ -6966,7 +6976,7 @@ public class FateCastleManager : MonoBehaviour
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
             
-            GUILayout.Space(12);
+            GUILayout.Space(14);
 
             // Row 2 (Skill 3 and Skill 4 Ultimate)
             GUILayout.BeginHorizontal();
@@ -6979,7 +6989,7 @@ public class FateCastleManager : MonoBehaviour
                 SetHoveredSkill(3, curLang, aiClass, castle.aiCommanderLevel);
             }
             
-            GUILayout.Space(12);
+            GUILayout.Space(14);
 
             // Skill 4 (Ultimate)
             GUI.backgroundColor = new Color(1.0f, 0.4f, 0.4f, 0.9f);
@@ -7164,6 +7174,8 @@ public class FateCastleManager : MonoBehaviour
             showSpyReportPopup = false;
         }
         GUI.backgroundColor = Color.white;
+        
+        DrawHoverTooltip(curLang, true);
     }
 
     private Texture2D GetTroopAvatarTexture(string id)
@@ -11810,13 +11822,13 @@ public class FateCastleManager : MonoBehaviour
         }
     }
 
-    private void SetHoveredItem(InventoryItem item, int curLang)
+    private void SetHoveredItem(InventoryItem item, int curLang, string overrideClass = null)
     {
         if (item == null) return;
 
         isHoveringSkill = true;
         hoveredSkillName = item.name;
-        hoveredSkillIcon = GetItemIconTexture(item);
+        hoveredSkillIcon = GetItemIconTexture(item, overrideClass);
 
         if (item.slotType == 0) // Potion
         {
