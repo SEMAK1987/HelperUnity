@@ -6420,6 +6420,224 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.EndHorizontal();
     }
 
+    private void DrawSecondaryHeroSpyWidget(string aiClass, string className, int hLvl, Texture2D commanderAvatar, int spyInfoLvl, int curLang, GUIStyle detailLabelS)
+    {
+        string displayCmdClass = (spyInfoLvl >= 2) ? className : "???";
+        string displayCmdLvl = (spyInfoLvl >= 2) ? $"Lvl {hLvl}" : "???";
+
+        // Draw the amazing 2-column layout for the secondary hero
+        GUILayout.BeginVertical(GUI.skin.box);
+        GUILayout.BeginHorizontal();
+
+        // ----------------------------------------------------
+        // COLUMN 1: Avatar, basic info, and real-time HP/MP/EXP status bars (Split Layout)
+        // ----------------------------------------------------
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(355));
+        GUILayout.BeginHorizontal();
+
+        // Left side of Column 1: Portrait and basic labels
+        GUILayout.BeginVertical(GUILayout.Width(130));
+        GUILayout.Label($"<b>{GetText9("👤 КЛАСС:", "👤 CLASS:", "👤 KLASSE:", "👤 CLASSE:", "👤 CLASE:", "👤 CLASSE:", "👤 クラス:", "👤 클래스:", "👤 职业:")}</b>\n{displayCmdClass}", detailLabelS);
+        GUILayout.Space(6);
+        GUILayout.Label($"<b>{GetText9("⭐ УРОВЕНЬ:", "⭐ LEVEL:", "⭐ STUFE:", "⭐ NIVEAU:", "⭐ NIVEL:", "⭐ NÍVEL:", "⭐ レベル:", "⭐ 레벨:", "⭐ 级别:")}</b>\n{displayCmdLvl}", detailLabelS);
+        GUILayout.Space(10);
+
+        if (commanderAvatar != null)
+        {
+            GUI.backgroundColor = new Color(0.12f, 0.75f, 0.95f, 0.35f);
+            GUILayout.Box("", GUI.skin.box, GUILayout.Width(90), GUILayout.Height(90));
+            Rect avRect = GUILayoutUtility.GetLastRect();
+            GUI.backgroundColor = Color.white;
+            GUI.DrawTexture(new Rect(avRect.x + 4, avRect.y + 4, avRect.width - 8, avRect.height - 8), commanderAvatar, ScaleMode.ScaleToFit);
+        }
+        GUILayout.EndVertical();
+
+        GUILayout.Space(12);
+
+        // Right side of Column 1: HP, MP, and EXP Progress Bars (Dynamic Stats)
+        GUILayout.BeginVertical();
+        GUILayout.Space(6);
+        GUILayout.Label($"<b>{GetText9("📊 СТАТУС ХАРАКТЕРИСТИК", "📊 STATS STATUS", "📊 STATUS-WERT", "📊 STATUT DES STATS", "📊 ESTADO DE ATRIBUTOS", "📊 ESTADO DOS ATRIBUTOS", "📊 ステータス情報", "📊 상태 능력치", "📊 生命值与法力值:")}</b>", detailLabelS);
+        GUILayout.Space(6);
+
+        int baseInt = 10, baseSta = 10;
+        if (aiClass == "warrior") { baseInt = 4; baseSta = 15; }
+        else if (aiClass == "archer") { baseInt = 6; baseSta = 11; }
+        else if (aiClass == "mage") { baseInt = 10; baseSta = 9; }
+
+        int curSta = baseSta + Mathf.RoundToInt(hLvl * 1.5f);
+        int curInt = baseInt + Mathf.RoundToInt(hLvl * 1.2f);
+
+        int maxHp = curSta * 12;
+        int maxMp = curInt * 10;
+
+        string hpText = (spyInfoLvl >= 2) ? $"{maxHp} / {maxHp} HP" : "??? / ??? HP";
+        string mpText = (spyInfoLvl >= 2) ? $"{maxMp} / {maxMp} MP" : "??? / ??? MP";
+        string expText = (spyInfoLvl >= 2) ? $"{Mathf.RoundToInt(hLvl * 150)} / {hLvl * 500} XP" : "??? / ??? XP";
+
+        float hpPct = (spyInfoLvl >= 2) ? 1.0f : 0.0f;
+        float mpPct = (spyInfoLvl >= 2) ? 1.0f : 0.0f;
+        float expPct = (spyInfoLvl >= 2) ? 0.45f : 0.0f;
+
+        GUIStyle barTextS = new GUIStyle(GUI.skin.label);
+        barTextS.alignment = TextAnchor.MiddleCenter;
+        barTextS.fontSize = 9;
+        barTextS.normal.textColor = Color.white;
+        barTextS.fontStyle = FontStyle.Bold;
+
+        // Health Bar (Red/Green)
+        GUILayout.Label($"<b>{GetText9("❤️ ЖИЗНЬ (HP):", "❤️ HEALTH (HP):", "❤️ LEBEN (HP):", "❤️ VIE (HP):", "❤️ SALUD (HP):", "❤️ SAÚDE (HP):", "❤️ HP:", "❤️ 체력 (HP):", "❤️ 生命值 (HP):")}</b>", detailLabelS);
+        GUI.backgroundColor = new Color(0.1f, 0.12f, 0.15f, 1.0f);
+        GUILayout.Box("", GUI.skin.box, GUILayout.Width(170), GUILayout.Height(16));
+        Rect hpRect = GUILayoutUtility.GetLastRect();
+        GUI.backgroundColor = Color.white;
+        if (spyInfoLvl >= 2)
+        {
+            GUI.color = new Color(0.85f, 0.15f, 0.15f, 0.85f);
+            GUI.DrawTexture(new Rect(hpRect.x + 2, hpRect.y + 2, (hpRect.width - 4) * hpPct, hpRect.height - 4), Texture2D.whiteTexture);
+            GUI.color = Color.white;
+        }
+        GUI.Label(hpRect, hpText, barTextS);
+
+        GUILayout.Space(6);
+
+        // Mana Bar (Blue)
+        GUILayout.Label($"<b>{GetText9("🔮 МАНА (MP):", "🔮 MANA (MP):", "🔮 MANA (MP):", "🔮 MANA (MP):", "🔮 MANA (MP):", "🔮 MANA (MP):", "🔮 MP:", "🔮 마나 (MP):", "🔮 法力值 (MP):")}</b>", detailLabelS);
+        GUI.backgroundColor = new Color(0.1f, 0.12f, 0.15f, 1.0f);
+        GUILayout.Box("", GUI.skin.box, GUILayout.Width(170), GUILayout.Height(16));
+        Rect mpRect = GUILayoutUtility.GetLastRect();
+        GUI.backgroundColor = Color.white;
+        if (spyInfoLvl >= 2)
+        {
+            GUI.color = new Color(0.15f, 0.45f, 0.85f, 0.85f);
+            GUI.DrawTexture(new Rect(mpRect.x + 2, mpRect.y + 2, (mpRect.width - 4) * mpPct, mpRect.height - 4), Texture2D.whiteTexture);
+            GUI.color = Color.white;
+        }
+        GUI.Label(mpRect, mpText, barTextS);
+
+        GUILayout.Space(6);
+
+        // Experience Bar (Gold)
+        GUILayout.Label($"<b>{GetText9("✨ ОПЫТ (EXP):", "✨ EXP (EXP):", "✨ EXP (EXP):", "✨ EXP (EXP):", "✨ EXP (EXP):", "✨ EXP (EXP):", "✨ EXP:", "✨ 경험치 (EXP):", "✨ 经验值 (EXP):")}</b>", detailLabelS);
+        GUI.backgroundColor = new Color(0.1f, 0.12f, 0.15f, 1.0f);
+        GUILayout.Box("", GUI.skin.box, GUILayout.Width(170), GUILayout.Height(16));
+        Rect expRect = GUILayoutUtility.GetLastRect();
+        GUI.backgroundColor = Color.white;
+        if (spyInfoLvl >= 2)
+        {
+            GUI.color = new Color(0.85f, 0.65f, 0.15f, 0.85f);
+            GUI.DrawTexture(new Rect(expRect.x + 2, expRect.y + 2, (expRect.width - 4) * expPct, expRect.height - 4), Texture2D.whiteTexture);
+            GUI.color = Color.white;
+        }
+        GUI.Label(expRect, expText, barTextS);
+
+        GUILayout.EndVertical();
+
+        GUILayout.EndHorizontal();
+        GUILayout.EndVertical();
+
+        GUILayout.Space(20);
+
+        // ----------------------------------------------------
+        // COLUMN 2: Skills
+        // ----------------------------------------------------
+        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(250));
+        GUILayout.Label($"<b>{GetText9("⚡ НАВЫКИ:", "⚡ SKILLS:", "⚡ FÄHIGKEITEN:", "⚡ COMPÉTENCES:", "⚡ HABILIDADES:", "⚡ HABILIDADES:", "⚡ スキル:", "⚡ 기술:", "⚡ 核心技能:")}</b>", detailLabelS);
+        GUILayout.Space(8);
+
+        if (spyInfoLvl >= 3)
+        {
+            LoadClassSkillsIcons();
+            Texture2D sk1 = warriorSkillPassive1;
+            Texture2D sk2 = warriorSkillPassive2;
+            Texture2D sk3 = warriorSkillPassive3;
+            Texture2D sk4 = warriorSkillUltimate;
+
+            if (aiClass == "mage")
+            {
+                sk1 = mageSkillPassive1;
+                sk2 = mageSkillPassive2;
+                sk3 = mageSkillPassive3;
+                sk4 = mageSkillUltimate;
+            }
+            else if (aiClass == "archer")
+            {
+                sk1 = archerSkillPassive1;
+                sk2 = archerSkillPassive2;
+                sk3 = archerSkillPassive3;
+                sk4 = archerSkillUltimate;
+            }
+
+            float sBoxW = 75f;
+            float sBoxH = 75f;
+
+            // Row 1 (Skill 1 and Skill 2)
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+
+            // Skill 1
+            GUILayout.Box(sk1 != null ? sk1 : Texture2D.whiteTexture, GUILayout.Width(sBoxW), GUILayout.Height(sBoxH));
+            if (Event.current.type == EventType.Repaint && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
+            {
+                SetHoveredSkill(1, curLang, aiClass, hLvl);
+            }
+
+            GUILayout.Space(10);
+
+            // Skill 2
+            GUILayout.Box(sk2 != null ? sk2 : Texture2D.whiteTexture, GUILayout.Width(sBoxW), GUILayout.Height(sBoxH));
+            if (Event.current.type == EventType.Repaint && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
+            {
+                SetHoveredSkill(2, curLang, aiClass, hLvl);
+            }
+
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(10);
+
+            // Row 2 (Skill 3 and Skill 4 Ultimate)
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+
+            // Skill 3
+            GUILayout.Box(sk3 != null ? sk3 : Texture2D.whiteTexture, GUILayout.Width(sBoxW), GUILayout.Height(sBoxH));
+            if (Event.current.type == EventType.Repaint && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
+            {
+                SetHoveredSkill(3, curLang, aiClass, hLvl);
+            }
+
+            GUILayout.Space(10);
+
+            // Skill 4 (Ultimate)
+            GUI.backgroundColor = new Color(1.0f, 0.4f, 0.4f, 0.9f);
+            GUILayout.Box(sk4 != null ? sk4 : Texture2D.whiteTexture, GUILayout.Width(sBoxW), GUILayout.Height(sBoxH));
+            if (Event.current.type == EventType.Repaint && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
+            {
+                SetHoveredSkill(4, curLang, aiClass, hLvl);
+            }
+            GUI.backgroundColor = Color.white;
+
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+        }
+        else
+        {
+            GUILayout.FlexibleSpace();
+            GUIStyle lockedS = new GUIStyle(GUI.skin.label);
+            lockedS.alignment = TextAnchor.MiddleCenter;
+            lockedS.normal.textColor = Color.gray;
+            lockedS.fontSize = 11;
+            GUILayout.Label("🔒 ???", lockedS);
+            GUILayout.FlexibleSpace();
+        }
+        GUILayout.EndVertical();
+
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+        GUILayout.EndVertical();
+    }
+
     private void SpyReportWindowFunction(int windowID)
     {
         int curLang = Translator.LanguageID;
@@ -7030,51 +7248,37 @@ public class FateCastleManager : MonoBehaviour
         ), sectionTitleS);
 
         int simpleHeroCount = castle.level >= 4 ? 2 : (castle.level >= 2 ? 1 : 0);
-        string heroInfoText = "";
-        if (spyInfoLvl == 1)
+        
+        if (simpleHeroCount == 0)
         {
-            heroInfoText = $" • {GetText9("Количество героев:", "Heroes Count:", "Heldenanzahl:", "Nombre de héros :", "Héroes:", "Heróis:", "ヒーロー数:", "부장 수:", "部将数量:")} ???";
-        }
-        else if (spyInfoLvl == 2)
-        {
-            heroInfoText = $" • {GetText9("Количество героев:", "Heroes Count:", "Heldenanzahl:", "Nombre de héros :", "Héroes:", "Heróis:", "ヒーロー数:", "부장 수:", "部将数量:")} {simpleHeroCount}";
-        }
-        else if (spyInfoLvl == 3)
-        {
-            if (simpleHeroCount == 0)
-            {
-                heroInfoText = $" • {GetText9("Вторичных героев нет", "No secondary heroes", "Keine sekundären Helden", "Aucun héros secondaire", "Sin héroes secundarios", "Sem heróis secundários", "副将はいません", "부장이 없습니다", "暂无麾下副将")}";
-            }
-            else if (simpleHeroCount == 1)
-            {
-                heroInfoText = $" • 1 {GetText9("Герой", "Hero", "Held", "Héros", "Héroe", "Herói", "ヒーロー", "영웅", "部将")} ({GetText9("Ур.", "Lvl", "St.", "Niv", "Niv", "Nív", "Lv", "레벨", "级")} {Mathf.Max(1, castle.aiCommanderLevel - 2)})";
-            }
-            else
-            {
-                heroInfoText = $" • 2 {GetText9("Героя", "Heroes", "Helden", "Héros", "Héroes", "Heróis", "ヒーロー", "영웅들", "部将")} ({GetText9("Ур.", "Lvl", "St.", "Niv", "Niv", "Nív", "Lv", "레벨", "级")} {Mathf.Max(1, castle.aiCommanderLevel - 2)})";
-            }
+            GUILayout.Label(" • " + GetText9("Вторичных героев нет", "No secondary heroes", "Keine sekundären Helden", "Aucun héros secondaire", "Sin héroes secundarios", "Sem heróis secundários", "副将はいません", "부장이 없습니다", "暂无麾下副将"), detailLabelS);
         }
         else
         {
-            // spyInfoLvl >= 4: Detailed listing
-            if (simpleHeroCount == 0)
+            if (spyInfoLvl == 1)
             {
-                heroInfoText = $" • {GetText9("Вторичных героев нет", "No secondary heroes", "Keine sekundären Helden", "Aucun héros secondaire", "Sin héroes secundarios", "Sem heróis secundários", "副将はいません", "부장이 없습니다", "暂无麾下副将")}";
-            }
-            else if (simpleHeroCount == 1)
-            {
-                string class1 = GetText9("Следопыт", "Ranger", "Läufer", "Ranger", "Ranger", "Patrulheiro", "レンジャー", "순찰자", "野外巡林散兵");
-                heroInfoText = $" • {class1} ({GetText9("Ур.", "Lvl", "St.", "Niv", "Niv", "Nív", "Lv", "레벨", "级")} {Mathf.Max(1, castle.aiCommanderLevel - 2)})";
+                string heroInfoText = $" • {GetText9("Количество героев:", "Heroes Count:", "Heldenanzahl:", "Nombre de héros :", "Héroes:", "Heróis:", "ヒーロー数:", "부장 수:", "部将数量:")} ???";
+                GUILayout.Label(heroInfoText, detailLabelS);
             }
             else
             {
+                // Hero 1 (Ranger)
                 string class1 = GetText9("Следопыт", "Ranger", "Läufer", "Ranger", "Ranger", "Patrulheiro", "レンジャー", "순찰자", "野外巡林散兵");
-                string class2 = GetText9("Архимаг", "Arch-Mage", "Erzmagier", "Archimage", "Archimago", "Arquimago", "アークメイジ", "아크메이지", "奥术秘法祭司");
-                heroInfoText = $" • {class1} ({GetText9("Ур.", "Lvl", "St.", "Niv", "Niv", "Nív", "Lv", "레벨", "级")} {Mathf.Max(1, castle.aiCommanderLevel - 2)})\n" +
-                               $" • {class2} ({GetText9("Ур.", "Lvl", "St.", "Niv", "Niv", "Nív", "Lv", "레벨", "级")} {Mathf.Max(1, castle.aiCommanderLevel - 1)})";
+                int lvl1 = Mathf.Max(1, castle.aiCommanderLevel - 2);
+                Texture2D avatar1 = GetAICommanderAvatar("archer");
+                DrawSecondaryHeroSpyWidget("archer", class1, lvl1, avatar1, spyInfoLvl, curLang, detailLabelS);
+
+                if (simpleHeroCount >= 2)
+                {
+                    GUILayout.Space(8);
+                    // Hero 2 (Arch-Mage)
+                    string class2 = GetText9("Архимаг", "Arch-Mage", "Erzmagier", "Archimage", "Archimago", "Arquimago", "アークメイジ", "아크메이지", "奥术秘法祭司");
+                    int lvl2 = Mathf.Max(1, castle.aiCommanderLevel - 1);
+                    Texture2D avatar2 = GetAICommanderAvatar("mage");
+                    DrawSecondaryHeroSpyWidget("mage", class2, lvl2, avatar2, spyInfoLvl, curLang, detailLabelS);
+                }
             }
         }
-        GUILayout.Label(heroInfoText, detailLabelS);
 
         GUILayout.Space(10);
 
