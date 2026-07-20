@@ -2079,109 +2079,33 @@ public class FateCastleManager : MonoBehaviour
         int enemyHeroPower = (castle.aiCommanderLevel * 50) + (castle.aiArmorTier * 100) + (enemyPotionsDrunk * 150) + enemySkillsPowerBonus;
         int totalEnemyPower = castle.aiTroopsPower + enemyHeroPower;
 
-        // Print information about the battle preparation
-        if (enemyPotionsDrunk > 0)
-        {
-            string prepMsg = GetText(
-                $"🛡️ Перед началом боя вражеский полководец выпил {enemyPotionsDrunk} боевых зелий, получив +{enemyPotionsDrunk * 150} к силе!",
-                $"🛡️ Before the battle, the enemy commander drank {enemyPotionsDrunk} combat potions, gaining +{enemyPotionsDrunk * 150} battle power!",
-                $"🛡️ 전투가 시작되기 전에 적 사령관이 {enemyPotionsDrunk}개의 영약을 복용하여 전투력이 +{enemyPotionsDrunk * 150} 증가했습니다!",
-                $"🛡️ 战斗开始前，敌方领主服用了 {enemyPotionsDrunk} 瓶战斗药水，战斗力提升了 +{enemyPotionsDrunk * 150}！"
-            );
-            ShowFeedback(prepMsg);
-        }
+        // --- SAVE BATTLE CONTEXT PARAMETERS FOR BATTLESCENE ---
+        PlayerPrefs.SetInt("Battle_Target_Zone_Index", targetZoneIdx);
+        PlayerPrefs.SetInt("Battle_Launch_Zone_Index", launchZone);
+        PlayerPrefs.SetInt("Battle_Player_Army_Power", maxPower);
+        PlayerPrefs.SetInt("Battle_Player_Hero_Power", mainHeroPower);
+        PlayerPrefs.SetInt("Battle_Player_Total_Power", totalPlayerPower);
+        
+        PlayerPrefs.SetInt("Battle_Enemy_Potions_Drunk", enemyPotionsDrunk);
+        PlayerPrefs.SetInt("Battle_Enemy_Level", enemyLvl);
+        PlayerPrefs.SetInt("Battle_Enemy_Armor_Tier", castle.aiArmorTier);
+        PlayerPrefs.SetInt("Battle_Enemy_Troops_Power", castle.aiTroopsPower);
+        PlayerPrefs.SetInt("Battle_Enemy_Hero_Power", enemyHeroPower);
+        PlayerPrefs.SetInt("Battle_Enemy_Total_Power", totalEnemyPower);
+        
+        // Save current active save slot to preserve player data (gold, levels, equipment)
+        int activeSlot = PlayerPrefs.GetInt("Active_Save_Slot", 0);
+        SaveGameSystem.Save(activeSlot);
+        PlayerPrefs.Save();
 
-        if (totalPlayerPower >= totalEnemyPower)
-        {
-            castle.owner = "Player";
-            PlayerPrefs.SetString("Castle_Owner_" + targetZoneIdx, "Player");
-            
-            string[] troop_ids = { "warrior", "archer", "mage", "paladin", "cavalry", "cannoneer", "centaur", "necromancer", "griffin", "overlord", "hydra", "dragon", "mountain_bear", "wasteland_serpent" };
-            float casualtyRate = UnityEngine.Random.Range(0.15f, 0.35f);
-            for (int i = 0; i < troop_ids.Length; i++)
-            {
-                int currentCount = GetUnitCount(troop_ids[i], launchZone);
-                if (currentCount > 0)
-                {
-                    int loss = Mathf.Max(1, Mathf.RoundToInt(currentCount * casualtyRate));
-                    SetUnitCount(troop_ids[i], launchZone, Mathf.Max(0, currentCount - loss));
-                }
-            }
+        // Inform the player about launching the scene
+        string loadingMsg = curLang == 0 ? 
+            $"⚔️ Начинается осада {castle.nameRU}! Загрузка боевой арены BattleScene..." : 
+            $"⚔️ Launching the siege of {castle.nameEN}! Loading the BattleScene arena...";
+        ShowFeedback(loadingMsg);
 
-            int lootGold = castle.level * 300 + UnityEngine.Random.Range(100, 400);
-            SaveGameSystem.CurrentData.gold += lootGold;
-            
-            PlayerPrefs.Save();
-            
-            if (LandingPositionManager.Instance != null)
-            {
-                LandingPositionManager.Instance.RepaintRegionsBasedOnLanding(0);
-            }
-            
-            SpawnAllCastles();
-
-            string resMsg = GetText(
-                $"👑 ПОБЕДА! Мы захватили {castle.nameRU}! Добыча: +{lootGold} 💰. Враг бежал, регион окрасился в цвета Ордена Света! (Сила авангарда: {totalPlayerPower} vs Сила обороны: {totalEnemyPower})",
-                $"👑 VICTORY! Conquered {castle.nameEN}! Loot: +{lootGold} 💰. Underneath grounds claim the banner of Light Alliance! (Vanguard Power: {totalPlayerPower} vs Defense Power: {totalEnemyPower})",
-                $"👑 승리! {castle.nameKR}을(를) 정복했습니다! 전리품: +{lootGold} 💰. (아군 정예력: {totalPlayerPower} vs 적군 수비력: {totalEnemyPower})",
-                $"👑 胜利！我们成功占领了 {castle.nameCH}！战利品: +{lootGold} 💰。 (我方总战力: {totalPlayerPower} vs 敌方防守力: {totalEnemyPower})"
-            );
-            ShowFeedback(resMsg);
-
-            // Check if all castles are conquered!
-            bool allConquered = true;
-            for (int i = 0; i < castles.Count; i++)
-            {
-                if (castles[i].owner != "Player")
-                {
-                    allConquered = false;
-                    break;
-                }
-            }
-            if (allConquered)
-            {
-                showStatsPanel = false;
-                isTownViewActive = false;
-                isDetailsOpen = false;
-                showCastleCalibrationPanel = false;
-                showSkillDetailPopup = false;
-                showTroopDetailPopup = false;
-                showForgeDetailPopup = false;
-                showSpyReportPopup = false;
-                showPurchaseConfirmPopup = false;
-                showNewDayOverlay = false;
-                
-                showContinentCompletedOverlay = true;
-                Time.timeScale = 0f; // Freeze gameplay
-            }
-        }
-        else
-        {
-            string[] troop_ids = { "warrior", "archer", "mage", "paladin", "cavalry", "cannoneer", "centaur", "necromancer", "griffin", "overlord", "hydra", "dragon", "mountain_bear", "wasteland_serpent" };
-            float casualtyRate = UnityEngine.Random.Range(0.40f, 0.70f);
-            for (int i = 0; i < troop_ids.Length; i++)
-            {
-                int currentCount = GetUnitCount(troop_ids[i], launchZone);
-                if (currentCount > 0)
-                {
-                    int loss = Mathf.Max(1, Mathf.RoundToInt(currentCount * casualtyRate));
-                    SetUnitCount(troop_ids[i], launchZone, Mathf.Max(0, currentCount - loss));
-                }
-            }
-            
-            PlayerPrefs.Save();
-
-            string resMsg = GetText(
-                $"❌ ПОРАЖЕНИЕ! Наши силы были разбиты у крепостных стен! Потеряно большинство когорт осады. (Наша сила: {totalPlayerPower} vs Оборона врага: {totalEnemyPower})",
-                $"❌ DEFEAT! Defending sentinel forces repelled our siege. Heavy cohort casualties suffered. (Our Power: {totalPlayerPower} vs Enemy Defense: {totalEnemyPower})",
-                $"❌ 패배! 적 성벽 앞수비대에 패배했습니다! (아군 전투력: {totalPlayerPower} vs 적 수비력: {totalEnemyPower})",
-                $"❌ 失败！我们在城墙下被击退！损失了大部分攻城部队。 (我方总战力: {totalPlayerPower} vs 敌方防守力: {totalEnemyPower})"
-            );
-            ShowFeedback(resMsg);
-        }
-
-        // В конце любой осады полностью восстанавливаем здоровье и сбрасываем баффы
-        ResetAfterBattle();
+        // Load the battle scene in Unity
+        UnityEngine.SceneManagement.SceneManager.LoadScene("BattleScene");
     }
 
     private void UpdateHoveredCastle()
