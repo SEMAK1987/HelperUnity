@@ -489,6 +489,7 @@ public class FateCastleManager : MonoBehaviour
 
     public bool isAutonomousStatsDistribution = false;
     public bool showStatsPanel = false;
+    public bool showContinentCompletedOverlay = false;
     public bool isDetailsOpen = false;
     
     // 🕵️ Spy Network Variables (v18.11.24)
@@ -1394,6 +1395,207 @@ public class FateCastleManager : MonoBehaviour
         SaveGameSystem.Save(0);
     }
 
+    public void CheatConquerAllCastles()
+    {
+        for (int i = 0; i < castles.Count; i++)
+        {
+            castles[i].owner = "Player";
+            PlayerPrefs.SetString("Castle_Owner_" + i, "Player");
+        }
+        
+        PlayerPrefs.Save();
+        SaveGameSystem.Save(0);
+
+        showStatsPanel = false;
+        isTownViewActive = false;
+        isDetailsOpen = false;
+        showCastleCalibrationPanel = false;
+        showSkillDetailPopup = false;
+        showTroopDetailPopup = false;
+        showForgeDetailPopup = false;
+        showSpyReportPopup = false;
+        showPurchaseConfirmPopup = false;
+        showNewDayOverlay = false;
+        
+        showContinentCompletedOverlay = true;
+        Time.timeScale = 0f; // Freeze gameplay
+
+        if (SettingsManager.Instance != null)
+        {
+            SettingsManager.Instance.PlayHoverSound(0);
+        }
+        
+        if (LandingPositionManager.Instance != null)
+        {
+            LandingPositionManager.Instance.RepaintRegionsBasedOnLanding(0);
+        }
+        SpawnAllCastles();
+        
+        int curLang = Translator.LanguageID;
+        ShowFeedback(GetText9(
+            "👑 ЧИТ: Все регионы захвачены вами!",
+            "👑 CHEAT: All regions successfully conquered by you!",
+            "👑 CHEAT: Alle Regionen erfolgreich erobert!",
+            "👑 CHEAT: Toutes les régions conquises par vous !",
+            "👑 CHEAT: ¡Todas las regiones conquistadas por ti!",
+            "👑 CHEAT: Todas as regiões conquistadas por você!",
+            "👑 チート: すべての地域が征服されました！",
+            "👑 치트: 모든 지역이 당신에 의해 정복되었습니다!",
+            "👑 作弊: 所有区域已被您完全征服！"
+        ));
+    }
+
+    private void DrawContinentCompletedOverlay(int curLang)
+    {
+        // Full screen blocking background (dark translucent)
+        GUI.color = new Color(0.02f, 0.02f, 0.05f, 0.95f);
+        GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
+        GUI.color = Color.white;
+
+        // Centered glassmorphic card window
+        float winW = Mathf.Min(Screen.width * 0.85f, 680f);
+        float winH = Mathf.Min(Screen.height * 0.85f, 480f);
+        float winX = (Screen.width - winW) / 2f;
+        float winY = (Screen.height - winH) / 2f;
+        Rect overlayRect = new Rect(winX, winY, winW, winH);
+
+        // Card base
+        GUIStyle cardStyle = new GUIStyle(GUI.skin.box);
+        cardStyle.normal.background = winBgTex; // Using winBgTex or hudTex
+        GUI.Box(overlayRect, "", cardStyle);
+
+        // Neon border representing Zenith Glassmorphism
+        DrawHighlightBorder(overlayRect, new Color(0.85f, 0.15f, 0.95f, 0.95f), 4f); // Majestic purple/violet glow
+
+        GUILayout.BeginArea(overlayRect);
+        GUILayout.Space(30);
+
+        // Title
+        GUIStyle titleStyle = new GUIStyle(GUI.skin.label);
+        titleStyle.fontSize = 24;
+        titleStyle.fontStyle = FontStyle.Bold;
+        titleStyle.alignment = TextAnchor.MiddleCenter;
+        titleStyle.normal.textColor = new Color(1.0f, 0.84f, 0f); // Gold!
+
+        string titleTxt = GetText9(
+            "🎉 КОНТИНЕНТ ПОЛНОСТЬЮ ПРОЙДЕН! 🎉",
+            "🎉 CONTINENT COMPLETELY CONQUERED! 🎉",
+            "🎉 KONTINENT REICHWEITE! 🎉",
+            "🎉 CONTINENT TERMINÉ ! 🎉",
+            "🎉 ¡CONTINENTE COMPLETADO! 🎉",
+            "🎉 CONTINENTE CONCLUÍDO! 🎉",
+            "🎉 大陸完全制覇！ 🎉",
+            "🎉 대륙 정복 완료! 🎉",
+            "🎉 大陆全部征服完成！ 🎉"
+        );
+        GUILayout.Label(titleTxt, titleStyle);
+        GUILayout.Space(25);
+
+        // Description style
+        GUIStyle descStyle = new GUIStyle(GUI.skin.label);
+        descStyle.fontSize = 15;
+        descStyle.alignment = TextAnchor.MiddleCenter;
+        descStyle.wordWrap = true;
+        descStyle.normal.textColor = new Color(0.9f, 0.95f, 1.0f, 1.0f);
+
+        string descTxt = GetText9(
+            "Поздравляем! Вы победили всех врагов и захватили все 12 регионов континента!\n\nВаш Герой со всем накопленным снаряжением, всеми изученными навыками и опытом переносится на следующий континент.\n\nВся ваша сила и экипировка бережно сохранены. Переходите на следующий континент для продолжения славного похода!",
+            "Congratulations! You have defeated all enemies and captured all 12 regions of the continent!\n\nYour Hero with all accumulated gear, learned skills, and experience is transferring to the next continent.\n\nAll your power and equipment have been carefully saved. Proceed to the next continent to continue your glorious crusade!",
+            "Herzlichen Glückwunsch! Sie haben alle Feinde besiegt und alle 12 Regionen des Kontinents erobert!\n\nIhr Held mit allen gesammelten Ausrüstungen, erlernten Fähigkeiten und Erfahrungen wird auf den nächsten Kontinent übertragen.\n\nAlle Ihre Kräfte und Geräte wurden sorgfältig gespeichert. Gehen Sie auf den nächsten Kontinent, um Ihren glorreichen Kreuzzug fortzusetzen!",
+            "Félicitations ! Vous avez vaincu tous les ennemis et capturé les 12 régions du continent !\n\nVotre héros avec tous les équipements accumulés, compétences apprises et expériences est transféré sur le continent suivant.\n\nToutes vos forces et équipements ont été soigneusement sauvegardés. Passez au continent suivant pour continuer votre glorieuse croisade !",
+            "¡Felicitaciones! ¡Has derrotado a todos los enemigos y capturado las 12 regiones del continente!\n\nTu Héroe con todo el equipamiento, habilidades aprendidas y experiencia acumulados se transfiere al siguiente continente.\n\nTodo tu poder y equipo han sido guardados cuidadosamente. ¡Continúa al siguiente continente para seguir con tu gloriosa cruzada!",
+            "Parabéns! Você derrotou todos os inimigos e capturou todas as 12 regiões do continente!\n\nSeu Herói com todos os equipamentos, habilidades aprendidas e experiência acumulados está se transferindo para o próximo continente.\n\nTodo o seu poder e equipamento foram guardados cuidadosamente. Avance para o próximo continente para continuar sua gloriosa cruzada!",
+            "おめでとうございます！すべての敵を打ち破り、大陸の12の全地域を完全制覇しました！\n\n獲得したすべての装備、習得したスキル、経験値を持つヒーローは、次の大陸へと引き継がれます。\n\nすべての力と装備は安全に引き継がれました。次の大陸へ進み、栄光ある遠征を続けましょう！",
+            "축하합니다! 모든 적들을 물리치고 대륙의 12개 전 지역을 완벽하게 정복했습니다!\n\n획득한 모든 장비, 습득한 기술 및 경험치를 보유한 영웅이 다음 대륙으로 안전하게 이동합니다.\n\n당신의 모든 능력치와 장비가 안전하게 저장되었습니다. 영광스러운 원정을 계속하기 위해 다음 대륙으로 이동하세요!",
+            "恭喜！您已击败所有敌人，成功占领了大陆的全部12个区域！\n\n您的英雄将携带着所有已装备的神装、学到的技能与累积的经验，一同前往下一个崭新的大陆！\n\n您所有的战力与装备都已妥善保存。请前往下一个大陆，继续您辉煌的征程！"
+        );
+        GUILayout.Label(descTxt, descStyle);
+        GUILayout.Space(30);
+
+        // Display saved Hero info just to give visual feedback that equipment & XP are saved
+        if (SaveGameSystem.CurrentData != null)
+        {
+            GUIStyle infoStyle = new GUIStyle(GUI.skin.box);
+            infoStyle.fontSize = 13;
+            infoStyle.alignment = TextAnchor.MiddleCenter;
+            infoStyle.normal.textColor = Color.green;
+
+            string heroClassLocal = GetText(SaveGameSystem.CurrentData.characterClass, SaveGameSystem.CurrentData.characterClass);
+            string levelLabel = curLang == 0 ? "Уровень" : "Level";
+            if (curLang == 8) levelLabel = "等级";
+            if (curLang == 7) levelLabel = "레벨";
+
+            string statusTxt = $"🛡️ {heroClassLocal} | {levelLabel}: {SaveGameSystem.CurrentData.playerLevel} | 💰: {SaveGameSystem.CurrentData.gold}";
+            GUILayout.Label(statusTxt, infoStyle, GUILayout.Height(36));
+        }
+
+        GUILayout.Space(25);
+
+        // Proceed Button
+        GUI.backgroundColor = new Color(0.12f, 0.88f, 0.45f); // Vibrant light green button
+        GUIStyle btnStyle = new GUIStyle(GUI.skin.button);
+        btnStyle.fontSize = 16;
+        btnStyle.fontStyle = FontStyle.Bold;
+        btnStyle.normal.textColor = Color.white;
+
+        string btnTxt = GetText9(
+            "ПЕРЕЙТИ НА СЛЕДУЮЩИЙ КОНТИНЕНТ",
+            "PROCEED TO THE NEXT CONTINENT",
+            "WEITER ZUM NÄCHSTEN KONTINENT",
+            "PASSER AU CONTINENT SUIVANT",
+            "CONTINUAR AL SIGUIENTE CONTINENTE",
+            "AVANÇAR PARA O PRÓXIMO CONTINENTE",
+            "次の大陸へ進む",
+            "다음 대륙으로 이동",
+            "前往下一个大陆"
+        );
+
+        if (GUILayout.Button($"🚀 {btnTxt}", btnStyle, GUILayout.Height(50)))
+        {
+            // Play click sound
+            if (SettingsManager.Instance != null)
+            {
+                SettingsManager.Instance.PlayHoverSound(0);
+            }
+
+            // Close this overlay and resume time
+            showContinentCompletedOverlay = false;
+            Time.timeScale = 1f;
+
+            // Trigger actual progression save and reset of non-player progression
+            TriggerContinentClearedTransition();
+
+            // Load the next scene!
+            try
+            {
+                int nextIndex = UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex + 1;
+                if (nextIndex < UnityEngine.SceneManagement.SceneManager.sceneCountInBuildSettings)
+                {
+                    if (LoadingScreenManager.Instance != null)
+                        LoadingScreenManager.Instance.LoadScene(nextIndex);
+                    else
+                        UnityEngine.SceneManagement.SceneManager.LoadScene(nextIndex);
+                }
+                else
+                {
+                    // Fallback to Main Menu or active scene if out of bounds
+                    if (LoadingScreenManager.Instance != null)
+                        LoadingScreenManager.Instance.LoadScene(0);
+                    else
+                        UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError("Error loading next scene, reloading current scene: " + ex.Message);
+                UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+            }
+        }
+        GUI.backgroundColor = Color.white;
+
+        GUILayout.EndArea();
+    }
+
     public void GetItemStats(int slotType, int tier, out int str, out int agi, out int intel, out int sta, string overrideClass = null)
     {
         str = 0; agi = 0; intel = 0; sta = 0;
@@ -1938,7 +2140,19 @@ public class FateCastleManager : MonoBehaviour
             }
             if (allConquered)
             {
-                TriggerContinentClearedTransition();
+                showStatsPanel = false;
+                isTownViewActive = false;
+                isDetailsOpen = false;
+                showCastleCalibrationPanel = false;
+                showSkillDetailPopup = false;
+                showTroopDetailPopup = false;
+                showForgeDetailPopup = false;
+                showSpyReportPopup = false;
+                showPurchaseConfirmPopup = false;
+                showNewDayOverlay = false;
+                
+                showContinentCompletedOverlay = true;
+                Time.timeScale = 0f; // Freeze gameplay
             }
         }
         else
@@ -1973,7 +2187,7 @@ public class FateCastleManager : MonoBehaviour
     private void UpdateHoveredCastle()
     {
         hoveredCastleIdx = -1;
-        if (!isContinentGameplayActive || isTownViewActive || showNewDayOverlay || isDetailsOpen) return;
+        if (!isContinentGameplayActive || isTownViewActive || showNewDayOverlay || showContinentCompletedOverlay || isDetailsOpen) return;
 
         if (Camera.main != null)
         {
@@ -2737,7 +2951,7 @@ public class FateCastleManager : MonoBehaviour
         if (clickCooldown > 0f) return;
 
         // Avoid clicking 3D structures if continent gameplay is not fully active, town view is active, day overlay is showing, or stats panel/details/popups are open
-        if (!isContinentGameplayActive || isTownViewActive || showNewDayOverlay || showStatsPanel || isDetailsOpen || showTroopDetailPopup || showForgeDetailPopup || showCastleCalibrationPanel || showSpyReportPopup || showPurchaseConfirmPopup) return;
+        if (!isContinentGameplayActive || isTownViewActive || showNewDayOverlay || showContinentCompletedOverlay || showStatsPanel || isDetailsOpen || showTroopDetailPopup || showForgeDetailPopup || showCastleCalibrationPanel || showSpyReportPopup || showPurchaseConfirmPopup) return;
 
         if (WasLeftMouseButtonClicked())
         {
@@ -4314,6 +4528,12 @@ public class FateCastleManager : MonoBehaviour
             DrawNewDayOverlay(curLang);
         }
 
+        // Overlay прохождения континента
+        if (showContinentCompletedOverlay)
+        {
+            DrawContinentCompletedOverlay(curLang);
+        }
+
         // Окно настроек деталей (сначала рисуем подложку, чтобы всплывающие окна были поверх неё; фон затемняется при активных поп-апах)
         if (isDetailsOpen && activeDetailsIndex >= 0 && activeDetailsIndex < castles.Count)
         {
@@ -4810,7 +5030,7 @@ public class FateCastleManager : MonoBehaviour
         portraitBtnStyle.padding = new RectOffset(2, 2, 2, 2);
         
         // Блокируем управление персонажем при активных других панелях (диалог, город, детали)
-        bool blockCharacterPanel = isTownViewActive || isDetailsOpen || showNewDayOverlay || showCastleCalibrationPanel || showForgeDetailPopup || showSpyReportPopup || (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.IsDialogueActive);
+        bool blockCharacterPanel = isTownViewActive || isDetailsOpen || showNewDayOverlay || showContinentCompletedOverlay || showCastleCalibrationPanel || showForgeDetailPopup || showSpyReportPopup || (DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.IsDialogueActive);
         if (blockCharacterPanel)
         {
             GUI.enabled = false;
@@ -5262,6 +5482,28 @@ public class FateCastleManager : MonoBehaviour
             SetPurchasedSlotsCount(999);
             ShowFeedback(curLang == 0 ? "🔓 Все 999 ячеек инвентаря успешно разблокированы!" : "🔓 All 999 inventory slots successfully unlocked!");
             if (SettingsManager.Instance != null) SettingsManager.Instance.PlayHoverSound(0);
+        }
+        GUI.backgroundColor = Color.white;
+        GUILayout.EndHorizontal();
+
+        GUILayout.Space(6);
+
+        GUILayout.BeginHorizontal();
+        GUI.backgroundColor = new Color(0.85f, 0.45f, 0.95f); // Violet / Purple
+        string conquerAllLabel = GetText9(
+            "ПОБЕДИТЬ ВСЕХ (ЧИТ)",
+            "CONQUER ALL (CHEAT)",
+            "ALLE ERGATTERN (CHEAT)",
+            "CONQUÉRIR TOUT (CHEAT)",
+            "CONQUISTAR TODO (CHEAT)",
+            "CONQUISTAR TUDO (CHEAT)",
+            "すべて征服 (チート)",
+            "모든 지역 정복 (치트)",
+            "征服所有区域 (作弊)"
+        );
+        if (GUILayout.Button($"👑 {conquerAllLabel}", GUILayout.Height(32)))
+        {
+            CheatConquerAllCastles();
         }
         GUI.backgroundColor = Color.white;
         GUILayout.EndHorizontal();
