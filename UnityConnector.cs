@@ -1,6 +1,6 @@
-// [MAX LEVEL & SLOT RE-LOCKING SYNC v18.11.30]
+// [CONTINENT COMPLETE OVERLAY SYNC v18.12.01]
 // Unity Connector for Quantum AI Assistant
-// Updated: 2026-07-19 (Synced with Stable v18.11.30)
+// Updated: 2026-07-20 (Synced with Stable v18.12.01)
 
 #if UNITY_EDITOR
 using UnityEngine;
@@ -16,7 +16,7 @@ namespace AI_Assistant_Quantum
         private string prompt = "";
         private string serverUrl = "http://localhost:3000";
         private Mode mode = Mode.Online;
-        private string status = "Ready for Quantum Manifestation v18.11.30";
+        private string status = "Ready for Quantum Manifestation v18.12.01";
         private bool isProcessing = false;
 
         public enum Mode { Online, Offline, NoInternet }
@@ -29,7 +29,7 @@ namespace AI_Assistant_Quantum
 
         private void OnGUI()
         {
-            GUILayout.Label("v18.11.27 - Tactical Camera & Landing Coords Sync", EditorStyles.boldLabel);
+            GUILayout.Label("v18.12.01 - Continent Completed Overlay & Cheat Conquer All Castles", EditorStyles.boldLabel);
             
             serverUrl = EditorGUILayout.TextField("Server URL", serverUrl);
             mode = (Mode)EditorGUILayout.EnumPopup("Mode", mode);

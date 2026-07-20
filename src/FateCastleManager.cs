@@ -1461,7 +1461,7 @@ public class FateCastleManager : MonoBehaviour
 
         // Card base
         GUIStyle cardStyle = new GUIStyle(GUI.skin.box);
-        cardStyle.normal.background = winBgTex; // Using winBgTex or hudTex
+        cardStyle.normal.background = hudTex; // Using hudTex
         GUI.Box(overlayRect, "", cardStyle);
 
         // Neon border representing Zenith Glassmorphism

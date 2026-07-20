@@ -1,4 +1,4 @@
-# 🤖 AI Assistant - Disaster Recovery & Replica Reconstruction Guide (v18.11.30)
+# 🤖 AI Assistant - Disaster Recovery & Replica Reconstruction Guide (v18.12.01)
 
 ## 📌 Introduction & Purpose
 This document serves as a complete **Disaster Recovery Blueprint** for the **Unity & Blender AI Assistant (Fate Continent Assistant)**. If the application environment is lost, corrupted, or needs to be redeployed on a different server or account, this guide contains the exact visual and functional specifications, UI layouts, styling guidelines, and architectural details to rebuild the application from scratch to match the attached screenshot.
@@ -13,7 +13,7 @@ The interface utilizes a custom high-density futuristic design theme: **Zenith C
 The left panel has a width of `320px` and is packed with system telemetries and status lists:
 - **Header Info Block**:
   - **App Name**: `AI ASSISTANT` (Font: Space Grotesk, Semi-bold, white, capitalized).
-  - **Version badge**: `V18.11.30` (Subtle grey text below the title).
+  - **Version badge**: `V18.12.01` (Subtle grey text below the title).
   - **System Badge**: A glowing cyan chip icon on the left.
 - **Server Metrics Status Rows**:
   - **СЕРВЕР (Server status)**: `● СВЯЗЬ ОК` (glowing bright green circle with text).
