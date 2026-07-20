@@ -10678,6 +10678,7 @@ public class FateCastleManager : MonoBehaviour
             default: potTabNames = new string[] { "❤️ Health", "💪 Strength", "🔮 Intelligence", "⚡ Agility", "🛡️ Stamina" }; break;
         }
 
+        GUILayout.BeginHorizontal();
         for (int i = 0; i < potTabNames.Length; i++)
         {
             GUI.backgroundColor = (potionTab == i) ? new Color(0.2f, 0.7f, 1f, 1f) : Color.white;
