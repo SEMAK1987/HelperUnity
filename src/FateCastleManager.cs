@@ -4210,7 +4210,27 @@ public class FateCastleManager : MonoBehaviour
                 aiLogs.Add(logMessage);
             }
 
+            int oldAICmdLvl = PlayerPrefs.GetInt("Castle_AI_CommanderLvl_" + castle.zoneIndex, 1);
+            int aiXP = PlayerPrefs.GetInt("Castle_AI_CommanderXP_" + castle.zoneIndex, UnityEngine.Random.Range(10, 50));
+            
+            if (castle.aiCommanderLevel > oldAICmdLvl)
+            {
+                aiXP = UnityEngine.Random.Range(0, castle.aiCommanderLevel * 50);
+            }
+            else
+            {
+                aiXP += UnityEngine.Random.Range(20, 150);
+                int aiXPNeeded = castle.aiCommanderLevel * 100;
+                while (aiXP >= aiXPNeeded)
+                {
+                    aiXP -= aiXPNeeded;
+                    castle.aiCommanderLevel++;
+                    aiXPNeeded = castle.aiCommanderLevel * 100;
+                }
+            }
+
             PlayerPrefs.SetInt("Castle_AI_CommanderLvl_" + castle.zoneIndex, castle.aiCommanderLevel);
+            PlayerPrefs.SetInt("Castle_AI_CommanderXP_" + castle.zoneIndex, aiXP);
             PlayerPrefs.SetInt("Castle_AI_Troops_" + castle.zoneIndex, castle.aiTroopsPower);
             PlayerPrefs.SetInt("Castle_AI_Armor_" + castle.zoneIndex, castle.aiArmorTier);
             PlayerPrefs.SetInt("Castle_AI_Potions_" + castle.zoneIndex, castle.aiPotionsStock);
@@ -7148,11 +7168,19 @@ public class FateCastleManager : MonoBehaviour
         
         string hpText = (spyInfoLvl >= 2) ? $"{maxHp} / {maxHp} HP" : "??? / ??? HP";
         string mpText = (spyInfoLvl >= 2) ? $"{maxMp} / {maxMp} MP" : "??? / ??? MP";
-        string expText = (spyInfoLvl >= 2) ? $"{Mathf.RoundToInt(aiLvl * 150)} / {aiLvl * 500} XP" : "??? / ??? XP";
+
+        int aiXP = PlayerPrefs.GetInt("Castle_AI_CommanderXP_" + castle.zoneIndex, Mathf.RoundToInt(aiLvl * 45));
+        int aiXPNeeded = aiLvl * 100;
+        if (aiXP >= aiXPNeeded)
+        {
+            aiXP = aiXPNeeded - 15;
+            PlayerPrefs.SetInt("Castle_AI_CommanderXP_" + castle.zoneIndex, aiXP);
+        }
+        string expText = (spyInfoLvl >= 2) ? $"{aiXP} / {aiXPNeeded} XP" : "??? / ??? XP";
         
         float hpPct = (spyInfoLvl >= 2) ? 1.0f : 0.0f;
         float mpPct = (spyInfoLvl >= 2) ? 1.0f : 0.0f;
-        float expPct = (spyInfoLvl >= 2) ? 0.45f : 0.0f;
+        float expPct = (spyInfoLvl >= 2) && aiXPNeeded > 0 ? Mathf.Clamp01((float)aiXP / aiXPNeeded) : 0.0f;
 
         GUIStyle barTextS = new GUIStyle(GUI.skin.label);
         barTextS.alignment = TextAnchor.MiddleCenter;
@@ -9527,14 +9555,15 @@ public class FateCastleManager : MonoBehaviour
         {
             int lvl = PlayerPrefs.GetInt("Companion_Lvl_" + id, 1);
             int xp = PlayerPrefs.GetInt("Companion_XP_" + id, 0);
+            int xpNeeded = lvl * 100;
             string name = GetUnitNameByID(id, curLang);
 
             isHoveringSkill = true;
             hoveredSkillName = name;
             hoveredSkillType = curLang == 0 ? "🕵️ ГЕРОЙ-СОЮЗНИК" : "🕵️ ALLIED HERO";
             hoveredSkillDesc = curLang == 0 ?
-                $"Ранг: {lvl} (XP: {xp}/1000)\n\n★ Специализированный герой, нанятый для поддержки авангарда цитадели." :
-                $"Rank: {lvl} (XP: {xp}/1000)\n\n★ Specialized hero recruited to support the citadel vanguard.";
+                $"Ранг: {lvl} (XP: {xp}/{xpNeeded})\n\n★ Специализированный герой, нанятый для поддержки авангарда цитадели." :
+                $"Rank: {lvl} (XP: {xp}/{xpNeeded})\n\n★ Specialized hero recruited to support the citadel vanguard.";
             hoveredSkillIcon = GetTroopAvatarTexture(id);
         }
         else
@@ -9542,14 +9571,15 @@ public class FateCastleManager : MonoBehaviour
             // Regular troop
             int troopLvl = GetTroopLevel(id, zIdx);
             int troopXp = GetTroopXP(id, zIdx);
+            int troopXpNeeded = troopLvl * 100;
             string name = GetUnitNameByID(id, curLang);
 
             isHoveringSkill = true;
             hoveredSkillName = name;
             hoveredSkillType = curLang == 0 ? "⚔️ РЕГУЛЯРНЫЙ ОТРЯД" : "⚔️ REGULAR COHORT";
             hoveredSkillDesc = curLang == 0 ?
-                $"Ранг: {troopLvl} (XP: {troopXp}/1000)\n\n★ Combat cohort defending this castle and participating in crusades." :
-                $"Rank: {troopLvl} (XP: {troopXp}/1000)\n\n★ Combat cohort defending this castle and participating in crusades.";
+                $"Ранг: {troopLvl} (XP: {troopXp}/{troopXpNeeded})\n\n★ Combat cohort defending this castle and participating in crusades." :
+                $"Rank: {troopLvl} (XP: {troopXp}/{troopXpNeeded})\n\n★ Combat cohort defending this castle and participating in crusades.";
             hoveredSkillIcon = GetTroopAvatarTexture(id);
         }
     }
@@ -10445,11 +10475,13 @@ public class FateCastleManager : MonoBehaviour
             
             curXp += xpToAdd;
             bool lvlUp = false;
-            while (curXp >= 100 && curLvl < cap)
+            int xpNeeded = curLvl * 100;
+            while (curXp >= xpNeeded && curLvl < cap)
             {
-                curXp -= 100;
+                curXp -= xpNeeded;
                 curLvl++;
                 lvlUp = true;
+                xpNeeded = curLvl * 100;
             }
             if (curLvl >= cap) curXp = 0;
             
@@ -10518,11 +10550,13 @@ public class FateCastleManager : MonoBehaviour
 
             curXp += xpToAdd;
             bool lvlUp = false;
-            while (curXp >= 100 && curLvl < cap)
+            int xpNeeded = curLvl * 100;
+            while (curXp >= xpNeeded && curLvl < cap)
             {
-                curXp -= 100;
+                curXp -= xpNeeded;
                 curLvl++;
                 lvlUp = true;
+                xpNeeded = curLvl * 100;
             }
             if (curLvl >= cap) curXp = 0;
 
@@ -10590,11 +10624,13 @@ public class FateCastleManager : MonoBehaviour
 
             curXp += xpToAdd;
             bool lvlUp = false;
-            while (curXp >= 100 && curLvl < cap)
+            int xpNeeded = curLvl * 100;
+            while (curXp >= xpNeeded && curLvl < cap)
             {
-                curXp -= 100;
+                curXp -= xpNeeded;
                 curLvl++;
                 lvlUp = true;
+                xpNeeded = curLvl * 100;
             }
             if (curLvl >= cap) curXp = 0;
 
@@ -10660,6 +10696,8 @@ public class FateCastleManager : MonoBehaviour
         GUILayout.Label(fDesc, subSt);
 
         GUILayout.Space(12);
+
+        forgeScrollPos = GUILayout.BeginScrollView(forgeScrollPos, GUILayout.Height(420));
 
         // --- POTION BREWING TAB ---
         int potionTab = PlayerPrefs.GetInt("Town_Selected_PotionTab", 0);
