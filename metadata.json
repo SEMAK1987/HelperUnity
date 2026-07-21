@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.12.02. BattleScene Arena Loading Integration.",
+  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.12.03. BattleScene UI Overlay Suppression Fix.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

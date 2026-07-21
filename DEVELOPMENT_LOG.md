@@ -1,5 +1,8 @@
 # DEVELOPMENT LOG
 
+## [v18.12.03] - 2026-07-21
+- **BattleScene UI Overlay Suppression**: Solved the issue where gold, day counter, player HUD, and the open castle details popup remained drawn over the combat arena when launching a fortress siege and entering `"BattleScene"`. Integrated active scene checks at the entry of `OnGUI()` in `FateCastleManager.cs` to automatically suppress the interface and close all active sub-panels while inside `"BattleScene"`, `"MainMenu"`, or `"CharacterSelection"`.
+
 ## [v18.12.02] - 2026-07-20
 - **BattleScene Arena Loading**: Reconfigured the fortress siege mechanic inside `FateCastleManager.cs` (`PerformBattleShieldSiege` method). Instead of text-based auto-resolution on the main screen, it now saves all crucial battle parameters to PlayerPrefs, triggers a standard save via `SaveGameSystem.Save()`, and instantly loads the `"BattleScene"` level (scene index 5) so that the user's active battle scene is used for combat.
 - **Battle Context Parameters Saved**:

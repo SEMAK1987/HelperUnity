@@ -9381,8 +9381,8 @@ export default function App() {
                                     <div className="pt-4 border-t border-white/5 text-center">
                                       <span className="text-[8px] text-slate-400 block mb-1">
                                         {simDialogueLang === "RU"
-                                          ? "Fate Continent • Версия 18.12.02"
-                                          : "Fate Continent • Lvl 18.12.02"}
+                                          ? "Fate Continent • Версия 18.12.03"
+                                          : "Fate Continent • Lvl 18.12.03"}
                                       </span>
                                       <span className="text-[6.5px] text-slate-600 block leading-tight">
                                         {simDialogueLang === "RU"

@@ -4379,6 +4379,22 @@ public class FateCastleManager : MonoBehaviour
 
     private void OnGUI()
     {
+        // Если текущая сцена — BattleScene, Главное меню или Выбор персонажа, скрываем весь интерфейс менеджера замков и закрываем все открытые окна
+        string activeSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        if (activeSceneName == "BattleScene" || activeSceneName == "MainMenu" || activeSceneName == "CharacterSelection")
+        {
+            isDetailsOpen = false;
+            isTownViewActive = false;
+            showStatsPanel = false;
+            showSpyReportPopup = false;
+            showSkillDetailPopup = false;
+            showTroopDetailPopup = false;
+            showForgeDetailPopup = false;
+            showPurchaseConfirmPopup = false;
+            showNewDayOverlay = false;
+            return;
+        }
+
         isHoveringSkill = false;
         int curLang = Translator.LanguageID;
         bool isDialogueOpen = DialogueSystem_Manager.Instance != null && DialogueSystem_Manager.Instance.IsDialogueActive;

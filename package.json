@@ -1,7 +1,7 @@
 {
   "name": "unity-blender-ai-assistant",
   "private": true,
-  "version": "18.12.02",
+  "version": "18.12.03",
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
