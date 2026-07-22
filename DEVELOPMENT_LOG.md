@@ -1,16 +1,8 @@
 # DEVELOPMENT LOG
 
-## [v18.12.04] - 2026-07-21
-- **Dual Grid Architecture**: Formulated a detailed comparison of running the BattleScene grid generator inside Blender vs directly inside Unity as a C# component.
-- **Unity C# Generator Script**: Created a complete, production-ready `BattleGridGenerator.cs` script supporting `[ExecuteInEditMode]` so users can tweak grid sizes, rows, columns, offsets, spacing, and materials in real-time inside Unity.
-- **Blender Addon Polish**: Provided full guidance on closing the Blender Scripting workspace using the top tab bar and managing the N-panel "Battle Grid" tab.
+## [2026-07-22] - v18.12.06
+- **v18.12.06 Update:** Battle Grid Unification & Automatic Zero Baked Colors System - Programmed `unifyGridMaterials` flag and dynamic neutral gray material extraction in `TacticalBattleGrid.cs` to eliminate pre-baked red, blue, and green colors of meshes. Fully implemented `ToggleDeploymentZones(bool show)` to easily hide colored red/blue placement zones at battle start, maintaining standard gold highlights on hover.
+- **v18.12.01 Update:** Full Continent Completed Overlay & Cheat Conquer All Castles - Solved compilation error CS0103 by replacing `winBgTex` with `hudTex` in `DrawContinentCompletedOverlay`. Fully implemented the majestic Zenith-styled glassmorphic overlay for completing all 12 continental regions. Added a purple "ПОБЕДИТЬ ВСЕХ (ЧИТ)" button in the Zenith Hero Control Panel's cheat tools list to easily capture all castles, freeze gameplay, display the victory overlay, and cleanly proceed to the next continent scene in the build index.
 
-## [v18.12.03] - 2026-07-21
-- **BattleScene UI Overlay Suppression**: Solved the issue where gold, day counter, player HUD, and the open castle details popup remained drawn over the combat arena when launching a fortress siege and entering `"BattleScene"`. Integrated active scene checks at the entry of `OnGUI()` in `FateCastleManager.cs` to automatically suppress the interface and close all active sub-panels while inside `"BattleScene"`, `"MainMenu"`, or `"CharacterSelection"`.
-
-## [v18.12.02] - 2026-07-20
-- **BattleScene Arena Loading**: Reconfigured the fortress siege mechanic inside `FateCastleManager.cs` (`PerformBattleShieldSiege` method). Instead of text-based auto-resolution on the main screen, it now saves all crucial battle parameters to PlayerPrefs, triggers a standard save via `SaveGameSystem.Save()`, and instantly loads the `"BattleScene"` level (scene index 5) so that the user's active battle scene is used for combat.
-
-## [v18.12.01] - 2026-07-20
-- **Full Continent Completed Overlay**: Created a beautiful glassmorphic modal overlay indicating successful continent conquest (when all regional castles from 0 to 11 are conquered by the player).
-- **Cheat All Castles Conquer**: Programmed a custom cheat button "ПОБЕДИТЬ ВСЕХ (ЧИТ)" to instantly capture all castles, freeze game loops, trigger the success screen, and auto-transition to the next continent scene in the Unity Build Settings.
+## [2026-05-14] - v18.5.8
+- Версия 18.5.8: Zenith Multi-Tool Synergy & Settings Fix.
