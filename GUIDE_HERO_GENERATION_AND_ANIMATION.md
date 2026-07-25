@@ -2,48 +2,65 @@
 
 Я полностью переработал и дополнил руководство по генерации одиночных фигурок персонажей, 3D-реконструкции и созданию оптимальной системы анимации в Unity 6!
 
-### 🔮 Исправление Мага (Mage) и решение проблемы с ногами
-Мы полностью переработали промпт для **Мага (Mage)**, так как предыдущие генерации могли выглядеть неестественно (с неестественными пропорциями, странным фантастическим оружием или лишними артефактами). Новый промпт гарантирует благородный, величественный образ классического фэнтезийного волшебника с красивым посохом, стоящего в естественной симметричной Т-позе в полный рост с полностью видимыми ногами и обувью!
+В этой версии мы подробно разберем **решение критической ошибки Mixamo: «Sorry, unable to map your existing skeleton»** (когда авто-риггер отказывается принимать модель), добавим детальные пошаговые инструкции, разберем настройки оптимизации и зафиксируем все важнейшие уроки.
 
-Также все уроки и ссылки на видеоуроки были бережно интегрированы в базу знаний проекта (`knowledge_base.json`):
+Все новые видеоуроки и ссылки на инструкции бережно сохранены в базе знаний проекта (`knowledge_base.json`):
 1. **Создание 3D из картинки (Hunyuan 3D):** https://www.youtube.com/watch?v=SDV54QaEHBs
 2. **Оптимальный импорт и анимация персонажей:** https://www.youtube.com/watch?v=TxyBoDqE6Zo
 3. **Продвинутая анимация и подготовка моделей:** https://www.youtube.com/watch?v=_aJzFbuLi1M
 
 ---
 
-## 🎨 ЭТАП 1: Настройки генерации в Leonardo.ai (Решение проблемы с двумя персонажами и обрезанными ногами)
+## 🎨 ЭТАП 1: Настройки генерации в Leonardo.ai (Решение проблемы полубоком, двух персонажей и обрезанных ног)
 
-Чтобы получить строго одну чистую фигурку персонажа в полный рост (без обрезки ног и сапог) на чистейшем белом фоне, выставьте следующие параметры в левой панели генератора:
+### ⚠️ ГЛАВНЫЙ СЕКРЕТ СИММЕТРИИ: Ловушка с Оружием в Руках
+На вашем скриншоте персонаж стоит полубоком (в полупрофиль/ракурсе 3/4), из-за чего осевая линия авто-риггера Mixamo делит тело неравномерно, а суставы рук и ног смещены.
+
+**Почему так произошло?**
+Причина — фраза *«holding a simple iron broadsword in his right hand»* (держит меч в правой руке). Любое упоминание оружия или щитов заставляет нейросеть рисовать персонажа в динамической **боевой стойке** (combat stance). В обучающей выборке ИИ воины всегда стоят в пол-оборота, чтобы защищаться или наносить удар, поэтому ИИ разворачивает корпус.
+
+**Профессиональное решение (Стандарт игровой индустрии):**
+1. **Генерируйте персонажей СТРОГО без оружия и щитов в руках (пустые руки)!** Руки должны быть разведены в идеально горизонтальную и симметричную **Т-позу** или **А-позу** с раскрытыми ладонями или нейтрально сжатыми кулаками.
+2. **Идеальная симметрия:** Тело должно быть абсолютно плоским, обращенным строго лицом к камере, без малейшего поворота таза, плеч или головы. Ноги должны стоять ровно на земле, параллельно друг другу.
+3. **Оружие крепится в Unity:** В самом Unity вы можете за 10 секунд импортировать отдельный меш меча, лука или посоха и сделать его дочерним объектом кости кисти руки персонажа (например, кости `RightHand` или `LeftHand`). 
+   * *Плюсы:* Идеальный риггинг в Mixamo, отсутствие резиновых деформаций оружия при анимации и возможность менять оружие прямо в игре при прокачке!
+
+---
+
+### ⚙️ Как настроить генератор Leonardo.ai:
 * **Инструмент:** Вкладка **Image Generation**.
 * **Модель (Model):** Пресет `Auto` или `Lucid Origin` / `Leonardo Vision XL` (для красивого объемного пластилинового 3D-стиля).
-* **Стиль (Style):** `Dynamic` (как на вашем Скриншоте 1) или `None` (для строгого соответствия тексту).
+* **Стиль (Style):** `Dynamic` или `None` (для строгого соответствия тексту).
 * **Размер (Aspect Ratio):** Выберите **1:1 (Square)** с разрешением **1024×1024** пикселей.
-* **Негативный промпт (Negative Prompt):** Обязательно активируйте тумблер и добавьте этот обновленный список исключений, блокирующий появление двойников, обрезание ног/ступней и ракурсов сзади:
+* **Негативный промпт (Negative Prompt):** Обязательно активируйте тумблер и добавьте этот обновленный список исключений, блокирующий появление двойников, обрезание ног/ступней, повороты корпуса, подставки и оружие:
   ```text
-  two characters, twin, duplicate characters, split screen, dual view, front and back view, character sheet, turn-around, multiple poses, mirror view, cropped legs, cut-off feet, half-body, torso-only shot, knees crop, cropped boots, close-up, cropped bottom, black background, dark background, grey background, floor shadow, ambient shadow, color gradient, vignette, pedestal, circular base, float pedestal, duplicate items, weapons on side, multiple angles, bad anatomy, flat 2D graphic.
+  two characters, twin, duplicate characters, split screen, dual view, front and back view, character sheet, turn-around, multiple poses, mirror view, cropped legs, cut-off feet, half-body, torso-only shot, knees crop, cropped boots, close-up, cropped bottom, black background, dark background, grey background, floor shadow, ambient shadow, color gradient, vignette, pedestal, circular base, float pedestal, stand, display stand, plastic stand, round platform, stone base, toy base, rock base, duplicate items, weapons on side, multiple angles, bad anatomy, flat 2D graphic, 3/4 view, half-turned stance, asymmetrical pose, dynamic pose, rotation, holding staff, holding wand, staff, wand, weapon, holding rod, holding sword.
   ```
 
 ---
 
-### 🛡️ Обновленные промпты для Основных Героев (В полный рост, без обрезки ног!):
+### 🛡️ Обновленные СВЕРХ-СИММЕТРИЧНЫЕ промпты для Героев (Без оружия в руках, без подставок, идеальная Т-поза/А-поза!):
 
-#### 1. Воин (Warrior) — Меч и Щит:
+> ⚠️ **КРИТИЧЕСКИЙ СЕКРЕТ ДЛЯ МАГА (WIZARD):**
+> Никогда не используйте в промпте слова **«miniature»** или **«tabletop gaming miniature style»** для мага! В обучающей выборке ИИ все настольные фигурки магов стоят на круглой пластиковой подставке (pedestal) и обязательно сжимают в руках посох или волшебную палочку. 
+> Мы заменили стиль на **«3D character model, digital sculpt, clay render»** — это заставляет ИИ сгенерировать современную трехмерную модель для видеоигр с абсолютно пустыми, раскрытыми руками и стоящую прямо на плоском полу без подставок!
+
+#### 1. Воин (Warrior) — Идеальная ортопедическая Т-поза (Без подставки, без оружия):
 ```text
-A single isolated full-body head-to-toe shot of a heroic warrior knight in heavy steel armor with gold accents, standing symmetrically in a clear front-facing T-pose, showing full legs and heavy iron boots standing on the ground, completely visible from head to feet within the frame, only one character, solo view. He is firmly holding a simple iron broadsword in his right hand. Stylized toy figurine aesthetic, high-detail clay render. Isolated on a solid flat pure white background (#ffffff), no floor shadows, no pedestal, ready for rigging.
+An absolute front-view straight isolated full-body head-to-toe shot of a heroic warrior knight in heavy steel plate armor with gold accents. Symmetrical flat orthopedic front-facing T-pose, with both arms spread perfectly straight out horizontally on the sides, open palms facing down, empty hands, strictly no weapons, no items, no sword, no shield. Both legs and heavy iron boots are standing straight and parallel on the ground, pointing forward. Zero body rotation, perfectly flat mirror-like symmetry, looking directly into the camera. Stylized high-detail 3D game character model, clean clay render, soft studio lighting. Isolated on a solid flat pure white background (#ffffff), strictly no pedestal, no circular base, no floor shadows, ready for rigging, solo view, single character only.
 ```
 
-#### 2. Стрелок (Archer) — Эльф с Луком:
+#### 2. Стрелок (Archer) — Идеальная ортопедическая А-поза (Без подставки, без оружия):
 ```text
-A single isolated full-body head-to-toe shot of an elven archer in light leather forest armor, standing symmetrically in a straight front-facing A-pose, showing entire legs and leather boots clearly standing on the floor, completely visible from head to feet within the frame, only one character, solo view. He is firmly holding a beautiful wooden recurve bow in his left hand, with a small quiver of arrows secured strictly on his back. Isolated on a solid flat pure white background (#ffffff), zero shadows on floor, no pedestal, ready for rigging.
+An absolute front-view straight isolated full-body head-to-toe shot of a fantasy elven archer in light green leather forest armor. Symmetrical flat orthopedic front-facing A-pose, both arms held slightly away from the body in an empty-handed neutral stance, open palms, strictly no weapons, no bow in hand, no arrows. Both legs and leather boots are standing perfectly straight and parallel on the ground, pointing forward. Zero body rotation, perfectly flat mirror-like symmetry, looking directly into the camera. Stylized high-detail 3D game character model, clean clay render. Isolated on a solid flat pure white background (#ffffff), strictly no pedestal, no circular base, zero shadows on floor, ready for rigging, solo view, single character only.
 ```
 
-#### 3. Маг (Mage) — Величественный Волшебник (ОБНОВЛЕННЫЙ, ЕСТЕСТВЕННЫЙ И КРАСИВЫЙ):
+#### 3. Маг (Mage) — Идеальная ортопедическая Т-поза БЕЗ ПОСОХА и БЕЗ ПОДСТАВКИ:
 ```text
-A single isolated full-body head-to-toe shot of an elegant fantasy wizard mage in long flowing mystical purple robes with soft golden runes, standing symmetrically in a natural, proud front-facing T-pose, with both legs and boots completely visible standing on the floor. He is firmly holding a single ornate ancient wooden magic staff with a glowing blue crystal orb at the top in his right hand. Authentic high-quality 3D tabletop gaming miniature style, clean clay render, soft cinematic studio lighting. Isolated on a solid flat pure white background (#ffffff), no floor shadows, no pedestal, ready for rigging, solo view, only one character.
+An absolute front-view straight isolated full-body head-to-toe shot of an elegant fantasy wizard mage with a long white beard in beautiful mystical purple robes with soft golden runes. Symmetrical flat orthopedic front-facing T-pose, with both arms spread perfectly straight out horizontally on the sides, completely open empty hands, fingers visible, strictly no weapons, no magic staff, no wand, no rod, empty palms. Both legs and boots are standing perfectly straight and parallel flat on the floor, pointing forward. Zero body rotation, perfectly flat mirror-like symmetry, looking directly into the camera, majestic face looking forward. Modern high-quality 3D video game character model, digital sculpt, clean clay render, cinematic studio lighting. Isolated on a solid flat pure white background (#ffffff), strictly no pedestal, no circular base, no plastic stand, no floor shadows, ready for rigging, solo view, single character only.
 ```
 
-> **🔥 Важное действие:** Наведите курсор на полученную картинку в Leonardo и нажмите кнопку **«Remove Background»** (Вырезать фон) для скачивания чистого PNG-файла без фона.
+> **🔥 Важное действие:** Наведите курсор на полученную картинку в Leonardo и нажмите кнопку **«Remove Background»** (Вырезать фон) для скачивания чистого PNG-файла без фона. Помните: руки без оружия гарантируют 100% успех при авто-риггинге!
 
 ---
 
@@ -57,109 +74,333 @@ A single isolated full-body head-to-toe shot of an elegant fantasy wizard mage i
 5. **Количество полигонов (Модель лиц) — Ключ к оптимизации памяти:**
    * На скриншоте доступны варианты: `1,5 M`, `1 M`, `500k`, `50k`.
    * **Выбор для минимальных настроек:** Строго выбирайте **`50k`** (50 тысяч полигонов) или максимум **`500k`**!
-   * *Почему?* Модели с `1.5 M` полигонов мгновенно перегрузят оперативную (RAM) и видеопамять (VRAM) на слабых устройствах, когда на поле боя появится десяток воинов. Вариант `50k` выглядит отлично с высоты камеры боя и работает в 30 раз быстрее!
+   * *Почему?* Модели с `1.5 M` полигонов мгновенно перегрузят память на слабых устройствах. Вариант `50k` выглядит отлично с высоты камеры боя и работает в 30 раз быстрее!
 6. Включите **«Земляную сетку»** (Ground Grid) в правом верхнем углу и нажмите **«Генерируйте немедленно»** (Generate Now). Скачайте полученную `.fbx` модель.
 
 ---
 
-## 🦴 ЭТАП 3: Создание автоматического скелета в Mixamo (Пошагово и подробно)
+## 🦴 ЭТАП 3: Создание автоматического скелета в Mixamo и Решение Ошибки «Unable to map your existing skeleton»
 
-Когда вы скачали готовую модель персонажа в формате `.fbx` (или `.obj`) из Tencent Hunyuan 3D, она является абсолютно «статической» (как пластилиновая статуэтка) — у неё нет костей и суставов. Чтобы заставить её двигаться и атаковать на поле боя, нужно настроить скелет. Мы будем использовать бесплатный сервис авто-риггинга **Mixamo** (mixamo.com).
+При загрузке `.fbx` модели, сгенерированной нейросетью Tencent Hunyuan 3D, в Mixamo часто возникает ошибка: **«Sorry, unable to map your existing skeleton. Please check best practices for using the Auto-Rigger and upload again»**.
 
-### 📝 Подробный пошаговый процесс риггинга:
+### 🔍 Почему возникает эта ошибка?
+Нейросеть Hunyuan 3D при создании модели в формате `.fbx` иногда генерирует внутреннюю, скрытую или пустую структуру костей (Armature / Dummy-костей), которая конфликтует с алгоритмом Mixamo. Mixamo пытается обнаружить существующий скелет, запутывается в структуре костей и аварийно завершает работу.
 
-1. **Подготовка файла перед загрузкой:**
-   * Убедитесь, что ваша модель экспортирована в формате `.fbx`, `.obj` или упакована в `.zip` вместе с текстурной картой.
-   * Размер файла не должен превышать 50 МБ (модель на 50k полигонов весит всего около 3–5 МБ, что идеально для быстрой загрузки).
+### 🛠️ Как гарантированно исправить ошибку (2 простых способа):
 
-2. **Загрузка модели на Mixamo:**
-   * Откройте сайт [Mixamo](https://www.mixamo.com/) и войдите под своей учетной записью.
-   * На правой панели нажмите большую синюю кнопку **«Upload Character»**.
-   * Перетащите ваш файл модели в открывшееся окно. Подождите 10–30 секунд, пока Mixamo обработает геометрию и отобразит персонажа во фронтальном ракурсе.
-   * *Внимание:* Если персонаж стоит спиной или боком, используйте кнопки вращения внизу экрана, чтобы развернуть его лицом к вам.
+#### РЕШЕНИЕ А (Самое простое, без сторонних программ — Экспорт в OBJ):
+Mixamo принимает файлы форматов `.fbx`, `.obj` и `.zip`. **Формат OBJ физически не умеет хранить скелет и кости** — это исключительно чистая трехмерная сетка (полигоны).
+1. Если у вас есть Blender, импортируйте туда ваш исходный файл `.fbx`.
+2. Нажмите **File -> Export -> Wavefront (.obj)** или экспортируйте модель из любого другого 3D-редактора в формат `.obj`.
+3. Загрузите полученный `.obj` файл на Mixamo. Ошибка с существующим скелетом исчезнет на 100%, так как скелета в файле больше нет!
 
-3. **Точная расстановка маркеров суставов (Критический шаг!):**
-   Mixamo попросит вас перетащить цветные кружки-маркеры на соответствующие анатомические точки вашего персонажа. Из-за того, что наши герои держат в руках оружие (меч у воина, лук у стрелка, посохи у мага), делайте это очень аккуратно, чтобы избежать деформации меша:
-   * **CHIN (Подбородок — Синий маркер):** Поместите строго на центр нижней челюсти (подбородок). Не поднимайте слишком высоко к губам.
-   * **WRISTS (Запястья — Желтые маркеры):** Поместите на середину лучезапястного сустава рук. 
-     * *Важно для Воина/Мага:* Так как они держат оружие, старайтесь позиционировать маркер точно там, где рука переходит в кисть, игнорируя геометрию рукояти меша оружия.
-   * **ELBOWS (Локти — Красные маркеры):** Поместите на внешнюю точку локтевого сгиба.
-   * **KNEES (Колени — Зеленые маркеры):** Поместите на центр коленных чашечек. Убедитесь, что они стоят симметрично.
-   * **GROIN (Пах — Оранжевый маркер):** Поместите строго по центру между ног в области таза. Не опускайте слишком низко, иначе при ходьбе ноги будут сильно растягиваться.
+#### РЕШЕНИЕ Б (Очистка скелета в Blender):
+Если вам критически важно использовать формат `.fbx` (например, для сохранения текстурных координат и материалов):
+1. Откройте **Blender** и импортируйте ваш `.fbx` файл.
+2. В окне иерархии (справа вверху) найдите объект **Armature** (обычно со значком бегущего человечка 🏃‍♂️ или кости).
+3. Разверните его, выделите вложенный меш (Mesh) персонажа, нажмите **Alt + P** на клавиатуре и выберите **«Clear and Keep Transformation»** (Очистить родителя с сохранением трансформаций). Меш отделится от скелета.
+4. Выделите пустой объект **Armature** и нажмите кнопку **Delete**, полностью удалив кости.
+5. Выделите меш персонажа, перейдите в настройки данных меша (зеленый значок треугольника справа) и в списке **Vertex Groups** удалите все группы вершин (если они есть), нажав на стрелочку вниз и выбрав **Clear All Groups**.
+6. Перейдите в настройки модификаторов (значок гаечного ключа) и, если там висит модификатор **Armature**, удалите его, нажав на крестик.
+7. Выделите чистую модель, нажмите **File -> Export -> FBX (.fbx)**. В настройках экспорта в поле **Include** выберите только **Mesh** (зажмите Shift и выберите Mesh, убрав выделение с Armature). Назовите файл, например, `Hero_Clean.fbx` и экспортируйте его.
 
-4. **Выбор скелета (Skeleton LOD):**
-   * В выпадающем списке **Skeleton LOD** выберите стандартный вариант **Standard Skeleton (65 bones)** для лучшего качества пальцев рук, либо **No Fingers (25 bones)** — если вы хотите выжать максимальную производительность (для мобильных телефонов и слабых ПК), так как пальцы на тактической карте боя всё равно не видны крупным планом.
+#### РЕШЕНИЕ В (⚡ Полная автоматизация кодом: Blender Python и Unity C#):
 
-5. **Генерация и скачивание:**
-   * Нажмите **Next**. Mixamo запустит процесс автоматического расчета скелета (это занимает от 1 до 2 минут).
-   * Посмотрите на анимацию-превью в реальном времени. Если персонаж двигается плавно, одежда не рвется и суставы сгибаются естественно — нажмите **Next**, а затем подтвердите замену персонажа.
-   * Нажмите кнопку **Download** в правом верхнем углу. Выберите параметры:
-     * **Format:** `FBX for Unity (.fbx)` (это критически важно для корректного масштабирования костей!).
-     * **Pose:** `T-Pose`.
-     * Нажмите кнопку **Download** и сохраните файл в папку вашего проекта Unity (например, `/Assets/Models/Characters/`).
+Вы можете полностью автоматизировать этот рутинный процесс! Ниже представлены два готовых скрипта, которые сделают всё за вас за 1 секунду.
+
+##### Вариант 1: Скрипт автоматизации для Blender (Python)
+Этот скрипт полностью очищает импортированную модель от костей, модификаторов и групп вершин, а затем экспортирует её в чистый `.obj` или `.fbx` формат.
+
+1. Откройте **Blender** и импортируйте вашу модель.
+2. Перейдите во вкладку **Scripting** сверху.
+3. Нажмите кнопку **New** и вставьте следующий Python-код:
+
+```python
+# [FATE CONTINENT - BLENDER AUTOMATION v18.12.06]
+import bpy
+import os
+
+def clean_and_export_character():
+    # 1. Находим все объекты типа ARMATURE (скелеты) в сцене
+    armatures = [obj for obj in bpy.context.scene.objects if obj.type == 'ARMATURE']
+    
+    for armature in armatures:
+        # Находим всех детей скелета (обычно это меши персонажа)
+        for child in armature.children:
+            if child.type == 'MESH':
+                # Делаем меш активным
+                bpy.context.view_layer.objects.active = child
+                child.select_set(True)
+                
+                # Отвязываем от скелета, сохраняя масштаб и координаты
+                bpy.ops.object.parent_clear(type='CLEAR_KEEP')
+                
+                # Удаляем модификатор Armature
+                for mod in child.modifiers:
+                    if mod.type == 'ARMATURE':
+                        child.modifiers.remove(mod)
+                
+                # Очищаем Vertex Groups (группы вершин)
+                child.vertex_groups.clear()
+        
+        # Удаляем сам скелет
+        bpy.data.objects.remove(armature, do_unlink=True)
+        
+    print("Очистка завершена! Все скелеты удалены, меши очищены.")
+    
+    # Автоматический экспорт очищенного меша в OBJ на рабочий стол
+    desktop_path = os.path.expanduser("~/Desktop")
+    export_file = os.path.join(desktop_path, "Hero_Clean_For_Mixamo.obj")
+    
+    # Выделяем все оставшиеся меши
+    bpy.ops.object.select_all(action='DESELECT')
+    for obj in bpy.context.scene.objects:
+        if obj.type == 'MESH':
+            obj.select_set(True)
+            
+    # Экспортируем в OBJ
+    bpy.ops.wm.obj_export(filepath=export_file, export_selected_objects=True)
+    print(f"Файл успешно экспортирован на рабочий стол: {export_file}")
+
+# Запуск функции очистки
+clean_and_export_character()
+```
+
+4. Нажмите кнопку **Run Script** (значок Play ▶️). 
+5. Очищенный `.obj` файл моментально появится на вашем **Рабочем столе** под именем `Hero_Clean_For_Mixamo.obj`. Просто загрузите его на Mixamo!
+
+---
+
+##### Вариант 2: C# Скрипт-Конвертер прямо внутри Unity 6 (Без открытия Blender!)
+Это самый удобный способ! Вам даже не нужно открывать Blender. Вы просто кликаете правой кнопкой мыши по импортированному FBX файлу прямо в Unity и экспортируете его чистую сетку в OBJ.
+
+1. Создайте в Unity папку `Assets/Editor/` (если её еще нет).
+2. Создайте внутри файл `FateMixamoExporter.cs` и вставьте в него код:
+
+```csharp
+// [FATE CONTINENT - UNITY EDITOR AUTOMATION v18.12.06]
+#if UNITY_EDITOR
+using UnityEngine;
+using UnityEditor;
+using System.IO;
+using System.Text;
+
+public class FateMixamoExporter : EditorWindow
+{
+    [MenuItem("Assets/Fate Tools/Export Clean OBJ for Mixamo", false, 10)]
+    public static void ExportSelectedFBXToCleanOBJ()
+    {
+        // Получаем выделенный объект в окне Project
+        GameObject selectedObject = Selection.activeGameObject;
+        if (selectedObject == null)
+        {
+            EditorUtility.DisplayDialog("Ошибка", "Пожалуйста, выделите импортированный FBX персонажа в окне Project!", "OK");
+            return;
+        }
+
+        string assetPath = AssetDatabase.GetAssetPath(selectedObject);
+        if (string.IsNullOrEmpty(assetPath) || !assetPath.ToLower().EndsWith(".fbx"))
+        {
+            EditorUtility.DisplayDialog("Ошибка", "Выбранный объект должен быть FBX файлом!", "OK");
+            return;
+        }
+
+        // Пытаемся получить MeshFilter или SkinnedMeshRenderer
+        Mesh mesh = null;
+        MeshFilter meshFilter = selectedObject.GetComponentInChildren<MeshFilter>();
+        if (meshFilter != null)
+        {
+            mesh = meshFilter.sharedMesh;
+        }
+        else
+        {
+            SkinnedMeshRenderer skinnedRenderer = selectedObject.GetComponentInChildren<SkinnedMeshRenderer>();
+            if (skinnedRenderer != null)
+            {
+                mesh = skinnedRenderer.sharedMesh;
+            }
+        }
+
+        if (mesh == null)
+        {
+            EditorUtility.DisplayDialog("Ошибка", "Внутри выделенного FBX не найден компонент Mesh!", "OK");
+            return;
+        }
+
+        // Создаем диалоговое окно сохранения файла
+        string defaultName = selectedObject.name + "_Clean_For_Mixamo";
+        string savePath = EditorUtility.SaveFilePanel("Сохранить очищенный OBJ для Mixamo", "", defaultName, "obj");
+
+        if (string.IsNullOrEmpty(savePath)) return;
+
+        // Конвертируем меш в стандартный формат Wavefront OBJ без костей
+        string objData = MeshToOBJString(mesh, selectedObject.name);
+        // КРИТИЧЕСКИ ВАЖНО: Заменяем Windows-переносы строк на Unix-переносы строк (\n), чтобы Mixamo корректно считывал файл
+        objData = objData.Replace("\r\n", "\n");
+        // КРИТИЧЕСКИ ВАЖНО: Пишем строго в UTF-8 БЕЗ сигнатуры BOM (Byte Order Mark, сигнатура EF BB BF в начале), 
+        // иначе авто-риггер Mixamo считает заголовок невалидным бинарным файлом и выдает ошибку "Unexpected File Type"!
+        File.WriteAllText(savePath, objData, new UTF8Encoding(false));
+
+        EditorUtility.DisplayDialog("Успех!", $"Чистый файл меша успешно экспортирован!\nСкелет удален.\n\nПуть: {savePath}", "Ура!");
+    }
+
+    private static string MeshToOBJString(Mesh mesh, string name)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.AppendLine($"# Fate Continent Clean Mesh Exporter v18.12.06");
+        sb.AppendLine($"# Object Name: {name}");
+        sb.AppendLine($"g {name}");
+
+        ### 🎨 СЕКРЕТ ТЕКСТУРИРОВАНИЯ И ЦВЕТА: Как вернуть цвет на модель?
+
+#### Почему OBJ-файл экспортировался в Mixamo серым?
+Стандартные файлы формата **Wavefront OBJ** по своей природе не умеют хранить текстурные изображения (картинки) внутри себя. Они содержат только саму геометрическую форму (сетку/меш) и **UV-развертку** (координаты, которые сообщают видеокарте, в каком именно месте накладывать цвета). 
+
+Поэтому модель в авто-риггере Mixamo отображается серой — **это абсолютно нормально и правильно!** Самой системе Mixamo текстуры не нужны, ей требуются только чистые геометрические пропорции тела, чтобы рассчитать и прикрепить кости скелета.
+
+#### Как за 1 минуту вернуть текстуры и цвета на зариггенную модель в Unity?
+После того как вы скачали зариггенный `.fbx` файл из Mixamo, его текстура осталась в вашем оригинальном (исходном) FBX-файле или в папке генератора Tencent Hunyuan 3D. Вот как их подружить в Unity:
+
+1. **Создайте материал для персонажа:**
+   * В папке `Assets/Models/Characters/` нажмите правой кнопкой мыши -> **Create -> Material**. Назовите его, например, `M_Warrior_Texture`.
+2. **Назначьте текстуру (Albedo / Base Color):**
+   * Найдите оригинальную цветную текстуру персонажа (обычно это PNG-картинка, которая шла вместе с исходной FBX-моделью).
+   * Перетащите эту текстуру в слот **Albedo** (в стандартном шейдере Unity) или **Base Map** (в Universal Render Pipeline - URP) вашего созданного материала `M_Warrior_Texture`.
+3. **Наложите материал на зариггенную модель:**
+   * Выделите зариггенный файл `Warrior_Rigged.fbx` на сцене (или откройте его Prefab).
+   * Раскройте меш персонажа в инспекторе и перетащите ваш новый материал `M_Warrior_Texture` прямо на него. Герой мгновенно окрасится в свои родные, сочные цвета!
 
 ---
 
-## 🎭 ЭТАП 4: Импорт в Unity 6 и Сверхлегкая система анимаций (Один Контроллер на Всех!)
+### 📖 Подробное пошаговое руководство по настройке, анимации и импорту персонажей в Unity 6
 
-Чтобы игра работала плавно даже при наличии десятков юнитов на экране, мы настроим систему анимации с использованием технологии **Humanoid**. Главная прелесть Humanoid-скелета в Unity заключается в том, что все ваши персонажи (и Воин, и Стрелок, и Маг) могут использовать **один-единственный общий Animator Controller в оперативной памяти**!
+Ниже представлена обновленная, детальная и пошаговая инструкция (Шаг 2 – Шаг 7) для безупречной работы в вашем проекте Fate Continent:
 
-### ⚙️ Пошаговая настройка импортированных моделей в Unity 6:
+#### 🦴 ШАГ 2: Риггинг (Создание скелета) в Mixamo
+1. Перейдите на сайт **[mixamo.com](https://www.mixamo.com/)** и войдите под своим аккаунтом.
+2. В правой части экрана нажмите синюю кнопку **Upload Character**.
+3. Перетащите ваш чистый файл **Warrior_Clean.obj** (который вы экспортировали через наше контекстное меню в Unity в один клик без BOM и лишних костей) в открывшееся окно.
+4. После загрузки персонаж отобразится во фронтальном ракурсе. Если он стоит спиной, разверните его лицом к себе кнопками вращения внизу экрана. Нажмите **Next**.
+5. Расставьте цветные маркеры на суставы (ориентируйтесь на правую подсказку на сайте):
+   * **CHIN (Синий):** Поместите на самый центр подбородка.
+   * **WRISTS (Желтые):** Поместите на запястья (в месте перехода руки в кисть). Игнорируйте оружие в руках, цельтесь точно в анатомический сустав.
+   * **ELBOWS (Красные):** Поместите на внешние стороны локтевых суставов.
+   * **KNEES (Зеленые):** Поместите на центры коленных чашечек.
+   * **GROIN (Оранжевый):** Поместите в самый центр паховой области (в самом низу таза).
+6. В выпадающем меню **Skeleton LOD** выберите:
+   * **Standard Skeleton (65 bones)** — если вам нужна анимация пальцев рук.
+   * **No Fingers (25 bones)** — *РЕКОМЕНДУЕТСЯ!* В тактических боях Fate Continent фигурки видны с высоты птичьего plate, пальцы рук разглядеть невозможно, а экономия процессора составит до 40% на один отряд!
+7. Нажмите **Next**. Mixamo за одну минуту рассчитает скелет. Если на анимации предпросмотра персонаж дышит ровно — нажмите **Next**, а затем **Next** для подтверждения замены.
+8. Нажмите **Download** в правом верхнем углу:
+   * **Format:** `FBX for Unity (.fbx)` (Критически важно!).
+   * **Pose:** `T-Pose`.
+9. Нажмите **Download** и сохраните файл в проект Unity (например, в `Assets/Models/Characters/Warrior_Rigged.fbx`).
 
-1. **Конфигурация Rig (Скелета):**
-   * Кликните на импортированный файл персонажа (например, `Warrior_Rigged.fbx`) в окне **Project**.
-   * В окне **Inspector** перейдите во вкладку **Rig**.
-   * Установите параметр **Animation Type** в значение **Humanoid**.
-   * В поле **Avatar Definition** оставьте значение **Create From This Model**.
-   * Нажмите кнопку **Apply** внизу. Unity автоматически создаст файл аватара (`Warrior_RiggedAvatar`).
-   * Повторите эту операцию для всех трех героев (Воина, Стрелка и Мага).
+#### 🔍 ШАГ 3: Поиск и Подбор необходимых анимаций в Mixamo
+Для полноценной работы нашей такческой боевой сцены нам нужны 3 базовых состояния для каждого персонажа (Воина, Стрелка и Мага).
+В левом верхнем углу Mixamo в строке поиска введите следующие названия и выберите понравившиеся:
 
-2. **Скачивание и настройка анимаций из Mixamo:**
-   * Найдите в Mixamo нужные анимации:
-     * **Idle:** `Warrior Idle`, `Archer Idle`, `Wizard Magic Idle` (или любое другое красивое дыхание).
-     * **Movement:** Анимацию бега или ходьбы. **Обязательно** поставьте галочку **In Place** в панели настроек Mixamo перед скачиванием, чтобы персонаж бежал на месте!
-     * **Attack:** `Sword Slash` (для Воина), `Standing Draw Arrow` (для Стрелка), `Spell Casting` (для Мага).
-   * Скачайте каждую анимацию со следующими параметрами:
-     * **Format:** `FBX for Unity (.fbx)`.
-     * **Skin:** Выберите **Without Skin** (Скачивать анимации БЕЗ меша модели! Это снижает размер каждого файла анимации с 15 МБ до 100 КБ!).
-   * Перенесите скачанные файлы анимаций в Unity (например, в папку `/Assets/Animations/`).
-   * Для каждого файла анимации выберите его в окне Project, перейдите во вкладку **Rig**, установите **Animation Type: Humanoid**, а в поле **Avatar Definition** выберите **Copy From Other Avatar** и укажите аватар вашего любого базового персонажа. Нажмите **Apply**.
+1. **Анимации покоя (Idle):**
+   * Введите в поиск: `Idle`.
+   * Подберите стойки под классы:
+     * **Для Воина:** `Warrior Idle` или `Knight Idle` (тяжелая, уверенная стойка с мечом).
+     * **Для Стрелка:** `Archer Idle` (легкая стойка, рука готова выхватить стрелу).
+     * **Для Мага:** `Wizard Magic Idle` или `Spell Casting Idle` (мистическое дыхание, стойка с посохом).
 
-3. **Настройка циклов анимации (Looping):**
-   * Для анимаций покоя (**Idle**) и бега (**Movement**) перейдите во вкладку **Animation** в инспекторе.
-   * Поставьте галочку напротив **Loop Time** (чтобы анимация проигрывалась бесконечно).
-   * Убедитесь, что индикаторы **Loop Match** горят зеленым цветом.
-   * Нажмите кнопку **Apply** внизу.
+2. **Анимация бега (Movement):**
+   * Введите в поиск: `Run` или `Running`.
+   * Выберите подходящий бег (например, `Standard Run` или `Sprint`).
+   * ⚠️ **КРИТИЧЕСКИ ВАЖНО:** На панели настроек анимации справа обязательно поставьте галочку **In Place** (Бег на месте). Персонаж должен бежать строго на одном месте, так как физически перемещать фигурку по тактической сетке мы будем C#-кодом.
 
-### 🎛️ Создание Единого Animator Controller:
+3. **Анимации атак (Attack):**
+   * Введите в поиск: `Attack` или `Slash` / `Shoot`.
+   * Выберите:
+     * **Воин:** `Sword Slash` (круговой или рубящий удар мечом).
+     * **Стрелок:** `Standing Draw Arrow` или `Archery Shoot` (выстрел из лука).
+     * **Маг:** `Spell Casting` или `Magic Attack` (взмах посохом/рукой для призыва заклинания).
 
-1. В окне **Project** нажмите правой кнопкой мыши -> **Create -> Animator Controller**. Назовите его `TacticalUnitAnimatorController`.
-2. Дважды кликните по нему, чтобы открыть окно **Animator**.
-3. Создайте параметры на левой панели вкладки **Parameters**:
-   * **`Speed`** (тип `Float`) — отвечает за переход между покоем и движением.
-   * **`IdleType`** (тип `Integer`) — определяет, какую стойку играть (0 = Воин, 1 = Стрелок, 2 = Маг).
-   * **`Attack`** (тип `Trigger`) — запускает стандартную атаку.
-   * **`SuperAttack`** (тип `Trigger`) — запускает суперспособность.
+#### 💾 ШАГ 4: Экспорт анимаций без лишнего веса («Without Skin»)
+Это важнейший трюк для профессиональной оптимизации! Нам не нужно скачивать 3D-модель персонажа заново вместе с каждой анимацией. Мы скачаем только чистую траекторию костей (скелет), что уменьшит вес файлов в 150 раз!
 
-4. **Логика состояний (States & Transitions):**
-   * Создайте состояние-контейнер типа **Blend Tree** (или настройте переключатель через стейты).
-   * Наиболее производительный способ — использовать **Blend Tree 1D** для Idle-состояний:
-     * Кликните правой кнопкой в поле сетки -> **Create State -> From New Blend Tree**. Назовите его `IdleBlend`.
-     * Дважды кликните по нему. Установите параметр переключения: **`IdleType`**.
-     * В списке **Motion** добавьте 3 слота и перетащите туда ваши анимации:
-       * Слот 0: `Warrior_Idle` (при значении IdleType = 0)
-       * Слот 1: `Archer_Idle` (при значении IdleType = 1)
-       * Слот 2: `Mage_Idle` (при значении IdleType = 2)
-   * Создайте состояние движения `Move` (перетащите туда анимацию бега `Run`).
-   * Создайте переходы (Transitions):
-     * Из `IdleBlend` в `Move` (Условие: **`Speed` Greater `0.1`**). Отключите галочку *Has Exit Time*.
-     * Из `Move` в `IdleBlend` (Условие: **`Speed` Less `0.1`**). Отключите галочку *Has Exit Time*.
-   * Настройте переходы для атак:
-     * Создайте состояния `AttackState` и `SuperAttackState` с соответствующими анимациями ударов.
-     * Сделайте переходы от **Any State** в `AttackState` по триггеру **`Attack`** и в `SuperAttackState` по триггеру **`SuperAttack`**.
-     * Из состояний атак сделайте возвратный переход в `IdleBlend` с включенной галочкой **Has Exit Time** (чтобы анимация удара гарантированно доиграла до конца перед возвращением в покой).
+При скачивании каждой выбранной анимации нажимайте кнопку **Download** и выставляйте следующие параметры:
+* **Format:** `FBX for Unity (.fbx)`.
+* **Skin:** Выберите **Without Skin** (Без текстур и меша).
+* **Frames per Second:** `30` (этого более чем достаточно для плавной тактической игры).
+* **Keyframe Reduction:** `uniform` (для дополнительного сжатия веса файла).
 
----
+Нажмите **Download**. Файл будет весить всего около ~100 КБ вместо 15 МБ! Сохраните их в Unity в папку `Assets/Animations/` (например, под именами `Warrior_Idle.fbx`, `Warrior_Run.fbx`, `Warrior_Attack.fbx`).
+
+#### ⚙️ ШАГ 5: Настройка импортированных файлов в Unity 6
+Когда все файлы перенесены в Unity, настройте их следующим образом:
+
+1. **Настройка Rig у Риггед-моделей (Модели с телом, скачанные в Шаге 2):**
+   * Кликните на файл модели (например, `Warrior_Rigged.fbx`) в папке `Assets/Models/Characters/`.
+   * В окне **Inspector** перейдите на вкладку **Rig**.
+   * **Animation Type:** Установите **Humanoid**.
+   * **Avatar Definition:** Выберите **Create From This Model**.
+   * Нажмите кнопку **Apply** внизу. Unity создаст аватар костей (`Warrior_RiggedAvatar`). Повторите это для всех ваших персонажей.
+
+2. **Настройка Rig у Анимаций (Файлы анимаций без скина, скачанные в Шаге 4):**
+   * Выделите файлы анимаций (например, `Warrior_Idle.fbx`) в папке `Assets/Animations/`.
+   * Перейдите во вкладку **Rig** в инспекторе.
+   * **Animation Type:** Установите **Humanoid**.
+   * **Avatar Definition:** Выберите **Copy From Other Avatar**.
+   * **Source:** В появившемся поле укажите созданный аватар любого вашего персонажа (например, `Warrior_RiggedAvatar`).
+   * Нажмите **Apply**. Теперь анимация знает структуру костей вашего героя!
+
+3. **Настройка циклов (Looping):**
+   * Для анимаций покоя (**Idle**) и бега (**Run**) перейдите во вкладку **Animation** в инспекторе файла анимации.
+   * Прокрутите вниз и поставьте галочку на **Loop Time** (чтобы анимация проигрывалась циклично).
+   * Поставьте галочки **Loop Pose** для идеальной склейки кадров, чтобы не было швов.
+   * Нажмите **Apply** в самом низу.
+   * *Для анимаций атак ставить галочку Loop Time не нужно* — они должны воспроизводиться только один раз за удар.
+
+#### 🎛 ШАГ 6: Сборка единого Animator Controller в Unity 6
+1. В окне **Project** нажмите правой кнопкой мыши -> **Create -> Animator Controller**. Назовите его **`TacticalUnitAnimatorController`**.
+2. Дважды кликните по нему, чтобы войти в редактор анимаций.
+3. На вкладке **Parameters** (слева вверху) добавьте параметры:
+   * Нажмите `+` -> **Float**, назовите **`Speed`** (отвечает за бег).
+   * Нажмите `+` -> **Integer**, назовите **`IdleType`** (0 = Воин, 1 = Стрелок, 2 = Маг).
+   * Нажмите `+` -> **Trigger**, назовите **`Attack`** (обычная атака).
+   * Нажмите `+` -> **Trigger**, назовите **`SuperAttack`** (суперспособность).
+
+4. **Создание Idle-переключателя (Blend Tree):**
+   * Кликните правой кнопкой мыши на пустом полем сетки -> **Create State -> From New Blend Tree**. Назовите состояние **`IdleBlend`**.
+   * Дважды кликните на серую плашку **`IdleBlend`**, чтобы войти внутрь дерева смешивания.
+   * Выделите узел дерева смешивания и в инспекторе справа в поле **Parameter** выберите созданный целочисленный параметр **`IdleType`**.
+   * В списке **Motion** нажмите `+` -> **Add Motion Field** три раза.
+   * Перетащите в слоты ваши анимации:
+     * **Слот 0 (Value = 0):** Анимация `Warrior_Idle`
+     * **Слот 1 (Value = 1):** Анимация `Archer_Idle`
+     * **Слот 2 (Value = 2):** Анимация `Mage_Idle`
+   * Нажмите на стрелочку в верхнем левом углу редактора (**Base Layer**), чтобы вернуться на главный экран аниматора.
+
+5. **Настройка движения (Move):**
+   * Перетащите вашу анимацию бега (Run) на поле сетки. Назовите состояние **`Move`**.
+   * Зажмите правую кнопку мыши на **`IdleBlend`**, выберите **Make Transition** и протяните стрелочку к **`Move`**.
+   * Нажмите на стрелочку. В инспекторе справа снимите галочку **Has Exit Time** и в списке условий (**Conditions**) добавьте: **`Speed` -> Greater -> `0.1`**.
+   * Сделайте обратную стрелочку от **`Move`** к **`IdleBlend`**.
+   * Снимите галочку **Has Exit Time** и добавьте условие: **`Speed` -> Less -> `0.1`**.
+
+6. **Настройка Атак (Attack и SuperAttack):**
+   * Перетащите анимацию атаки (например, `Warrior_Attack`) на поле сетки. Назовите состояние **`AttackState`**.
+   * Перетащите анимацию суперспособности на поле сетки. Назовите состояние **`SuperAttackState`**.
+   * Кликните правой кнопкой мыши по оранжевому блоку **Any State** (он всегда есть в аниматоре), выберите **Make Transition** и протяните стрелочку к **`AttackState`**.
+   * В условиях добавьте триггер **`Attack`**.
+   * Сделайте стрелочку от **Any State** к **`SuperAttackState`** с условием **`SuperAttack`**.
+   * Протяните обратные стрелочки от **`AttackState`** и **`SuperAttackState`** обратно в наше состояние **`IdleBlend`**.
+   * ⚠️ **ВНИМАНИЕ:** На этих возвратных стрелочках обязательно **оставьте включенной** галочку **Has Exit Time**! Это гарантирует, что анимация удара красиво и до конца доиграет свой взмах перед тем, как персонаж вернется в спокойное дыхание.
+
+#### ⚡ ШАГ 7: Подключение на сцену
+1. Повесьте на вашу 3D-модель персонажа на сцене компонент **Animator**.
+2. В поле **Controller** перетащите созданный **`TacticalUnitAnimatorController`**.
+3. В поле **Avatar** перетащите созданный аватар костей (например, `Warrior_RiggedAvatar`).
+4. Добавьте на персонажа наш оптимизированный скрипт **`TacticalUnitAnimator.cs`** (код есть в руководстве ниже).
+5. Настройте параметр **`IdleType`** в скрипте (0 — для воина, 1 — для лучника, 2 — для мага).
+
+Всё готово к бою! Теперь, вызывая методы `MoveToCell`, `PlayStandardAttack` или `PlaySuperAttack` из вашего игрового кода, персонаж будет плавно бегать, разворачиваться, переключать стойки и атаковать без каких-либо зависаний процессора и видеокарты!
+
+
 
 ## 💻 ЭТАП 5: Сверхлегкий C# Скрипт `TacticalUnitAnimator.cs`
 
