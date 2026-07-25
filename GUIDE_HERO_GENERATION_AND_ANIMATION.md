@@ -32,30 +32,30 @@
 * **Модель (Model):** Пресет `Auto` или `Lucid Origin` / `Leonardo Vision XL` (для красивого объемного пластилинового 3D-стиля).
 * **Стиль (Style):** `Dynamic` или `None` (для строгого соответствия тексту).
 * **Размер (Aspect Ratio):** Выберите **1:1 (Square)** с разрешением **1024×1024** пикселей.
-* **Негативный промпт (Negative Prompt):** Обязательно активируйте тумблер и добавьте этот обновленный список исключений, блокирующий появление двойников, обрезание ног/ступней, повороты корпуса, подставки и оружие:
+* **Негативный промпт (Negative Prompt):** Обязательно активируйте тумблер и добавьте этот обновленный список исключений, блокирующий появление двойников, обрезание ног/ступней, повороты корпуса, подставки, оружие и фоновые пейзажи (леса, деревья):
   ```text
-  two characters, twin, duplicate characters, split screen, dual view, front and back view, character sheet, turn-around, multiple poses, mirror view, cropped legs, cut-off feet, half-body, torso-only shot, knees crop, cropped boots, close-up, cropped bottom, black background, dark background, grey background, floor shadow, ambient shadow, color gradient, vignette, pedestal, circular base, float pedestal, stand, display stand, plastic stand, round platform, stone base, toy base, rock base, duplicate items, weapons on side, multiple angles, bad anatomy, flat 2D graphic, 3/4 view, half-turned stance, asymmetrical pose, dynamic pose, rotation, holding staff, holding wand, staff, wand, weapon, holding rod, holding sword.
+  two characters, twin, duplicate characters, split screen, dual view, front and back view, character sheet, turn-around, multiple poses, mirror view, cropped legs, cut-off feet, half-body, torso-only shot, knees crop, cropped boots, close-up, cropped bottom, black background, dark background, grey background, floor shadow, ambient shadow, color gradient, vignette, pedestal, circular base, float pedestal, stand, display stand, plastic stand, round platform, stone base, toy base, rock base, duplicate items, weapons on side, multiple angles, bad anatomy, flat 2D graphic, 3/4 view, half-turned stance, asymmetrical pose, dynamic pose, rotation, holding staff, holding wand, staff, wand, weapon, holding rod, holding sword, holding bow, holding dagger, dagger, forest background, trees, woods, outdoor background, leaves, nature background, grass, landscape, plants, scenic background.
   ```
 
 ---
 
 ### 🛡️ Обновленные СВЕРХ-СИММЕТРИЧНЫЕ промпты для Героев (Без оружия в руках, без подставок, идеальная Т-поза/А-поза!):
 
-> ⚠️ **КРИТИЧЕСКИЙ СЕКРЕТ ДЛЯ МАГА (WIZARD):**
-> Никогда не используйте в промпте слова **«miniature»** или **«tabletop gaming miniature style»** для мага! В обучающей выборке ИИ все настольные фигурки магов стоят на круглой пластиковой подставке (pedestal) и обязательно сжимают в руках посох или волшебную палочку. 
-> Мы заменили стиль на **«3D character model, digital sculpt, clay render»** — это заставляет ИИ сгенерировать современную трехмерную модель для видеоигр с абсолютно пустыми, раскрытыми руками и стоящую прямо на плоском полу без подставок!
+> ⚠️ **КРИТИЧЕСКИЕ СЕКРЕТЫ ДЛЯ МАГА И СТРЕЛКА:**
+> 1. **Для Мага (Wizard):** Никогда не используйте в промпте слова **«miniature»** или **«tabletop gaming miniature style»**! В обучающей выборке ИИ все настольные фигурки магов стоят на круглой пластиковой подставке (pedestal) и обязательно сжимают в руках посох или волшебную палочку. Мы заменили стиль на **«3D character model, digital sculpt, clay render»** — это заставляет ИИ сгенерировать современную трехмерную модель для видеоигр с абсолютно пустыми, раскрытыми руками и стоящую прямо на плоском полу без подставок!
+> 2. **Для Стрелка (Archer):** Избегайте упоминания слов **«forest»** (лес), **«woods»** (деревья) или **«bow»** (лук) в позитивном промпте! Любое упоминание «леса» заставляет нейросеть рисовать красивый природный фон вместо белого студийного, а упоминание «лука» или «стрел» заставляет ее рисовать оружие и боевую позу. Оружие и колчан мы добавим в Unity, а в промпте пишем только нейтральное описание кожаной брони на плоском белом фоне!
 
 #### 1. Воин (Warrior) — Идеальная ортопедическая Т-поза (Без подставки, без оружия):
 ```text
 An absolute front-view straight isolated full-body head-to-toe shot of a heroic warrior knight in heavy steel plate armor with gold accents. Symmetrical flat orthopedic front-facing T-pose, with both arms spread perfectly straight out horizontally on the sides, open palms facing down, empty hands, strictly no weapons, no items, no sword, no shield. Both legs and heavy iron boots are standing straight and parallel on the ground, pointing forward. Zero body rotation, perfectly flat mirror-like symmetry, looking directly into the camera. Stylized high-detail 3D game character model, clean clay render, soft studio lighting. Isolated on a solid flat pure white background (#ffffff), strictly no pedestal, no circular base, no floor shadows, ready for rigging, solo view, single character only.
 ```
 
-#### 2. Стрелок (Archer) — Идеальная ортопедическая А-поза (Без подставки, без оружия):
+#### 2. Стрелок (Archer) — Идеальная ортопедическая А-поза (Без подставки, без оружия, без лесного фона):
 ```text
-An absolute front-view straight isolated full-body head-to-toe shot of a fantasy elven archer in light green leather forest armor. Symmetrical flat orthopedic front-facing A-pose, both arms held slightly away from the body in an empty-handed neutral stance, open palms, strictly no weapons, no bow in hand, no arrows. Both legs and leather boots are standing perfectly straight and parallel on the ground, pointing forward. Zero body rotation, perfectly flat mirror-like symmetry, looking directly into the camera. Stylized high-detail 3D game character model, clean clay render. Isolated on a solid flat pure white background (#ffffff), strictly no pedestal, no circular base, zero shadows on floor, ready for rigging, solo view, single character only.
+An absolute front-view straight isolated full-body head-to-toe shot of a fantasy elven archer in a clean, tight leather brigandine armor suit with green trim, empty hands. Symmetrical flat orthopedic front-facing T-pose, with both arms spread perfectly straight out horizontally on the sides, completely open empty hands, fingers visible, strictly no weapons, no bow, no arrows, no quiver, no dagger, empty palms. Both legs and flat leather boots are standing perfectly straight and parallel flat on the floor, pointing forward. Zero body rotation, perfectly flat mirror-like symmetry, looking directly into the camera, beautiful face looking forward. Modern high-quality 3D video game character model, digital sculpt, clean clay render, cinematic studio lighting. Isolated on a solid flat pure white background (#ffffff), strictly no background scenery, no forest, no trees, no pedestal, no circular base, no plastic stand, no floor shadows, ready for rigging, solo view, single character only.
 ```
 
-#### 3. Маг (Mage) — Идеальная ортопедическая Т-поза БЕЗ ПОСОХА и БЕЗ ПОДСТАВКИ:
+#### 3. Mage (Mage) — Идеальная ортопедическая Т-поза БЕЗ ПОСОХА и БЕЗ ПОДСТАВКИ:
 ```text
 An absolute front-view straight isolated full-body head-to-toe shot of an elegant fantasy wizard mage with a long white beard in beautiful mystical purple robes with soft golden runes. Symmetrical flat orthopedic front-facing T-pose, with both arms spread perfectly straight out horizontally on the sides, completely open empty hands, fingers visible, strictly no weapons, no magic staff, no wand, no rod, empty palms. Both legs and boots are standing perfectly straight and parallel flat on the floor, pointing forward. Zero body rotation, perfectly flat mirror-like symmetry, looking directly into the camera, majestic face looking forward. Modern high-quality 3D video game character model, digital sculpt, clean clay render, cinematic studio lighting. Isolated on a solid flat pure white background (#ffffff), strictly no pedestal, no circular base, no plastic stand, no floor shadows, ready for rigging, solo view, single character only.
 ```
@@ -402,13 +402,13 @@ public class FateMixamoExporter : EditorWindow
 
 
 
-## 💻 ЭТАП 5: Сверхлегкий C# Скрипт `TacticalUnitAnimator.cs`
+## 💻 ЭТАП 5: Сверхлегкий C# Скрипт `TacticalUnitAnimator.cs` (С полной поддержкой боя)
 
-Этот скрипт разработан с учетом требований к экстремальной производительности под Unity 6. Он полностью исключает выделение мусора (GC Alloc) за счет предварительного кэширования строк в числовые хэши параметров аниматора, а также бережет процессор за счет отключения анимации костей вне зоны видимости камеры.
+Этот скрипт разработан с учетом требований к экстремальной производительности под Unity 6. Он полностью исключает выделение мусора (GC Alloc) за счет предварительного кэширования строк в числовые хэши параметров аниматора, бережет процессор за счет отключения анимации костей вне зоны видимости камеры, а также блокирует движение и атаки, если персонаж погиб.
 
 ```csharp
 // [TACTICAL UNIT ANIMATOR v18.12.06]
-// Оптимизированный менеджер анимаций для BattleScene
+// Оптимизированный менеджер анимаций для BattleScene (Бег, Атаки, Блоки, Получение урона, Смерть)
 using UnityEngine;
 
 [RequireComponent(typeof(Animator))]
@@ -427,10 +427,18 @@ public class TacticalUnitAnimator : MonoBehaviour
     private static readonly int IdleTypeHash = Animator.StringToHash("IdleType");
     private static readonly int AttackTriggerHash = Animator.StringToHash("Attack");
     private static readonly int SuperAttackTriggerHash = Animator.StringToHash("SuperAttack");
+    
+    // Новые хэши параметров для расширенной боевой системы
+    private static readonly int HitTriggerHash = Animator.StringToHash("Hit");
+    private static readonly int BlockTriggerHash = Animator.StringToHash("Block");
+    private static readonly int DeathTriggerHash = Animator.StringToHash("Death");
+    private static readonly int SuperDeathTriggerHash = Animator.StringToHash("SuperDeath");
+    private static readonly int IsDeadBoolHash = Animator.StringToHash("IsDead");
 
     private Vector3 targetPosition;
     private Quaternion targetRotation;
     private bool isMoving = false;
+    private bool isDead = false;
 
     private void Awake()
     {
@@ -448,6 +456,8 @@ public class TacticalUnitAnimator : MonoBehaviour
 
     private void Update()
     {
+        if (isDead) return; // Если мертв — не двигаемся и не обновляем логику
+
         if (isMoving)
         {
             // Перемещение силами C# без тяжелой физики (экономит до 90% ресурсов процессора)
@@ -468,6 +478,8 @@ public class TacticalUnitAnimator : MonoBehaviour
     /// </summary>
     public void MoveToCell(Vector3 destination)
     {
+        if (isDead) return;
+
         targetPosition = destination;
         Vector3 direction = (destination - cachedTransform.position).normalized;
         if (direction != Vector3.zero)
@@ -483,6 +495,8 @@ public class TacticalUnitAnimator : MonoBehaviour
     /// </summary>
     public void PlayStandardAttack(Vector3 lookAtTarget)
     {
+        if (isDead) return;
+
         LookAtTargetInstant(lookAtTarget);
         animator.SetTrigger(AttackTriggerHash);
     }
@@ -492,8 +506,62 @@ public class TacticalUnitAnimator : MonoBehaviour
     /// </summary>
     public void PlaySuperAttack(Vector3 lookAtTarget)
     {
+        if (isDead) return;
+
         LookAtTargetInstant(lookAtTarget);
         animator.SetTrigger(SuperAttackTriggerHash);
+    }
+
+    /// <summary>
+    /// Воспроизведение попадания (получение урона)
+    /// </summary>
+    public void PlayHit()
+    {
+        if (isDead) return;
+        animator.SetTrigger(HitTriggerHash);
+    }
+
+    /// <summary>
+    /// Воспроизведение блока удара щитом/оружием
+    /// </summary>
+    public void PlayBlock()
+    {
+        if (isDead) return;
+        animator.SetTrigger(BlockTriggerHash);
+    }
+
+    /// <summary>
+    /// Воспроизведение смерти персонажа
+    /// </summary>
+    /// <param name="isSuperAbility">Если true, воспроизводится смерть от мощного суперудара (падение/отлет)</param>
+    public void PlayDeath(bool isSuperAbility)
+    {
+        if (isDead) return;
+        isDead = true;
+        isMoving = false;
+
+        animator.SetFloat(SpeedHash, 0f);
+        animator.SetBool(IsDeadBoolHash, true);
+
+        if (isSuperAbility)
+        {
+            animator.SetTrigger(SuperDeathTriggerHash);
+        }
+        else
+        {
+            animator.SetTrigger(DeathTriggerHash);
+        }
+    }
+
+    /// <summary>
+    /// Полный сброс состояния (например, для переиспользования в пуле объектов)
+    /// </summary>
+    public void ResetUnit()
+    {
+        isDead = false;
+        isMoving = false;
+        animator.SetBool(IsDeadBoolHash, false);
+        animator.SetFloat(SpeedHash, 0f);
     }
 
     private void LookAtTargetInstant(Vector3 target)
@@ -510,7 +578,111 @@ public class TacticalUnitAnimator : MonoBehaviour
 
 ---
 
-## 🗜️ ЭТАП 6: Финальная оптимизация видеокарты и оперативной памяти в Unity 6
+## ⚔️ ЭТАП 6: Добавление боевых анимаций: удары, блоки, смерть и падения
+
+Чтобы превратить простое перемещение в зрелищное тактическое сражение, вам понадобятся дополнительные анимации. Ниже приведена подробная инструкция по их поиску, скачиванию, импорту и настройке в аниматоре Unity.
+
+### 🔍 1. Поисковые запросы на Mixamo для каждого класса
+Зайдите на [Mixamo.com](https://www.mixamo.com/) и введите следующие поисковые запросы. Выбирайте те анимации, которые лучше всего подходят стилистике вашего персонажа:
+
+#### 🛡️ Для Воина (Warrior):
+* **Обычная атака (Sword Slash / Shield Bash):** 
+  * Поиск: `sword slash` или `shield bash` или `one hand sword combo`.
+  * Рекомендуемая анимация: **«Sword And Shield Slash»** или **«Standing Melee Kick»**.
+* **Супер-атака (Heavy Jump Attack):**
+  * Поиск: `heavy sword slash` или `jump attack`.
+  * Рекомендуемая анимация: **«Great Sword Slash»** или **«Standing One-Handed Greatsword Slash»**.
+* **Блок (Block):**
+  * Поиск: `shield block` или `sword block`.
+  * Рекомендуемая анимация: **«Standing Shield Block Pose»** or **«Sword And Shield Block To Hit»**.
+
+#### 🏹 Для Стрелка (Archer):
+* **Обычная атака (Bow Shot):**
+  * Поиск: `standing draw bow` или `crossbow shoot`.
+  * Рекомендуемая анимация: **«Standing Draw Bow»** (Убедитесь, что анимация воспроизводится стоя на месте!).
+* **Супер-атака (Double / Rapid Shot):**
+  * Поиск: `rapid bow shoot` или `bow combat combination`.
+  * Рекомендуемая анимация: **«Standing Rapid Bow Fire»**.
+* **Блок (Dodge / Evade):**
+  * Поиск: `dodge` или `evade jump`.
+  * Рекомендуемая анимация: **«Dodge Backwards»** (выберите параметр **In Place**, чтобы персонаж не улетал физически с клетки!).
+
+#### 🔮 Для Мага (Mage):
+* **Обычная атака (Magic Projectile):**
+  * Поиск: `spell cast` или `standing magic fire`.
+  * Рекомендуемая анимация: **«Standing Direct Magic Attack»** or **«Standing Magic Spell»**.
+* **Супер-атака (Area of Effect Summon):**
+  * Поиск: `summon spell` или `heavy magic summon`.
+  * Рекомендуемая анимация: **«Summoning Ground Spells»** or **«Spell Casting High Energy»**.
+* **Блок (Energy Shield / Ward):**
+  * Поиск: `magic block` или `shield barrier`.
+  * Рекомендуемая анимация: **«Standing Barrier Block»** (персонаж выставляет руку вперед, создавая магический щит).
+
+#### 💀 Общие анимации (Для всех классов):
+* **Получение урона (Hit Reaction):**
+  * Поиск: `hit reaction` или `get hit standing`.
+  * Рекомендуемая анимация: **«Standing Reaction Hit»** (быстрое вздрагивание корпуса от удара).
+* **Смерть от обычного удара (Simple Death):**
+  * Поиск: `death` или `standing death`.
+  * Рекомендуемая анимация: **«Stagger Back And Die»** or **«Slightly Fold Death»** (персонаж падает вперед или на спину аккуратно в пределах своей клетки).
+* **Смерть от суперспособности / Падение (Super Death / Knockdown):**
+  * Поиск: `flying death` или `knockdown death` или `backward fall`.
+  * Рекомендуемая анимация: **«Knocked Backwards And Death»** (мощный отлет назад с падением навзничь, идеально для смерти от взрыва или суперудара).
+
+---
+
+### 📥 2. Правильные параметры скачивания (Секрет экономии веса билда)
+Когда вы скачиваете **дополнительные** анимации, соблюдайте эти правила:
+1. **Первую анимацию (Idle / Скин)** вы скачиваете с настройкой **Format: FBX for Unity** и **Skin: With Skin** (чтобы получить 3D-модель).
+2. **Все последующие анимации (удары, смерть, блоки)** скачивайте строго с настройкой **Skin: Without Skin**!
+   * *Почему:* Файлы без скина содержат только математическую информацию о движении костей. Они весят по 50-100 КБ вместо 15-30 МБ! Это уменьшит вес вашей игры в 50 раз.
+3. Всегда ставьте галочку **In Place** (На месте) для всех анимаций перемещений или уклонений, чтобы игровая логика Unity сама управляла положением фигурки на сетке, а анимация не уводила 3D-модель физически в сторону от её логической клетки.
+
+---
+
+### 📂 3. Настройка импорта анимаций в Unity
+После того как вы перетащили файлы `.fbx` с анимациями в Unity:
+1. Выделите файл анимации в окне **Project**.
+2. В инспекторе перейдите во вкладку **Rig**:
+   * **Animation Type:** Установите **Humanoid** (так как мы настроили Т-позу, кости идеально перенесутся!).
+   * **Avatar Definition:** Выберите **Copy From Other Avatar** и укажите аватар вашей основной модели (например, `Warrior_Avatar`), который вы создали на Этапе 3. Это гарантирует 100% совместимость.
+3. Перейдите во вкладку **Animation**:
+   * Для анимаций смерти и урона **снимите** галочку **Loop Time** (они должны проиграться ровно один раз).
+   * Для анимаций атак и блоков также **снимите** галочку **Loop Time**.
+   * Нажмите **Apply** внизу инспектора.
+
+---
+
+### 🎨 4. Настройка Animator Controller (Логика переходов)
+
+Создайте параметры в левой вкладке **Parameters** вашего Animator Controller:
+1. `Speed` (Float) — для бега.
+2. `IdleType` (Int) — стойка (0, 1, 2).
+3. `Attack` (Trigger) — запуск атаки.
+4. `SuperAttack` (Trigger) — запуск суперудара.
+5. `Hit` (Trigger) — урон.
+6. `Block` (Trigger) — блок.
+7. `Death` (Trigger) — обычная смерть.
+8. `SuperDeath` (Trigger) — жесткая смерть с отлетом.
+9. `IsDead` (Bool) — флаг смерти.
+
+#### 🗺️ Архитектура переходов (Transitions):
+
+* **Переход в урон/блок (Any State -> Hit / Block):**
+  * Создайте связь от узла **Any State** к состоянию **Hit** и к состоянию **Block**.
+  * В условиях перехода (Conditions) укажите соответствующий триггер: `Hit` или `Block`.
+  * Установите **Has Exit Time = false** (чтобы анимация срабатывала мгновенно, прерывая бег или покой).
+  * Из состояний **Hit** и **Block** сделайте обратный переход в **Blend Tree (Idle/Run)** с включенной галочкой **Has Exit Time = true** (чтобы по окончании анимации персонаж автоматически вернулся в стойку покоя).
+
+* **Переход в смерть (Any State -> Death / SuperDeath):**
+  * Создайте связь от **Any State** к состояниям **Death** (обычное падение) и **SuperDeath** (отлет назад).
+  * В условиях перехода укажите триггер `Death` или `SuperDeath`, а также обязательное условие `IsDead = true`.
+  * Установите **Has Exit Time = false** и **Transition Duration = 0.1s** (для моментальной смерти).
+  * **ВАЖНО:** Из состояний смерти **НЕ должно быть никаких выходящих стрелок!** Персонаж должен оставаться лежать на земле до тех пор, пока отряд не возродится или не исчезнет с поля боя.
+
+---
+
+## 🗜️ ЭТАП 7: Финальная оптимизация видеокарты и оперативной памяти в Unity 6
 
 Когда на поле боя сходятся десятки воинов, правильные настройки импорта моделей и текстур определяют, будет ли игра выдавать стабильные 60 кадров в секунду или начнет сильно зависать. Выполните эти шаги для каждой модели:
 
@@ -538,4 +710,59 @@ public class TacticalUnitAnimator : MonoBehaviour
 
 ---
 
+## 🛠️ РЕШЕНИЕ ПРОБЛЕМЫ: Растягивание («резиновый» шлем, воротник или плечи) в Mixamo
+
+### 🔍 Почему это происходит?
+Когда авто-риггер Mixamo рассчитывает привязку вершин меша к костям скелета (**Skin Weighting**), он использует автоматические алгоритмы расстояний. 
+* Если у вашего рыцаря/воина **высокий воротник, массивные наплечники (pauldrons) или шлем со спускающимся забралом/подбородком**, автоматический алгоритм путается.
+* Часть вершин шлема он привязывает к кости **Головы (Head)**, а часть нижних вершин — к костям **Шеи (Neck)** или **Груди (Spine/Chest)**.
+* В результате при вращении головы часть шлема поворачивается правильно, а нижняя часть «прилипает» к шее или плечам, создавая ужасный эффект растянутой резины («смазанности»).
+
+---
+
+### 🚀 Как это исправить? 3 проверенных способа (от простого к профессиональному)
+
+#### 🎯 Вариант 1: Правильная расстановка меток в Mixamo (Быстрый фикс)
+1. Нажмите **Back** в Mixamo, чтобы вернуться к расстановке цветных маркеров.
+2. **Маркер CHIN (Синий):** Поднимите его немного выше, чем обычно! Расположите его строго на уровне рта/забрала шлема, а не на самом нижнем кончике подбородка. Это «отрежет» влияние кости головы от шеи и воротника.
+3. **Маркер GROIN (Оранжевый):** Убедитесь, что он стоит ровно по центру, не слишком низко.
+4. В выпадающем меню **Skeleton LOD** выберите **No Fingers (25 bones)**. С упрощенным скелетом алгоритму Mixamo намного проще рассчитать правильные веса на голову и шею!
+
+---
+
+#### 💻 Вариант 2: Программный 1-клик фикс прямо в Unity (Скрипт `FateBoneWeightFixer.cs`)
+Мы создали для вас специальный автоматический инструмент, который решает эту проблему прямо внутри Unity без использования Blender! Скрипт уже лежит в корне вашего проекта: `/FateBoneWeightFixer.cs`.
+
+**Как запустить в Unity:**
+1. Скопируйте файл `/FateBoneWeightFixer.cs` в ваш проект Unity в любую папку (например, `Assets/Editor/` или `Assets/Scripts/`).
+2. Перетащите вашу риггеную модель (например, `Warrior_Rigged`) на сцену в Unity.
+3. Найдите объект внутри модели, на котором висит компонент **SkinnedMeshRenderer** (это сам меш персонажа).
+4. Добавьте на этот же объект наш скрипт **Fate Bone Weight Fixer** (нажмите *Add Component -> Fate Tools -> Fate Bone Weight Fixer*).
+5. Настройте параметры в инспекторе:
+   * **Head Bone:** Перетащите кость головы персонажа из иерархии (обычно называется `mixamorig:Head`).
+   * **Height Threshold:** Установите пороговую высоту (по умолчанию `1.6` в локальных координатах). Все вершины меша выше этой отметки (то есть вся голова и верхняя часть шлема) будут принудительно привязаны 100% только к голове!
+6. Нажмите правой кнопкой мыши по названию компонента **Fate Bone Weight Fixer** в инспекторе и выберите пункт меню **«Fix Head & Helmet Weights»** (или найдите контекстное меню).
+7. Скрипт мгновенно очистит веса шеи со шлема, создаст новый оптимизированный меш в папке проекта и заменит его. Растягивание шлема полностью исчезнет!
+
+---
+
+#### 🖌️ Вариант 3: Ручная развесовка в Blender (Профессиональный индустриальный стандарт)
+Если вы хотите идеального контроля над каждым миллиметром брони, сделайте ручную зачистку весов вершин (**Weight Paint**):
+
+1. Импортируйте ваш полученный `.fbx` файл из Mixamo в Blender.
+2. Выделите скелет (Armature), перейдите в **Pose Mode** и поверните кость головы (`Head`), чтобы увидеть, какие вершины тянутся.
+3. Вернитесь в **Object Mode**, выделите меш брони, а затем зажмите `Shift` и выделите скелет.
+4. Перейдите в режим **Weight Paint** (выпадающее меню слева вверху).
+5. В правой панели найдите вкладку **Object Data Properties** (зеленый значок треугольной сетки) и раскройте список **Vertex Groups** (Группы вершин).
+6. Найдите группу с именем головы (обычно `mixamorig:Head` или `Head`):
+   * Выберите кисть **Draw** со значением **Weight = 1.0**.
+   * Аккуратно закрасьте весь шлем красным цветом (красный цвет = 100% привязка к голове).
+7. Найдите группу шеи (`mixamorig:Neck` или `Neck`) и груди (`mixamorig:Spine3`):
+   * Выберите кисть **Subtract** со значением **Weight = 1.0** (или установите кисть Draw с Weight = 0.0).
+   * Сотрите влияние шеи со всего шлема (он должен стать абсолютно синим в зоне шлема). Синий цвет означает нулевое влияние кости шеи.
+8. Экспортируйте исправленную модель обратно в Unity в формате FBX. Теперь шлем будет сидеть как литой!
+
+---
+
 *Ваш проект полностью оптимизирован и готов к запуску в Unity 6!*
+
