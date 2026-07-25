@@ -82,7 +82,10 @@
         "https://www.youtube.com/watch?v=JgmIM7qhGh8",
         "https://www.youtube.com/watch?v=AKKpPmxx07w",
         "https://www.youtube.com/watch?v=juSKjpD3G7o",
-        "https://www.youtube.com/watch?v=NpfgeQZKmcU"
+        "https://www.youtube.com/watch?v=NpfgeQZKmcU",
+        "https://www.youtube.com/watch?v=SDV54QaEHBs",
+        "https://www.youtube.com/watch?v=TxyBoDqE6Zo",
+        "https://www.youtube.com/watch?v=_aJzFbuLi1M"
       ],
       "topics": ["Unity Physics", "Blender Geometry Nodes", "Shader Graph", "Advanced Rigging", "ML-Agents"]
     },
