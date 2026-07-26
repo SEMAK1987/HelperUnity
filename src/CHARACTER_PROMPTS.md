@@ -6,9 +6,9 @@
 
 ## 1. ⚔️ Воин (Warrior)
 
-### Поза 1: Спокойная (Оружие опущено)
+### Поза 1: Идеальная ортопедическая Т-поза (Для 3D-моделирования, без оружия, руки строго горизонтально)
 **Prompt:**
-Full-body character sheet of a legendary heavy Warrior from Fate Continent, standing in a neutral T-pose or neutral upright stance, white background. Wearing Zenith Plate Armor made of dark slate-metal with integrated glowing blue energy veins and translucent sapphire glass joints. Colossal greatsword resting by his side. Sharp 8K hyper-realistic detail, cinematic lighting, visible boots and feet, high-density armor textures, unreal engine 5 render style --ar 9:16
+An absolute front-view straight isolated full-body head-to-toe shot of a powerful male human knight in heavy steel plate armor with gold accents. Symmetrical flat orthopedic front-facing T-pose, both arms are perfectly raised and outstretched horizontally straight to the sides at a strict 90-degree angle relative to the spine, parallel to the ground, forming a perfect straight line across the shoulders (rigid T-shape). Empty hands, open flat palms facing the floor, fingers separated. Wide open negative space under the armpits, ensuring the arms are completely detached from the torso, tight-fitting armor plates. Both legs and heavy iron boots are standing straight and parallel flat on the ground, pointing forward. Zero body rotation, perfectly flat mirror-like symmetry, looking directly into the camera. The entire character, from the top of the helmet to the bottom of the boots, is fully contained and centered inside the frame, with generous empty space at the top, bottom, and sides so no part of the body is cut off or cropped. Stylized high-detail 3D game character model, clean clay render, soft studio lighting. Isolated on a solid flat pure white background (#ffffff), strictly no floor shadows, ready for rigging, solo view, single character only.
 
 ### Поза 2: Боевая (Меч поднят)
 **Prompt:**
@@ -18,9 +18,9 @@ Full-body action concept art of a Zenith Warrior from Fate Continent on a white 
 
 ## 2. 🏹 Стрелок (Archer)
 
-### Поза 1: Спокойная (Лук в руке)
+### Поза 1: Идеальная ортопедическая Т-поза (Для 3D-моделирования, без оружия, без плаща, руки строго в стороны)
 **Prompt:**
-Full-body concept art of a Master Archer from Fate Continent, standing still on a white background. Wearing sleek Zenith obsidian armor with translucent sapphire glass-morphism plates. Holding an un-drawn ethereal energy bow. Feet clearly visible in high-tech boots. Elegant star-weave cloak with backdrop blur effect. Hyper-realistic detail, 8K, cinematic lighting, sharp focus --ar 9:16
+An absolute front-view straight isolated full-body head-to-toe shot of a handsome male elven hunter ranger in tight leather armor with green trim. Symmetrical flat orthopedic front-facing T-pose, both arms are perfectly raised and outstretched horizontally straight to the sides at a strict 90-degree angle relative to the spine, parallel to the ground, forming a perfect straight line across the shoulders (rigid T-shape). Empty hands, open flat palms facing the floor, fingers separated and visible. Wide open negative space under the armpits, ensuring the arms are completely detached from the torso, tight-fitting sleeves, no cape, no hanging cloth. Both legs and flat leather boots are standing perfectly straight and parallel flat on the ground, pointing forward. Zero body rotation, perfectly flat mirror-like symmetry, looking directly into the camera, handsome clear face. The entire character, from the top of the head to the bottom of the boots, is fully contained and centered inside the frame, with generous empty space at the top, bottom, and sides so no part of the body is cut off or cropped. Modern high-quality 3D video game character model, digital sculpt, clean clay render, cinematic studio lighting. Isolated on a solid flat pure white background (#ffffff), strictly no floor shadows, ready for rigging, solo view, single character only.
 
 ### Поза 2: Боевая (Лук поднят/целится)
 **Prompt:**
@@ -30,9 +30,9 @@ Full-body action pose of a Zenith Archer from Fate Continent on a white backgrou
 
 ## 3. 🔮 Маг (Mage)
 
-### Поза 1: Спокойная (Парение/Посох вниз)
+### Поза 1: Идеальная Т-поза БЕЗ ПОСОХА, БЕЗ ШИРОКИХ РУКАВОВ (Для 3D-моделирования, чистая подмышечная зона, руки в стороны)
 **Prompt:**
-Full-body portrait of a Cosmic Archmage from Fate Continent, standing/levitating slightly on a white background. Robes made of deep slate fabric with galaxy patterns and floating golden glass rings. Holding a crystalline staff vertically. Full height visible including decorative sandals or bare feet. Ethereal glow, high-density visualization, 8K, sharp realistic character design --ar 9:16
+An absolute front-view straight isolated full-body head-to-toe shot of a wise old male wizard mage with a white beard in purple mystical robes with gold runes. Symmetrical flat orthopedic front-facing T-pose, both arms are perfectly raised and outstretched horizontally straight to the sides at a strict 90-degree angle relative to the spine, parallel to the ground, forming a perfect straight line across the shoulders (rigid T-shape). Empty hands, open flat palms facing the floor, fingers separated. Wide open negative space under the armpits, ensuring the arms are completely detached from the torso, tight-fitting sleeves, strictly no wide hanging cloth, no cape, no draped fabric. Both legs and boots are standing perfectly straight and parallel flat on the ground, pointing forward. Zero body rotation, perfectly flat mirror-like symmetry, looking directly into the camera, majestic face. The entire character, from the top of the head to the bottom of the boots, is fully contained and centered inside the frame, with generous empty space at the top, bottom, and sides so no part of the body is cut off or cropped. Modern high-quality 3D video game character model, digital sculpt, clean clay render, cinematic studio lighting. Isolated on a solid flat pure white background (#ffffff), strictly no floor shadows, ready for rigging, solo view, single character only.
 
 ### Поза 2: Боевая (Сотворение заклинания)
 **Prompt:**
