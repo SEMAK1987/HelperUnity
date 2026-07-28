@@ -570,6 +570,42 @@ def run_auto_binding():
     try:
         bpy.ops.object.parent_set(type='WITH_AUTOMATIC_WEIGHTS')
         print("SUCCESS! Mesh is now perfectly bound to the skeleton with automatic weights!")
+        
+        # Fix unweighted vertices to prevent Unity "ImportFBX Warnings: vertices with no weight"
+        print("Checking for unweighted vertices...")
+        bpy.ops.object.mode_set(mode='OBJECT')
+        
+        # Find a suitable root or center bone from the armature to assign unweighted vertices to
+        target_bone_name = None
+        for name in ["Hips", "Spine", "Pelvis", "Root", "mixamorig:Hips", "mixamorig:Spine", "Spine.001"]:
+            if name in arm_obj.data.bones:
+                target_bone_name = name
+                break
+        if not target_bone_name and len(arm_obj.data.bones) > 0:
+            target_bone_name = arm_obj.data.bones[0].name
+            
+        default_group = None
+        if target_bone_name:
+            if target_bone_name in mesh_obj.vertex_groups:
+                default_group = mesh_obj.vertex_groups[target_bone_name]
+            else:
+                default_group = mesh_obj.vertex_groups.new(name=target_bone_name)
+                print(f"Created missing vertex group '{target_bone_name}' on the mesh to map to bone.")
+        
+        if not default_group and len(mesh_obj.vertex_groups) > 0:
+            default_group = mesh_obj.vertex_groups[0]
+            
+        if default_group:
+            unweighted_count = 0
+            for v in mesh_obj.data.vertices:
+                if len(v.groups) == 0:
+                    default_group.add([v.index], 1.0, 'REPLACE')
+                    unweighted_count += 1
+            if unweighted_count > 0:
+                print(f"Fixed {unweighted_count} unweighted vertices by assigning them to '{default_group.name}' vertex group!")
+        else:
+            print("Warning: No vertex groups or bones found to bind unweighted vertices.")
+            
         print("Now you can switch to POSE MODE and rotate bones - the body will move!")
         return True
     except Exception as e:
