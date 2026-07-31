@@ -1,4 +1,4 @@
-# ⚔️ Fate Continent • Полное пошаговое руководство по генерации фигурок Героев и настройке высокопроизводительной анимации для BattleScene (v18.12.06)
+# ⚔️ Fate Continent • Полное пошаговое руководство по генерации фигурок Героев и настройке высокопроизводительной анимации для BattleScene (v18.12.07)
 
 Я полностью переработал и дополнил руководство по генерации одиночных фигурок персонажей, 3D-реконструкции и созданию оптимальной системы анимации в Unity 6!
 
@@ -1030,7 +1030,7 @@ Mixamo принимает файлы форматов `.fbx`, `.obj` и `.zip`. 
 3. Нажмите кнопку **New** и вставьте следующий Python-код:
 
 ```python
-# [FATE CONTINENT - BLENDER AUTOMATION v18.12.06]
+# [FATE CONTINENT - BLENDER AUTOMATION v18.12.07]
 import bpy
 import os
 
@@ -1092,7 +1092,7 @@ clean_and_export_character()
 2. Создайте внутри файл `FateMixamoExporter.cs` и вставьте в него код:
 
 ```csharp
-// [FATE CONTINENT - UNITY EDITOR AUTOMATION v18.12.06]
+// [FATE CONTINENT - UNITY EDITOR AUTOMATION v18.12.07]
 #if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
@@ -1161,7 +1161,7 @@ public class FateMixamoExporter : EditorWindow
     private static string MeshToOBJString(Mesh mesh, string name)
     {
         StringBuilder sb = new StringBuilder();
-        sb.AppendLine($"# Fate Continent Clean Mesh Exporter v18.12.06");
+        sb.AppendLine($"# Fate Continent Clean Mesh Exporter v18.12.07");
         sb.AppendLine($"# Object Name: {name}");
         sb.AppendLine($"g {name}");
 
@@ -1486,7 +1486,7 @@ public class FateMixamoExporter : EditorWindow
 Этот скрипт разработан с учетом требований к экстремальной производительности под Unity 6. Он полностью исключает выделение мусора (GC Alloc) за счет предварительного кэширования строк в числовые хэши параметров аниматора, бережет процессор за счет отключения анимации костей вне зоны видимости камеры, а также блокирует движение и атаки, если персонаж погиб.
 
 ```csharp
-// [TACTICAL UNIT ANIMATOR v18.12.06]
+// [TACTICAL UNIT ANIMATOR v18.12.07]
 // Оптимизированный менеджер анимаций для BattleScene (Бег, Атаки, Блоки, Получение урона, Смерть)
 using UnityEngine;
 

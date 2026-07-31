@@ -1,4 +1,4 @@
-// [FATE CONTINENT - UNITY EDITOR AUTOMATION v18.12.06]
+// [FATE CONTINENT - UNITY EDITOR AUTOMATION v18.12.07]
 #if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
@@ -67,7 +67,7 @@ public class FateMixamoExporter : EditorWindow
     private static string MeshToOBJString(Mesh mesh, string name)
     {
         StringBuilder sb = new StringBuilder();
-        sb.AppendLine($"# Fate Continent Clean Mesh Exporter v18.12.06");
+        sb.AppendLine($"# Fate Continent Clean Mesh Exporter v18.12.07");
         sb.AppendLine($"# Object Name: {name}");
         sb.AppendLine($"g {name}");
 

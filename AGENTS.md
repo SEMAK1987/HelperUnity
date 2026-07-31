@@ -1,9 +1,10 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.12.06)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.12.07)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** v18.12.06
+- **Version:** v18.12.07
 - **Engine:** Unity 6 (6000.3.10f1)
+- **v18.12.07 Update:** Core Knowledge Base & YouTube References Integration - Added new high-fidelity video tutorials on Mixamo-Unity character importing, animation workflows, and custom blend configurations to the master knowledge index. Synchronized version info and metadata across all files.
 - **v18.12.06 Update:** Battle Grid Unification & Automatic Zero Baked Colors System - Programmed `unifyGridMaterials` flag and dynamic neutral gray material extraction in `TacticalBattleGrid.cs` to eliminate pre-baked red, blue, and green colors of meshes. Fully implemented `ToggleDeploymentZones(bool show)` to easily hide colored red/blue placement zones at battle start, maintaining standard gold highlights on hover.
 - **v18.12.01 Update:** Full Continent Completed Overlay & Cheat Conquer All Castles - Solved compilation error CS0103 by replacing `winBgTex` with `hudTex` in `DrawContinentCompletedOverlay`. Fully implemented the majestic Zenith-styled glassmorphic overlay for completing all 12 continental regions. Added a purple "ПОБЕДИТЬ ВСЕХ (ЧИТ)" button in the Zenith Hero Control Panel's cheat tools list to easily capture all castles, freeze gameplay, display the victory overlay, and cleanly proceed to the next continent scene in the build index.
 - **v18.11.30 Update:** Max Level XP Calibration & Slot Re-locking Reset - Programmed `GainXP` and `SetMaxLevel` inside `FateCastleManager.cs` to set the player's XP exactly to `999999/999999 XP` at maximum level 9999, capping experience gain completely. Modified `GetUnlockedSlotsCount` to cap free level-up slots to 12 (up to level 120) so that resetting the inventory using the "СБРОС ИНВ." button successfully locks and blocks slots back to the pristine starting state of 12 slots with their starting cost returning.
@@ -49,7 +50,7 @@
 - **Audio Rule (CRITICAL):** Используйте только `SettingsManager.cs` для управления звуком и музыкой (включая hover-эффекты и списки воспроизведения). Скрипты `AudioHandler` и `AudioManager` должны быть полностью удалены для чистоты проекта. Музыкальные клипы продлеваются через Suno/Udio и настраиваются на бесшовное зацикливание (`loop = true`). Звуковые файлы берем с Pixabay/Freesound по CC0-лицензии и подключаем напрямую к SettingsManager или через AudioMixer.
 
 ## 🚀 Протокол «Пошаговое Мастерство» (Step-by-Step Mastery)
-1. **Отслеживание прогресса:** Текущая версия v18.12.06 (Battle Grid Unification & Automatic Zero Baked Colors System).
+1. **Отслеживание прогресса:** Текущая версия v18.12.07 (Core Knowledge Base & YouTube References Integration).
 2. **Инструкции Настройки Компонентов (Verified Inspector Settings):**
    - **FateMapManager (FATE_WORLD_MAP):**
      - *Maps List:* [+] Слот для глобальной карты (Map Name = "Континент Судьбы", Map Background = фоновый спрайт карты).
@@ -69,4 +70,4 @@
 5. **ОЧИСТКА:** Используйте только `SettingsManager.cs` для аудио. Удалите `AudioHandler` и `AudioManager` скрипты. Не использовать ElevenLabs.
 
 ---
-*Ядро AI пересинхронизировано (v18.12.06). Авто-апдейтер активен.*
+*Ядро AI пересинхронизировано (v18.12.07). Авто-апдейтер активен.*

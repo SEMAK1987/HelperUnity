@@ -1,4 +1,4 @@
-# 🤖 AI Assistant - Disaster Recovery & Replica Reconstruction Guide (v18.12.06)
+# 🤖 AI Assistant - Disaster Recovery & Replica Reconstruction Guide (v18.12.07)
 
 ## 📌 Introduction & Purpose
 This document serves as a complete **Disaster Recovery Blueprint** for the **Unity & Blender AI Assistant (Fate Continent Assistant)**. If the application environment is lost, corrupted, or needs to be redeployed on a different server or account, this guide contains the exact visual and functional specifications, UI layouts, styling guidelines, and architectural details to rebuild the application from scratch to match the attached screenshot.
@@ -53,11 +53,11 @@ The left panel has a width of `320px` and is packed with system telemetries and 
 
 ### 3. Central Chat & Neural Hub
 - **Ambient Center Icon**: A large glowing circle containing a digital microchip graphic (`Cpu`).
-- **Main Heading Text**: `UNITY AI ASSISTANT V18.12.06` (Extra bold display font, white, centered).
+- **Main Heading Text**: `UNITY AI ASSISTANT V18.12.07` (Extra bold display font, white, centered).
 - **Sub-heading Description**:
   - *"Я полностью осведомлен о вашем проекте по пути..."*
   - Animated loading label: `Загрузка...`
-  - Subtext: *"Задавайте любые вопросы по Unity, Blender, Photoshop или GIMP. Модули Menu Studio Visuals Mastery, Omni-Answer Engine и проект 'Континент судьбы' (v18.12.06) активированы."*
+  - Subtext: *"Задавайте любые вопросы по Unity, Blender, Photoshop или GIMP. Модули Menu Studio Visuals Mastery, Omni-Answer Engine и проект 'Континент судьбы' (v18.12.07) активированы."*
 - **Warning pill**: `ВНИМАНИЕ: PROFESSIONAL MULTI-TOOL MASTERY` (High-contrast amber border pill with capitalized text).
 
 ### 4. Interactive Input Block (Footer Input)
