@@ -1,9 +1,10 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.12.07)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.12.08)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** v18.12.07
+- **Version:** v18.12.08
 - **Engine:** Unity 6 (6000.3.10f1)
+- **v18.12.08 Update:** 3D Models & Blender Integration Workflow Sync - Paused Ollama setup to prioritize robust 3D models development, mesh workflows, and Mixamo animation configurations in Unity. Synchronized system metadata and documentation.
 - **v18.12.07 Update:** Core Knowledge Base & YouTube References Integration - Added new high-fidelity video tutorials on Mixamo-Unity character importing, animation workflows, and custom blend configurations to the master knowledge index. Synchronized version info and metadata across all files.
 - **v18.12.06 Update:** Battle Grid Unification & Automatic Zero Baked Colors System - Programmed `unifyGridMaterials` flag and dynamic neutral gray material extraction in `TacticalBattleGrid.cs` to eliminate pre-baked red, blue, and green colors of meshes. Fully implemented `ToggleDeploymentZones(bool show)` to easily hide colored red/blue placement zones at battle start, maintaining standard gold highlights on hover.
 - **v18.12.01 Update:** Full Continent Completed Overlay & Cheat Conquer All Castles - Solved compilation error CS0103 by replacing `winBgTex` with `hudTex` in `DrawContinentCompletedOverlay`. Fully implemented the majestic Zenith-styled glassmorphic overlay for completing all 12 continental regions. Added a purple "ПОБЕДИТЬ ВСЕХ (ЧИТ)" button in the Zenith Hero Control Panel's cheat tools list to easily capture all castles, freeze gameplay, display the victory overlay, and cleanly proceed to the next continent scene in the build index.
@@ -50,7 +51,7 @@
 - **Audio Rule (CRITICAL):** Используйте только `SettingsManager.cs` для управления звуком и музыкой (включая hover-эффекты и списки воспроизведения). Скрипты `AudioHandler` и `AudioManager` должны быть полностью удалены для чистоты проекта. Музыкальные клипы продлеваются через Suno/Udio и настраиваются на бесшовное зацикливание (`loop = true`). Звуковые файлы берем с Pixabay/Freesound по CC0-лицензии и подключаем напрямую к SettingsManager или через AudioMixer.
 
 ## 🚀 Протокол «Пошаговое Мастерство» (Step-by-Step Mastery)
-1. **Отслеживание прогресса:** Текущая версия v18.12.07 (Core Knowledge Base & YouTube References Integration).
+1. **Отслеживание прогресса:** Текущая версия v18.12.08 (3D Models & Blender Integration Workflow Sync).
 2. **Инструкции Настройки Компонентов (Verified Inspector Settings):**
    - **FateMapManager (FATE_WORLD_MAP):**
      - *Maps List:* [+] Слот для глобальной карты (Map Name = "Континент Судьбы", Map Background = фоновый спрайт карты).
@@ -70,4 +71,4 @@
 5. **ОЧИСТКА:** Используйте только `SettingsManager.cs` для аудио. Удалите `AudioHandler` и `AudioManager` скрипты. Не использовать ElevenLabs.
 
 ---
-*Ядро AI пересинхронизировано (v18.12.07). Авто-апдейтер активен.*
+*Ядро AI пересинхронизировано (v18.12.08). Авто-апдейтер активен.*

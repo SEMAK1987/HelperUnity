@@ -1,17 +1,17 @@
 # PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Total Knowledge Archive Edition)
 
-> **ВНИМАНИЕ:** Этот документ является "источником истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.12.07.
+> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.12.08.
 
 ## 1. Общая информация
-- **Версия Помощника:** 18.12.07
-- **Описание:** Гибридный ИИ-помощник нового поколения (v18.12.07 - Core Knowledge Base & YouTube Integration) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Интеграция адаптивного переключения ввода, калибровка зум-параметров при высадке, позиционирование маркеров по Z=-2.0f, сохранение прогресса и моделирования отрядов.
+- **Версия Помощника:** 18.12.08
+- **Описание:** Гибридный ИИ-помощник нового поколения (v18.12.08 - 3D Models & Blender Integration Workflow Sync) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Интеграция адаптивного переключения ввода, калибровка зум-параметров при высадке, позиционирование маркеров по Z=-2.0f, сохранение прогресса и моделирования отрядов.
 - **Путь проекта:** Не задан
 - **Локальное хранилище:** Не задано
 - **Версия Unity:** unknown
 - **Версия Blender:** unknown
 - **Версия GIMP:** unknown
 - **Версия Redot:** unknown
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_11_18_FATE_MASTER]
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_12_08_FATE_MASTER]
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -52,10 +52,7 @@ You are Zenith Quantum Divine Assistant, guiding the Fate Continent world develo
 - **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.
 - **No-Internet Mode (Quantum Archive):** 10,000+ видео-уроков. Мгновенный доступ при любых внешних условиях.
 
-### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.12.07 Sync)
-- **Mixamo to Unity 6 Workflow:** [Video #10](https://www.youtube.com/watch?v=RXmW8aVcR-U)
-- **Humanoid Character Config:** [Video #11](https://www.youtube.com/watch?v=uj1xzzCOhNU)
-- **Root Motion & Loop Tuning:** [Video #12](https://www.youtube.com/watch?v=aO68GKBbaw0)
+### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.11.11 Sync)
 - **Unity 6 Physics & Optimization:** [Video #2](https://www.youtube.com/watch?v=9vuyis_Y-LY)
 - **Blender Advanced Rigging:** [Video #3](https://www.youtube.com/watch?v=UKZp67dY1_w)
 - **Shader Graph Mastery:** [Video #4](https://www.youtube.com/watch?v=-hvxjyzcSkI)

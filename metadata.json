@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.12.07. Core Knowledge Base & YouTube Integration.",
+  "description": "Unity & Blender AI Assistant (Континент Судьбы) v18.12.08. 3D Models & Blender Integration Workflow Sync.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
