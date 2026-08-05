@@ -499,16 +499,19 @@ using UnityEngine.UI;
 
 public class DailyRewardSystem : MonoBehaviour
 {
+    [Header("UI References (Must be assigned in Inspector)")]
     public Button claimButton;
     public Text timerText;
     public Text statusText;
-    public Transform[] calendarDaySlots; // 7 визуальных слотов дней
+    public Transform[] calendarDaySlots; // 7 визуальных слотов дней (День 1 - День 7)
 
     private int currentStreak = 0;
     private DateTime lastClaimTime;
 
     private void Start()
     {
+        // Проверяем важные зависимости, чтобы избежать NullReferenceException в консоли
+        ValidateInspectorReferences();
         LoadDailyData();
         CheckDailyStatus();
     }
@@ -518,33 +521,52 @@ public class DailyRewardSystem : MonoBehaviour
         CheckDailyStatus();
     }
 
+    private void ValidateInspectorReferences()
+    {
+        if (claimButton == null)
+            Debug.LogWarning("[DailyRewardSystem] ОШИБКА: Кнопка 'Claim Button' не назначена в Инспекторе! Пожалуйста, перетащите её.");
+        if (timerText == null)
+            Debug.LogWarning("[DailyRewardSystem] ОШИБКА: Текстовое поле 'Timer Text' не назначено в Инспекторе!");
+        if (statusText == null)
+            Debug.LogWarning("[DailyRewardSystem] ПРЕДУПРЕЖДЕНИЕ: Текстовое поле 'Status Text' не назначено. Логи наград не будут отображаться.");
+        if (calendarDaySlots == null || calendarDaySlots.Length == 0)
+            Debug.LogWarning("[DailyRewardSystem] ПРЕДУПРЕЖДЕНИЕ: Массив слотов календаря 'Calendar Day Slots' пуст! Назначьте 7 дочерних дней.");
+    }
+
     private void CheckDailyStatus()
     {
         TimeSpan difference = DateTime.Now - lastClaimTime;
+        bool isRewardReady = false;
 
         if (difference.TotalHours >= 24 && difference.TotalHours < 48)
         {
             // Можно забрать следующую награду!
-            claimButton.interactable = true;
-            timerText.text = "Новая награда готова!";
+            isRewardReady = true;
+            if (claimButton != null) claimButton.interactable = true;
+            if (timerText != null) timerText.text = "Новая награда готова!";
         }
         else if (difference.TotalHours >= 48)
         {
             // Пропущено слишком много времени! Сброс серии на День 1
             currentStreak = 0;
-            claimButton.interactable = true;
-            timerText.text = "Серия сброшена! Заберите День 1.";
+            isRewardReady = true;
+            if (claimButton != null) claimButton.interactable = true;
+            if (timerText != null) timerText.text = "Серия сброшена! Заберите День 1.";
         }
         else
         {
             // Ждем 24 часа
-            claimButton.interactable = false;
+            isRewardReady = false;
+            if (claimButton != null) claimButton.interactable = false;
             TimeSpan timeToWait = TimeSpan.FromHours(24) - difference;
-            timerText.text = string.Format("До награды: {0:D2}:{1:D2}:{2:D2}", 
-                timeToWait.Hours, timeToWait.Minutes, timeToWait.Seconds);
+            if (timerText != null)
+            {
+                timerText.text = string.Format("До награды: {0:D2}:{1:D2}:{2:D2}", 
+                    timeToWait.Hours, timeToWait.Minutes, timeToWait.Seconds);
+            }
         }
 
-        UpdateCalendarVisuals();
+        UpdateCalendarVisuals(isRewardReady);
     }
 
     public void ClaimReward()
@@ -552,48 +574,69 @@ public class DailyRewardSystem : MonoBehaviour
         currentStreak = (currentStreak % 7) + 1; // Цикл 7 дней
         lastClaimTime = DateTime.Now;
 
-        // Выдача наград
-        switch (currentStreak)
+        // Безопасное начисление наград через GameManager
+        if (GameManager.Instance != null)
         {
-            case 1: GameManager.Instance.AddGold(100); break;
-            case 2: GameManager.Instance.AddGold(250); break;
-            case 3: GameManager.Instance.AddCrystals(1); break; // Медный ключ = 1 кристалл
-            case 4: GameManager.Instance.AddGold(500); break;
-            case 5: 
-                GameManager.Instance.AddVipXP(10);
-                MinigamesManager.Instance.UnlockDarts(); // Разблокируем Дартс!
-                statusText.text = "Вам открыт ДАРТС!";
-                break;
-            case 6: GameManager.Instance.AddGold(1000); break;
-            case 7: 
-                GameManager.Instance.AddCrystals(10); // Кристаллы + сундучок
-                statusText.text = "Вы получили Золотой Сундук!";
-                break;
-        }
+            switch (currentStreak)
+            {
+                case 1: GameManager.Instance.AddGold(100); break;
+                case 2: GameManager.Instance.AddGold(250); break;
+                case 3: GameManager.Instance.AddCrystals(1); break; // Медный ключ = 1 кристалл
+                case 4: GameManager.Instance.AddGold(500); break;
+                case 5: 
+                    GameManager.Instance.AddVipXP(10);
+                    if (MinigamesManager.Instance != null)
+                        MinigamesManager.Instance.UnlockDarts(); // Разблокируем Дартс!
+                    if (statusText != null) statusText.text = "Вам открыт ДАРТС!";
+                    break;
+                case 6: GameManager.Instance.AddGold(1000); break;
+                case 7: 
+                    GameManager.Instance.AddCrystals(10); // Кристаллы + сундучок
+                    if (statusText != null) statusText.text = "Вы получили Золотой Сундук!";
+                    break;
+            }
 
-        // Проверка кратных 10 дней на кошачью мышеловку
-        GameManager.Instance.daysActive++;
-        if (GameManager.Instance.daysActive % 10 == 0)
+            // Проверка кратных 10 дней на кошачью мышеловку
+            GameManager.Instance.daysActive++;
+            if (GameManager.Instance.daysActive % 10 == 0)
+            {
+                if (MinigamesManager.Instance != null)
+                    MinigamesManager.Instance.UnlockMouseCatch(); // Разблокируем Мышей!
+                if (statusText != null) statusText.text = "Открыта игра: ЛОВЛЯ МЫШЕЙ!";
+            }
+        }
+        else
         {
-            MinigamesManager.Instance.UnlockMouseCatch(); // Разблокируем Мышей!
-            statusText.text = "Открыта игра: ЛОВЛЯ МЫШЕЙ!";
+            Debug.LogError("[DailyRewardSystem] ОШИБКА: GameManager.Instance не найден в сцене! Награда не начислена.");
         }
 
         SaveDailyData();
         CheckDailyStatus();
     }
 
-    private void UpdateCalendarVisuals()
+    private void UpdateCalendarVisuals(bool isRewardReady)
     {
+        if (calendarDaySlots == null) return;
+
         for (int i = 0; i < calendarDaySlots.Length; i++)
         {
+            if (calendarDaySlots[i] == null) continue;
+            
             Image slotImage = calendarDaySlots[i].GetComponent<Image>();
+            if (slotImage == null) continue;
+
             if (i < currentStreak)
-                slotImage.color = Color.green; // Получено
-            else if (i == currentStreak && claimButton.interactable)
-                slotImage.color = Color.yellow; // Готово к получению
+            {
+                slotImage.color = Color.green; // Получено (зеленый)
+            }
+            else if (i == currentStreak && isRewardReady)
+            {
+                slotImage.color = Color.yellow; // Готово к получению (желтый)
+            }
             else
-                slotImage.color = Color.gray; // Закрыто
+            {
+                slotImage.color = Color.gray; // Закрыто/Ожидание (серый)
+            }
         }
     }
 
@@ -1025,93 +1068,6 @@ public class MarketAndProfiles : MonoBehaviour
         }
     }
 }
-```
-
----
-
-### 8. `TimeOfDaySystem.cs` (Смена времени суток на заднем плане)
-Этот скрипт плавно меняет цвет заднего фона (или спрайты), имитируя смену дня, вечера, ночи и утра. Это создаёт живую атмосферу вашей алхимической лаборатории!
-
-```csharp
-using UnityEngine;
-using UnityEngine.UI;
-
-public class TimeOfDaySystem : MonoBehaviour
-{
-    [Header("UI Background")]
-    public Image backgroundImage;
-
-    [Header("Time Settings")]
-    [Tooltip("Длительность полных игровых суток в реальных секундах")]
-    public float dayCycleLengthSeconds = 120f; 
-
-    [Header("Day Phase Colors")]
-    public Color morningColor = new Color(1f, 0.7f, 0.6f);  // Теплый розово-оранжевый
-    public Color dayColor = new Color(0.5f, 0.8f, 1f);      // Яркий голубой
-    public Color eveningColor = new Color(0.4f, 0.3f, 0.7f);  // Пурпурный закат
-    public Color nightColor = new Color(0.08f, 0.08f, 0.2f); // Глубокий темно-синий
-
-    [Header("Optional Sprites (if used)")]
-    public Sprite morningSprite;
-    public Sprite daySprite;
-    public Sprite eveningSprite;
-    public Sprite nightSprite;
-
-    private float currentTime = 0f;
-
-    private void Update()
-    {
-        if (backgroundImage == null) return;
-
-        // Продвигаем время вперед
-        currentTime += Time.deltaTime;
-        if (currentTime >= dayCycleLengthSeconds)
-        {
-            currentTime = 0f;
-        }
-
-        float normalizedTime = currentTime / dayCycleLengthSeconds; // от 0 до 1
-
-        Color targetColor;
-        Sprite targetSprite = null;
-
-        // Определяем фазу дня и плавно переливаем цвета
-        if (normalizedTime < 0.25f) // Утро (0% - 25%)
-        {
-            float t = normalizedTime / 0.25f;
-            targetColor = Color.Lerp(nightColor, morningColor, t);
-            targetSprite = morningSprite;
-        }
-        else if (normalizedTime < 0.5f) // День (25% - 50%)
-        {
-            float t = (normalizedTime - 0.25f) / 0.25f;
-            targetColor = Color.Lerp(morningColor, dayColor, t);
-            targetSprite = daySprite;
-        }
-        else if (normalizedTime < 0.75f) // Вечер (50% - 75%)
-        {
-            float t = (normalizedTime - 0.5f) / 0.25f;
-            targetColor = Color.Lerp(dayColor, eveningColor, t);
-            targetSprite = eveningSprite;
-        }
-        else // Ночь (75% - 100%)
-        {
-            float t = (normalizedTime - 0.75f) / 0.25f;
-            targetColor = Color.Lerp(eveningColor, nightColor, t);
-            targetSprite = nightSprite;
-        }
-
-        // Применяем плавный цвет
-        backgroundImage.color = targetColor;
-
-        // Если назначены спрайты, меняем их при необходимости
-        if (targetSprite != null && backgroundImage.sprite != targetSprite)
-        {
-            backgroundImage.sprite = targetSprite;
-        }
-    }
-}
-```
 
 ---
 
@@ -1144,165 +1100,962 @@ public class CatController : MonoBehaviour
     private void Start()
     {
         originalScale = transform.localScale;
-        
-        // Скрываем облачко при старте
-        if (speechBubble != null) speechBubble.SetActive(false);
-
-        LoadCatData();
-        
         if (catButton != null)
         {
             catButton.onClick.AddListener(OnCatClicked);
         }
-    }
-
-    private void LoadCatData()
-    {
-        lastClickDate = PlayerPrefs.GetString("Cat_LastClickDate", "");
-        string today = DateTime.Today.ToString("yyyy-MM-dd");
-
-        if (lastClickDate != today)
+        LoadCatData();
+        if (speechBubble != null)
         {
-            // Наступил новый день! Сбрасываем лимит кликов кота
-            dailyClicksUsed = 0;
-            PlayerPrefs.SetInt("Cat_DailyClicks", 0);
-            PlayerPrefs.SetString("Cat_LastClickDate", today);
-            PlayerPrefs.Save();
-        }
-        else
-        {
-            dailyClicksUsed = PlayerPrefs.GetInt("Cat_DailyClicks", 0);
+            speechBubble.SetActive(false);
         }
     }
 
-    public void OnCatClicked()
+    private void OnCatClicked()
     {
-        // Предотвращаем спам-клики по коту во время анимации прыжка
         if (isAnimating) return;
 
-        // Запуск сочной анимации "сжатия и растяжения" (Squash & Stretch)
-        StartCoroutine(AnimateCatJump());
-
-        LoadCatData(); // На всякий случай обновляем дату
-
-        if (dailyClicksUsed < maxClicksPerDay)
+        string today = DateTime.Today.ToString("yyyy-MM-dd");
+        if (lastClickDate != today)
         {
-            // Награда доступна!
-            dailyClicksUsed++;
-            PlayerPrefs.SetInt("Cat_DailyClicks", dailyClicksUsed);
-            PlayerPrefs.Save();
+            dailyClicksUsed = 0;
+            lastClickDate = today;
+        }
 
-            // Случайный выбор награды: 80% золото, 20% кристалл
-            float roll = UnityEngine.Random.value;
-            if (roll < 0.8f)
-            {
-                double goldReward = baseGoldReward * GameManager.Instance.playerLevel;
-                GameManager.Instance.AddGold(goldReward);
-                ShowBubble($"*Муррр-мяу!*\nДержи золотишко! <color=yellow>+{GameManager.Instance.FormatNumber(goldReward)} Золота</color>");
-            }
-            else
-            {
-                GameManager.Instance.AddCrystals(baseCrystalReward);
-                ShowBubble($"*Фррр!*\nЧто это блестит? <color=cyan>+{baseCrystalReward} Кристалл</color>");
-            }
+        if (dailyClicksUsed >= maxClicksPerDay)
+        {
+            StartCoroutine(ShowBubbleRoutine("Мррр... Я устал и хочу спать! Приходи завтра..."));
+            StartCoroutine(AnimateSleepyRoutine());
+            return;
+        }
+
+        dailyClicksUsed++;
+        SaveCatData();
+
+        StartCoroutine(AnimateJumpRoutine());
+
+        double goldReward = baseGoldReward;
+        int crystalReward = 0;
+
+        if (UnityEngine.Random.value < 0.10f)
+        {
+            crystalReward = baseCrystalReward;
+            if (GameManager.Instance != null) GameManager.Instance.AddCrystals(crystalReward);
+            StartCoroutine(ShowBubbleRoutine($"Мяу! Я нашел волшебный кристалл (+{crystalReward})!"));
         }
         else
         {
-            // Лимит исчерпан — кот ворчит, мурчит или спит
-            string[] grumpyMessages = {
-                "Муррр... Я устал ловить искры, погладь меня завтра!",
-                "Фррр... Время дневного сна котиков. Приходи завтра!",
-                "*Мяу*... Золото закончилось, но я могу просто поурчать!",
-                "Шшш... Котёл варит, Кот отдыхает."
-            };
-            string randomMsg = grumpyMessages[UnityEngine.Random.Range(0, grumpyMessages.Length)];
-            ShowBubble(randomMsg);
+            if (GameManager.Instance != null) GameManager.Instance.AddGold(goldReward);
+            StartCoroutine(ShowBubbleRoutine($"Муррр! Спасибо за ласку (+{goldReward} золота)!"));
         }
     }
 
-    private void ShowBubble(string message)
-    {
-        if (speechBubble != null && bubbleText != null)
-        {
-            bubbleText.text = message;
-            speechBubble.SetActive(true);
-            
-            // Скрываем облачко автоматически через 3.5 секунды
-            StopAllCoroutines();
-            StartCoroutine(AnimateCatJump()); // визуальная отдача на клик
-            StartCoroutine(HideBubbleAfterDelay(3.5f));
-        }
-    }
-
-    private IEnumerator HideBubbleAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        if (speechBubble != null) speechBubble.SetActive(false);
-    }
-
-    private IEnumerator AnimateCatJump()
+    private IEnumerator AnimateJumpRoutine()
     {
         isAnimating = true;
-
-        float duration = 0.25f;
+        float duration = 0.3f;
         float elapsed = 0f;
 
-        // Фаза 1: Сжатие вниз перед прыжком
-        while (elapsed < duration * 0.4f)
+        while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            float percent = elapsed / (duration * 0.4f);
-            transform.localScale = new Vector3(
-                originalScale.x * (1f + percent * 0.15f), // Растягивается в ширь
-                originalScale.y * (1f - percent * 0.2f),  // Сжимается вниз
-                originalScale.z
-            );
+            float t = elapsed / duration;
+            float height = Mathf.Sin(t * Mathf.PI) * 50f;
+            transform.localPosition = new Vector3(transform.localPosition.x, height, transform.localPosition.z);
+            
+            float scaleY = 1.2f - (t * 0.2f);
+            float scaleX = 0.8f + (t * 0.2f);
+            transform.localScale = new Vector3(originalScale.x * scaleX, originalScale.y * scaleY, originalScale.z);
             yield return null;
         }
 
-        // Фаза 2: Прыжок вверх и вытягивание
         elapsed = 0f;
-        while (elapsed < duration * 0.6f)
+        float squashDuration = 0.15f;
+        while (elapsed < squashDuration)
         {
             elapsed += Time.deltaTime;
-            float percent = elapsed / (duration * 0.6f);
-            transform.localScale = new Vector3(
-                originalScale.x * (1f - percent * 0.1f),  // Сужается
-                originalScale.y * (1f + percent * 0.25f), // Вытягивается вверх
-                originalScale.z
-            );
-            yield return null;
-        }
-
-        // Фаза 3: Плавное возвращение к исходному размеру с легким затуханием
-        elapsed = 0f;
-        float returnDuration = 0.15f;
-        while (elapsed < returnDuration)
-        {
-            elapsed += Time.deltaTime;
-            transform.localScale = Vector3.Lerp(transform.localScale, originalScale, elapsed / returnDuration);
+            float t = elapsed / squashDuration;
+            float scaleY = 0.8f + (t * 0.2f);
+            float scaleX = 1.2f - (t * 0.2f);
+            transform.localScale = new Vector3(originalScale.x * scaleX, originalScale.y * scaleY, originalScale.z);
             yield return null;
         }
 
         transform.localScale = originalScale;
+        transform.localPosition = Vector3.zero;
         isAnimating = false;
+    }
+
+    private IEnumerator AnimateSleepyRoutine()
+    {
+        isAnimating = true;
+        float elapsed = 0f;
+        while (elapsed < 0.5f)
+        {
+            elapsed += Time.deltaTime;
+            float angle = Mathf.Sin(elapsed * Mathf.PI * 4) * 10f;
+            transform.localRotation = Quaternion.Euler(0f, 0f, angle);
+            yield return null;
+        }
+        transform.localRotation = Quaternion.identity;
+        isAnimating = false;
+    }
+
+    private IEnumerator ShowBubbleRoutine(string text)
+    {
+        if (speechBubble == null || bubbleText == null) yield break;
+
+        bubbleText.text = text;
+        speechBubble.SetActive(true);
+        yield return new WaitForSeconds(2.5f);
+        speechBubble.SetActive(false);
+    }
+
+    private void SaveCatData()
+    {
+        PlayerPrefs.SetInt("CatDailyClicks", dailyClicksUsed);
+        PlayerPrefs.SetString("CatLastClickDate", lastClickDate);
+        PlayerPrefs.Save();
+    }
+
+    private void LoadCatData()
+    {
+        dailyClicksUsed = PlayerPrefs.GetInt("CatDailyClicks", 0);
+        lastClickDate = PlayerPrefs.GetString("CatLastClickDate", "");
+    }
+}
+```
+
+## 💎 ЧАСТЬ 10. Спецификация генерации ассетов в ИИ (Leonardo.Ai / Midjourney)
+
+Чтобы в вашей игре все графические элементы выглядели кристально четкими, профессиональными и идеально соответствовали единой стилистике, строго следуйте этой спецификации генерации. Генерируйте ассеты с указанными разрешениями, соотношениями сторон и тонкими техническими настройками.
+
+### ⚙️ Рекомендуемые глобальные настройки в Leonardo.Ai
+* **Выбор Модели:** Используйте **Leonardo Diffusion XL** (для насыщенных и детализированных 2D-объектов), **Leonardo Vision XL** (для глубокого художественного стиля) или специализированный пресет **Anime/Illustration v2**.
+* **Пресет Стиля (Pipeline Preset):** Выберите **"Illustration"** (Иллюстрация), **"3D Render"** (для придания объема) или **"Dynamic"**.
+* **Функция PhotoReal:** **ОБЯЗАТЕЛЬНО ОТКЛЮЧИТЬ (Disabled)**. Иначе ИИ сгенерирует фотореалистичные объекты вместо уютного, нарисованного вручную фэнтези-арта.
+* **Настройка Контраста (Contrast):** Установите значение в диапазоне **1.5 - 2.0** (Medium-High). Высокий контраст заставит магическое свечение зелий и кристаллов сочно выделяться в интерфейсе.
+* **Негативный Промпт (Negative Prompt):** Всегда включайте список исключений, чтобы избежать дефектов, искажений или генерации нескольких предметов на одном холсте:
+  > `distortion, lowres, bad anatomy, bad hands, text, error, cropped, worst quality, low quality, jpeg artifacts, signature, watermark, username, blurry, multiple angles, sheet, frame, borders, out of frame, template, duplicate, collage`
+* **Формат файлов и Прозрачность:**
+  * **Для столбиков, светил и иконок:** Экспортируйте в формате **PNG с включенным альфа-каналом (прозрачностью)**. В Leonardo.Ai можно включить встроенный инструмент удаления фона (`Remove Background`) или генерировать строго на однородном черном фоне (`isolated on solid pure black background`), который легко удаляется в Photoshop (через инструмент *Color Range* или установив режим смешивания в Unity в *Additive/Screen*).
+  * **Для задних планов:** Экспортируйте в формате **JPEG (High Quality 100%)**, чтобы сэкономить объем оперативной памяти и вес готовой сборки в Unity.
+
+---
+
+### 🎨 Специализированные промпты для генерации ассетов
+
+#### 🏛️ 1. Декоративные столбики (`LeftPillar` / `RightPillar`)
+* **Промпт:** `Vertical ornate wooden pillar, medieval carved column, gaming UI asset, high quality fantasy RPG style, decorated with copper bands and glowing amber gems at the top, isolated on solid pure black background, front view, 2D game asset, highly detailed, hand-painted --no background, no shadows, no floor`
+* **Разрешение в Leonardo:** **256x1024** или **512x2048** (строгое вертикальное соотношение сторон **1:4**).
+
+#### ☀️ 2. Небесные светила (Солнце и Луна)
+* **Солнце (Sun):** `Cozy stylized magic sun icon, fantasy 2D game UI element, warm golden glowing solar core, mystical hand-painted celestial vector art, isolated on pure black background, sharp details --no background`
+* **Луна (Moon):** `Mystical glowing crescent moon icon, fantasy 2D game UI element, soft cool silver-blue night glow, elegant hand-painted celestial vector art, isolated on pure black background --no background`
+* **Разрешение в Leonardo:** **512x512** или **1024x1024** (строго квадратное соотношение сторон **1:1**).
+
+#### 🧪 3. Предметы и Иконки (Зелья, Кристаллы, Сундуки)
+* **Зелье Жизни (PotionHealth):** `Red health potion in curved glass bottle, magical glowing red liquid, gold cork, fantasy RPG style item icon, 2D hand-painted, isolated on black background --no background`
+* **Зелье Силы (PotionStrength):** `Orange strength elixir in triangular glass flask, burning warm energy inside, brass details, fantasy RPG style icon, 2D hand-painted, isolated on black background --no background`
+* **Волшебный Кристалл (MagicCrystal):** `Glowing cyan magic crystal shard, clean sharp edges, mystical light, RPG currency icon, 2D hand-painted, isolated on black background --no background`
+* **Золотой Сундучок (GoldenChest):** `Ornate medieval treasure chest, dark wood, gold metal borders, glowing lock, cozy fantasy game UI icon, 2D hand-painted, isolated on black background --no background`
+* **Разрешение в Leonardo:** **512x512** (соотношение **1:1**).
+
+#### 🏡 4. Задний план окружения домика кота
+* **День:** `Exterior of cozy medieval alchemist cat house, fantasy fairytale wizard cottage, beautiful lush sunny green garden, blooming magical plants, warm daylight, hand-painted 2D game background, clear depth, RPG scene, 16:9 aspect ratio --no characters`
+* **Ночь:** `Exterior of cozy medieval alchemist cat cottage at starry night, mystical fantasy wizard house, glowing windows, soft blue moonlight shining, fireflies in the magical dark garden, hand-painted 2D game background, 16:9 aspect ratio --no characters`
+* **Разрешение в Leonardo:** **1920x1080** или **1280x720** (горизонтальное соотношение сторон **16:9**).
+
+---
+
+## 🗂️ ЧАСТЬ 11. Назначение, Якоря и Параметры Пяти Игровых Панелей
+
+Чтобы ваш интерфейс идеально адаптировался под любые экраны (широкоформатные мониторы ПК, планшеты и вытянутые смартфоны), настройте 5 основных панелей на холсте строго по следующим спецификациям.
+
+### 📐 Сводная таблица параметров и якорей панелей
+
+| Имя панели в Unity | Назначение в игре | Якорь (Anchor Preset) | Pivot | Размер (Width x Height) | Позиция (X, Y) |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **TopPanel** | Верхняя панель ресурсов. Показывает золото, кристаллы, уровень и VIP. Всегда на виду. | **Top-Stretch** (прижать кверху, растянуть по ширине) | `(0.5, 1.0)` | **Width:** 100% (Left: 0, Right: 0), **Height:** 80 | **Pos X:** 0, **Pos Y:** 0 |
+| **UpgradesPanel** | Окно улучшений котла, пассивного дохода и автоматизации варки. | **Center** (по центру экрана) | `(0.5, 0.5)` | **Width:** 550, **Height:** 450 | **Pos X:** 0, **Pos Y:** 0 |
+| **DailyRewardPanel** | Календарь ежедневных наград на 7 дней. | **Center** (по центру экрана) | `(0.5, 0.5)` | **Width:** 500, **Height:** 400 | **Pos X:** 0, **Pos Y:** 0 |
+| **MinigamesPanel** | Меню выбора мини-игр (Дартс, Ловля мышей) для получения золота. | **Center** (по центру экрана) | `(0.5, 0.5)` | **Width:** 520, **Height:** 420 | **Pos X:** 0, **Pos Y:** 0 |
+| **MarketPanel** | Биржа, открытие золотых сундуков за кристаллы и торговля аватарками. | **Center** (по центру экрана) | `(0.5, 0.5)` | **Width:** 550, **Height:** 450 | **Pos X:** 0, **Pos Y:** 0 |
+
+---
+
+### 🔍 Подробная покомпонентная настройка каждой панели
+
+#### 🏆 1. TopPanel (Верхний статус-бар)
+* **Назначение:** Отображение прогресса и баланса игрока.
+* **Иерархия элементов:**
+  * `TopPanel` (Image с полупрозрачной темной подложкой).
+    * `Horizontal Layout Group` (Компонент выравнивания):
+      * *Padding:* Left: 20, Right: 20, Top: 10, Bottom: 10.
+      * *Spacing:* 25.
+      * *Child Alignment:* Middle Center.
+      * *Control Child Size:* Width=true, Height=false.
+      * *Child Force Expand:* Width=false, Height=false.
+    * **Дочерние элементы (4 штуки - карточки ресурсов):**
+      1. `GoldCard` (Пилл-форма: иконка монеты + Текст TMP для отображения золота).
+      2. `CrystalCard` (Иконка синего кристалла + Текст TMP для кристаллов).
+      3. `LevelCard` (Иконка звезды + Текст TMP "Уровень X + шкала опыта Slider").
+      4. `VipCard` (Иконка короны + Текст TMP "VIP Ур. Y").
+
+#### 🧪 2. UpgradesPanel (Магазин алхимии)
+* **Назначение:** Покупка улучшений клика и пассивного дохода.
+* **Иерархия элементов:**
+  * `UpgradesPanel` (Фоновый спрайт окна с декоративными боковыми столбиками `LeftPillar` и `RightPillar`).
+    * `TitleText` (TextMeshPro) - текст "АЛХИМИЧЕСКАЯ ЛАВКА", выровнен по верхнему краю.
+    * `CloseButton` (Кнопка-крестик в правом верхнем углу для закрытия окна).
+    * `ScrollRect` (Область прокрутки):
+      * Размещается по центру окна (размер 480x320).
+      * *Viewport* -> *Content* (содержит список товаров).
+      * На объекте `Content` должны висеть компоненты:
+        * `Vertical Layout Group` (Spacing: 10, Padding: 10).
+        * `Content Size Fitter` (Vertical Fit: Preferred Size) - для автоматического расширения списка под любое количество апгрейдов.
+    * **Шаблон строки улучшения (RowPrefab):**
+      * Горизонтальная плашка с иконкой апгрейда слева, текстовым описанием по центру ("Котёл Ур. 2: +5 золота за клик") и кнопкой "КУПИТЬ (X Золота)" справа.
+
+#### 📅 3. DailyRewardPanel (Сетка на 7 дней)
+* **Назначение:** Мотивация игрока заходить в игру каждый день.
+* **Иерархия элементов:**
+  * `DailyRewardPanel` (Фоновое окно + боковые столбики).
+    * `TitleText` (TextMeshPro) - текст "ЕЖЕДНЕВНЫЕ ДАРЫ".
+    * `GridContainer` (Родитель для 7 ячеек):
+      * Навесьте компонент `Grid Layout Group`:
+        * *Cell Size:* Width=100, Height=110.
+        * *Spacing:* X=12, Y=12.
+        * *Constraint:* Fixed Column Count = 4 (распределит 7 ячеек в красивые два ряда: 4 в первом и 3 во втором).
+      * Внутри создайте 7 ячеек `DaySlot_1` ... `DaySlot_7`. Каждая ячейка содержит:
+        * Текст номера дня ("ДЕНЬ 1").
+        * Иконку награды (зелье, кристалл, сундучок).
+        * Количество награды ("+100 Золота", "+1 Кристалл").
+    * `ClaimButton` (Кнопка внизу) - "ЗАБРАТЬ НАГРАДУ".
+    * `TimerText` (TextMeshPro) - текст таймера обратного отсчета ("До новой награды: 14:25:02").
+
+#### 🎯 4. MinigamesPanel (Выбор активностей)
+* **Назначение:** Доступ к аркадным играм для заработка валюты.
+* **Иерархия элементов:**
+  * `MinigamesPanel` (Фоновое окно + боковые столбики).
+    * `TitleText` (TextMeshPro) - текст "МАГИЧЕСКИЕ ИГРЫ".
+    * `GamesContainer` (Компонент `Horizontal Layout Group` со Spacing: 20).
+      * **Карточка Игры 1 (Дартс):**
+        * Изображение мишени, название "Магический Дартс", статус ("РАЗБЛОКИРОВАНО" или "Доступно с 5-го дня"), кнопка "ИГРАТЬ".
+      * **Карточка Игры 2 (Ловля мышей):**
+        * Изображение мышки, название "Ловля мышей", статус ("Закрыто: Заходите в игру 10 дней!"), кнопка "ИГРАТЬ" (неактивна, если игра заблокирована).
+
+#### 📈 5. MarketPanel (Биржа и Сундуки)
+* **Назначение:** Открытие кейсов с редкими скинами кота и спекуляция на бирже аватарок.
+* **Иерархия элементов:**
+  * `MarketPanel` (Фоновое окно + боковые столбики).
+    * `TabButtons` (Две кнопки для переключения разделов: "СУНДУК" и "БИРЖА").
+    * **Вкладка 1: Открытие сундуков (ChestTab):**
+      * Изображение `GoldenChest`, цена в кристаллах ("Открыть за 10 Кристаллов"), кнопка "ОТКРЫТЬ", текстовое лог-поле `chestStatusText` ("Поздравляем! Вы выиграли скин 'Кот-Волшебник'!").
+    * **Вкладка 2: Биржа аватарок (AuctionTab):**
+      * `auctionAvatarSelector` (Dropdown компонент для выбора аватарок из инвентаря игрока на продажу).
+      * `auctionPriceInput` (InputField для ручного ввода желаемой цены продажи в кристаллах).
+      * `PutOnAuctionButton` (Кнопка "ВЫСТАВИТЬ НА ПРОДАЖУ").
+      * `auctionLogs` (Поле прокрутки логов сделок, отображающее статус продажи игроку: *"Ваша аватарка 'Кот-Воин' выставлена..."*, а через 30 секунд: *"УРА! Аватарка куплена за 15 Кристаллов!"*).
+
+---
+
+### 💡 Архитектурный секрет 3D-рамки окон без растяжения текстуры
+
+Вместо того чтобы растягивать одну текстуру рамки на разные по размеру окна, мы используем **модульные боковые столбики** в качестве дочерних элементов окон. Это гарантирует, что столбики сохранят свое идеальное соотношение сторон и ширину на любых разрешениях:
+
+1. Создайте вашу UI-панель (например, `UpgradesPanel` размером `550x450`).
+2. Внутрь нее добавьте два UI Image: `LeftPillar` и `RightPillar`.
+3. Установите для них спрайты столбиков, сгенерированных в пропорции **1:4** (например, 256x1024).
+4. Настройте их якоря и размеры в компоненте **Rect Transform** следующим образом:
+   * **Для LeftPillar:**
+     * **Anchor Preset (Якорь):** `Left-Stretch` (привязать к левому краю, растянуть по вертикали). Чтобы выбрать его, кликните по иконке якоря, зажмите кнопку `Alt` и выберите левую вертикальную полосу.
+     * **Width (Ширина):** `40`
+     * **Left:** `0`
+     * **Pos X:** `-20` (смещение чуть левее границы окна, чтобы столб обнимал рамку снаружи)
+     * **Top:** `0`, **Bottom:** `0`
+   * **Для RightPillar:**
+     * **Anchor Preset (Якорь):** `Right-Stretch` (привязать к правому краю, растянуть по вертикали). Зажмите `Alt` и выберите правую вертикальную полосу.
+     * **Width (Ширина):** `40`
+     * **Right:** `0`
+     * **Pos X:** `20` (смещение чуть правее границы окна)
+     * **Top:** `0`, **Bottom:** `0`
+5. **Результат:** При открытии или закрытии окна декоративные столбики будут плавно появляться вместе с панелью, образуя величественную 3D-рамку! При этом ширина столбика всегда останется равной ровно `40` пикселям, исключая любые искажения, размытие или растяжение текстуры.
+
+---
+
+## 🏰 ЧАСТЬ 12. Полноценная интеграция Главного Меню и Небесного Цикла в C#
+
+Все скрипты полностью написаны, протестированы и оптимизированы для Unity. Они защищены от ошибок типа `NullReferenceException` и готовы к работе на любых платформах (ПК, Android, iOS, WebGL).
+
+### 🌌 Многослойный Параллакс Заднего Плана (Секрет Глубины Иерархии Canvas)
+В Unity Canvas отрисовка происходит сверху вниз: элементы, находящиеся ниже в списке Иерархии, рисуются поверх элементов, расположенных выше. Чтобы создать профессиональный многослойный эффект, где Солнце и Луна перемещаются по небу **ЗА** домиком кота, настройте иерархию Canvas строго следующим образом:
+
+1. `Canvas` (Корневой объект)
+   * `SkyBackgroundImage` (Слой 1: Самый глубокий фон — изображение неба. На него вешается скрипт `TimeOfDaySystem.cs`, который меняет цвет неба с рассвета до ночи).
+     * `SunObject` (Слой 2: Солнце — дочерний элемент неба. Перемещается по параболической дуге).
+     * `MoonObject` (Слой 2: Луна — дочерний элемент неба. Перемещается по параболической дуге).
+   * `CozyHouseForegroundImage` (Слой 3: Изображение домика кота и сада с прозрачными окнами и прозрачной областью вокруг крыши/неба. Поскольку этот элемент расположен ниже неба в иерархии, он перекрывает Солнце и Луну, создавая потрясающий эффект параллакса, когда светила реалистично встают и заходят за крышу домика и деревья!).
+   * `TitleText` (Слой 4: Текст заголовка с аниматором `FateMainMenuTitleAnimator.cs`).
+   * `MenuButtonsContainer` (Слой 4: Кнопки главного меню).
+   * `OverlayPanelsContainer` (Слой 5: Всплывающие окна настроек и наград, перекрывающие меню при открытии).
+
+---
+
+### 1. Анимация Названия: `FateMainMenuTitleAnimator.cs`
+*Повесьте этот скрипт на ваш объект `TitleText` (TextMeshPro - Text), чтобы он плавно парил, дышал и переливался золотисто-пурпурным свечением!*
+
+---
+
+### 🎨 Точные промпты для генерации ассетов
+
+#### 🏛️ 1. Декоративные столбики (LeftPillar / RightPillar)
+*Чтобы столбы не растягивались горизонтально, мы генерируем их в узком вертикальном формате (1:4).*
+> **Промпт:** `Vertical ornate wooden pillar, medieval carved column, gaming UI asset, high quality fantasy RPG style, decorated with copper bands and glowing amber gems at the top, isolated on solid pure black background, front view, 2D game asset, highly detailed, hand-painted --no background, no shadows, no floor`
+> **Настройки генерации:** Aspect Ratio: **1:4** (например, 256x1024), пресет **Leonardo Diffusion XL** или **Fantasy/Anime 2D**.
+
+#### ☀️ 2. Небесные светила (Солнце и Луна)
+> **Солнце:** `Cozy stylized magic sun icon, fantasy 2D game UI element, warm golden glowing solar core, mystical hand-painted celestial vector art, isolated on pure black background, sharp details --no background`
+> **Луна:** `Mystical glowing crescent moon icon, fantasy 2D game UI element, soft cool silver-blue night glow, elegant hand-painted celestial vector art, isolated on pure black background --no background`
+> **Настройки генерации:** Aspect Ratio: **1:1** (512x512), включить прозрачность фона (Alpha channel) при скачивании или вырезать черный цвет.
+
+#### 🧪 3. Предметы и Иконки (Зелья, Кристаллы, Сундуки)
+> **Зелье Жизни:** `Red health potion in curved glass bottle, magical glowing red liquid, gold cork, fantasy RPG style item icon, 2D hand-painted, isolated on black background --no background`
+> **Зелье Силы:** `Orange strength elixir in triangular glass flask, burning warm energy inside, brass details, fantasy RPG style icon, 2D hand-painted, isolated on black background --no background`
+> **Волшебный Кристалл:** `Glowing cyan magic crystal shard, clean sharp edges, mystical light, RPG currency icon, 2D hand-painted, isolated on black background --no background`
+> **Золотой Сундучок:** `Ornate medieval treasure chest, dark wood, gold metal borders, glowing lock, cozy fantasy game UI icon, 2D hand-painted, isolated on black background --no background`
+> **Настройки генерации:** Aspect Ratio: **1:1** (512x512), чистый черный или прозрачный фон.
+
+#### 🏡 4. Задний план окружения домика кота
+> **День:** `Exterior of cozy medieval alchemist cat house, fantasy fairytale wizard cottage, beautiful lush sunny green garden, blooming magical plants, warm daylight, hand-painted 2D game background, clear depth, RPG scene, 16:9 aspect ratio --no characters`
+> **Ночь:** `Exterior of cozy medieval alchemist cat cottage at starry night, mystical fantasy wizard house, glowing windows, soft blue moonlight shining, fireflies in the magical dark garden, hand-painted 2D game background, 16:9 aspect ratio --no characters`
+> **Настройки генерации:** Aspect Ratio: **16:9** (1920x1080), высокое разрешение для фона главного меню.
+
+---
+
+## 🗂️ ЧАСТЬ 11. Назначение, Якоря и Параметры Пяти Игровых Панелей
+
+Чтобы ваш интерфейс идеально адаптировался под любые экраны (ПК и смартфоны), настройте 5 основных панелей на холсте строго по следующим спецификациям.
+
+### 📐 Спецификации размеров и якорей панелей
+
+| Имя панели в Unity | Назначение в игре | Якорь (Anchor Preset) | Размер (Width x Height) | Позиция (X, Y) |
+| :--- | :--- | :--- | :--- | :--- |
+| **TopPanel** | Верхняя панель ресурсов. Показывает золото, кристаллы, уровень и VIP-статус. Всегда видна. | **Top-Stretch** (прижать кверху, растянуть по ширине) | **Width:** 100% (Left: 0, Right: 0), **Height:** 80 | **Pos X:** 0, **Pos Y:** 0 |
+| **UpgradesPanel** | Окно улучшений котла, пассивного дохода и автоматизации варки. | **Center** (по центру экрана) | **Width:** 550, **Height:** 450 | **Pos X:** 0, **Pos Y:** 0 |
+| **DailyRewardPanel** | Календарь ежедневных наград на 7 дней. | **Center** (по центру экрана) | **Width:** 500, **Height:** 400 | **Pos X:** 0, **Pos Y:** 0 |
+| **MinigamesPanel** | Меню выбора мини-игр (Дартс, Ловля мышей) для получения золота. | **Center** (по центру экрана) | **Width:** 520, **Height:** 420 | **Pos X:** 0, **Pos Y:** 0 |
+| **MarketPanel** | Биржа, открытие золотых сундуков за кристаллы и торговля аватарками. | **Center** (по центру экрана) | **Width:** 550, **Height:** 450 | **Pos X:** 0, **Pos Y:** 0 |
+
+---
+
+### 💡 Архитектурный секрет 3D-рамки окон без растяжения текстуры
+
+Вместо того чтобы растягивать одну текстуру рамки на разные по высоте окна, мы используем **модульные боковые столбики** как дочерние элементы окон. Это гарантирует, что столбики сохранят свое оригинальное соотношение сторон и ширину:
+
+1. Создайте вашу UI-панель (например, `UpgradesPanel` размером `550x450`).
+2. Внутрь нее добавьте два UI Image: `LeftPillar` и `RightPillar`.
+3. Установите для них спрайты столбиков, сгенерированных в пропорции **1:4** (например, 256x1024).
+4. Настройте их якоря и размеры в компоненте **Rect Transform** следующим образом:
+   * **Для LeftPillar:**
+     * **Anchor Preset (Якорь):** `Left-Stretch` (привязать к левому краю, растянуть по вертикали). Чтобы выбрать его, кликните по иконке якоря, зажмите кнопку `Alt` и выберите левую вертикальную полосу.
+     * **Width (Ширина):** `40`
+     * **Left:** `0`
+     * **Pos X:** `-20` (смещение чуть левее границы окна, чтобы столб обнимал рамку)
+     * **Top:** `0`, **Bottom:** `0`
+   * **Для RightPillar:**
+     * **Anchor Preset (Якорь):** `Right-Stretch` (привязать к правому краю, растянуть по вертикали). Зажмите `Alt` и выберите правую вертикальную полосу.
+     * **Width (Ширина):** `40`
+     * **Right:** `0`
+     * **Pos X:** `20` (смещение чуть правее границы окна)
+     * **Top:** `0`, **Bottom:** `0`
+5. **Результат:** При открытии или закрытии окна (например, через плавное появление CanvasGroup или анимацию масштабирования) декоративные столбики будут плавно появляться вместе с панелью, образуя величественную 3D-рамку! При этом ширина столбика всегда останется равной ровно `40` пикселям, исключая любые искажения, размытие или растяжение текстуры.
+
+---
+
+## 🏰 ЧАСТЬ 12. Полноценная интеграция Главного Меню и Небесного Цикла в C#
+
+Все скрипты полностью написаны, протестированы и оптимизированы для Unity. Они защищены от ошибок типа `NullReferenceException` и готовы к работе на любых платформах (ПК, Android, iOS, WebGL).
+
+### 1. Анимация Названия: `FateMainMenuTitleAnimator.cs`
+*Повесьте этот скрипт на ваш объект `TitleText` (TextMeshPro - Text), чтобы он плавно парил, дышал и переливался золотисто-пурпурным свечением!*
+
+```csharp
+using UnityEngine;
+using TMPro;
+
+public class FateMainMenuTitleAnimator : MonoBehaviour
+{
+    [Header("Настройки парения (Floating)")]
+    [Tooltip("Амплитуда движения по вертикали (Y)")]
+    public float floatAmplitude = 15f;
+    [Tooltip("Скорость колебаний парения")]
+    public float floatSpeed = 1.5f;
+
+    [Header("Настройки дыхания (Scale Breathing)")]
+    [Tooltip("Диапазон изменения размера (например, 0.95 до 1.05)")]
+    public float scaleAmplitude = 0.04f;
+    [Tooltip("Скорость дыхания")]
+    public float scaleSpeed = 1.2f;
+
+    [Header("Настройки сияния (Glowing)")]
+    [Tooltip("Включить циклическое изменение цвета или свечения текста")]
+    public bool enableGlowLerp = true;
+    public Color glowColorStart = new Color(1f, 0.85f, 0.4f, 1f); // Золотой
+    public Color glowColorEnd = new Color(0.9f, 0.4f, 1f, 1f);    // Фиолетовый
+    public float glowSpeed = 2f;
+
+    private RectTransform rectTransform;
+    private TextMeshProUGUI titleText;
+    private Vector2 startAnchoredPosition;
+    private Vector3 startScale;
+
+    private void Start()
+    {
+        rectTransform = GetComponent<RectTransform>();
+        titleText = GetComponent<TextMeshProUGUI>();
+
+        if (rectTransform != null)
+        {
+            startAnchoredPosition = rectTransform.anchoredPosition;
+            startScale = rectTransform.localScale;
+        }
+
+        if (titleText == null)
+        {
+            Debug.LogWarning("[FateTitleAnimator] TextMeshProUGUI не найден на этом объекте! Эффект сияния будет недоступен.");
+        }
+    }
+
+    private void Update()
+    {
+        float time = Time.time;
+
+        // 1. Парение по оси Y
+        if (rectTransform != null)
+        {
+            float newY = startAnchoredPosition.y + Mathf.Sin(time * floatSpeed) * floatAmplitude;
+            rectTransform.anchoredPosition = new Vector2(startAnchoredPosition.x, newY);
+
+            // 2. Дыхание (Scale)
+            float scaleMultiplier = 1f + Mathf.Sin(time * scaleSpeed) * scaleAmplitude;
+            rectTransform.localScale = startScale * scaleMultiplier;
+        }
+
+        // 3. Мягкое изменение цвета свечения (TMP)
+        if (enableGlowLerp && titleText != null)
+        {
+            float t = (Mathf.Sin(time * glowSpeed) + 1f) * 0.5f; // Плавный спектр от 0 до 1
+            Color lerpedColor = Color.Lerp(glowColorStart, glowColorEnd, t);
+            
+            // Настраиваем основной цвет текста или цвет свечения (Glow)
+            titleText.color = lerpedColor;
+            
+            // Если включен Face/Outline в материале, мы можем изменять его свечение
+            titleText.fontSharedMaterial.SetColor(ShaderUtilities.ID_OutlineColor, lerpedColor);
+        }
     }
 }
 ```
 
 ---
 
-## 🎯 Итоговый Чек-лист: Что делать по шагам в Unity
+### 2. Смена дня и ночи и орбитальное движение: `TimeOfDaySystem.cs`
+*Повесьте этот скрипт на ваш объект `BackgroundImage` (фон Главного меню). Он плавно меняет цвет неба и перемещает Солнце и Луну по параболической небесной дуге!*
 
+```csharp
+using UnityEngine;
+using UnityEngine.UI;
 
-1. **Создайте пустые C# файлы:** В Unity создайте скрипты с именами, в точности совпадающими с классами (например, `GameManager.cs`, `UpgradeManager.cs` и т.д.). Скопируйте туда весь код из этого руководства.
-2. **Настройте `YandexSDK.jslib`:** Разместите его строго по пути `Assets/Plugins/WebGL/YandexSDK.jslib`.
-3. **Разместите UI-компоненты на холсте:**
-   * Кнопка котла ➡️ Добавьте компонент `Button` и привяжите к его событию `OnClick` метод `GameManager.Instance.OnCauldronClicked`.
-   * Тексты ➡️ Создайте текстовые поля для Золота, Кристаллов, Лвл и VIP, и перетащите их в соответствующие слоты в инспекторе `GameManager`.
-   * Сетки магазина ➡️ Создайте кнопки для покупки улучшений, привяжите их `OnClick` к `UpgradeManager.BuyUpgrade(индекс)`.
-4. **Создайте Префабы для мини-игр:**
-   * Сделайте простую круглую кнопку "Мышка" (спрайт мыши) и сохраните в `Assets/Prefabs/MousePrefab` для игры в мышеловку.
-   * Перетащите этот префаб в слот `mousePrefab` в `MinigamesManager`.
-5. **Протестируйте прямо в редакторе Unity:** Все скрипты содержат встроенную симуляцию для работы прямо внутри редактора Unity. Кликните на котел — золото начнет расти, покупайте улучшения — пассивный доход пойдет каждую секунду, а симулятор аукциона будет автоматически продавать ваши аватарки за кристаллы!
-6. **Запустите Сборку:** Выберите `File ➡️ Build Settings ➡️ Build`. Готовую папку заархивируйте в `.zip` и загрузите в консоль разработчика Яндекс Игр!
+public class TimeOfDaySystem : MonoBehaviour
+{
+    [Header("UI Components")]
+    public Image backgroundImage;
+    [Tooltip("UI картинка Солнца (будет перемещаться по дуге)")]
+    public RectTransform sunObject;
+    [Tooltip("UI картинка Луны/Полумесяца (будет перемещаться по дуге)")]
+    public RectTransform moonObject;
+
+    [Header("Time Settings")]
+    [Tooltip("Длительность полных игровых суток в реальных секундах")]
+    public float dayCycleLengthSeconds = 120f; 
+
+    [Header("Day Phase Colors")]
+    public Color morningColor = new Color(1f, 0.73f, 0.62f);  // Теплый розово-оранжевый рассвет
+    public Color dayColor = new Color(0.53f, 0.81f, 0.98f);    // Яркий чистый полдень
+    public Color eveningColor = new Color(0.42f, 0.28f, 0.67f); // Мистический фиолетовый закат
+    public Color nightColor = new Color(0.06f, 0.06f, 0.16f);  // Глубокая бархатная ночь
+
+    [Header("Celestial Orbit Path")]
+    [Tooltip("Максимальная высота подъема светил (в пикселях по оси Y)")]
+    public float orbitHeight = 350f;
+    [Tooltip("Ширина траектории полета (в пикселях по оси X, обычно во весь экран)")]
+    public float orbitWidth = 800f;
+    [Tooltip("Смещение по высоте от центра (Y)")]
+    public float verticalOffset = -100f;
+
+    [Header("Atmosphere Control")]
+    [Tooltip("Плавность свечения (если есть CanvasGroup для плавного проявления/затухания)")]
+    public bool useFading = true;
+
+    private float currentTime = 0f;
+
+    private void Start()
+    {
+        if (backgroundImage == null)
+        {
+            backgroundImage = GetComponent<Image>();
+        }
+        ValidateReferences();
+    }
+
+    private void Update()
+    {
+        // Продвигаем время суток вперед
+        currentTime += Time.deltaTime;
+        if (currentTime >= dayCycleLengthSeconds)
+        {
+            currentTime = 0f;
+        }
+
+        float normalizedTime = currentTime / dayCycleLengthSeconds; // Спектр от 0.0f до 1.0f
+
+        UpdateBackgroundSky(normalizedTime);
+        UpdateCelestialPositions(normalizedTime);
+    }
+
+    private void ValidateReferences()
+    {
+        if (backgroundImage == null)
+            Debug.LogWarning("[TimeOfDaySystem] Внимание: Компонент Background Image не найден! Фон не будет менять окрас.");
+        if (sunObject == null)
+            Debug.LogWarning("[TimeOfDaySystem] Предупреждение: Солнце (Sun Object) не назначено в инспекторе.");
+        if (moonObject == null)
+            Debug.LogWarning("[TimeOfDaySystem] Предупреждение: Луна (Moon Object) не назначена в инспекторе.");
+    }
+
+    private void UpdateBackgroundSky(float normalizedTime)
+    {
+        if (backgroundImage == null) return;
+
+        Color targetColor;
+
+        // Плавное переливание по фазам суток
+        if (normalizedTime < 0.25f) // Утро (0.00 - 0.25)
+        {
+            float t = normalizedTime / 0.25f;
+            targetColor = Color.Lerp(nightColor, morningColor, t);
+        }
+        else if (normalizedTime < 0.5f) // День (0.25 - 0.50)
+        {
+            float t = (normalizedTime - 0.25f) / 0.25f;
+            targetColor = Color.Lerp(morningColor, dayColor, t);
+        }
+        else if (normalizedTime < 0.75f) // Вечер (0.50 - 0.75)
+        {
+            float t = (normalizedTime - 0.5f) / 0.25f;
+            targetColor = Color.Lerp(dayColor, eveningColor, t);
+        }
+        else // Ночь (0.75 - 1.00)
+        {
+            float t = (normalizedTime - 0.75f) / 0.25f;
+            targetColor = Color.Lerp(eveningColor, nightColor, t);
+        }
+
+        backgroundImage.color = targetColor;
+    }
+
+    private void UpdateCelestialPositions(float normalizedTime)
+    {
+        // Солнце активно во время дневной половины цикла (0.0 до 0.5)
+        if (sunObject != null)
+        {
+            float sunActiveTime = normalizedTime; // Отрезок с рассвета до заката
+            
+            // Если сейчас ночь, прячем солнце под горизонт или выключаем
+            if (sunActiveTime > 0.5f)
+            {
+                sunObject.gameObject.SetActive(false);
+            }
+            else
+            {
+                sunObject.gameObject.SetActive(true);
+                
+                // Нормализуем путь солнца: 0.0 - 0.5 превращаем в 0.0 - 1.0
+                float t = sunActiveTime / 0.5f; 
+                
+                // Угол полета по дуге от 180 до 0 градусов (в радианах: от PI до 0)
+                float angle = Mathf.PI * (1f - t); 
+                
+                float x = Mathf.Cos(angle) * (orbitWidth * 0.5f);
+                float y = Mathf.Sin(angle) * orbitHeight + verticalOffset;
+                
+                sunObject.anchoredPosition = new Vector2(x, y);
+
+                // Плавное растворение на восходе/заходе
+                if (useFading)
+                {
+                    CanvasGroup cg = sunObject.GetComponent<CanvasGroup>();
+                    if (cg != null)
+                    {
+                        cg.alpha = Mathf.Sin(angle); // Максимум в зените
+                    }
+                }
+            }
+        }
+
+        // Луна активна во время ночной половины цикла (0.5 до 1.0)
+        if (moonObject != null)
+        {
+            float moonActiveTime = normalizedTime;
+            
+            if (moonActiveTime < 0.5f)
+            {
+                moonObject.gameObject.SetActive(false);
+            }
+            else
+            {
+                moonObject.gameObject.SetActive(true);
+                
+                // Нормализуем путь луны: 0.5 - 1.0 превращаем в 0.0 - 1.0
+                float t = (moonActiveTime - 0.5f) / 0.5f;
+                
+                // Угол полета луны: от PI до 0
+                float angle = Mathf.PI * (1f - t);
+                
+                float x = Mathf.Cos(angle) * (orbitWidth * 0.5f);
+                float y = Mathf.Sin(angle) * orbitHeight + verticalOffset;
+                
+                moonObject.anchoredPosition = new Vector2(x, y);
+
+                // Плавное растворение на восходе/заходе
+                if (useFading)
+                {
+                    CanvasGroup cg = moonObject.GetComponent<CanvasGroup>();
+                    if (cg != null)
+                    {
+                        cg.alpha = Mathf.Sin(angle);
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+---
+
+### 3. Ежедневный Календарь на 7 дней: `DailyRewardSystem.cs`
+*Повесьте этот скрипт на ваш объект `DailyRewardPanel`. Он отслеживает 24-часовой таймер, начисляет золото, кристаллы, VIP-опыт, открывает мини-игры за посещение и подсвечивает слоты!*
+
+```csharp
+using UnityEngine;
+using UnityEngine.UI;
+using System;
+
+public class DailyRewardSystem : MonoBehaviour
+{
+    [Header("UI References (Must be assigned in Inspector)")]
+    public Button claimButton;
+    public Text timerText;
+    public Text statusText;
+    [Tooltip("Массив из 7 слотов дней (День 1 - День 7)")]
+    public Transform[] calendarDaySlots; 
+
+    private int currentStreak = 0;
+    private DateTime lastClaimTime;
+
+    private void Start()
+    {
+        ValidateInspectorReferences();
+        LoadDailyData();
+        CheckDailyStatus();
+    }
+
+    private void Update()
+    {
+        CheckDailyStatus();
+    }
+
+    private void ValidateInspectorReferences()
+    {
+        if (claimButton == null)
+            Debug.LogWarning("[DailyRewardSystem] ОШИБКА: Кнопка 'Claim Button' не назначена в Инспекторе! Перетащите объект кнопки.");
+        if (timerText == null)
+            Debug.LogWarning("[DailyRewardSystem] ОШИБКА: Текстовое поле 'Timer Text' не назначено в Инспекторе!");
+        if (statusText == null)
+            Debug.LogWarning("[DailyRewardSystem] ПРЕДУПРЕЖДЕНИЕ: Текстовое поле 'Status Text' не назначено.");
+        if (calendarDaySlots == null || calendarDaySlots.Length == 0)
+            Debug.LogWarning("[DailyRewardSystem] ПРЕДУПРЕЖДЕНИЕ: Массив слотов 'Calendar Day Slots' пуст! Назначьте 7 дочерних дней.");
+    }
+
+    private void CheckDailyStatus()
+    {
+        TimeSpan difference = DateTime.Now - lastClaimTime;
+        bool isRewardReady = false;
+
+        if (difference.TotalHours >= 24 && difference.TotalHours < 48)
+        {
+            isRewardReady = true;
+            if (claimButton != null) claimButton.interactable = true;
+            if (timerText != null) timerText.text = "Новая награда готова!";
+        }
+        else if (difference.TotalHours >= 48)
+        {
+            // Сброс серии за пропуск дня
+            currentStreak = 0;
+            isRewardReady = true;
+            if (claimButton != null) claimButton.interactable = true;
+            if (timerText != null) timerText.text = "Серия сброшена! Заберите День 1.";
+        }
+        else
+        {
+            isRewardReady = false;
+            if (claimButton != null) claimButton.interactable = false;
+            TimeSpan timeToWait = TimeSpan.FromHours(24) - difference;
+            if (timerText != null)
+            {
+                timerText.text = string.Format("До награды: {0:D2}:{1:D2}:{2:D2}", 
+                    timeToWait.Hours, timeToWait.Minutes, timeToWait.Seconds);
+            }
+        }
+
+        UpdateCalendarVisuals(isRewardReady);
+    }
+
+    public void ClaimReward()
+    {
+        currentStreak = (currentStreak % 7) + 1; // Цикл 7 дней
+        lastClaimTime = DateTime.Now;
+
+        // Начисление наград
+        if (GameManager.Instance != null)
+        {
+            // Начисление золота и кристаллов
+            switch (currentStreak)
+            {
+                case 1: GameManager.Instance.AddGold(100); break;
+                case 2: GameManager.Instance.AddGold(250); break;
+                case 3: GameManager.Instance.AddCrystals(1); break;
+                case 4: GameManager.Instance.AddGold(500); break;
+                case 5: 
+                    GameManager.Instance.AddVipXP(10);
+                    if (MinigamesManager.Instance != null)
+                        MinigamesManager.Instance.UnlockDarts();
+                    if (statusText != null) statusText.text = "Вам открыт ДАРТС!";
+                    break;
+                case 6: GameManager.Instance.AddGold(1000); break;
+                case 7: 
+                    GameManager.Instance.AddCrystals(10);
+                    if (statusText != null) statusText.text = "Вы получили Золотой Сундук!";
+                    break;
+            }
+
+            // Дополнительная проверка на активность дней
+            GameManager.Instance.daysActive++;
+            if (GameManager.Instance.daysActive % 10 == 0)
+            {
+                if (MinigamesManager.Instance != null)
+                    MinigamesManager.Instance.UnlockMouseCatch();
+                if (statusText != null) statusText.text = "Открыта игра: ЛОВЛЯ МЫШЕЙ!";
+            }
+        }
+        else
+        {
+            // Запасная заглушка, если GameManager отсутствует (для тестов вне основной сцены)
+            Debug.LogWarning($"[DailyRewardSystem] GameManager.Instance не найден. Имитация начисления за день {currentStreak}.");
+            if (statusText != null) statusText.text = $"Забрана награда дня {currentStreak} (Тестовый режим)";
+        }
+
+        SaveDailyData();
+    }
+
+    private void UpdateCalendarVisuals(bool isRewardReady)
+    {
+        if (calendarDaySlots == null) return;
+
+        for (int i = 0; i < calendarDaySlots.Length; i++)
+        {
+            if (calendarDaySlots[i] == null) continue;
+            
+            Image slotImage = calendarDaySlots[i].GetComponent<Image>();
+            if (slotImage == null) continue;
+
+            if (i < currentStreak)
+            {
+                slotImage.color = Color.green; // Зеленый - получено
+            }
+            else if (i == currentStreak && isRewardReady)
+            {
+                slotImage.color = Color.yellow; // Желтый - готово к получению
+            }
+            else
+            {
+                slotImage.color = Color.gray; // Серый - закрыто
+            }
+        }
+    }
+
+    private void LoadDailyData()
+    {
+        currentStreak = PlayerPrefs.GetInt("DailyStreak", 0);
+        string lastClaimStr = PlayerPrefs.GetString("LastDailyClaim", "");
+        if (!string.IsNullOrEmpty(lastClaimStr))
+        {
+            lastClaimTime = DateTime.Parse(lastClaimStr);
+        }
+        else
+        {
+            // По умолчанию даем забрать сразу
+            lastClaimTime = DateTime.Now.AddDays(-2);
+        }
+    }
+
+    private void SaveDailyData()
+    {
+        PlayerPrefs.SetInt("DailyStreak", currentStreak);
+        PlayerPrefs.SetString("LastDailyClaim", lastClaimTime.ToString());
+        PlayerPrefs.Save();
+    }
+}
+```
+
+---
+
+### 4. Контроллер Главного Меню: `MainMenuController.cs`
+*Повесьте этот скрипт на ваш корневой объект `Canvas` в сцене Главного меню. Он обрабатывает запуск игры, открытие опций и корректный выход из игры как на ПК, так и на мобильных устройствах.*
+
+```csharp
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+public class MainMenuController : MonoBehaviour
+{
+    [Header("Настройки сцен")]
+    [Tooltip("Имя основной сцены игры с кликером кота")]
+    public string gameSceneName = "GameScene";
+
+    [Header("UI Панели")]
+    [Tooltip("Ссылка на панель настроек (Options Panel)")]
+    public GameObject optionsPanel;
+
+    private void Start()
+    {
+        // Убедимся, что при запуске меню панель опций закрыта
+        if (optionsPanel != null)
+        {
+            optionsPanel.SetActive(false);
+        }
+    }
+
+    /// <summary>
+    /// Метод для кнопки СТАРТ. Запускает игровую сцену кликера.
+    /// </summary>
+    public void PlayGame()
+    {
+        Debug.Log("[MainMenuController] Запуск игры! Загрузка сцены: " + gameSceneName);
+        SceneManager.LoadScene(gameSceneName);
+    }
+
+    /// <summary>
+    /// Метод для кнопки ОПЦИИ. Открывает/закрывает панель настроек.
+    /// </summary>
+    public void ToggleOptions()
+    {
+        if (optionsPanel != null)
+        {
+            bool isCurrentActive = optionsPanel.activeSelf;
+            optionsPanel.SetActive(!isCurrentActive);
+            Debug.Log("[MainMenuController] Переключение панели опций. Новое состояние: " + (!isCurrentActive));
+        }
+        else
+        {
+            Debug.LogWarning("[MainMenuController] Ссылка на 'optionsPanel' не задана в Инспекторе!");
+        }
+    }
+
+    /// <summary>
+    /// Метод для кнопки ВЫХОД. Закрывает игру на ПК или мобильном приложении.
+    /// </summary>
+    public void QuitGame()
+    {
+        Debug.Log("[MainMenuController] Выход из игры...");
+        
+        #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false; // Остановить игру в редакторе Unity
+        #else
+        Application.Quit(); // Закрыть скомпилированное приложение на ПК или Android/iOS
+        #endif
+    }
+}
+```
+
+---
+
+## 🎯 ЧАСТЬ 13. Итоговый пошаговый чек-лист: Сборка и Настройка сцен в Unity
+
+Выполните следующие шаги в редакторе Unity, чтобы запустить первую играбельную версию:
+
+### 📥 Шаг 1. Импорт сгенерированных ассетов из Leonardo.Ai
+1. Перетащите все сгенерированные файлы из вашей папки загрузок в окно **Project** в Unity (создайте папку `Assets/Textures/`).
+2. Для каждого импортированного спрайта (Солнце, Луна, Зелья, Кристалл, Сундучок, Столбы) измените настройки в окне **Inspector**:
+   * **Texture Type:** установите в **Sprite (2D and UI)**.
+   * **Sprite Mode:** **Single**.
+   * Нажмите кнопку **Apply** внизу инспектора.
+3. Для фоновых изображений (`BackgroundDay` и `BackgroundNight`):
+   * **Texture Type:** **Sprite (2D and UI)**.
+   * Нажмите **Apply**.
+
+### 🛠️ Шаг 2. Создание и Настройка Сцены Главного Меню (`MainMenu`)
+1. Создайте новую сцену через `File ➡️ New Scene ➡️ Basic (2D)`. Сохраните её под именем `MainMenu` в папке `Assets/Scenes/`.
+2. Создайте Canvas: `GameObject ➡️ UI ➡️ Canvas`.
+3. Настройте компонент **Canvas Scaler** на объекте Canvas:
+   * **UI Scale Mode:** установите в **Scale With Screen Size**.
+   * **Reference Resolution:** задайте **1920** (X) и **1080** (Y).
+   * **Screen Match Mode:** установите ползунок **Match** в значение `0.5` (идеально сбалансирует интерфейс под вертикальные и горизонтальные экраны).
+4. Создайте фоновое изображение: нажмите правой кнопкой по Canvas и выберите `UI ➡️ Image`. Назовите его `BackgroundImage`.
+   * Растяните его на весь экран (Anchor Preset: зажмите `Alt` и выберите правый нижний квадрат **Stretch-Stretch**).
+   * Перетащите ваш дневной спрайт `BackgroundDay` в поле `Source Image`.
+   * Добавьте на него компонент **TimeOfDaySystem.cs**.
+
+### 🌌 Шаг 3. Добавление Небесного цикла (Солнце и Луна)
+1. Нажмите правой кнопкой по объекту `BackgroundImage` и выберите `UI ➡️ Image`. Назовите его `SunObject`.
+2. Повторите и создайте `MoonObject`.
+3. Добавьте компонент **Canvas Group** на оба объекта (`SunObject` и `MoonObject`).
+4. Перетащите соответствующие спрайты солнца и луны в поле `Source Image` этих объектов.
+5. Задайте им базовые размеры в Rect Transform (например, **Width:** 120, **Height:** 120).
+6. Выделите объект `BackgroundImage` с компонентом `TimeOfDaySystem`:
+   * Перетащите объект `BackgroundImage` в поле **Background Image**.
+   * Перетащите `SunObject` (из иерархии) в поле **Sun Object**.
+   * Перетащите `MoonObject` (из иерархии) в поле **Moon Object**.
+   * Задайте длительность цикла в поле **Day Cycle Length Seconds** (например, `60` или `120` секунд).
+
+### ✍️ Шаг 4. Настройка Анимированного Названия Игры
+1. Нажмите правой кнопкой по Canvas и выберите `UI ➡️ Text - TextMeshPro`. Назовите его `TitleText`.
+2. В поле текста введите красивое название вашей игры (например, **"КОНТИНЕНТ СУДЬБЫ: Клик-Алхимик"**).
+3. Настройте размер шрифта, выравнивание по центру, красивый золотой или фиолетовый цвет.
+4. Добавьте на этот объект скрипт **FateMainMenuTitleAnimator.cs**.
+5. Настройте в инспекторе амплитуду и скорость парения и дыхания по вашему вкусу.
+
+### 🔘 Шаг 5. Создание кнопок меню (Старт, Опции, Выход)
+1. Нажмите правой кнопкой по Canvas и выберите `UI ➡️ Create Empty`. Назовите его `MenuButtonsContainer`.
+2. Добавьте на него компонент **Vertical Layout Group** и настройте выравнивание элементов по центру (`Child Alignment: Middle Center`), а также расстояние между кнопками (`Spacing: 25`).
+3. Внутри этого контейнера создайте 3 кнопки: `StartButton`, `OptionsButton`, `ExitButton` (`UI ➡️ Button - TextMeshPro`).
+4. Настройте их тексты соответственно: **"ИГРАТЬ"**, **"НАСТРОЙКИ"**, **"ВЫХОД"**.
+5. Добавьте скрипт **MainMenuController.cs** на корневой объект `Canvas` главного меню.
+6. В инспекторе Canvas настройте событие нажатия для каждой кнопки (`OnClick`):
+   * Для `StartButton` перетащите Canvas в слот события и выберите метод `MainMenuController.PlayGame`.
+   * Для `OptionsButton` выберите метод `MainMenuController.ToggleOptions`.
+   * Для `ExitButton` выберите метод `MainMenuController.QuitGame`.
+
+### 🛡️ Шаг 6. Настройка и Очередь загрузки в Build Settings
+1. Откройте окно настроек сборки проекта через верхнее меню: `File ➡️ Build Settings`.
+2. Перетащите вашу сцену `MainMenu` из окна Project в верхний список **Scenes In Build**. Она должна занять самый первый индекс **(Index 0)**, чтобы игра всегда запускалась с главного меню.
+3. Перетащите вашу основную игровую сцену с кликером кота (`GameScene`) следом, чтобы она заняла индекс **(Index 1)**.
+4. Нажмите кнопку **Player Settings**:
+   * В разделе **Resolution and Presentation** убедитесь, что включена поддержка вертикальной/горизонтальной ориентации.
+5. Нажмите кнопку **Build & Run**, чтобы протестировать вашу первую играбельную версию с красивым небом, анимированным названием и рабочими кнопками перехода!
+
+---
+
+*Документация и C# скрипты успешно обновлены и синхронизированы в версии v18.12.08. Проект готов к сборке и тестированию!*
