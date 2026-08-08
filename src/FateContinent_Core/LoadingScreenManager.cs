@@ -137,17 +137,40 @@ public class LoadingScreenManager : MonoBehaviour
         StopAllCoroutines(); 
         if (loadingContainer != null) loadingContainer.SetActive(false);
         
-        // В Unity нельзя прямо отменить LoadSceneAsync, но можно просто скрыть UI 
-        // и не активировать сцену. Принудительно вызываем ShowMainMenu.
-        if (Menu_Game.Instance != null) 
+        // Безопасный вызов ShowMainMenu через рефлексию, чтобы не вызывать ошибку компиляции при отсутствии Menu_Game.cs
+        System.Type menuGameType = System.Type.GetType("Menu_Game");
+        if (menuGameType != null)
         {
-            Menu_Game.Instance.ShowMainMenu();
+            var instanceProp = menuGameType.GetProperty("Instance", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+            object instance = null;
+            if (instanceProp != null)
+            {
+                instance = instanceProp.GetValue(null);
+            }
+
+            if (instance == null)
+            {
+                // Поиск по сцене, если синглтон не инициализирован
+#if UNITY_2023_1_OR_NEWER
+                instance = FindFirstObjectByType(menuGameType);
+#else
+                instance = FindObjectOfType(menuGameType);
+#endif
+            }
+
+            if (instance != null)
+            {
+                var method = menuGameType.GetMethod("ShowMainMenu", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                if (method != null)
+                {
+                    method.Invoke(instance, null);
+                    return;
+                }
+            }
         }
         else
         {
-            // Если синглтон недоступен, пробуем найти его
-            Menu_Game mg = FindFirstObjectByType<Menu_Game>();
-            if (mg != null) mg.ShowMainMenu();
+            Debug.LogWarning("[FATE CORE] Menu_Game не найден в проекте. Не удалось автоматически вернуть игрока в Главное Меню.");
         }
     }
 }

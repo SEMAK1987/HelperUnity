@@ -890,16 +890,12 @@ public class MarketAndProfiles : MonoBehaviour
     [Header("Market & Inventory")]
     public List<AvatarItem> allAvatars;
     public List<SkinItem> allSkins;
-    public Image activeCatDisplay; // Наш кот-алхимик на сцене
 
-    [Header("Auction System")]
-    public Text auctionLogs;
-    public InputField auctionPriceInput;
+    [Header("UI References")]
     public Dropdown auctionAvatarSelector;
-
-    [Header("Lootbox (Chest) Settings")]
-    public int chestCost = 5; // 5 кристаллов за сундучок
-    public Text chestStatusText;
+    public InputField auctionPriceInput;
+    public Text auctionLogs;
+    public Image catDisplayImage;
 
     private void Start()
     {
@@ -907,85 +903,54 @@ public class MarketAndProfiles : MonoBehaviour
         RefreshMarketUI();
     }
 
-    // --- КУЗНИЦА ОБЛИКОВ (Скин-система) ---
-    public void UnlockSkin(string skinId)
+    public void SaveMarketData()
     {
-        var skin = allSkins.Find(s => s.id == skinId);
-        if (skin != null)
+        foreach (var av in allAvatars)
         {
-            skin.isUnlocked = true;
-            SaveMarketData();
+            PlayerPrefs.SetInt("Avatar_Owned_" + av.id, av.isOwned ? 1 : 0);
+        }
+        foreach (var skin in allSkins)
+        {
+            PlayerPrefs.SetInt("Skin_Unlocked_" + skin.id, skin.isUnlocked ? 1 : 0);
+        }
+        PlayerPrefs.Save();
+    }
+
+    public void LoadMarketData()
+    {
+        foreach (var av in allAvatars)
+        {
+            av.isOwned = PlayerPrefs.GetInt("Avatar_Owned_" + av.id, av.id == "default" ? 1 : 0) == 1;
+        }
+        foreach (var skin in allSkins)
+        {
+            skin.isUnlocked = PlayerPrefs.GetInt("Skin_Unlocked_" + skin.id, skin.id == "default" ? 1 : 0) == 1;
         }
     }
 
-    public void EquipSkin(string skinId)
+    public void RefreshMarketUI()
     {
-        var skin = allSkins.Find(s => s.id == skinId);
-        if (skin != null && skin.isUnlocked && activeCatDisplay != null)
+        if (auctionAvatarSelector != null)
         {
-            activeCatDisplay.sprite = skin.catVisual;
-            Debug.Log("Equipped cat skin: " + skin.name);
-        }
-    }
-
-    // --- ОТКРЫТИЕ СУНДУКОВ (Lootboxes) ---
-    public void BuyAndOpenChest()
-    {
-        if (GameManager.Instance.crystals >= chestCost)
-        {
-            GameManager.Instance.AddCrystals(-chestCost);
-            
-            // 80% - Обычная аватарка, 20% - Кот Скин!
-            float chance = Random.value;
-            if (chance < 0.8f)
+            auctionAvatarSelector.ClearOptions();
+            List<string> options = new List<string>();
+            foreach (var av in allAvatars)
             {
-                // Дарим случайную заблокированную аватарку
-                var lockedAvatars = allAvatars.FindAll(a => !a.isOwned);
-                if (lockedAvatars.Count > 0)
+                if (av.isOwned)
                 {
-                    var wonAv = lockedAvatars[Random.Range(0, lockedAvatars.Count)];
-                    wonAv.isOwned = true;
-                    chestStatusText.text = $"Вы выиграли аватарку: {wonAv.name}!";
-                }
-                else
-                {
-                    GameManager.Instance.AddGold(5000);
-                    chestStatusText.text = "Все аватарки уже ваши! Утешительный приз: 5,000 золота!";
+                    options.Add(av.name);
                 }
             }
-            else
-            {
-                // Дарим случайный скин кота
-                var lockedSkins = allSkins.FindAll(s => !s.isUnlocked);
-                if (lockedSkins.Count > 0)
-                {
-                    var wonSkin = lockedSkins[Random.Range(0, lockedSkins.Count)];
-                    wonSkin.isUnlocked = true;
-                    chestStatusText.text = $"ЛЕГЕНДАРНО! Разблокирован скин: {wonSkin.name}!";
-                }
-                else
-                {
-                    GameManager.Instance.AddCrystals(chestCost); // Возврат стоимости
-                    chestStatusText.text = "Все скины уже открыты! Кристаллы возвращены.";
-                }
-            }
-            SaveMarketData();
-            RefreshMarketUI();
-        }
-        else
-        {
-            chestStatusText.text = "Недостаточно кристаллов для открытия сундука!";
+            auctionAvatarSelector.AddOptions(options);
         }
     }
 
-    // --- БИРЖА / АУКЦИОН АВАТАРОК ---
-    public void PutAvatarOnAuction()
+    public void PutOnAuction()
     {
-        int selectedIndex = auctionAvatarSelector.value;
-        if (selectedIndex < 0 || selectedIndex >= allAvatars.Count) return;
-
-        var av = allAvatars[selectedIndex];
-        if (!av.isOwned)
+        if (auctionAvatarSelector.options.Count == 0) return;
+        string selectedName = auctionAvatarSelector.options[auctionAvatarSelector.value].text;
+        AvatarItem av = allAvatars.Find(x => x.name == selectedName);
+        if (av == null || !av.isOwned)
         {
             auctionLogs.text = "Вы не владеете этой аватаркой!";
             return;
@@ -1015,283 +980,248 @@ public class MarketAndProfiles : MonoBehaviour
         yield return new WaitForSeconds(delay);
 
         // Покупатель нашелся! Возвращаем кристаллы игроку
-        GameManager.Instance.AddCrystals(price);
-        auctionLogs.text = $"УРА! Аватарка '{av.name}' была куплена на Бирже за {price} кристаллов!\nВам начислен баланс!";
-        GameManager.Instance.UpdateUI();
-    }
-
-    private void RefreshMarketUI()
-    {
-        if (auctionAvatarSelector != null)
+        if (GameManager.Instance != null)
         {
-            auctionAvatarSelector.ClearOptions();
-            List<string> options = new List<string>();
-            foreach (var av in allAvatars)
-            {
-                if (av.isOwned) options.Add(av.name);
-            }
-            auctionAvatarSelector.AddOptions(options);
+            GameManager.Instance.AddCrystals(price);
         }
-    }
-
-    private void SaveMarketData()
-    {
-        foreach (var av in allAvatars)
+        
+        if (auctionLogs != null)
         {
-            PlayerPrefs.SetInt("Avatar_" + av.id, av.isOwned ? 1 : 0);
+            auctionLogs.text = $"[ПРОДАНО] Ваша аватарка '{av.name}' успешно куплена за {price} Кристаллов!";
         }
-        foreach (var s in allSkins)
-        {
-            PlayerPrefs.SetInt("Skin_" + s.id, s.isUnlocked ? 1 : 0);
-        }
-        PlayerPrefs.Save();
-    }
-
-    private void LoadMarketData()
-    {
-        // По умолчанию первый скин открыт всегда
-        if (allSkins.Count > 0) allSkins[0].isUnlocked = true;
-
-        foreach (var av in allAvatars)
-        {
-            if (PlayerPrefs.HasKey("Avatar_" + av.id))
-            {
-                av.isOwned = PlayerPrefs.GetInt("Avatar_" + av.id) == 1;
-            }
-        }
-        foreach (var s in allSkins)
-        {
-            if (PlayerPrefs.HasKey("Skin_" + s.id))
-            {
-                s.isUnlocked = PlayerPrefs.GetInt("Skin_" + s.id) == 1;
-            }
-        }
+        
+        SaveMarketData();
+        RefreshMarketUI();
     }
 }
+```
 
 ---
 
-### 9. `CatController.cs` (Интерактивный Живой Кот)
-Этот скрипт делает кота живым! При клике он подпрыгивает с сочной 2D-анимацией (Squash & Stretch), мяукает/мурчит в текстовое облачко и дает ежедневные бонусы (золото или кристаллы). При превышении лимита кот засыпает и мило ворчит.
+### 8. `JuicyCat.cs`
+Полноценный скрипт для анимации «сочного» кота по центру экрана. Кот упруго сжимается и растягивается (Squash & Stretch) при каждом клике, плавно «дышит» во время сна и отображает случайные забавные фразы в текстовом облаке.
 
 ```csharp
-using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
-public class CatController : MonoBehaviour
+public class JuicyCat : MonoBehaviour
 {
-    [Header("Cat UI Elements")]
-    public Button catButton;
-    public Text bubbleText;           // Текст облачка диалога над котом
-    public GameObject speechBubble;   // Родительский объект облачка диалога
+    [Header("Настройки анимации")]
+    public float clickScaleMultiplier = 1.15f;
+    public float animationSpeed = 15f;
+    
+    [Header("UI и Обл�---
 
-    [Header("Settings")]
-    public int maxClicksPerDay = 5;
-    public double baseGoldReward = 50;
-    public int baseCrystalReward = 1;
+### ⚙️ 2. Тонкая Настройка Импорта Ассетов в Unity (Inspector)   else
+            transform.localScale = startScale;
 
-    private int dailyClicksUsed = 0;
-    private string lastClickDate = "";
-    private bool isAnimating = false;
-    private Vector3 originalScale;
+        isAnimating = false;
+    }
 
-    private void Start()
+    private IEnumerator ShowBubbleRoutine(string text)
     {
-        originalScale = transform.localScale;
-        if (catButton != null)
+        if (speechBubble != null && bubbleText != null)
         {
-            catButton.onClick.AddListener(OnCatClicked);
-        }
-        LoadCatData();
-        if (speechBubble != null)
-        {
+            bubbleText.text = text;
+            speechBubble.SetActive(true);
+            yield return new WaitForSeconds(2.5f);
             speechBubble.SetActive(false);
         }
     }
+}
+```
 
-    private void OnCatClicked()
-    {
-        if (isAnimating) return;
+---
 
-        string today = DateTime.Today.ToString("yyyy-MM-dd");
-        if (lastClickDate != today)
-        {
-            dailyClicksUsed = 0;
-            lastClickDate = today;
-        }
+### ⚙️ 2. Тонкая Настройка Импорта Ассетов в Unity (Inspector)м на продажу (забираем у игрока аватарку)
+        av.isOwned = false;
+        SaveMarketData();
+        RefreshMarketUI();
 
-        if (dailyClicksUsed >= maxClicksPerDay)
-        {
-            StartCoroutine(ShowBubbleRoutine("Мррр... Я устал и хочу спать! Приходи завтра..."));
-            StartCoroutine(AnimateSleepyRoutine());
-            return;
-        }
+        auctionLogs.text = $"Аватарка '{av.name}' выставлена за {price} кристаллов.\nОжидайте покупателей...";
 
-        dailyClicksUsed++;
-        SaveCatData();
-
-        StartCoroutine(AnimateJumpRoutine());
-
-        double goldReward = baseGoldReward;
-        int crystalReward = 0;
-
-        if (UnityEngine.Random.value < 0.10f)
-        {
-            crystalReward = baseCrystalReward;
-            if (GameManager.Instance != null) GameManager.Instance.AddCrystals(crystalReward);
-            StartCoroutine(ShowBubbleRoutine($"Мяу! Я нашел волшебный кристалл (+{crystalReward})!"));
-        }
-        else
-        {
-            if (GameManager.Instance != null) GameManager.Instance.AddGold(goldReward);
-            StartCoroutine(ShowBubbleRoutine($"Муррр! Спасибо за ласку (+{goldReward} золота)!"));
-        }
+        // Симулируем покупку через случайное время (от 15 до 60 секунд)
+        float simulateDelay = Random.Range(15f, 60f);
+        StartCoroutine(SimulateSale(av, price, simulateDelay));
     }
 
-    private IEnumerator AnimateJumpRoutine()
+    private System.Collections.IEnumerator SimulateSale(AvatarItem av, int price, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        // Покупатель нашелся! Возвраща�    private IEnumerator AnimateJumpRoutine()
     {
         isAnimating = true;
-        float duration = 0.3f;
+        float duration = 0.12f;
         float elapsed = 0f;
 
+        Vector3 startScale = originalScale;
+        Vector3 squashScale = new Vector3(startScale.x * 1.15f, startScale.y * 0.85f, startScale.z);
+        Vector3 stretchScale = new Vector3(startScale.x * 0.85f, startScale.y * 1.25f, startScale.z);
+
+        // 1. Сжатие перед прыжком (Squash)
         while (elapsed < duration)
         {
+            if (rectTransform != null)
+                rectTransform.localScale = Vector3.Lerp(startScale, squashScale, elapsed / duration);
+            else
+                transform.localScale = Vector3.Lerp(startScale, squashScale, elapsed / duration);
             elapsed += Time.deltaTime;
-            float t = elapsed / duration;
-            float height = Mathf.Sin(t * Mathf.PI) * 50f;
-            transform.localPosition = new Vector3(transform.localPosition.x, height, transform.localPosition.z);
-            
-            float scaleY = 1.2f - (t * 0.2f);
-            float scaleX = 0.8f + (t * 0.2f);
-            transform.localScale = new Vector3(originalScale.x * scaleX, originalScale.y * scaleY, originalScale.z);
             yield return null;
         }
 
+        // 2. Прыжок вверх и растяжение (Stretch)
         elapsed = 0f;
-        float squashDuration = 0.15f;
-        while (elapsed < squashDuration)
+        while (elapsed < duration)
         {
+            if (rectTransform != null)
+                rectTransform.localScale = Vector3.Lerp(squashScale, stretchScale, elapsed / duration);
+            else
+                transform.localScale = Vector3.Lerp(squashScale, stretchScale, elapsed / duration);
             elapsed += Time.deltaTime;
-            float t = elapsed / squashDuration;
-            float scaleY = 0.8f + (t * 0.2f);
-            float scaleX = 1.2f - (t * 0.2f);
-            transform.localScale = new Vector3(originalScale.x * scaleX, originalScale.y * scaleY, originalScale.z);
             yield return null;
         }
 
-        transform.localScale = originalScale;
-        transform.localPosition = Vector3.zero;
+        // 3. Плавный возврат в исходный масштаб
+        elapsed = 0f;
+        while (elapsed < duration)
+        {
+            if (rectTransform != null)
+                rectTransform.localScale = Vector3.Lerp(stretchScale, startScale, elapsed / duration);
+            else
+                transform.localScale = Vector3.Lerp(stretchScale, startScale, elapsed / duration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        if (rectTransform != null)
+            rectTransform.localScale = startScale;
+        else
+            transform.localScale = startScale;
+
         isAnimating = false;
     }
 
     private IEnumerator AnimateSleepyRoutine()
     {
         isAnimating = true;
+        float duration = 0.5f;
         float elapsed = 0f;
-        while (elapsed < 0.5f)
+        Vector3 startScale = originalScale;
+        Vector3 sleepyScale = new Vector3(startScale.x, startScale.y * 0.9f, startScale.z);
+
+        while (elapsed < duration)
         {
+            if (rectTransform != null)
+                rectTransform.localScale = Vector3.Lerp(startScale, sleepyScale, elapsed / duration);
+            else
+                transform.localScale = Vector3.Lerp(startScale, sleepyScale, elapsed / duration);
             elapsed += Time.deltaTime;
-            float angle = Mathf.Sin(elapsed * Mathf.PI * 4) * 10f;
-            transform.localRotation = Quaternion.Euler(0f, 0f, angle);
             yield return null;
         }
-        transform.localRotation = Quaternion.identity;
+
+        elapsed = 0f;
+        while (elapsed < duration)
+        {
+            if (rectTransform != null)
+                rectTransform.localScale = Vector3.Lerp(sleepyScale, startScale, elapsed / duration);
+            else
+                transform.localScale = Vector3.Lerp(sleepyScale, startScale, elapsed / duration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        if (rectTransform != null)
+            rectTransform.localScale = startScale;
+        else
+            transform.localScale = startScale;
+
         isAnimating = false;
     }
 
     private IEnumerator ShowBubbleRoutine(string text)
     {
-        if (speechBubble == null || bubbleText == null) yield break;
+        if (speechBubble != null && bubbleText != null)
+        {
+            bubbleText.text = text;
+            speechBubble.SetActive(true);
+            yield return new WaitForSeconds(2.5f);
+            speechBubble.SetActive(false);
+  ### ⚙️ 2. Тонкая Настройка Импорта Ассетов в Unity (Inspector)
 
-        bubbleText.text = text;
-        speechBubble.SetActive(true);
-        yield return new WaitForSeconds(2.5f);
-        speechBubble.SetActive(false);
-    }
+Когда вы импортировали готовые файлы в папку `Assets/Sprites/` вашего проекта Unity, выберите их в окне **Project** и настройте параметры в окне **Inspector** справа. Неправильные настройки — главная причина эффекта размытия («мыла»), грязных чёрных или серых пиксельных ореолов вокруг иконок и падения производительности WebGL-приложения.
 
-    private void SaveCatData()
-    {
-        PlayerPrefs.SetInt("CatDailyClicks", dailyClicksUsed);
-        PlayerPrefs.SetString("CatLastClickDate", lastClickDate);
-        PlayerPrefs.Save();
-    }
+#### 🛠️ Покомпонентный разбор каждого параметра:
 
-    private void LoadCatData()
-    {
-        dailyClicksUsed = PlayerPrefs.GetInt("CatDailyClicks", 0);
-        lastClickDate = PlayerPrefs.GetString("CatLastClickDate", "");
-    }
-}
-```
-
-## 💎 ЧАСТЬ 10. Спецификация генерации ассетов в ИИ (Leonardo.Ai / Midjourney)
-
-Чтобы в вашей игре все графические элементы выглядели кристально четкими, профессиональными и идеально соответствовали единой стилистике, строго следуйте этой спецификации генерации. Генерируйте ассеты с указанными разрешениями, соотношениями сторон и тонкими техническими настройками.
-
-### ⚙️ Рекомендуемые глобальные настройки в Leonardo.Ai
-* **Выбор Модели:** Используйте **Leonardo Diffusion XL** (для насыщенных и детализированных 2D-объектов), **Leonardo Vision XL** (для глубокого художественного стиля) или специализированный пресет **Anime/Illustration v2**.
-* **Пресет Стиля (Pipeline Preset):** Выберите **"Illustration"** (Иллюстрация), **"3D Render"** (для придания объема) или **"Dynamic"**.
-* **Функция PhotoReal:** **ОБЯЗАТЕЛЬНО ОТКЛЮЧИТЬ (Disabled)**. Иначе ИИ сгенерирует фотореалистичные объекты вместо уютного, нарисованного вручную фэнтези-арта.
-* **Настройка Контраста (Contrast):** Установите значение в диапазоне **1.5 - 2.0** (Medium-High). Высокий контраст заставит магическое свечение зелий и кристаллов сочно выделяться в интерфейсе.
-* **Негативный Промпт (Negative Prompt):** Всегда включайте список исключений, чтобы избежать дефектов, искажений или генерации нескольких предметов на одном холсте:
-  > `distortion, lowres, bad anatomy, bad hands, text, error, cropped, worst quality, low quality, jpeg artifacts, signature, watermark, username, blurry, multiple angles, sheet, frame, borders, out of frame, template, duplicate, collage`
-* **Формат файлов и Прозрачность:**
-  * **Для столбиков, светил и иконок:** Экспортируйте в формате **PNG с включенным альфа-каналом (прозрачностью)**. В Leonardo.Ai можно включить встроенный инструмент удаления фона (`Remove Background`) или генерировать строго на однородном черном фоне (`isolated on solid pure black background`), который легко удаляется в Photoshop (через инструмент *Color Range* или установив режим смешивания в Unity в *Additive/Screen*).
-  * **Для задних планов:** Экспортируйте в формате **JPEG (High Quality 100%)**, чтобы сэкономить объем оперативной памяти и вес готовой сборки в Unity.
-
----
-
-### 🎨 Специализированные промпты для генерации ассетов
-
-#### 🏛️ 1. Декоративные столбики (`LeftPillar` / `RightPillar`)
-* **Промпт:** `Vertical ornate wooden pillar, medieval carved column, gaming UI asset, high quality fantasy RPG style, decorated with copper bands and glowing amber gems at the top, isolated on solid pure black background, front view, 2D game asset, highly detailed, hand-painted --no background, no shadows, no floor`
-* **Разрешение в Leonardo:** **256x1024** или **512x2048** (строгое вертикальное соотношение сторон **1:4**).
-
-#### ☀️ 2. Небесные светила (Солнце и Луна)
-* **Солнце (Sun):** `Cozy stylized magic sun icon, fantasy 2D game UI element, warm golden glowing solar core, mystical hand-painted celestial vector art, isolated on pure black background, sharp details --no background`
-* **Луна (Moon):** `Mystical glowing crescent moon icon, fantasy 2D game UI element, soft cool silver-blue night glow, elegant hand-painted celestial vector art, isolated on pure black background --no background`
-* **Разрешение в Leonardo:** **512x512** или **1024x1024** (строго квадратное соотношение сторон **1:1**).
-
-#### 🧪 3. Предметы и Иконки (Зелья, Кристаллы, Сундуки)
-* **Зелье Жизни (PotionHealth):** `Red health potion in curved glass bottle, magical glowing red liquid, gold cork, fantasy RPG style item icon, 2D hand-painted, isolated on black background --no background`
-* **Зелье Силы (PotionStrength):** `Orange strength elixir in triangular glass flask, burning warm energy inside, brass details, fantasy RPG style icon, 2D hand-painted, isolated on black background --no background`
-* **Волшебный Кристалл (MagicCrystal):** `Glowing cyan magic crystal shard, clean sharp edges, mystical light, RPG currency icon, 2D hand-painted, isolated on black background --no background`
-* **Золотой Сундучок (GoldenChest):** `Ornate medieval treasure chest, dark wood, gold metal borders, glowing lock, cozy fantasy game UI icon, 2D hand-painted, isolated on black background --no background`
-* **Разрешение в Leonardo:** **512x512** (соотношение **1:1**).
-
-#### 🏡 4. Задний план окружения домика кота
-* **День:** `Exterior of cozy medieval alchemist cat house, fantasy fairytale wizard cottage, beautiful lush sunny green garden, blooming magical plants, warm daylight, hand-painted 2D game background, clear depth, RPG scene, 16:9 aspect ratio --no characters`
-* **Ночь:** `Exterior of cozy medieval alchemist cat cottage at starry night, mystical fantasy wizard house, glowing windows, soft blue moonlight shining, fireflies in the magical dark garden, hand-painted 2D game background, 16:9 aspect ratio --no characters`
-* **Разрешение в Leonardo:** **1920x1080** или **1280x720** (горизонтальное соотношение сторон **16:9**).
+* **Texture Type (Тип текстуры):** 
+  * Установите в режим `Sprite (2D and UI)`. 
+  * *Почему?* Это переключает движок со стандартного 3D-текстурирования на плоский 2D-рендеринг, делая спрайт пригодным для использования в компонентах `Image` (UI Canvas) и `SpriteRenderer` (2D-объекты сцены).
+* **Sprite Mode (Режим спрайта):** 
+  * Выберите `Single` для одиночных иллюстраций (фоны, декорации).
+  * Выберите `Multiple` для спрайт-листов и атласов (например, если на одной текстуре расположена сетка из 12 иконок зелий), чтобы далее разрезать её в окне **Sprite Editor**.
+* **Alpha Source (Источник прозрачности):**
+  * Установите значение `Input Texture Alpha` для считывания встроенной прозрачности из альфа-канала вашего исходного PNG-файла.
+* **Alpha Is Transparency (Прозрачность из Альфы):**
+  * **ОБЯЗАТЕЛЬНО установите галочку (True)** для всех иконок, зелий, резных столбиков и элементов интерфейса с прозрачным фоном!
+  * *Почему это критично?* Если галочка выключена, Unity не производит цветовое расширение (color bleeding) на полупрозрачных границах пикселей. При сжатии текстуры на краях элементов появится некрасивый серый или чёрный рваный ореол. Включение этой галочки гарантирует идеально чистые и сглаженные края.
+* **Generate Mip Maps (Создавать Mip-карты):**
+  * **СТРОГО СНИМИТЕ галочку (False) для всех спрайтов UI и фонов 2D-сцен!**
+  * *Почему это важно?* 
+    1. **Защита от размытия:** Mip-карты предназначены для 3D-графики, создавая уменьшенные копии картинки для оптимизации при удалении камеры. На плоском Canvas Mip-карты приводят к тому, что при изменении разрешения экрана Unity подставляет размытые микро-копии, превращая интерфейс в «мыло».
+    2. **Экономия видеопамяти (VRAM):** Mip-карты увеличивают вес текстуры на **33%** совершенно бесполезно. Для оптимизации WebGL-сборок каждый сэкономленный мегабайт ускоряет загрузку игры в браузере.
+* **Filter Mode (Режим фильтрации):**
+  * Установите `Bilinear` для сочных иллюстраций, градиентных фонов неба, мягких эликсиров и плавного UI.
+  * Установите `Point (no filter)` только в том случае, если вы делаете ретро-кликер в стиле **Pixel Art**, чтобы пиксели сохраняли абсолютную бритвенную резкость при масштабировании.
+* **Wrap Mode (Режим зацикливания):**
+  * Установите `Clamp`. Режим `Repeat` может приводить к паразитным цветным полосам толщиной в 1 пиксель по краям спрайта из-за дублирования противоположных пикселей границы текстуры.
+* **Max Size (Максимальный размер):**
+  * Выберите значение, соответствующее реальному физическому разрешению ассета (например, `2048` для больших фонов неба и земли, `512` или `256` для отдельных иконок зелий и кристаллов).
+* **Compression (Сжатие):**
+  * Установите `Normal Quality` для обычных игровых элементов и спрайтов.
+  * Установите `High Quality` для больших градиентных фонов ночного неба. Это предотвращает возникновение ступенчатых переходов цвета (цветового бандинга) на плавных переходах от глубокого индиго к ультрафиолету.
+* **Применение настроек:** Нажмите кнопку **Apply** в самом низу окна Inspector для вступления изменений в силу.
 
 ---
 
-## 🗂️ ЧАСТЬ 11. Назначение, Якоря и Параметры Пяти Игровых Панелей
+## ⚠️ ЧАСТЬ 2. Безопасная настройка эффектов TextMeshPro
 
-Чтобы ваш интерфейс идеально адаптировался под любые экраны (широкоформатные мониторы ПК, планшеты и вытянутые смартфоны), настройте 5 основных панелей на холсте строго по следующим спецификациям.
+Когда вы настраиваете текст названия игры (`TitleText`), добавление эффектов свечения (Glow) или обводки (Outline) непосредственно в материал по умолчанию испортит шрифты во всей игре. Все текстовые объекты с этим шрифтом используют один и тот же общий материал, поэтому изменения применятся глобально ко всем кнопкам, описаниям и цифрам.
 
-### 📐 Сводная таблица параметров и якорей панелей
-
-| Имя панели в Unity | Назначение в игре | Якорь (Anchor Preset) | Pivot | Размер (Width x Height) | Позиция (X, Y) |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **TopPanel** | Верхняя панель ресурсов. Показывает золото, кристаллы, уровень и VIP. Всегда на виду. | **Top-Stretch** (прижать кверху, растянуть по ширине) | `(0.5, 1.0)` | **Width:** 100% (Left: 0, Right: 0), **Height:** 80 | **Pos X:** 0, **Pos Y:** 0 |
-| **UpgradesPanel** | Окно улучшений котла, пассивного дохода и автоматизации варки. | **Center** (по центру экрана) | `(0.5, 0.5)` | **Width:** 550, **Height:** 450 | **Pos X:** 0, **Pos Y:** 0 |
-| **DailyRewardPanel** | Календарь ежедневных наград на 7 дней. | **Center** (по центру экрана) | `(0.5, 0.5)` | **Width:** 500, **Height:** 400 | **Pos X:** 0, **Pos Y:** 0 |
-| **MinigamesPanel** | Меню выбора мини-игр (Дартс, Ловля мышей) для получения золота. | **Center** (по центру экрана) | `(0.5, 0.5)` | **Width:** 520, **Height:** 420 | **Pos X:** 0, **Pos Y:** 0 |
-| **MarketPanel** | Биржа, открытие золотых сундуков за кристаллы и торговля аватарками. | **Center** (по центру экрана) | `(0.5, 0.5)` | **Width:** 550, **Height:** 450 | **Pos X:** 0, **Pos Y:** 0 |
+### 🛠️ Пошаговый протокол настройки:
+1. Найдите файл вашего шрифта в папке проекта (например, ассет `LiberationSans SDF` или `NotoSans KR SDF`).
+2. Раскройте этот объект в окне Project, нажав на маленькую стрелочку слева от него. Внутри вы увидите дочерний материал по умолчанию: `LiberationSans SDF - Common`.
+3. Выберите этот материал и нажмите комбинацию клавиш `Ctrl + D` (дублировать). В папке появится копия. Переименовайте её в `LiberationSans SDF - TitleGlow`.
+4. В окне Hierarchy выберите ваш объект заголовка (`TitleText`).
+5. В компоненте **TextMeshPro - Text (UI)** найдите поле **Material Preset** (выпадающий список в самом верху настроек компонента) и перетащите туда созданный вами дубликат материала `LiberationSans SDF - TitleGlow`.
+6. Теперь вы можете безопасно раскрыть вкладки **Outline** (Обводка) и **Underlay** (Свечение/Тень) внизу инспектора и настроить их параметры (например, красивое неоновое свечение). Изменения затронут исключительно заголовок игры и не коснутся других текстов!
 
 ---
 
-### 🔍 Подробная покомпонентная настройка каждой панели
+## 🗂️ ЧАСТЬ 3. Спецификации Панелей и Секрет 3D-Рамок
 
-#### 🏆 1. TopPanel (Верхний статус-бар)
-* **Назначение:** Отображение прогресса и баланса игрока.
+Чтобы ваш интерфейс идеально адаптировался под любые экраны (ПК и смартфоны), настройте 5 основных панелей на холсте строго по следующим спецификациям.
+
+### 📐 Спецификации размеров и якорей панелей
+
+| Имя панели в Unity | Назначение в игре | Якорь (Anchor Preset) | Размер (Width x Height) | Позиция (X, Y) |
+| :--- | :--- | :--- | :--- | :--- |
+| **TopPanel** | Верхняя панель ресурсов. Показывает золото, кристаллы, уровень и VIP-статус. Всегда видна. | **Top-Stretch** (прижать кверху, растянуть по ширине) | **Width:** 100% (Left: 0, Right: 0), **Height:** 80 | **Pos X:** 0, **Pos Y:** 0 |
+| **UpgradesPanel** | Окно улучшений котла, пассивного дохода и автоматизации варки. | **Center** (по центру экрана) | **Width:** 550, **Height:** 450 | **Pos X:** 0, **Pos Y:** 0 |
+| **DailyRewardPanel** | Календарь ежедневных наград на 7 дней. | **Center** (по центру экрана) | **Width:** 500, **Height:** 400 | **Pos X:** 0, **Pos Y:** 0 |
+| **MinigamesPanel** | Меню выбора мини-игр (Дартс, Ловля мышей) для получения золота. | **Center** (по центру экрана) | **Width:** 520, **Height:** 420 | **Pos X:** 0, **Pos Y:** 0 |
+| **MarketPanel** | Биржа, открытие золотых сундуков за кристаллы и торговля аватарками. | **Center** (по центру экрана) | **Width:** 550, **Height:** 450 | **Pos X:** 0, **Pos Y:** 0 |
+
+---
+
+### ⚙️ Подробная покомпонентная настройка каждой панели
+
+#### 👑 1. TopPanel (Панель ресурсов)
 * **Иерархия элементов:**
-  * `TopPanel` (Image с полупрозрачной темной подложкой).
-    * `Horizontal Layout Group` (Компонент выравнивания):
-      * *Padding:* Left: 20, Right: 20, Top: 10, Bottom: 10.
+  * `TopPanel` (Фоновое изображение панели с горизонтальной декоративной текстурой).
+    * Добавьте компонент **Horizontal Layout Group**:
       * *Spacing:* 25.
       * *Child Alignment:* Middle Center.
       * *Control Child Size:* Width=true, Height=false.
@@ -1304,6 +1234,168 @@ public class CatController : MonoBehaviour
 
 #### 🧪 2. UpgradesPanel (Магазин алхимии)
 * **Назначение:** Покупка улучшений клика и пассивного дохода.
+* **Иерархия элементов:**
+  * `UpgradesPanel` (Фоновый спрайт окна с декоративными боковыми столбиками `LeftPillar` и `RightPillar`).
+    * `TitleText` (TextMeshPro) - текст "АЛХИМИЧЕСКАЯ ЛАВКА", выровнен по верхнему краю.
+    * `CloseButton` (Кнопка-крестик в правом верхнем углу для закрытия окна).
+    * `ScrollRect` (Область прокрутки):
+      * Размещается по центру окна (размер 480x320).
+      * *Viewport* -> *Content* (содержит список товаров).
+      * На объекте `Content` должны висеть компоненты:
+        * `Vertical Layout Group` (Spacing: 10, Padding: 10).
+        * `Content Size Fitter` (Vertical Fit: Preferred Size) - для автоматического расширения списка под любое количество апгрейдов.
+    * **Шаблон строки улучшения (RowPrefab):**
+      * Горизонтальная плашка с иконкой апгрейда слева, текстовым описанием по центру ("Котёл Ур. 2: +5 золота за клик") и кнопкой "КУПИТЬ (X Золота)" справа.
+
+#### 📅 3. DailyRewardPanel (Сетка на 7 дней)
+* **Назначение:** Мотивация игрока заходить в игру каждый день.
+* **Иерархия элементов:**
+  * `DailyRewardPanel` (Фоновое окно + боковые столбики).
+    * `TitleText` (TextMeshPro) - текст "ЕЖЕДНЕВНЫЕ ДАРЫ".
+    * `GridContainer` (Родитель для 7 ячеек):
+      * Навесьте компонент `Grid Layout Group`:
+        * *Cell Size:* Width=100, Height=110.
+        * *Spacing:* X=12, Y=12.
+        * *Constraint:* Fixed Column Count = 4 (распределит 7 ячеек в красивые два ряда: 4 в первом и 3 во втором).
+      * Внутри создайте 7 ячеек `DaySlot_1` ... `DaySlot_7`. Каждая ячейка содержит:
+        * Текст номера дня ("ДЕНЬ 1").
+        * Иконку награды (зелье, кристалл, сундучок).
+        * Количество награды ("+100 Золота", "+1 Кристалл").
+    * `ClaimButton` (Кнопка внизу) - "ЗАБРАТЬ НАГРАДУ".
+    * `TimerText` (TextMeshPro) - текст таймера обратного отсчета ("До новой награды: 14:25:02").
+
+#### 🎯 4. MinigamesPanel (Выбор активностей)
+* **Назначение:** Доступ к аркадным играм для заработка валюты.
+* **Иерархия элементов:**
+  * `MinigamesPanel` (Фоновое окно + боковые столбики).
+    * `TitleText` (TextMeshPro) - текст "МАГИЧЕСКИЕ ИГРЫ".
+    * `GamesContainer` (Компонент `Horizontal Layout Group` со Spacing: 20).
+      * **Карточка Игры 1 (Дартс):**
+        * Изображение мишени, название "Магический Дартс", статус ("РАЗБЛОКИРОВАНО" или "Доступно с 5-го дня"), кнопка "ИГРАТЬ".
+      * **Карточка Игры 2 (Ловля мышей):**
+        * Изображение мышки, название "Ловля мышей", статус ("Закрыто: Заходите в игру 10 дней!"), кнопка "ИГРАТЬ" (неактивна, если игра заблокирована).
+
+#### 👑 5. MarketPanel (Биржа и Сундуки)
+* **Назначение:** Открытие кейсов с редкими скинами кота и спекуляция на бирже аватарок.
+* **Иерархия элементов:**
+  * `MarketPanel` (Фоновое окно + боковые столбики).
+    * `TabButtons` (Две кнопки для переключения разделов: "СУНДУК" и "БИРЖА").
+    * **Вкладка 1: Открытие сундуков (ChestTab):**
+      * Изображение `GoldenChest`, цена в кристаллах ("Открыть за 10 Кристаллов"), кнопка "ОТКРЫТЬ", текстовое лог-поле `chestStatusText` ("Поздравляем! Вы выиграли скин 'Кот-Волшебник'!").
+    * **Вкладка 2: Биржа аватарок (AuctionTab):**
+      * `auctionAvatarSelector` (Dropdown компонент для выбора аватарок из инвентаря игрока на продажу).
+      * `auctionPriceInput` (InputField для ручного ввода желаемой цены продажи в кристаллах).
+      * `PutOnAuctionButton` (Кнопка "ВЫСТАВИТЬ НА ПРОДАЖУ").
+      * `auctionLogs` (Поле прокрутки логов сделок, отображающее статус продажи игроку: *"Ваша аватарка 'Кот-Воин' выставлена..."*, а через 30 секунд: *"УРА! Аватарка куплена за 15 Кристаллов!"*).
+
+---
+
+### 💡 Архитектурный секрет 3D-рамки окон без растяжения текстуры
+
+Вместо того чтобы растягивать одну текстуру рамки на разные по размеру окна, мы используем **модульные боковые столбики** в качестве дочерних элементов окон. Это гарантирует, что столбики сохранят свое идеальное соотношение сторон и ширину на любых разрешениях:
+
+1. Создайте вашу UI-панель (например, `UpgradesPanel` размером `550x450`).
+2. Внутрь нее добавьте два UI Image: `LeftPillar` и `RightPillar`.
+3. Установите для них спрайты столбиков, сгенерированных в пропорции **1:4** (например, 256x1024).
+4. Настройте их якоря и размеры в компоненте **Rect Transform** следующим образом:
+   * **Для LeftPillar:**
+     * **Anchor Preset (Якорь):** `Left-Stretch` (привязать к левому краю, растянуть по вертикали). Чтобы выбрать его, кликните по иконке якоря, зажмите кнопку `Alt` и выберите левую вертикальную полосу.
+     * **Width (Ширина):** `40`
+     * **Left:** `0`
+     * **Pos X:** `-20` (смещение чуть левее границы окна, чтобы столб обнимал рамку снаружи)
+     * **Top:** `0`, **Bottom:** `0`
+   * **Для RightPillar:**
+     * **Anchor Preset (Якорь):** `Right-Stretch` (привязать к правому краю, растянуть по вертикали). Зажмите `Alt` и выберите правую вертикальную полосу.
+     * **Width (Ширина):** `40`
+     * **Right:** `0`
+     * **Pos X:** `20` (смещение чуть правее границы окна)
+     * **Top:** `0`, **Bottom:** `0`
+5. **Результат:** При открытии или закрытии окна декоративные столбики будут плавно появляться вместе с панелью, образуя величественную 3D-рамку! При этом ширина столбика всегда останется равной ровно `40` пикселям, исключая любые искажения, размытие или растяжение текстуры.
+
+---
+
+### 🎨 Специализированные промпты для генерации ассетов
+
+#### 🏛️ 1. Декоративные столбики (`LeftPillar` / `RightPillar`)
+*Чтобы столбы не растягивались горизонтально при изменении размеров окон, мы генерируем их в узком вертикальном формате (1:4).*
+> **Промпт:** `Vertical ornate wooden pillar, medieval carved column, gaming UI asset, high quality fantasy RPG style, decorated with copper bands and glowing amber gems at the top, isolated on solid pure black background, front view, 2D game asset, highly detailed, hand-painted --no background, no shadows, no floor`
+> **Настройки генерации:** Aspect Ratio: **1:4** (например, 256x1024), пресет **Leonardo Diffusion XL** или **Anime/Illustration v2**.
+
+#### ☀️ 2. Небесные светила (Солнце и Луна)
+> **Солнце:** `Cozy stylized magic sun icon, fantasy 2D game UI element, warm golden glowing solar core, mystical hand-painted celestial vector art, isolated on pure black background, sharp details --no background`
+> **Луна:** `Mystical glowing crescent moon icon, fantasy 2D game UI element, soft cool silver-blue night glow, elegant hand-painted celestial vector art, isolated on pure black background --no background`
+> **Настройки генерации:** Aspect Ratio: **1:1** (512x512), включить прозрачность фона (Alpha channel) при скачивании или вырезать черный цвет.
+
+#### 🧪 3. Предметы и Иконки (Зелья, Кристаллы, Сундуки)
+> **Зелье Жизни:** `Red health potion in curved glass bottle, magical glowing red liquid, gold cork, fantasy RPG style item icon, 2D hand-painted, isolated on black background --no background`
+> **Зелье Силы:** `Orange strength elixir in triangular glass flask, burning warm energy inside, brass details, fantasy RPG style icon, 2D hand-painted, isolated on black background --no background`
+> **Волшебный Кристалл:** `Glowing cyan magic crystal shard, clean sharp edges, mystical light, RPG currency icon, 2D hand-painted, isolated on black background --no background`
+> **Золотой Сундучок:** `Ornate medieval treasure chest, dark wood, gold metal borders, glowing lock, cozy fantasy game UI icon, 2D hand-painted, isolated on black background --no background`
+> **Настройки генерации:** Aspect Ratio: **1:1** (512x512), чистый черный или прозрачный фон.
+
+#### 🏡 4. Задний план окружения домика кота
+> **День:** `Exterior of cozy medieval alchemist cat house, fantasy fairytale wizard cottage, beautiful lush sunny green garden, blooming magical plants, warm daylight, hand-painted 2D game background, clear depth, RPG scene, 16:9 aspect ratio --no characters`
+> **Ночь:** `Exterior of cozy medieval alchemist cat cottage at starry night, mystical fantasy wizard house, glowing windows, soft blue moonlight shining, fireflies in the magical dark garden, hand-painted 2D game background, 16:9 aspect ratio --no characters`
+> **Настройки генерации:** Aspect Ratio: **16:9** (1920x1080), высокое разрешение для главного фона.
+
+---
+
+## 👾 ЧАСТЬ 4. Интеграция C# скриптов в Unity
+
+Эти скрипты оживляют визуальное оформление и связывают интерфейс с логикой игры.
+
+### 📝 Скрипт 1. FateMainMenuTitleAnimator.cs
+* **Что делает:** Создает эффект мягкого физического парения заголовка игры вверх-вниз и плавного «дыхания» масштаба, а также плавно переливает неоновое свечение outline-эффекта материала.
+* **Куда вешать:** На объект вашего главного текстового заголовка (`TitleText`).
+* **Настройка в Инспекторе:**
+  * `floatingAmplitude = 12` (заголовок плавно парит вверх-вниз в пределах 12 пикселей).
+  * `floatingSpeed = 1.6` (скорость парения).
+  * `scaleAmplitude = 0.03` (эффект мягкого «дыхания» размера от 97% до 103%).
+  * `scaleSpeed = 1.3` (скорость изменения размера).
+  * `enableGlowLerp = true` (включает перелив цветов свечения).
+  * `glowStartColor` и `glowEndColor` (выберите два красивых контрастных неоновых оттенка, например золотой и пурпурный).
+
+### 📝 Скрипт 2. FateButtonAnimator.cs
+* **Что делает:** Реализует сочный и упругий отклик кнопок (Squash & Stretch) при наведении курсора и клике мыши. Также воспроизводит звуки интерфейса через глобальный менеджер настроек.
+* **Куда вешать:** На все интерактивные кнопки (Buttons) в главном меню и панелях.
+* **Настройка в Инспекторе:**
+  * `hoverScaleMultiplier = 1.08` (при наведении курсора кнопка плавно увеличивается на 8%).
+  * `clickScaleMultiplier = 0.93` (при нажатии кнопка слегка сжимается на 7%).
+  * `animationSpeed = 16` (плавность и упругость интерполяции Lerp).
+  * **Связь со звуком:** Скрипт содержит безопасный вызов `PlaySoundSafe`, который автоматически находит глобальный менеджер настроек `SettingsManager` и проигрывает системные аудиоклипы "UI_Hover_Soft" при наведении и "UI_Click_Metallic" при клике.
+
+### 📝 Скрипт 3. MainMenuController.cs
+* **Что делает:** Обеспечивает навигацию между экранами, запуск игрового процесса по имени сцены или индексу, а также безопасный выход из приложения.
+* **Куда вешать:** Создайте на сцене пустой игровой объект `MainMenuController` и прикрепите к нему данный скрипт.
+* **Настройка в Инспекторе:**
+  * `characterSelectionSceneName = "CharacterSelection"` (название сцены выбора персонажа).
+  * `characterSelectionSceneIndex = 1` (индекс сцены выбора класса в настройках Build Settings).
+  * `loadByName = false` (загрузка по индексу предпочтительнее для оптимизации времени загрузки в Unity).
+  * **Настройка событий кнопок (Unity Events) в Hierarchy:**
+    * Выберите кнопку «Играть», в событии `OnClick()` нажмите `+`, перетащите туда объект `MainMenuController` и выберите функцию `MainMenuController.PlayGame`.
+    * Выберите кнопку «Настройки», в событии `OnClick()` перетащите объект `MainMenuController` и выберите функцию `MainMenuController.OpenSettings` (она плавно вызовет окно через синглтон настроек).
+    * Выберите кнопку «Выход», привяжите функцию `MainMenuController.QuitGame` (она поддерживает как закрытие скомпилированного билда, так и остановку режима Play прямо в редакторе Unity).
+
+---
+
+## 📅 ЧАСТЬ 5. Логика смены дня/ночи и ежедневных наград
+
+### 🌓 Идея системы времени суток (TimeOfDaySystem.cs)
+
+* **Орбитальное движение:** Направленный источник света (Directional Light — Солнце) медленно вращается по оси X. Как только угол его наклона уходит ниже горизонта (наступает закат), с противоположной стороны плавно активируется и вращается Луна.
+* **Интерполяция цвета неба (Skybox Lerp):** Текстура или цвет заднего фона плавно перетекает из нежно-золотого (день) через глубокий фиолетовый (закат) в насыщенный индиго (ночь) с помощью синусоидальной формулы `Mathf.Sin` от текущего игрового времени.
+* **Плавное появление ночных элементов:** Наземный ночной фон и спрайты светлячков имеют компонент `CanvasGroup` или `SpriteRenderer`. Скрипт считывает положение солнца и плавно меняет прозрачность (Альфа-канал) ночных элементов от 0 до 1 при наступлении сумерек.
+
+### 📅 Идея календаря наград (DailyRewardSystem.cs)
+
+* **Сохранение прогресса через PlayerPrefs:** Дата последнего успешного получения награды сохраняется на устройстве в виде текстовой строки (`DateTime.ToString()`). При каждом новом запуске игра считывает текущее системное время устройства и вычисляет разницу.
+* **Проверка серии ежедневных заходов:**
+  * **Серия продолжается:** Если разница между предыдущим и текущим заходом составляет более 24 часов, но меньше 48 часов — порядковый день увеличивается на 1 (игрок переходит, например, со Дня 2 на День 3).
+  * **Серия сбрасывается:** Если игрок пропустил более 48 часов (два дня), серия сбрасывается обратно в День 1.
+  * **Повторный вход в тот же день:** Если игрок заходит в игру в тот же календарный день, кнопка «ЗАБРАТЬ» блокируется, а на экране появляется таймер обратного отсчета, показывающий, сколько часов и минут осталось до полуночи.
+* **Начисление наград:** После нажатия кнопки «ЗАБРАТЬ», игроку начисляются соответствующие дню ресурсы (золото, кристаллы, зелья), которые записываются в его файлы сохранений, а в панели аукциона разблокируются новые уникальные аватарки!
+
+---�е:** Покупка улучшений клика и пассивного дохода.
 * **Иерархия элементов:**
   * `UpgradesPanel` (Фоновый спрайт окна с декоративными боковыми столбиками `LeftPillar` и `RightPillar`).
     * `TitleText` (TextMeshPro) - текст "АЛХИМИЧЕСКАЯ ЛАВКА", выровнен по верхнему краю.
@@ -1384,35 +1476,12 @@ public class CatController : MonoBehaviour
 
 ---
 
-## 🏰 ЧАСТЬ 12. Полноценная интеграция Главного Меню и Небесного Цикла в C#
+### 🎨 Специализированные промпты для генерации ассетов
 
-Все скрипты полностью написаны, протестированы и оптимизированы для Unity. Они защищены от ошибок типа `NullReferenceException` и готовы к работе на любых платформах (ПК, Android, iOS, WebGL).
-
-### 🌌 Многослойный Параллакс Заднего Плана (Секрет Глубины Иерархии Canvas)
-В Unity Canvas отрисовка происходит сверху вниз: элементы, находящиеся ниже в списке Иерархии, рисуются поверх элементов, расположенных выше. Чтобы создать профессиональный многослойный эффект, где Солнце и Луна перемещаются по небу **ЗА** домиком кота, настройте иерархию Canvas строго следующим образом:
-
-1. `Canvas` (Корневой объект)
-   * `SkyBackgroundImage` (Слой 1: Самый глубокий фон — изображение неба. На него вешается скрипт `TimeOfDaySystem.cs`, который меняет цвет неба с рассвета до ночи).
-     * `SunObject` (Слой 2: Солнце — дочерний элемент неба. Перемещается по параболической дуге).
-     * `MoonObject` (Слой 2: Луна — дочерний элемент неба. Перемещается по параболической дуге).
-   * `CozyHouseForegroundImage` (Слой 3: Изображение домика кота и сада с прозрачными окнами и прозрачной областью вокруг крыши/неба. Поскольку этот элемент расположен ниже неба в иерархии, он перекрывает Солнце и Луну, создавая потрясающий эффект параллакса, когда светила реалистично встают и заходят за крышу домика и деревья!).
-   * `TitleText` (Слой 4: Текст заголовка с аниматором `FateMainMenuTitleAnimator.cs`).
-   * `MenuButtonsContainer` (Слой 4: Кнопки главного меню).
-   * `OverlayPanelsContainer` (Слой 5: Всплывающие окна настроек и наград, перекрывающие меню при открытии).
-
----
-
-### 1. Анимация Названия: `FateMainMenuTitleAnimator.cs`
-*Повесьте этот скрипт на ваш объект `TitleText` (TextMeshPro - Text), чтобы он плавно парил, дышал и переливался золотисто-пурпурным свечением!*
-
----
-
-### 🎨 Точные промпты для генерации ассетов
-
-#### 🏛️ 1. Декоративные столбики (LeftPillar / RightPillar)
-*Чтобы столбы не растягивались горизонтально, мы генерируем их в узком вертикальном формате (1:4).*
+#### 🏛️ 1. Декоративные столбики (`LeftPillar` / `RightPillar`)
+*Чтобы столбы не растягивались горизонтально при изменении размеров окон, мы генерируем их в узком вертикальном формате (1:4).*
 > **Промпт:** `Vertical ornate wooden pillar, medieval carved column, gaming UI asset, high quality fantasy RPG style, decorated with copper bands and glowing amber gems at the top, isolated on solid pure black background, front view, 2D game asset, highly detailed, hand-painted --no background, no shadows, no floor`
-> **Настройки генерации:** Aspect Ratio: **1:4** (например, 256x1024), пресет **Leonardo Diffusion XL** или **Fantasy/Anime 2D**.
+> **Настройки генерации:** Aspect Ratio: **1:4** (например, 256x1024), пресет **Leonardo Diffusion XL** или **Anime/Illustration v2**.
 
 #### ☀️ 2. Небесные светила (Солнце и Луна)
 > **Солнце:** `Cozy stylized magic sun icon, fantasy 2D game UI element, warm golden glowing solar core, mystical hand-painted celestial vector art, isolated on pure black background, sharp details --no background`
@@ -1433,43 +1502,74 @@ public class CatController : MonoBehaviour
 
 ---
 
-## 🗂️ ЧАСТЬ 11. Назначение, Якоря и Параметры Пяти Игровых Панелей
+### ⚠️ ЧАСТЬ 2. Безопасная настройка эффектов TextMeshPro
 
-Чтобы ваш интерфейс идеально адаптировался под любые экраны (ПК и смартфоны), настройте 5 основных панелей на холсте строго по следующим спецификациям.
+Когда вы настраиваете текст названия игры (`TitleText`), добавление эффектов свечения (Glow) или обводки (Outline) непосредственно в материал по умолчанию испортит шрифты во всей игре. Все текстовые объекты с этим шрифтом используют один и тот же общий материал, поэтому изменения применятся глобально ко всем кнопкам, описаниям и цифрам.
 
-### 📐 Спецификации размеров и якорей панелей
-
-| Имя панели в Unity | Назначение в игре | Якорь (Anchor Preset) | Размер (Width x Height) | Позиция (X, Y) |
-| :--- | :--- | :--- | :--- | :--- |
-| **TopPanel** | Верхняя панель ресурсов. Показывает золото, кристаллы, уровень и VIP-статус. Всегда видна. | **Top-Stretch** (прижать кверху, растянуть по ширине) | **Width:** 100% (Left: 0, Right: 0), **Height:** 80 | **Pos X:** 0, **Pos Y:** 0 |
-| **UpgradesPanel** | Окно улучшений котла, пассивного дохода и автоматизации варки. | **Center** (по центру экрана) | **Width:** 550, **Height:** 450 | **Pos X:** 0, **Pos Y:** 0 |
-| **DailyRewardPanel** | Календарь ежедневных наград на 7 дней. | **Center** (по центру экрана) | **Width:** 500, **Height:** 400 | **Pos X:** 0, **Pos Y:** 0 |
-| **MinigamesPanel** | Меню выбора мини-игр (Дартс, Ловля мышей) для получения золота. | **Center** (по центру экрана) | **Width:** 520, **Height:** 420 | **Pos X:** 0, **Pos Y:** 0 |
-| **MarketPanel** | Биржа, открытие золотых сундуков за кристаллы и торговля аватарками. | **Center** (по центру экрана) | **Width:** 550, **Height:** 450 | **Pos X:** 0, **Pos Y:** 0 |
+#### 🛠️ Пошаговый протокол настройки:
+1. Найдите файл вашего шрифта в папке проекта (например, ассет `LiberationSans SDF` или `NotoSans KR SDF`).
+2. Раскройте этот объект в окне Project, нажав на маленькую стрелочку слева от него. Внутри вы увидите дочерний материал по умолчанию: `LiberationSans SDF - Common`.
+3. Выберите этот материал и нажмите комбинацию клавиш `Ctrl + D` (дублировать). В папке появится копия. Переименовайте её в `LiberationSans SDF - TitleGlow`.
+4. В окне Hierarchy выберите ваш объект заголовка (`TitleText`).
+5. В компоненте **TextMeshPro - Text (UI)** найдите поле **Material Preset** (выпадающий список в самом верху настроек компонента) и перетащите туда созданный вами дубликат материала `LiberationSans SDF - TitleGlow`.
+6. Теперь вы можете безопасно раскрыть вкладки **Outline** (Обводка) и **Underlay** (Свечение/Тень) внизу инспектора и настроить их параметры (например, красивое неоновое свечение). Изменения затронут исключительно заголовок игры и не коснутся других текстов!
 
 ---
 
-### 💡 Архитектурный секрет 3D-рамки окон без растяжения текстуры
+## 👾 ЧАСТЬ 4. Интеграция C# скриптов в Unity
 
-Вместо того чтобы растягивать одну текстуру рамки на разные по высоте окна, мы используем **модульные боковые столбики** как дочерние элементы окон. Это гарантирует, что столбики сохранят свое оригинальное соотношение сторон и ширину:
+Эти скрипты оживляют визуальное оформление и связывают интерфейс с логикой игры.
 
-1. Создайте вашу UI-панель (например, `UpgradesPanel` размером `550x450`).
-2. Внутрь нее добавьте два UI Image: `LeftPillar` и `RightPillar`.
-3. Установите для них спрайты столбиков, сгенерированных в пропорции **1:4** (например, 256x1024).
-4. Настройте их якоря и размеры в компоненте **Rect Transform** следующим образом:
-   * **Для LeftPillar:**
-     * **Anchor Preset (Якорь):** `Left-Stretch` (привязать к левому краю, растянуть по вертикали). Чтобы выбрать его, кликните по иконке якоря, зажмите кнопку `Alt` и выберите левую вертикальную полосу.
-     * **Width (Ширина):** `40`
-     * **Left:** `0`
-     * **Pos X:** `-20` (смещение чуть левее границы окна, чтобы столб обнимал рамку)
-     * **Top:** `0`, **Bottom:** `0`
-   * **Для RightPillar:**
-     * **Anchor Preset (Якорь):** `Right-Stretch` (привязать к правому краю, растянуть по вертикали). Зажмите `Alt` и выберите правую вертикальную полосу.
-     * **Width (Ширина):** `40`
-     * **Right:** `0`
-     * **Pos X:** `20` (смещение чуть правее границы окна)
-     * **Top:** `0`, **Bottom:** `0`
-5. **Результат:** При открытии или закрытии окна (например, через плавное появление CanvasGroup или анимацию масштабирования) декоративные столбики будут плавно появляться вместе с панелью, образуя величественную 3D-рамку! При этом ширина столбика всегда останется равной ровно `40` пикселям, исключая любые искажения, размытие или растяжение текстуры.
+### 📝 Скрипт 1. FateMainMenuTitleAnimator.cs
+* **Что делает:** Создает эффект мягкого физического парения заголовка игры вверх-вниз и плавного «дыхания» масштаба, а также плавно переливает неоновое свечение outline-эффекта материала.
+* **Куда вешать:** На объект вашего главного текстового заголовка (`TitleText`).
+* **Настройка в Инспекторе:**
+  * `floatingAmplitude = 12` (заголовок плавно парит вверх-вниз в пределах 12 пикселей).
+  * `floatingSpeed = 1.6` (скорость парения).
+  * `scaleAmplitude = 0.03` (эффект мягкого «дыхания» размера от 97% до 103%).
+  * `scaleSpeed = 1.3` (скорость изменения размера).
+  * `enableGlowLerp = true` (включает перелив цветов свечения).
+  * `glowStartColor` и `glowEndColor` (выберите два красивых контрастных неоновых оттенка, например золотой и пурпурный).
+
+### 📝 Скрипт 2. FateButtonAnimator.cs
+* **Что делает:** Реализует сочный и упругий отклик кнопок (Squash & Stretch) при наведении курсора и клике мыши. Также воспроизводит звуки интерфейса через глобальный менеджер настроек.
+* **Куда вешать:** На все интерактивные кнопки (Buttons) в главном меню и панелях.
+* **Настройка в Инспекторе:**
+  * `hoverScaleMultiplier = 1.08` (при наведении курсора кнопка плавно увеличивается на 8%).
+  * `clickScaleMultiplier = 0.93` (при нажатии кнопка слегка сжимается на 7%).
+  * `animationSpeed = 16` (плавность и упругость интерполяции Lerp).
+  * **Связь со звуком:** Скрипт содержит безопасный вызов `PlaySoundSafe`, который автоматически находит глобальный менеджер настроек `SettingsManager` и проигрывает системные аудиоклипы "UI_Hover_Soft" при наведении и "UI_Click_Metallic" при клике.
+
+### 📝 Скрипт 3. MainMenuController.cs
+* **Что делает:** Обеспечивает навигацию между экранами, запуск игрового процесса по имени сцены или индексу, а также безопасный выход из приложения.
+* **Куда вешать:** Создайте на сцене пустой игровой объект `MainMenuController` и прикрепите к нему данный скрипт.
+* **Настройка в Инспекторе:**
+  * `characterSelectionSceneName = "CharacterSelection"` (название сцены выбора персонажа).
+  * `characterSelectionSceneIndex = 1` (индекс сцены выбора класса в настройках Build Settings).
+  * `loadByName = false` (загрузка по индексу предпочтительнее для оптимизации времени загрузки в Unity).
+  * **Настройка событий кнопок (Unity Events) в Hierarchy:**
+    * Выберите кнопку «Играть», в событии `OnClick()` нажмите `+`, перетащите туда объект `MainMenuController` и выберите функцию `MainMenuController.PlayGame`.
+    * Выберите кнопку «Настройки», в событии `OnClick()` перетащите объект `MainMenuController` и выберите функцию `MainMenuController.OpenSettings` (она плавно вызовет окно через синглтон настроек).
+    * Выберите кнопку «Выход», привяжите функцию `MainMenuController.QuitGame` (она поддерживает как закрытие скомпилированного билда, так и остановку режима Play прямо в редакторе Unity).
+
+---
+
+## 📅 ЧАСТЬ 5. Логика смены дня/ночи и ежедневных наград
+
+### 🌓 Идея системы времени суток (TimeOfDaySystem.cs)
+
+* **Орбитальное движение:** Направленный источник света (Directional Light — Солнце) медленно вращается по оси X. Как только угол его наклона уходит ниже горизонта (наступает закат), с противоположной стороны плавно активируется и вращается Луна.
+* **Интерполяция цвета неба (Skybox Lerp):** Текстура или цвет заднего фона плавно перетекает из нежно-золотого (день) через глубокий фиолетовый (закат) в насыщенный индиго (ночь) с помощью синусоидальной формулы `Mathf.Sin` от текущего игрового времени.
+* **Плавное появление ночных элементов:** Наземный ночной фон и спрайты светлячков имеют компонент `CanvasGroup` или `SpriteRenderer`. Скрипт считывает положение солнца и плавно меняет прозрачность (Альфа-канал) ночных элементов от 0 до 1 при наступлении сумерек.
+
+### 📅 Идея календаря наград (DailyRewardSystem.cs)
+
+* **Сохранение прогресса через PlayerPrefs:** Дата последнего успешного получения награды сохраняется на устройстве в виде текстовой строки (`DateTime.ToString()`). При каждом новом запуске игра считывает текущее системное время устройства и вычисляет разницу.
+* **Проверка серии ежедневных заходов:**
+  * **Серия продолжается:** Если разница между предыдущим и текущим заходом составляет более 24 часов, но меньше 48 часов — порядковый день увеличивается на 1 (игрок переходит, например, со Дня 2 на День 3).
+  * **Серия сбрасывается:** Если игрок пропустил более 48 часов (два дня), серия сбрасывается обратно в День 1.
+  * **Повторный вход в тот же день:** Если игрок заходит в игру в тот же календарный день, кнопка «ЗАБРАТЬ» блокируется, а на экране появляется таймер обратного отсчета, показывающий, сколько часов и минут осталось до полуночи.
+* **Начисление наград:** После нажатия кнопки «ЗАБРАТЬ», игроку начисляются соответствующие дню ресурсы (золото, кристаллы, зелья), которые записываются в его файлы сохранений, а в панели аукциона разблокируются новые уникальные аватарки!
 
 ---
 

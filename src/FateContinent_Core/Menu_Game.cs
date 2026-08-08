@@ -246,7 +246,7 @@ public class Menu_Game : MonoBehaviour
     public void OnConfirmNewGameYes()
     {
         Debug.Log($"[FATE CORE] Новая игра ПОДТВЕРЖДЕНА. Сброс игровых данных и загрузка сцены выбора героя {(loadByName ? characterSelectionSceneName : characterSelectionSceneIndex.ToString())}.");
-        SaveGameSystem.ResetData(); 
+        SafeResetSaveData(); 
         
         if (loadByName)
         {
@@ -336,7 +336,7 @@ public class Menu_Game : MonoBehaviour
                         }
                         else
                         {
-                            txt.text = GetAutosaveLabel() + " " + Translator.GetText(27);
+                            txt.text = GetAutosaveLabel() + " " + GetTranslation(27, "(Empty)");
                         }
                     }
                     else
@@ -344,11 +344,11 @@ public class Menu_Game : MonoBehaviour
                         if (hasSave)
                         {
                             string saveInfo = PlayerPrefs.GetString("Save_Slot_" + currentSlot + "_Info", "Saved Game");
-                            txt.text = Translator.GetText(24) + (currentSlot + 1) + " - " + saveInfo; 
+                            txt.text = GetTranslation(24, "Slot ") + (currentSlot + 1) + " - " + saveInfo; 
                         }
                         else
                         {
-                            txt.text = Translator.GetText(24) + (currentSlot + 1) + " " + Translator.GetText(27); 
+                            txt.text = GetTranslation(24, "Slot ") + (currentSlot + 1) + " " + GetTranslation(27, "(Empty)"); 
                         }
                     }
                 }
@@ -363,7 +363,7 @@ public class Menu_Game : MonoBehaviour
 
     private string GetAutosaveLabel()
     {
-        switch (Translator.LanguageID)
+        switch (GetLanguageID())
         {
             case 0: return "Автосохранение";
             case 2: return "Auto-Speichern";
@@ -388,7 +388,7 @@ public class Menu_Game : MonoBehaviour
             PlayerPrefs.SetInt("Active_Save_Slot", slotIndex);
             PlayerPrefs.Save();
             
-            bool loadSuccess = SaveGameSystem.Load(slotIndex);
+            bool loadSuccess = SafeLoadSaveData(slotIndex);
             if (!loadSuccess)
             {
                 Debug.LogError("[FATE CORE] Ошибка при чтении или десериализации файла сохранения!");
@@ -403,5 +403,73 @@ public class Menu_Game : MonoBehaviour
     public void OnBackToMainMenu()
     {
         ShowMainMenu();
+    }
+
+    // --- Вспомогательные безопасные методы рефлексии (Zenith Decoupling Pattern) ---
+
+    private string GetTranslation(int textKey, string fallback)
+    {
+        System.Type translatorType = System.Type.GetType("Translator");
+        if (translatorType != null)
+        {
+            var method = translatorType.GetMethod("GetText", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+            if (method != null)
+            {
+                return (string)method.Invoke(null, new object[] { textKey });
+            }
+        }
+        return fallback;
+    }
+
+    private int GetLanguageID()
+    {
+        System.Type translatorType = System.Type.GetType("Translator");
+        if (translatorType != null)
+        {
+            var prop = translatorType.GetProperty("LanguageID", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+            if (prop != null)
+            {
+                return (int)prop.GetValue(null);
+            }
+        }
+        return 0; // Default Russian
+    }
+
+    private void SafeResetSaveData()
+    {
+        System.Type saveSystemType = System.Type.GetType("SaveGameSystem");
+        if (saveSystemType != null)
+        {
+            var method = saveSystemType.GetMethod("ResetData", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+            if (method != null)
+            {
+                method.Invoke(null, null);
+                return;
+            }
+        }
+        Debug.LogWarning("[FATE CORE] SaveGameSystem.ResetData не найден в текущем контексте сборки.");
+    }
+
+    private bool SafeLoadSaveData(int slotIndex)
+    {
+        System.Type saveSystemType = System.Type.GetType("SaveGameSystem");
+        if (saveSystemType != null)
+        {
+            // Пытаемся получить метод Load(int, bool)
+            var method = saveSystemType.GetMethod("Load", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static, null, new System.Type[] { typeof(int), typeof(bool) }, null);
+            if (method != null)
+            {
+                return (bool)method.Invoke(null, new object[] { slotIndex, true });
+            }
+            
+            // Если такой перегрузки нет, пробуем Load(int)
+            method = saveSystemType.GetMethod("Load", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static, null, new System.Type[] { typeof(int) }, null);
+            if (method != null)
+            {
+                return (bool)method.Invoke(null, new object[] { slotIndex });
+            }
+        }
+        Debug.LogWarning("[FATE CORE] SaveGameSystem.Load не найден в текущем контексте сборки.");
+        return false;
     }
 }

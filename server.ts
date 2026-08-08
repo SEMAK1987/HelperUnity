@@ -1225,32 +1225,38 @@ async function startServer() {
   app.get("/api/project/files/list", async (req, res) => {
     try {
       const filesList = [
-        // Core C# scripts
-        { path: "src/FateCastleManager.cs", name: "FateCastleManager.cs", desc: "Управление замками, пошаговая экономика, рекрутинг, прокачка и телеметрия ПК" },
-        { path: "src/CastleFacilitiesHUD.cs", name: "CastleFacilitiesHUD.cs", desc: "Интерактивный HUD Менеджер помещений замка (Казармы, Кузница, Академия)" },
-        { path: "src/DialogueSystem_Manager.cs", name: "DialogueSystem_Manager.cs", desc: "Система диалогов, катсцены Аэлиссы, автовыравнивание и выбор вариантов" },
-        { path: "src/SaveGameSystem.cs", name: "SaveGameSystem.cs", desc: "Система сохранений и загрузки RPG-прогресса (3 слота на основе PlayerPrefs)" },
-        { path: "src/SettingsManager.cs", name: "SettingsManager.cs", desc: "Управление настройками, аудиомикшер, антиперегрев GPU и лимит кадров" },
-        { path: "src/Translator.cs", name: "Translator.cs", desc: "Ядро локализации на 9 языков с функцией GetText9" },
-        { path: "src/StrategicCameraController.cs", name: "StrategicCameraController.cs", desc: "Управление камерой тактической карты, зум, авто-границы и скроллинг краев" },
-        { path: "src/LandingPositionManager.cs", name: "LandingPositionManager.cs", desc: "Управление высадкой в 4 зоны, интерактивные маркеры, сохранение зоны" },
-        { path: "src/FateMapManager.cs", name: "FateMapManager.cs", desc: "Отрисовка и инициализация интерактивных колец тактической карты мира" },
-        { path: "src/PhaseCombatSystem.cs", name: "PhaseCombatSystem.cs", desc: "Пошаговая боевая система сражений, расчет урона и ИИ-командиров" },
-        { path: "src/LanguageSelector.cs", name: "LanguageSelector.cs", desc: "Переключатель локализации в меню игры" },
-        { path: "src/Transtable_Dropdown.cs", name: "Transtable_Dropdown.cs", desc: "Ядро авто-локализации для стандартных выпадающих списков Dropdown" },
-        { path: "src/Transtable_Text.cs", name: "Transtable_Text.cs", desc: "Ядро авто-локализации для текстовых полей TextMeshPro" },
-        { path: "src/UIButtonSfxBinder.cs", name: "UIButtonSfxBinder.cs", desc: "Автоматический биндер неоновых звуков UI на все кнопки сцены" },
-        { path: "src/UIButtonHoverEffect.cs", name: "UIButtonHoverEffect.cs", desc: "Плавный эффект масштабирования и свечения при наведении курсора" },
-        { path: "src/LoadingScreenManager.cs", name: "LoadingScreenManager.cs", desc: "Менеджер асинхронных загрузочных экранов между сценами" },
-        { path: "src/MainMenuController.cs", name: "MainMenuController.cs", desc: "Контроллер главного меню с выбором сохранений и настроек" },
-        { path: "src/GamePause_Manager.cs", name: "GamePause_Manager.cs", desc: "Менеджер меню паузы и игрового интерфейса" },
-        { path: "src/CharacterSelectionController.cs", name: "CharacterSelectionController.cs", desc: "Контроллер экрана создания персонажа, распределения статов и выбора класса" },
+        // Fate Continent Core C# scripts
+        { path: "src/FateContinent_Core/FateCastleManager.cs", name: "FateCastleManager.cs", desc: "Управление замками, пошаговая экономика, рекрутинг, прокачка и телеметрия ПК" },
+        { path: "src/FateContinent_Core/CastleFacilitiesHUD.cs", name: "CastleFacilitiesHUD.cs", desc: "Интерактивный HUD Менеджер помещений замка (Казармы, Кузница, Академия)" },
+        { path: "src/FateContinent_Core/DialogueSystem_Manager.cs", name: "DialogueSystem_Manager.cs", desc: "Система диалогов, катсцены Аэлиссы, автовыравнивание и выбор вариантов" },
+        { path: "src/FateContinent_Core/SaveGameSystem.cs", name: "SaveGameSystem.cs", desc: "Система сохранений и загрузки RPG-прогресса (3 слота на основе PlayerPrefs)" },
+        { path: "src/FateContinent_Core/SettingsManager.cs", name: "SettingsManager.cs", desc: "Управление настройками, аудиомикшер, антиперегрев GPU и лимит кадров" },
+        { path: "src/FateContinent_Core/Translator.cs", name: "Translator.cs", desc: "Ядро локализации на 9 языков с функцией GetText9" },
+        { path: "src/FateContinent_Core/StrategicCameraController.cs", name: "StrategicCameraController.cs", desc: "Управление камерой тактической карты, зум, авто-границы и скроллинг краев" },
+        { path: "src/FateContinent_Core/LandingPositionManager.cs", name: "LandingPositionManager.cs", desc: "Управление высадкой в 4 зоны, интерактивные маркеры, сохранение зоны" },
+        { path: "src/FateContinent_Core/FateMapManager.cs", name: "FateMapManager.cs", desc: "Отрисовка и инициализация интерактивных колец тактической карты мира" },
+        { path: "src/FateContinent_Core/PhaseCombatSystem.cs", name: "PhaseCombatSystem.cs", desc: "Пошаговая боевая система сражений, расчет урона и ИИ-командиров" },
+        { path: "src/FateContinent_Core/LanguageSelector.cs", name: "LanguageSelector.cs", desc: "Переключатель локализации в меню игры" },
+        { path: "src/FateContinent_Core/Transtable_Dropdown.cs", name: "Transtable_Dropdown.cs", desc: "Ядро авто-локализации для стандартных выпадающих списков Dropdown" },
+        { path: "src/FateContinent_Core/Transtable_Text.cs", name: "Transtable_Text.cs", desc: "Ядро авто-локализации для текстовых полей TextMeshPro" },
+        { path: "src/FateContinent_Core/UIButtonSfxBinder.cs", name: "UIButtonSfxBinder.cs", desc: "Автоматический биндер неоновых звуков UI на все кнопки сцены" },
+        { path: "src/FateContinent_Core/UIButtonHoverEffect.cs", name: "UIButtonHoverEffect.cs", desc: "Плавный эффект масштабирования и свечения при наведении курсора" },
+        { path: "src/FateContinent_Core/LoadingScreenManager.cs", name: "LoadingScreenManager.cs", desc: "Менеджер асинхронных загрузочных экранов между сценами" },
+        { path: "src/FateContinent_Core/MainMenuController.cs", name: "MainMenuController.cs", desc: "Контроллер главного меню с выбором сохранений и настроек" },
+        { path: "src/FateContinent_Core/GamePause_Manager.cs", name: "GamePause_Manager.cs", desc: "Менеджер меню паузы и игрового интерфейса" },
+        { path: "src/FateContinent_Core/CharacterSelectionController.cs", name: "CharacterSelectionController.cs", desc: "Контроллер экрана создания персонажа, распределения статов и выбора класса" },
+        
+        // Alchemist Cat scripts
+        { path: "src/AlchemistCat_Core/DailyRewardSystem.cs", name: "DailyRewardSystem.cs", desc: "Ежедневные награды и разблокировка миниигр (Алхимический Кот)" },
+        { path: "src/AlchemistCat_Core/TimeOfDaySystem.cs", name: "TimeOfDaySystem.cs", desc: "Интерактивная система смены дня и ночи с орбитой светил (Алхимический Кот)" },
+
+        // External Integration and Python Tools
         { path: "UnityConnector.cs", name: "UnityConnector.cs", desc: "Связующее звено между Unity и Blender, синхронизация 3D и импорт геометрии" },
         { path: "FactionMapMarker.cs", name: "FactionMapMarker.cs", desc: "Маркеры фракций на тактической карте мира" },
         { path: "blender_connector.py", name: "blender_connector.py", desc: "Python-скрипт Blender для связи с Unity-сервером" },
         { path: "blender_fate_continent_gen.py", name: "blender_fate_continent_gen.py", desc: "Генератор 3D-моделей континента и рельефа в Blender" },
         { path: "blender_world_gen.py", name: "blender_world_gen.py", desc: "Альтернативный генератор окружения и процедурных объектов Blender" },
-        { path: "BlenderRiggingOptimizer.py", name: "BlenderRiggingOptimizer.py", desc: "Оптимизация скелета, весов и арматуры 3D персонажей в Blender" }
+        { path: "src/FateContinent_Core/BlenderRiggingOptimizer.py", name: "BlenderRiggingOptimizer.py", desc: "Оптимизация скелета, весов и арматуры 3D персонажей в Blender" }
       ];
 
       const enrichedList = await Promise.all(
