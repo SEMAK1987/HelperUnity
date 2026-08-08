@@ -1,9 +1,10 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.12.08)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.12.09)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** v18.12.08
+- **Version:** v18.12.09
 - **Engine:** Unity 6 (6000.3.10f1)
+- **v18.12.09 Update:** Alchemist Cat Loading Screen & Kitten Silhouette Integration - Integrated step-by-step visual configuration instructions for the `Loading_Panel` interface in the Unity 6 main menu. Documented the precise procedures to configure the dark purple menu theme background and align the glowing Alchemist Cat silhouette watermark sprite centrally with optimal aspect ratio clamping.
 - **v18.12.08 Update:** 3D Models & Blender Integration Workflow Sync - Paused Ollama setup to prioritize robust 3D models development, mesh workflows, and Mixamo animation configurations in Unity. Synchronized system metadata and documentation.
 - **v18.12.07 Update:** Core Knowledge Base & YouTube References Integration - Added new high-fidelity video tutorials on Mixamo-Unity character importing, animation workflows, and custom blend configurations to the master knowledge index. Synchronized version info and metadata across all files.
 - **v18.12.06 Update:** Battle Grid Unification & Automatic Zero Baked Colors System - Programmed `unifyGridMaterials` flag and dynamic neutral gray material extraction in `TacticalBattleGrid.cs` to eliminate pre-baked red, blue, and green colors of meshes. Fully implemented `ToggleDeploymentZones(bool show)` to easily hide colored red/blue placement zones at battle start, maintaining standard gold highlights on hover.
@@ -51,7 +52,7 @@
 - **Audio Rule (CRITICAL):** Используйте только `SettingsManager.cs` для управления звуком и музыкой (включая hover-эффекты и списки воспроизведения). Скрипты `AudioHandler` и `AudioManager` должны быть полностью удалены для чистоты проекта. Музыкальные клипы продлеваются через Suno/Udio и настраиваются на бесшовное зацикливание (`loop = true`). Звуковые файлы берем с Pixabay/Freesound по CC0-лицензии и подключаем напрямую к SettingsManager или через AudioMixer.
 
 ## 🚀 Протокол «Пошаговое Мастерство» (Step-by-Step Mastery)
-1. **Отслеживание прогресса:** Текущая версия v18.12.08 (3D Models & Blender Integration Workflow Sync).
+1. **Отслеживание прогресса:** Текущая версия v18.12.09 (Alchemist Cat Loading Screen & Kitten Silhouette Integration).
 2. **Инструкции Настройки Компонентов (Verified Inspector Settings):**
    - **FateMapManager (FATE_WORLD_MAP):**
      - *Maps List:* [+] Слот для глобальной карты (Map Name = "Континент Судьбы", Map Background = фоновый спрайт карты).

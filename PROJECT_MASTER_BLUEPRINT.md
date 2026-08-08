@@ -1,17 +1,17 @@
 # PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Total Knowledge Archive Edition)
 
-> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.12.08.
+> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.11.18.
 
 ## 1. Общая информация
-- **Версия Помощника:** 18.12.08
-- **Описание:** Гибридный ИИ-помощник нового поколения (v18.12.08 - 3D Models & Blender Integration Workflow Sync) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Интеграция адаптивного переключения ввода, калибровка зум-параметров при высадке, позиционирование маркеров по Z=-2.0f, сохранение прогресса и моделирования отрядов.
+- **Версия Помощника:** 18.11.19
+- **Описание:** Гибридный ИИ-помощник нового поколения (v18.11.18 - Dynamic Army Units, Character Prompts Book Integration & High-Density UI) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Интеграция адаптивного переключения ввода, калибровка зум-параметров при высадке, позиционирование маркеров по Z=-2.0f, сохранение прогресса и моделирования отрядов.
 - **Путь проекта:** Не задан
 - **Локальное хранилище:** Не задано
 - **Версия Unity:** unknown
 - **Версия Blender:** unknown
 - **Версия GIMP:** unknown
 - **Версия Redot:** unknown
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_12_08_FATE_MASTER]
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_11_18_FATE_MASTER]
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -293,7 +293,8 @@ Freesound содержит миллионы звуков от инди-разр�
 - **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.
 - **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.
 
-## 13. История изменений (v18.11.7)
+## 13. История изменений (v18.12.09)
+- **v18.12.09:** Alchemist Cat Loading Screen & Kitten Silhouette Integration • Documented the precise procedures to configure the dark purple menu theme background and align the glowing Alchemist Cat silhouette watermark sprite centrally on the newly created loading screen panel.
 - **v18.11.7:** Selective Dialogue Map Dismissal & Hidden Faction Markers • Solves critical scene-cleanup issue where the map background, tactical landing rings, and companion marker coordinates stayed visible after clicking 'End Dialogue' or ending conversation. Directs DialogueSystem_Manager to hide active map and overlay modules dynamically on non-interactive dialogue steps, and completely hides flat white redundant faction reference circles (`Faction_Marker_Aelyssa`/class markers) from the tactical world map view and during the interactive landing phase.
 - **v18.11.6:** Synchronized Map & Marker Dismissal • Automatically caches Faction_Marker_Aelyssa and player class markers on startup to properly control their visibility in sync with the tactical world map. Directs DialogueSystem_Manager to dismiss map visibility when ending dialogue (clicking "Завершить диалог"), completely cleaning up map background sprites, active landing point rings, and the companion companion/faction markers from the viewport upon conversation exit.
 - **v18.11.5:** Single Ring Visibility & Pure Coordinates Preservation • Dynamically disables other rings at runtime, displaying ONLY the single chosen landing point ring. Preserves user-entered Inspector coordinates at runtime by establishing your exact manually fine-tuned layout coordinates as hardcoded default variable parameters in C# and removing the runtime scene-sync overwrite block, completely resolving coordinate resets or values "jumping" to zero on play start.

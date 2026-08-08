@@ -1,6 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 /// <summary>
 /// Разработчик: Алхимический Кот (Alchemist Cat Core)
@@ -57,7 +60,20 @@ public class MainMenuController : MonoBehaviour
         // 2. Интерактивный Параллакс фона за счет наклона мыши
         if (backgroundLayer != null)
         {
-            Vector2 mousePos = Input.mousePosition;
+            Vector2 mousePos = Vector2.zero;
+#if ENABLE_INPUT_SYSTEM
+            if (Mouse.current != null)
+            {
+                mousePos = Mouse.current.position.ReadValue();
+            }
+            else
+            {
+                mousePos = Input.mousePosition;
+            }
+#else
+            mousePos = Input.mousePosition;
+#endif
+
             float normX = (mousePos.x / Screen.width) - 0.5f;
             float normY = (mousePos.y / Screen.height) - 0.5f;
 
