@@ -1,6 +1,6 @@
-// [BATTLESCENE ARENA SYNC v18.12.09]
+// [BATTLESCENE ARENA SYNC v18.12.10]
 // Unity Connector for Quantum AI Assistant
-// Updated: 2026-08-08 (Synced with Stable v18.12.09)
+// Updated: 2026-08-09 (Synced with Stable v18.12.10)
 
 #if UNITY_EDITOR
 using UnityEngine;
@@ -16,7 +16,7 @@ namespace AI_Assistant_Quantum
         private string prompt = "";
         private string serverUrl = "http://localhost:3000";
         private Mode mode = Mode.Online;
-        private string status = "Ready for Quantum Manifestation v18.12.09";
+        private string status = "Ready for Quantum Manifestation v18.12.10";
         private bool isProcessing = false;
 
         public enum Mode { Online, Offline, NoInternet }
@@ -29,7 +29,7 @@ namespace AI_Assistant_Quantum
 
         private void OnGUI()
         {
-            GUILayout.Label("v18.12.09 - Alchemist Cat Loading Screen & Kitten Silhouette Integration", EditorStyles.boldLabel);
+            GUILayout.Label("v18.12.10 - Advanced Dropdown Calibration & Text Wrapping Fixes", EditorStyles.boldLabel);
             
             serverUrl = EditorGUILayout.TextField("Server URL", serverUrl);
             mode = (Mode)EditorGUILayout.EnumPopup("Mode", mode);

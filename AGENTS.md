@@ -1,9 +1,10 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.12.09)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.12.10)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** v18.12.09
+- **Version:** v18.12.10
 - **Engine:** Unity 6 (6000.3.10f1)
+- **v18.12.10 Update:** Advanced Dropdown Calibration & Text Wrapping Fixes - Standardized dropdown text wrapping to `TextWrappingModes.NoWrap`, suppressed warning CS0618 inside `SettingsManager.cs` by migrating `enableWordWrapping` to modern `textWrappingMode` API. Fixed pivot offsets and item height scaling to prevent layout clipping and text overlapping in high-density Russian and Turkish language dropdowns. Verified dynamic item layout, spacing, and center alignment for all drop menus.
 - **v18.12.09 Update:** Alchemist Cat Loading Screen & Kitten Silhouette Integration - Integrated step-by-step visual configuration instructions for the `Loading_Panel` interface in the Unity 6 main menu. Documented the precise procedures to configure the dark purple menu theme background and align the glowing Alchemist Cat silhouette watermark sprite centrally with optimal aspect ratio clamping.
 - **v18.12.08 Update:** 3D Models & Blender Integration Workflow Sync - Paused Ollama setup to prioritize robust 3D models development, mesh workflows, and Mixamo animation configurations in Unity. Synchronized system metadata and documentation.
 - **v18.12.07 Update:** Core Knowledge Base & YouTube References Integration - Added new high-fidelity video tutorials on Mixamo-Unity character importing, animation workflows, and custom blend configurations to the master knowledge index. Synchronized version info and metadata across all files.

@@ -1,7 +1,7 @@
 bl_info = {
     "name": "AI Assistant Link",
-    "author": "Omniversal World Architect v18.12.09",
-    "version": (18, 12, 9),
+    "author": "Omniversal World Architect v18.12.10",
+    "version": (18, 12, 10),
     "blender": (2, 80, 0),
     "location": "View3D > N-Panel > AI Assistant",
     "description": "Direct bridge to the World Architect Divine Architect Supreme with project level GOD Synergy.",
@@ -101,7 +101,7 @@ class AI_ASSISTANT_PT_Panel(bpy.types.Panel):
         props = context.scene.ai_assistant_props
         
         col = layout.column(align=True)
-        col.label(text="v18.12.09 - Alchemist Cat Loading Screen & Kitten Silhouette Integration")
+        col.label(text="v18.12.10 - Advanced Dropdown Calibration & Text Wrapping Fixes")
         col.prop(props, "server_url")
         col.prop(props, "mode")
         
