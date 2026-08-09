@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 using TMPro;
 using System.Collections.Generic;
 
@@ -346,6 +347,8 @@ public class SettingsManager : MonoBehaviour
                 tmpText.alignment = TextAlignmentOptions.Center;
                 tmpText.textWrappingMode = TextWrappingModes.NoWrap;
                 tmpText.overflowMode = TextOverflowModes.Ellipsis;
+                tmpText.characterSpacing = 0f; // СБРОС КРИТИЧЕСКОГО СПЕЙСИНГА СЛОВ!
+                tmpText.wordSpacing = 0f;
                 
                 // Растягиваем RectTransform, чтобы текст влезал полностью без обрезки по бокам
                 RectTransform labelRect = labelTrans.GetComponent<RectTransform>();
@@ -359,6 +362,15 @@ public class SettingsManager : MonoBehaviour
             }
         }
 
+        // Вычисляем оптимальную высоту шторки динамически на основе количества опций
+        int optionCount = dropdown.options != null ? dropdown.options.Count : 3;
+        float spacingVal = 2f;
+        float paddingVal = 4f; // Минимальный паддинг
+        float dynamicTemplateHeight = (optionCount * itemHeight) + ((optionCount - 1) * spacingVal) + paddingVal;
+        
+        // Ограничиваем разумным максимумом, если опций слишком много
+        if (dynamicTemplateHeight > 400f) dynamicTemplateHeight = 400f;
+
         // 2. Исправляем Template
         Transform templateTransform = dropdown.transform.Find("Template");
         if (templateTransform != null)
@@ -367,7 +379,6 @@ public class SettingsManager : MonoBehaviour
             if (templateRect != null)
             {
                 // КРИТИЧЕСКИЙ ФИКС: Сбрасываем съехавший Pivot (ставим его на верхнюю грань 0.5, 1.0)
-                // Если pivot.y равен 3.48 или любому другому значению, список будет улетать за экран
                 templateRect.pivot = new Vector2(0.5f, 1f);
 
                 // Выравниваем анкоры (stretch по ширине, крепление к нижней грани кнопки)
@@ -375,11 +386,11 @@ public class SettingsManager : MonoBehaviour
                 templateRect.anchorMax = new Vector2(1f, 0f);
 
                 // Очищаем левый/правый оффсеты и сдвигаем слегка вниз
-                templateRect.offsetMin = new Vector2(0f, -templateHeight);
+                templateRect.offsetMin = new Vector2(0f, -dynamicTemplateHeight);
                 templateRect.offsetMax = new Vector2(0f, -2f);
                 
                 // Фиксируем высоту шторки
-                templateRect.sizeDelta = new Vector2(templateRect.sizeDelta.x, templateHeight);
+                templateRect.sizeDelta = new Vector2(templateRect.sizeDelta.x, dynamicTemplateHeight);
             }
 
             // Настройка Viewport (чтобы не резал элементы)
@@ -413,8 +424,14 @@ public class SettingsManager : MonoBehaviour
                         {
                             vlg.childControlHeight = true;
                             vlg.childForceExpandHeight = false;
-                            vlg.spacing = 2f;
+                            vlg.spacing = spacingVal;
+                            vlg.padding = new RectOffset(0, 0, (int)(paddingVal/2), (int)(paddingVal/2));
                         }
+
+                        ContentSizeFitter csf = content.GetComponent<ContentSizeFitter>();
+                        if (csf == null) csf = content.gameObject.AddComponent<ContentSizeFitter>();
+                        csf.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+                        csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
                     }
 
                     // Настройка эталонного Item
@@ -438,6 +455,8 @@ public class SettingsManager : MonoBehaviour
                                 itemTmp.alignment = TextAlignmentOptions.Center; // По центру!
                                 itemTmp.textWrappingMode = TextWrappingModes.NoWrap; // Отключаем перенос слов!
                                 itemTmp.overflowMode = TextOverflowModes.Ellipsis;
+                                itemTmp.characterSpacing = 0f; // СБРОС КРИТИЧЕСКОГО СПЕЙСИНГА!
+                                itemTmp.wordSpacing = 0f;
                             }
 
                             // Расширяем оффсеты текста на всю ширину ячейки (чтобы длинные слова не резались)
@@ -482,6 +501,51 @@ public class SettingsManager : MonoBehaviour
             sfxSource.PlayOneShot(clip);
         }
     }
+
+    // --- СОВМЕСТИМОСТЬ С FATE CONTINENT ---
+    public void PlayHoverSound(int index)
+    {
+        PlayHoverSound();
+    }
+
+    public void PlaySound(AudioClip clip)
+    {
+        PlaySoundEffect(clip);
+    }
+
+    public void PlaySfx(AudioClip clip)
+    {
+        PlaySoundEffect(clip);
+    }
+
+    public void PlaySfx(string sfxName)
+    {
+        PlaySFX(sfxName);
+    }
+
+    public void PlaySFX(string sfxName)
+    {
+        AudioClip clip = Resources.Load<AudioClip>("Audio/" + sfxName);
+        if (clip == null) clip = Resources.Load<AudioClip>(sfxName);
+        if (clip != null) PlaySoundEffect(clip);
+    }
+
+    public void PlayMusicTrack(int playlistIndex, int trackIndex)
+    {
+        switch (playlistIndex)
+        {
+            case 0: ChangePlaylist(menuPlaylist); break;
+            case 1: ChangePlaylist(menuPlaylist); break;
+            case 2: ChangePlaylist(labPlaylist); break;
+            case 3: ChangePlaylist(minigamePlaylist); break;
+        }
+    }
+
+    public void BindLoadedUIElements()
+    {
+        BindUIElements();
+    }
+    // --------------------------------------
 
     // Воспроизведение фоновой музыки по плейлистам
     public void PlayThemeForActiveScene()

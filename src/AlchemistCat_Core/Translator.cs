@@ -161,7 +161,14 @@ public class Translator : MonoBehaviour
 
             if (_languageID == 0)
             {
-                text.UIText.characterSpacing = Instance.russianCharacterSpacing;
+                if (text.GetComponentInParent<TMP_Dropdown>() != null)
+                {
+                    text.UIText.characterSpacing = 0f;
+                }
+                else
+                {
+                    text.UIText.characterSpacing = Instance.russianCharacterSpacing;
+                }
             }
         }
     }
@@ -177,5 +184,10 @@ public class Translator : MonoBehaviour
         {
             if (dd != null) dd.UpdateDropdown();
         }
+    }
+
+    public static void TranslateAll()
+    {
+        Update_texts();
     }
 }
