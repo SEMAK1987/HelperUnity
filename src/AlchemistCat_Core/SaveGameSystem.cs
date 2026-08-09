@@ -147,6 +147,7 @@ public static class SaveGameSystem
         switch (lang)
         {
             case 0: return "Ур.";
+            case 2: return "Seviye"; // Turkish Level
             case 7: return "레벨";
             case 6: return "レベル";
             case 8: return "等级";

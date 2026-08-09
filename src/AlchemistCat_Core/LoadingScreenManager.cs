@@ -145,10 +145,20 @@ public class LoadingScreenManager : MonoBehaviour
                 "Teaching mice to sit still during alchemy...",
                 "Testing cauldron temperature with paws...",
                 "Sweeping fur out of the magic potion..."
+            },
+            // Turkish
+            new string[] {
+                "Kazana bir damla balık yağı ekleniyor...",
+                "Büyük iksir yapımından önce pençeler keskinleştiriliyor...",
+                "Kedi nanesi sert akıl hocasından saklanıyor...",
+                "Simya sırasında farelere uslu durmaları öğretiliyor...",
+                "Kazan sıcaklığı patilerle test ediliyor...",
+                "Sihirli iksirden tüyler temizleniyor..."
             }
         };
 
-        int lang = PlayerPrefs.GetInt("Alchemist_Language", 0) == 0 ? 0 : 1;
+        int lang = PlayerPrefs.GetInt("Alchemist_Language", 0);
+        if (lang < 0 || lang >= quotes.Length) lang = 1;
         int index = Random.Range(0, quotes[lang].Length);
         return quotes[lang][index];
     }
