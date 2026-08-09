@@ -134,6 +134,8 @@ public class SettingsManager : MonoBehaviour
 
         if (qualityDropdown != null)
         {
+            AutoCalibrateDropdown(qualityDropdown, 55f, 320f, 22f);
+
             // Автоматически гарантируем наличие ровно 6 опций качества, если список пуст или поврежден
             if (qualityDropdown.options.Count != 6)
             {
@@ -173,6 +175,8 @@ public class SettingsManager : MonoBehaviour
 
         if (languageDropdown != null)
         {
+            AutoCalibrateDropdown(languageDropdown, 55f, 200f, 22f);
+
             // Автоматически гарантируем наличие 3 официальных языков (RU, EN, TR) в их нативном виде
             if (languageDropdown.options.Count != 3)
             {
@@ -309,6 +313,147 @@ public class SettingsManager : MonoBehaviour
     public void SetLanguage(int index)
     {
         Translator.SelectLanguage(index);
+    }
+
+    /// <summary>
+    /// Автоматическая калибровка выпадающего списка TMP_Dropdown.
+    /// Исправляет поломанные пивоты (Pivot), оффсеты, высоту элементов (Item Height),
+    /// центрирует текст и запрещает перенос длинных слов, чтобы они не обрезались.
+    /// </summary>
+    private void AutoCalibrateDropdown(TMP_Dropdown dropdown, float itemHeight, float templateHeight, float fontSize)
+    {
+        if (dropdown == null) return;
+
+        // 1. Позиционирование и размеры самого dropdown
+        RectTransform ddRect = dropdown.GetComponent<RectTransform>();
+        if (ddRect != null)
+        {
+            LayoutElement layout = dropdown.GetComponent<LayoutElement>();
+            if (layout != null)
+            {
+                layout.preferredHeight = 45f;
+            }
+        }
+
+        // Основной текст (Label) на самой кнопке
+        Transform labelTrans = dropdown.transform.Find("Label");
+        if (labelTrans != null)
+        {
+            TextMeshProUGUI tmpText = labelTrans.GetComponent<TextMeshProUGUI>();
+            if (tmpText != null)
+            {
+                tmpText.fontSize = fontSize;
+                tmpText.alignment = TextAlignmentOptions.Center;
+                tmpText.textWrappingMode = TextWrappingModes.NoWrap;
+                tmpText.overflowMode = TextOverflowModes.Ellipsis;
+                
+                // Растягиваем RectTransform, чтобы текст влезал полностью без обрезки по бокам
+                RectTransform labelRect = labelTrans.GetComponent<RectTransform>();
+                if (labelRect != null)
+                {
+                    labelRect.anchorMin = new Vector2(0f, 0f);
+                    labelRect.anchorMax = new Vector2(1f, 1f);
+                    labelRect.offsetMin = new Vector2(15f, 0f); // небольшой отступ слева
+                    labelRect.offsetMax = new Vector2(-25f, 0f); // отступ справа под стрелочку
+                }
+            }
+        }
+
+        // 2. Исправляем Template
+        Transform templateTransform = dropdown.transform.Find("Template");
+        if (templateTransform != null)
+        {
+            RectTransform templateRect = templateTransform.GetComponent<RectTransform>();
+            if (templateRect != null)
+            {
+                // КРИТИЧЕСКИЙ ФИКС: Сбрасываем съехавший Pivot (ставим его на верхнюю грань 0.5, 1.0)
+                // Если pivot.y равен 3.48 или любому другому значению, список будет улетать за экран
+                templateRect.pivot = new Vector2(0.5f, 1f);
+
+                // Выравниваем анкоры (stretch по ширине, крепление к нижней грани кнопки)
+                templateRect.anchorMin = new Vector2(0f, 0f);
+                templateRect.anchorMax = new Vector2(1f, 0f);
+
+                // Очищаем левый/правый оффсеты и сдвигаем слегка вниз
+                templateRect.offsetMin = new Vector2(0f, -templateHeight);
+                templateRect.offsetMax = new Vector2(0f, -2f);
+                
+                // Фиксируем высоту шторки
+                templateRect.sizeDelta = new Vector2(templateRect.sizeDelta.x, templateHeight);
+            }
+
+            // Настройка Viewport (чтобы не резал элементы)
+            Transform viewport = templateTransform.Find("Viewport");
+            if (viewport != null)
+            {
+                RectTransform viewportRect = viewport.GetComponent<RectTransform>();
+                if (viewportRect != null)
+                {
+                    viewportRect.anchorMin = Vector2.zero;
+                    viewportRect.anchorMax = Vector2.one;
+                    viewportRect.sizeDelta = Vector2.zero;
+                    viewportRect.anchoredPosition = Vector2.zero;
+                }
+
+                // Настройка Content (контейнер для списка элементов)
+                Transform content = viewport.Find("Content");
+                if (content != null)
+                {
+                    RectTransform contentRect = content.GetComponent<RectTransform>();
+                    if (contentRect != null)
+                    {
+                        contentRect.anchorMin = new Vector2(0f, 1f);
+                        contentRect.anchorMax = new Vector2(1f, 1f);
+                        contentRect.pivot = new Vector2(0.5f, 1f);
+                        contentRect.anchoredPosition = Vector2.zero;
+                        
+                        // Если на Content висит Vertical Layout Group или Content Size Fitter, настраиваем его
+                        VerticalLayoutGroup vlg = content.GetComponent<VerticalLayoutGroup>();
+                        if (vlg != null)
+                        {
+                            vlg.childControlHeight = true;
+                            vlg.childForceExpandHeight = false;
+                            vlg.spacing = 2f;
+                        }
+                    }
+
+                    // Настройка эталонного Item
+                    Transform item = content.Find("Item");
+                    if (item != null)
+                    {
+                        RectTransform itemRect = item.GetComponent<RectTransform>();
+                        if (itemRect != null)
+                        {
+                            itemRect.sizeDelta = new Vector2(itemRect.sizeDelta.x, itemHeight);
+                        }
+
+                        // Текст внутри элемента списка (Item Label)
+                        Transform itemLabel = item.Find("Item Label");
+                        if (itemLabel != null)
+                        {
+                            TextMeshProUGUI itemTmp = itemLabel.GetComponent<TextMeshProUGUI>();
+                            if (itemTmp != null)
+                            {
+                                itemTmp.fontSize = fontSize - 2f; // Делаем текст читаемым и крупным
+                                itemTmp.alignment = TextAlignmentOptions.Center; // По центру!
+                                itemTmp.textWrappingMode = TextWrappingModes.NoWrap; // Отключаем перенос слов!
+                                itemTmp.overflowMode = TextOverflowModes.Ellipsis;
+                            }
+
+                            // Расширяем оффсеты текста на всю ширину ячейки (чтобы длинные слова не резались)
+                            RectTransform itemLabelRect = itemLabel.GetComponent<RectTransform>();
+                            if (itemLabelRect != null)
+                            {
+                                itemLabelRect.anchorMin = Vector2.zero;
+                                itemLabelRect.anchorMax = Vector2.one;
+                                itemLabelRect.offsetMin = new Vector2(30f, 0f); // Запас под галочку слева
+                                itemLabelRect.offsetMax = new Vector2(-15f, 0f);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // Воспроизведение звуков
