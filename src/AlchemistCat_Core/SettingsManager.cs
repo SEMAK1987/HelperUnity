@@ -134,9 +134,34 @@ public class SettingsManager : MonoBehaviour
 
         if (qualityDropdown != null)
         {
+            // Автоматически гарантируем наличие ровно 6 опций качества, если список пуст или поврежден
+            if (qualityDropdown.options.Count != 6)
+            {
+                qualityDropdown.ClearOptions();
+                List<string> optionsList = new List<string>();
+                for (int i = 37; i <= 42; i++)
+                {
+                    optionsList.Add(Translator.GetText(i));
+                }
+                qualityDropdown.AddOptions(optionsList);
+            }
+
+            // Автоматически настраиваем и связываем Transtable_Dropdown, если его забыли настроить в Инспекторе
+            Transtable_Dropdown transDD = qualityDropdown.GetComponent<Transtable_Dropdown>();
+            if (transDD == null)
+            {
+                transDD = qualityDropdown.gameObject.AddComponent<Transtable_Dropdown>();
+                transDD.translations.optionTextIDs = new int[] { 37, 38, 39, 40, 41, 42 };
+            }
+            else if (transDD.translations.optionTextIDs == null || transDD.translations.optionTextIDs.Length != 6)
+            {
+                transDD.translations.optionTextIDs = new int[] { 37, 38, 39, 40, 41, 42 };
+            }
+
             qualityDropdown.value = PlayerPrefs.GetInt("QualitySetting", 2);
             qualityDropdown.onValueChanged.RemoveAllListeners();
             qualityDropdown.onValueChanged.AddListener(SetQuality);
+            transDD.UpdateDropdown();
         }
 
         if (fullscreenToggle != null)
@@ -148,6 +173,20 @@ public class SettingsManager : MonoBehaviour
 
         if (languageDropdown != null)
         {
+            // Автоматически гарантируем наличие 3 официальных языков (RU, EN, TR) в их нативном виде
+            if (languageDropdown.options.Count != 3)
+            {
+                languageDropdown.ClearOptions();
+                languageDropdown.AddOptions(new List<string> { "Русский", "English", "Türkçe" });
+            }
+
+            // Отключаем Transtable_Dropdown для языка, так как названия языков должны оставаться нативными (Русский, English, Türkçe)
+            Transtable_Dropdown transDD = languageDropdown.GetComponent<Transtable_Dropdown>();
+            if (transDD != null)
+            {
+                Destroy(transDD);
+            }
+
             languageDropdown.value = PlayerPrefs.GetInt("Alchemist_Language", 0);
             languageDropdown.onValueChanged.RemoveAllListeners();
             languageDropdown.onValueChanged.AddListener(SetLanguage);
@@ -189,6 +228,10 @@ public class SettingsManager : MonoBehaviour
     public void SetSFXVolume(float val)
     {
         PlayerPrefs.SetFloat("Vol_SFX", val);
+        if (sfxSource != null)
+        {
+            sfxSource.volume = val;
+        }
         if (masterMixer != null)
         {
             float db = Mathf.Log10(Mathf.Clamp(val, 0.0001f, 1f)) * 20f;
@@ -199,6 +242,10 @@ public class SettingsManager : MonoBehaviour
     public void SetMusicVolume(float val)
     {
         PlayerPrefs.SetFloat("Vol_Music", val);
+        if (musicSource != null)
+        {
+            musicSource.volume = val;
+        }
         if (masterMixer != null)
         {
             float db = Mathf.Log10(Mathf.Clamp(val, 0.0001f, 1f)) * 20f;
