@@ -91,6 +91,17 @@ public class SettingsManager : MonoBehaviour
             Instance.languageDropdown = this.languageDropdown;
             Instance.fullscreenToggle = this.fullscreenToggle;
             
+            // Предотвращаем наложение музыки: останавливаем и уничтожаем дублирующие AudioSource
+            AudioSource[] duplicateSources = GetComponentsInChildren<AudioSource>(true);
+            foreach (var src in duplicateSources)
+            {
+                if (src != null)
+                {
+                    src.Stop();
+                    Destroy(src);
+                }
+            }
+            
             Instance.BindUIElements();
             Destroy(this);
         }
@@ -364,6 +375,7 @@ public class SettingsManager : MonoBehaviour
             }
 
             BuildResolutionsList();
+            UpdateDropdownFontStyles();
         }
         finally
         {
@@ -522,10 +534,62 @@ public class SettingsManager : MonoBehaviour
         {
             Translator.SelectLanguage(index);
             Debug.Log($"[ALCHEMIST SETTINGS] Успешно установлен язык: {index} (0=RU, 1=EN, 2=TR)");
+            UpdateDropdownFontStyles();
         }
         finally
         {
             isUpdatingSettings = false;
+        }
+    }
+
+    /// <summary>
+    /// Автоматическое обновление стиля шрифта выпадающих списков при смене языка.
+    /// Русский язык получает жирное начертание (Bold) для лучшей читаемости и плотности.
+    /// </summary>
+    public void UpdateDropdownFontStyles()
+    {
+        int lang = PlayerPrefs.GetInt("Alchemist_Language", 0);
+        TMPro.FontStyles style = (lang == 0) ? TMPro.FontStyles.Bold : TMPro.FontStyles.Normal;
+
+        // Принудительно устанавливаем правильный шрифт локализации, поддерживающий все символы (включая турецкий и русский)
+        if (Translator.Instance != null && Translator.Instance.defaultFont != null)
+        {
+            if (languageDropdown != null)
+            {
+                if (languageDropdown.captionText != null) languageDropdown.captionText.font = Translator.Instance.defaultFont;
+                if (languageDropdown.itemText != null) languageDropdown.itemText.font = Translator.Instance.defaultFont;
+            }
+            if (qualityDropdown != null)
+            {
+                if (qualityDropdown.captionText != null) qualityDropdown.captionText.font = Translator.Instance.defaultFont;
+                if (qualityDropdown.itemText != null) qualityDropdown.itemText.font = Translator.Instance.defaultFont;
+            }
+            if (resolutionDropdown != null)
+            {
+                if (resolutionDropdown.captionText != null) resolutionDropdown.captionText.font = Translator.Instance.defaultFont;
+                if (resolutionDropdown.itemText != null) resolutionDropdown.itemText.font = Translator.Instance.defaultFont;
+            }
+        }
+
+        if (languageDropdown != null)
+        {
+            if (languageDropdown.captionText != null) languageDropdown.captionText.fontStyle = style;
+            if (languageDropdown.itemText != null) languageDropdown.itemText.fontStyle = style;
+            languageDropdown.RefreshShownValue();
+        }
+
+        if (qualityDropdown != null)
+        {
+            if (qualityDropdown.captionText != null) qualityDropdown.captionText.fontStyle = style;
+            if (qualityDropdown.itemText != null) qualityDropdown.itemText.fontStyle = style;
+            qualityDropdown.RefreshShownValue();
+        }
+
+        if (resolutionDropdown != null)
+        {
+            if (resolutionDropdown.captionText != null) resolutionDropdown.captionText.fontStyle = style;
+            if (resolutionDropdown.itemText != null) resolutionDropdown.itemText.fontStyle = style;
+            resolutionDropdown.RefreshShownValue();
         }
     }
 
@@ -539,13 +603,20 @@ public class SettingsManager : MonoBehaviour
     {
         if (dropdown == null) return;
 
+        // Принудительно устанавливаем правильный шрифт локализации, поддерживающий все символы (включая турецкий и русский)
+        if (Translator.Instance != null && Translator.Instance.defaultFont != null)
+        {
+            if (dropdown.captionText != null) dropdown.captionText.font = Translator.Instance.defaultFont;
+            if (dropdown.itemText != null) dropdown.itemText.font = Translator.Instance.defaultFont;
+        }
+
         // 1. Настройка основного текста (Label) на самой кнопке
         if (dropdown.captionText != null)
         {
             dropdown.captionText.fontSize = fontSize;
             dropdown.captionText.alignment = TextAlignmentOptions.Center;
             dropdown.captionText.textWrappingMode = TextWrappingModes.NoWrap;
-            dropdown.captionText.overflowMode = TextOverflowModes.Ellipsis;
+            dropdown.captionText.overflowMode = TextOverflowModes.Overflow;
             dropdown.captionText.characterSpacing = 0f;
             dropdown.captionText.wordSpacing = 0f;
         }
@@ -556,7 +627,7 @@ public class SettingsManager : MonoBehaviour
             dropdown.itemText.fontSize = fontSize - 2f;
             dropdown.itemText.alignment = TextAlignmentOptions.Center;
             dropdown.itemText.textWrappingMode = TextWrappingModes.NoWrap;
-            dropdown.itemText.overflowMode = TextOverflowModes.Ellipsis;
+            dropdown.itemText.overflowMode = TextOverflowModes.Overflow;
             dropdown.itemText.characterSpacing = 0f;
             dropdown.itemText.wordSpacing = 0f;
             dropdown.itemText.color = new Color(0.12f, 0.12f, 0.12f, 1f); // Темно-серый цвет для отличной читаемости на светлом фоне
@@ -734,6 +805,13 @@ public class SettingsManager : MonoBehaviour
     private void ChangePlaylist(AudioClip[] newPlaylist)
     {
         if (newPlaylist == null || newPlaylist.Length == 0) return;
+
+        // ПРОВЕРКА: Если этот плейлист уже играет, ничего не делаем, чтобы избежать наложения звуков
+        if (activePlaylist == newPlaylist && musicSource != null && musicSource.isPlaying)
+        {
+            return;
+        }
+
         activePlaylist = newPlaylist;
         currentPlaylistIndex = 0;
         PlayPlaylistTrack();
@@ -746,7 +824,13 @@ public class SettingsManager : MonoBehaviour
         AudioClip track = activePlaylist[currentPlaylistIndex];
         if (track != null)
         {
+            // Убеждаемся, что мы не перезапускаем тот же самый трек, если он уже играет!
+            if (musicSource.clip == track && musicSource.isPlaying)
+            {
+                return;
+            }
             musicSource.clip = track;
+            musicSource.loop = true; // Принудительно устанавливаем зацикливание фоновой музыки
             musicSource.Play();
         }
     }

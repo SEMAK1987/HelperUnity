@@ -291,7 +291,7 @@ public class Menu_Game : MonoBehaviour
             foreach (var b in buttons)
             {
                 string nameLower = b.name.ToLower();
-                if (nameLower.Contains("back") || nameLower.Contains("назад") || nameLower.Contains("close") || nameLower.Contains("return"))
+                if (nameLower.Contains("back") || nameLower.Contains("назад") || nameLower.Contains("close") || nameLower.Contains("return") || nameLower.Contains("geri"))
                 {
                     settingsBackButton = b;
                     break;
@@ -358,7 +358,42 @@ public class Menu_Game : MonoBehaviour
     private void ShowPanel(GameObject panel)
     {
         if (mainMenuPanel != null) mainMenuPanel.SetActive(panel == mainMenuPanel);
-        if (settingsPanel != null) settingsPanel.SetActive(panel == settingsPanel);
+        if (settingsPanel != null)
+        {
+            settingsPanel.SetActive(panel == settingsPanel);
+            if (panel == settingsPanel)
+            {
+                // Адаптивное масштабирование панели настроек под разрешение экрана, чтобы ничего не обрезалось по высоте
+                RectTransform settingsRect = settingsPanel.GetComponent<RectTransform>();
+                if (settingsRect != null)
+                {
+                    // Проверяем высоту экрана или родительского Canvas
+                    float screenHeight = Screen.height;
+                    Canvas parentCanvas = settingsPanel.GetComponentInParent<Canvas>();
+                    if (parentCanvas != null && parentCanvas.GetComponent<RectTransform>() != null)
+                    {
+                        screenHeight = parentCanvas.GetComponent<RectTransform>().rect.height;
+                    }
+
+                    // Если экран ландшафтный (ширина > высоты) или высота экрана меньше 850 пикселей
+                    if (Screen.width > Screen.height || screenHeight < 850f)
+                    {
+                        // Подбираем оптимальный масштаб: чем меньше высота экрана, тем меньше масштаб
+                        float targetScale = Mathf.Clamp(screenHeight / 850f, 0.65f, 0.9f);
+                        
+                        settingsRect.localScale = new Vector3(targetScale, targetScale, 1f);
+                        
+                        // Слегка приподнимаем панель, чтобы компенсировать уменьшение размера снизу
+                        settingsRect.anchoredPosition = new Vector2(settingsRect.anchoredPosition.x, 10f);
+                    }
+                    else
+                    {
+                        settingsRect.localScale = Vector3.one;
+                        settingsRect.anchoredPosition = Vector2.zero;
+                    }
+                }
+            }
+        }
     }
 
     public void OnStartPressed()

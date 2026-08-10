@@ -39,7 +39,7 @@ public class Translator : MonoBehaviour
             "Качество", "Рейтинг", "Магазин", "Привет, Кот-Алхимик!", "Слот ", "Выбор сохранения", "Перезапись", "(Пусто)",
             "Мяу! Начнем варку?", "Мыши пойманы!", "Улучшить котел", "Книга рецептов", "Поймать мышь", "Играть в Дартс", "Далее", "Сохранить", "Мышей в амбаре: ",
             "Очень Низкое", "Низкое", "Среднее", "Высокое", "Очень Высокое", "Ультра",
-            "Вы уверены?", "Да", "Нет", "Загрузить", "Меню кота", "Золото: ", "Кристаллы: ", "Уровень Кота: ", "Зелья: "
+            "Вы уверены?", "Да", "Нет", "Загрузить", "Меню кота", "Золото: ", "Кристаллы: ", "Уровень Кота: ", "Зелья: ", "Настройки"
         },
         // 1 - English
         new string[] {
@@ -48,7 +48,7 @@ public class Translator : MonoBehaviour
             "Quality", "Rating", "Shop", "Welcome, Alchemist Cat!", "Slot ", "Select Save Slot", "Overwrite", "(Empty)",
             "Meow! Start brewing?", "Mice caught!", "Upgrade Cauldron", "Recipe Book", "Catch Mice", "Play Darts", "Continue", "Save", "Mice in Barn: ",
             "Very Low", "Low", "Medium", "High", "Very High", "Ultra",
-            "Are you sure?", "Yes", "No", "Load", "Cat Menu", "Gold: ", "Crystals: ", "Cat Level: ", "Potions: "
+            "Are you sure?", "Yes", "No", "Load", "Cat Menu", "Gold: ", "Crystals: ", "Cat Level: ", "Potions: ", "Settings"
         },
         // 2 - Turkish (TR) - Идеально для Яндекс Игр!
         new string[] {
@@ -57,7 +57,7 @@ public class Translator : MonoBehaviour
             "Kalite", "Derecelendirme", "Mağaza", "Hoş geldin, Simyacı Kedi!", "Yuva ", "Kayıt Yuvası Seç", "Üzerine Yaz", "(Boş)",
             "Miyav! İksir yapmaya başla?", "Fareler yakalandı!", "Kazanı Geliştir", "Tarif Kitabı", "Fare Yakala", "Dart Oyna", "Devam Et", "Kaydet", "Barn'daki Fareler: ",
             "Çok Düşük", "Düşük", "Orta", "Yüksek", "Çok Yüksek", "Ultra",
-            "Emin misiniz?", "Evet", "Hayır", "Yükle", "Kedi Menüsü", "Altın: ", "Kristaller: ", "Kedi Seviyesi: ", "İksirler: "
+            "Emin misiniz?", "Evet", "Hayır", "Yükle", "Kedi Menüsü", "Altın: ", "Kristaller: ", "Kedi Seviyesi: ", "İksirler: ", "Ayarlar"
         }
     };
 
@@ -144,6 +144,16 @@ public class Translator : MonoBehaviour
         text.UIText.wordSpacing = 0f;
         text.UIText.lineSpacing = 0f;
         text.UIText.textWrappingMode = TextWrappingModes.NoWrap;
+
+        // Если включена опция boldForRussian и активный язык русский, делаем текст жирным (Bold)
+        if (text.boldForRussian && _languageID == 0)
+        {
+            text.UIText.fontStyle = FontStyles.Bold;
+        }
+        else
+        {
+            text.UIText.fontStyle = FontStyles.Normal;
+        }
 
         if (Instance == null) return;
 

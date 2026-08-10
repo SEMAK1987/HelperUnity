@@ -18,6 +18,9 @@ public class Transtable_Dropdown : MonoBehaviour
 
     public DropdownOptionTranslation translations;
 
+    [Tooltip("Принудительно делать текст жирным (Bold) для русского языка")]
+    public bool boldForRussian = true;
+
     private TMP_Dropdown dropdown;
     private TMP_FontAsset originalCaptionFont;
     private TMP_FontAsset originalItemFont;
@@ -68,11 +71,17 @@ public class Transtable_Dropdown : MonoBehaviour
                 if (originalItemFont == null && dropdown.itemText != null) originalItemFont = dropdown.itemText.font;
 
                 int lang = Translator.LanguageID;
-                TMP_FontAsset font = originalCaptionFont != null ? originalCaptionFont : Translator.Instance.defaultFont;
-                TMP_FontAsset itemFont = originalItemFont != null ? originalItemFont : Translator.Instance.defaultFont;
-                float charSpacing = 0f;
+                TMP_FontAsset font = Translator.Instance.defaultFont;
+                TMP_FontAsset itemFont = Translator.Instance.defaultFont;
 
-                if (lang == 7) 
+                // Для сохранения оригинальных шрифтов, если это русский или английский и оригинальные шрифты заданы.
+                // Для турецкого (2), корейского (7), китайского (8/6) принудительно используем шрифты с полной поддержкой символов.
+                if (lang == 0 || lang == 1)
+                {
+                    if (originalCaptionFont != null) font = originalCaptionFont;
+                    if (originalItemFont != null) itemFont = originalItemFont;
+                }
+                else if (lang == 7) 
                 {
                     font = Translator.Instance.koreanFont;
                     itemFont = Translator.Instance.koreanFont;
@@ -82,7 +91,11 @@ public class Transtable_Dropdown : MonoBehaviour
                     font = Translator.Instance.chineseFont;
                     itemFont = Translator.Instance.chineseFont;
                 }
+                float charSpacing = 0f;
                 charSpacing = 0f; // Сбрасываем межбуквенный интервал, чтобы русский и турецкий помещались идеально
+
+                // Если включена опция boldForRussian и активный язык русский, делаем текст жирным (Bold)
+                FontStyles style = (boldForRussian && lang == 0) ? FontStyles.Bold : FontStyles.Normal;
 
                 if (dropdown.captionText != null)
                 {
@@ -90,6 +103,9 @@ public class Transtable_Dropdown : MonoBehaviour
                     dropdown.captionText.characterSpacing = charSpacing;
                     dropdown.captionText.wordSpacing = 0;
                     dropdown.captionText.alignment = TextAlignmentOptions.Center;
+                    dropdown.captionText.fontStyle = style;
+                    dropdown.captionText.textWrappingMode = TextWrappingModes.NoWrap;
+                    dropdown.captionText.overflowMode = TextOverflowModes.Overflow;
                 }
 
                 if (dropdown.itemText != null)
@@ -98,6 +114,9 @@ public class Transtable_Dropdown : MonoBehaviour
                     dropdown.itemText.characterSpacing = charSpacing;
                     dropdown.itemText.wordSpacing = 0;
                     dropdown.itemText.alignment = TextAlignmentOptions.Center;
+                    dropdown.itemText.fontStyle = style;
+                    dropdown.itemText.textWrappingMode = TextWrappingModes.NoWrap;
+                    dropdown.itemText.overflowMode = TextOverflowModes.Overflow;
                 }
 
                 // Применяем перевод по ID или используем автоопределение

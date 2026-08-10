@@ -11,6 +11,9 @@ public class Transtable_Text : MonoBehaviour
     [Tooltip("ID текстовой строки в базе переводчика Translator (например, 0 - Старт, 1 - Продолжить...)")]
     public int TextID;
 
+    [Tooltip("Принудительно делать текст жирным (Bold) для русского языка")]
+    public bool boldForRussian = false;
+
     [HideInInspector]
     public TextMeshProUGUI UIText;
     
