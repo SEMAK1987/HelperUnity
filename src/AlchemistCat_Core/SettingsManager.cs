@@ -1,3 +1,4 @@
+#pragma warning disable 0618
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Audio;
@@ -120,12 +121,184 @@ public class SettingsManager : MonoBehaviour
 
     public void BindUIElements()
     {
+        // 1. Сверхнадежный динамический автопоиск элементов по названию, опциям и поведению
+        if (soundSlider == null)
+        {
+            foreach (var s in FindObjectsOfType<UnityEngine.UI.Slider>(true))
+            {
+                if (s == null) continue;
+                string sName = s.gameObject.name.ToLower();
+                if (sName.Contains("sound") || sName.Contains("sfx") || sName.Contains("звук"))
+                {
+                    soundSlider = s;
+                    break;
+                }
+            }
+        }
+        if (musicSlider == null)
+        {
+            foreach (var s in FindObjectsOfType<UnityEngine.UI.Slider>(true))
+            {
+                if (s == null) continue;
+                string sName = s.gameObject.name.ToLower();
+                if (sName.Contains("music") || sName.Contains("муз"))
+                {
+                    musicSlider = s;
+                    break;
+                }
+            }
+        }
+
+        // Нам нужна 100% защита от случайной перепутанной привязки в Инспекторе Unity!
+        // Рассчитаем баллы (scores) соответствия для всех выпадающих списков на сцене
+        TMP_Dropdown[] allDropdowns = FindObjectsOfType<TMP_Dropdown>(true);
+        Dictionary<TMP_Dropdown, int> langScores = new Dictionary<TMP_Dropdown, int>();
+        Dictionary<TMP_Dropdown, int> qualScores = new Dictionary<TMP_Dropdown, int>();
+        Dictionary<TMP_Dropdown, int> resScores = new Dictionary<TMP_Dropdown, int>();
+
+        foreach (var dd in allDropdowns)
+        {
+            if (dd == null) continue;
+            string ddName = dd.gameObject.name.ToLower();
+            int langScore = 0;
+            int qualScore = 0;
+            int resScore = 0;
+
+            // 1. Проверяем имя объекта в иерархии
+            if (ddName.Contains("lang") || ddName.Contains("язык") || ddName.Contains("dil") || ddName.Contains("loc")) langScore += 15;
+            if (ddName.Contains("qual") || ddName.Contains("качество") || ddName.Contains("graf") || ddName.Contains("shading") || ddName.Contains("shadow")) qualScore += 15;
+            if (ddName.Contains("resol") || ddName.Contains("разреш") || ddName.Contains("ekran") || ddName.Contains("screen")) resScore += 15;
+
+            // 2. Проверяем содержимое опций
+            foreach (var opt in dd.options)
+            {
+                if (opt == null || string.IsNullOrEmpty(opt.text)) continue;
+                string t = opt.text.ToLower();
+
+                // Языковые ключевые слова
+                if (t.Contains("русск") || t.Contains("english") || t.Contains("türkçe") || t.Contains("turkish") || t.Contains("dil") || t.Contains("lang"))
+                {
+                    langScore += 10;
+                }
+                // Графические ключевые слова
+                if (t.Contains("ультра") || t.Contains("ultra") || t.Contains("низко") || t.Contains("low") || t.Contains("качество") || t.Contains("quality") || t.Contains("high") || t.Contains("medium") || t.Contains("средн") || t.Contains("высок"))
+                {
+                    qualScore += 10;
+                }
+                // Разрешение экрана
+                if (t.Contains("x") && (t.Contains("1080") || t.Contains("720") || t.Contains("768") || t.Contains("1440") || t.Contains("2160") || t.Contains("4k")))
+                {
+                    resScore += 10;
+                }
+            }
+
+            langScores[dd] = langScore;
+            qualScores[dd] = qualScore;
+            resScores[dd] = resScore;
+        }
+
+        // 3. Если ссылки в инспекторе перепутаны местами, мы их меняем на основе баллов
+        if (qualityDropdown != null && languageDropdown != null)
+        {
+            int qLangScore = langScores.ContainsKey(qualityDropdown) ? langScores[qualityDropdown] : 0;
+            int qQualScore = qualScores.ContainsKey(qualityDropdown) ? qualScores[qualityDropdown] : 0;
+            int lLangScore = langScores.ContainsKey(languageDropdown) ? langScores[languageDropdown] : 0;
+            int lQualScore = qualScores.ContainsKey(languageDropdown) ? qualScores[languageDropdown] : 0;
+
+            if (qLangScore > qQualScore && lQualScore > lLangScore)
+            {
+                TMP_Dropdown temp = qualityDropdown;
+                qualityDropdown = languageDropdown;
+                languageDropdown = temp;
+                Debug.LogWarning("[ALCHEMIST SETTINGS] Ссылки qualityDropdown и languageDropdown были явно перепутаны в Инспекторе! Мы успешно поменяли их местами.");
+            }
+        }
+
+        // 4. Автоматическое заполнение пустых (null) ссылок на основе наивысших баллов
+        if (languageDropdown == null)
+        {
+            TMP_Dropdown bestLang = null;
+            int maxScore = 0;
+            foreach (var dd in allDropdowns)
+            {
+                if (dd == null) continue;
+                int score = langScores.ContainsKey(dd) ? langScores[dd] : 0;
+                if (score > maxScore && dd != qualityDropdown && dd != resolutionDropdown)
+                {
+                    maxScore = score;
+                    bestLang = dd;
+                }
+            }
+            if (bestLang != null && maxScore >= 10)
+            {
+                languageDropdown = bestLang;
+                Debug.Log($"[ALCHEMIST SETTINGS] Автоопределен languageDropdown: {languageDropdown.gameObject.name} (Score: {maxScore})");
+            }
+        }
+
+        if (qualityDropdown == null)
+        {
+            TMP_Dropdown bestQual = null;
+            int maxScore = 0;
+            foreach (var dd in allDropdowns)
+            {
+                if (dd == null) continue;
+                int score = qualScores.ContainsKey(dd) ? qualScores[dd] : 0;
+                if (score > maxScore && dd != languageDropdown && dd != resolutionDropdown)
+                {
+                    maxScore = score;
+                    bestQual = dd;
+                }
+            }
+            if (bestQual != null && maxScore >= 10)
+            {
+                qualityDropdown = bestQual;
+                Debug.Log($"[ALCHEMIST SETTINGS] Автоопределен qualityDropdown: {qualityDropdown.gameObject.name} (Score: {maxScore})");
+            }
+        }
+
+        if (resolutionDropdown == null)
+        {
+            TMP_Dropdown bestRes = null;
+            int maxScore = 0;
+            foreach (var dd in allDropdowns)
+            {
+                if (dd == null) continue;
+                int score = resScores.ContainsKey(dd) ? resScores[dd] : 0;
+                if (score > maxScore && dd != languageDropdown && dd != qualityDropdown)
+                {
+                    maxScore = score;
+                    bestRes = dd;
+                }
+            }
+            if (bestRes != null && maxScore >= 10)
+            {
+                resolutionDropdown = bestRes;
+                Debug.Log($"[ALCHEMIST SETTINGS] Автоопределен resolutionDropdown: {resolutionDropdown.gameObject.name} (Score: {maxScore})");
+            }
+        }
+
+        if (fullscreenToggle == null)
+        {
+            foreach (UnityEngine.UI.Toggle t in FindObjectsOfType<UnityEngine.UI.Toggle>(true))
+            {
+                if (t == null) continue;
+                string tName = t.gameObject.name.ToLower();
+                if (tName.Contains("full") || tName.Contains("экран"))
+                {
+                    fullscreenToggle = t;
+                    break;
+                }
+            }
+        }
+
         isUpdatingSettings = true;
         try
         {
             if (soundSlider != null)
             {
                 soundSlider.value = PlayerPrefs.GetFloat("Vol_SFX", 0.75f);
+                ClearPersistentListeners(soundSlider.onValueChanged);
                 soundSlider.onValueChanged.RemoveAllListeners();
                 soundSlider.onValueChanged.AddListener(SetSFXVolume);
             }
@@ -133,15 +306,13 @@ public class SettingsManager : MonoBehaviour
             if (musicSlider != null)
             {
                 musicSlider.value = PlayerPrefs.GetFloat("Vol_Music", 0.5f);
+                ClearPersistentListeners(musicSlider.onValueChanged);
                 musicSlider.onValueChanged.RemoveAllListeners();
                 musicSlider.onValueChanged.AddListener(SetMusicVolume);
             }
 
             if (qualityDropdown != null)
             {
-                // Сбрасываем автоматическую калибровку верстки для качества! (Убираем AutoCalibrateDropdown)
-                // Это оставляет оригинальные настройки шаблона (Template, Content, Viewport) из Инспектора нетронутыми.
-
                 // Настраиваем только перевод текстов через Transtable_Dropdown (это безопасно, не ломает верстку)
                 Transtable_Dropdown transDD = qualityDropdown.GetComponent<Transtable_Dropdown>();
                 if (transDD == null)
@@ -153,6 +324,7 @@ public class SettingsManager : MonoBehaviour
                 transDD.translations.optionTextIDs = new int[] { 37, 38, 39, 40, 41, 42 };
 
                 qualityDropdown.value = PlayerPrefs.GetInt("QualitySetting", 2);
+                ClearPersistentListeners(qualityDropdown.onValueChanged);
                 qualityDropdown.onValueChanged.RemoveAllListeners();
                 qualityDropdown.onValueChanged.AddListener(SetQuality);
                 
@@ -163,6 +335,7 @@ public class SettingsManager : MonoBehaviour
             if (fullscreenToggle != null)
             {
                 fullscreenToggle.isOn = PlayerPrefs.GetInt("FullscreenMode", Screen.fullScreen ? 1 : 0) == 1;
+                ClearPersistentListeners(fullscreenToggle.onValueChanged);
                 fullscreenToggle.onValueChanged.RemoveAllListeners();
                 fullscreenToggle.onValueChanged.AddListener(SetFullscreen);
             }
@@ -184,6 +357,7 @@ public class SettingsManager : MonoBehaviour
                 AutoCalibrateDropdown(languageDropdown, 55f, 200f, 22f);
 
                 languageDropdown.value = PlayerPrefs.GetInt("Alchemist_Language", 0);
+                ClearPersistentListeners(languageDropdown.onValueChanged);
                 languageDropdown.onValueChanged.RemoveAllListeners();
                 languageDropdown.onValueChanged.AddListener(SetLanguage);
                 languageDropdown.RefreshShownValue();
@@ -261,35 +435,13 @@ public class SettingsManager : MonoBehaviour
     {
         if (isUpdatingSettings) return;
 
-        // Полная проверка: вызов разрешен только при непосредственном ручном выборе пользователем в qualityDropdown
-        if (UnityEngine.EventSystems.EventSystem.current != null)
-        {
-            GameObject selected = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
-            if (selected != null)
-            {
-                bool isQualityActive = (qualityDropdown != null && (selected == qualityDropdown.gameObject || selected.transform.IsChildOf(qualityDropdown.transform)));
-                if (!isQualityActive)
-                {
-                    Debug.LogWarning($"[ALCHEMIST SETTINGS] SetQuality проигнорирован: активен выбранный объект {selected.name}, а не qualityDropdown");
-                    return;
-                }
-            }
-        }
-
-        // Жесткая защита от перекрестного срабатывания событий в Unity:
-        // Если вызов пришел не от qualityDropdown, игнорируем его!
-        if (qualityDropdown != null && qualityDropdown.value != index)
-        {
-            Debug.LogWarning($"[ALCHEMIST SETTINGS] SetQuality проигнорирован: пришел индекс {index}, но в качестве выбрано {qualityDropdown.value}");
-            return;
-        }
-
         isUpdatingSettings = true;
         try
         {
             QualitySettings.SetQualityLevel(index);
             PlayerPrefs.SetInt("QualitySetting", index);
             ApplyQualitySafeguards(index);
+            Debug.Log($"[ALCHEMIST SETTINGS] Успешно установлено качество графики: {index}");
         }
         finally
         {
@@ -365,33 +517,11 @@ public class SettingsManager : MonoBehaviour
     {
         if (isUpdatingSettings) return;
 
-        // Полная проверка: вызов разрешен только при непосредственном ручном выборе пользователем в languageDropdown
-        if (UnityEngine.EventSystems.EventSystem.current != null)
-        {
-            GameObject selected = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
-            if (selected != null)
-            {
-                bool isLanguageActive = (languageDropdown != null && (selected == languageDropdown.gameObject || selected.transform.IsChildOf(languageDropdown.transform)));
-                if (!isLanguageActive)
-                {
-                    Debug.LogWarning($"[ALCHEMIST SETTINGS] SetLanguage проигнорирован: активен выбранный объект {selected.name}, а не languageDropdown");
-                    return;
-                }
-            }
-        }
-
-        // Жесткая защита от перекрестного срабатывания событий в Unity:
-        // Если вызов пришел не от languageDropdown, игнорируем его!
-        if (languageDropdown != null && languageDropdown.value != index)
-        {
-            Debug.LogWarning($"[ALCHEMIST SETTINGS] SetLanguage проигнорирован: пришел индекс {index}, но в языке выбрано {languageDropdown.value}");
-            return;
-        }
-
         isUpdatingSettings = true;
         try
         {
             Translator.SelectLanguage(index);
+            Debug.Log($"[ALCHEMIST SETTINGS] Успешно установлен язык: {index} (0=RU, 1=EN, 2=TR)");
         }
         finally
         {
@@ -618,6 +748,16 @@ public class SettingsManager : MonoBehaviour
         {
             musicSource.clip = track;
             musicSource.Play();
+        }
+    }
+
+    private void ClearPersistentListeners(UnityEngine.Events.UnityEventBase unityEvent)
+    {
+        if (unityEvent == null) return;
+        int count = unityEvent.GetPersistentEventCount();
+        for (int i = 0; i < count; i++)
+        {
+            unityEvent.SetPersistentListenerState(i, UnityEngine.Events.UnityEventCallState.Off);
         }
     }
 }

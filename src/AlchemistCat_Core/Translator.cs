@@ -143,6 +143,7 @@ public class Translator : MonoBehaviour
         text.UIText.characterSpacing = 0f;
         text.UIText.wordSpacing = 0f;
         text.UIText.lineSpacing = 0f;
+        text.UIText.textWrappingMode = TextWrappingModes.NoWrap;
 
         if (Instance == null) return;
 
@@ -161,14 +162,7 @@ public class Translator : MonoBehaviour
 
             if (_languageID == 0)
             {
-                if (text.GetComponentInParent<TMP_Dropdown>() != null)
-                {
-                    text.UIText.characterSpacing = 0f;
-                }
-                else
-                {
-                    text.UIText.characterSpacing = Instance.russianCharacterSpacing;
-                }
+                text.UIText.characterSpacing = 0f;
             }
         }
     }

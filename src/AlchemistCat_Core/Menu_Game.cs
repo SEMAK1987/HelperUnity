@@ -302,13 +302,7 @@ public class Menu_Game : MonoBehaviour
         if (settingsBackButton != null)
         {
             settingsBackButton.onClick.RemoveAllListeners();
-            settingsBackButton.onClick.AddListener(() => {
-                ShowPanel(mainMenuPanel);
-                if (SettingsManager.Instance != null)
-                {
-                    SettingsManager.Instance.PlayClickSound();
-                }
-            });
+            settingsBackButton.onClick.AddListener(OnBackPressed);
             SetAlphaHitThreshold(settingsBackButton, 0.5f);
         }
 
@@ -367,7 +361,7 @@ public class Menu_Game : MonoBehaviour
         if (settingsPanel != null) settingsPanel.SetActive(panel == settingsPanel);
     }
 
-    private void OnStartPressed()
+    public void OnStartPressed()
     {
         // Автоматическая загрузка или старт новой игры в единственный слот 0
         if (PlayerPrefs.HasKey("Alchemist_Slot_Used_0"))
@@ -387,7 +381,7 @@ public class Menu_Game : MonoBehaviour
         SceneManager.LoadScene(1);
     }
 
-    private void OnSettingsPressed()
+    public void OnSettingsPressed()
     {
         ShowPanel(settingsPanel);
         if (SettingsManager.Instance != null)
@@ -396,7 +390,16 @@ public class Menu_Game : MonoBehaviour
         }
     }
 
-    private void OnExitPressed()
+    public void OnBackPressed()
+    {
+        ShowPanel(mainMenuPanel);
+        if (SettingsManager.Instance != null)
+        {
+            SettingsManager.Instance.PlayClickSound();
+        }
+    }
+
+    public void OnExitPressed()
     {
         Debug.Log("[ALCHEMIST MENU] Выход из игры...");
         Application.Quit();
