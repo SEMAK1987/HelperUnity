@@ -1,17 +1,17 @@
 # PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Total Knowledge Archive Edition)
 
-> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.12.11.
+> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.12.12.
 
 ## 1. Общая информация
-- **Версия Помощника:** 18.12.11
-- **Описание:** Гибридный ИИ-помощник нового поколения (v18.12.11 - Alchemist Cat UI & Localization Calibration) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Интеграция адаптивного переключения ввода, калибровка зум-параметров при высадке, позиционирование маркеров по Z=-2.0f, сохранение прогресса и моделирования отрядов.
+- **Версия Помощника:** 18.12.12
+- **Описание:** Гибридный ИИ-помощник нового поколения (v18.12.12 - Alchemist Cat Audio Slider Swap & Manual Inspector Alignment Hotfix) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Интеграция адаптивного переключения ввода, калибровка зум-параметров при высадке, позиционирование маркеров по Z=-2.0f, сохранение прогресса и моделирования отрядов.
 - **Путь проекта:** Не задан
 - **Локальное хранилище:** Не задано
 - **Версия Unity:** unknown
 - **Версия Blender:** unknown
 - **Версия GIMP:** unknown
 - **Версия Redot:** unknown
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_12_11_FATE_MASTER]
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_12_12_FATE_MASTER]
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -46,13 +46,13 @@ You are Zenith Quantum Divine Assistant, guiding the Fate Continent world develo
 ```
 
 
-## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.12.10 - Advanced Dropdown Calibration & Text Wrapping Fixes)
+## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.12.12 - Alchemist Cat Audio Slider Swap & Manual Inspector Alignment Hotfix)
 ### Режимы работы и Архитектурные уровни
 - **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.
 - **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.
 - **No-Internet Mode (Quantum Archive):** 10,000+ видео-уроков. Мгновенный доступ при любых внешних условиях.
 
-### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.12.10 Sync)
+### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.12.12 Sync)
 - **Unity 6 Physics & Optimization:** [Video #2](https://www.youtube.com/watch?v=9vuyis_Y-LY)
 - **Blender Advanced Rigging:** [Video #3](https://www.youtube.com/watch?v=UKZp67dY1_w)
 - **Shader Graph Mastery:** [Video #4](https://www.youtube.com/watch?v=-hvxjyzcSkI)
@@ -293,7 +293,8 @@ Freesound содержит миллионы звуков от инди-разр�
 - **Local Knowledge:** Использование knowledge_base.json и project_stats.json для контекста без облака.
 - **Media Handling:** Локальная обработка файлов через Multer и FS-Extra.
 
-## 13. История изменений (v18.12.10)
+## 13. История изменений (v18.12.11)
+- **v18.12.11:** Alchemist Cat UI & Localization Calibration • Standardized language dropdowns, auto-detection score logic, word wrapping disable in Translator, public UI callbacks for OnClick Inspector integration, and horizontal layout row alignment.
 - **v18.12.10:** Advanced Dropdown Calibration & Text Wrapping Fixes • Standardized dropdown text wrapping to TextWrappingModes.NoWrap, suppressing obsolete warning CS0618 inside SettingsManager.cs. Fixed pivot offsets and item height scaling to prevent layout clipping and text overlapping in high-density Russian and Turkish language dropdowns. Verified dynamic item layout, spacing, and center alignment for all drop menus.
 - **v18.12.09:** Alchemist Cat Loading Screen & Kitten Silhouette Integration • Integrated step-by-step visual configuration instructions for the Loading_Panel interface in the Unity 6 main menu. Documented the precise procedures to configure the dark purple menu theme background and align the glowing Alchemist Cat silhouette watermark sprite centrally with optimal aspect ratio clamping.
 - **v18.12.08:** 3D Models & Blender Integration Workflow Sync • Paused Ollama setup to prioritize robust 3D models development, mesh workflows, and Mixamo animation configurations in Unity.
