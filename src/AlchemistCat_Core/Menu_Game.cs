@@ -179,18 +179,30 @@ public class Menu_Game : MonoBehaviour
         if (backgroundLayer != null)
         {
             Vector2 mousePos = Vector2.zero;
-#if ENABLE_INPUT_SYSTEM
-            if (Mouse.current != null)
+            bool gotMouse = false;
+#if ENABLE_INPUT_SYSTEM || UNITY_INPUT_SYSTEM
+            try
             {
-                mousePos = Mouse.current.position.ReadValue();
+                if (Mouse.current != null)
+                {
+                    mousePos = Mouse.current.position.ReadValue();
+                    gotMouse = true;
+                }
             }
-            else
-            {
-                mousePos = Input.mousePosition;
-            }
-#else
-            mousePos = Input.mousePosition;
+            catch {}
 #endif
+            if (!gotMouse)
+            {
+                try
+                {
+                    mousePos = Input.mousePosition;
+                }
+                catch (System.InvalidOperationException)
+                {
+                    // Игнорируем ошибку, если Input Manager полностью отключен в Player Settings
+                    mousePos = new Vector2(Screen.width / 2f, Screen.height / 2f);
+                }
+            }
 
             float normX = (mousePos.x / Screen.width) - 0.5f;
             float normY = (mousePos.y / Screen.height) - 0.5f;
@@ -396,9 +408,23 @@ public class Menu_Game : MonoBehaviour
         }
     }
 
+    private bool isStartingGame = false;
+
     public void OnStartPressed()
     {
+        if (isStartingGame)
+        {
+            return;
+        }
+        isStartingGame = true;
+
         Debug.Log("<color=#FFFF00>[FATE DIAGNOSTIC]</color> НАЖАТА КНОПКА СТАРТ (OnStartPressed) в Menu_Game!");
+
+        // Деактивируем кнопку, чтобы избежать повторных нажатий
+        if (startButton != null)
+        {
+            startButton.interactable = false;
+        }
         
         // Автоматическая загрузка или старт новой игры в единственный слот 0
         if (PlayerPrefs.HasKey("Alchemist_Slot_Used_0"))

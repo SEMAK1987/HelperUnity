@@ -38,11 +38,19 @@ public class LoadingScreenManager : MonoBehaviour
         if (loadingPanel != null) loadingPanel.SetActive(false);
     }
 
+    private bool isLoading = false;
+
     /// <summary>
     /// Асинхронный запуск загрузки любой сцены по индексу.
     /// </summary>
     public void LoadScene(int sceneBuildIndex)
     {
+        if (isLoading)
+        {
+            Debug.LogWarning($"[FATE DIAGNOSTIC] Загрузка уже активна! Блокируем дублирующий вызов LoadScene(индекс: {sceneBuildIndex})");
+            return;
+        }
+        isLoading = true;
         Debug.Log($"<color=#00FFCC>[FATE DIAGNOSTIC]</color> Вызван публичный метод LoadScene(индекс: {sceneBuildIndex}). Запускаем корутину.");
         StartCoroutine(LoadAsynchronously(sceneBuildIndex));
     }
@@ -52,6 +60,12 @@ public class LoadingScreenManager : MonoBehaviour
     /// </summary>
     public void LoadScene(string sceneName)
     {
+        if (isLoading)
+        {
+            Debug.LogWarning($"[FATE DIAGNOSTIC] Загрузка уже активна! Блокируем дублирующий вызов LoadScene(имя: '{sceneName}')");
+            return;
+        }
+        isLoading = true;
         Debug.Log($"<color=#00FFCC>[FATE DIAGNOSTIC]</color> Вызван публичный метод LoadScene(имя: '{sceneName}'). Запускаем корутину.");
         StartCoroutine(LoadAsynchronouslyByName(sceneName));
     }
@@ -106,6 +120,7 @@ public class LoadingScreenManager : MonoBehaviour
         {
             Debug.LogError($"[FATE DIAGNOSTIC] КРИТИЧЕСКАЯ ОШИБКА: AsyncOperation равен NULL! Проверьте, добавлена ли сцена '{sceneName}' в Build Settings (меню File -> Build Settings).");
             if (loadingPanel != null) loadingPanel.SetActive(false);
+            isLoading = false;
             yield break;
         }
 
@@ -152,8 +167,9 @@ public class LoadingScreenManager : MonoBehaviour
             yield return null;
         }
 
-        Debug.Log("[FATE DIAGNOSTIC] Выход из цикла корутины LoadAsynchronously. Загрузка завершена.");
+        Debug.Log("[FATE DIAGNOSTIC] Выход из цикла корутины LoadAsynchronouslyByName. Загрузка завершена.");
         if (loadingPanel != null) loadingPanel.SetActive(false);
+        isLoading = false;
     }
 
     private IEnumerator LoadAsynchronously(int sceneBuildIndex)
@@ -206,6 +222,7 @@ public class LoadingScreenManager : MonoBehaviour
         {
             Debug.LogError($"[FATE DIAGNOSTIC] КРИТИЧЕСКАЯ ОШИБКА: AsyncOperation равен NULL! Проверьте, добавлена ли сцена с индексом {sceneBuildIndex} в Build Settings (меню File -> Build Settings).");
             if (loadingPanel != null) loadingPanel.SetActive(false);
+            isLoading = false;
             yield break;
         }
 
@@ -252,8 +269,9 @@ public class LoadingScreenManager : MonoBehaviour
             yield return null;
         }
 
-        Debug.Log("[FATE DIAGNOSTIC] Выход из цикла корутины LoadAsynchronously. Загрузка завершена.");
+        Debug.Log("[FATE DIAGNOSTIC] Выход из цикла корутины LoadAsynchronouslyByIndex. Загрузка завершена.");
         if (loadingPanel != null) loadingPanel.SetActive(false);
+        isLoading = false;
     }
 
     private string GetRandomCatQuote()
