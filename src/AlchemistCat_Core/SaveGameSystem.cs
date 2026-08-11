@@ -117,7 +117,17 @@ public static class SaveGameSystem
 
             if (loadScene)
             {
-                SceneManager.LoadScene(CurrentData.currentSceneIndex);
+                Debug.Log($"[FATE DIAGNOSTIC] Запрошена загрузка сцены {CurrentData.currentSceneIndex} из SaveGameSystem...");
+                if (LoadingScreenManager.Instance != null)
+                {
+                    Debug.Log($"[FATE DIAGNOSTIC] Загружаем сцену {CurrentData.currentSceneIndex} через LoadingScreenManager.Instance...");
+                    LoadingScreenManager.Instance.LoadScene(CurrentData.currentSceneIndex);
+                }
+                else
+                {
+                    Debug.LogWarning($"[FATE DIAGNOSTIC] LoadingScreenManager.Instance не найден! Загружаем сцену {CurrentData.currentSceneIndex} напрямую.");
+                    SceneManager.LoadScene(CurrentData.currentSceneIndex);
+                }
             }
             return true;
         }

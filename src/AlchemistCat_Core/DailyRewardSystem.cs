@@ -28,14 +28,76 @@ public class DailyRewardSystem : MonoBehaviour
 
     private void ValidateInspectorReferences()
     {
+        // Попытка авто-поиска кнопок и текстов в дочерних объектах, если они не заданы в Инспекторе
         if (claimButton == null)
-            Debug.LogWarning("[DailyRewardSystem] ОШИБКА: Кнопка 'Claim Button' не назначена в Инспекторе! Перетащите объект кнопки.");
+        {
+            claimButton = GetComponentInChildren<Button>(true);
+            if (claimButton == null)
+            {
+                Button[] buttons = GetComponentsInChildren<Button>(true);
+                foreach (var b in buttons)
+                {
+                    if (b.name.ToLower().Contains("claim") || b.name.ToLower().Contains("reward") || b.name.ToLower().Contains("button"))
+                    {
+                        claimButton = b;
+                        break;
+                    }
+                }
+            }
+        }
+
         if (timerText == null)
-            Debug.LogWarning("[DailyRewardSystem] ОШИБКА: Текстовое поле 'Timer Text' не назначено в Инспекторе!");
+        {
+            Text[] texts = GetComponentsInChildren<Text>(true);
+            foreach (var t in texts)
+            {
+                if (t.name.ToLower().Contains("timer") || t.name.ToLower().Contains("time"))
+                {
+                    timerText = t;
+                    break;
+                }
+            }
+        }
+
         if (statusText == null)
-            Debug.LogWarning("[DailyRewardSystem] ПРЕДУПРЕЖДЕНИЕ: Текстовое поле 'Status Text' не назначено.");
+        {
+            Text[] texts = GetComponentsInChildren<Text>(true);
+            foreach (var t in texts)
+            {
+                if (t.name.ToLower().Contains("status") || t.name.ToLower().Contains("info") || t.name.ToLower().Contains("log"))
+                {
+                    statusText = t;
+                    break;
+                }
+            }
+        }
+
         if (calendarDaySlots == null || calendarDaySlots.Length == 0)
-            Debug.LogWarning("[DailyRewardSystem] ПРЕДУПРЕЖДЕНИЕ: Массив слотов 'Calendar Day Slots' пуст! Назначьте 7 дочерних дней.");
+        {
+            // Пытаемся найти дочерние объекты, представляющие собой дни календаря
+            System.Collections.Generic.List<Transform> foundSlots = new System.Collections.Generic.List<Transform>();
+            foreach (Transform child in transform)
+            {
+                if (child.name.ToLower().Contains("day") || child.name.ToLower().Contains("slot") || child.name.ToLower().Contains("calendar"))
+                {
+                    foundSlots.Add(child);
+                }
+            }
+            if (foundSlots.Count > 0)
+            {
+                calendarDaySlots = foundSlots.ToArray();
+            }
+        }
+
+        // Выводим только мягкие информативные предупреждения, чтобы не засорять консоль красными ошибками
+        if (claimButton == null)
+            Debug.Log("[DailyRewardSystem] Мягкое уведомление: Кнопка 'Claim Button' не назначена. Система наград будет работать в фоновом режиме.");
+        if (timerText == null)
+            Debug.Log("[DailyRewardSystem] Мягкое уведомление: Текстовое поле 'Timer Text' отсутствует. Отсчет времени будет скрыт.");
+        if (statusText == null)
+            Debug.Log("[DailyRewardSystem] Мягкое уведомление: Текстовое поле 'Status Text' не назначено.");
+        if (calendarDaySlots == null || calendarDaySlots.Length == 0)
+            Debug.Log("[DailyRewardSystem] Мягкое уведомление: Массив слотов дней 'Calendar Day Slots' пуст.");
     }
 
     private void CheckDailyStatus()

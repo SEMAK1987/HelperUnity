@@ -398,13 +398,17 @@ public class Menu_Game : MonoBehaviour
 
     public void OnStartPressed()
     {
+        Debug.Log("<color=#FFFF00>[FATE DIAGNOSTIC]</color> НАЖАТА КНОПКА СТАРТ (OnStartPressed) в Menu_Game!");
+        
         // Автоматическая загрузка или старт новой игры в единственный слот 0
         if (PlayerPrefs.HasKey("Alchemist_Slot_Used_0"))
         {
-            SaveGameSystem.Load(0);
+            Debug.Log("[FATE DIAGNOSTIC] Найдено существующее сохранение в слоте 0. Загружаем данные без активации сцены...");
+            SaveGameSystem.Load(0, false);
         }
         else
         {
+            Debug.Log("[FATE DIAGNOSTIC] Сохранений нет. Инициализируем новую игру...");
             SaveGameSystem.DeleteSave(0);
             SaveGameSystem.CurrentData = new SaveGameSystem.SaveData();
             SaveGameSystem.CurrentData.saveName = Translator.GetText9(
@@ -412,8 +416,18 @@ public class Menu_Game : MonoBehaviour
             );
             SaveGameSystem.Save(0);
         }
-        // Запуск сцены лаборатории (Индекс 1)
-        SceneManager.LoadScene(1);
+
+        // Запуск сцены лаборатории (Индекс 1) с использованием нашего экрана загрузки
+        if (LoadingScreenManager.Instance != null)
+        {
+            Debug.Log("[FATE DIAGNOSTIC] Найден LoadingScreenManager.Instance! Запускаем сцену 1 асинхронно через него...");
+            LoadingScreenManager.Instance.LoadScene(1);
+        }
+        else
+        {
+            Debug.LogError("[FATE DIAGNOSTIC] ОШИБКА: LoadingScreenManager.Instance не найден! Загружаем сцену 1 НАПРЯМУЮ и мгновенно.");
+            SceneManager.LoadScene(1);
+        }
     }
 
     public void OnSettingsPressed()

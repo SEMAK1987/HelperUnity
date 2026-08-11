@@ -3,7 +3,7 @@
   "project_name": "Fate Continent",
   "project_path": "",
   "system_instruction": "You are Zenith Quantum Divine Assistant, guiding the Fate Continent world development and Unity/Blender workflows.",
-  "version": "18.12.12",
+  "version": "18.12.13",
   "modules": [
     {
       "name": "Localization & Fonts",
@@ -29,6 +29,7 @@
         "Zenith Safe Transition v18.7.6: Zero Editor/Canvas leak on Scene reload, separated the UI Panels and SettingsManager standalone lifecycle to guarantee there are no Canvas duplicates or overlaps upon loading scenes back-and-forth.",
         "Zenith Canvas Lifecycle Mastery v18.7.7: Resolves active UI panels duplicating or failing back-to-menu navigation states on reload through automatic reference recycling in Menu_Game.",
         "Alchemist Cat Audio Slider Swap & Manual Inspector Alignment Hotfix v18.12.12: Swapped localization keys/values for sound and music labels (upper slider is Sounds/SFX, lower slider is Music) to match visual layout of sliders without restructuring logic connections. Removed automatic AudioMixer routing to prevent 'Exposed name does not exist' console errors when specific parameters are not pre-exposed, routing strictly via clean direct AudioSource volume parameters.",
+        "Alchemist Cat Loading Panel Responsive Scaling & Kitten Progress Opacity v18.12.13: Configured responsive stretching for the Loading_Panel canvas to dynamically adapt to desktop and mobile aspect ratios. Programmed the kittenSilhouette image opacity to fade in proportionally as the progress bar increments from 0% to 100%.",
         "Zenith Universal Input Safety v18.7.8: Resolves runtime InvalidOperationException when calling UnityEngine.Input in projects with Active Input System set to New Input System. Incorporates automatic try-catch checks and reflection-based modern Input System fallbacks for Escape (GamePause_Manager.cs) and Space (PhaseCombatSystem.cs) keys.",
         "Zenith Self-Healing UI v18.7.9: Automatically heals and reassigns misconfigured TextMeshProUGUI references (e.g., Pause Title vs Confirm Exit Prompts) at scene load. Intelligently scans panel object sub-trees (PausePanel vs ConfirmPanel), deactivates extra stray warning texts inside active gameplay panels, and binds correct localized components.",
         "Zenith Audio Autonomy & Standalone Routing v18.8.0: Resolves disabled AudioSource exceptions during inside-game menu pause. Isolated UIButtonPauseHover audio execution by targeting stable active Scene hosts (such as GamePause_Manager or SettingsManager singletons) instead of button components themselves. Excludes pause scenes from UIButtonSfxBinder automatic scan to completely bypass auto-scanning/auto-binding, allowing clean custom bindings and preventing duplicate sound triggers.",

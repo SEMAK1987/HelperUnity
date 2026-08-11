@@ -1,9 +1,10 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.12.12)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.12.13)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** v18.12.12
+- **Version:** v18.12.13
 - **Engine:** Unity 6 (6000.3.10f1)
+- **v18.12.13 Update:** Loading Panel Responsive Scaling & Kitten Progress Opacity - Configured responsive stretching for the `Loading_Panel` canvas to dynamically adapt to desktop and mobile aspects. Programmed the `kittenSilhouette` image opacity to fade in proportionally as the progress bar increments from 0% to 100%.
 - **v18.12.12 Update:** Audio Slider Swap & Manual Inspector Alignment Hotfix - Swapped localization keys/values for sound and music labels (upper slider is Sounds/SFX, lower slider is Music) to match visual layout of sliders without restructuring logic connections. Removed automatic AudioMixer routing to prevent "Exposed name does not exist" console errors when specific parameters are not pre-exposed, routing strictly via clean direct AudioSource volume parameters.
 - **v18.12.11 Update:** Alchemist Cat Calibration & Dropdown Layout Alignment - Standardized language dropdowns, auto-detection score logic, word wrapping disable in Translator, public UI callbacks for OnClick Inspector integration, and horizontal layout row alignment.
 - **v18.12.10 Update:** Advanced Dropdown Calibration & Text Wrapping Fixes - Standardized dropdown text wrapping to `TextWrappingModes.NoWrap`, suppressed warning CS0618 inside `SettingsManager.cs` by migrating `enableWordWrapping` to modern `textWrappingMode` API. Fixed pivot offsets and item height scaling to prevent layout clipping and text overlapping in high-density Russian and Turkish language dropdowns. Verified dynamic item layout, spacing, and center alignment for all drop menus.
@@ -55,7 +56,7 @@
 - **Audio Rule (CRITICAL):** Используйте только `SettingsManager.cs` для управления звуком и музыкой (включая hover-эффекты и списки воспроизведения). Скрипты `AudioHandler` и `AudioManager` должны быть полностью удалены для чистоты проекта. Музыкальные клипы продлеваются через Suno/Udio и настраиваются на бесшовное зацикливание (`loop = true`). Звуковые файлы берем с Pixabay/Freesound по CC0-лицензии и подключаем напрямую к SettingsManager или через AudioMixer.
 
 ## 🚀 Протокол «Пошаговое Мастерство» (Step-by-Step Mastery)
-1. **Отслеживание прогресса:** Текущая версия v18.12.12 (Audio Slider Swap & Manual Inspector Alignment Hotfix).
+1. **Отслеживание прогресса:** Текущая версия v18.12.13 (Loading Panel Responsive Scaling & Kitten Progress Opacity).
 2. **Инструкции Настройки Компонентов (Verified Inspector Settings):**
    - **FateMapManager (FATE_WORLD_MAP):**
      - *Maps List:* [+] Слот для глобальной карты (Map Name = "Континент Судьбы", Map Background = фоновый спрайт карты).

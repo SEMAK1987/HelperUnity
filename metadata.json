@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Fate Continent: Alchemist Cat Edition (v18.12.11) - Optimized for Yandex Games PC & Mobile with full 9-language localization and adaptive UI.",
+  "description": "Fate Continent: Alchemist Cat Edition (v18.12.13) - Optimized for Yandex Games PC & Mobile with full 9-language localization and adaptive UI.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
