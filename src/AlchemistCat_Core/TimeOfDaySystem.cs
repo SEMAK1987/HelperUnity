@@ -10,6 +10,12 @@ public class TimeOfDaySystem : MonoBehaviour
     [Tooltip("UI картинка Луны/Полумесяца (будет перемещаться по дуге)")]
     public RectTransform moonObject;
 
+    [Header("Cozy Room Day/Night Blending")]
+    [Tooltip("Дневной фон комнаты алхимика (яркий день)")]
+    public Image dayRoomImage;
+    [Tooltip("Ночной фон комнаты алхимика (уютный свет свечей и камина)")]
+    public Image nightRoomImage;
+
     [Header("Time Settings")]
     [Tooltip("Длительность полных игровых суток в реальных секундах")]
     public float dayCycleLengthSeconds = 120f; 
@@ -56,6 +62,7 @@ public class TimeOfDaySystem : MonoBehaviour
 
         UpdateBackgroundSky(normalizedTime);
         UpdateCelestialPositions(normalizedTime);
+        UpdateRoomBlending(normalizedTime);
     }
 
     private void ValidateReferences()
@@ -172,6 +179,47 @@ public class TimeOfDaySystem : MonoBehaviour
                     }
                 }
             }
+        }
+    }
+
+    /// <summary>
+    /// Плавно смешивает дневной и ночной фоны комнаты алхимика в зависимости от времени суток.
+    /// </summary>
+    private void UpdateRoomBlending(float normalizedTime)
+    {
+        float nightBlend = 0f;
+
+        // Определяем коэффициент смешивания (0f - чистый день, 1f - чистая ночь)
+        if (normalizedTime < 0.25f) // Утро: переход от глубокой ночи к яркому дню
+        {
+            nightBlend = 1f - (normalizedTime / 0.25f);
+        }
+        else if (normalizedTime >= 0.25f && normalizedTime < 0.5f) // Полдень: стабильный яркий день
+        {
+            nightBlend = 0f;
+        }
+        else if (normalizedTime >= 0.5f && normalizedTime < 0.75f) // Вечер: переход от дня к ночи
+        {
+            nightBlend = (normalizedTime - 0.5f) / 0.25f;
+        }
+        else // Полночь: стабильная темная ночь с уютным свечением камина
+        {
+            nightBlend = 1f;
+        }
+
+        // Применяем прозрачность к слоям комнаты
+        if (dayRoomImage != null)
+        {
+            Color c = dayRoomImage.color;
+            c.a = 1f - nightBlend;
+            dayRoomImage.color = c;
+        }
+
+        if (nightRoomImage != null)
+        {
+            Color c = nightRoomImage.color;
+            c.a = nightBlend;
+            nightRoomImage.color = c;
         }
     }
 }
