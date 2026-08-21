@@ -3,7 +3,7 @@
   "project_name": "Fate Continent",
   "project_path": "",
   "system_instruction": "You are Zenith Quantum Divine Assistant, guiding the Fate Continent world development and Unity/Blender workflows.",
-  "version": "18.12.13",
+  "version": "18.12.15",
   "modules": [
     {
       "name": "Localization & Fonts",
@@ -64,7 +64,8 @@
         "Zenith Core Knowledge Base & YouTube Integration v18.12.07: Added high-fidelity video tutorials covering Mixamo-to-Unity workflow, character setup, and dynamic blend configs. Synchronized version metadata and documentation across entire repository.",
         "Zenith 3D Models & Blender Integration Workflow Sync v18.12.08: Paused local Ollama integration and pivoted fully to 3D models development. Updated and synchronized core knowledge, connectors, and master documentation for seamless asset pipelines.",
         "Zenith Alchemist Cat Loading Screen & Kitten Silhouette Integration v18.12.09: Integrated step-by-step visual configuration instructions for the Loading_Panel interface in the Unity 6 main menu. Documented the precise procedures to configure the dark purple menu theme background and align the glowing Alchemist Cat silhouette watermark sprite centrally with optimal aspect ratio clamping.",
-        "Zenith Advanced Dropdown Calibration & Text Wrapping Fixes v18.12.10: Re-engineered dynamic drop-down layouts to prevent word wrapping in Russian and Turkish languages, suppressed obsolete warning CS0618 in SettingsManager.cs by migrating enableWordWrapping to textWrappingMode, and fixed template pivot/offset misalignment to keep drop-downs perfectly visible."
+        "Zenith Advanced Dropdown Calibration & Text Wrapping Fixes v18.12.10: Re-engineered dynamic drop-down layouts to prevent word wrapping in Russian and Turkish languages, suppressed obsolete warning CS0618 in SettingsManager.cs by migrating enableWordWrapping to textWrappingMode, and fixed template pivot/offset misalignment to keep drop-downs perfectly visible.",
+        "Alchemist Cat Calendar Auto-Open & RectOffset Exception Prevention v18.12.16: Resolved 36 UnityException 'set_left can only be called from the main thread' errors by migrating MonthLayoutConfig from RectOffset field initializers to pure serializable integers (padLeft, padRight, padTop, padBottom). Enhanced DialogueSystem_Manager.OpenCalendarUI() to support direct inspector references, search inactive objects via FindObjectsInactive.Include, and automatically generate and activate the 12 seasonal months seamlessly upon opening."
       ]
     },
     {

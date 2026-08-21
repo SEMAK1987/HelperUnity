@@ -1,17 +1,17 @@
 # PROJECT MASTER BLUEPRINT: Unity & Blender AI Assistant (Total Knowledge Archive Edition)
 
-> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.12.13.
+> **ВНИМАНИЕ:** Этот документ является "источников истины" для всего проекта. Он содержит полную структуру интерфейса, базу знаний агентов, инструкции по самовосстановлению и описание возможностей ИИ v18.12.11.
 
 ## 1. Общая информация
-- **Версия Помощника:** 18.12.13
-- **Описание:** Гибридный ИИ-помощник нового поколения (v18.12.13 - Alchemist Cat Loading Panel Responsive Scaling & Kitten Progress Opacity) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Интеграция адаптивного переключения ввода, калибровка зум-параметров при высадке, позиционирование маркеров по Z=-2.0f, сохранение прогресса и моделирования отрядов.
+- **Версия Помощника:** 18.12.09
+- **Описание:** Гибридный ИИ-помощник нового поколения (v18.12.11 - Alchemist Cat UI & Localization Calibration) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4. Интеграция адаптивного переключения ввода, калибровка зум-параметров при высадке, позиционирование маркеров по Z=-2.0f, сохранение прогресса и моделирования отрядов.
 - **Путь проекта:** Не задан
 - **Локальное хранилище:** Не задано
 - **Версия Unity:** unknown
 - **Версия Blender:** unknown
 - **Версия GIMP:** unknown
 - **Версия Redot:** unknown
-- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_12_13_FATE_MASTER]
+- **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_12_11_FATE_MASTER]
 
 ## 2. Структура интерфейса
 ### Вкладки
@@ -46,13 +46,13 @@ You are Zenith Quantum Divine Assistant, guiding the Fate Continent world develo
 ```
 
 
-## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.12.13 - Loading Panel Responsive Scaling & Kitten Progress Opacity)
+## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.12.11 - Alchemist Cat UI & Localization Calibration)
 ### Режимы работы и Архитектурные уровни
 - **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.
 - **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.
 - **No-Internet Mode (Quantum Archive):** 10,000+ видео-уроков. Мгновенный доступ при любых внешних условиях.
 
-### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.12.13 Sync)
+### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.12.11 Sync)
 - **Unity 6 Physics & Optimization:** [Video #2](https://www.youtube.com/watch?v=9vuyis_Y-LY)
 - **Blender Advanced Rigging:** [Video #3](https://www.youtube.com/watch?v=UKZp67dY1_w)
 - **Shader Graph Mastery:** [Video #4](https://www.youtube.com/watch?v=-hvxjyzcSkI)
@@ -317,6 +317,9 @@ Freesound содержит миллионы звуков от инди-разр�
 - **v18.11.16:** GPU Anti-Overheat Protection & Resolution Universal Sync • Implements a hardware performance safeguard within SettingsManager.cs. Disables infinite framerates in Unity; clamps Target Frame Rate to 30 FPS on low presets, 60 FPS on medium/high, and 120 FPS on ultra. Automatically manages standard Post-Processing Volume weights (Bloom/Postprocess is scaled down to 15% on low settings). Ensures persistent Screen Resolution and Fullscreen Mode are dynamically synchronized and automatically restored across all strategic scenes, loading processes, and gameplay transitions.
 - **v18.11.15:** RPG Skills & Turn-Based Castle • Fully integrates class base attributes and difficulty-dependent starting free stat pools (from 0 to 30 points) during new game character initialization. Prevents reduction below base stats, implements autonomous auto-allocation, and displays a glossy glassmorphic class skills glossary inside the castle manager GUI panel. Replaced per-second gold accumulation with turn-based castle income ticking and Castle Level 1 -> Level 2 majestic visual shape-shifting morph builders!
 - **v18.11.14:** Post-Landing Narrative & Castle Progression System • Implements scale and offset persistence for the tactical world map preventing reset on play. Adds a multi-phase post-landing narrative briefing starting at DialogStep 8 through 12, focusing the camera on the player castle, locking movement and pausing. Programmatically spawns four majestic 3D castles (emerald neon for player, ruby neon for enemy built using Standard/URP-compatible materials) and establishes the interactive Castle Management logic featuring Zenith Glassmorphism UI, passive gold income tick system, military recruitment, shop equipment and espionage.
+- **v18.12.16:** Calendar Auto-Open & RectOffset Exception Prevention • Resolved 36 UnityException 'set_left can only be called from the main thread' errors by converting MonthLayoutConfig from RectOffset field initializers to pure serializable integer padding fields (padLeft, padRight, padTop, padBottom). Upgraded `DialogueSystem_Manager.OpenCalendarUI()` to support direct Inspector references (`calendarPanel`, `calendarManager`), perform comprehensive fallback searches including inactive hierarchy objects via `FindAnyObjectByType<Calendar_Manager>(FindObjectsInactive.Include)`, and automatically generate and activate the 12 seasonal months seamlessly upon opening.
+- **v18.12.15:** Alchemist Cat Recipe Scroll & Missed Flask Badges • Added `missedFlaskSprite` slot to `Calendar_Manager.cs` to render cracked potion flasks on missed days. Built `Recipe_Scroll_Panel` integration in `DialogueSystem_Manager.cs` to display the big parchment recipe scroll after closing the calendar.
+- **v18.12.14:** Alchemist Cat Extended Dialogue & Daily/Monthly/Quarterly/Annual Calendar Reward System • Extended narrative dialogue so Cat introduces the Magic Calendar detailing daily rewards, monthly complete rewards (30k gold, 10 stones, 5 scrolls, 3 crystals), quarterly super-bonuses (scaling up to 90k gold, 20 stones, 15 scrolls, 20 crystals), and the 365-day annual streak mega-bonus (500k gold, 200 stones, 100 scrolls, 200 crystals).
 - **v18.11.13:** Ground-Focused Camera Clamping • Refactors camera coordinates clamping in StrategicCameraController.cs to mathematically limit the screen's visual center focal point projected on the ground (Y = 0) rather than restricting raw camera coordinates. This solves physical camera locks at high elevations and allows manual limits to perfectly match visual map coordinate dimensions.
 - **v18.11.12:** Dynamic Ocean Occlusion & Quality Synchronization • Integrates auto-active ocean plane hide on Start() and show on DispatchLanding() for dialogue sequence protection; fixes pink standard shader issues in Universal Render Pipeline projects by detecting M_Ocean_Background automatically or compiling URP-compatible lit fallbacks; and dynamically scales water glossiness and metallic parameters based on system graphics quality levels (Low, Med, Ultra) loaded from PlayerPrefs.
 - **v18.11.11:** Real-Time Bound Locking, Edge Scrolling & Ocean Planes • Integrates strict real-time coordinate constraints in StrategicCameraController.cs with a dynamic AutoFitBounds() system that automatically calculates bounds according to New_Kontinent's mesh, implements mouse-steerable Edge Scrolling, and instantiates an automatic Ocean background Plane with 40x40 UV tiling ready for seamless 8K high-res textures.

@@ -17,6 +17,8 @@ using TMPro;
 /// </summary>
 public class Calendar_Manager : MonoBehaviour
 {
+    public static Calendar_Manager Instance { get; private set; }
+
     [Header("UI Panels & Containers")]
     [SerializeField] private GameObject calendarPanel;
     [SerializeField] private Transform monthsContainer; // Content у ScrollRect
@@ -27,11 +29,30 @@ public class Calendar_Manager : MonoBehaviour
     [Header("12 Month Sprites (Jan..Dec)")]
     [SerializeField] private Sprite[] monthSprites = new Sprite[12];
 
+    [Header("Missed Day Icon (Broken Flask)")]
+    [SerializeField] private Sprite missedFlaskSprite; // Спрайт разбитой колбы для пропущенных дней
+
     [Header("Reward Icons")]
     [SerializeField] private Sprite goldIcon;
     [SerializeField] private Sprite stoneIcon;
     [SerializeField] private Sprite scrollIcon;
     [SerializeField] private Sprite crystalIcon;
+
+    [System.Serializable]
+    public class MonthLayoutConfig
+    {
+        public string monthName = "Month";
+        public Vector2 cardSize = new Vector2(400f, 540f);
+        public Vector2 cellSize = new Vector2(34f, 34f);
+        public Vector2 spacing = new Vector2(5f, 5f);
+        public int padLeft = 35;
+        public int padRight = 35;
+        public int padTop = 95;
+        public int padBottom = 30;
+    }
+
+    [Header("Индивидуальная калибровка сеток для каждого месяца")]
+    [SerializeField] private MonthLayoutConfig[] customMonthLayouts = new MonthLayoutConfig[12];
 
     [Header("Reward Popup / Notification")]
     [SerializeField] private GameObject rewardPopup;
@@ -50,13 +71,24 @@ public class Calendar_Manager : MonoBehaviour
 
     private void Awake()
     {
+        Instance = this;
+
+        if (calendarPanel == null)
+            calendarPanel = this.gameObject;
+
         if (closeButton != null)
+        {
+            closeButton.onClick.RemoveAllListeners();
             closeButton.onClick.AddListener(CloseCalendar);
+        }
 
         if (rewardPopupCloseBtn != null)
+        {
+            rewardPopupCloseBtn.onClick.RemoveAllListeners();
             rewardPopupCloseBtn.onClick.AddListener(() => {
                 if (rewardPopup != null) rewardPopup.SetActive(false);
             });
+        }
     }
 
     private void Start()
@@ -70,7 +102,21 @@ public class Calendar_Manager : MonoBehaviour
         if (calendarPanel != null)
         {
             calendarPanel.SetActive(true);
-            UpdateCurrentDate();
+        }
+        else
+        {
+            gameObject.SetActive(true);
+        }
+
+        UpdateCurrentDate();
+
+        // Если при старте панель была выключена и не сгенерировалась — генерируем сейчас
+        if (monthsContainer != null && monthsContainer.childCount == 0)
+        {
+            GenerateFullCalendar();
+        }
+        else
+        {
             RefreshAllDaysUI();
         }
     }
@@ -79,6 +125,14 @@ public class Calendar_Manager : MonoBehaviour
     {
         if (calendarPanel != null)
             calendarPanel.SetActive(false);
+        else
+            gameObject.SetActive(false);
+
+        // Уведомляем диалоговую систему о закрытии календаря (старт фазы Котла и Рецепта)
+        if (DialogueSystem_Manager.Instance != null)
+        {
+            DialogueSystem_Manager.Instance.OnCalendarClosed();
+        }
     }
 
     private void UpdateCurrentDate()
@@ -87,6 +141,134 @@ public class Calendar_Manager : MonoBehaviour
         currentYear = now.Year;
         currentMonth = now.Month; // 1..12
         currentDay = now.Day;     // 1..31
+    }
+
+    // Получить конфигурацию выравнивания для конкретного месяца
+    public MonthLayoutConfig GetLayoutConfigForMonth(int monthIndex1Based)
+    {
+        int idx = monthIndex1Based - 1;
+        if (customMonthLayouts != null && idx >= 0 && idx < customMonthLayouts.Length && customMonthLayouts[idx] != null && customMonthLayouts[idx].cellSize.x > 0)
+        {
+            return customMonthLayouts[idx];
+        }
+
+        // Предустановленные идеальные калибровки для каждого месяца (1..12) под уникальные сезонные рамки
+        MonthLayoutConfig cfg = new MonthLayoutConfig();
+        cfg.monthName = monthNamesRu[idx];
+
+        switch (monthIndex1Based)
+        {
+            case 1: // Январь (Ледяная вытянутая рамка)
+                cfg.cardSize = new Vector2(400f, 540f);
+                cfg.cellSize = new Vector2(34f, 34f);
+                cfg.spacing = new Vector2(4f, 4f);
+                cfg.padLeft = 42;
+                cfg.padRight = 42;
+                cfg.padTop = 98;
+                cfg.padBottom = 30;
+                break;
+            case 2: // Февраль (Аметистовая квадратная рамка)
+                cfg.cardSize = new Vector2(400f, 540f);
+                cfg.cellSize = new Vector2(34f, 34f);
+                cfg.spacing = new Vector2(4f, 4f);
+                cfg.padLeft = 40;
+                cfg.padRight = 40;
+                cfg.padTop = 95;
+                cfg.padBottom = 30;
+                break;
+            case 3: // Март (Зеленые лиственные побеги)
+                cfg.cardSize = new Vector2(400f, 540f);
+                cfg.cellSize = new Vector2(34f, 34f);
+                cfg.spacing = new Vector2(4f, 4f);
+                cfg.padLeft = 38;
+                cfg.padRight = 38;
+                cfg.padTop = 92;
+                cfg.padBottom = 30;
+                break;
+            case 4: // Апрель (Цветущая сакура)
+                cfg.cardSize = new Vector2(400f, 540f);
+                cfg.cellSize = new Vector2(34f, 34f);
+                cfg.spacing = new Vector2(4f, 4f);
+                cfg.padLeft = 38;
+                cfg.padRight = 38;
+                cfg.padTop = 92;
+                cfg.padBottom = 30;
+                break;
+            case 5: // Май (Золотые вензеля и синие кристаллы)
+                cfg.cardSize = new Vector2(400f, 540f);
+                cfg.cellSize = new Vector2(34f, 34f);
+                cfg.spacing = new Vector2(4f, 4f);
+                cfg.padLeft = 42;
+                cfg.padRight = 42;
+                cfg.padTop = 96;
+                cfg.padBottom = 30;
+                break;
+            case 6: // Июнь (Солнечные лучи и янтарные капли)
+                cfg.cardSize = new Vector2(400f, 540f);
+                cfg.cellSize = new Vector2(34f, 34f);
+                cfg.spacing = new Vector2(4f, 4f);
+                cfg.padLeft = 40;
+                cfg.padRight = 40;
+                cfg.padTop = 98;
+                cfg.padBottom = 30;
+                break;
+            case 7: // Июль (Жемчуг и бирюзовые камни)
+                cfg.cardSize = new Vector2(400f, 540f);
+                cfg.cellSize = new Vector2(34f, 34f);
+                cfg.spacing = new Vector2(4f, 4f);
+                cfg.padLeft = 38;
+                cfg.padRight = 38;
+                cfg.padTop = 95;
+                cfg.padBottom = 30;
+                break;
+            case 8: // Август (Золотой колос и звезды)
+                cfg.cardSize = new Vector2(400f, 540f);
+                cfg.cellSize = new Vector2(34f, 34f);
+                cfg.spacing = new Vector2(4f, 4f);
+                cfg.padLeft = 38;
+                cfg.padRight = 38;
+                cfg.padTop = 92;
+                cfg.padBottom = 30;
+                break;
+            case 9: // Сентябрь (Дубовые листья и желуди)
+                cfg.cardSize = new Vector2(400f, 540f);
+                cfg.cellSize = new Vector2(34f, 34f);
+                cfg.spacing = new Vector2(4f, 4f);
+                cfg.padLeft = 42;
+                cfg.padRight = 42;
+                cfg.padTop = 95;
+                cfg.padBottom = 30;
+                break;
+            case 10: // Октябрь (Тыквы Хэллоуина и аметисты)
+                cfg.cardSize = new Vector2(410f, 540f);
+                cfg.cellSize = new Vector2(34f, 34f);
+                cfg.spacing = new Vector2(4f, 4f);
+                cfg.padLeft = 46;
+                cfg.padRight = 46;
+                cfg.padTop = 96;
+                cfg.padBottom = 32;
+                break;
+            case 11: // Ноябрь (Серебряно-золотой контур)
+                cfg.cardSize = new Vector2(400f, 540f);
+                cfg.cellSize = new Vector2(34f, 34f);
+                cfg.spacing = new Vector2(4f, 4f);
+                cfg.padLeft = 38;
+                cfg.padRight = 38;
+                cfg.padTop = 92;
+                cfg.padBottom = 30;
+                break;
+            case 12: // Декабрь (Хвойные лапы и рубины)
+                cfg.cardSize = new Vector2(410f, 540f);
+                cfg.cellSize = new Vector2(34f, 34f);
+                cfg.spacing = new Vector2(4f, 4f);
+                cfg.padLeft = 44;
+                cfg.padRight = 44;
+                cfg.padTop = 96;
+                cfg.padBottom = 32;
+                break;
+        }
+
+        return cfg;
     }
 
     // Генерация 12 месяцев
@@ -105,6 +287,15 @@ public class Calendar_Manager : MonoBehaviour
             GameObject monthObj = Instantiate(monthPrefab, monthsContainer);
             monthObj.name = $"Month_{m:00}_{monthNamesRu[m - 1]}";
 
+            MonthLayoutConfig cfg = GetLayoutConfigForMonth(m);
+
+            // Настройка размера карточки месяца
+            RectTransform cardRect = monthObj.GetComponent<RectTransform>();
+            if (cardRect != null)
+            {
+                cardRect.sizeDelta = cfg.cardSize;
+            }
+
             // Установка спрайта рамки месяца
             Image frameImg = monthObj.GetComponent<Image>();
             if (frameImg != null && monthSprites != null && (m - 1) < monthSprites.Length)
@@ -115,6 +306,18 @@ public class Calendar_Manager : MonoBehaviour
             // Контейнер для ячеек дней внутри месяца
             Transform daysGrid = monthObj.transform.Find("Days_Grid");
             if (daysGrid == null) daysGrid = monthObj.transform;
+
+            // Настройка сетки GridLayoutGroup под пропорции конкретной рамки
+            GridLayoutGroup gridGroup = daysGrid.GetComponent<GridLayoutGroup>();
+            if (gridGroup != null)
+            {
+                gridGroup.cellSize = cfg.cellSize;
+                gridGroup.spacing = cfg.spacing;
+                gridGroup.padding = new RectOffset(cfg.padLeft, cfg.padRight, cfg.padTop, cfg.padBottom);
+                gridGroup.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+                gridGroup.constraintCount = 7;
+                gridGroup.childAlignment = TextAnchor.MiddleCenter;
+            }
 
             int daysInMonth = DateTime.DaysInMonth(currentYear, m);
 
@@ -210,8 +413,21 @@ public class Calendar_Manager : MonoBehaviour
         int crystals = (day % 7 == 0) ? 5 : 0;
 
         int currentGold = PlayerPrefs.GetInt("Player_Gold", 5000);
+        int currentStones = PlayerPrefs.GetInt("Player_Stones", 10);
+        int currentScrolls = PlayerPrefs.GetInt("Player_Scrolls", 3);
+        int currentCrystals = PlayerPrefs.GetInt("Player_Crystals", 0);
+
         PlayerPrefs.SetInt("Player_Gold", currentGold + gold);
+        PlayerPrefs.SetInt("Player_Stones", currentStones + stones);
+        PlayerPrefs.SetInt("Player_Scrolls", currentScrolls + scrolls);
+        PlayerPrefs.SetInt("Player_Crystals", currentCrystals + crystals);
         PlayerPrefs.Save();
+
+        // Мгновенная синхронизация цифр в верхней панели (TopPanel)
+        if (DialogueSystem_Manager.Instance != null)
+        {
+            DialogueSystem_Manager.Instance.SyncPlayerPrefsResources();
+        }
 
         string res = $"+{gold} Золота";
         if (stones > 0) res += $", +{stones} Камней";
@@ -245,7 +461,15 @@ public class Calendar_Manager : MonoBehaviour
         else if (month < currentMonth || (month == currentMonth && day < currentDay))
         {
             if (checkmark != null) checkmark.SetActive(isClaimed);
-            if (missedBadge != null) missedBadge.SetActive(!isClaimed); // Если не забрали — показываем красный крестик/пропуск
+            if (missedBadge != null)
+            {
+                missedBadge.SetActive(!isClaimed); // Если не забрали — показываем разбитую колбу
+                if (missedFlaskSprite != null && !isClaimed)
+                {
+                    Image missedImg = missedBadge.GetComponent<Image>();
+                    if (missedImg != null) missedImg.sprite = missedFlaskSprite;
+                }
+            }
 
             if (bgImage != null)
             {

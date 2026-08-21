@@ -49,7 +49,16 @@ public class DialogueSystem_Manager : MonoBehaviour
     [Header("Иконка Календаря в игре")]
     public GameObject calendarIconButton; // Перетащите сюда Calendar_Button
 
-    [Header("Объекты игрового мира (Активируются в самом конце)")]
+    [Header("Панель Календаря Наград (Calendar Panel)")]
+    public GameObject calendarPanel;         // Перетащите сюда Calendar_Panel
+    public Calendar_Manager calendarManager; // Перетащите сюда Calendar_Panel (компонент Calendar_Manager)
+
+    [Header("Большой Свиток Рецепта (Recipe Scroll Panel)")]
+    public GameObject recipeScrollPanel;     // Перетащите сюда Recipe_Scroll_Panel
+    public Button recipeScrollCloseButton;   // Кнопка закрытия свитка рецепта
+    public AudioClip scrollOpenSound;        // Звук разворачивания свитка
+
+    [Header("Объекты игрового мира (Активируются по ходу обучения)")]
     public GameObject cauldronButton;
     public GameObject roomCatObject;
 
@@ -72,6 +81,8 @@ public class DialogueSystem_Manager : MonoBehaviour
         public int revealResourceIndex = -1; // 0=Gold, 1=Stones, 2=Scrolls, 3=Crystals, 4=StarterReward
         public bool isClaimStarterRewardStep = false;
         public bool showCalendarIcon = false; // Показать иконку календарика на этом шаге
+        public bool revealCauldron = false;   // Показать котел на этом шаге
+        public bool isRecipeStep = false;     // Шаг перехода к свитку рецепта
     }
 
     private List<DialogStep> dialogueSteps = new List<DialogStep>();
@@ -166,6 +177,40 @@ public class DialogueSystem_Manager : MonoBehaviour
         {
             nextStepButton.onClick.RemoveAllListeners();
             nextStepButton.onClick.AddListener(NextStep);
+        }
+
+        // Авто-привязка клика по маленькой иконке календаря
+        if (calendarIconButton != null)
+        {
+            Button calBtn = calendarIconButton.GetComponent<Button>();
+            if (calBtn != null)
+            {
+                calBtn.onClick.RemoveAllListeners();
+                calBtn.onClick.AddListener(OnCalendarIconButtonClicked);
+            }
+        }
+
+        // Авто-привязка клика по котлу
+        if (cauldronButton != null)
+        {
+            Button cBtn = cauldronButton.GetComponent<Button>();
+            if (cBtn != null)
+            {
+                cBtn.onClick.RemoveAllListeners();
+                cBtn.onClick.AddListener(OnCauldronButtonClicked);
+            }
+        }
+
+        // Авто-привязка кнопки закрытия свитка рецепта
+        if (recipeScrollCloseButton != null)
+        {
+            recipeScrollCloseButton.onClick.RemoveAllListeners();
+            recipeScrollCloseButton.onClick.AddListener(CloseRecipeScrollUI);
+        }
+
+        if (recipeScrollPanel != null)
+        {
+            recipeScrollPanel.SetActive(false);
         }
 
         BuildDefaultScenario();
@@ -276,6 +321,11 @@ public class DialogueSystem_Manager : MonoBehaviour
             calendarIconButton.SetActive(true);
         }
 
+        if (step.revealCauldron && cauldronButton != null)
+        {
+            cauldronButton.SetActive(true);
+        }
+
         string rawText = GetLocalizedText(step.textRU, step.textEN, step.textTR);
         activeFullText = FormatPlayerName(rawText);
 
@@ -369,10 +419,12 @@ public class DialogueSystem_Manager : MonoBehaviour
                 nextStepButton.interactable = true;
                 if (nextStepButtonText != null)
                 {
-                    if (step.isClaimStarterRewardStep)
+                    if (step.isRecipeStep)
+                        nextStepButtonText.text = "Открыть рецепт >>";
+                    else if (step.isClaimStarterRewardStep)
                         nextStepButtonText.text = "Забрать бонус!";
                     else if (currentStepIndex == dialogueSteps.Count - 1)
-                        nextStepButtonText.text = "Открыть календарь";
+                        nextStepButtonText.text = isCauldronPhase ? "Открыть рецепт >>" : "Открыть календарь";
                     else
                         nextStepButtonText.text = "Далее >>";
                 }
@@ -509,18 +561,198 @@ public class DialogueSystem_Manager : MonoBehaviour
         return raw.Replace("{PLAYER_NAME}", $"<b><color=#FFE57F>{playerName}</color></b>");
     }
 
-    public void EndDialogue()
+    private bool isCauldronPhase = false;
+    private bool cauldronDialogueCompleted = false;
+
+    public void OnCalendarIconButtonClicked()
     {
-        if (dialoguePanel != null) dialoguePanel.SetActive(false);
+        if (buttonClickSound != null && SettingsManager.Instance != null)
+            SettingsManager.Instance.PlaySoundEffect(buttonClickSound);
 
-        // Котел и кот в комнате (если нужны)
-        if (cauldronButton != null) cauldronButton.SetActive(true);
-        if (roomCatObject != null) roomCatObject.SetActive(true);
+        OpenCalendarUI();
+    }
 
-        // 🌟 ГЛАВНОЕ: Кнопка календаря остается активной на экране!
+    public void OnCalendarClosed()
+    {
+        // Когда игрок закрывает календарь крестиком — стартуем диалог про котел и первое зелье!
+        if (!cauldronDialogueCompleted)
+        {
+            StartCauldronDialoguePhase();
+        }
+    }
+
+    public void StartCauldronDialoguePhase()
+    {
+        isCauldronPhase = true;
+        currentStepIndex = 0;
+
+        if (dialoguePanel != null) dialoguePanel.SetActive(true);
         if (calendarIconButton != null) calendarIconButton.SetActive(true);
 
-        Debug.Log("[ALCHEMIST DIALOGUE] Интро завершено. Кот просит нажать на Календарь!");
+        BuildCauldronScenario();
+        DisplayStep(0);
+    }
+
+    private void BuildCauldronScenario()
+    {
+        dialogueSteps.Clear();
+
+        // 1. Появление котла и рассказ об изготовлении зелий
+        dialogueSteps.Add(new DialogStep
+        {
+            textRU = "Отлично! С календарем наград мы разобрались. Теперь пора заняться настоящей алхимией!\n\nВзгляни: в комнате появился наш <b><color=#FFE57F>Магический Котёл</color></b> — в нём мы сможем варить могущественные зелья и эликсиры из собранных ресурсов!",
+            textEN = "Excellent! Now that we understand the calendar, it's time for true alchemy!\n\nLook: our <b><color=#FFE57F>Magic Cauldron</color></b> has appeared — here we can brew powerful potions and elixirs from gathered resources!",
+            textTR = "Harika! Odul takvimini ogrendik, simdi gercek simya vakti!\n\nBak: odada <b><color=#FFE57F>Buyulu Kazanimiz</color></b> belirdi — burada topladigimiz kaynaklardan guclu iksirler uretebiliriz!",
+            isNameInputStep = false,
+            revealResourceIndex = 4,
+            revealCauldron = true,
+            isRecipeStep = false
+        });
+
+        // 2. Первое зелье и рецепт (100 золота, 1 камень, 1 свиток)
+        dialogueSteps.Add(new DialogStep
+        {
+            textRU = "Давай я помогу тебе сварить твоё самое первое зелье!\n\nДля его приготовления нам потребуется:\n• <b><color=#FFE57F>100 Золота</color></b>\n• <b><color=#80FFDB>1 Магический Камень</color></b>\n• <b><color=#FFD166>1 Древний Свиток</color></b>\n\nНажми кнопку ниже, чтобы открыть свиток рецепта!",
+            textEN = "Let me assist you in brewing your very first potion!\n\nTo brew it, we will need:\n• <b><color=#FFE57F>100 Gold</color></b>\n• <b><color=#80FFDB>1 Magic Stone</color></b>\n• <b><color=#FFD166>1 Ancient Scroll</color></b>\n\nTap below to open the recipe scroll!",
+            textTR = "Ilk iksirini hazirlamana yardim edeyim!\n\nGerekli malzemeler:\n• <b><color=#FFE57F>100 Altin</color></b>\n• <b><color=#80FFDB>1 Buyulu Tas</color></b>\n• <b><color=#FFD166>1 Kadim Parsomen</color></b>\n\nTarif parsomenini acmak icin asagidaki butona bas!",
+            isNameInputStep = false,
+            revealResourceIndex = 4,
+            revealCauldron = true,
+            isRecipeStep = true
+        });
+    }
+
+    public void OnCauldronButtonClicked()
+    {
+        if (buttonClickSound != null && SettingsManager.Instance != null)
+            SettingsManager.Instance.PlaySoundEffect(buttonClickSound);
+
+        if (!cauldronDialogueCompleted)
+        {
+            Debug.Log("[ALCHEMIST CAULDRON] Котел ожидает открытия свитка рецепта!");
+            return;
+        }
+
+        // После завершения обучения клик по котлу открывает свиток рецептов
+        OpenRecipeScrollUI();
+    }
+
+    public void OpenRecipeScrollUI()
+    {
+        if (scrollOpenSound != null && SettingsManager.Instance != null)
+            SettingsManager.Instance.PlaySoundEffect(scrollOpenSound);
+        else if (buttonClickSound != null && SettingsManager.Instance != null)
+            SettingsManager.Instance.PlaySoundEffect(buttonClickSound);
+
+        if (dialoguePanel != null) dialoguePanel.SetActive(false);
+
+        if (recipeScrollPanel != null)
+        {
+            recipeScrollPanel.SetActive(true);
+        }
+        else
+        {
+            Debug.LogWarning("[ALCHEMIST DIALOGUE] Recipe_Scroll_Panel не назначена в инспекторе!");
+        }
+
+        cauldronDialogueCompleted = true;
+        if (cauldronButton != null) cauldronButton.SetActive(true);
+        if (roomCatObject != null) roomCatObject.SetActive(true);
+    }
+
+    public void CloseRecipeScrollUI()
+    {
+        if (buttonClickSound != null && SettingsManager.Instance != null)
+            SettingsManager.Instance.PlaySoundEffect(buttonClickSound);
+
+        if (recipeScrollPanel != null)
+        {
+            recipeScrollPanel.SetActive(false);
+        }
+    }
+
+    public void EndDialogue()
+    {
+        if (isCauldronPhase)
+        {
+            OpenRecipeScrollUI();
+            return;
+        }
+
+        if (dialoguePanel != null) dialoguePanel.SetActive(false);
+
+        // 🛑 ВАЖНО: Кот в комнате и Котёл НЕ появляются во время интро! Они появляются только после закрытия календаря!
+        if (cauldronButton != null) cauldronButton.SetActive(false);
+        if (roomCatObject != null) roomCatObject.SetActive(false);
+
+        // 🌟 Иконка календаря на экране всегда остается активной!
+        if (calendarIconButton != null) calendarIconButton.SetActive(true);
+
+        // 🌟 МГНОВЕННО ОТКРЫВАЕМ САМ КАЛЕНДАРЬ НАГРАД!
+        OpenCalendarUI();
+
+        Debug.Log("[ALCHEMIST DIALOGUE] Интро завершено. Окно диалога закрыто, открыт Магический Календарь!");
+    }
+
+    public void OpenCalendarUI()
+    {
+        // 1. Прямая ссылка на скрипт из инспектора
+        if (calendarManager != null)
+        {
+            calendarManager.OpenCalendar();
+            return;
+        }
+
+        // 2. Прямая ссылка на панель календаря из инспектора
+        if (calendarPanel != null)
+        {
+            calendarPanel.SetActive(true);
+            Calendar_Manager cm = calendarPanel.GetComponent<Calendar_Manager>();
+            if (cm != null)
+            {
+                cm.OpenCalendar();
+                return;
+            }
+        }
+
+        // 3. Статический Singleton (если объект уже активен)
+        if (Calendar_Manager.Instance != null)
+        {
+            Calendar_Manager.Instance.OpenCalendar();
+            return;
+        }
+
+        // 4. Поиск компонента на сцене, включая неактивные (Inactive) объекты
+        Calendar_Manager cal = FindAnyObjectByType<Calendar_Manager>(FindObjectsInactive.Include);
+        if (cal != null)
+        {
+            cal.OpenCalendar();
+            return;
+        }
+
+        // 5. Поиск объекта по имени "Calendar_Panel"
+        GameObject foundPanel = GameObject.Find("Calendar_Panel");
+        if (foundPanel != null)
+        {
+            foundPanel.SetActive(true);
+            Calendar_Manager foundCm = foundPanel.GetComponent<Calendar_Manager>();
+            if (foundCm != null)
+            {
+                foundCm.OpenCalendar();
+                return;
+            }
+        }
+
+        Debug.LogWarning("[ALCHEMIST DIALOGUE] Calendar_Manager не найден на сцене! Перетащите Calendar_Panel в поле Calendar Panel в инспекторе DialogueSystem_Manager.");
+    }
+
+    public void SyncPlayerPrefsResources()
+    {
+        currentGold = PlayerPrefs.GetInt("Player_Gold", currentGold);
+        currentStones = PlayerPrefs.GetInt("Player_Stones", currentStones);
+        currentScrolls = PlayerPrefs.GetInt("Player_Scrolls", currentScrolls);
+        currentCrystals = PlayerPrefs.GetInt("Player_Crystals", currentCrystals);
+        UpdateResourceTextsInstant();
     }
 
     private void BuildDefaultScenario()

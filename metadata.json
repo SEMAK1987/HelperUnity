@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Fate Continent: Alchemist Cat Edition (v18.12.15) - Daily Calendar Progression & Dialogue Extension.",
+  "description": "Fate Continent: Alchemist Cat Edition (v18.12.16) - Daily Calendar Progression & Auto-Open Exception Safeguard.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

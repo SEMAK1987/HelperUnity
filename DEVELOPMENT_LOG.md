@@ -1,10 +1,17 @@
 # DEVELOPMENT LOG
 
-## [2026-08-11]
-- **v18.12.13 Update:** Loading Panel Responsive Scaling & Kitten Progress Opacity. Configured responsive stretching for the `Loading_Panel` canvas to dynamically adapt to desktop and mobile aspect ratios. Programmed the `kittenSilhouette` image opacity to fade in proportionally as the progress bar increments from 0% to 100%.
+## [v18.12.16] - 2026-08-21
+- **Alchemist Cat Calendar Auto-Open & RectOffset Exception Prevention**:
+  - Replaced `new RectOffset()` field initializers in `MonthLayoutConfig` (`Calendar_Manager.cs`) with serializable integers (`padLeft`, `padRight`, `padTop`, `padBottom`) to fix 36 `UnityException: set_left can only be called from the main thread` errors.
+  - Enhanced `DialogueSystem_Manager.OpenCalendarUI()` to support direct inspector slots (`calendarPanel`, `calendarManager`), search inactive hierarchy objects via `FindAnyObjectByType<Calendar_Manager>(FindObjectsInactive.Include)` and search `"Calendar_Panel"` by name.
+  - Added auto-generation check in `Calendar_Manager.OpenCalendar()` to ensure the 12 seasonal months generate immediately if opened while initially inactive at scene start.
 
-## [2026-08-10]
-- **v18.12.12 Update:** Audio Slider Swap & Manual Inspector Alignment Hotfix. Swapped localization keys/values for sound and music labels (upper slider is Sounds/SFX, lower slider is Music) to match visual layout of sliders without restructuring logic connections. Removed automatic AudioMixer routing to prevent "Exposed name does not exist" console errors when specific parameters are not pre-exposed, routing strictly via clean direct AudioSource volume parameters.
+## [v18.12.15] - 2026-08-21
+- **Alchemist Cat Recipe Scroll & Missed Flask Badges**:
+  - Added `missedFlaskSprite` slot to `Calendar_Manager.cs` to render cracked potion flasks on missed days.
+  - Built `Recipe_Scroll_Panel` integration in `DialogueSystem_Manager.cs` to display the big parchment recipe scroll after closing the calendar.
 
-## [2026-05-14]
-- Версия 18.5.8: Zenith Multi-Tool Synergy & Settings Fix.
+## [v18.12.14] - 2026-08-21
+- **Alchemist Cat Extended Dialogue & Daily/Monthly/Quarterly/Annual Calendar Reward System**:
+  - Extended narrative dialogue in `DialogueSystem_Manager.cs`.
+  - Added daily, monthly, quarterly, and annual streak reward progression logic.
