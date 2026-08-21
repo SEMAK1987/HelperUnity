@@ -319,6 +319,9 @@ public class DialogueSystem_Manager : MonoBehaviour
         if (step.showCalendarIcon && calendarIconButton != null)
         {
             calendarIconButton.SetActive(true);
+            // Если Кот еще объясняет правила (шаги 7..10) — иконка видна, но некликабельна, чтобы не перекрывать диалог
+            bool isFinalCalendarStep = (index == dialogueSteps.Count - 1 && !isCauldronPhase);
+            SetCalendarButtonInteractable(isFinalCalendarStep);
         }
 
         if (step.revealCauldron && cauldronButton != null)
@@ -563,11 +566,37 @@ public class DialogueSystem_Manager : MonoBehaviour
         return raw.Replace("{PLAYER_NAME}", $"<b><color=#FFE57F>{playerName}</color></b>");
     }
 
+    private void SetCalendarButtonInteractable(bool interactable)
+    {
+        if (calendarIconButton != null)
+        {
+            Button btn = calendarIconButton.GetComponent<Button>();
+            if (btn != null)
+            {
+                btn.interactable = interactable;
+            }
+        }
+    }
+
     private bool isCauldronPhase = false;
     private bool cauldronDialogueCompleted = false;
 
     public void OnCalendarIconButtonClicked()
     {
+        // Если окно диалога еще активно и Кот объясняет что-то, кроме финального шага — блокируем клик
+        if (dialoguePanel != null && dialoguePanel.activeSelf)
+        {
+            bool isFinalCalendarStep = (currentStepIndex == dialogueSteps.Count - 1 && !isCauldronPhase);
+            if (!isFinalCalendarStep)
+            {
+                Debug.Log("[ALCHEMIST DIALOGUE] Кот ещё говорит! Иконка календаря временно заблокирована.");
+                return;
+            }
+
+            // Если это финальный шаг — закрываем диалог перед открытием календаря, чтобы не накладывались друг на друга!
+            dialoguePanel.SetActive(false);
+        }
+
         if (buttonClickSound != null && SettingsManager.Instance != null)
             SettingsManager.Instance.PlaySoundEffect(buttonClickSound);
 
