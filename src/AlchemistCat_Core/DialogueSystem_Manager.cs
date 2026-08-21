@@ -137,7 +137,7 @@ public class DialogueSystem_Manager : MonoBehaviour
     {
         InitBackgroundMusic();
 
-        if (topPanel != null) topPanel.SetActive(true);
+        if (topPanel != null) topPanel.SetActive(false);
         if (slotGold != null) slotGold.SetActive(false);
         if (slotStones != null) slotStones.SetActive(false);
         if (slotScrolls != null) slotScrolls.SetActive(false);
@@ -335,6 +335,8 @@ public class DialogueSystem_Manager : MonoBehaviour
 
     private void HandleResourceReveal(int resourceIndex)
     {
+        if (topPanel != null) topPanel.SetActive(true);
+
         if (resourceIndex == 0)
         {
             if (slotGold != null) slotGold.SetActive(true);
