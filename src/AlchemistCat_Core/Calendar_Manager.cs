@@ -143,130 +143,42 @@ public class Calendar_Manager : MonoBehaviour
         currentDay = now.Day;     // 1..31
     }
 
-    // Получить конфигурацию выравнивания для конкретного месяца
+    // Таблица параметров калибровки для 12 сезонных рамок (padLeft, padRight, padTop, padBottom, cardWidth, cardHeight)
+    private static readonly int[,] DefaultPaddings = new int[,]
+    {
+        { 42, 42, 98, 30, 400, 540 }, // 1. Январь
+        { 40, 40, 95, 30, 400, 540 }, // 2. Февраль
+        { 38, 38, 92, 30, 400, 540 }, // 3. Март
+        { 38, 38, 92, 30, 400, 540 }, // 4. Апрель
+        { 42, 42, 96, 30, 400, 540 }, // 5. Май
+        { 40, 40, 98, 30, 400, 540 }, // 6. Июнь
+        { 38, 38, 95, 30, 400, 540 }, // 7. Июль
+        { 38, 38, 92, 30, 400, 540 }, // 8. Август
+        { 42, 42, 95, 30, 400, 540 }, // 9. Сентябрь
+        { 46, 46, 96, 32, 410, 540 }, // 10. Октябрь
+        { 38, 38, 92, 30, 400, 540 }, // 11. Ноябрь
+        { 44, 44, 96, 32, 410, 540 }  // 12. Декабрь
+    };
+
     public MonthLayoutConfig GetLayoutConfigForMonth(int monthIndex1Based)
     {
-        int idx = monthIndex1Based - 1;
-        if (customMonthLayouts != null && idx >= 0 && idx < customMonthLayouts.Length && customMonthLayouts[idx] != null && customMonthLayouts[idx].cellSize.x > 0)
+        int idx = Mathf.Clamp(monthIndex1Based - 1, 0, 11);
+        if (customMonthLayouts != null && idx < customMonthLayouts.Length && customMonthLayouts[idx] != null && customMonthLayouts[idx].cellSize.x > 0)
         {
             return customMonthLayouts[idx];
         }
 
-        // Предустановленные идеальные калибровки для каждого месяца (1..12) под уникальные сезонные рамки
-        MonthLayoutConfig cfg = new MonthLayoutConfig();
-        cfg.monthName = monthNamesRu[idx];
-
-        switch (monthIndex1Based)
+        MonthLayoutConfig cfg = new MonthLayoutConfig
         {
-            case 1: // Январь (Ледяная вытянутая рамка)
-                cfg.cardSize = new Vector2(400f, 540f);
-                cfg.cellSize = new Vector2(34f, 34f);
-                cfg.spacing = new Vector2(4f, 4f);
-                cfg.padLeft = 42;
-                cfg.padRight = 42;
-                cfg.padTop = 98;
-                cfg.padBottom = 30;
-                break;
-            case 2: // Февраль (Аметистовая квадратная рамка)
-                cfg.cardSize = new Vector2(400f, 540f);
-                cfg.cellSize = new Vector2(34f, 34f);
-                cfg.spacing = new Vector2(4f, 4f);
-                cfg.padLeft = 40;
-                cfg.padRight = 40;
-                cfg.padTop = 95;
-                cfg.padBottom = 30;
-                break;
-            case 3: // Март (Зеленые лиственные побеги)
-                cfg.cardSize = new Vector2(400f, 540f);
-                cfg.cellSize = new Vector2(34f, 34f);
-                cfg.spacing = new Vector2(4f, 4f);
-                cfg.padLeft = 38;
-                cfg.padRight = 38;
-                cfg.padTop = 92;
-                cfg.padBottom = 30;
-                break;
-            case 4: // Апрель (Цветущая сакура)
-                cfg.cardSize = new Vector2(400f, 540f);
-                cfg.cellSize = new Vector2(34f, 34f);
-                cfg.spacing = new Vector2(4f, 4f);
-                cfg.padLeft = 38;
-                cfg.padRight = 38;
-                cfg.padTop = 92;
-                cfg.padBottom = 30;
-                break;
-            case 5: // Май (Золотые вензеля и синие кристаллы)
-                cfg.cardSize = new Vector2(400f, 540f);
-                cfg.cellSize = new Vector2(34f, 34f);
-                cfg.spacing = new Vector2(4f, 4f);
-                cfg.padLeft = 42;
-                cfg.padRight = 42;
-                cfg.padTop = 96;
-                cfg.padBottom = 30;
-                break;
-            case 6: // Июнь (Солнечные лучи и янтарные капли)
-                cfg.cardSize = new Vector2(400f, 540f);
-                cfg.cellSize = new Vector2(34f, 34f);
-                cfg.spacing = new Vector2(4f, 4f);
-                cfg.padLeft = 40;
-                cfg.padRight = 40;
-                cfg.padTop = 98;
-                cfg.padBottom = 30;
-                break;
-            case 7: // Июль (Жемчуг и бирюзовые камни)
-                cfg.cardSize = new Vector2(400f, 540f);
-                cfg.cellSize = new Vector2(34f, 34f);
-                cfg.spacing = new Vector2(4f, 4f);
-                cfg.padLeft = 38;
-                cfg.padRight = 38;
-                cfg.padTop = 95;
-                cfg.padBottom = 30;
-                break;
-            case 8: // Август (Золотой колос и звезды)
-                cfg.cardSize = new Vector2(400f, 540f);
-                cfg.cellSize = new Vector2(34f, 34f);
-                cfg.spacing = new Vector2(4f, 4f);
-                cfg.padLeft = 38;
-                cfg.padRight = 38;
-                cfg.padTop = 92;
-                cfg.padBottom = 30;
-                break;
-            case 9: // Сентябрь (Дубовые листья и желуди)
-                cfg.cardSize = new Vector2(400f, 540f);
-                cfg.cellSize = new Vector2(34f, 34f);
-                cfg.spacing = new Vector2(4f, 4f);
-                cfg.padLeft = 42;
-                cfg.padRight = 42;
-                cfg.padTop = 95;
-                cfg.padBottom = 30;
-                break;
-            case 10: // Октябрь (Тыквы Хэллоуина и аметисты)
-                cfg.cardSize = new Vector2(410f, 540f);
-                cfg.cellSize = new Vector2(34f, 34f);
-                cfg.spacing = new Vector2(4f, 4f);
-                cfg.padLeft = 46;
-                cfg.padRight = 46;
-                cfg.padTop = 96;
-                cfg.padBottom = 32;
-                break;
-            case 11: // Ноябрь (Серебряно-золотой контур)
-                cfg.cardSize = new Vector2(400f, 540f);
-                cfg.cellSize = new Vector2(34f, 34f);
-                cfg.spacing = new Vector2(4f, 4f);
-                cfg.padLeft = 38;
-                cfg.padRight = 38;
-                cfg.padTop = 92;
-                cfg.padBottom = 30;
-                break;
-            case 12: // Декабрь (Хвойные лапы и рубины)
-                cfg.cardSize = new Vector2(410f, 540f);
-                cfg.cellSize = new Vector2(34f, 34f);
-                cfg.spacing = new Vector2(4f, 4f);
-                cfg.padLeft = 44;
-                cfg.padRight = 44;
-                cfg.padTop = 96;
-                cfg.padBottom = 32;
-                break;
-        }
+            monthName = monthNamesRu[idx],
+            padLeft = DefaultPaddings[idx, 0],
+            padRight = DefaultPaddings[idx, 1],
+            padTop = DefaultPaddings[idx, 2],
+            padBottom = DefaultPaddings[idx, 3],
+            cardSize = new Vector2(DefaultPaddings[idx, 4], DefaultPaddings[idx, 5]),
+            cellSize = new Vector2(34f, 34f),
+            spacing = new Vector2(4f, 4f)
+        };
 
         return cfg;
     }
@@ -316,7 +228,7 @@ public class Calendar_Manager : MonoBehaviour
                 gridGroup.padding = new RectOffset(cfg.padLeft, cfg.padRight, cfg.padTop, cfg.padBottom);
                 gridGroup.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
                 gridGroup.constraintCount = 7;
-                gridGroup.childAlignment = TextAnchor.MiddleCenter;
+                gridGroup.childAlignment = TextAnchor.UpperCenter;
             }
 
             int daysInMonth = DateTime.DaysInMonth(currentYear, m);
