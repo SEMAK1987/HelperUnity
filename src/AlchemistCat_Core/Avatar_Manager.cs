@@ -45,12 +45,21 @@ public class Avatar_Manager : MonoBehaviour
         public int id;
         public string avatarNameRU;
         public string avatarNameEN;
+        public string avatarNameTR;
         public AvatarCategory category;
         public Sprite avatarSprite;
         public bool isUnlockedByDefault = false;
         public int unlockLevelRequired = 0;
         public int goldPrice = 0;
         public int crystalPrice = 0;
+
+        public string GetLocalizedName()
+        {
+            int lang = PlayerPrefs.GetInt("SelectedLanguage", 0);
+            if (lang == 1 && !string.IsNullOrEmpty(avatarNameEN)) return avatarNameEN;
+            if (lang == 2 && !string.IsNullOrEmpty(avatarNameTR)) return avatarNameTR;
+            return string.IsNullOrEmpty(avatarNameRU) ? $"Avatar #{id}" : avatarNameRU;
+        }
     }
 
     [System.Serializable]
@@ -58,11 +67,22 @@ public class Avatar_Manager : MonoBehaviour
     {
         public int id;
         public string frameNameRU;
+        public string frameNameEN;
+        public string frameNameTR;
         public Sprite frameSprite;
         public AvatarCategory category;
+        public bool isUnlockedByDefault = false;
         public int unlockLevelRequired = 0;
         public int goldPrice = 0;
         public int crystalPrice = 0;
+
+        public string GetLocalizedName()
+        {
+            int lang = PlayerPrefs.GetInt("SelectedLanguage", 0);
+            if (lang == 1 && !string.IsNullOrEmpty(frameNameEN)) return frameNameEN;
+            if (lang == 2 && !string.IsNullOrEmpty(frameNameTR)) return frameNameTR;
+            return string.IsNullOrEmpty(frameNameRU) ? $"Frame #{id}" : frameNameRU;
+        }
     }
 
     [Header("Коллекция Аватарок (До 100 Уровня)")]
@@ -226,14 +246,16 @@ public class Avatar_Manager : MonoBehaviour
 
     private void InitDefaultData()
     {
-        // 5 Рамок профиля
+        // 7 Рамок профиля (1 Бесплатная, 4 за Золото в магазине, 2 Премиум за Кристаллы)
         if (allFrames.Count == 0)
         {
-            allFrames.Add(new FrameData { id = 0, frameNameRU = "Стартовая Рамка Ученика", category = AvatarCategory.Free });
+            allFrames.Add(new FrameData { id = 0, frameNameRU = "Стартовая Рамка Ученика", category = AvatarCategory.Free, isUnlockedByDefault = true });
             allFrames.Add(new FrameData { id = 1, frameNameRU = "Медная Рамка Лавки", category = AvatarCategory.Shop, unlockLevelRequired = 5, goldPrice = 3000 });
             allFrames.Add(new FrameData { id = 2, frameNameRU = "Серебряная Рамка Мастера", category = AvatarCategory.Shop, unlockLevelRequired = 5, goldPrice = 6000 });
             allFrames.Add(new FrameData { id = 3, frameNameRU = "Золотая Рамка Алхимика", category = AvatarCategory.Shop, unlockLevelRequired = 5, goldPrice = 10000 });
-            allFrames.Add(new FrameData { id = 4, frameNameRU = "Астральная Донатная Рамка", category = AvatarCategory.Premium, unlockLevelRequired = 3, crystalPrice = 50 });
+            allFrames.Add(new FrameData { id = 4, frameNameRU = "Королевская Изумрудная Рамка", category = AvatarCategory.Shop, unlockLevelRequired = 10, goldPrice = 25000 });
+            allFrames.Add(new FrameData { id = 5, frameNameRU = "Астральная Донатная Рамка", category = AvatarCategory.Premium, unlockLevelRequired = 3, crystalPrice = 50 });
+            allFrames.Add(new FrameData { id = 6, frameNameRU = "Божественная Солнечная Рамка", category = AvatarCategory.Premium, unlockLevelRequired = 5, crystalPrice = 100 });
         }
 
         // Коллекция Аватарок
