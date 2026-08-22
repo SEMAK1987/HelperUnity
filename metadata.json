@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Fate Continent: Alchemist Cat Edition (v18.12.16) - Daily Calendar Progression & Auto-Open Exception Safeguard.",
+  "description": "Fate Continent: Alchemist Cat Edition (v18.12.21) - 3-Language Translator Sync (RU/EN/TR) for Avatar Wardrobe & Prefabs.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

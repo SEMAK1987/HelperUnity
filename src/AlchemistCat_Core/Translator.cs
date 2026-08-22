@@ -39,7 +39,8 @@ public class Translator : MonoBehaviour
             "Качество", "Рейтинг", "Магазин", "Привет, Кот-Алхимик!", "Слот ", "Выбор сохранения", "Перезапись", "(Пусто)",
             "Мяу! Начнем варку?", "Мыши пойманы!", "Улучшить котел", "Книга рецептов", "Поймать мышь", "Играть в Дартс", "Далее", "Сохранить", "Мышей в амбаре: ",
             "Очень Низкое", "Низкое", "Среднее", "Высокое", "Очень Высокое", "Ультра",
-            "Вы уверены?", "Да", "Нет", "Загрузить", "Меню кота", "Золото: ", "Кристаллы: ", "Уровень Кота: ", "Зелья: ", "Настройки"
+            "Вы уверены?", "Да", "Нет", "Загрузить", "Меню кота", "Золото: ", "Кристаллы: ", "Уровень Кота: ", "Зелья: ", "Настройки",
+            "Гардероб Аватарок", "Ур. ", "Выбрано", "Надеть", "Категория Аватарок", "Простые Аватарки (до 100 Ур.)", "Покупные Аватарки (с 5 Ур.)", "Премиум Аватарки (с 3 Ур.)", "Рамки Профиля", "С 5 Ур.", "С 3 Ур.", "Закрыто"
         },
         // 1 - English
         new string[] {
@@ -48,7 +49,8 @@ public class Translator : MonoBehaviour
             "Quality", "Rating", "Shop", "Welcome, Alchemist Cat!", "Slot ", "Select Save Slot", "Overwrite", "(Empty)",
             "Meow! Start brewing?", "Mice caught!", "Upgrade Cauldron", "Recipe Book", "Catch Mice", "Play Darts", "Continue", "Save", "Mice in Barn: ",
             "Very Low", "Low", "Medium", "High", "Very High", "Ultra",
-            "Are you sure?", "Yes", "No", "Load", "Cat Menu", "Gold: ", "Crystals: ", "Cat Level: ", "Potions: ", "Settings"
+            "Are you sure?", "Yes", "No", "Load", "Cat Menu", "Gold: ", "Crystals: ", "Cat Level: ", "Potions: ", "Settings",
+            "Avatar Wardrobe", "Lvl. ", "Selected", "Equip", "Avatar Category", "Free Avatars (up to Lvl 100)", "Shop Avatars (from Lvl 5)", "Premium Avatars (from Lvl 3)", "Profile Frames", "From Lvl 5", "From Lvl 3", "Locked"
         },
         // 2 - Turkish (TR) - Идеально для Яндекс Игр!
         new string[] {
@@ -57,7 +59,8 @@ public class Translator : MonoBehaviour
             "Kalite", "Derecelendirme", "Mağaza", "Hoş geldin, Simyacı Kedi!", "Yuva ", "Kayıt Yuvası Seç", "Üzerine Yaz", "(Boş)",
             "Miyav! İksir yapmaya başla?", "Fareler yakalandı!", "Kazanı Geliştir", "Tarif Kitabı", "Fare Yakala", "Dart Oyna", "Devam Et", "Kaydet", "Barn'daki Fareler: ",
             "Çok Düşük", "Düşük", "Orta", "Yüksek", "Çok Yüksek", "Ultra",
-            "Emin misiniz?", "Evet", "Hayır", "Yükle", "Kedi Menüsü", "Altın: ", "Kristaller: ", "Kedi Seviyesi: ", "İksirler: ", "Ayarlar"
+            "Emin misiniz?", "Evet", "Hayır", "Yükle", "Kedi Menüsü", "Altın: ", "Kristaller: ", "Kedi Seviyesi: ", "İksirler: ", "Ayarlar",
+            "Avatar Gardırobu", "Seviye ", "Seçildi", "Kuşan", "Avatar Kategorisi", "Ücretsiz Avatarlar (100 Seviyeye Kadar)", "Mağaza Avatarları (5. Seviyeden)", "Premium Avatarlar (3. Seviyeden)", "Profil Çerçeveleri", "5. Seviyeden", "3. Seviyeden", "Kilitli"
         }
     };
 
