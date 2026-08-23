@@ -520,20 +520,27 @@ public class DialogueSystem_Manager : MonoBehaviour
                 nextStepButton.interactable = true;
                 if (nextStepButtonText != null)
                 {
+                    // Настройка переноса строк и авто-подгонки шрифта под плашку
+                    nextStepButtonText.enableAutoSizing = true;
+                    nextStepButtonText.fontSizeMin = 14;
+                    nextStepButtonText.fontSizeMax = 22;
+                    nextStepButtonText.textWrappingMode = TextWrappingModes.NoWrap;
+                    nextStepButtonText.overflowMode = TextOverflowModes.Ellipsis;
+
                     if (step.isClaimStarterRewardStep)
                         nextStepButtonText.text = "Забрать бонус!";
                     else if (step.isCalendarOpenStep)
-                        nextStepButtonText.text = "Открыть календарь >>";
+                        nextStepButtonText.text = "Открыть календарь";
                     else if (step.isAvatarShowStep)
-                        nextStepButtonText.text = "Показать аватарки >>";
+                        nextStepButtonText.text = "Показать аватарки";
                     else if (step.isConfirmHelpStep)
-                        nextStepButtonText.text = "Согласен >>";
+                        nextStepButtonText.text = "Согласен";
                     else if (step.isConfirmRecipeStep)
                         nextStepButtonText.text = "Да, я согласен!";
                     else if (step.isRecipeStep)
-                        nextStepButtonText.text = "Открыть рецепт >>";
+                        nextStepButtonText.text = "Открыть рецепт";
                     else
-                        nextStepButtonText.text = "Далее >>";
+                        nextStepButtonText.text = "Далее";
                 }
             }
         }

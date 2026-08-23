@@ -15,6 +15,7 @@ using TMPro;
 ///   * Красный крестик (Missed_Badge / The day is missed) - день пропущен без входа
 /// - Ежедневные, месячные, квартальные и годовые награды
 /// </summary>
+[ExecuteAlways]
 public class Calendar_Manager : MonoBehaviour
 {
     public static Calendar_Manager Instance { get; private set; }
@@ -52,7 +53,7 @@ public class Calendar_Manager : MonoBehaviour
     }
 
     [Header("Индивидуальная калибровка сеток для каждого месяца")]
-    [SerializeField] private MonthLayoutConfig[] customMonthLayouts = new MonthLayoutConfig[12];
+    public MonthLayoutConfig[] customMonthLayouts = new MonthLayoutConfig[12];
 
     [Header("Reward Popup / Notification")]
     [SerializeField] private GameObject rewardPopup;
@@ -69,9 +70,41 @@ public class Calendar_Manager : MonoBehaviour
         "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
     };
 
+    private void Reset()
+    {
+        ResetLayoutsToDefaults();
+    }
+
     private void Awake()
     {
         Instance = this;
+
+        // Если в инспекторе уже были заданы валидные калибровки пользователем, не перезаписываем их дефолтами
+        bool hasValidInspectorLayouts = (customMonthLayouts != null && customMonthLayouts.Length == 12 && customMonthLayouts[0] != null && customMonthLayouts[0].cellSize.x > 0);
+
+        if (!hasValidInspectorLayouts)
+        {
+            // Если в PlayerPrefs есть сохраненные настройки верстки, подгружаем их
+            string savedJson = PlayerPrefs.GetString("FateContinent_Calendar_Layouts", "");
+            if (!string.IsNullOrEmpty(savedJson))
+            {
+                try
+                {
+                    MonthLayoutDataWrapper wrapper = JsonUtility.FromJson<MonthLayoutDataWrapper>(savedJson);
+                    if (wrapper != null && wrapper.layouts != null && wrapper.layouts.Length == 12)
+                    {
+                        customMonthLayouts = wrapper.layouts;
+                        hasValidInspectorLayouts = true;
+                    }
+                }
+                catch {}
+            }
+        }
+
+        if (!hasValidInspectorLayouts)
+        {
+            ResetLayoutsToDefaults();
+        }
 
         if (calendarPanel == null)
             calendarPanel = this.gameObject;
@@ -110,13 +143,14 @@ public class Calendar_Manager : MonoBehaviour
 
         UpdateCurrentDate();
 
-        // Если при старте панель была выключена и не сгенерировалась — генерируем сейчас
+        // Всегда синхронизируем и применяем свежие координаты ячеек при открытии
         if (monthsContainer != null && monthsContainer.childCount == 0)
         {
             GenerateFullCalendar();
         }
         else
         {
+            ApplyAllLayoutsInRealtime();
             RefreshAllDaysUI();
         }
     }
@@ -167,28 +201,273 @@ public class Calendar_Manager : MonoBehaviour
         currentDay = now.Day;     // 1..31
     }
 
+    [Header("Принудительно использовать калибровочные настройки из кода")]
+    [Tooltip("Если выключено (false), календарь использует ваши настройки из инспектора в реальном времени!")]
+    public bool useCodeDefaultPaddings = false;
+
     // Таблица параметров калибровки для 12 сезонных рамок:
     // [padLeft, padRight, padTop, padBottom, cardWidth, cardHeight, cellWidth, cellHeight, spacingX, spacingY]
     private static readonly int[,] DefaultPaddings = new int[,]
     {
-        { 50, 50, 110, 30, 420, 540, 33, 35, 4, 10 }, // 1. Январь (Распределены цифры по высоте: spacingY=10, cellHeight=35)
-        { 40, 40, 100, 30, 420, 540, 35, 35, 5, 5 },  // 2. Февраль (Без изменений)
-        { 50, 50, 110, 30, 420, 540, 33, 35, 4, 10 }, // 3. Март (Распределены цифры по высоте: spacingY=10, cellHeight=35)
-        { 38, 38, 102, 28, 420, 540, 36, 36, 5, 5 },  // 4. Апрель (Без изменений)
-        { 62, 62, 120, 30, 420, 540, 28, 30, 3, 4 },  // 5. Май (Сужены цифры вовнутрь от синих камней: padLeft/Right=62, cellWidth=28)
-        { 40, 40, 100, 30, 420, 540, 35, 35, 5, 5 },  // 6. Июнь (Без изменений)
-        { 40, 40, 100, 30, 420, 540, 35, 35, 5, 5 },  // 7. Июль (Без изменений)
-        { 50, 50, 110, 30, 420, 540, 33, 35, 4, 10 }, // 8. Август (Распределены цифры по высоте: spacingY=10, cellHeight=35)
-        { 62, 62, 120, 30, 420, 540, 28, 30, 3, 4 },  // 9. Сентябрь (Сужены цифры вовнутрь от листьев: padLeft/Right=62, cellWidth=28)
-        { 52, 52, 115, 32, 430, 540, 32, 34, 3, 10 }, // 10. Октябрь (Распределены цифры по высоте: spacingY=10, cellHeight=34)
-        { 50, 50, 110, 30, 420, 540, 33, 35, 4, 10 }, // 11. Ноябрь (Распределены цифры по высоте: spacingY=10, cellHeight=35)
-        { 42, 42, 102, 30, 420, 540, 35, 35, 5, 5 }   // 12. Декабрь (Без изменений)
+        { 110, 110, 44, 75, 600, 680, 27, 44, 4, 13 },  // 1. Январь (Цифры подняты выше: padTop 44 - не касаются нижней планки рамки 29..31)
+        { 40, 40, 44, 30, 455, 540, 27, 44, 4, 15 },   // 2. Февраль (Цифры на высоте Января: padTop 44, рамка 455x540)
+        { 75, 75, 38, 70, 525, 675, 27, 44, 4, 15 },   // 3. Март (Цифры чуть подняты вверх: padTop 38 - не касаются низа рамки 29..31)
+        { 38, 38, 35, 28, 460, 540, 27, 44, 4, 15 },   // 4. Апрель (Эталон)
+        { 60, 60, 35, 35, 460, 540, 27, 44, 4, 15 },   // 5. Май (Эталон)
+        { 40, 40, 35, 30, 460, 540, 27, 44, 4, 15 },   // 6. Июнь (Эталон)
+        { 40, 40, 35, 30, 460, 540, 27, 44, 4, 15 },   // 7. Июль (Эталон: padTop 35)
+        { 85, 85, 35, 75, 575, 685, 27, 44, 4, 15 },   // 8. Август (Цифры подняты на точный уровень Июля: padTop 35, рамка не тронута)
+        { 40, 40, 30, 30, 460, 540, 27, 44, 4, 15 },   // 9. Сентябрь (Эталон: padTop 30)
+        { 90, 90, 30, 75, 585, 685, 27, 44, 4, 15 },   // 10. Октябрь (Цифры подняты до уровня Сентября: padTop 30, рамка не тронута)
+        { 60, 60, 35, 35, 460, 540, 27, 44, 4, 15 },   // 11. Ноябрь (Эталон)
+        { 60, 60, 35, 35, 460, 540, 27, 44, 4, 15 }    // 12. Декабрь (Высота Ноября: padTop 35, ячейки 27x44)
     };
+
+    [Header("Кнопки управления калибровкой (Включайте галочку для действия в Инспекторе)")]
+    [Tooltip("Поставьте галочку, чтобы скопировать все координаты месяцев в буфер обмена")]
+    public bool btn_CopyAllLayouts = false;
+    [Tooltip("Поставьте галочку, чтобы вставить координаты месяцев из буфера обмена")]
+    public bool btn_PasteAllLayouts = false;
+    [Tooltip("Поставьте галочку, чтобы сохранить текущие координаты в PlayerPrefs на устройстве")]
+    public bool btn_SaveLayoutsToPrefs = false;
+    [Tooltip("Поставьте галочку, чтобы загрузить сохраненные координаты из PlayerPrefs")]
+    public bool btn_LoadLayoutsFromPrefs = false;
+    [Tooltip("Поставьте галочку, чтобы сбросить все месяцы на стандартные значения")]
+    public bool btn_ResetToDefaults = false;
+
+    [ContextMenu("Сбросить калибровку на значения по умолчанию")]
+    public void ResetLayoutsToDefaults()
+    {
+        customMonthLayouts = new MonthLayoutConfig[12];
+        for (int i = 0; i < 12; i++)
+        {
+            customMonthLayouts[i] = new MonthLayoutConfig
+            {
+                monthName = (monthNamesRu != null && i < monthNamesRu.Length) ? monthNamesRu[i] : $"Месяц {i + 1}",
+                padLeft = DefaultPaddings[i, 0],
+                padRight = DefaultPaddings[i, 1],
+                padTop = DefaultPaddings[i, 2],
+                padBottom = DefaultPaddings[i, 3],
+                cardSize = new Vector2(DefaultPaddings[i, 4], DefaultPaddings[i, 5]),
+                cellSize = new Vector2(DefaultPaddings[i, 6], DefaultPaddings[i, 7]),
+                spacing = new Vector2(DefaultPaddings[i, 8], DefaultPaddings[i, 9])
+            };
+        }
+        ApplyAllLayoutsInRealtime();
+    }
+
+    [ContextMenu("Скопировать все координаты месяцев (В Буфер JSON)")]
+    public void CopyAllLayoutsToClipboard()
+    {
+        if (customMonthLayouts == null || customMonthLayouts.Length == 0)
+        {
+            ResetLayoutsToDefaults();
+        }
+
+        MonthLayoutDataWrapper wrapper = new MonthLayoutDataWrapper { layouts = customMonthLayouts };
+        string json = JsonUtility.ToJson(wrapper, true);
+        GUIUtility.systemCopyBuffer = json;
+        Debug.Log("<color=#80FFDB><b>[CALENDAR] Все координаты 12 месяцев скопированы в буфер обмена!</b></color>");
+    }
+
+    [ContextMenu("Вставить координаты месяцев (Из Буфера JSON)")]
+    public void PasteAllLayoutsFromClipboard()
+    {
+        string json = GUIUtility.systemCopyBuffer;
+        if (string.IsNullOrEmpty(json))
+        {
+            Debug.LogWarning("[CALENDAR] Буфер обмена пуст!");
+            return;
+        }
+
+        try
+        {
+            MonthLayoutDataWrapper wrapper = JsonUtility.FromJson<MonthLayoutDataWrapper>(json);
+            if (wrapper != null && wrapper.layouts != null && wrapper.layouts.Length == 12)
+            {
+                customMonthLayouts = wrapper.layouts;
+                ApplyAllLayoutsInRealtime();
+                Debug.Log("<color=#FFE57F><b>[CALENDAR] Координаты месяцев успешно вставлены и применены!</b></color>");
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"[CALENDAR] Ошибка разбора JSON из буфера: {ex.Message}");
+        }
+    }
+
+    [ContextMenu("Сохранить координаты в PlayerPrefs")]
+    public void SaveLayoutsToPrefs()
+    {
+        if (customMonthLayouts == null || customMonthLayouts.Length == 0) return;
+        MonthLayoutDataWrapper wrapper = new MonthLayoutDataWrapper { layouts = customMonthLayouts };
+        string json = JsonUtility.ToJson(wrapper);
+        PlayerPrefs.SetString("FateContinent_Calendar_Layouts", json);
+        PlayerPrefs.Save();
+        Debug.Log("<color=#80FFDB><b>[CALENDAR] Координаты успешно сохранены в постоянную память игры!</b></color>");
+    }
+
+    [ContextMenu("Загрузить координаты из PlayerPrefs")]
+    public void LoadLayoutsFromPrefs()
+    {
+        string json = PlayerPrefs.GetString("FateContinent_Calendar_Layouts", "");
+        if (string.IsNullOrEmpty(json))
+        {
+            Debug.LogWarning("[CALENDAR] Нет сохраненных координат в PlayerPrefs.");
+            return;
+        }
+
+        try
+        {
+            MonthLayoutDataWrapper wrapper = JsonUtility.FromJson<MonthLayoutDataWrapper>(json);
+            if (wrapper != null && wrapper.layouts != null && wrapper.layouts.Length == 12)
+            {
+                customMonthLayouts = wrapper.layouts;
+                ApplyAllLayoutsInRealtime();
+                Debug.Log("<color=#FFE57F><b>[CALENDAR] Координаты успешно загружены из PlayerPrefs и применены!</b></color>");
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"[CALENDAR] Ошибка загрузки координат: {ex.Message}");
+        }
+    }
+
+    [System.Serializable]
+    private class MonthLayoutDataWrapper
+    {
+        public MonthLayoutConfig[] layouts;
+    }
+
+    private bool _needsLayoutUpdate = false;
+
+    private void OnValidate()
+    {
+        // Кнопки-триггеры в Инспекторе
+        if (btn_CopyAllLayouts)
+        {
+            btn_CopyAllLayouts = false;
+            CopyAllLayoutsToClipboard();
+        }
+        if (btn_PasteAllLayouts)
+        {
+            btn_PasteAllLayouts = false;
+            PasteAllLayoutsFromClipboard();
+        }
+        if (btn_SaveLayoutsToPrefs)
+        {
+            btn_SaveLayoutsToPrefs = false;
+            SaveLayoutsToPrefs();
+        }
+        if (btn_LoadLayoutsFromPrefs)
+        {
+            btn_LoadLayoutsFromPrefs = false;
+            LoadLayoutsFromPrefs();
+        }
+        if (btn_ResetToDefaults)
+        {
+            btn_ResetToDefaults = false;
+            ResetLayoutsToDefaults();
+        }
+
+        // Помечаем флаг для безопасного обновления верстки в кадре LateUpdate без исключений SendMessage!
+        _needsLayoutUpdate = true;
+    }
+
+    private void Update()
+    {
+        // Если в Play Mode вы меняете координаты в Инспекторе — они мгновенно применяются к сетке!
+        if (Application.isPlaying && calendarPanel != null && calendarPanel.activeInHierarchy)
+        {
+            ApplyAllLayoutsInRealtime();
+        }
+    }
+
+    private void LateUpdate()
+    {
+        if (_needsLayoutUpdate)
+        {
+            _needsLayoutUpdate = false;
+            ApplyAllLayoutsInRealtime();
+        }
+    }
+
+    /// <summary>
+    /// Применяет измененные размеры карточек, отступы и сетки ячеек ко всем 12 месяцам в реальном времени
+    /// </summary>
+    public void ApplyAllLayoutsInRealtime()
+    {
+        if (monthsContainer == null || monthsContainer.childCount == 0) return;
+
+        // 1. Проверяем все дочерние объекты в контейнере
+        int childCount = monthsContainer.childCount;
+        for (int i = 0; i < childCount; i++)
+        {
+            Transform monthTransform = monthsContainer.GetChild(i);
+            if (monthTransform == null) continue;
+
+            // Определяем порядковый номер месяца (1..12) из имени объекта или по индексу
+            int monthNum = i + 1;
+            string objName = monthTransform.name;
+            if (objName.StartsWith("Month_") && objName.Length >= 8)
+            {
+                int parsed;
+                if (int.TryParse(objName.Substring(6, 2), out parsed))
+                {
+                    monthNum = parsed;
+                }
+            }
+
+            MonthLayoutConfig cfg = GetLayoutConfigForMonth(monthNum);
+            if (cfg == null) continue;
+
+            // Настройка размера карточки месяца
+            RectTransform cardRect = monthTransform.GetComponent<RectTransform>();
+            if (cardRect != null)
+            {
+                cardRect.sizeDelta = cfg.cardSize;
+            }
+
+            // Находим сетку чисел внутри месяца
+            Transform daysGrid = monthTransform.Find("Days_Grid");
+            if (daysGrid == null) daysGrid = monthTransform;
+
+            GridLayoutGroup gridGroup = daysGrid.GetComponent<GridLayoutGroup>();
+            if (gridGroup != null)
+            {
+                gridGroup.cellSize = cfg.cellSize;
+                gridGroup.spacing = cfg.spacing;
+                gridGroup.padding = new RectOffset(cfg.padLeft, cfg.padRight, cfg.padTop, cfg.padBottom);
+                gridGroup.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+                gridGroup.constraintCount = 7;
+                gridGroup.childAlignment = TextAnchor.UpperCenter;
+
+                // Немедленно обновляем внутреннюю сетку чисел
+                RectTransform gridRect = daysGrid.GetComponent<RectTransform>();
+                if (gridRect != null)
+                {
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(gridRect);
+                }
+            }
+
+            if (cardRect != null)
+            {
+                LayoutRebuilder.ForceRebuildLayoutImmediate(cardRect);
+            }
+        }
+
+        // Обновляем родительский контейнер Scroll Content
+        RectTransform containerRect = monthsContainer.GetComponent<RectTransform>();
+        if (containerRect != null)
+        {
+            LayoutRebuilder.ForceRebuildLayoutImmediate(containerRect);
+        }
+    }
 
     public MonthLayoutConfig GetLayoutConfigForMonth(int monthIndex1Based)
     {
         int idx = Mathf.Clamp(monthIndex1Based - 1, 0, 11);
-        if (customMonthLayouts != null && idx < customMonthLayouts.Length && customMonthLayouts[idx] != null && customMonthLayouts[idx].cellSize.x > 0)
+        if (!useCodeDefaultPaddings && customMonthLayouts != null && idx < customMonthLayouts.Length && customMonthLayouts[idx] != null && customMonthLayouts[idx].cellSize.x > 0)
         {
             return customMonthLayouts[idx];
         }
@@ -295,10 +574,15 @@ public class Calendar_Manager : MonoBehaviour
 
     private Sprite GetRewardSpriteForDay(int month, int day)
     {
-        if (day % 7 == 0) return crystalIcon; // Кристаллы раз в неделю
-        if (day % 3 == 0) return scrollIcon;  // Свитки
-        if (day % 2 == 0) return stoneIcon;   // Камни
-        return goldIcon;                      // Золото
+        // Гармоничное чередование наград на каждый день (без повторения только камней):
+        // 7, 14, 21, 28-й день (каждое воскресенье) и конец месяца -> Кристаллы
+        if (day % 7 == 0 || day == DateTime.DaysInMonth(currentYear, month)) return crystalIcon != null ? crystalIcon : goldIcon;
+        // 5, 10, 15, 20, 25-й день -> Древние Свитки
+        if (day % 5 == 0) return scrollIcon != null ? scrollIcon : goldIcon;
+        // 3, 6, 9, 12, 18, 24-й день -> Камни Улучшения
+        if (day % 3 == 0) return stoneIcon != null ? stoneIcon : goldIcon;
+        // Остальные дни (1, 2, 4, 8, 11, 13, 16, 17, 19, 22, 23, 26, 27, 29) -> Золото
+        return goldIcon;
     }
 
     private void OnDayClicked(int month, int day, GameObject cellObj)
@@ -344,10 +628,23 @@ public class Calendar_Manager : MonoBehaviour
 
     private string ClaimReward(int month, int day)
     {
-        int gold = 1000 + (day * 100);
-        int stones = (day % 2 == 0) ? 2 : 0;
-        int scrolls = (day % 3 == 0) ? 1 : 0;
-        int crystals = (day % 7 == 0) ? 5 : 0;
+        int gold = 1000 + (day * 80);
+        int stones = 0;
+        int scrolls = 0;
+        int crystals = 0;
+
+        if (day % 7 == 0 || day == DateTime.DaysInMonth(currentYear, month))
+        {
+            crystals = 5 + (month >= 6 ? 3 : 0);
+        }
+        else if (day % 5 == 0)
+        {
+            scrolls = 2;
+        }
+        else if (day % 3 == 0)
+        {
+            stones = 3;
+        }
 
         int currentGold = PlayerPrefs.GetInt("Player_Gold", 5000);
         int currentStones = PlayerPrefs.GetInt("Player_Stones", 10);
@@ -364,6 +661,11 @@ public class Calendar_Manager : MonoBehaviour
         if (DialogueSystem_Manager.Instance != null)
         {
             DialogueSystem_Manager.Instance.SyncPlayerPrefsResources();
+        }
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.AddResources(gold, stones, scrolls, crystals);
         }
 
         string res = $"+{gold} Золота";

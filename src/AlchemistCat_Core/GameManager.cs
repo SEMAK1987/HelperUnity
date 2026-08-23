@@ -90,6 +90,18 @@ public class GameManager : MonoBehaviour
         AutoSave();
     }
 
+    public void AddResources(int addGold, int addStones, int addScrolls, int addCrystals)
+    {
+        if (addGold != 0) gold += addGold;
+        if (addCrystals != 0) crystals += addCrystals;
+        SyncUI();
+        AutoSave();
+        if (DialogueSystem_Manager.Instance != null)
+        {
+            DialogueSystem_Manager.Instance.SyncPlayerPrefsResources();
+        }
+    }
+
     public void AddVipXP(int amount)
     {
         vipXP += amount;

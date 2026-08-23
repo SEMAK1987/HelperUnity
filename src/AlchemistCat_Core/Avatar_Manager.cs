@@ -29,6 +29,15 @@ public class Avatar_Manager : MonoBehaviour
     public Vector2 cellSpacing = new Vector2(12, 12);
     public Vector2 panelSize = new Vector2(580, 720);
 
+    [Header("Настройки Цветов Гардероба (Легко настраивать в Инспекторе)")]
+    public Color categoryHeaderColor = new Color(1f, 0.92f, 0.45f, 1f); // #FFEBA3 Яркий золотой
+    public Color selectedStatusColor = new Color(0.3f, 1f, 0.75f, 1f);   // #4DFFBF Изумрудно-зеленый
+    public Color wearStatusColor = new Color(1f, 0.95f, 0.4f, 1f);       // #FFF266 Золотой
+    public Color levelLockedColor = new Color(1f, 0.45f, 0.55f, 1f);     // #FF738C Розово-красный
+    public Color shopGoldPriceColor = new Color(1f, 0.85f, 0.2f, 1f);    // #FFD933 Золотой
+    public Color premiumCrystalColor = new Color(0.95f, 0.5f, 1f, 1f);   // #F280FF Пурпурный
+    public Color cellBackgroundColor = new Color(0.12f, 0.11f, 0.18f, 0.85f); // Темный контрастный фон ячейки
+
     [Header("Иконка Профиля в верхнем левом углу")]
     public Button avatarIconButton;
     public Image currentAvatarDisplayImage;
@@ -90,6 +99,15 @@ public class Avatar_Manager : MonoBehaviour
             return string.IsNullOrEmpty(frameNameRU) ? $"Frame #{id}" : frameNameRU;
         }
     }
+
+    [Header("Позиции и Масштаб Элементов Профиля (Ручная и Автоматическая Калибровка)")]
+    public bool autoAlignProfileOffsets = true;
+    public Vector2 avatarRingPosition = new Vector2(40, -40); // Позиция кольца аватара
+    public Vector2 avatarRingScale = new Vector2(1.2f, 1.2f); // Размер кольца аватара
+    public Vector2 levelBadgePosition = new Vector2(90, 14);  // Сдвинуто ближе к кольцу
+    public Vector2 expBarPosition = new Vector2(-74, 0);      // Сдвинуто ровно на -74 Pos X вплотную к кольцу аватара
+    public Vector2 expBarScale = new Vector2(1f, 1f);         // Масштаб шкалы опыта
+    public float levelTextFontSize = 24f;                     // Размер шрифта "Ур. 1"
 
     [Header("Коллекция Аватарок (До 100 Уровня)")]
     public List<AvatarData> allAvatars = new List<AvatarData>();
@@ -165,6 +183,37 @@ public class Avatar_Manager : MonoBehaviour
 
     public void UpdateProfileUI()
     {
+        // Автоматическое позиционирование кольца аватара, уровня и шкалы опыта
+        if (autoAlignProfileOffsets)
+        {
+            if (avatarIconButton != null)
+            {
+                RectTransform ringRect = avatarIconButton.GetComponent<RectTransform>();
+                if (ringRect != null)
+                {
+                    ringRect.anchoredPosition = avatarRingPosition;
+                    ringRect.localScale = new Vector3(avatarRingScale.x, avatarRingScale.y, 1f);
+                }
+            }
+
+            if (levelBadgeText != null)
+            {
+                RectTransform lvlRect = levelBadgeText.GetComponent<RectTransform>();
+                if (lvlRect != null) lvlRect.anchoredPosition = levelBadgePosition;
+                levelBadgeText.fontSize = levelTextFontSize;
+            }
+
+            if (expProgressBar != null && expProgressBar.transform.parent != null)
+            {
+                RectTransform expBgRect = expProgressBar.transform.parent.GetComponent<RectTransform>();
+                if (expBgRect != null)
+                {
+                    expBgRect.anchoredPosition = expBarPosition;
+                    expBgRect.localScale = new Vector3(expBarScale.x, expBarScale.y, 1f);
+                }
+            }
+        }
+
         string lvlPrefix = Translator.GetText(54); // "Ур. " / "Lvl. " / "Seviye "
         if (levelBadgeText != null)
         {
@@ -354,6 +403,9 @@ public class Avatar_Manager : MonoBehaviour
         CreateCategorySection(Translator.GetText(58), AvatarCategory.Free);
         CreateCategorySection(Translator.GetText(59), AvatarCategory.Shop);
         CreateCategorySection(Translator.GetText(60), AvatarCategory.Premium);
+
+        // Секция 14 Волшебных Рамок Профиля (без спецсимволов Юникода для предотвращения предупреждений TextMeshPro)
+        CreateFramesSection("ВОЛШЕБНЫЕ РАМКИ ПРОФИЛЯ");
     }
 
     private void CreateCategorySection(string headerTitle, AvatarCategory cat)
@@ -362,7 +414,11 @@ public class Avatar_Manager : MonoBehaviour
         {
             GameObject headerObj = Instantiate(categoryHeaderPrefab, scrollContent);
             TextMeshProUGUI txt = headerObj.GetComponentInChildren<TextMeshProUGUI>();
-            if (txt != null) txt.text = headerTitle;
+            if (txt != null)
+            {
+                txt.text = headerTitle;
+                txt.color = categoryHeaderColor;
+            }
         }
 
         List<AvatarData> catList = allAvatars.FindAll(a => a.category == cat);
@@ -398,11 +454,23 @@ public class Avatar_Manager : MonoBehaviour
         GameObject cell = Instantiate(avatarItemPrefab, targetParent);
         cell.name = $"Avatar_{data.id}";
 
+        Image bgImg = cell.GetComponent<Image>();
+        if (bgImg != null)
+        {
+            bgImg.color = cellBackgroundColor;
+        }
+
         Image iconImg = cell.transform.Find("Avatar_Icon")?.GetComponent<Image>();
         Image frameImg = cell.transform.Find("Avatar_Frame")?.GetComponent<Image>();
         GameObject lockObj = cell.transform.Find("Lock_Overlay")?.gameObject;
         TextMeshProUGUI statusText = cell.transform.Find("Status_Text")?.GetComponent<TextMeshProUGUI>();
         Button cellBtn = cell.GetComponent<Button>();
+
+        // Отключаем лишнюю рамку на карточке аватарки, чтобы она не перекрывала изображение сверху
+        if (frameImg != null)
+        {
+            frameImg.gameObject.SetActive(false);
+        }
 
         bool isUnlocked = IsAvatarUnlocked(data);
         bool isSelected = (selectedAvatarId == data.id);
@@ -435,31 +503,37 @@ public class Avatar_Manager : MonoBehaviour
 
         if (statusText != null)
         {
+            string hexSelected = ColorUtility.ToHtmlStringRGB(selectedStatusColor);
+            string hexWear = ColorUtility.ToHtmlStringRGB(wearStatusColor);
+            string hexLocked = ColorUtility.ToHtmlStringRGB(levelLockedColor);
+            string hexGold = ColorUtility.ToHtmlStringRGB(shopGoldPriceColor);
+            string hexCrystal = ColorUtility.ToHtmlStringRGB(premiumCrystalColor);
+
             if (isSelected)
             {
-                statusText.text = $"<color=#80FFDB><b>{Translator.GetText(55)}</b></color>"; // Выбрано
+                statusText.text = $"<color=#{hexSelected}><b>{Translator.GetText(55)}</b></color>"; // Выбрано
             }
             else if (isUnlocked)
             {
-                statusText.text = $"<color=#FFE57F>{Translator.GetText(56)}</color>"; // Надеть
+                statusText.text = $"<color=#{hexWear}>{Translator.GetText(56)}</color>"; // Надеть
             }
             else
             {
                 if (data.category == AvatarCategory.Free)
                 {
-                    statusText.text = $"<color=#FF758F>{Translator.GetText(54)}{data.unlockLevelRequired}</color>"; // Ур. X
+                    statusText.text = $"<color=#{hexLocked}>{Translator.GetText(54)}{data.unlockLevelRequired}</color>"; // Ур. X
                 }
                 else if (data.category == AvatarCategory.Shop)
                 {
                     statusText.text = currentLevel < 5 
-                        ? $"<color=#FF758F>{Translator.GetText(62)}</color>" // С 5 Ур.
-                        : $"<color=#FFE57F>{data.goldPrice} G</color>";
+                        ? $"<color=#{hexLocked}>{Translator.GetText(62)}</color>" // С 5 Ур.
+                        : $"<color=#{hexGold}>{data.goldPrice} G</color>";
                 }
                 else
                 {
                     statusText.text = currentLevel < 3 
-                        ? $"<color=#F384FF>{Translator.GetText(63)}</color>" // С 3 Ур.
-                        : $"<color=#F384FF>{data.crystalPrice} C</color>";
+                        ? $"<color=#{hexCrystal}>{Translator.GetText(63)}</color>" // С 3 Ур.
+                        : $"<color=#{hexCrystal}>{data.crystalPrice} C</color>";
                 }
             }
         }
@@ -468,6 +542,165 @@ public class Avatar_Manager : MonoBehaviour
         {
             cellBtn.onClick.AddListener(() => OnSelectAvatar(data));
         }
+    }
+
+    private void CreateFramesSection(string headerTitle)
+    {
+        if (allFrames == null || allFrames.Count == 0) return;
+
+        if (categoryHeaderPrefab != null)
+        {
+            GameObject headerObj = Instantiate(categoryHeaderPrefab, scrollContent);
+            TextMeshProUGUI txt = headerObj.GetComponentInChildren<TextMeshProUGUI>();
+            if (txt != null)
+            {
+                txt.text = headerTitle;
+                txt.color = categoryHeaderColor;
+            }
+        }
+
+        GameObject gridContainer = new GameObject("GridSection_Frames", typeof(RectTransform), typeof(GridLayoutGroup), typeof(ContentSizeFitter));
+        gridContainer.transform.SetParent(scrollContent, false);
+
+        GridLayoutGroup grid = gridContainer.GetComponent<GridLayoutGroup>();
+        grid.cellSize = cellSize;
+        grid.spacing = cellSpacing;
+        grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+        grid.constraintCount = Mathf.Max(1, columnsCount);
+        grid.childAlignment = TextAnchor.UpperCenter;
+        grid.padding = new RectOffset(8, 8, 8, 16);
+
+        ContentSizeFitter fitter = gridContainer.GetComponent<ContentSizeFitter>();
+        fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+        foreach (FrameData frame in allFrames)
+        {
+            CreateFrameCell(frame, gridContainer.transform);
+        }
+    }
+
+    private void CreateFrameCell(FrameData data, Transform parentContainer)
+    {
+        if (avatarItemPrefab == null) return;
+
+        Transform targetParent = parentContainer != null ? parentContainer : scrollContent;
+        GameObject cell = Instantiate(avatarItemPrefab, targetParent);
+        cell.name = $"Frame_{data.id}";
+
+        Image bgImg = cell.GetComponent<Image>();
+        if (bgImg != null)
+        {
+            bgImg.color = cellBackgroundColor;
+        }
+
+        Image iconImg = cell.transform.Find("Avatar_Icon")?.GetComponent<Image>();
+        Image frameImg = cell.transform.Find("Avatar_Frame")?.GetComponent<Image>();
+        GameObject lockObj = cell.transform.Find("Lock_Overlay")?.gameObject;
+        TextMeshProUGUI statusText = cell.transform.Find("Status_Text")?.GetComponent<TextMeshProUGUI>();
+        Button cellBtn = cell.GetComponent<Button>();
+
+        bool isUnlocked = IsFrameUnlocked(data);
+        bool isSelected = (selectedFrameId == data.id);
+
+        if (iconImg != null)
+        {
+            if (data.frameSprite != null)
+            {
+                iconImg.sprite = data.frameSprite;
+                iconImg.color = Color.white;
+                iconImg.enabled = true;
+            }
+            else
+            {
+                iconImg.sprite = null;
+                iconImg.color = new Color(0.15f, 0.15f, 0.22f, 0.4f);
+            }
+        }
+
+        if (frameImg != null)
+        {
+            frameImg.gameObject.SetActive(false);
+        }
+
+        if (lockObj != null)
+        {
+            lockObj.SetActive(!isUnlocked);
+        }
+
+        if (statusText != null)
+        {
+            string hexSelected = ColorUtility.ToHtmlStringRGB(selectedStatusColor);
+            string hexWear = ColorUtility.ToHtmlStringRGB(wearStatusColor);
+            string hexLocked = ColorUtility.ToHtmlStringRGB(levelLockedColor);
+            string hexGold = ColorUtility.ToHtmlStringRGB(shopGoldPriceColor);
+            string hexCrystal = ColorUtility.ToHtmlStringRGB(premiumCrystalColor);
+
+            if (isSelected)
+            {
+                statusText.text = $"<color=#{hexSelected}><b>{Translator.GetText(55)}</b></color>"; // Выбрано
+            }
+            else if (isUnlocked)
+            {
+                statusText.text = $"<color=#{hexWear}>{Translator.GetText(56)}</color>"; // Надеть
+            }
+            else
+            {
+                if (data.category == AvatarCategory.Free)
+                {
+                    statusText.text = $"<color=#{hexLocked}>{Translator.GetText(54)}{data.unlockLevelRequired}</color>";
+                }
+                else if (data.category == AvatarCategory.Shop)
+                {
+                    statusText.text = currentLevel < 5 
+                        ? $"<color=#{hexLocked}>{Translator.GetText(62)}</color>"
+                        : $"<color=#{hexGold}>{data.goldPrice} G</color>";
+                }
+                else
+                {
+                    statusText.text = currentLevel < 3 
+                        ? $"<color=#{hexCrystal}>{Translator.GetText(63)}</color>"
+                        : $"<color=#{hexCrystal}>{data.crystalPrice} C</color>";
+                }
+            }
+        }
+
+        if (cellBtn != null)
+        {
+            cellBtn.onClick.AddListener(() => OnSelectFrame(data));
+        }
+    }
+
+    public bool IsFrameUnlocked(FrameData data)
+    {
+        if (data.isUnlockedByDefault) return true;
+        if (PlayerPrefs.GetInt($"Frame_Unlocked_{data.id}", 0) == 1) return true;
+
+        if (data.category == AvatarCategory.Free && currentLevel >= data.unlockLevelRequired && data.unlockLevelRequired > 0)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void OnSelectFrame(FrameData data)
+    {
+        if (!IsFrameUnlocked(data))
+        {
+            Debug.Log($"[FRAME] {data.frameNameRU} is locked!");
+            return;
+        }
+
+        selectedFrameId = data.id;
+        PlayerPrefs.SetInt("Selected_Frame_Id", selectedFrameId);
+        PlayerPrefs.Save();
+
+        if (selectSound != null && SettingsManager.Instance != null)
+            SettingsManager.Instance.PlaySoundEffect(selectSound);
+
+        UpdateProfileUI();
+        UpdateAllCellStatusTexts();
     }
 
     public bool IsAvatarUnlocked(AvatarData data)
@@ -499,6 +732,57 @@ public class Avatar_Manager : MonoBehaviour
             SettingsManager.Instance.PlaySoundEffect(selectSound);
 
         UpdateProfileUI();
-        BuildAvatarGrid();
+        UpdateAllCellStatusTexts();
+    }
+
+    /// <summary>
+    /// Быстрое бесшовное обновление надписей "Выбрано / Надеть" без мерцания и без пересоздания GameObjects
+    /// </summary>
+    private void UpdateAllCellStatusTexts()
+    {
+        if (scrollContent == null) return;
+
+        string hexSelected = ColorUtility.ToHtmlStringRGB(selectedStatusColor);
+        string hexWear = ColorUtility.ToHtmlStringRGB(wearStatusColor);
+
+        foreach (Transform section in scrollContent)
+        {
+            if (!section.name.StartsWith("GridSection_")) continue;
+
+            foreach (Transform cell in section)
+            {
+                TextMeshProUGUI statusText = cell.Find("Status_Text")?.GetComponent<TextMeshProUGUI>();
+                if (statusText == null) continue;
+
+                if (cell.name.StartsWith("Avatar_"))
+                {
+                    if (int.TryParse(cell.name.Replace("Avatar_", ""), out int aId))
+                    {
+                        AvatarData av = allAvatars.Find(a => a.id == aId);
+                        if (av != null && IsAvatarUnlocked(av))
+                        {
+                            bool isSel = (selectedAvatarId == aId);
+                            statusText.text = isSel 
+                                ? $"<color=#{hexSelected}><b>{Translator.GetText(55)}</b></color>" 
+                                : $"<color=#{hexWear}>{Translator.GetText(56)}</color>";
+                        }
+                    }
+                }
+                else if (cell.name.StartsWith("Frame_"))
+                {
+                    if (int.TryParse(cell.name.Replace("Frame_", ""), out int fId))
+                    {
+                        FrameData fr = allFrames.Find(f => f.id == fId);
+                        if (fr != null && IsFrameUnlocked(fr))
+                        {
+                            bool isSel = (selectedFrameId == fId);
+                            statusText.text = isSel 
+                                ? $"<color=#{hexSelected}><b>{Translator.GetText(55)}</b></color>" 
+                                : $"<color=#{hexWear}>{Translator.GetText(56)}</color>";
+                        }
+                    }
+                }
+            }
+        }
     }
 }
