@@ -23,6 +23,12 @@ public class Avatar_Manager : MonoBehaviour
     public GameObject avatarItemPrefab;  // Префаб ячейки аватарки
     public GameObject categoryHeaderPrefab; // Префаб заголовка категории
 
+    [Header("Настройки Сетки Гардероба (2-3 в ряд)")]
+    public int columnsCount = 3;
+    public Vector2 cellSize = new Vector2(130, 155);
+    public Vector2 cellSpacing = new Vector2(12, 12);
+    public Vector2 panelSize = new Vector2(580, 720);
+
     [Header("Иконка Профиля в верхнем левом углу")]
     public Button avatarIconButton;
     public Image currentAvatarDisplayImage;
@@ -227,6 +233,14 @@ public class Avatar_Manager : MonoBehaviour
         if (avatarPanel != null)
         {
             avatarPanel.SetActive(true);
+
+            // Настройка размеров окна гардероба (ширина и высота для удобного отображения по 3 в ряд)
+            RectTransform panelRect = avatarPanel.GetComponent<RectTransform>();
+            if (panelRect != null && panelSize.x > 0 && panelSize.y > 0)
+            {
+                panelRect.sizeDelta = panelSize;
+            }
+
             BuildAvatarGrid();
         }
     }
@@ -352,17 +366,36 @@ public class Avatar_Manager : MonoBehaviour
         }
 
         List<AvatarData> catList = allAvatars.FindAll(a => a.category == cat);
+        if (catList.Count == 0) return;
+
+        // Создаем контейнер-сетку с GridLayoutGroup для размещения по 2-3 аватарки по горизонтали
+        GameObject gridContainer = new GameObject($"GridSection_{cat}", typeof(RectTransform), typeof(GridLayoutGroup), typeof(ContentSizeFitter));
+        gridContainer.transform.SetParent(scrollContent, false);
+
+        GridLayoutGroup grid = gridContainer.GetComponent<GridLayoutGroup>();
+        grid.cellSize = cellSize;
+        grid.spacing = cellSpacing;
+        grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+        grid.constraintCount = Mathf.Max(1, columnsCount);
+        grid.childAlignment = TextAnchor.UpperCenter;
+        grid.padding = new RectOffset(8, 8, 8, 16);
+
+        ContentSizeFitter fitter = gridContainer.GetComponent<ContentSizeFitter>();
+        fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
         foreach (AvatarData data in catList)
         {
-            CreateAvatarCell(data);
+            CreateAvatarCell(data, gridContainer.transform);
         }
     }
 
-    private void CreateAvatarCell(AvatarData data)
+    private void CreateAvatarCell(AvatarData data, Transform parentContainer)
     {
         if (avatarItemPrefab == null) return;
 
-        GameObject cell = Instantiate(avatarItemPrefab, scrollContent);
+        Transform targetParent = parentContainer != null ? parentContainer : scrollContent;
+        GameObject cell = Instantiate(avatarItemPrefab, targetParent);
         cell.name = $"Avatar_{data.id}";
 
         Image iconImg = cell.transform.Find("Avatar_Icon")?.GetComponent<Image>();
@@ -371,15 +404,34 @@ public class Avatar_Manager : MonoBehaviour
         TextMeshProUGUI statusText = cell.transform.Find("Status_Text")?.GetComponent<TextMeshProUGUI>();
         Button cellBtn = cell.GetComponent<Button>();
 
-        if (iconImg != null && data.avatarSprite != null)
-        {
-            iconImg.sprite = data.avatarSprite;
-        }
-
         bool isUnlocked = IsAvatarUnlocked(data);
         bool isSelected = (selectedAvatarId == data.id);
 
-        if (lockObj != null) lockObj.SetActive(!isUnlocked);
+        if (iconImg != null)
+        {
+            if (data.avatarSprite != null)
+            {
+                iconImg.sprite = data.avatarSprite;
+                iconImg.color = Color.white;
+                iconImg.enabled = true;
+            }
+            else
+            {
+                // Защита от белого квадрата: если спрайт еще не прикреплен, делаем темный полупрозрачный фон
+                iconImg.sprite = null;
+                iconImg.color = new Color(0.15f, 0.15f, 0.22f, 0.4f);
+            }
+        }
+
+        if (lockObj != null)
+        {
+            lockObj.SetActive(!isUnlocked);
+            Image lockImg = lockObj.GetComponent<Image>();
+            if (lockImg != null)
+            {
+                lockImg.color = Color.white;
+            }
+        }
 
         if (statusText != null)
         {

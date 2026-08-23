@@ -809,9 +809,9 @@ public class DialogueSystem_Manager : MonoBehaviour
         // 1. Появление аватара и шкалы опыта (0/10 XP)
         dialogueSteps.Add(new DialogStep
         {
-            textRU = "Замечательно! Посещаемость отмечена. Теперь взгляни в левый верхний угол:\n\nТам появилась твоя <b><color=#FFE57F>Аватарка и Полоска Опыта (0/10 XP)</color></b>. За изготовление любых зелий и эликсиров ты будешь накапливать опыт!",
-            textEN = "Splendid! Attendance marked. Now look at the top-left corner:\n\nThere is your <b><color=#FFE57F>Avatar & EXP Bar (0/10 XP)</color></b>. Brewing any potion grants you valuable alchemy experience!",
-            textTR = "Harika! Katilim damgalandi. Simdi sol ust koseye bak:\n\nOrada <b><color=#FFE57F>Avatarin ve Deneyim Cubugun (0/10 XP)</color></b> belirdi. Iksir urettikce tecrube kazanacaksin!",
+            textRU = "<size=79%>Замечательно! Посещаемость отмечена. Теперь взгляни в левый верхний угол:\n\nТам появилась твоя <b><color=#FFE57F>Аватарка и Полоска Опыта (0/10 XP)</color></b>. За изготовление любых зелий и эликсиров ты будешь накапливать опыт!</size>",
+            textEN = "<size=79%>Splendid! Attendance marked. Now look at the top-left corner:\n\nThere is your <b><color=#FFE57F>Avatar & EXP Bar (0/10 XP)</color></b>. Brewing any potion grants you valuable alchemy experience!</size>",
+            textTR = "<size=79%>Harika! Katilim damgalandi. Simdi sol ust koseye bak:\n\nOrada <b><color=#FFE57F>Avatarin ve Deneyim Cubugun (0/10 XP)</color></b> belirdi. Iksir urettikce tecrube kazanacaksin!</size>",
             revealResourceIndex = 4,
             showCalendarIcon = true,
             revealAvatarUI = true
@@ -820,20 +820,20 @@ public class DialogueSystem_Manager : MonoBehaviour
         // 2. Цвета полоски опыта
         dialogueSteps.Add(new DialogStep
         {
-            textRU = "<size=85%>Полоска опыта меняет цвет: сначала она <b>белая</b>, затем при заполнении станет <b>зеленой</b>, ближе к уровню — <b>оранжевой</b>, а перед самым повышением — <b>красной</b>!</size>",
-            textEN = "<size=85%>The EXP bar dynamically changes color: <b>White</b> at start, <b>Green</b> midway, <b>Orange</b> near the top, and <b>Red</b> right before Level Up!</size>",
-            textTR = "<size=85%>Deneyim cubugu renk degistirir: basta <b>Beyaz</b>, doldukca <b>Yesil</b>, seviyeye yaklasinca <b>Turuncu</b> ve seviye atlamadan once <b>Kirmizi</b> olur!</size>",
+            textRU = "<size=82%>Полоска опыта меняет цвет: сначала она <b>белая</b>, затем при заполнении станет <b>зеленой</b>, ближе к уровню — <b>оранжевой</b>, а перед самым повышением — <b>красной</b>!</size>",
+            textEN = "<size=82%>The EXP bar dynamically changes color: <b>White</b> at start, <b>Green</b> midway, <b>Orange</b> near the top, and <b>Red</b> right before Level Up!</size>",
+            textTR = "<size=82%>Deneyim cubugu renk degistirir: basta <b>Beyaz</b>, doldukca <b>Yesil</b>, seviyeye yaklasinca <b>Turuncu</b> ve seviye atlamadan once <b>Kirmizi</b> olur!</size>",
             revealResourceIndex = 4,
             showCalendarIcon = true,
             revealAvatarUI = true
         });
 
-        // 3. Аватарки: простые, магазинные и премиум
+        // 3. Аватарки: полная коллекция из 34 аватарок и 14 рамок
         dialogueSteps.Add(new DialogStep
         {
-            textRU = "<size=85%>Также у нас есть коллекция аватарок: <b>10 простых</b> (3 открыты сразу, 7 откроются за уровни), <b>5 покупных</b> за золото в лавке и <b>5 донатных</b> за кристаллы!\n\nНажми кнопку ниже, я открою гардероб, чтобы ты мог выбрать себе облик!</size>",
-            textEN = "<size=85%>We also have an avatar wardrobe: <b>10 free</b> (3 open, 7 via level), <b>5 shop</b> (Gold), and <b>5 premium</b> (Crystals)!\n\nTap below to explore and pick your avatar!</size>",
-            textTR = "<size=85%>Ayrica avatar gardirobumuz var: <b>10 ucretsiz</b>, <b>5 magaza</b> ve <b>5 premium</b>!\n\nKiyafet secimi icin asagidaki butona bas!</size>",
+            textRU = "<size=76%>Также у нас богатая коллекция: <b>34 уникальные Аватарки</b> (3 открыты со старта, 21 за уровни мастерства до 100 Ур., 5 в лавке за золото и 5 за кристаллы) и <b>14 волшебных Рамок</b>!\n\nНажми кнопку ниже, я открою гардероб, чтобы ты мог выбрать себе облик!</size>",
+            textEN = "<size=76%>We also have a rich wardrobe: <b>34 unique Avatars</b> (3 starter, 21 level-up up to Lv.100, 5 in shop, 5 premium) and <b>14 magical Frames</b>!\n\nTap below to explore and pick your avatar!</size>",
+            textTR = "<size=76%>Ayrica zengin bir koleksiyonumuz var: <b>34 ozel Avatar</b> (3 baslangic, 21 seviye odulu 100'e kadar, 5 dukkan, 5 kristal) ve <b>14 buyulu Cerceve</b>!\n\nKiyafet secimi icin asagidaki butona bas!</size>",
             revealResourceIndex = 4,
             showCalendarIcon = true,
             revealAvatarUI = true,
@@ -1109,9 +1109,9 @@ public class DialogueSystem_Manager : MonoBehaviour
         // 11. Переход в календарь (нажатие кнопки внизу)
         dialogueSteps.Add(new DialogStep
         {
-            textRU = "Сейчас я покажу тебе календарь. Поставь отметку на сегодняшнем числе — с этого дня начнется твой отсчет посещаемости!\n\nНажми кнопку ниже, чтобы открыть календарь!",
-            textEN = "Now I will show you the calendar. Stamp today's date — your attendance streak begins today!\n\nClick the button below to open the calendar!",
-            textTR = "Simdi takvimi gosterecegim. Bugunku tarihi damgala — giris takibin baslasin!\n\nTakvimi acmak icin asagidaki butona bas!",
+            textRU = "<size=84%>Сейчас я покажу тебе календарь. Поставь отметку на сегодняшнем числе — с этого дня начнется твой отсчет посещаемости!\n\nНажми кнопку ниже, чтобы открыть календарь!</size>",
+            textEN = "<size=84%>Now I will show you the calendar. Stamp today's date — your attendance streak begins today!\n\nClick the button below to open the calendar!</size>",
+            textTR = "<size=84%>Simdi takvimi gosterecegim. Bugunku tarihi damgala — giris takibin baslasin!\n\nTakvimi acmak icin asagidaki butona bas!</size>",
             isNameInputStep = false,
             revealResourceIndex = 4,
             showCalendarIcon = true,
