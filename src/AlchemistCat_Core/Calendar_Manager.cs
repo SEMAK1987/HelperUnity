@@ -121,14 +121,38 @@ public class Calendar_Manager : MonoBehaviour
         }
     }
 
+    private Coroutine popupAutoHideCoroutine;
+
     public void CloseCalendar()
     {
+        UpdateCurrentDate();
+        string todayKey = $"Cal_Claimed_{currentYear}_{currentMonth}_{currentDay}";
+        bool isTodayClaimed = PlayerPrefs.GetInt(todayKey, 0) == 1;
+        bool isTutorialDone = PlayerPrefs.GetInt("Tutorial_Calendar_Claim_Done", 0) == 1;
+
+        // Если это первый обязательный визит с Котом и день еще не отмечен — блокируем выход и показываем подсказку
+        if (!isTodayClaimed && !isTutorialDone)
+        {
+            string curLang = PlayerPrefs.GetString("Selected_Language", "RU");
+            string title = curLang == "EN" ? "Attendance Required" : (curLang == "TR" ? "Giriş Damgası Gerekli" : "Отметьте день");
+            string msg = curLang == "EN" ? "Meow! Please stamp today's date in the calendar first to claim your reward!" :
+                         (curLang == "TR" ? "Miyav! Ödülünüzü almak için lütfen önce takvimde bugünkü tarihi işaretleyin!" :
+                         "Мяу! Сначала отметьте сегодняшний день в календаре (нажав на сияющее число), чтобы получить награду!");
+
+            ShowPopup(title, msg, 2.5f);
+            return;
+        }
+
+        // Если день отмечен или туториал уже пройден — закрываем календарь
+        PlayerPrefs.SetInt("Tutorial_Calendar_Claim_Done", 1);
+        PlayerPrefs.Save();
+
         if (calendarPanel != null)
             calendarPanel.SetActive(false);
         else
             gameObject.SetActive(false);
 
-        // Уведомляем диалоговую систему о закрытии календаря (старт фазы Котла и Рецепта)
+        // Уведомляем диалоговую систему о закрытии календаря (старт фазы Опыта, Уровня и Аватарок)
         if (DialogueSystem_Manager.Instance != null)
         {
             DialogueSystem_Manager.Instance.OnCalendarClosed();
@@ -147,18 +171,18 @@ public class Calendar_Manager : MonoBehaviour
     // [padLeft, padRight, padTop, padBottom, cardWidth, cardHeight, cellWidth, cellHeight, spacingX, spacingY]
     private static readonly int[,] DefaultPaddings = new int[,]
     {
-        { 48, 48, 120, 30, 420, 540, 32, 32, 4, 4 }, // 1. Январь (Узкая ледяная рамка, сжата по бокам, опущен верх)
-        { 40, 40, 100, 30, 420, 540, 35, 35, 5, 5 }, // 2. Февраль (Отлично)
-        { 50, 50, 120, 30, 420, 540, 32, 32, 4, 4 }, // 3. Март (Сжаты боковые веточки, увеличен отступ сверху)
-        { 40, 40, 100, 30, 420, 540, 35, 35, 5, 5 }, // 4. Апрель (Отлично)
-        { 52, 52, 120, 30, 420, 540, 32, 32, 4, 4 }, // 5. Май (Сжаты боковые вензеля, ячейки внутри золотой каймы)
-        { 40, 40, 100, 30, 420, 540, 35, 35, 5, 5 }, // 6. Июнь (Отлично)
-        { 40, 40, 100, 30, 420, 540, 35, 35, 5, 5 }, // 7. Июль (Отлично)
-        { 50, 50, 115, 30, 420, 540, 32, 32, 4, 4 }, // 8. Август (Сжата сетка под звезды и колоски)
-        { 52, 52, 120, 30, 420, 540, 32, 32, 4, 4 }, // 9. Сентябрь (Сжата сетка от дубовых листьев, отступ сверху)
-        { 54, 54, 125, 32, 430, 540, 32, 32, 4, 4 }, // 10. Октябрь (Сжата сетка от тыкв и аметистов)
-        { 50, 50, 115, 30, 420, 540, 32, 32, 4, 4 }, // 11. Ноябрь (Сжата сетка под серебряный контур)
-        { 44, 44, 100, 32, 420, 540, 35, 35, 5, 5 }  // 12. Декабрь (Отлично)
+        { 54, 54, 125, 32, 430, 540, 30, 30, 3, 3 }, // 1. Январь (Узкая ледяная рамка: сжаты боковые ледяные кристаллы, опущен верх)
+        { 40, 40, 100, 30, 420, 540, 35, 35, 5, 5 }, // 2. Февраль (Золотая рамка с аметистами)
+        { 52, 52, 122, 32, 430, 540, 30, 30, 3, 3 }, // 3. Март (Сжаты боковые веточки, увеличен отступ сверху от названия)
+        { 38, 38, 102, 28, 420, 540, 36, 36, 5, 5 }, // 4. Апрель (Расширены ячейки и цифры 36x36)
+        { 54, 54, 125, 32, 430, 540, 30, 30, 3, 3 }, // 5. Май (Сжаты боковые золотые вензеля, ячейки строго внутри каймы)
+        { 40, 40, 100, 30, 420, 540, 35, 35, 5, 5 }, // 6. Июнь (Золотые капли)
+        { 40, 40, 100, 30, 420, 540, 35, 35, 5, 5 }, // 7. Июль (Жемчуг и лазурит)
+        { 54, 54, 125, 32, 430, 540, 30, 30, 3, 3 }, // 8. Август (Сжата сетка под звезды и колоски, ячейки внутри рамки)
+        { 54, 54, 125, 32, 430, 540, 30, 30, 3, 3 }, // 9. Сентябрь (Сжата сетка от дубовых листьев, увеличен отступ сверху)
+        { 56, 56, 130, 32, 435, 540, 29, 29, 3, 3 }, // 10. Октябрь (Расширенная карточка 435, ячейки 29x29 внутри тыкв и самоцветов)
+        { 54, 54, 125, 32, 430, 540, 30, 30, 3, 3 }, // 11. Ноябрь (Сжата сетка под серебряный контур)
+        { 42, 42, 102, 30, 420, 540, 35, 35, 5, 5 }  // 12. Декабрь (Хвойные ветви с ягодами)
     };
 
     public MonthLayoutConfig GetLayoutConfigForMonth(int monthIndex1Based)
@@ -422,12 +446,33 @@ public class Calendar_Manager : MonoBehaviour
         }
     }
 
-    private void ShowPopup(string title, string message)
+    private void ShowPopup(string title, string message, float autoHideSeconds = 0f)
     {
         if (rewardPopup != null && rewardPopupText != null)
         {
             rewardPopupText.text = $"<size=120%><b>{title}</b></size>\n\n{message}";
             rewardPopup.SetActive(true);
+
+            if (popupAutoHideCoroutine != null)
+            {
+                StopCoroutine(popupAutoHideCoroutine);
+                popupAutoHideCoroutine = null;
+            }
+
+            if (autoHideSeconds > 0f)
+            {
+                popupAutoHideCoroutine = StartCoroutine(AutoHidePopupRoutine(autoHideSeconds));
+            }
         }
+    }
+
+    private System.Collections.IEnumerator AutoHidePopupRoutine(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (rewardPopup != null)
+        {
+            rewardPopup.SetActive(false);
+        }
+        popupAutoHideCoroutine = null;
     }
 }

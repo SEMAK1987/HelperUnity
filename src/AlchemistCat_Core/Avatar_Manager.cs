@@ -88,7 +88,7 @@ public class Avatar_Manager : MonoBehaviour
     [Header("Коллекция Аватарок (До 100 Уровня)")]
     public List<AvatarData> allAvatars = new List<AvatarData>();
 
-    [Header("Коллекция 5 Рамок Профиля")]
+    [Header("Коллекция 14 Рамок Профиля")]
     public List<FrameData> allFrames = new List<FrameData>();
 
     [Header("Звуки")]
@@ -246,16 +246,26 @@ public class Avatar_Manager : MonoBehaviour
 
     private void InitDefaultData()
     {
-        // 7 Рамок профиля (1 Бесплатная, 4 за Золото в магазине, 2 Премиум за Кристаллы)
+        // 14 Рамок профиля (1 Бесплатная, 11 за Золото в магазине, 2 Премиум за Кристаллы)
         if (allFrames.Count == 0)
         {
-            allFrames.Add(new FrameData { id = 0, frameNameRU = "Стартовая Рамка Ученика", category = AvatarCategory.Free, isUnlockedByDefault = true });
-            allFrames.Add(new FrameData { id = 1, frameNameRU = "Медная Рамка Лавки", category = AvatarCategory.Shop, unlockLevelRequired = 5, goldPrice = 3000 });
-            allFrames.Add(new FrameData { id = 2, frameNameRU = "Серебряная Рамка Мастера", category = AvatarCategory.Shop, unlockLevelRequired = 5, goldPrice = 6000 });
-            allFrames.Add(new FrameData { id = 3, frameNameRU = "Золотая Рамка Алхимика", category = AvatarCategory.Shop, unlockLevelRequired = 5, goldPrice = 10000 });
-            allFrames.Add(new FrameData { id = 4, frameNameRU = "Королевская Изумрудная Рамка", category = AvatarCategory.Shop, unlockLevelRequired = 10, goldPrice = 25000 });
-            allFrames.Add(new FrameData { id = 5, frameNameRU = "Астральная Донатная Рамка", category = AvatarCategory.Premium, unlockLevelRequired = 3, crystalPrice = 50 });
-            allFrames.Add(new FrameData { id = 6, frameNameRU = "Божественная Солнечная Рамка", category = AvatarCategory.Premium, unlockLevelRequired = 5, crystalPrice = 100 });
+            // Базовые 7 рамок
+            allFrames.Add(new FrameData { id = 0, frameNameRU = "Стартовая Рамка Ученика", frameNameEN = "Starter Apprentice Frame", frameNameTR = "Başlangıç Çırak Çerçevesi", category = AvatarCategory.Free, isUnlockedByDefault = true });
+            allFrames.Add(new FrameData { id = 1, frameNameRU = "Медная Рамка Лавки", frameNameEN = "Copper Shop Frame", frameNameTR = "Bakır Dükkan Çerçevesi", category = AvatarCategory.Shop, unlockLevelRequired = 5, goldPrice = 3000 });
+            allFrames.Add(new FrameData { id = 2, frameNameRU = "Серебряная Рамка Мастера", frameNameEN = "Silver Master Frame", frameNameTR = "Gümüş Usta Çerçevesi", category = AvatarCategory.Shop, unlockLevelRequired = 5, goldPrice = 6000 });
+            allFrames.Add(new FrameData { id = 3, frameNameRU = "Золотая Рамка Алхимика", frameNameEN = "Golden Alchemist Frame", frameNameTR = "Altın Simyacı Çerçevesi", category = AvatarCategory.Shop, unlockLevelRequired = 5, goldPrice = 10000 });
+            allFrames.Add(new FrameData { id = 4, frameNameRU = "Королевская Изумрудная Рамка", frameNameEN = "Royal Emerald Frame", frameNameTR = "Kraliyet Zümrüt Çerçevesi", category = AvatarCategory.Shop, unlockLevelRequired = 10, goldPrice = 25000 });
+            allFrames.Add(new FrameData { id = 5, frameNameRU = "Астральная Донатная Рамка", frameNameEN = "Astral Premium Frame", frameNameTR = "Astral Özel Çerçeve", category = AvatarCategory.Premium, unlockLevelRequired = 3, crystalPrice = 50 });
+            allFrames.Add(new FrameData { id = 6, frameNameRU = "Божественная Солнечная Рамка", frameNameEN = "Divine Solar Frame", frameNameTR = "İlahi Güneş Çerçevesi", category = AvatarCategory.Premium, unlockLevelRequired = 5, crystalPrice = 100 });
+
+            // 7 Дополнительных покупных рамок в Магазине (Shop)
+            allFrames.Add(new FrameData { id = 7, frameNameRU = "Аметистовая Рамка Травника", frameNameEN = "Herbalist Amethyst Frame", frameNameTR = "Bitkici Ametist Çerçevesi", category = AvatarCategory.Shop, unlockLevelRequired = 6, goldPrice = 12000 });
+            allFrames.Add(new FrameData { id = 8, frameNameRU = "Рубиновая Рамка Пламени", frameNameEN = "Flame Ruby Frame", frameNameTR = "Alev Yakut Çerçevesi", category = AvatarCategory.Shop, unlockLevelRequired = 7, goldPrice = 15000 });
+            allFrames.Add(new FrameData { id = 9, frameNameRU = "Сапфировая Рамка Мороза", frameNameEN = "Frost Sapphire Frame", frameNameTR = "Buz Safir Çerçevesi", category = AvatarCategory.Shop, unlockLevelRequired = 8, goldPrice = 18000 });
+            allFrames.Add(new FrameData { id = 10, frameNameRU = "Нефритовая Рамка Друида", frameNameEN = "Druid Jade Frame", frameNameTR = "Druid Yeşim Çerçevesi", category = AvatarCategory.Shop, unlockLevelRequired = 9, goldPrice = 22000 });
+            allFrames.Add(new FrameData { id = 11, frameNameRU = "Обсидиановая Рамка Теней", frameNameEN = "Shadow Obsidian Frame", frameNameTR = "Gölge Obsidyen Çerçevesi", category = AvatarCategory.Shop, unlockLevelRequired = 11, goldPrice = 30000 });
+            allFrames.Add(new FrameData { id = 12, frameNameRU = "Небесная Лазурная Рамка", frameNameEN = "Celestial Azure Frame", frameNameTR = "Göksel Azur Çerçevesi", category = AvatarCategory.Shop, unlockLevelRequired = 13, goldPrice = 35000 });
+            allFrames.Add(new FrameData { id = 13, frameNameRU = "Древняя Руническая Рамка", frameNameEN = "Ancient Runic Frame", frameNameTR = "Kadim Rünik Çerçeve", category = AvatarCategory.Shop, unlockLevelRequired = 15, goldPrice = 40000 });
         }
 
         // Коллекция Аватарок

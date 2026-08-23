@@ -148,6 +148,8 @@ public class DialogueSystem_Manager : MonoBehaviour
             PlayerPrefs.DeleteKey("Player_Level");
             PlayerPrefs.DeleteKey("Player_Exp");
             PlayerPrefs.DeleteKey("Player_MaxExp");
+            PlayerPrefs.DeleteKey("Tutorial_Calendar_Claim_Done");
+            PlayerPrefs.DeleteKey($"Cal_Claimed_{System.DateTime.Now.Year}_{System.DateTime.Now.Month}_{System.DateTime.Now.Day}");
             PlayerPrefs.Save();
 
             currentGold = 0;
