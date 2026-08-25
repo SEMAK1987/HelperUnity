@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Fate Continent: Alchemist Cat Edition (v18.12.37) - January Volumetric Frame Scale (525x560) with Static Numbers Centering & February Preservation.",
+  "description": "Fate Continent: Alchemist Cat Edition (v18.12.38) - Full XP Leveling (1-100), Large Responsive Wardrobe Panel, Text Overflow Fixes, and Full First Recipe Crafting Tutorial Flow with Cauldron & Storage Chest.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

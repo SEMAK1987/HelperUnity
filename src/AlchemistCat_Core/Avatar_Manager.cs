@@ -25,9 +25,9 @@ public class Avatar_Manager : MonoBehaviour
 
     [Header("Настройки Сетки Гардероба (2-3 в ряд)")]
     public int columnsCount = 3;
-    public Vector2 cellSize = new Vector2(130, 155);
-    public Vector2 cellSpacing = new Vector2(12, 12);
-    public Vector2 panelSize = new Vector2(580, 720);
+    public Vector2 cellSize = new Vector2(145, 170);
+    public Vector2 cellSpacing = new Vector2(16, 16);
+    public Vector2 panelSize = new Vector2(620, 840); // Высота 840 для отображения почти на весь экран без лишней прокрутки
 
     [Header("Настройки Цветов Гардероба (Легко настраивать в Инспекторе)")]
     public Color categoryHeaderColor = new Color(1f, 0.92f, 0.45f, 1f); // #FFEBA3 Яркий золотой
@@ -151,11 +151,20 @@ public class Avatar_Manager : MonoBehaviour
         UpdateProfileUI();
     }
 
+    /// <summary>
+    /// Расчет максимального опыта для текущего уровня: 
+    /// Ур 1 = 10 XP, Ур 2 = 20 XP, Ур 3 = 30 XP ... Ур 100 = 1000 XP (Формула: Level * 10 XP)
+    /// </summary>
+    public static int GetMaxExpForLevel(int level)
+    {
+        return Mathf.Clamp(level, 1, 100) * 10;
+    }
+
     private void LoadPlayerProfile()
     {
         currentLevel = PlayerPrefs.GetInt("Player_Level", 1);
         currentExp = PlayerPrefs.GetInt("Player_Exp", 0);
-        maxExp = PlayerPrefs.GetInt("Player_MaxExp", 10);
+        maxExp = GetMaxExpForLevel(currentLevel);
         selectedAvatarId = PlayerPrefs.GetInt("Selected_Avatar_Id", 0);
         selectedFrameId = PlayerPrefs.GetInt("Selected_Frame_Id", 0);
     }
@@ -163,14 +172,21 @@ public class Avatar_Manager : MonoBehaviour
     public void AddExperience(int amount)
     {
         currentExp += amount;
-        while (currentExp >= maxExp)
+        while (currentLevel < 100 && currentExp >= maxExp)
         {
             currentExp -= maxExp;
             currentLevel++;
-            maxExp = Mathf.RoundToInt(maxExp * 1.5f);
+            maxExp = GetMaxExpForLevel(currentLevel);
 
             if (levelUpSound != null && SettingsManager.Instance != null)
                 SettingsManager.Instance.PlaySoundEffect(levelUpSound);
+        }
+
+        if (currentLevel >= 100)
+        {
+            currentLevel = 100;
+            maxExp = GetMaxExpForLevel(100);
+            if (currentExp > maxExp) currentExp = maxExp;
         }
 
         PlayerPrefs.SetInt("Player_Level", currentLevel);

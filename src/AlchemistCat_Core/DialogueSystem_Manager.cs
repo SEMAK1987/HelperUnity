@@ -80,6 +80,14 @@ public class DialogueSystem_Manager : MonoBehaviour
     public AudioClip coinRewardSound;
     public AudioClip levelUpSound;
 
+    [Header("Иконка Сундука в верхнем UI")]
+    public GameObject chestIconButton;      // Иконка сундучка (слева от свитка)
+    public Button chestButton;
+
+    [Header("Окно Инвентаря")]
+    public GameObject inventoryPanel;
+    public Button inventoryCloseButton;
+
     [Header("Настройки")]
     public float textSpeed = 0.025f;
 
@@ -102,6 +110,8 @@ public class DialogueSystem_Manager : MonoBehaviour
         public bool isConfirmRecipeStep = false;
         public bool showSmallScrollIcon = false;
         public bool isRecipeStep = false;
+        public bool showChestIcon = false;
+        public bool isInventoryOpenStep = false;
     }
 
     private List<DialogStep> dialogueSteps = new List<DialogStep>();
@@ -374,6 +384,22 @@ public class DialogueSystem_Manager : MonoBehaviour
             return;
         }
 
+        // Если это шаг открытия Инвентаря
+        if (currentStep.isInventoryOpenStep)
+        {
+            if (dialoguePanel != null) dialoguePanel.SetActive(false);
+            if (RecipeCrafting_Manager.Instance != null)
+            {
+                RecipeCrafting_Manager.Instance.OpenInventory();
+            }
+            else if (inventoryPanel != null)
+            {
+                inventoryPanel.SetActive(true);
+                if (inventoryCloseButton != null) inventoryCloseButton.interactable = false;
+            }
+            return;
+        }
+
         currentStepIndex++;
         if (currentStepIndex < dialogueSteps.Count)
         {
@@ -422,6 +448,12 @@ public class DialogueSystem_Manager : MonoBehaviour
         {
             smallScrollIconButton.SetActive(true);
             SetSmallScrollInteractable(false); // Заблокирован во время объяснения
+        }
+
+        if (step.showChestIcon && chestIconButton != null)
+        {
+            chestIconButton.SetActive(true);
+            if (chestButton != null) chestButton.interactable = false; // Заблокирован во время монолога Кота
         }
 
         string rawText = GetLocalizedText(step.textRU, step.textEN, step.textTR);
@@ -538,7 +570,9 @@ public class DialogueSystem_Manager : MonoBehaviour
                     else if (step.isConfirmRecipeStep)
                         nextStepButtonText.text = "Да, я согласен!";
                     else if (step.isRecipeStep)
-                        nextStepButtonText.text = "Открыть рецепт";
+                        nextStepButtonText.text = "Посмотреть рецепт";
+                    else if (step.isInventoryOpenStep)
+                        nextStepButtonText.text = "Открыть инвентарь";
                     else
                         nextStepButtonText.text = "Далее";
                 }
@@ -661,23 +695,16 @@ public class DialogueSystem_Manager : MonoBehaviour
 
         UpdateResourceTextsInstant();
 
-        // Начисление опыта (+10 XP) и апгрейд уровня
-        if (avatarManager != null)
-        {
-            avatarManager.AddExperience(10);
-        }
-
         if (coinRewardSound != null && SettingsManager.Instance != null)
             SettingsManager.Instance.PlaySoundEffect(coinRewardSound);
 
-        yield return new WaitForSeconds(0.4f);
+        yield return new WaitForSeconds(0.3f);
 
-        // Показываем котел и свиток
-        if (cauldronButton != null) cauldronButton.SetActive(true);
+        // Появляется иконка свитка рецептов
         if (smallScrollIconButton != null)
         {
             smallScrollIconButton.SetActive(true);
-            SetSmallScrollInteractable(true); // Разблокируем свиток!
+            SetSmallScrollInteractable(true);
         }
 
         currentStepIndex++;
@@ -893,15 +920,67 @@ public class DialogueSystem_Manager : MonoBehaviour
         // 3. Появление свитка слева от календаря и открытие
         dialogueSteps.Add(new DialogStep
         {
-            textRU = "Ура! Ты получил <b><color=#80FFDB>+10 XP</color></b> и поднял свой уровень! Слева от календарика появился наш <b><color=#FFD166>Свиток Рецептов</color></b>!\n\nНажми кнопку ниже, чтобы развернуть его и посмотреть формулу!",
-            textEN = "Hooray! You gained <b><color=#80FFDB>+10 XP</color></b> and leveled up! Our <b><color=#FFD166>Recipe Scroll</color></b> appeared next to the calendar!\n\nTap below to open and inspect the formula!",
-            textTR = "Tebrikler! <b><color=#80FFDB>+10 XP</color></b> kazandin ve seviye atladin! Takvimin solunda <b><color=#FFD166>Tarif Parsomenimiz</color></b> belirdi!\n\nFormulu gormek icin asagidaki butona bas!",
+            textRU = "Отлично! Слева от календаря появился наш <b><color=#FFD166>Свиток Рецептов</color></b>!\n\nНажми кнопку ниже, чтобы развернуть его и посмотреть формулу приготовления первого зелья!",
+            textEN = "Look! Next to the calendar, our <b><color=#FFD166>Recipe Scroll</color></b> has appeared!\n\nTap below to open it and inspect the first potion formula!",
+            textTR = "Takvimin solunda <b><color=#FFD166>Tarif Parsomenimiz</color></b> belirdi!\n\nIlk iksir formulu icin asagidaki butona bas!",
             revealResourceIndex = 4,
             showCalendarIcon = true,
             revealAvatarUI = true,
             showSmallScrollIcon = true,
             isRecipeStep = true
         });
+    }
+
+    // -------------------------------------------------------------
+    // ФАЗА 4: ПОСЛЕ ВАРКИ ЗЕЛЬЯ — СУНДУК И ИНВЕНТАРЬ
+    // -------------------------------------------------------------
+    public void StartPostCraftChestDialogue()
+    {
+        if (dialoguePanel != null) dialoguePanel.SetActive(true);
+        dialogueSteps.Clear();
+        currentStepIndex = 0;
+
+        // 1. Поздравление с уровнем
+        dialogueSteps.Add(new DialogStep
+        {
+            textRU = "<size=80%>Поздравляю! Ты получил <b><color=#80FFDB>+10 XP</color></b> и поднял <b><color=#FFE57F>2-й Уровень</color></b>!\n\nСлева от свитка рецептов появился твой <b><color=#FFD166>Сундук Алхимика</color></b>!</size>",
+            textEN = "<size=80%>Congratulations! You gained <b><color=#80FFDB>+10 XP</color></b> and reached <b><color=#FFE57F>Level 2</color></b>!\n\nNext to the scroll, your <b><color=#FFD166>Alchemist Chest</color></b> appeared!</size>",
+            textTR = "<size=80%>Tebrikler! <b><color=#80FFDB>+10 XP</color></b> kazandin ve <b><color=#FFE57F>Seviye 2</color></b> oldun!\n\nParsomenin solunda <b><color=#FFD166>Sandigin</color></b> belirdi!</size>",
+            revealResourceIndex = 4,
+            showCalendarIcon = true,
+            revealAvatarUI = true,
+            showSmallScrollIcon = true,
+            showChestIcon = true
+        });
+
+        // 2. Рассказ про хранение предметов в сундуке
+        dialogueSteps.Add(new DialogStep
+        {
+            textRU = "<size=77%>В сундуке хранятся все твои найденные и сваренные предметы: <b>свитки рецептов</b>, <b>готовые зелья</b>, а также <b>части пазлов и обликов</b>.\n\nОдинаковые предметы аккуратно суммируются в стаках!</size>",
+            textEN = "<size=77%>Your chest stores all discovered items: <b>recipe scrolls</b>, <b>potions</b>, and <b>puzzle shards</b>.\n\nIdentical items neatly stack together!</size>",
+            textTR = "<size=77%>Sandikta tum esyalarin saklanir: <b>tarifler</b>, <b>iksirler</b> ve <b>parcalar</b>.\n\nAyni esyalar yigin halinde birikir!</size>",
+            revealResourceIndex = 4,
+            showCalendarIcon = true,
+            revealAvatarUI = true,
+            showSmallScrollIcon = true,
+            showChestIcon = true
+        });
+
+        // 3. Предложение открыть инвентарь
+        dialogueSteps.Add(new DialogStep
+        {
+            textRU = "<size=80%>Давай взглянем внутрь твоего инвентаря!\n\nНажми кнопку ниже, чтобы открыть сундук и посмотреть ячейки хранения!</size>",
+            textEN = "<size=80%>Let us inspect your inventory!\n\nTap below to open your chest and view the storage slots!</size>",
+            textTR = "<size=80%>Envanterine bir goz atalim!\n\nSandigi acip yuvalari gormek icin asagidaki butona bas!</size>",
+            revealResourceIndex = 4,
+            showCalendarIcon = true,
+            revealAvatarUI = true,
+            showSmallScrollIcon = true,
+            showChestIcon = true,
+            isInventoryOpenStep = true
+        });
+
+        DisplayStep(0);
     }
 
     public void OpenRecipeScrollUI()
