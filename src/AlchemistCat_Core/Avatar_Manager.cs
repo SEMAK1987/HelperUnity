@@ -257,21 +257,43 @@ public class Avatar_Manager : MonoBehaviour
                 expProgressBar.color = new Color(0.95f, 0.2f, 0.2f, 1f);  // Красный
         }
 
-        if (currentAvatarDisplayImage != null && allAvatars.Count > 0)
+        if (currentAvatarDisplayImage != null)
         {
-            AvatarData cur = allAvatars.Find(a => a.id == selectedAvatarId);
-            if (cur != null && cur.avatarSprite != null)
+            if (allAvatars.Count > 0)
             {
-                currentAvatarDisplayImage.sprite = cur.avatarSprite;
+                AvatarData cur = allAvatars.Find(a => a.id == selectedAvatarId);
+                if (cur != null && cur.avatarSprite != null)
+                {
+                    currentAvatarDisplayImage.sprite = cur.avatarSprite;
+                    currentAvatarDisplayImage.enabled = true;
+                    currentAvatarDisplayImage.color = Color.white;
+                }
+                else if (allAvatars[0].avatarSprite != null)
+                {
+                    currentAvatarDisplayImage.sprite = allAvatars[0].avatarSprite;
+                    currentAvatarDisplayImage.enabled = true;
+                    currentAvatarDisplayImage.color = Color.white;
+                }
+            }
+            else
+            {
+                // Если список в коде пуст, проверяем не скрыт ли компонент
+                currentAvatarDisplayImage.enabled = (currentAvatarDisplayImage.sprite != null);
+                if (currentAvatarDisplayImage.enabled) currentAvatarDisplayImage.color = Color.white;
             }
         }
 
-        if (currentFrameDisplayImage != null && allFrames.Count > 0)
+        if (currentFrameDisplayImage != null)
         {
-            FrameData curF = allFrames.Find(f => f.id == selectedFrameId);
-            if (curF != null && curF.frameSprite != null)
+            if (allFrames.Count > 0)
             {
-                currentFrameDisplayImage.sprite = curF.frameSprite;
+                FrameData curF = allFrames.Find(f => f.id == selectedFrameId);
+                if (curF != null && curF.frameSprite != null)
+                {
+                    currentFrameDisplayImage.sprite = curF.frameSprite;
+                    currentFrameDisplayImage.enabled = true;
+                    currentFrameDisplayImage.color = Color.white;
+                }
             }
         }
     }

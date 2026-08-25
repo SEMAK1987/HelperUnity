@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// Разработчик: Алхимический Кот (Alchemist Cat Core v18.12.18)
+/// Разработчик: Алхимический Кот (Alchemist Cat Core v18.12.40)
 /// Полный сценарий игрового обучения и интерактивных переходов:
 /// 1. Ввод имени и знакомство с ресурсами (Золото, Камни, Свитки, Кристаллы).
 /// 2. Начисление стартового бонуса (5k Gold, 10 Stones, 3 Scrolls).
@@ -15,6 +15,7 @@ using TMPro;
 /// 5. Рассказ про Аватарки (Простые, Покупные, Премиум) -> Кнопка "Показать аватарки >>" -> Окно аватарок со скроллингом.
 /// 6. Закрытие аватарок -> Согласие на первый опыт и изготовление первого рецепта за 100 золота, 5 камней, 1 свиток.
 /// 7. Кнопка "Да, я согласен" -> Списание ресурсов, выдача опыта (+10 XP, повышение уровня), появление иконки свитка и открытие Большого Свитка Рецепта!
+/// 8. После варки зелья в котле -> Появление сундука и открытие инвентаря.
 /// </summary>
 public class DialogueSystem_Manager : MonoBehaviour
 {
@@ -158,33 +159,28 @@ public class DialogueSystem_Manager : MonoBehaviour
             PlayerPrefs.DeleteKey("Player_Level");
             PlayerPrefs.DeleteKey("Player_Exp");
             PlayerPrefs.DeleteKey("Player_MaxExp");
-            PlayerPrefs.DeleteKey("Tutorial_Calendar_Claim_Done");
-            PlayerPrefs.DeleteKey($"Cal_Claimed_{System.DateTime.Now.Year}_{System.DateTime.Now.Month}_{System.DateTime.Now.Day}");
             PlayerPrefs.Save();
+        }
 
-            currentGold = 0;
-            currentStones = 0;
-            currentScrolls = 0;
-            currentCrystals = 0;
-        }
-        else
-        {
-            if (PlayerPrefs.HasKey("Alchemist_Player_Name"))
-            {
-                playerName = PlayerPrefs.GetString("Alchemist_Player_Name");
-            }
-            currentGold = PlayerPrefs.GetInt("Player_Gold", 0);
-            currentStones = PlayerPrefs.GetInt("Player_Stones", 0);
-            currentScrolls = PlayerPrefs.GetInt("Player_Scrolls", 0);
-            currentCrystals = PlayerPrefs.GetInt("Player_Crystals", 0);
-        }
+        currentGold = PlayerPrefs.GetInt("Player_Gold", 0);
+        currentStones = PlayerPrefs.GetInt("Player_Stones", 0);
+        currentScrolls = PlayerPrefs.GetInt("Player_Scrolls", 0);
+        currentCrystals = PlayerPrefs.GetInt("Player_Crystals", 0);
+        playerName = PlayerPrefs.GetString("Alchemist_Player_Name", "Путник");
     }
 
     private void Start()
     {
-        InitBackgroundMusic();
+        StartBackgroundMusic();
 
-        // 1. Скрываем все лишние UI до их фазы
+        if (dialogueBodyText != null)
+        {
+            dialogueBodyText.enableAutoSizing = true;
+            dialogueBodyText.fontSizeMin = 14;
+            dialogueBodyText.fontSizeMax = 24;
+            dialogueBodyText.overflowMode = TextOverflowModes.Ellipsis;
+        }
+
         if (topPanel != null) topPanel.SetActive(false);
         if (slotGold != null) slotGold.SetActive(false);
         if (slotStones != null) slotStones.SetActive(false);
@@ -192,157 +188,103 @@ public class DialogueSystem_Manager : MonoBehaviour
         if (slotCrystals != null) slotCrystals.SetActive(false);
 
         if (playerAvatarContainer != null) playerAvatarContainer.SetActive(false);
-        if (cauldronButton != null) cauldronButton.SetActive(false);
-        if (roomCatObject != null) roomCatObject.SetActive(false);
         if (calendarIconButton != null) calendarIconButton.SetActive(false);
         if (smallScrollIconButton != null) smallScrollIconButton.SetActive(false);
+        if (chestIconButton != null) chestIconButton.SetActive(false);
+
+        if (calendarPanel != null) calendarPanel.SetActive(false);
+        if (recipeScrollPanel != null) recipeScrollPanel.SetActive(false);
+        if (cauldronButton != null) cauldronButton.SetActive(false);
+        if (roomCatObject != null) roomCatObject.SetActive(false);
+        if (inventoryPanel != null) inventoryPanel.SetActive(false);
 
         UpdateResourceTextsInstant();
 
-        // 2. Настройка поля ввода имени
-        if (nameInputField != null)
-        {
-            nameInputField.characterLimit = 12;
-            nameInputField.contentType = TMP_InputField.ContentType.Standard;
-            nameInputField.lineType = TMP_InputField.LineType.SingleLine;
-
-            if (nameInputField.placeholder is TextMeshProUGUI placeholderText)
-            {
-                string curLang = PlayerPrefs.GetString("Selected_Language", "RU");
-                if (curLang == "EN") placeholderText.text = "Name (2-12 letters)";
-                else if (curLang == "TR") placeholderText.text = "İsim (2-12 harf)";
-                else placeholderText.text = "Имя (от 2 до 12 букв)";
-            }
-
-            nameInputField.onSubmit.RemoveAllListeners();
-            nameInputField.onSubmit.AddListener((val) => OnConfirmNameClicked());
-        }
-
         if (confirmNameButton != null)
-        {
-            confirmNameButton.onClick.RemoveAllListeners();
             confirmNameButton.onClick.AddListener(OnConfirmNameClicked);
-        }
 
         if (nextStepButton != null)
+            nextStepButton.onClick.AddListener(OnNextStepClicked);
+
+        if (nameInputField != null)
         {
-            nextStepButton.onClick.RemoveAllListeners();
-            nextStepButton.onClick.AddListener(NextStep);
+            nameInputField.onSubmit.AddListener(delegate { OnConfirmNameClicked(); });
+            nameInputField.characterLimit = 12;
+            nameInputField.lineType = TMP_InputField.LineType.SingleLine;
         }
 
-        // 3. Авто-привязка иконки календаря
-        if (calendarIconButton != null)
-        {
-            Button calBtn = calendarIconButton.GetComponent<Button>();
-            if (calBtn != null)
-            {
-                calBtn.onClick.RemoveAllListeners();
-                calBtn.onClick.AddListener(OnCalendarIconButtonClicked);
-            }
-        }
-
-        // 4. Авто-привязка иконки маленького свитка
-        if (smallScrollButton != null)
-        {
-            smallScrollButton.onClick.RemoveAllListeners();
-            smallScrollButton.onClick.AddListener(OnSmallScrollButtonClicked);
-        }
-
-        // 5. Авто-привязка котла
-        if (cauldronButton != null)
-        {
-            Button cBtn = cauldronButton.GetComponent<Button>();
-            if (cBtn != null)
-            {
-                cBtn.onClick.RemoveAllListeners();
-                cBtn.onClick.AddListener(OnCauldronButtonClicked);
-            }
-        }
-
-        // 6. Закрытие свитка рецепта
         if (recipeScrollCloseButton != null)
-        {
-            recipeScrollCloseButton.onClick.RemoveAllListeners();
             recipeScrollCloseButton.onClick.AddListener(CloseRecipeScrollUI);
-        }
 
-        if (recipeScrollPanel != null)
-        {
-            recipeScrollPanel.SetActive(false);
-        }
+        if (smallScrollButton != null)
+            smallScrollButton.onClick.AddListener(OnSmallScrollButtonClicked);
+
+        if (inventoryCloseButton != null)
+            inventoryCloseButton.onClick.AddListener(() => {
+                if (inventoryPanel != null) inventoryPanel.SetActive(false);
+            });
+
+        if (chestButton != null)
+            chestButton.onClick.AddListener(() => {
+                if (RecipeCrafting_Manager.Instance != null)
+                    RecipeCrafting_Manager.Instance.OpenInventory();
+                else if (inventoryPanel != null)
+                    inventoryPanel.SetActive(true);
+            });
 
         // Старт Фазы 1
         currentPhase = DialoguePhase.IntroAndCalendar;
         BuildIntroScenario();
-        StartDialogue();
+        DisplayStep(0);
     }
 
     private void SilenceMenuMusicSources()
     {
-        AudioSource[] allAudioSources = FindObjectsByType<AudioSource>(FindObjectsSortMode.None);
-        foreach (AudioSource src in allAudioSources)
+        AudioSource[] sources = FindObjectsByType<AudioSource>(FindObjectsSortMode.None);
+        foreach (var s in sources)
         {
-            if (src != null && src.gameObject != this.gameObject)
+            if (s != null && s.clip != null)
             {
-                if (src.isPlaying && src.loop)
+                string clipName = s.clip.name.ToLower();
+                if (clipName.Contains("main") || clipName.Contains("menu") || clipName.Contains("intro"))
                 {
-                    src.Stop();
+                    s.Stop();
+                    s.volume = 0f;
                 }
             }
         }
     }
 
-    private void InitBackgroundMusic()
+    private void StartBackgroundMusic()
     {
         if (backgroundMusic == null) return;
-
-        localMusicSource = GetComponent<AudioSource>();
-        if (localMusicSource == null)
-        {
-            localMusicSource = gameObject.AddComponent<AudioSource>();
-        }
-
-        float savedVolume = PlayerPrefs.GetFloat("MusicVolume", 0.75f);
-        if (savedVolume <= 0.05f) savedVolume = 0.75f;
+        if (localMusicSource == null) localMusicSource = gameObject.AddComponent<AudioSource>();
 
         localMusicSource.clip = backgroundMusic;
         localMusicSource.loop = true;
-        localMusicSource.volume = savedVolume;
         localMusicSource.playOnAwake = false;
-
-        if (!localMusicSource.isPlaying)
-        {
-            localMusicSource.Play();
-        }
+        localMusicSource.volume = 0.35f;
+        localMusicSource.Play();
     }
 
-    public void StartDialogue()
+    public void OnNextStepClicked()
     {
-        if (dialoguePanel != null) dialoguePanel.SetActive(true);
-        currentStepIndex = 0;
-        DisplayStep(currentStepIndex);
-    }
+        if (buttonClickSound != null && SettingsManager.Instance != null)
+            SettingsManager.Instance.PlaySoundEffect(buttonClickSound);
 
-    public void NextStep()
-    {
         if (isTyping)
         {
-            isTyping = false;
             if (typingCoroutine != null) StopCoroutine(typingCoroutine);
-            if (dialogueBodyText != null) dialogueBodyText.text = FormatPlayerName(activeFullText);
+            isTyping = false;
+            if (dialogueBodyText != null) dialogueBodyText.text = activeFullText;
             OnTypingFinished();
             return;
         }
 
-        if (currentStepIndex < 0 || currentStepIndex >= dialogueSteps.Count)
-        {
-            return;
-        }
-
+        if (currentStepIndex < 0 || currentStepIndex >= dialogueSteps.Count) return;
         DialogStep currentStep = dialogueSteps[currentStepIndex];
-        if (currentStep.isNameInputStep) return;
 
-        // Если это шаг "Забрать бонус!"
+        // Если это шаг сбора стартовой награды
         if (currentStep.isClaimStarterRewardStep && !starterRewardClaimed)
         {
             StartCoroutine(AnimateStarterRewardAndContinue());
@@ -409,7 +351,6 @@ public class DialogueSystem_Manager : MonoBehaviour
         {
             if (currentPhase == DialoguePhase.IntroAndCalendar)
             {
-                // Финал 1 фазы
                 SetCalendarButtonInteractable(true);
                 OpenCalendarUI();
             }
@@ -430,7 +371,6 @@ public class DialogueSystem_Manager : MonoBehaviour
         if (step.showCalendarIcon && calendarIconButton != null)
         {
             calendarIconButton.SetActive(true);
-            // Иконка заблокирована во время разговора, клик только через кнопку
             SetCalendarButtonInteractable(false);
         }
 
@@ -440,20 +380,20 @@ public class DialogueSystem_Manager : MonoBehaviour
             if (avatarManager != null)
             {
                 avatarManager.UpdateProfileUI();
-                avatarManager.SetAvatarButtonInteractable(false); // Заблокирована во время речи
+                avatarManager.SetAvatarButtonInteractable(false);
             }
         }
 
         if (step.showSmallScrollIcon && smallScrollIconButton != null)
         {
             smallScrollIconButton.SetActive(true);
-            SetSmallScrollInteractable(false); // Заблокирован во время объяснения
+            SetSmallScrollInteractable(false);
         }
 
         if (step.showChestIcon && chestIconButton != null)
         {
             chestIconButton.SetActive(true);
-            if (chestButton != null) chestButton.interactable = false; // Заблокирован во время монолога Кота
+            if (chestButton != null) chestButton.interactable = false;
         }
 
         string rawText = GetLocalizedText(step.textRU, step.textEN, step.textTR);
@@ -552,7 +492,6 @@ public class DialogueSystem_Manager : MonoBehaviour
                 nextStepButton.interactable = true;
                 if (nextStepButtonText != null)
                 {
-                    // Настройка переноса строк и авто-подгонки шрифта под плашку
                     nextStepButtonText.enableAutoSizing = true;
                     nextStepButtonText.fontSizeMin = 14;
                     nextStepButtonText.fontSizeMax = 22;
@@ -700,7 +639,6 @@ public class DialogueSystem_Manager : MonoBehaviour
 
         yield return new WaitForSeconds(0.3f);
 
-        // Появляется иконка свитка рецептов
         if (smallScrollIconButton != null)
         {
             smallScrollIconButton.SetActive(true);
@@ -742,7 +680,6 @@ public class DialogueSystem_Manager : MonoBehaviour
 
     public bool CanInteractWithAvatarIcon()
     {
-        // Разрешено кликать только если диалог закрыт или мы вне обучения
         return (dialoguePanel == null || !dialoguePanel.activeSelf);
     }
 
@@ -796,7 +733,6 @@ public class DialogueSystem_Manager : MonoBehaviour
 
     public void OnCalendarClosed()
     {
-        // 🌟 Игрок закрыл календарь -> иконка календаря блокируется, стартует Фаза 2 (Опыт, Уровень, Аватарки)
         SetCalendarButtonInteractable(false);
 
         if (!calendarOpenedOnce)
@@ -808,7 +744,6 @@ public class DialogueSystem_Manager : MonoBehaviour
 
     public void OnAvatarPanelClosed()
     {
-        // 🌟 Игрок выбрал/закрыл аватарку -> иконка аватарок блокируется, стартует Фаза 3 (Первый опыт и рецепт)
         if (avatarManager != null)
         {
             avatarManager.SetAvatarButtonInteractable(false);
@@ -843,9 +778,9 @@ public class DialogueSystem_Manager : MonoBehaviour
         // 1. Появление аватара и шкалы опыта (0/10 XP)
         dialogueSteps.Add(new DialogStep
         {
-            textRU = "<size=79%>Замечательно! Посещаемость отмечена. Теперь взгляни в левый верхний угол:\n\nТам появилась твоя <b><color=#FFE57F>Аватарка и Полоска Опыта (0/10 XP)</color></b>. За изготовление любых зелий и эликсиров ты будешь накапливать опыт!</size>",
-            textEN = "<size=79%>Splendid! Attendance marked. Now look at the top-left corner:\n\nThere is your <b><color=#FFE57F>Avatar & EXP Bar (0/10 XP)</color></b>. Brewing any potion grants you valuable alchemy experience!</size>",
-            textTR = "<size=79%>Harika! Katilim damgalandi. Simdi sol ust koseye bak:\n\nOrada <b><color=#FFE57F>Avatarin ve Deneyim Cubugun (0/10 XP)</color></b> belirdi. Iksir urettikce tecrube kazanacaksin!</size>",
+            textRU = "<size=84%>Замечательно! Посещаемость отмечена. Теперь взгляни в левый верхний угол:\n\nТам появилась твоя <b><color=#FFE57F>Аватарка и Полоска Опыта (0/10 XP)</color></b>. За изготовление любых зелий и эликсиров ты будешь накапливать опыт!</size>",
+            textEN = "<size=84%>Splendid! Attendance marked. Now look at the top-left corner:\n\nThere is your <b><color=#FFE57F>Avatar & EXP Bar (0/10 XP)</color></b>. Brewing any potion grants you valuable alchemy experience!</size>",
+            textTR = "<size=84%>Harika! Katilim damgalandi. Simdi sol ust koseye bak:\n\nOrada <b><color=#FFE57F>Avatarin ve Deneyim Cubugun (0/10 XP)</color></b> belirdi. Iksir urettikce tecrube kazanacaksin!</size>",
             revealResourceIndex = 4,
             showCalendarIcon = true,
             revealAvatarUI = true
@@ -854,9 +789,9 @@ public class DialogueSystem_Manager : MonoBehaviour
         // 2. Цвета полоски опыта
         dialogueSteps.Add(new DialogStep
         {
-            textRU = "<size=82%>Полоска опыта меняет цвет: сначала она <b>белая</b>, затем при заполнении станет <b>зеленой</b>, ближе к уровню — <b>оранжевой</b>, а перед самым повышением — <b>красной</b>!</size>",
-            textEN = "<size=82%>The EXP bar dynamically changes color: <b>White</b> at start, <b>Green</b> midway, <b>Orange</b> near the top, and <b>Red</b> right before Level Up!</size>",
-            textTR = "<size=82%>Deneyim cubugu renk degistirir: basta <b>Beyaz</b>, doldukca <b>Yesil</b>, seviyeye yaklasinca <b>Turuncu</b> ve seviye atlamadan once <b>Kirmizi</b> olur!</size>",
+            textRU = "<size=86%>Полоска опыта меняет цвет: сначала она <b>белая</b>, затем при заполнении станет <b>зеленой</b>, ближе к уровню — <b>оранжевой</b>, а перед самым повышением — <b>красной</b>!</size>",
+            textEN = "<size=86%>The EXP bar dynamically changes color: <b>White</b> at start, <b>Green</b> midway, <b>Orange</b> near the top, and <b>Red</b> right before Level Up!</size>",
+            textTR = "<size=86%>Deneyim cubugu renk degistirir: basta <b>Beyaz</b>, doldukca <b>Yesil</b>, seviyeye yaklasinca <b>Turuncu</b> ve seviye atlamadan once <b>Kirmizi</b> olur!</size>",
             revealResourceIndex = 4,
             showCalendarIcon = true,
             revealAvatarUI = true
@@ -865,9 +800,9 @@ public class DialogueSystem_Manager : MonoBehaviour
         // 3. Аватарки: полная коллекция из 34 аватарок и 14 рамок
         dialogueSteps.Add(new DialogStep
         {
-            textRU = "<size=76%>Также у нас богатая коллекция: <b>34 уникальные Аватарки</b> (3 открыты со старта, 21 за уровни мастерства до 100 Ур., 5 в лавке за золото и 5 за кристаллы) и <b>14 волшебных Рамок</b>!\n\nНажми кнопку ниже, я открою гардероб, чтобы ты мог выбрать себе облик!</size>",
-            textEN = "<size=76%>We also have a rich wardrobe: <b>34 unique Avatars</b> (3 starter, 21 level-up up to Lv.100, 5 in shop, 5 premium) and <b>14 magical Frames</b>!\n\nTap below to explore and pick your avatar!</size>",
-            textTR = "<size=76%>Ayrica zengin bir koleksiyonumuz var: <b>34 ozel Avatar</b> (3 baslangic, 21 seviye odulu 100'e kadar, 5 dukkan, 5 kristal) ve <b>14 buyulu Cerceve</b>!\n\nKiyafet secimi icin asagidaki butona bas!</size>",
+            textRU = "<size=82%>Также у нас богатая коллекция: <b>34 уникальные Аватарки</b> (3 открыты со старта, 21 за уровни до 100 Ур., 5 в лавке за золото и 5 за кристаллы) и <b>14 волшебных Рамок</b>!\n\nНажми кнопку ниже, я открою гардероб, чтобы ты мог выбрать себе облик!</size>",
+            textEN = "<size=82%>We also have a rich wardrobe: <b>34 unique Avatars</b> (3 starter, 21 level-up up to Lv.100, 5 in shop, 5 premium) and <b>14 magical Frames</b>!\n\nTap below to explore and pick your avatar!</size>",
+            textTR = "<size=82%>Ayrica zengin bir koleksiyonumuz var: <b>34 ozel Avatar</b> (3 baslangic, 21 seviye odulu 100'e kadar, 5 dukkan, 5 kristal) ve <b>14 buyulu Cerceve</b>!\n\nKiyafet secimi icin asagidaki butona bas!</size>",
             revealResourceIndex = 4,
             showCalendarIcon = true,
             revealAvatarUI = true,
@@ -896,9 +831,9 @@ public class DialogueSystem_Manager : MonoBehaviour
         // 1. Предложение помощи с первым опытом
         dialogueSteps.Add(new DialogStep
         {
-            textRU = "Отличный выбор облика! Теперь я помогу тебе получить твой <b>первый опыт алхимии</b> и повысить уровень до 2-го!\n\nНажми «Согласен», чтобы приступить к изучению первого рецепта!",
-            textEN = "Great avatar choice! Now I will assist you in gaining your <b>first alchemy experience</b> and leveling up to Level 2!\n\nClick «Agree» to begin learning the first recipe!",
-            textTR = "Harika secim! Simdi <b>ilk simya tecrubeni</b> kazanmana ve Seviye 2'ye yukselmene yardim edecegim!\n\nIlk tarifi ogrenmek icin «Kabul» butonuna bas!",
+            textRU = "<size=86%>Отличный выбор облика! Теперь я помогу тебе получить твой <b>первый опыт алхимии</b> и повысить уровень до 2-го!\n\nНажми «Согласен», чтобы приступить к изучению первого рецепта!</size>",
+            textEN = "<size=86%>Great avatar choice! Now I will assist you in gaining your <b>first alchemy experience</b> and leveling up to Level 2!\n\nClick «Agree» to begin learning the first recipe!</size>",
+            textTR = "<size=86%>Harika secim! Simdi <b>ilk simya tecrubeni</b> kazanmana ve Seviye 2'ye yukselmene yardim edecegim!\n\nIlk tarifi ogrenmek icin «Kabul» butonuna bas!</size>",
             revealResourceIndex = 4,
             showCalendarIcon = true,
             revealAvatarUI = true,
@@ -908,9 +843,9 @@ public class DialogueSystem_Manager : MonoBehaviour
         // 2. Согласие на списание 100 золота, 5 камней, 1 свитка
         dialogueSteps.Add(new DialogStep
         {
-            textRU = "Для изучения и создания первого зелья нам потребуется:\n• <b><color=#FFE57F>100 Золота</color></b>\n• <b><color=#80FFDB>5 Магических Камней</color></b>\n• <b><color=#FFD166>1 Древний Свиток</color></b>\n\nТы согласен отдать эти ресурсы на изготовление первого рецепта?",
-            textEN = "To research and brew the first potion, we need:\n• <b><color=#FFE57F>100 Gold</color></b>\n• <b><color=#80FFDB>5 Magic Stones</color></b>\n• <b><color=#FFD166>1 Ancient Scroll</color></b>\n\nDo you agree to grant these resources for the first craft?",
-            textTR = "Ilk iksiri hazirlamak icin gerekenler:\n• <b><color=#FFE57F>100 Altin</color></b>\n• <b><color=#80FFDB>5 Buyulu Tas</color></b>\n• <b><color=#FFD166>1 Kadim Parsomen</color></b>\n\nBu kaynaklari vermeyi kabul ediyor musun?",
+            textRU = "<size=84%>Для изучения и создания первого зелья нам потребуется:\n• <b><color=#FFE57F>100 Золота</color></b>\n• <b><color=#80FFDB>5 Магических Камней</color></b>\n• <b><color=#FFD166>1 Древний Свиток</color></b>\n\nТы согласен отдать эти ресурсы на изготовление первого рецепта?</size>",
+            textEN = "<size=84%>To research and brew the first potion, we need:\n• <b><color=#FFE57F>100 Gold</color></b>\n• <b><color=#80FFDB>5 Magic Stones</color></b>\n• <b><color=#FFD166>1 Ancient Scroll</color></b>\n\nDo you agree to grant these resources for the first craft?</size>",
+            textTR = "<size=84%>Ilk iksiri hazirlamak icin gerekenler:\n• <b><color=#FFE57F>100 Altin</color></b>\n• <b><color=#80FFDB>5 Buyulu Tas</color></b>\n• <b><color=#FFD166>1 Kadim Parsomen</color></b>\n\nBu kaynaklari vermeyi kabul ediyor musun?</size>",
             revealResourceIndex = 4,
             showCalendarIcon = true,
             revealAvatarUI = true,
@@ -920,9 +855,9 @@ public class DialogueSystem_Manager : MonoBehaviour
         // 3. Появление свитка слева от календаря и открытие
         dialogueSteps.Add(new DialogStep
         {
-            textRU = "Отлично! Слева от календаря появился наш <b><color=#FFD166>Свиток Рецептов</color></b>!\n\nНажми кнопку ниже, чтобы развернуть его и посмотреть формулу приготовления первого зелья!",
-            textEN = "Look! Next to the calendar, our <b><color=#FFD166>Recipe Scroll</color></b> has appeared!\n\nTap below to open it and inspect the first potion formula!",
-            textTR = "Takvimin solunda <b><color=#FFD166>Tarif Parsomenimiz</color></b> belirdi!\n\nIlk iksir formulu icin asagidaki butona bas!",
+            textRU = "<size=84%>Отлично! Слева от календаря появился наш <b><color=#FFD166>Свиток Рецептов</color></b>!\n\nНажми кнопку ниже, чтобы развернуть его и посмотреть формулу приготовления первого зелья!</size>",
+            textEN = "<size=84%>Look! Next to the calendar, our <b><color=#FFD166>Recipe Scroll</color></b> has appeared!\n\nTap below to open it and inspect the first potion formula!</size>",
+            textTR = "<size=84%>Takvimin solunda <b><color=#FFD166>Tarif Parsomenimiz</color></b> belirdi!\n\nIlk iksir formulu icin asagidaki butona bas!</size>",
             revealResourceIndex = 4,
             showCalendarIcon = true,
             revealAvatarUI = true,
@@ -943,9 +878,9 @@ public class DialogueSystem_Manager : MonoBehaviour
         // 1. Поздравление с уровнем
         dialogueSteps.Add(new DialogStep
         {
-            textRU = "<size=80%>Поздравляю! Ты получил <b><color=#80FFDB>+10 XP</color></b> и поднял <b><color=#FFE57F>2-й Уровень</color></b>!\n\nСлева от свитка рецептов появился твой <b><color=#FFD166>Сундук Алхимика</color></b>!</size>",
-            textEN = "<size=80%>Congratulations! You gained <b><color=#80FFDB>+10 XP</color></b> and reached <b><color=#FFE57F>Level 2</color></b>!\n\nNext to the scroll, your <b><color=#FFD166>Alchemist Chest</color></b> appeared!</size>",
-            textTR = "<size=80%>Tebrikler! <b><color=#80FFDB>+10 XP</color></b> kazandin ve <b><color=#FFE57F>Seviye 2</color></b> oldun!\n\nParsomenin solunda <b><color=#FFD166>Sandigin</color></b> belirdi!</size>",
+            textRU = "<size=86%>Поздравляю! Ты получил <b><color=#80FFDB>+10 XP</color></b> и поднял <b><color=#FFE57F>2-й Уровень</color></b>!\n\nСлева от свитка рецептов появился твой <b><color=#FFD166>Сундук Алхимика</color></b>!</size>",
+            textEN = "<size=86%>Congratulations! You gained <b><color=#80FFDB>+10 XP</color></b> and reached <b><color=#FFE57F>Level 2</color></b>!\n\nNext to the scroll, your <b><color=#FFD166>Alchemist Chest</color></b> appeared!</size>",
+            textTR = "<size=86%>Tebrikler! <b><color=#80FFDB>+10 XP</color></b> kazandin ve <b><color=#FFE57F>Seviye 2</color></b> oldun!\n\nParsomenin solunda <b><color=#FFD166>Sandigin</color></b> belirdi!</size>",
             revealResourceIndex = 4,
             showCalendarIcon = true,
             revealAvatarUI = true,
@@ -956,9 +891,9 @@ public class DialogueSystem_Manager : MonoBehaviour
         // 2. Рассказ про хранение предметов в сундуке
         dialogueSteps.Add(new DialogStep
         {
-            textRU = "<size=77%>В сундуке хранятся все твои найденные и сваренные предметы: <b>свитки рецептов</b>, <b>готовые зелья</b>, а также <b>части пазлов и обликов</b>.\n\nОдинаковые предметы аккуратно суммируются в стаках!</size>",
-            textEN = "<size=77%>Your chest stores all discovered items: <b>recipe scrolls</b>, <b>potions</b>, and <b>puzzle shards</b>.\n\nIdentical items neatly stack together!</size>",
-            textTR = "<size=77%>Sandikta tum esyalarin saklanir: <b>tarifler</b>, <b>iksirler</b> ve <b>parcalar</b>.\n\nAyni esyalar yigin halinde birikir!</size>",
+            textRU = "<size=84%>В сундуке хранятся все твои найденные и сваренные предметы: <b>свитки рецептов</b>, <b>готовые зелья</b>, а также <b>части пазлов и обликов</b>.\n\nОдинаковые предметы аккуратно суммируются в стаках!</size>",
+            textEN = "<size=84%>Your chest stores all discovered items: <b>recipe scrolls</b>, <b>potions</b>, and <b>puzzle shards</b>.\n\nIdentical items neatly stack together!</size>",
+            textTR = "<size=84%>Sandikta tum esyalarin saklanir: <b>tarifler</b>, <b>iksirler</b> ve <b>parcalar</b>.\n\nAyni esyalar yigin halinde birikir!</size>",
             revealResourceIndex = 4,
             showCalendarIcon = true,
             revealAvatarUI = true,
@@ -969,9 +904,9 @@ public class DialogueSystem_Manager : MonoBehaviour
         // 3. Предложение открыть инвентарь
         dialogueSteps.Add(new DialogStep
         {
-            textRU = "<size=80%>Давай взглянем внутрь твоего инвентаря!\n\nНажми кнопку ниже, чтобы открыть сундук и посмотреть ячейки хранения!</size>",
-            textEN = "<size=80%>Let us inspect your inventory!\n\nTap below to open your chest and view the storage slots!</size>",
-            textTR = "<size=80%>Envanterine bir goz atalim!\n\nSandigi acip yuvalari gormek icin asagidaki butona bas!</size>",
+            textRU = "<size=86%>Давай взглянем внутрь твоего инвентаря!\n\nНажми кнопку ниже, чтобы открыть сундук и посмотреть ячейки хранения!</size>",
+            textEN = "<size=86%>Let us inspect your inventory!\n\nTap below to open your chest and view the storage slots!</size>",
+            textTR = "<size=86%>Envanterine bir goz atalim!\n\nSandigi acip yuvalari gormek icin asagidaki butona bas!</size>",
             revealResourceIndex = 4,
             showCalendarIcon = true,
             revealAvatarUI = true,
@@ -992,6 +927,12 @@ public class DialogueSystem_Manager : MonoBehaviour
 
         if (dialoguePanel != null) dialoguePanel.SetActive(false);
 
+        // При открытом свитке отключаем интерактивность и скрываем фон ресурсов/календаря/аватарки
+        if (topPanel != null) topPanel.SetActive(false);
+        if (calendarIconButton != null) calendarIconButton.SetActive(false);
+        if (playerAvatarContainer != null) playerAvatarContainer.SetActive(false);
+        if (smallScrollIconButton != null) smallScrollIconButton.SetActive(false);
+
         if (recipeScrollPanel != null)
         {
             recipeScrollPanel.SetActive(true);
@@ -999,10 +940,6 @@ public class DialogueSystem_Manager : MonoBehaviour
 
         if (cauldronButton != null) cauldronButton.SetActive(true);
         if (roomCatObject != null) roomCatObject.SetActive(true);
-        if (smallScrollIconButton != null) smallScrollIconButton.SetActive(true);
-        SetSmallScrollInteractable(true);
-        SetCalendarButtonInteractable(true);
-        if (avatarManager != null) avatarManager.SetAvatarButtonInteractable(true);
     }
 
     public void CloseRecipeScrollUI()
@@ -1014,6 +951,16 @@ public class DialogueSystem_Manager : MonoBehaviour
         {
             recipeScrollPanel.SetActive(false);
         }
+
+        // При выходе из свитка рецептов восстанавливаем ресурсы, аватарку, календарь и свиток
+        if (topPanel != null) topPanel.SetActive(true);
+        if (calendarIconButton != null) calendarIconButton.SetActive(true);
+        if (playerAvatarContainer != null) playerAvatarContainer.SetActive(true);
+        if (smallScrollIconButton != null) smallScrollIconButton.SetActive(true);
+
+        SetSmallScrollInteractable(true);
+        SetCalendarButtonInteractable(true);
+        if (avatarManager != null) avatarManager.SetAvatarButtonInteractable(true);
     }
 
     public void OpenCalendarUI()

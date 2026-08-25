@@ -1,9 +1,10 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.12.14)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.12.41)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** v18.12.14
+- **Version:** v18.12.41
 - **Engine:** Unity 6 (6000.3.10f1)
+- **v18.12.41 Update:** Avatar Ring Display Binding, Recipe Scroll UI Isolation & Interactive Table Cat - Fixed profile avatar sprite rendering in `Avatar_Manager.cs` to ensure `currentAvatarDisplayImage` is enabled and correctly colored white. Scaled dialogue text sizes in `DialogueSystem_Manager.cs` (from 68-72% to 84-86%) for comfortable reading without clipping. Implemented UI isolation when opening the Recipe Scroll (auto-hiding background resources, calendar icon, and avatar ring, restoring them cleanly on exit). Connected the table Mini Cat click interaction in `RecipeCrafting_Manager.cs` so clicking the small cat toggles his dialogue bubble hint, and ensured `Floating_XP_Badge` is cleanly hidden until the potion is claimed.
 - **v18.12.14 Update:** Alchemist Cat Extended Dialogue & Daily/Monthly/Quarterly/Annual Calendar Reward System - Extended the narrative dialogue in `DialogueSystem_Manager.cs` so after claiming the 5k gold/10 stones/3 scrolls starter bonus, the Cat does not disappear. Instead, the dialogue continues to introduce the Magic Calendar, detailing daily rewards, monthly complete rewards (30k gold, 10 stones, 5 scrolls, 3 crystals), quarterly super-bonuses (3rd, 6th, 9th, 12th month scaling up to 90k gold, 20 stones, 15 scrolls, 20 crystals), and the ultimate 365-day annual streak mega-bonus (500k gold, 200 stones, 100 scrolls, 200 crystals).
 - **v18.12.13 Update:** Loading Panel Responsive Scaling & Kitten Progress Opacity - Configured responsive stretching for the `Loading_Panel` canvas to dynamically adapt to desktop and mobile aspects. Programmed the `kittenSilhouette` image opacity to fade in proportionally as the progress bar increments from 0% to 100%.
 - **v18.12.12 Update:** Audio Slider Swap & Manual Inspector Alignment Hotfix - Swapped localization keys/values for sound and music labels (upper slider is Sounds/SFX, lower slider is Music) to match visual layout of sliders without restructuring logic connections. Removed automatic AudioMixer routing to prevent "Exposed name does not exist" console errors when specific parameters are not pre-exposed, routing strictly via clean direct AudioSource volume parameters.

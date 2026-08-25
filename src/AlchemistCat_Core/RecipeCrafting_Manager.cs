@@ -29,6 +29,7 @@ public class RecipeCrafting_Manager : MonoBehaviour
     public GameObject tableCauldronObject;     // Объект/Кнопка котла на столе
     public Button cauldronClickButton;
     public GameObject tableMiniCatObject;       // Маленький кот на столе
+    public Button miniCatClickButton;           // Кнопка на маленьком котике для вызова подсказки
     public GameObject miniCatBubblePanel;       // Рамка-реплика маленького кота
     public TextMeshProUGUI miniCatBubbleText;
 
@@ -94,6 +95,21 @@ public class RecipeCrafting_Manager : MonoBehaviour
             cauldronClickButton.onClick.AddListener(OnCauldronClicked);
         }
 
+        if (miniCatClickButton != null)
+        {
+            miniCatClickButton.onClick.RemoveAllListeners();
+            miniCatClickButton.onClick.AddListener(OnMiniCatClicked);
+        }
+        else if (tableMiniCatObject != null)
+        {
+            Button autoBtn = tableMiniCatObject.GetComponent<Button>();
+            if (autoBtn != null)
+            {
+                autoBtn.onClick.RemoveAllListeners();
+                autoBtn.onClick.AddListener(OnMiniCatClicked);
+            }
+        }
+
         if (makeBadgeButton != null)
         {
             makeBadgeButton.onClick.RemoveAllListeners();
@@ -112,11 +128,12 @@ public class RecipeCrafting_Manager : MonoBehaviour
             chestButton.onClick.AddListener(OnChestButtonClicked);
         }
 
-        // По умолчанию вспомогательные плашки скрыты
+        // По умолчанию вспомогательные плашки скрыты в чистом начальном состоянии
         if (makeBadgeButtonObject != null) makeBadgeButtonObject.SetActive(false);
         if (craftingProgressBarContainer != null) craftingProgressBarContainer.SetActive(false);
         if (claimPotionButtonObject != null) claimPotionButtonObject.SetActive(false);
         if (miniCatBubblePanel != null) miniCatBubblePanel.SetActive(false);
+        if (floatingXPPrefab != null) floatingXPPrefab.SetActive(false);
         if (chestIconButton != null) chestIconButton.SetActive(false);
         if (inventoryPanel != null) inventoryPanel.SetActive(false);
     }
@@ -135,18 +152,43 @@ public class RecipeCrafting_Manager : MonoBehaviour
         if (tableCauldronObject != null) tableCauldronObject.SetActive(true);
         if (tableMiniCatObject != null) tableMiniCatObject.SetActive(true);
 
+        // Показываем подсказку кота
+        ShowMiniCatBubble("Мяу! Нажми на котёл, чтобы начать приготовление зелья!");
+    }
+
+    /// <summary>
+    /// Клик по маленькому коту на столе — переключает/показывает облачко с подсказкой
+    /// </summary>
+    public void OnMiniCatClicked()
+    {
+        if (miniCatBubblePanel != null)
+        {
+            bool isCurrentActive = miniCatBubblePanel.activeSelf;
+            if (isCurrentActive)
+            {
+                miniCatBubblePanel.SetActive(false);
+            }
+            else
+            {
+                ShowMiniCatBubble("Мяу! Нажми на котёл, чтобы изготовить первое зелье!");
+            }
+        }
+    }
+
+    private void ShowMiniCatBubble(string text)
+    {
         if (miniCatBubblePanel != null)
         {
             miniCatBubblePanel.SetActive(true);
             if (miniCatBubbleText != null)
             {
-                miniCatBubbleText.text = "Мяу! Нажми на котёл, чтобы начать приготовление зелья!";
+                miniCatBubbleText.text = text;
             }
         }
     }
 
     /// <summary>
-    /// Шаг 2: Нажатие на котел на столе -> появляется плашка 'Изготовить'
+    /// Шаг 2: Нажатие на котел на столе -> скрывается облачко кота, появляется плашка 'Изготовить'
     /// </summary>
     public void OnCauldronClicked()
     {
