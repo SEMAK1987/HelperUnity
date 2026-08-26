@@ -1,6 +1,6 @@
 {
   "name": "Fate Continent",
-  "description": "Fate Continent: Alchemist Cat Edition (v18.12.40) - Frame Hierarchy Fix (Icon under Frame), Dialogue Text Font Auto-Sizing (No Overflow), Top-Right Button Removal, and Full First Recipe Crafting Tutorial Flow with Cauldron & Storage Chest.",
+  "description": "Fate Continent: Alchemist Cat Edition (v18.12.42) - Inventory Slots Grid Calibration, Small Scroll Button TopPanel Integration, Interactive Mini Cat Hints, and Floating XP Badge Synchronization.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
