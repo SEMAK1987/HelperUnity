@@ -68,9 +68,19 @@ public class RecipeCrafting_Manager : MonoBehaviour
     public GameObject chestIconButton;         // Иконка сундучка (слева от свитка)
     public Button chestButton;
 
-    [Header("7. Окно Инвентаря")]
+    [Header("7. Окно Инвентаря (100 слотов, 5 в ряд, со скроллом)")]
     public GameObject inventoryPanel;
-    public Button inventoryCloseButton;        // Некликабельная кнопка закрытия
+    public Button inventoryCloseButton;        // Кнопка закрытия (крестик)
+    public Transform inventorySlotsContent;    // Content внутри ScrollRect
+    public GameObject inventorySlotPrefab;     // Префаб ячейки инвентаря
+    public int totalSlots = 100;               // 100 ячеек
+    public int columnsCount = 5;               // 5 в ряду
+
+    [Header("8. Колба Опыта Мастерства в 1-м слоте")]
+    public GameObject masteryPotionItemObject; // Иконка колбы опыта мастерства в первом слоте
+    public Button masteryPotionButton;         // Кнопка на колбе для ее выпивания (+100 XP)
+    public AudioClip potionConsumeSound;       // Звук применения колбы
+    public bool isMasteryPotionConsumed = false;
 
     [Header("Звуки")]
     public AudioClip craftStartSound;
@@ -100,15 +110,8 @@ public class RecipeCrafting_Manager : MonoBehaviour
             miniCatClickButton.onClick.RemoveAllListeners();
             miniCatClickButton.onClick.AddListener(OnMiniCatClicked);
         }
-        else if (tableMiniCatObject != null)
-        {
-            Button autoBtn = tableMiniCatObject.GetComponent<Button>();
-            if (autoBtn != null)
-            {
-                autoBtn.onClick.RemoveAllListeners();
-                autoBtn.onClick.AddListener(OnMiniCatClicked);
-            }
-        }
+        
+        SanitizeMiniCatObject();
 
         if (makeBadgeButton != null)
         {
@@ -128,6 +131,18 @@ public class RecipeCrafting_Manager : MonoBehaviour
             chestButton.onClick.AddListener(OnChestButtonClicked);
         }
 
+        if (masteryPotionButton != null)
+        {
+            masteryPotionButton.onClick.RemoveAllListeners();
+            masteryPotionButton.onClick.AddListener(OnMasteryPotionClicked);
+        }
+
+        if (inventoryCloseButton != null)
+        {
+            inventoryCloseButton.onClick.RemoveAllListeners();
+            inventoryCloseButton.onClick.AddListener(OnInventoryCloseClicked);
+        }
+
         // По умолчанию вспомогательные плашки скрыты в чистом начальном состоянии
         if (makeBadgeButtonObject != null) makeBadgeButtonObject.SetActive(false);
         if (craftingProgressBarContainer != null) craftingProgressBarContainer.SetActive(false);
@@ -138,8 +153,50 @@ public class RecipeCrafting_Manager : MonoBehaviour
         if (inventoryPanel != null) inventoryPanel.SetActive(false);
     }
 
+    private Coroutine miniCatBubbleHideCoroutine;
+
+    private void SanitizeMiniCatObject()
+    {
+        if (tableMiniCatObject != null)
+        {
+            // 1. Отключаем лишний дочерний GameObject "Button" с белым фоном, если он был создан
+            Transform childBtn = tableMiniCatObject.transform.Find("Button");
+            if (childBtn != null)
+            {
+                Image childImg = childBtn.GetComponent<Image>();
+                if (childImg != null) childImg.enabled = false;
+                TextMeshProUGUI childTmp = childBtn.GetComponentInChildren<TextMeshProUGUI>(true);
+                if (childTmp != null) childTmp.text = "";
+                UnityEngine.UI.Text childTxt = childBtn.GetComponentInChildren<UnityEngine.UI.Text>(true);
+                if (childTxt != null) childTxt.text = "";
+                childBtn.gameObject.SetActive(false);
+            }
+
+            // 2. Включаем кликабельность на самом спрайте кота
+            Image catImage = tableMiniCatObject.GetComponent<Image>();
+            if (catImage != null)
+            {
+                catImage.raycastTarget = true;
+            }
+
+            Button catBtn = tableMiniCatObject.GetComponent<Button>();
+            if (catBtn == null)
+            {
+                catBtn = tableMiniCatObject.AddComponent<Button>();
+            }
+
+            if (catImage != null)
+            {
+                catBtn.targetGraphic = catImage;
+            }
+
+            catBtn.onClick.RemoveAllListeners();
+            catBtn.onClick.AddListener(OnMiniCatClicked);
+        }
+    }
+
     /// <summary>
-    /// Шаг 1: Игрок открыл Старый Свиток и нажал кнопку 'Начать' внизу свитка
+    /// Шаг 1: Игрок открыл Старый Свиток и нажал кнопку 'Начать' внизу свитка (Скриншот 4 -> Скриншот 3)
     /// </summary>
     public void OnStartCraftButtonClicked()
     {
@@ -148,12 +205,38 @@ public class RecipeCrafting_Manager : MonoBehaviour
 
         if (recipeScrollPanel != null) recipeScrollPanel.SetActive(false);
 
+        // Панель ресурсов, аватарка, календарь и свиток остаются видимыми, но БЛОКИРУЮТСЯ (заблокированы) на время варки
+        if (DialogueSystem_Manager.Instance != null)
+        {
+            if (DialogueSystem_Manager.Instance.topPanel != null) 
+                DialogueSystem_Manager.Instance.topPanel.SetActive(true);
+            if (DialogueSystem_Manager.Instance.calendarIconButton != null) 
+                DialogueSystem_Manager.Instance.calendarIconButton.SetActive(true);
+            if (DialogueSystem_Manager.Instance.playerAvatarContainer != null) 
+                DialogueSystem_Manager.Instance.playerAvatarContainer.SetActive(true);
+            if (DialogueSystem_Manager.Instance.smallScrollIconButton != null) 
+                DialogueSystem_Manager.Instance.smallScrollIconButton.SetActive(true);
+
+            DialogueSystem_Manager.Instance.isCraftingInProgress = true;
+            DialogueSystem_Manager.Instance.SetCalendarButtonInteractable(false);
+            DialogueSystem_Manager.Instance.SetSmallScrollInteractable(false);
+        }
+
+        if (Avatar_Manager.Instance != null)
+        {
+            Avatar_Manager.Instance.SetAvatarButtonInteractable(false);
+        }
+
         // Появляется котел и маленький кот на столе
         if (tableCauldronObject != null) tableCauldronObject.SetActive(true);
-        if (tableMiniCatObject != null) tableMiniCatObject.SetActive(true);
+        if (tableMiniCatObject != null)
+        {
+            tableMiniCatObject.SetActive(true);
+            SanitizeMiniCatObject();
+        }
 
-        // Показываем подсказку кота
-        ShowMiniCatBubble("Мяу! Нажми на котёл, чтобы начать приготовление зелья!");
+        // Показываем бабл с подсказкой котика на столе
+        ShowMiniCatBubble("Нажми на котёл, чтобы начать варить!", false);
     }
 
     /// <summary>
@@ -166,16 +249,16 @@ public class RecipeCrafting_Manager : MonoBehaviour
             bool isCurrentActive = miniCatBubblePanel.activeSelf;
             if (isCurrentActive)
             {
-                miniCatBubblePanel.SetActive(false);
+                HideMiniCatBubble();
             }
             else
             {
-                ShowMiniCatBubble("Мяу! Нажми на котёл, чтобы изготовить первое зелье!");
+                ShowMiniCatBubble("Нажми на котёл, чтобы начать варить!", false);
             }
         }
     }
 
-    private void ShowMiniCatBubble(string text)
+    public void ShowMiniCatBubble(string text, bool autoHide = false)
     {
         if (miniCatBubblePanel != null)
         {
@@ -184,7 +267,36 @@ public class RecipeCrafting_Manager : MonoBehaviour
             {
                 miniCatBubbleText.text = text;
             }
+
+            if (miniCatBubbleHideCoroutine != null) StopCoroutine(miniCatBubbleHideCoroutine);
+            if (autoHide)
+            {
+                miniCatBubbleHideCoroutine = StartCoroutine(AutoHideMiniCatBubbleRoutine(3.5f));
+            }
         }
+    }
+
+    public void HideMiniCatBubble()
+    {
+        if (miniCatBubbleHideCoroutine != null)
+        {
+            StopCoroutine(miniCatBubbleHideCoroutine);
+            miniCatBubbleHideCoroutine = null;
+        }
+        if (miniCatBubblePanel != null)
+        {
+            miniCatBubblePanel.SetActive(false);
+        }
+    }
+
+    private IEnumerator AutoHideMiniCatBubbleRoutine(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (miniCatBubblePanel != null)
+        {
+            miniCatBubblePanel.SetActive(false);
+        }
+        miniCatBubbleHideCoroutine = null;
     }
 
     /// <summary>
@@ -195,7 +307,7 @@ public class RecipeCrafting_Manager : MonoBehaviour
         if (SettingsManager.Instance != null)
             SettingsManager.Instance.PlaySoundEffect(craftStartSound);
 
-        if (miniCatBubblePanel != null) miniCatBubblePanel.SetActive(false);
+        HideMiniCatBubble();
         if (makeBadgeButtonObject != null) makeBadgeButtonObject.SetActive(true);
     }
 
@@ -313,6 +425,7 @@ public class RecipeCrafting_Manager : MonoBehaviour
         // Запуск финальной фазы диалога с основным котом
         if (DialogueSystem_Manager.Instance != null)
         {
+            DialogueSystem_Manager.Instance.isCraftingInProgress = false;
             DialogueSystem_Manager.Instance.StartPostCraftChestDialogue();
         }
     }
@@ -358,10 +471,101 @@ public class RecipeCrafting_Manager : MonoBehaviour
             inventoryPanel.SetActive(true);
         }
 
-        // Кнопка закрытия пока некликабельна
+        EnsureInventorySlots();
+
+        // Проверяем, выпита ли колба опыта мастерства
+        int savedRank = PlayerPrefs.GetInt("Player_Mastery_Rank", 0);
+        int savedExp = PlayerPrefs.GetInt("Player_Mastery_Exp", 0);
+        isMasteryPotionConsumed = (savedRank > 0 || savedExp > 0);
+
+        if (masteryPotionItemObject != null)
+        {
+            masteryPotionItemObject.SetActive(!isMasteryPotionConsumed);
+        }
+
+        // Если колба еще не выпита - блокируем крестик закрытия. Если выпита - разблокируем
         if (inventoryCloseButton != null)
         {
-            inventoryCloseButton.interactable = false;
+            inventoryCloseButton.interactable = isMasteryPotionConsumed;
+        }
+    }
+
+    /// <summary>
+    /// Автоматическая генерация или проверка 100 ячеек инвентаря
+    /// </summary>
+    public void EnsureInventorySlots()
+    {
+        if (inventorySlotsContent == null) return;
+
+        // Настраиваем сетку (GridLayoutGroup) на 5 колонок если компонент есть
+        GridLayoutGroup grid = inventorySlotsContent.GetComponent<GridLayoutGroup>();
+        if (grid != null)
+        {
+            grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            grid.constraintCount = columnsCount;
+        }
+
+        // Если в инвентаре уже есть дочерние слоты и их меньше 100, дополняем при наличии префаба
+        if (inventorySlotPrefab != null)
+        {
+            int currentChildCount = inventorySlotsContent.childCount;
+            for (int i = currentChildCount; i < totalSlots; i++)
+            {
+                GameObject newSlot = Instantiate(inventorySlotPrefab, inventorySlotsContent);
+                newSlot.name = $"Inventory_Slot_Hex_{i + 1}";
+            }
+        }
+    }
+
+    /// <summary>
+    /// Шаг 6: Игрок нажимает на Колбу Опыта Мастерства в 1-м слоте (+100 XP)
+    /// </summary>
+    public void OnMasteryPotionClicked()
+    {
+        if (isMasteryPotionConsumed) return;
+        isMasteryPotionConsumed = true;
+
+        if (potionConsumeSound != null && SettingsManager.Instance != null)
+            SettingsManager.Instance.PlaySoundEffect(potionConsumeSound);
+        else if (craftCompleteSound != null && SettingsManager.Instance != null)
+            SettingsManager.Instance.PlaySoundEffect(craftCompleteSound);
+
+        // Колба пропадает из слота
+        if (masteryPotionItemObject != null)
+        {
+            masteryPotionItemObject.SetActive(false);
+        }
+
+        // Начисляем 100 опыта мастерства (переход с Новичка на Новичок-травник)
+        if (Avatar_Manager.Instance != null)
+        {
+            Avatar_Manager.Instance.AddMasteryExperience(100);
+        }
+
+        // Активируем кнопку-крестик выхода из инвентаря
+        if (inventoryCloseButton != null)
+        {
+            inventoryCloseButton.interactable = true;
+        }
+    }
+
+    /// <summary>
+    /// Шаг 7: Игрок нажимает крестик выхода из инвентаря -> блокировка сундука, переход к диалогу о Знаниях
+    /// </summary>
+    public void OnInventoryCloseClicked()
+    {
+        if (inventoryPanel != null)
+        {
+            inventoryPanel.SetActive(false);
+        }
+
+        if (DialogueSystem_Manager.Instance != null)
+        {
+            // Блокируем сундук
+            DialogueSystem_Manager.Instance.SetChestButtonInteractable(false);
+
+            // Запускаем диалог про раздел 'Знания' и повышение до 'Новичок-травник'
+            DialogueSystem_Manager.Instance.StartPostMasteryKnowledgeDialogue();
         }
     }
 }

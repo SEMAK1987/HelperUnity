@@ -23,11 +23,18 @@ public class Avatar_Manager : MonoBehaviour
     public GameObject avatarItemPrefab;  // Префаб ячейки аватарки
     public GameObject categoryHeaderPrefab; // Префаб заголовка категории
 
-    [Header("Настройки Сетки Гардероба (2-3 в ряд)")]
+    [Header("Настройки Сетки Гардероба")]
     public int columnsCount = 3;
     public Vector2 cellSize = new Vector2(145, 170);
     public Vector2 cellSpacing = new Vector2(16, 16);
-    public Vector2 panelSize = new Vector2(620, 840); // Высота 840 для отображения почти на весь экран без лишней прокрутки
+    public Vector2 panelSize = new Vector2(620, 840);
+
+    [Header("Адаптивная Настройка Гардероба")]
+    public bool autoAdaptResolution = false; // Отключено принудительное растяжение белого фона, чтобы не ломать верстку в 4K и на телефонах
+    public int pcColumnsCount = 3;
+    public Vector2 pcPanelSize = new Vector2(620, 840);
+    public int mobileColumnsCount = 3;
+    public Vector2 mobilePanelSize = new Vector2(620, 840);
 
     [Header("Настройки Цветов Гардероба (Легко настраивать в Инспекторе)")]
     public Color categoryHeaderColor = new Color(1f, 0.92f, 0.45f, 1f); // #FFEBA3 Яркий золотой
@@ -43,8 +50,19 @@ public class Avatar_Manager : MonoBehaviour
     public Image currentAvatarDisplayImage;
     public Image currentFrameDisplayImage;
     public TextMeshProUGUI levelBadgeText;
-    public Image expProgressBar;       // Полоска опыта (Image Type: Filled)
+    public Image expProgressBar;       // Полоска опыта кота (Image Type: Filled)
     public TextMeshProUGUI expProgressText; // Текст опыта "0/10 XP"
+
+    [Header("Шкала Опыта Мастерства (Алхимический Ранг)")]
+    public GameObject masteryContainer;            // Родительский контейнер второй полоски
+    public TextMeshProUGUI masteryRankTitleText;   // "Новичок" / "Новичок-травник"
+    public Image masteryExpProgressBar;            // Вторая полоска опыта мастерства
+    public TextMeshProUGUI masteryExpProgressText; // Текст "0/100 XP"
+    public Vector2 masteryBarPosition = new Vector2(-74, -28); // Сдвиг второй полоски чуть ниже
+    public Vector2 masteryBarScale = new Vector2(1f, 0.85f);
+    public Color noviceTextColor = Color.white;
+    public Color herbalistTextColor = new Color(0.32f, 0.75f, 0.50f, 1f); // #52B788 Более темный травянисто-зеленый
+    public AudioClip masteryRankUpSound;
 
     [System.Serializable]
     public enum AvatarCategory
@@ -119,12 +137,33 @@ public class Avatar_Manager : MonoBehaviour
     public AudioClip selectSound;
     public AudioClip levelUpSound;
 
-    // Опыт и Уровень
+    // Опыт и Уровень Кота
     private int currentLevel = 1;
     private int currentExp = 0;
     private int maxExp = 10;
     private int selectedAvatarId = 0;
     private int selectedFrameId = 0;
+
+    // Опыт Мастерства и Алхимический Ранг
+    private int currentMasteryRankIndex = 0; // 0 = Новичок, 1 = Новичок-травник...
+    private int currentMasteryExp = 0;
+    private int maxMasteryExp = 100;
+
+    private static readonly string[] MasteryRankNamesRU = new string[]
+    {
+        "Новичок", "Новичок-травник", "Подмастерье угля", "Экстрактор", "Знаток пропорций", "Сертифицированный ученик",
+        "Практик масел", "Дистиллятор", "Мастер ферментации", "Каталитический химик", "Старший фармацевт",
+        "Эфирный экспериментатор", "Кристаллограф", "Мастер трансмутации", "Вивисектор сущностей", "Архимагистр рецептуры",
+        "Повелитель температур", "Ткач реальности", "Конструктор душ", "Хранитель Первоматерии", "Создатель Философского камня"
+    };
+
+    private static readonly int[] MasteryRankThresholds = new int[]
+    {
+        100, 300, 500, 1000, 1500, 3000,
+        5000, 7000, 10000, 15000, 20000,
+        25000, 30000, 37000, 45000, 60000,
+        70000, 85000, 120000, 200000, 500000
+    };
 
     private void Awake()
     {
@@ -149,6 +188,7 @@ public class Avatar_Manager : MonoBehaviour
     private void Start()
     {
         UpdateProfileUI();
+        UpdateMasteryUI();
     }
 
     /// <summary>
@@ -167,6 +207,17 @@ public class Avatar_Manager : MonoBehaviour
         maxExp = GetMaxExpForLevel(currentLevel);
         selectedAvatarId = PlayerPrefs.GetInt("Selected_Avatar_Id", 0);
         selectedFrameId = PlayerPrefs.GetInt("Selected_Frame_Id", 0);
+
+        currentMasteryRankIndex = PlayerPrefs.GetInt("Player_Mastery_Rank", 0);
+        currentMasteryExp = PlayerPrefs.GetInt("Player_Mastery_Exp", 0);
+        maxMasteryExp = GetMaxExpForMasteryRank(currentMasteryRankIndex);
+    }
+
+    public static int GetMaxExpForMasteryRank(int rankIdx)
+    {
+        if (rankIdx >= 0 && rankIdx < MasteryRankThresholds.Length)
+            return MasteryRankThresholds[rankIdx];
+        return 100;
     }
 
     public void AddExperience(int amount)
@@ -195,6 +246,76 @@ public class Avatar_Manager : MonoBehaviour
         PlayerPrefs.Save();
 
         UpdateProfileUI();
+    }
+
+    public void AddMasteryExperience(int amount)
+    {
+        currentMasteryExp += amount;
+        maxMasteryExp = GetMaxExpForMasteryRank(currentMasteryRankIndex);
+
+        while (currentMasteryRankIndex < MasteryRankThresholds.Length - 1 && currentMasteryExp >= maxMasteryExp)
+        {
+            currentMasteryExp -= maxMasteryExp;
+            currentMasteryRankIndex++;
+            maxMasteryExp = GetMaxExpForMasteryRank(currentMasteryRankIndex);
+
+            if (masteryRankUpSound != null && SettingsManager.Instance != null)
+                SettingsManager.Instance.PlaySoundEffect(masteryRankUpSound);
+            else if (levelUpSound != null && SettingsManager.Instance != null)
+                SettingsManager.Instance.PlaySoundEffect(levelUpSound);
+        }
+
+        PlayerPrefs.SetInt("Player_Mastery_Rank", currentMasteryRankIndex);
+        PlayerPrefs.SetInt("Player_Mastery_Exp", currentMasteryExp);
+        PlayerPrefs.Save();
+
+        UpdateMasteryUI();
+    }
+
+    public void UpdateMasteryUI()
+    {
+        if (autoAlignProfileOffsets && masteryContainer != null)
+        {
+            RectTransform masteryRect = masteryContainer.GetComponent<RectTransform>();
+            if (masteryRect != null)
+            {
+                masteryRect.anchoredPosition = masteryBarPosition;
+                masteryRect.localScale = new Vector3(masteryBarScale.x, masteryBarScale.y, 1f);
+            }
+        }
+
+        string rankTitle = currentMasteryRankIndex < MasteryRankNamesRU.Length ? MasteryRankNamesRU[currentMasteryRankIndex] : "Новичок";
+        if (masteryRankTitleText != null)
+        {
+            masteryRankTitleText.text = rankTitle;
+            if (currentMasteryRankIndex == 0)
+            {
+                masteryRankTitleText.color = noviceTextColor; // Белый #FFFFFF
+            }
+            else
+            {
+                masteryRankTitleText.color = herbalistTextColor; // Более темный насыщенный травянисто-зеленый #52B788
+            }
+        }
+
+        if (masteryExpProgressText != null)
+        {
+            masteryExpProgressText.text = $"{currentMasteryExp}/{maxMasteryExp} XP";
+        }
+
+        if (masteryExpProgressBar != null)
+        {
+            float fillRatio = maxMasteryExp > 0 ? Mathf.Clamp01((float)currentMasteryExp / maxMasteryExp) : 0f;
+            masteryExpProgressBar.fillAmount = fillRatio;
+
+            // Переливающийся изумрудно-бирюзовый градиент для мастерства
+            if (fillRatio <= 0.01f)
+                masteryExpProgressBar.color = new Color(0.9f, 0.95f, 0.9f, 1f);
+            else if (fillRatio < 0.5f)
+                masteryExpProgressBar.color = new Color(0.3f, 0.9f, 0.6f, 1f); // Травянисто-зеленый
+            else
+                masteryExpProgressBar.color = new Color(0.15f, 0.75f, 0.85f, 1f); // Бирюзово-магический
+        }
     }
 
     public void UpdateProfileUI()
@@ -321,14 +442,40 @@ public class Avatar_Manager : MonoBehaviour
         {
             avatarPanel.SetActive(true);
 
-            // Настройка размеров окна гардероба (ширина и высота для удобного отображения по 3 в ряд)
-            RectTransform panelRect = avatarPanel.GetComponent<RectTransform>();
-            if (panelRect != null && panelSize.x > 0 && panelSize.y > 0)
+            if (autoAdaptResolution)
             {
-                panelRect.sizeDelta = panelSize;
+                RectTransform panelRect = avatarPanel.GetComponent<RectTransform>();
+                if (panelRect != null && panelSize.x > 0 && panelSize.y > 0)
+                {
+                    panelRect.sizeDelta = panelSize;
+                }
             }
 
             BuildAvatarGrid();
+            StartCoroutine(ResetScrollToTopRoutine());
+        }
+    }
+
+    private System.Collections.IEnumerator ResetScrollToTopRoutine()
+    {
+        // Ожидаем завершения кадра верстки GridLayoutGroup и ContentSizeFitter
+        yield return null;
+        Canvas.ForceUpdateCanvases();
+
+        ScrollRect sr = avatarPanel != null ? avatarPanel.GetComponentInChildren<ScrollRect>() : null;
+        if (sr != null)
+        {
+            sr.verticalNormalizedPosition = 1f;
+            sr.velocity = Vector2.zero;
+        }
+
+        if (scrollContent != null)
+        {
+            RectTransform crt = scrollContent.GetComponent<RectTransform>();
+            if (crt != null)
+            {
+                crt.anchoredPosition = new Vector2(crt.anchoredPosition.x, 0f);
+            }
         }
     }
 
@@ -712,9 +859,10 @@ public class Avatar_Manager : MonoBehaviour
     public bool IsFrameUnlocked(FrameData data)
     {
         if (data.isUnlockedByDefault) return true;
+        if (data.id < 1 && data.category == AvatarCategory.Free) return true;
         if (PlayerPrefs.GetInt($"Frame_Unlocked_{data.id}", 0) == 1) return true;
 
-        if (data.category == AvatarCategory.Free && currentLevel >= data.unlockLevelRequired && data.unlockLevelRequired > 0)
+        if (data.category == AvatarCategory.Free && currentLevel >= data.unlockLevelRequired)
         {
             return true;
         }
@@ -744,9 +892,10 @@ public class Avatar_Manager : MonoBehaviour
     public bool IsAvatarUnlocked(AvatarData data)
     {
         if (data.isUnlockedByDefault) return true;
+        if (data.id < 3 && data.category == AvatarCategory.Free) return true; // Первые 3 стартовые аватарки всегда открыты
         if (PlayerPrefs.GetInt($"Avatar_Unlocked_{data.id}", 0) == 1) return true;
 
-        if (data.category == AvatarCategory.Free && currentLevel >= data.unlockLevelRequired && data.unlockLevelRequired > 0)
+        if (data.category == AvatarCategory.Free && currentLevel >= data.unlockLevelRequired)
         {
             return true;
         }
