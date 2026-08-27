@@ -204,7 +204,7 @@ function GameHelpView() {
             –ü–æ–º–æ—â—å –ü–æ –ò–≥—Ä–µ (Unity 6)
           </h2>
           <p className="text-xs text-slate-500 uppercase tracking-widest font-bold ml-11">
-            –ò–Ω—Ç–µ—Ä–∞–∫—Ç–∏–≤–Ω–æ–µ —Ä—É–∫–æ–≤–æ–¥—Å—Ç–≤–æ –ø–æ —Ä–∞–∑—Ä–∞–±–æ—Ç–∫–µ ‚Ä¢ v18.12.13
+            –ò–Ω—Ç–µ—Ä–∞–∫—Ç–∏–≤–Ω–æ–µ —Ä—É–∫–æ–≤–æ–¥—Å—Ç–≤–æ –ø–æ —Ä–∞–∑—Ä–∞–±–æ—Ç–∫–µ ‚Ä¢ v18.12.44
           </p>
         </div>
         <div className="flex items-center gap-4">
@@ -1903,7 +1903,7 @@ export default function App() {
     | "external_skills_db"
     | "project_scripts"
   >("chat");
-  const [appVersion, setAppVersion] = useState("18.12.13");
+  const [appVersion, setAppVersion] = useState("18.12.44");
 
   useEffect(() => {
     // –ê–≤—Ç–æ–º–∞—Ç–∏—á–µ—Å–∫–∞—è —Å–∏–Ω—Ö—Ä–æ–Ω–∏–∑–∞—Ü–∏—è –≤–µ—Ä—Å–∏–∏ —Å —Å–µ—Ä–≤–µ—Ä–æ–º
@@ -9381,8 +9381,8 @@ export default function App() {
                                     <div className="pt-4 border-t border-white/5 text-center">
                                       <span className="text-[8px] text-slate-400 block mb-1">
                                         {simDialogueLang === "RU"
-                                          ? "Fate Continent ‚Ä¢ –í–µ—Ä—Å–∏—è 18.12.13"
-                                          : "Fate Continent ‚Ä¢ Lvl 18.12.13"}
+                                          ? "Fate Continent ‚Ä¢ –í–µ—Ä—Å–∏—è 18.12.44"
+                                          : "Fate Continent ‚Ä¢ Lvl 18.12.44"}
                                       </span>
                                       <span className="text-[6.5px] text-slate-600 block leading-tight">
                                         {simDialogueLang === "RU"
@@ -9835,7985 +9835,268 @@ export default function App() {
                                           {STATS_LABELS.XP[simDialogueLang]}
                                         </span>
                                         <span className="font-mono">
-                                          {simHeroXp} / 2500
-                                        </span>
-                                      </div>
-                                      <div className="h-2 bg-slate-950 rounded-full overflow-hidden border border-white/5 p-[1px]">
-                                        <div
-                                          className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-indigo-500 shadow-[0_0_10px_rgba(34,211,238,0.5)] transition-all duration-300"
-                                          style={{
-                                            width: `${Math.min(100, (simHeroXp / 2500) * 100)}%`,
-                                          }}
-                                        />
-                                      </div>
-                                    </div>
-
-                                    {/* Mana Progress Bar & Spend Control */}
-                                    <div className="mt-3 space-y-1">
-                                      <div className="flex justify-between text-[9px] font-black text-cyan-200">
-                                        <span>
-                                          {STATS_LABELS.MANA[simDialogueLang]}
-                                        </span>
-                                        <span className="font-mono">
-                                          {simHeroMana} / 300
-                                        </span>
-                                      </div>
-                                      <div className="h-2 bg-slate-950 rounded-full overflow-hidden border border-white/5 p-[1px]">
-                                        <div
-                                          className="h-full rounded-full bg-gradient-to-r from-purple-400 to-pink-500 shadow-[0_0_10px_rgba(244,114,182,0.5)] transition-all duration-300"
-                                          style={{
-                                            width: `${Math.min(100, (simHeroMana / 300) * 100)}%`,
-                                          }}
-                                        />
-                                      </div>
-                                    </div>
-
-                                    {/* Micro status controls inside HUD */}
-                                    <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-white/5">
-                                      <button
-                                        onClick={() => {
-                                          try {
-                                            const ctx = new (
-                                              window.AudioContext ||
-                                              (window as any).webkitAudioContext
-                                            )();
-                                            const osc = ctx.createOscillator();
-                                            const g = ctx.createGain();
-                                            osc.frequency.setValueAtTime(
-                                              523.25,
-                                              ctx.currentTime,
-                                            );
-                                            osc.frequency.exponentialRampToValueAtTime(
-                                              1046.5,
-                                              ctx.currentTime + 0.2,
-                                            );
-                                            g.gain.setValueAtTime(
-                                              0.12,
-                                              ctx.currentTime,
-                                            );
-                                            osc.connect(g);
-                                            g.connect(ctx.destination);
-                                            osc.start();
-                                            osc.stop(ctx.currentTime + 0.2);
-                                          } catch (e) {}
-
-                                          setSimHeroXp((prev) => {
-                                            const added = prev + 350;
-                                            if (added >= 2500) {
-                                              setSimHeroLvl((l) => l + 1);
-                                              showNotification(
-                                                simDialogueLang === "RU"
-                                                  ? "üéâ –£–†–û–í–ï–ù–¨ –ü–û–í–´–®–ï–ù!"
-                                                  : "üéâ LEVEL UP!",
-                                                "success",
-                                              );
-                                              return added - 2500;
-                                            } else {
-                                              showNotification(
-                                                simDialogueLang === "RU"
-                                                  ? "‚≠ê –ü–æ–ª—É—á–µ–Ω–æ +350 –æ–ø—ã—Ç–∞!"
-                                                  : "‚≠ê Received +350 XP!",
-                                                "info",
-                                              );
-                                              return added;
-                                            }
-                                          });
-                                        }}
-                                        className="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-[8px] font-black uppercase text-white transition-all text-center border border-indigo-400/30"
-                                      >
-                                        ‚ûï{" "}
-                                        {STATS_LABELS.GAIN_XP[simDialogueLang]}
-                                      </button>
-
-                                      <button
-                                        onClick={() => {
-                                          if (simHeroMana >= 40) {
-                                            setSimHeroMana((prev) => prev - 40);
-                                            showNotification(
-                                              simDialogueLang === "RU"
-                                                ? "üî• –ò–∑—Ä–∞—Å—Ö–æ–¥–æ–≤–∞–Ω–æ 40 –º–∞–Ω—ã!"
-                                                : "üî• Expended 40 Mana!",
-                                              "info",
-                                            );
-                                            try {
-                                              const ctx = new (
-                                                window.AudioContext ||
-                                                (window as any)
-                                                  .webkitAudioContext
-                                              )();
-                                              const osc =
-                                                ctx.createOscillator();
-                                              osc.frequency.setValueAtTime(
-                                                200,
-                                                ctx.currentTime,
-                                              );
-                                              osc.frequency.exponentialRampToValueAtTime(
-                                                80,
-                                                ctx.currentTime + 0.15,
-                                              );
-                                              const g = ctx.createGain();
-                                              g.gain.setValueAtTime(
-                                                0.1,
-                                                ctx.currentTime,
-                                              );
-                                              osc.connect(g);
-                                              g.connect(ctx.destination);
-                                              osc.start();
-                                              osc.stop(ctx.currentTime + 0.15);
-                                            } catch (e) {}
-                                          } else {
-                                            setSimHeroMana(300);
-                                            showNotification(
-                                              simDialogueLang === "RU"
-                                                ? "‚ú® –ú–∞–Ω–∞ –ø–æ–ª–Ω–æ—Å—Ç—å—é –≤–æ—Å—Å—Ç–∞–Ω–æ–≤–ª–µ–Ω–∞!"
-                                                : "‚ú® Mana completely restored!",
-                                              "success",
-                                            );
-                                            try {
-                                              const ctx = new (
-                                                window.AudioContext ||
-                                                (window as any)
-                                                  .webkitAudioContext
-                                              )();
-                                              const osc =
-                                                ctx.createOscillator();
-                                              osc.frequency.setValueAtTime(
-                                                880,
-                                                ctx.currentTime,
-                                              );
-                                              osc.frequency.exponentialRampToValueAtTime(
-                                                1760,
-                                                ctx.currentTime + 0.2,
-                                              );
-                                              const g = ctx.createGain();
-                                              g.gain.setValueAtTime(
-                                                0.08,
-                                                ctx.currentTime,
-                                              );
-                                              osc.connect(g);
-                                              g.connect(ctx.destination);
-                                              osc.start();
-                                              osc.stop(ctx.currentTime + 0.2);
-                                            } catch (e) {}
-                                          }
-                                        }}
-                                        className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 hover:text-white rounded-xl text-[8px] font-black uppercase text-slate-300 transition-all text-center border border-white/5"
-                                      >
-                                        üßô‚Äç‚ôÇÔ∏è{" "}
-                                        {simHeroMana >= 40
-                                          ? STATS_LABELS.USE_MANA[
-                                              simDialogueLang
-                                            ]
-                                          : simDialogueLang === "RU"
-                                            ? "–ó–∞–ª–∏—Ç—å –ú–∞–Ω—É"
-                                            : "Restore Mana"}
-                                      </button>
-                                    </div>
-                                  </div>
-
-                                  {/* MAIN BG GRAPHIC AND TERRIROY OVERVIEW or CASTLE SIMULATION */}
-                                  {simDialogueStep < 8 ? (
-                                    <div className="flex-1 flex flex-col items-center justify-center text-center p-8 space-y-6 pt-[300px] md:pt-[240px]">
-                                      <div className="w-16 h-16 rounded-full bg-indigo-500/10 border-2 border-indigo-400/40 flex items-center justify-center animate-pulse">
-                                        <Compass className="w-8 h-8 text-indigo-400" />
-                                      </div>
-
-                                      <div className="space-y-2">
-                                        <span className="text-[10px] font-black bg-indigo-600/20 text-indigo-400 px-3 py-1 rounded-full border border-indigo-500/30 uppercase tracking-widest">
-                                          {simDialogueLang === "RU"
-                                            ? "–î–µ—Å–∞–Ω—Ç–∏—Ä–æ–≤–∞–Ω–∏–µ –∑–∞–≤–µ—Ä—à–µ–Ω–æ"
-                                            : "VANGUARD DEPLOYMENT COMPLETED"}
-                                        </span>
-                                        <h4 className="text-xl font-black text-white uppercase italic tracking-tighter">
-                                          {simDialogueStep === 4
-                                            ? simDialogueLang === "RU"
-                                              ? "ü©∏ –ö—Ä–æ–≤–∞–≤—ã–µ –ü—É—Å—Ç–æ—à–∏"
-                                              : "ü©∏ Crimson Wastes"
-                                            : simDialogueStep === 5
-                                              ? simDialogueLang === "RU"
-                                                ? "‚ùÑÔ∏è –õ–µ–¥—è–Ω–æ–π –ü–∏–∫"
-                                                : "‚ùÑÔ∏è Ice-Bound Peak"
-                                              : simDialogueStep === 6
-                                                ? simDialogueLang === "RU"
-                                                  ? "üèõÔ∏è –î—Ä–µ–≤–Ω–∏–µ –†—É–∏–Ω—ã"
-                                                  : "üèõÔ∏è Ancient Ruins"
-                                                : simDialogueLang === "RU"
-                                                  ? "üåø –°–≤—è—Ç–∏–ª–∏—â–µ –ó–µ–Ω–∏—Ç–∞"
-                                                  : "üåø Zenith Sanctuary"}
-                                        </h4>
-                                        <p className="text-xs text-slate-400 max-w-xl mx-auto leading-relaxed">
-                                          {DIALOGUE_TRANSLATIONS[
-                                            simDialogueStep
-                                          ]?.[simDialogueLang] ||
-                                            DIALOGUE_TRANSLATIONS[
-                                              simDialogueStep
-                                            ]?.RU}
-                                        </p>
-                                      </div>
-
-                                      <div className="p-4 max-w-lg bg-indigo-950/40 border border-indigo-500/20 rounded-2xl text-[10px] text-slate-300 italic text-center">
-                                        {simDialogueLang === "RU"
-                                          ? "üî• –í–∞—à–∞ –ø—Ä–µ–¥–∞–Ω–Ω–æ—Å—Ç—å –ö—Ä–∏—Å—Ç–∞–ª–ª—É –≤–¥–æ—Ö–Ω–æ–≤–ª—è–µ—Ç –∞—Ä–º–∏—é! –í—Å–µ 3D —à–µ–π–¥–µ—Ä—ã –ö–æ–Ω—Ç–∏–Ω–µ–Ω—Ç–∞ –∞–≤—Ç–æ–º–∞—Ç–∏—á–µ—Å–∫–∏ –ø–µ—Ä–µ–∫–ª—é—á–∞—é—Ç—Å—è –≤ –±–æ–µ–≤–æ–π —Ä–µ–∂–∏–º. –ù–∞ –ø–∞–Ω–µ–ª–∏ HUD —Å–≤–µ—Ä—Ö—É —Å–ª–µ–≤–∞ –≤ Unity —Ç–µ–ø–µ—Ä—å –æ—Ç–æ–±—Ä–∞–∂–∞–µ—Ç—Å—è —Å—Ç–∞—Ç—É—Å –≤–∞—à–µ–≥–æ –≤—ã–±—Ä–∞–Ω–Ω–æ–≥–æ –ø–µ—Ä—Å–æ–Ω–∞–∂–∞, –≤—ã—á–∏—Å–ª—è–µ–º—ã–π –¥–∏–Ω–∞–º–∏—á–µ—Å–∫–∏."
-                                          : "üî• Your absolute loyalty to the Crystal ignites the battlefield! All 3-dimensional shaders of the New Continent automatically adapt into combat state. Your floating status HUD HUD top-left is fully active."}
-                                      </div>
-
-                                      <div className="flex flex-wrap gap-4 justify-center items-center w-full">
-                                        <button
-                                          onClick={() => {
-                                            setSimDialogueStep(8);
-                                            try {
-                                              const ctx = new (
-                                                window.AudioContext ||
-                                                (window as any)
-                                                  .webkitAudioContext
-                                              )();
-                                              const osc =
-                                                ctx.createOscillator();
-                                              const g = ctx.createGain();
-                                              osc.frequency.setValueAtTime(
-                                                440,
-                                                ctx.currentTime,
-                                              );
-                                              osc.frequency.exponentialRampToValueAtTime(
-                                                880,
-                                                ctx.currentTime + 0.25,
-                                              );
-                                              g.gain.setValueAtTime(
-                                                0.1,
-                                                ctx.currentTime,
-                                              );
-                                              osc.connect(g);
-                                              g.connect(ctx.destination);
-                                              osc.start();
-                                              osc.stop(ctx.currentTime + 0.25);
-                                            } catch (e) {}
-                                            showNotification(
-                                              simDialogueLang === "RU"
-                                                ? "–í—ã –≤—ã—Å–∞–¥–∏–ª–∏—Å—å –≤ –∑–∞–º–æ–∫! –®–∞–≥ 8 –∞–∫—Ç–∏–≤–∏—Ä–æ–≤–∞–Ω."
-                                                : "Deployed to Castle! Step 8 active.",
-                                              "success",
-                                            );
-                                          }}
-                                          className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white border border-emerald-400/20 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all shadow-[0_0_25px_rgba(16,185,129,0.3)] hover:scale-105"
-                                        >
-                                          {simDialogueLang === "RU"
-                                            ? "üè∞ –ü–æ—Å—Ç—Ä–æ–∏—Ç—å –ø–µ—Ä–≤—É—é –ë–∞—à–Ω—é (–®–∞–≥ 8)"
-                                            : "üè∞ Build First Tower (Step 8)"}{" "}
-                                          ‚ûî
-                                        </button>
-
-                                        <button
-                                          onClick={() => {
-                                            setSimDialogueStep(0);
-                                            showNotification(
-                                              simDialogueLang === "RU"
-                                                ? "–°—é–∂–µ—Ç —Å–±—Ä–æ—à–µ–Ω!"
-                                                : "Quest has been reset!",
-                                              "info",
-                                            );
-                                          }}
-                                          className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-wider transition-all"
-                                        >
-                                          {STATS_LABELS.RESET[simDialogueLang]}
-                                        </button>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    /* NEW CASTLE SYSTEM INTERACTIVE SIMULATOR (Steps 8-12) */
-                                    <div className="flex-1 flex flex-col space-y-6 pt-24 animate-fade-in w-full text-left">
-                                      {/* Day Tracker & Cyan controller and End Turn HUD top panel */}
-                                      <div className="bg-slate-900/95 border border-emerald-500/30 p-4 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-4 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
-                                        <div className="flex items-center gap-4">
-                                          <div className="px-4 py-2 bg-gradient-to-r from-emerald-900 to-teal-950 border border-emerald-500/40 rounded-2xl text-center">
-                                            <span className="text-[8px] text-emerald-400 font-mono uppercase block font-black">
-                                              Day Counter
-                                            </span>
-                                            <span className="text-xl font-black text-white font-mono">
-                                              –î–ï–ù–¨ {gameDayCount}
-                                            </span>
-                                          </div>
-                                          <div>
-                                            <h5 className="text-[10px] uppercase font-black tracking-widest text-[#22d3ee] flex items-center gap-1.5">
-                                              <span>
-                                                üîÆ{" "}
-                                                {simDialogueLang === "RU"
-                                                  ? "–ö–û–ù–¢–†–û–õ–õ–ï–† –°–í–ï–ß–ï–ù–ò–Ø –ó–ï–ù–ò–¢–ê"
-                                                  : "ZENITH SHADER CONTROLLER"}
-                                              </span>
-                                            </h5>
-                                            <span className="text-[9px] text-slate-400 block font-sans">
-                                              {simDialogueLang === "RU"
-                                                ? "–£–ø—Ä–∞–≤–ª—è–π—Ç–µ –º–∞—Ç–µ—Ä–∏–∞–ª–∞–º–∏ URP —à–µ–π–¥–µ—Ä–æ–≤ –∑–∞–º–∫–∞ –Ω–∞–ø—Ä—è–º—É—é!"
-                                                : "Tune C# shader emission variables dynamically."}
-                                            </span>
-                                          </div>
-                                        </div>
-
-                                        {/* Passive Turn-Based Gold Income Action */}
-                                        <div className="flex items-center gap-3">
-                                          <div className="text-right">
-                                            <span className="text-[9px] text-slate-400 block">
-                                              {simDialogueLang === "RU"
-                                                ? "–ö–∞–∑–Ω–∞ –õ–æ—Ä–¥–∞:"
-                                                : "Lord Treasure:"}
-                                            </span>
-                                            <span className="text-base font-black text-amber-400 font-mono">
-                                              üí∞ {playerGold}{" "}
-                                              {simDialogueLang === "RU"
-                                                ? "–∑–æ–ª–æ—Ç–∞"
-                                                : "gold"}
-                                            </span>
-                                          </div>
-                                          <button
-                                            onClick={() => {
-                                              // Increment turn day
-                                              setGameDayCount(
-                                                (prev) => prev + 1,
-                                              );
-                                              // Decrement training parade cooldown days
-                                              setHeroTrainingCooldownDay(
-                                                (prev) => Math.max(0, prev - 1),
-                                              );
-                                              setWarriorTrainingCooldownDay(
-                                                (prev) => Math.max(0, prev - 1),
-                                              );
-                                              // Add Passive income matching castle level
-                                              const income =
-                                                simCastleLevel === 1 ? 25 : 75;
-                                              setPlayerGold(
-                                                (prev) => prev + income,
-                                              );
-
-                                              // Simulate AI action!
-                                              // AI upgrades base or hires
-                                              const didUpgrade =
-                                                Math.random() < aiUpgradeProb;
-                                              const didRecruit =
-                                                Math.random() < aiRecruitProb;
-                                              let aiLog = "";
-                                              if (didUpgrade) {
-                                                aiLog = `–î–µ–Ω—å ${gameDayCount + 1}: –õ–æ—Ä–¥ –ú–µ–ª—å–≥–∞—Ä–¥ (–û–ø–ø–æ–Ω–µ–Ω—Ç) —É—Å–ø–µ—à–Ω–æ —É–ª—É—á—à–∏–ª –û–±–∏—Ç–µ–ª—å –ó–ª–∞ –¥–æ 2 —É—Ä.! –°–≥–µ–Ω–µ—Ä–∏—Ä–æ–≤–∞–Ω –†—É–±–∏–Ω–æ–≤—ã–π –Ω–µ–æ–Ω.`;
-                                              } else if (didRecruit) {
-                                                const troops =
-                                                  Math.floor(
-                                                    Math.random() * 6,
-                                                  ) + 3;
-                                                aiLog = `–î–µ–Ω—å ${gameDayCount + 1}: –ü—Ä–æ—Ç–∏–≤–Ω–∏–∫ –ø–æ—Ç—Ä–∞—Ç–∏–ª –∑–æ–ª–æ—Ç–æ –∏ –Ω–∞–Ω—è–ª +${troops} –≤–æ–∏–Ω–æ–≤ —á–µ—Ä–µ–∑ –ö–∞–∑–∞—Ä–º—ã –¢—å–º—ã.`;
-                                              } else {
-                                                aiLog = `–î–µ–Ω—å ${gameDayCount + 1}: –ü—Ä–æ—Ç–∏–≤–Ω–∏–∫ –ø—Ä–æ–ø—É—Å—Ç–∏–ª —Ö–æ–¥, –Ω–∞–∫–∞–ø–ª–∏–≤–∞—è –∑–æ–ª–æ—Ç–æ (+${Math.floor(60 * aiIncomeMult)} –∑–æ–ª–æ—Ç–∞).`;
-                                              }
-                                              setAiActionLogs((prev) => [
-                                                aiLog,
-                                                ...prev.slice(0, 5),
-                                              ]);
-
-                                              try {
-                                                const ctx = new (
-                                                  window.AudioContext ||
-                                                  (window as any)
-                                                    .webkitAudioContext
-                                                )();
-                                                const osc =
-                                                  ctx.createOscillator();
-                                                const osc2 =
-                                                  ctx.createOscillator();
-                                                const g = ctx.createGain();
-
-                                                osc.frequency.setValueAtTime(
-                                                  330,
-                                                  ctx.currentTime,
-                                                );
-                                                osc.frequency.exponentialRampToValueAtTime(
-                                                  660,
-                                                  ctx.currentTime + 0.35,
-                                                );
-                                                osc2.frequency.setValueAtTime(
-                                                  440,
-                                                  ctx.currentTime,
-                                                );
-                                                osc2.frequency.exponentialRampToValueAtTime(
-                                                  880,
-                                                  ctx.currentTime + 0.35,
-                                                );
-
-                                                g.gain.setValueAtTime(
-                                                  0.08,
-                                                  ctx.currentTime,
-                                                );
-                                                g.gain.exponentialRampToValueAtTime(
-                                                  0.01,
-                                                  ctx.currentTime + 0.4,
-                                                );
-
-                                                osc.connect(g);
-                                                osc2.connect(g);
-                                                g.connect(ctx.destination);
-                                                osc.start();
-                                                osc2.start();
-                                                osc.stop(ctx.currentTime + 0.4);
-                                                osc2.stop(
-                                                  ctx.currentTime + 0.4,
-                                                );
-                                              } catch (e) {}
-
-                                              showNotification(
-                                                simDialogueLang === "RU"
-                                                  ? `–•–æ–¥ –ø—Ä–æ–ø—É—â–µ–Ω! –ù–∞—á–∏—Å–ª–µ–Ω–æ +${income} –∑–∞ –∑–∞–º–æ–∫.`
-                                                  : `Turn passed! Received +${income} from castle.`,
-                                                "success",
-                                              );
-                                            }}
-                                            className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white rounded-2xl text-[10.5px] font-black uppercase tracking-widest transition-all hover:scale-[1.03] active:scale-[0.98] shadow-[0_0_20px_rgba(16,185,129,0.3)]"
-                                          >
-                                            ‚è≥{" "}
-                                            {simDialogueLang === "RU"
-                                              ? "–ü–†–û–ü–£–°–¢–ò–¢–¨ –•–û–î"
-                                              : "END TURN"}
-                                          </button>
-                                        </div>
-                                      </div>
-
-                                      {/* Dialogue Box Inside Castle View */}
-                                      <div className="bg-slate-900/90 border-2 border-[#22d3ee]/40 rounded-[2rem] p-5 relative overflow-hidden shadow-[0_0_25px_rgba(34,211,238,0.15)]">
-                                        <div className="flex items-center gap-2 mb-2 pb-2 border-b border-white/5">
-                                          <span className="w-1.5 h-1.5 rounded-full bg-[#22d3ee] animate-pulse" />
-                                          <span className="text-[10px] font-black text-[#22d3ee] uppercase tracking-widest">
-                                            üßù‚Äç‚ôÄÔ∏è{" "}
-                                            {simDialogueLang === "RU"
-                                              ? "–ê—ç–ª–∏—Å—Å–∞ –°—é–∂–µ—Ç–Ω—ã–π –ì–∏–¥"
-                                              : "AELYSSA STORY MENTOR"}{" "}
-                                            ‚Ä¢ –®–∞–≥ {simDialogueStep}
-                                          </span>
-                                        </div>
-                                        <p className="text-xs text-slate-200 leading-relaxed italic">
-                                          "
-                                          {DIALOGUE_TRANSLATIONS[
-                                            simDialogueStep
-                                          ]?.[simDialogueLang] ||
-                                            DIALOGUE_TRANSLATIONS[
-                                              simDialogueStep
-                                            ]?.RU}
-                                          "
-                                        </p>
-                                      </div>
-
-                                      {/* Castle Building Visual Structure & Upgrade section */}
-                                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-20">
-                                        {/* Left 5 Cols: Graphic of the castle (morphed based on level 1 or 2 with shader settings) */}
-                                        <div className="lg:col-span-5 bg-slate-950 border border-white/5 rounded-3xl p-5 flex flex-col items-center justify-between min-h-[350px]">
-                                          <div className="text-center w-full">
-                                            <span className="text-[8px] tracking-widest font-mono text-slate-500 font-bold block uppercase">
-                                              UNITY PROCEDURAL BUILDER SHADER
-                                              VIEW
-                                            </span>
-                                            <h5 className="text-xs font-black text-white uppercase tracking-tight mt-1">
-                                              {simCastleLevel === 1
-                                                ? simDialogueLang === "RU"
-                                                  ? "üè∞ –û–¥–∏–Ω–æ–∫–∞—è –ó–∞—Å—Ç–∞–≤–∞ (–£—Ä. 1)"
-                                                  : "üè∞ Basic Sentry Outpost (Lvl 1)"
-                                                : simDialogueLang === "RU"
-                                                  ? "üè∞ –í–µ–ª–∏—á–µ—Å—Ç–≤–µ–Ω–Ω—ã–π –ó–∞–º–æ–∫ –ó–µ–Ω–∏—Ç (–£—Ä. 2)"
-                                                  : "üè∞ Sovereign Zenith Citadel (Lvl 2)"}
-                                            </h5>
-                                          </div>
-
-                                          {/* Interactive SVG Castle */}
-                                          <div className="w-full max-w-[200px] h-[200px] relative my-4 flex items-center justify-center">
-                                            <svg
-                                              className="w-full h-full"
-                                              viewBox="0 0 100 120"
-                                              xmlns="http://www.w3.org/2000/svg"
-                                            >
-                                              {/* Sky subtle backlight shadow based on customization */}
-                                              <circle
-                                                cx="50"
-                                                cy="50"
-                                                r="30"
-                                                fill={spireColor}
-                                                opacity="0.1"
-                                                className="animate-pulse"
-                                                style={{
-                                                  filter: `blur(${spireGlowStrength}px)`,
-                                                }}
-                                              />
-                                              <g id="CastleMesh">
-                                                {/* Landscape grass ground */}
-                                                <path
-                                                  d="M10 110 L90 110 L85 115 L15 115 Z"
-                                                  fill="#1e293b"
-                                                />
-                                                {/* Level 1 Sentry Tower core structure */}
-                                                <rect
-                                                  x="38"
-                                                  y="55"
-                                                  width="24"
-                                                  height="55"
-                                                  fill="#334155"
-                                                  stroke="#475569"
-                                                  strokeWidth="2"
-                                                />
-                                                {/* Tower window */}
-                                                <rect
-                                                  x="47"
-                                                  y="65"
-                                                  width="6"
-                                                  height="12"
-                                                  rx="3"
-                                                  fill="#0f172a"
-                                                />
-                                                {/* Window glass sparkle */}
-                                                <circle
-                                                  cx="50"
-                                                  cy="71"
-                                                  r="1.5"
-                                                  fill={spireColor}
-                                                />
-
-                                                {/* LEVEL 2 EXTRACTED CITADEL MORPHS ON VALUE CHANGE */}
-                                                {simCastleLevel >= 2 && (
-                                                  <>
-                                                    {/* Left lateral side wing (—Ñ–ª–∏–≥–µ–ª—å) */}
-                                                    <rect
-                                                      x="18"
-                                                      y="70"
-                                                      width="20"
-                                                      height="40"
-                                                      fill="#1e293b"
-                                                      stroke="#334155"
-                                                      strokeWidth="2"
-                                                      className="animate-bounce"
-                                                      style={{
-                                                        animationDuration: "4s",
-                                                      }}
-                                                    />
-                                                    <polygon
-                                                      points="18,70 28,55 38,70"
-                                                      fill="#0f172a"
-                                                      stroke="#334155"
-                                                    />
-                                                    <line
-                                                      x1="28"
-                                                      y1="57"
-                                                      x2="28"
-                                                      y2="110"
-                                                      stroke={spireColor}
-                                                      strokeWidth="1"
-                                                      opacity="0.5"
-                                                    />
-
-                                                    {/* Right lateral side wing */}
-                                                    <rect
-                                                      x="62"
-                                                      y="70"
-                                                      width="20"
-                                                      height="40"
-                                                      fill="#1e293b"
-                                                      stroke="#334155"
-                                                      strokeWidth="2"
-                                                      className="animate-bounce"
-                                                      style={{
-                                                        animationDuration: "4s",
-                                                        animationDelay: "1s",
-                                                      }}
-                                                    />
-                                                    <polygon
-                                                      points="62,70 72,55 82,70"
-                                                      fill="#0f172a"
-                                                      stroke="#334155"
-                                                    />
-                                                    <line
-                                                      x1="72"
-                                                      y1="57"
-                                                      x2="72"
-                                                      y2="110"
-                                                      stroke={spireColor}
-                                                      strokeWidth="1"
-                                                      opacity="0.5"
-                                                    />
-
-                                                    {/* Front outer defensive ramparts (–∫—Ä–µ–ø–æ—Å—Ç–Ω–∞—è —Å—Ç–µ–Ω–∞) */}
-                                                    <rect
-                                                      x="10"
-                                                      y="90"
-                                                      width="80"
-                                                      height="20"
-                                                      fill="#0f172a"
-                                                      opacity="0.9"
-                                                      stroke="#334155"
-                                                      strokeWidth="2"
-                                                    />
-                                                    {/* Battlements for defense on ramparts */}
-                                                    <rect
-                                                      x="15"
-                                                      y="84"
-                                                      width="8"
-                                                      height="6"
-                                                      fill="#1e293b"
-                                                      stroke="#334155"
-                                                    />
-                                                    <rect
-                                                      x="35"
-                                                      y="84"
-                                                      width="8"
-                                                      height="6"
-                                                      fill="#1e293b"
-                                                      stroke="#334155"
-                                                    />
-                                                    <rect
-                                                      x="55"
-                                                      y="84"
-                                                      width="8"
-                                                      height="6"
-                                                      fill="#1e293b"
-                                                      stroke="#334155"
-                                                    />
-                                                    <rect
-                                                      x="75"
-                                                      y="84"
-                                                      width="8"
-                                                      height="6"
-                                                      fill="#1e293b"
-                                                      stroke="#334155"
-                                                    />
-                                                  </>
-                                                )}
-
-                                                {/* Central tower battlements roof crown */}
-                                                <polygon
-                                                  points="34,55 50,30 66,55"
-                                                  fill="#1e293b"
-                                                  stroke="#475569"
-                                                  strokeWidth="1.5"
-                                                />
-
-                                                {/* Rotating spire crystal matching custom speed and color */}
-                                                <g
-                                                  className="origin-center"
-                                                  style={{
-                                                    transformOrigin:
-                                                      "50px 25px",
-                                                    animation: `spin ${spireRotationSpeed}s linear infinite`,
-                                                  }}
-                                                >
-                                                  {/* Spire tip line holding gem */}
-                                                  <line
-                                                    x1="50"
-                                                    y1="30"
-                                                    x2="50"
-                                                    y2="15"
-                                                    stroke="#f59e0b"
-                                                    strokeWidth="2.5"
-                                                  />
-                                                  {/* Sparkling Neon Gem Crystal Spire with custom emission lights */}
-                                                  <polygon
-                                                    points="50,5 56,15 50,25 44,15"
-                                                    fill={spireColor}
-                                                    stroke="#ffffff"
-                                                    strokeWidth="1"
-                                                    style={{
-                                                      filter: `drop-shadow(0 0 8px ${spireColor})`,
-                                                    }}
-                                                  />
-                                                </g>
-                                              </g>
-                                            </svg>
-
-                                            {/* CSS Keyframe rotation hack built dynamically */}
-                                            <style
-                                              dangerouslySetInnerHTML={{
-                                                __html: `
-                                          @keyframes spin {
-                                            from { transform: rotate(0deg); }
-                                            to { transform: rotate(360deg); }
-                                          }
-                                        `,
-                                              }}
-                                            />
-                                          </div>
-
-                                          {/* Micro Shader config controllers */}
-                                          <div className="w-full space-y-3 p-3 bg-black/60 rounded-2xl border border-white/5">
-                                            <span className="text-[8px] text-cyan-400 font-mono block uppercase tracking-wide font-black">
-                                              üî¨ Dynamic Material Shader
-                                              parameters
-                                            </span>
-
-                                            {/* Color Picker presets */}
-                                            <div className="space-y-1">
-                                              <div className="flex justify-between text-[7.5px] text-slate-400 font-bold uppercase">
-                                                <span>Emission Color</span>
-                                                <span
-                                                  style={{ color: spireColor }}
-                                                >
-                                                  {spireColor === "#22d3ee"
-                                                    ? "Cyan (Alliance)"
-                                                    : spireColor === "#ef4444"
-                                                      ? "Ruby (Opponent)"
-                                                      : spireColor === "#a855f7"
-                                                        ? "Amethyst"
-                                                        : "Emerald"}
-                                                </span>
-                                              </div>
-                                              <div className="flex gap-2">
-                                                <button
-                                                  onClick={() =>
-                                                    setSpireColor("#22d3ee")
-                                                  }
-                                                  className={`w-3 h-3 rounded-full bg-cyan-400 transition-all ${spireColor === "#22d3ee" ? "ring-2 ring-white scale-125" : ""}`}
-                                                />
-                                                <button
-                                                  onClick={() =>
-                                                    setSpireColor("#ef4444")
-                                                  }
-                                                  className={`w-3 h-3 rounded-full bg-red-500 transition-all ${spireColor === "#ef4444" ? "ring-2 ring-white scale-125" : ""}`}
-                                                />
-                                                <button
-                                                  onClick={() =>
-                                                    setSpireColor("#a855f7")
-                                                  }
-                                                  className={`w-3 h-3 rounded-full bg-purple-500 transition-all ${spireColor === "#a855f7" ? "ring-2 ring-white scale-125" : ""}`}
-                                                />
-                                                <button
-                                                  onClick={() =>
-                                                    setSpireColor("#10b981")
-                                                  }
-                                                  className={`w-3 h-3 rounded-full bg-emerald-500 transition-all ${spireColor === "#10b981" ? "ring-2 ring-white scale-125" : ""}`}
-                                                />
-                                              </div>
-                                            </div>
-
-                                            {/* Rotation Speed control slider */}
-                                            <div className="space-y-0.5">
-                                              <div className="flex justify-between text-[7.5px] text-slate-400 font-bold uppercase">
-                                                <span>
-                                                  Rotate Velocity (Seconds)
-                                                </span>
-                                                <span className="font-mono text-cyan-400">
-                                                  {spireRotationSpeed}s
-                                                </span>
-                                              </div>
-                                              <input
-                                                type="range"
-                                                min="1"
-                                                max="10"
-                                                step="0.5"
-                                                value={spireRotationSpeed}
-                                                onChange={(e) =>
-                                                  setSpireRotationSpeed(
-                                                    parseFloat(e.target.value),
-                                                  )
-                                                }
-                                                className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[#22d3ee]"
-                                              />
-                                            </div>
-
-                                            {/* Bloom intensity glow strength */}
-                                            <div className="space-y-0.5">
-                                              <div className="flex justify-between text-[7.5px] text-slate-400 font-bold uppercase">
-                                                <span>Bloom Glow Size</span>
-                                                <span className="font-mono text-cyan-400">
-                                                  {spireGlowStrength}px
-                                                </span>
-                                              </div>
-                                              <input
-                                                type="range"
-                                                min="5"
-                                                max="40"
-                                                step="1"
-                                                value={spireGlowStrength}
-                                                onChange={(e) =>
-                                                  setSpireGlowStrength(
-                                                    parseInt(e.target.value),
-                                                  )
-                                                }
-                                                className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[#22d3ee]"
-                                              />
-                                            </div>
-                                          </div>
-                                        </div>
-
-                                        {/* Castle positioning & Enemy AI config controller (v18.11.15) */}
-                                        <div className="w-full space-y-3 p-3 bg-black/60 rounded-2xl border border-white/5 mt-3 text-slate-200">
-                                          <div className="flex justify-between items-center pb-2 border-b border-white/10">
-                                            <span className="text-[8px] text-cyan-400 font-mono uppercase tracking-wide font-black">
-                                              üè∞{" "}
-                                              {simDialogueLang === "RU"
-                                                ? "–†–∞–∑–º–µ—â–µ–Ω–∏–µ –ó–∞–º–∫–æ–≤ & –ò–ò –í—Ä–∞–≥–∞"
-                                                : "Castle Placement & Enemy AI"}
-                                            </span>
-                                            <span className="px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-400 font-mono text-[6px] uppercase font-bold">
-                                              v18.11.15
-                                            </span>
-                                          </div>
-
-                                          {/* Mode Selector */}
-                                          <div className="flex gap-2 p-1 bg-slate-900 rounded-lg border border-white/5">
-                                            <button
-                                              type="button"
-                                              onClick={() => {
-                                                setIsCastlePlacementManual(
-                                                  false,
-                                                );
-                                                showNotification(
-                                                  simDialogueLang === "RU"
-                                                    ? "–í–∫–ª—é—á–µ–Ω–æ –∞–≤—Ç–æ-—Ä–∞–∑–º–µ—â–µ–Ω–∏–µ –∑–∞–º–∫–æ–≤"
-                                                    : "Autonomous castle placement active",
-                                                  "info",
-                                                );
-                                              }}
-                                              className={`flex-1 py-1 rounded text-[7.5px] uppercase font-bold transition-all ${!isCastlePlacementManual ? "bg-cyan-500 text-slate-950 font-black" : "text-slate-400 hover:text-white"}`}
-                                            >
-                                              ü§ñ{" "}
-                                              {simDialogueLang === "RU"
-                                                ? "–ê–≤—Ç–æ–Ω–æ–º–Ω–æ"
-                                                : "Auto"}
-                                            </button>
-                                            <button
-                                              type="button"
-                                              onClick={() => {
-                                                setIsCastlePlacementManual(
-                                                  true,
-                                                );
-                                                showNotification(
-                                                  simDialogueLang === "RU"
-                                                    ? "–í–∫–ª—é—á–µ–Ω–æ —Ä—É—á–Ω–æ–µ —Ä–∞–∑–º–µ—â–µ–Ω–∏–µ"
-                                                    : "Manual castle positioning enabled",
-                                                  "info",
-                                                );
-                                              }}
-                                              className={`flex-1 py-1 rounded text-[7.5px] uppercase font-bold transition-all ${isCastlePlacementManual ? "bg-amber-500 text-slate-950 font-black" : "text-slate-400 hover:text-white"}`}
-                                            >
-                                              üîß{" "}
-                                              {simDialogueLang === "RU"
-                                                ? "–†—É—á–Ω—ã–µ –æ—Å–∏ (X,Y,Z)"
-                                                : "Manual Offsets"}
-                                            </button>
-                                          </div>
-
-                                          {/* If manual mode is active, show the 4 castle dimension sliders */}
-                                          {isCastlePlacementManual && (
-                                            <div className="space-y-2.5 pt-1 border-t border-white/5">
-                                              {/* 1. Player Castle */}
-                                              <div className="p-2 bg-slate-950/80 rounded-xl space-y-2 border border-white/5 border-emerald-500/10">
-                                                <div className="flex justify-between items-center text-[7.5px] text-green-400 font-black uppercase">
-                                                  <span>
-                                                    {simDialogueLang === "RU"
-                                                      ? "–¢–≤–æ–π –ó–∞–º–æ–∫ (–û–∞–∑–∏—Å)"
-                                                      : "Player Castle"}
-                                                  </span>
-                                                  <span className="font-mono text-slate-500 text-[6.5px]">
-                                                    X:
-                                                    {manualCastlePositions.player.x.toFixed(
-                                                      1,
-                                                    )}{" "}
-                                                    Y:
-                                                    {manualCastlePositions.player.y.toFixed(
-                                                      1,
-                                                    )}{" "}
-                                                    Z:
-                                                    {manualCastlePositions.player.z.toFixed(
-                                                      1,
-                                                    )}
-                                                  </span>
-                                                </div>
-                                                <div className="grid grid-cols-3 gap-1.5 text-[6px]">
-                                                  <div>
-                                                    <span className="text-slate-500">
-                                                      X:
-                                                    </span>
-                                                    <input
-                                                      type="range"
-                                                      min="-20"
-                                                      max="20"
-                                                      step="0.5"
-                                                      value={
-                                                        manualCastlePositions
-                                                          .player.x
-                                                      }
-                                                      onChange={(e) =>
-                                                        setManualCastlePositions(
-                                                          (prev) => ({
-                                                            ...prev,
-                                                            player: {
-                                                              ...prev.player,
-                                                              x: parseFloat(
-                                                                e.target.value,
-                                                              ),
-                                                            },
-                                                          }),
-                                                        )
-                                                      }
-                                                      className="w-full h-1 accent-green-400"
-                                                    />
-                                                  </div>
-                                                  <div>
-                                                    <span className="text-slate-500">
-                                                      Y:
-                                                    </span>
-                                                    <input
-                                                      type="range"
-                                                      min="-10"
-                                                      max="10"
-                                                      step="0.5"
-                                                      value={
-                                                        manualCastlePositions
-                                                          .player.y
-                                                      }
-                                                      onChange={(e) =>
-                                                        setManualCastlePositions(
-                                                          (prev) => ({
-                                                            ...prev,
-                                                            player: {
-                                                              ...prev.player,
-                                                              y: parseFloat(
-                                                                e.target.value,
-                                                              ),
-                                                            },
-                                                          }),
-                                                        )
-                                                      }
-                                                      className="w-full h-1 accent-green-400"
-                                                    />
-                                                  </div>
-                                                  <div>
-                                                    <span className="text-slate-500">
-                                                      Z:
-                                                    </span>
-                                                    <input
-                                                      type="range"
-                                                      min="-20"
-                                                      max="20"
-                                                      step="0.5"
-                                                      value={
-                                                        manualCastlePositions
-                                                          .player.z
-                                                      }
-                                                      onChange={(e) =>
-                                                        setManualCastlePositions(
-                                                          (prev) => ({
-                                                            ...prev,
-                                                            player: {
-                                                              ...prev.player,
-                                                              z: parseFloat(
-                                                                e.target.value,
-                                                              ),
-                                                            },
-                                                          }),
-                                                        )
-                                                      }
-                                                      className="w-full h-1 accent-green-400"
-                                                    />
-                                                  </div>
-                                                </div>
-                                              </div>
-
-                                              {/* 2. Enemy Peak Castle */}
-                                              <div className="p-2 bg-slate-950/80 rounded-xl space-y-2 border border-white/5 border-red-500/10">
-                                                <div className="flex justify-between items-center text-[7.5px] text-red-500 font-black uppercase">
-                                                  <span>
-                                                    {simDialogueLang === "RU"
-                                                      ? "–õ–µ–¥—è–Ω–æ–π –ü–∏–∫"
-                                                      : "Peak Outpost"}
-                                                  </span>
-                                                  <span className="font-mono text-slate-500 text-[6.5px]">
-                                                    X:
-                                                    {manualCastlePositions.peak.x.toFixed(
-                                                      1,
-                                                    )}{" "}
-                                                    Y:
-                                                    {manualCastlePositions.peak.y.toFixed(
-                                                      1,
-                                                    )}{" "}
-                                                    Z:
-                                                    {manualCastlePositions.peak.z.toFixed(
-                                                      1,
-                                                    )}
-                                                  </span>
-                                                </div>
-                                                <div className="grid grid-cols-3 gap-1.5 text-[6px]">
-                                                  <div>
-                                                    <span className="text-slate-500">
-                                                      X:
-                                                    </span>
-                                                    <input
-                                                      type="range"
-                                                      min="-20"
-                                                      max="20"
-                                                      step="0.5"
-                                                      value={
-                                                        manualCastlePositions
-                                                          .peak.x
-                                                      }
-                                                      onChange={(e) =>
-                                                        setManualCastlePositions(
-                                                          (prev) => ({
-                                                            ...prev,
-                                                            peak: {
-                                                              ...prev.peak,
-                                                              x: parseFloat(
-                                                                e.target.value,
-                                                              ),
-                                                            },
-                                                          }),
-                                                        )
-                                                      }
-                                                      className="w-full h-1 accent-red-400"
-                                                    />
-                                                  </div>
-                                                  <div>
-                                                    <span className="text-slate-500">
-                                                      Y:
-                                                    </span>
-                                                    <input
-                                                      type="range"
-                                                      min="-10"
-                                                      max="10"
-                                                      step="0.5"
-                                                      value={
-                                                        manualCastlePositions
-                                                          .peak.y
-                                                      }
-                                                      onChange={(e) =>
-                                                        setManualCastlePositions(
-                                                          (prev) => ({
-                                                            ...prev,
-                                                            peak: {
-                                                              ...prev.peak,
-                                                              y: parseFloat(
-                                                                e.target.value,
-                                                              ),
-                                                            },
-                                                          }),
-                                                        )
-                                                      }
-                                                      className="w-full h-1 accent-red-400"
-                                                    />
-                                                  </div>
-                                                  <div>
-                                                    <span className="text-slate-500">
-                                                      Z:
-                                                    </span>
-                                                    <input
-                                                      type="range"
-                                                      min="-20"
-                                                      max="20"
-                                                      step="0.5"
-                                                      value={
-                                                        manualCastlePositions
-                                                          .peak.z
-                                                      }
-                                                      onChange={(e) =>
-                                                        setManualCastlePositions(
-                                                          (prev) => ({
-                                                            ...prev,
-                                                            peak: {
-                                                              ...prev.peak,
-                                                              z: parseFloat(
-                                                                e.target.value,
-                                                              ),
-                                                            },
-                                                          }),
-                                                        )
-                                                      }
-                                                      className="w-full h-1 accent-red-400"
-                                                    />
-                                                  </div>
-                                                </div>
-                                              </div>
-
-                                              {/* 3. Enemy Ruins Castle */}
-                                              <div className="p-2 bg-slate-950/80 rounded-xl space-y-2 border border-white/5 border-purple-500/10">
-                                                <div className="flex justify-between items-center text-[7.5px] text-purple-400 font-black uppercase">
-                                                  <span>
-                                                    {simDialogueLang === "RU"
-                                                      ? "–î—Ä–µ–≤–Ω–∏–µ –†—É–∏–Ω—ã"
-                                                      : "Ancient Ruins"}
-                                                  </span>
-                                                  <span className="font-mono text-slate-500 text-[6.5px]">
-                                                    X:
-                                                    {manualCastlePositions.ruins.x.toFixed(
-                                                      1,
-                                                    )}{" "}
-                                                    Y:
-                                                    {manualCastlePositions.ruins.y.toFixed(
-                                                      1,
-                                                    )}{" "}
-                                                    Z:
-                                                    {manualCastlePositions.ruins.z.toFixed(
-                                                      1,
-                                                    )}
-                                                  </span>
-                                                </div>
-                                                <div className="grid grid-cols-3 gap-1.5 text-[6px]">
-                                                  <div>
-                                                    <span className="text-slate-500">
-                                                      X:
-                                                    </span>
-                                                    <input
-                                                      type="range"
-                                                      min="-20"
-                                                      max="20"
-                                                      step="0.5"
-                                                      value={
-                                                        manualCastlePositions
-                                                          .ruins.x
-                                                      }
-                                                      onChange={(e) =>
-                                                        setManualCastlePositions(
-                                                          (prev) => ({
-                                                            ...prev,
-                                                            ruins: {
-                                                              ...prev.ruins,
-                                                              x: parseFloat(
-                                                                e.target.value,
-                                                              ),
-                                                            },
-                                                          }),
-                                                        )
-                                                      }
-                                                      className="w-full h-1 accent-purple-400"
-                                                    />
-                                                  </div>
-                                                  <div>
-                                                    <span className="text-slate-500">
-                                                      Y:
-                                                    </span>
-                                                    <input
-                                                      type="range"
-                                                      min="-10"
-                                                      max="10"
-                                                      step="0.5"
-                                                      value={
-                                                        manualCastlePositions
-                                                          .ruins.y
-                                                      }
-                                                      onChange={(e) =>
-                                                        setManualCastlePositions(
-                                                          (prev) => ({
-                                                            ...prev,
-                                                            ruins: {
-                                                              ...prev.ruins,
-                                                              y: parseFloat(
-                                                                e.target.value,
-                                                              ),
-                                                            },
-                                                          }),
-                                                        )
-                                                      }
-                                                      className="w-full h-1 accent-purple-400"
-                                                    />
-                                                  </div>
-                                                  <div>
-                                                    <span className="text-slate-500">
-                                                      Z:
-                                                    </span>
-                                                    <input
-                                                      type="range"
-                                                      min="-20"
-                                                      max="20"
-                                                      step="0.5"
-                                                      value={
-                                                        manualCastlePositions
-                                                          .ruins.z
-                                                      }
-                                                      onChange={(e) =>
-                                                        setManualCastlePositions(
-                                                          (prev) => ({
-                                                            ...prev,
-                                                            ruins: {
-                                                              ...prev.ruins,
-                                                              z: parseFloat(
-                                                                e.target.value,
-                                                              ),
-                                                            },
-                                                          }),
-                                                        )
-                                                      }
-                                                      className="w-full h-1 accent-purple-400"
-                                                    />
-                                                  </div>
-                                                </div>
-                                              </div>
-                                            </div>
-                                          )}
-
-                                          {/* Enemy Castle AI configs */}
-                                          <div className="space-y-1.5 pt-2 border-t border-white/10 hover:text-white">
-                                            <span className="text-[7.5px] text-amber-400 font-mono uppercase block tracking-wider font-extrabold pb-1">
-                                              ü§ñ{" "}
-                                              {simDialogueLang === "RU"
-                                                ? "–ü–∞—Ä–∞–º–µ—Ç—Ä—ã —Ç–∞–∫—Ç–∏–∫–∏ –ò–ò –í—Ä–∞–≥–∞"
-                                                : "Enemy Tactics Config"}
-                                            </span>
-
-                                            <div className="grid grid-cols-2 gap-2 text-[6.5px]">
-                                              <div className="space-y-0.5">
-                                                <div className="flex justify-between uppercase font-mono">
-                                                  <span>Upgrade</span>
-                                                  <span className="text-red-400 font-bold">
-                                                    {(
-                                                      aiUpgradeProb * 100
-                                                    ).toFixed(0)}
-                                                    %
-                                                  </span>
-                                                </div>
-                                                <input
-                                                  type="range"
-                                                  min="0"
-                                                  max="1"
-                                                  step="0.05"
-                                                  value={aiUpgradeProb}
-                                                  onChange={(e) =>
-                                                    setAiUpgradeProb(
-                                                      parseFloat(
-                                                        e.target.value,
-                                                      ),
-                                                    )
-                                                  }
-                                                  className="w-full h-0.5"
-                                                />
-                                              </div>
-                                              <div className="space-y-0.5">
-                                                <div className="flex justify-between uppercase font-mono">
-                                                  <span>Recruit</span>
-                                                  <span className="text-red-400 font-bold">
-                                                    {(
-                                                      aiRecruitProb * 100
-                                                    ).toFixed(0)}
-                                                    %
-                                                  </span>
-                                                </div>
-                                                <input
-                                                  type="range"
-                                                  min="0"
-                                                  max="1"
-                                                  step="0.05"
-                                                  value={aiRecruitProb}
-                                                  onChange={(e) =>
-                                                    setAiRecruitProb(
-                                                      parseFloat(
-                                                        e.target.value,
-                                                      ),
-                                                    )
-                                                  }
-                                                  className="w-full h-0.5"
-                                                />
-                                              </div>
-                                              <div className="space-y-0.5">
-                                                <div className="flex justify-between uppercase font-mono">
-                                                  <span>Equip</span>
-                                                  <span className="text-red-400 font-bold">
-                                                    {(
-                                                      aiEquipProb * 100
-                                                    ).toFixed(0)}
-                                                    %
-                                                  </span>
-                                                </div>
-                                                <input
-                                                  type="range"
-                                                  min="0"
-                                                  max="1"
-                                                  step="0.05"
-                                                  value={aiEquipProb}
-                                                  onChange={(e) =>
-                                                    setAiEquipProb(
-                                                      parseFloat(
-                                                        e.target.value,
-                                                      ),
-                                                    )
-                                                  }
-                                                  className="w-full h-0.5"
-                                                />
-                                              </div>
-                                              <div className="space-y-0.5">
-                                                <div className="flex justify-between uppercase font-mono">
-                                                  <span>Gold</span>
-                                                  <span className="text-red-400 font-bold">
-                                                    {aiIncomeMult.toFixed(2)}x
-                                                  </span>
-                                                </div>
-                                                <input
-                                                  type="range"
-                                                  min="1.0"
-                                                  max="3.0"
-                                                  step="0.05"
-                                                  value={aiIncomeMult}
-                                                  onChange={(e) =>
-                                                    setAiIncomeMult(
-                                                      parseFloat(
-                                                        e.target.value,
-                                                      ),
-                                                    )
-                                                  }
-                                                  className="w-full h-0.5"
-                                                />
-                                              </div>
-                                            </div>
-
-                                            <div className="space-y-0.5 mt-1">
-                                              <div className="flex justify-between text-[6.5px] text-slate-400 uppercase font-mono">
-                                                <span>Starting Soldiers</span>
-                                                <span className="font-mono text-red-400 font-bold">
-                                                  {aiStartingPower}
-                                                </span>
-                                              </div>
-                                              <input
-                                                type="range"
-                                                min="5"
-                                                max="100"
-                                                step="5"
-                                                value={aiStartingPower}
-                                                onChange={(e) =>
-                                                  setAiStartingPower(
-                                                    parseInt(e.target.value),
-                                                  )
-                                                }
-                                                className="w-full h-1 accent-red-500"
-                                              />
-                                            </div>
-                                          </div>
-                                        </div>
-
-                                        {/* Right 7 Cols: Contextual action box depending on step */}
-                                        <div className="lg:col-span-7 flex flex-col justify-between space-y-4">
-                                          {/* STEP 8: THE UPGRADE MANDATE */}
-                                          {simDialogueStep === 8 && (
-                                            <div className="bg-slate-900 border border-indigo-500/20 rounded-3xl p-5 md:p-6 flex-1 flex flex-col justify-between">
-                                              <div>
-                                                <h6 className="text-xs font-black text-amber-400 uppercase tracking-widest mb-2">
-                                                  üõ°Ô∏è –ó–ê–î–ê–ù–ò–ï –ù–ê –ü–û–í–´–®–ï–ù–ò–ï
-                                                  –ó–ê–°–¢–ê–í–´
-                                                </h6>
-                                                <p className="text-[11px] text-slate-300 leading-relaxed mb-4">
-                                                  –ê—ç–ª–∏—Å—Å–∞ –ø—Ä–æ—Å–∏—Ç –≤–∞—Å —É–ª—É—á—à–∏—Ç—å
-                                                  –∑–∞—Å—Ç–∞–≤—É –¥–æ{" "}
-                                                  <strong className="text-white">
-                                                    –£—Ä–æ–≤–Ω—è 2
-                                                  </strong>
-                                                  ! –ù–∞—à–∞ –æ–¥–∏–Ω–æ–∫–∞—è —Å–∏–≥–Ω–∞–ª—å–Ω–∞—è
-                                                  –≤—ã—à–∫–∞ –Ω–µ –≤—ã–¥–µ—Ä–∂–∏—Ç —à—Ç–æ—Ä–º–∞.
-                                                  –£–ª—É—á—à–µ–Ω–∏–µ –æ—Ç–∫—Ä–æ–µ—Ç –ö–∞–∑–∞—Ä–º—ã,
-                                                  –û—Ä—É–∂–µ–π–Ω—É—é –∏ –®–ø–∏–æ–Ω—Å–∫–∏–π –ø–æ—Å—Ç –¥–ª—è
-                                                  –ø–æ–¥–≥–æ—Ç–æ–≤–∫–∏ –∫ –æ–±–æ—Ä–æ–Ω–µ.
-                                                </p>
-
-                                                {/* Cost preview and current gold statement */}
-                                                <div className="bg-slate-950/80 p-4 rounded-2xl space-y-2 border border-white/5 my-2">
-                                                  <div className="flex justify-between text-[10px]">
-                                                    <span className="text-slate-400">
-                                                      –°—Ç–æ–∏–º–æ—Å—Ç—å –∞–ø–≥—Ä–µ–π–¥–∞:
-                                                    </span>
-                                                    <span className="font-mono text-amber-400 font-black">
-                                                      250 –∑–æ–ª–æ—Ç–∞
-                                                    </span>
-                                                  </div>
-                                                  <div className="flex justify-between text-[10px]">
-                                                    <span className="text-slate-400">
-                                                      –í–∞—à–∞ –∫–∞–∑–Ω–∞:
-                                                    </span>
-                                                    <span
-                                                      className={`font-mono font-black ${playerGold >= 250 ? "text-green-400" : "text-red-400"}`}
-                                                    >
-                                                      üí∞ {playerGold} –∑–æ–ª–æ—Ç–∞
-                                                    </span>
-                                                  </div>
-                                                  {playerGold < 250 && (
-                                                    <div className="text-[9px] text-amber-500 italic">
-                                                      –ù–µ–¥–æ—Å—Ç–∞—Ç–æ—á–Ω–æ –∑–æ–ª–æ—Ç–∞ –¥–ª—è
-                                                      –∞–ø–≥—Ä–µ–π–¥–∞! –î–æ–±–∞–≤—å—Ç–µ –≤ –∫–∞–∑–Ω—É
-                                                      –º–æ–Ω–µ—Ç –Ω–∏–∂–µ.
-                                                    </div>
-                                                  )}
-                                                </div>
-                                              </div>
-
-                                              <div className="space-y-3 pt-4">
-                                                {playerGold < 250 && (
-                                                  <button
-                                                    onClick={() => {
-                                                      setPlayerGold(
-                                                        (prev) => prev + 500,
-                                                      );
-                                                      try {
-                                                        const ctx = new (
-                                                          window.AudioContext ||
-                                                          (window as any)
-                                                            .webkitAudioContext
-                                                        )();
-                                                        const osc =
-                                                          ctx.createOscillator();
-                                                        const g =
-                                                          ctx.createGain();
-                                                        osc.frequency.setValueAtTime(
-                                                          659.25,
-                                                          ctx.currentTime,
-                                                        );
-                                                        osc.frequency.setValueAtTime(
-                                                          987.77,
-                                                          ctx.currentTime + 0.1,
-                                                        );
-                                                        g.gain.setValueAtTime(
-                                                          0.08,
-                                                          ctx.currentTime,
-                                                        );
-                                                        osc.connect(g);
-                                                        g.connect(
-                                                          ctx.destination,
-                                                        );
-                                                        osc.start();
-                                                        osc.stop(
-                                                          ctx.currentTime +
-                                                            0.25,
-                                                        );
-                                                      } catch (e) {}
-                                                      showNotification(
-                                                        "üí∞ –ù–∞–∂–∞—Ç–æ ¬´–î–æ–±–∞–≤–∏—Ç—å –º–æ–Ω–µ—Ç¬ª (+500 –∑–æ–ª–æ—Ç–∞ –≤ –∫–∞–∑–Ω—É)!",
-                                                        "success",
-                                                      );
-                                                    }}
-                                                    className="w-full py-2 bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 border border-amber-500/40 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all"
-                                                  >
-                                                    ü™ô –î–æ–±–∞–≤–∏—Ç—å –º–æ–Ω–µ—Ç (+500
-                                                    –∑–æ–ª–æ—Ç–∞)
-                                                  </button>
-                                                )}
-
-                                                <button
-                                                  onClick={() => {
-                                                    if (playerGold >= 250) {
-                                                      setPlayerGold(
-                                                        (prev) => prev - 250,
-                                                      );
-                                                      setSimCastleLevel(2);
-                                                      setSimDialogueStep(9);
-                                                      try {
-                                                        const ctx = new (
-                                                          window.AudioContext ||
-                                                          (window as any)
-                                                            .webkitAudioContext
-                                                        )();
-                                                        const osc =
-                                                          ctx.createOscillator();
-                                                        const osc2 =
-                                                          ctx.createOscillator();
-                                                        const g =
-                                                          ctx.createGain();
-                                                        osc.frequency.setValueAtTime(
-                                                          523.25,
-                                                          ctx.currentTime,
-                                                        );
-                                                        osc.frequency.exponentialRampToValueAtTime(
-                                                          1046.5,
-                                                          ctx.currentTime + 0.4,
-                                                        );
-                                                        osc2.frequency.setValueAtTime(
-                                                          659.25,
-                                                          ctx.currentTime,
-                                                        );
-                                                        osc2.frequency.exponentialRampToValueAtTime(
-                                                          1318.51,
-                                                          ctx.currentTime + 0.4,
-                                                        );
-                                                        g.gain.setValueAtTime(
-                                                          0.12,
-                                                          ctx.currentTime,
-                                                        );
-                                                        g.gain.exponentialRampToValueAtTime(
-                                                          0.01,
-                                                          ctx.currentTime +
-                                                            0.45,
-                                                        );
-                                                        osc.connect(g);
-                                                        osc2.connect(g);
-                                                        g.connect(
-                                                          ctx.destination,
-                                                        );
-                                                        osc.start();
-                                                        osc2.start();
-                                                        osc.stop(
-                                                          ctx.currentTime +
-                                                            0.45,
-                                                        );
-                                                      } catch (e) {}
-                                                      showNotification(
-                                                        "üéâ –ë–∞—à–Ω—è —É—Å–ø–µ—à–Ω–æ —É–ª—É—á—à–µ–Ω–∞ –¥–æ –£—Ä–æ–≤–Ω—è 2! –í–∫–ª—é—á–∞–µ—Ç—Å—è –º–æ—Ä—Ñ–∏–Ω–≥ 3D –º–æ–¥–µ–ª–µ–π.",
-                                                        "success",
-                                                      );
-                                                    } else {
-                                                      showNotification(
-                                                        "‚ùå –ù–µ–¥–æ—Å—Ç–∞—Ç–æ—á–Ω–æ –ø–∞—Å—Å–∏–≤–Ω–æ–≥–æ –∑–æ–ª–æ—Ç–∞! –ù–∞–∂–º–∏—Ç–µ –î–æ–±–∞–≤–∏—Ç—å –º–æ–Ω–µ—Ç –∏–ª–∏ –∑–∞–≤–µ—Ä—à–∏—Ç–µ —Ö–æ–¥—ã.",
-                                                        "error",
-                                                      );
-                                                    }
-                                                  }}
-                                                  className="w-full py-3.5 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-[0_0_25px_rgba(6,182,212,0.3)] hover:scale-[1.01]"
-                                                >
-                                                  üî® –£–ª—É—á—à–∏—Ç—å –ë–∞—à–Ω—é –¥–æ –£—Ä–æ–≤–Ω—è 2
-                                                  (250 –∑–æ–ª–æ—Ç–∞)
-                                                </button>
-                                              </div>
-                                            </div>
-                                          )}
-
-                                          {/* STEP 9: TRANSITIONAL ROYAL REVEAL */}
-                                          {simDialogueStep === 9 && (
-                                            <div className="bg-slate-900 border border-emerald-500/20 rounded-3xl p-5 md:p-6 flex-1 flex flex-col justify-between">
-                                              <div>
-                                                <h6 className="text-xs font-black text-emerald-400 uppercase tracking-widest mb-2">
-                                                  ‚öîÔ∏è –£–†–û–í–ï–ù–¨ –ü–û–í–´–®–ï–ù: –¶–ò–¢–ê–î–ï–õ–¨
-                                                  –ê–õ–¨–Ø–ù–°–ê-–ó–ï–ù–ò–¢–ê
-                                                </h6>
-                                                <p className="text-[11px] text-slate-300 leading-relaxed mb-4">
-                                                  –ü—Ä–µ–≤–æ—Å—Ö–æ–¥–Ω–æ! –¢–µ–ø–µ—Ä—å –Ω–∞—à–∞
-                                                  –∫—Ä–µ–ø–æ—Å—Ç—å –æ–±–∑–∞–≤–µ–ª–∞—Å—å –ø—Ä–æ—á–Ω—ã–º–∏
-                                                  –±–æ–∫–æ–≤—ã–º–∏ —Ñ–ª–∏–≥–µ–ª—è–º–∏, –≤–Ω–µ—à–Ω–∏–º
-                                                  —á–∞—Å—Ç–æ–∫–æ–ª–æ–º –¥–ª—è –ø—Ä–∏–∫—Ä—ã—Ç–∏—è
-                                                  –æ—Ç—Ä—è–¥–æ–≤ –∏ —à–ø–∏–ª–µ–º –Ω–∞–¥
-                                                  –ö—Ä–∏—Å—Ç–∞–ª–ª–æ–º Zenith. –ó–∞–º–µ—Ç—å—Ç–µ,
-                                                  –∫–∞–∫ –∏–∑–º–µ–Ω–∏–ª–∏—Å—å –µ—ë 3D –æ—á–µ—Ä—Ç–∞–Ω–∏—è
-                                                  –∏ –≤—ã—Ä–æ—Å–ª–∞ –ø–∞—Å—Å–∏–≤–Ω–∞—è –µ–∂–µ–¥–Ω–µ–≤–Ω–∞—è
-                                                  –ø—Ä–∏–±—ã–ª—å —Å{" "}
-                                                  <strong className="text-emerald-400">
-                                                    +25 –¥–æ +75 –∑–æ–ª–æ—Ç–∞ –∑–∞
-                                                    –ø—Ä–æ–ø—É—Å–∫–∞–µ–º—ã–π —Ö–æ–¥!
-                                                  </strong>
-                                                </p>
-
-                                                <div className="bg-slate-950/80 p-4 rounded-2xl space-y-1 border border-white/5 my-2 text-[10px] text-slate-300">
-                                                  <div>
-                                                    ‚úÖ{" "}
-                                                    <span className="text-cyan-400 font-bold">
-                                                      –û—Ç—Ä–∞–±–æ—Ç–∞–Ω C# –ú–æ—Ä—Ñ–∏–Ω–≥
-                                                    </span>
-                                                    : —Å–ø–∞–≤–Ω –±–æ–∫–æ–≤—ã—Ö –±–∞—à–µ–Ω
-                                                  </div>
-                                                  <div>
-                                                    ‚úÖ{" "}
-                                                    <span className="text-cyan-400 font-bold">
-                                                      –¶–≤–µ—Ç —Å–≤–µ—á–µ–Ω–∏–π
-                                                    </span>
-                                                    : –∫–∞—Å—Ç–æ–º–∏–∑–∏—Ä–æ–≤–∞–Ω –ø–æ–¥ –ó–µ–Ω–∏—Ç
-                                                  </div>
-                                                  <div>
-                                                    ‚úÖ{" "}
-                                                    <span className="text-cyan-400 font-bold">
-                                                      –ò–Ω—Ç–µ—Ä–∞–∫—Ç–∏–≤–Ω—ã–µ –∑–¥–∞–Ω–∏—è
-                                                    </span>
-                                                    : –∑–¥–∞–Ω–∏—è –≤–Ω—É—Ç—Ä–∏ –∑–∞–º–∫–∞ –≥–æ—Ç–æ–≤—ã
-                                                    –∫ –æ—Å–º–æ—Ç—Ä—É!
-                                                  </div>
-                                                </div>
-                                              </div>
-
-                                              <button
-                                                onClick={() => {
-                                                  setSimDialogueStep(10);
-                                                  showNotification(
-                                                    "–î–æ–±—Ä–æ –ø–æ–∂–∞–ª–æ–≤–∞—Ç—å –≤–Ω—É—Ç—Ä—å –∑–∞–º–∫–∞!",
-                                                    "success",
-                                                  );
-                                                }}
-                                                className="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)]"
-                                              >
-                                                üö™ –í–æ–π—Ç–∏ –≤ –¶–∏—Ç–∞–¥–µ–ª—å –∏ –æ—Å–º–æ—Ç—Ä–µ—Ç—å
-                                                —Å—Ç—Ä–æ–µ–Ω–∏—è (–®–∞–≥ 10) ‚ûî
-                                              </button>
-                                            </div>
-                                          )}
-
-                                          {/* STEP 10, 11, 12: THE INNER CITADEL BUILDING BOARD */}
-                                          {simDialogueStep >= 10 && (
-                                            <div className="bg-slate-900 border border-cyan-500/20 rounded-3xl p-5 flex-1 flex flex-col justify-between">
-                                              <div>
-                                                <div className="flex border-b border-white/5 pb-2 mb-3">
-                                                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
-                                                    üíí –í–Ω—É—Ç—Ä–µ–Ω–Ω—è—è —Å—Ç—Ä—É–∫—Ç—É—Ä–∞
-                                                    –¶–∏—Ç–∞–¥–µ–ª–∏ ‚Ä¢ –ü–æ–¥—Ä–æ–±–Ω—ã–π
-                                                    –ø–µ—Ä–µ—á–µ–Ω—å (–ò–Ω—Ç–µ—Ä—Ñ–µ–π—Å
-                                                    v18.11.17)
-                                                  </span>
-                                                </div>
-
-                                                <CastleFacilities
-                                                   currentCastleFacility={currentCastleFacility}
-                                                   setCurrentCastleFacility={setCurrentCastleFacility}
-                                                   troopProgress={troopProgress}
-                                                   setTroopProgress={setTroopProgress}
-                                                   customImages={customImages}
-                                                   setCustomImages={setCustomImages}
-                                                   isVramSaverActive={isVramSaverActive}
-                                                   setIsVramSaverActive={setIsVramSaverActive}
-                                                   simCastleLevel={simCastleLevel}
-                                                   playerGold={playerGold}
-                                                   setPlayerGold={setPlayerGold}
-                                                   showNotification={showNotification}
-                                                   trainedHeroLvl={trainedHeroLvl}
-                                                   setTrainedHeroLvl={setTrainedHeroLvl}
-                                                   trainedHeroXp={trainedHeroXp}
-                                                   setTrainedHeroXp={setTrainedHeroXp}
-                                                   heroTrainingCooldownDay={heroTrainingCooldownDay}
-                                                   setHeroTrainingCooldownDay={setHeroTrainingCooldownDay}
-                                                   trainedWarriorsLvl={trainedWarriorsLvl}
-                                                   setTrainedWarriorsLvl={setTrainedWarriorsLvl}
-                                                   trainedWarriorsXp={trainedWarriorsXp}
-                                                   setTrainedWarriorsXp={setTrainedWarriorsXp}
-                                                   warriorTrainingCooldownDay={warriorTrainingCooldownDay}
-                                                   setWarriorTrainingCooldownDay={setWarriorTrainingCooldownDay}
-                                                   equippedItems={equippedItems}
-                                                   setEquippedItems={setEquippedItems}
-                                                 />
-
-                                                 {/* AI Simulation Logs to let the player track how opponents play when skipping turns */}
-                                                <div className="mt-4 bg-slate-950 p-3 rounded-2xl border border-white/5 space-y-2">
-                                                  <span className="text-[7.5px] font-black font-mono text-slate-400 block uppercase tracking-wide">
-                                                    üìù –•–†–û–ù–ò–ö–ê –û–ü–ü–û–ù–ï–ù–¢–û–í –ù–ê
-                                                    –ö–ê–†–¢–ï (–°–ò–ú–£–õ–Ø–¶–ò–Ø –•–û–î–û–í –ò–ò)
-                                                  </span>
-                                                  <div className="max-h-[75px] overflow-y-auto space-y-1 text-[8.5px] font-mono scrollbar-thin">
-                                                    {aiActionLogs.map(
-                                                      (log, i) => (
-                                                        <div
-                                                          key={i}
-                                                          className="text-slate-300 border-l border-emerald-500/40 pl-2 leading-tight"
-                                                        >
-                                                          {log}
-                                                        </div>
-                                                      ),
-                                                    )}
-                                                  </div>
-                                                </div>
-                                              </div>
-
-                                              <div className="flex justify-between items-center gap-4 pt-4 mt-2 border-t border-white/5">
-                                                <div className="text-[9px] text-slate-400">
-                                                  {simDialogueStep < 12 ? (
-                                                    <span>
-                                                      üëâ –ê—ç–ª–∏—Å—Å–∞ –ø—Ä–æ—Å–∏—Ç –í–∞—Å{" "}
-                                                      <strong className="text-white">
-                                                        –Ω–∞–∂–∞—Ç—å –Ω–∞ –∏–∫–æ–Ω–∫—É HUD
-                                                        –≤–≤–µ—Ä—Ö—É —Å–ª–µ–≤–∞
-                                                      </strong>
-                                                      , —á—Ç–æ–±—ã —Å–º–µ–Ω–∏—Ç—å
-                                                      —Å–Ω–∞—Ä—è–∂–µ–Ω–∏–µ.
-                                                    </span>
-                                                  ) : (
-                                                    <span>
-                                                      üéâ –ü–æ–∑–¥—Ä–∞–≤–ª—è–µ–º! –û–±—É—á–µ–Ω–∏–µ
-                                                      –ø–æ—à–∞–≥–æ–≤–æ–π –∑–∞—Å—Ç—Ä–æ–π–∫–∏ –∑–∞–º–∫–∞
-                                                      –∏ —Å–Ω–∞—Ä—è–∂–µ–Ω–∏—è —É—Å–ø–µ—à–Ω–æ
-                                                      –∑–∞–≤–µ—Ä—à–µ–Ω–æ.
-                                                    </span>
-                                                  )}
-                                                </div>
-
-                                                <div className="flex gap-2">
-                                                  {simDialogueStep < 12 ? (
-                                                    <button
-                                                      onClick={() => {
-                                                        setSimDialogueStep(
-                                                          (prev) => prev + 1,
-                                                        );
-                                                        try {
-                                                          const ctx = new (
-                                                            window.AudioContext ||
-                                                            (window as any)
-                                                              .webkitAudioContext
-                                                          )();
-                                                          const osc =
-                                                            ctx.createOscillator();
-                                                          osc.frequency.setValueAtTime(
-                                                            587.33,
-                                                            ctx.currentTime,
-                                                          );
-                                                          osc.frequency.setValueAtTime(
-                                                            880,
-                                                            ctx.currentTime +
-                                                              0.1,
-                                                          );
-                                                          const g =
-                                                            ctx.createGain();
-                                                          g.gain.setValueAtTime(
-                                                            0.08,
-                                                            ctx.currentTime,
-                                                          );
-                                                          osc.connect(g);
-                                                          g.connect(
-                                                            ctx.destination,
-                                                          );
-                                                          osc.start();
-                                                          osc.stop(
-                                                            ctx.currentTime +
-                                                              0.2,
-                                                          );
-                                                        } catch (e) {}
-                                                      }}
-                                                      className="px-4 py-1.5 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white rounded-xl text-[8px] font-black uppercase tracking-wider transition-all"
-                                                    >
-                                                      {simDialogueLang === "RU"
-                                                        ? "–î–∞–ª–µ–µ ‚ûî"
-                                                        : "Next ‚ûî"}
-                                                    </button>
-                                                  ) : (
-                                                    <button
-                                                      onClick={() => {
-                                                        setSimDialogueStep(0);
-                                                        setDialogueActiveScene(
-                                                          false,
-                                                        );
-                                                        showNotification(
-                                                          simDialogueLang ===
-                                                            "RU"
-                                                            ? "–ü—Ä–æ—Ö–æ–∂–¥–µ–Ω–∏–µ –∑–∞–≤–µ—Ä—à–µ–Ω–æ! –í–æ–∑–≤—Ä–∞—Ç –Ω–∞ –∫–∞—Ä—Ç—É."
-                                                            : "Campaign completed! Returning to map.",
-                                                          "success",
-                                                        );
-                                                      }}
-                                                      className="px-4 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl text-[8px] font-black uppercase tracking-wider transition-all"
-                                                    >
-                                                      {simDialogueLang === "RU"
-                                                        ? "–ó–∞–≤–µ—Ä—à–∏—Ç—å –ö–∞–º–ø–∞–Ω–∏—é üèÅ"
-                                                        : "Complete Campaign üèÅ"}
-                                                    </button>
-                                                  )}
-                                                </div>
-                                              </div>
-                                            </div>
-                                          )}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  )}
-                                </div>
-                              ) : (
-                                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-center pt-2 relative">
-                                  {/* LEFT COLUMN: COMPANION (AELYSSA) INSIDE SMALL FRAME */}
-                                  <div className="lg:col-span-1 flex flex-col items-center space-y-3 relative group">
-                                    {/* Dynamic Mentor Indicator (No overlaps) */}
-
-                                    {/* Dialogue Companion Header Prefab Badge Slots "–®–ê–ü–ö–ê –î–ò–ê–õ–û–ì–ê" */}
-                                    <div
-                                      className="w-full bg-slate-900/95 border-2 border-indigo-500/40 rounded-2xl px-3 py-2 text-center text-[10px] font-black uppercase text-cyan-400 tracking-wider shadow-[0_0_20px_rgba(99,102,241,0.35)] relative overflow-hidden group hover:scale-[1.02] transition-transform"
-                                      id="Dialogue_Header_Companion_Plaque"
-                                    >
-                                      <span className="text-[6px] text-slate-500 font-mono block mb-0.5">
-                                        GameObject: Dialogue_Header_Prefab_Slot
-                                        (Left)
-                                      </span>
-                                      üè∞{" "}
-                                      {simDialogueLang === "RU"
-                                        ? "–ê–≠–õ–ò–°–°–ê (–ù–ê–°–¢–ê–í–ù–ò–ö)"
-                                        : "AELYSSA (MENTOR)"}
-                                    </div>
-
-                                    <div className="w-32 h-32 md:w-40 md:h-40 rounded-[2.5rem] bg-indigo-950/60 border-2 border-indigo-500 shadow-[0_0_30px_rgba(99,102,241,0.3)] relative overflow-hidden transition-all duration-300 ring-4 ring-indigo-500/10 hover:scale-105">
-                                      {/* Companion Graphic Placeholder drawing */}
-                                      <svg
-                                        className="w-full h-full p-2"
-                                        viewBox="0 0 100 100"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                      >
-                                        <circle
-                                          cx="50"
-                                          cy="50"
-                                          r="45"
-                                          fill="#0f172a"
-                                        />
-                                        <path
-                                          d="M20 70C20 40 30 15 50 15C70 15 80 40 80 70C75 75 70 80 50 82C30 80 25 75 20 70Z"
-                                          fill="#e2e8f0"
-                                        />
-                                        <path
-                                          d="M10 50C10 40 25 20 50 20C75 20 90 40 90 50C90 60 85 75 50 85C15 75 10 60 10 50Z"
-                                          fill="#f1f5f9"
-                                        />
-                                        <path
-                                          d="M15 35C5 32 5 25 8 20C12 25 18 30 20 35H15Z"
-                                          fill="#fbcfe8"
-                                        />
-                                        <path
-                                          d="M85 35C95 32 95 25 92 20C88 25 82 30 80 35H85Z"
-                                          fill="#fbcfe8"
-                                        />
-                                        <path
-                                          d="M30 50C30 35 38 30 50 30C62 30 70 35 70 50C70 65 62 80 50 80C38 80 30 65 30 50Z"
-                                          fill="#fbcfe8"
-                                        />
-                                        <path
-                                          d="M28 20C32 25 35 35 32 50C30 60 25 70 20 75"
-                                          stroke="#f1f5f9"
-                                          strokeWidth="2.5"
-                                        />
-                                        <path
-                                          d="M72 20C68 25 65 35 68 50C70 60 75 70 80 75"
-                                          stroke="#f1f5f9"
-                                          strokeWidth="2.5"
-                                        />
-                                        <ellipse
-                                          cx="40"
-                                          cy="48"
-                                          rx="3"
-                                          ry="5"
-                                          fill="#a855f7"
-                                        />
-                                        <ellipse
-                                          cx="60"
-                                          cy="48"
-                                          rx="3"
-                                          ry="5"
-                                          fill="#a855f7"
-                                        />
-                                        <circle
-                                          cx="41"
-                                          cy="46"
-                                          r="1"
-                                          fill="#ffffff"
-                                        />
-                                        <circle
-                                          cx="61"
-                                          cy="46"
-                                          r="1"
-                                          fill="#ffffff"
-                                        />
-                                        <path
-                                          d="M35 75C40 78 45 80 50 80C55 80 60 78 65 75"
-                                          stroke="#818cf8"
-                                          strokeWidth="3"
-                                        />
-                                      </svg>
-
-                                      <div className="absolute inset-0 bg-indigo-500/10 group-hover:bg-indigo-500/0 transition-colors pointer-events-none" />
-                                    </div>
-
-                                    <div className="flex flex-col items-center">
-                                      <span className="text-[10px] font-black text-indigo-400 bg-indigo-500/20 px-3 py-1 rounded-full border border-indigo-500/30 uppercase tracking-widest">
-                                        –ê—ç–ª–∏—Å—Å–∞ (–ì–∏–¥) üßù‚Äç‚ôÄÔ∏è
-                                      </span>
-                                      <button
-                                        onClick={() => {
-                                          // Synthesize companion sound
-                                          try {
-                                            const ctx = new (
-                                              window.AudioContext ||
-                                              (window as any).webkitAudioContext
-                                            )();
-                                            const osc = ctx.createOscillator();
-                                            const gain = ctx.createGain();
-                                            osc.type = "triangle";
-                                            osc.frequency.setValueAtTime(
-                                              587.33,
-                                              ctx.currentTime,
-                                            );
-                                            osc.frequency.exponentialRampToValueAtTime(
-                                              1174.66,
-                                              ctx.currentTime + 0.3,
-                                            );
-                                            gain.gain.setValueAtTime(
-                                              0.12,
-                                              ctx.currentTime,
-                                            );
-                                            gain.gain.exponentialRampToValueAtTime(
-                                              0.01,
-                                              ctx.currentTime + 0.35,
-                                            );
-                                            osc.connect(gain);
-                                            gain.connect(ctx.destination);
-                                            osc.start();
-                                            osc.stop(ctx.currentTime + 0.35);
-                                          } catch (e) {}
-                                          showNotification(
-                                            "üîä –¢–µ—Å—Ç Voice Clip –ê—ç–ª–∏—Å—Å—ã –≤–æ—Å–ø—Ä–æ–∏–∑–≤–µ–¥–µ–Ω! (–ò–º–∏—Ç–∞—Ü–∏—è companionVoiceClip)",
-                                            "info",
-                                          );
-                                        }}
-                                        className="mt-2 text-[9px] text-slate-400 hover:text-white bg-black/40 hover:bg-slate-800 px-2 py-1 rounded-lg border border-white/5 transition flex items-center gap-1.5"
-                                      >
-                                        üîä –û–∑–≤—É—á–∫–∞ (Unity Clip)
-                                      </button>
-                                    </div>
-                                  </div>
-
-                                  {/* CENTER 2 COLS: LARGE DIALOGUE CONTAINER FRAME */}
-                                  <div className="lg:col-span-2 relative">
-                                    {/* The Large Slanted RPG Frame Dialog Box inspired by user artwork */}
-                                    <div className="rounded-[2.5rem] bg-gradient-to-br from-indigo-950 to-slate-900 border-2 border-cyan-400/80 shadow-[0_0_35px_rgba(34,211,238,0.25)] relative overflow-hidden backdrop-blur-2xl p-6 md:p-8 flex flex-col justify-between min-h-[220px]">
-                                      {/* Top gold slanting title bar cover cap with gem star (as on screenshot 1 & 2) */}
-                                      <div className="absolute top-0 left-0 bg-gradient-to-r from-amber-500 to-orange-600 border-b border-r border-amber-400/40 px-6 py-1.5 rounded-br-[1.5rem] flex items-center gap-2">
-                                        <span className="w-3 h-3 rounded bg-amber-200 animate-pulse flex items-center justify-center text-[8px] text-black font-black">
-                                          ‚ú¶
-                                        </span>
-                                        <span className="text-[10px] font-black text-white uppercase tracking-widest">
-                                          {simDialogueStep === 0
-                                            ? "–ê–ö–¢–ò–í–ù–ê–Ø –†–ï–ß–¨"
-                                            : simDialogueStep === 3
-                                              ? "–í–´–ë–û–† –û–ß–ò–©–ï–ù–ò–Ø"
-                                              : "–°–õ–ï–î–£–Æ–©–ò–ô –®–ê–ì"}
-                                        </span>
-                                      </div>
-
-                                      {/* Diagonal Polygonal Side Corners Visual accents */}
-                                      <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-cyan-400/40 rounded-tr-xl pointer-events-none" />
-                                      <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-cyan-400/40 rounded-bl-xl pointer-events-none" />
-
-                                      <div className="mt-4 space-y-4">
-                                        {/* Speaker Name label in bold */}
-                                        <div className="text-[11px] font-black text-amber-400 uppercase tracking-widest mt-1">
-                                          {simDialogueLang === "RU"
-                                            ? "–ê—ç–ª–∏—Å—Å–∞"
-                                            : "Aelyssa"}
-                                        </div>
-
-                                        {/* Dialogue message itself inside standard styling */}
-                                        <p className="text-[12.5px] md:text-sm text-slate-100 font-medium leading-relaxed italic">
-                                          {simDialogueLang === "RU"
-                                            ? simDialogueStep === 0
-                                              ? `–ó–¥—Ä–∞–≤—Å—Ç–≤—É–π, ${simDialogueHero === "warrior" ? "–æ—Ç–≤–∞–∂–Ω—ã–π –í–æ–∏–Ω" : simDialogueHero === "archer" ? "–º–µ—Ç–∫–∏–π –°—Ç—Ä–µ–ª–æ–∫" : "–º—É–¥—Ä—ã–π –ú–∞–≥"}! –ù–∞—à –ö–æ–Ω—Ç–∏–Ω–µ–Ω—Ç –°—É–¥—å–±—ã –ø–æ–≥—Ä—É–∂–∞–µ—Ç—Å—è –≤–æ —Ç—å–º—É –¥—Ä–µ–≤–Ω–µ–≥–æ –±–µ–∑–≤—Ä–µ–º–µ–Ω—å—è. –Ø –±—É–¥—É —Å–æ–ø—Ä–æ–≤–æ–∂–¥–∞—Ç—å —Ç–µ–±—è –≤ —ç—Ç–æ–º –æ–ø–∞—Å–Ω–æ–º –ø–æ—Ö–æ–¥–µ.`
-                                              : simDialogueStep === 1
-                                                ? "–Ø ‚Äî —Ö—Ä–∞–Ω–∏—Ç–µ–ª—å–Ω–∏—Ü–∞ —Å–≤—è—â–µ–Ω–Ω–æ–≥–æ –ö—Ä–∏—Å—Ç–∞–ª–ª–∞ –ó–µ–Ω–∏—Ç–∞. –ú–æ—è –º–∞–≥–∏—è –∑–∞—â–∏—Ç–∏—Ç —Ç–≤–æ–µ –±–æ–µ–≤–æ–µ —Å–Ω–∞—Ä—è–∂–µ–Ω–∏–µ –æ—Ç —Å–º–µ—Ä—Ç–æ–Ω–æ—Å–Ω–æ–π —Å–∫–≤–µ—Ä–Ω—ã."
-                                                : simDialogueStep === 2
-                                                  ? `–¢–≤–æ—è –≤–æ–ª—è –Ω–µ–ø–æ–∫–æ–ª–µ–±–∏–º–∞! –û—Ä—É–∂–∏–µ –∫–ª–∞—Å—Å–∞ ${simDialogueHero === "warrior" ? "–í–æ–∏–Ω" : simDialogueHero === "archer" ? "–°—Ç—Ä–µ–ª–æ–∫" : "–ú–∞–≥"} –Ω–∞–ø–∏—Ç–∞–Ω–æ –±–æ–∂–µ—Å—Ç–≤–µ–Ω–Ω—ã–º —Å–∏—è–Ω–∏–µ–º. –ú—ã –≥–æ—Ç–æ–≤—ã —Å–æ–≤–µ—Ä—à–∏—Ç—å –ø–æ—Ö–æ–¥.`
-                                                  : simDialogueStep === 3
-                                                    ? "–ü—É—Ç–Ω–∏–∫, –Ω–∞—Å—Ç–∞–ª —Ä–µ—à–∞—é—â–∏–π –º–∏–≥! –í—ã–±–µ—Ä–∏—Ç–µ —Ç–µ—Ä—Ä–∏—Ç–æ—Ä–∏—é –Ω–∞ –ö–æ–Ω—Ç–∏–Ω–µ–Ω—Ç–µ –°—É–¥—å–±—ã, –∫–æ—Ç–æ—Ä—É—é –Ω–∞—à –≤–æ–∏–Ω—Å–∫–∏–π –æ—Ç—Ä—è–¥ –¥–æ–ª–∂–µ–Ω –∑–∞—á–∏—Å—Ç–∏—Ç—å –æ—Ç –ª–µ–≥–∏–æ–Ω–æ–≤ —Å–∫–≤–µ—Ä–Ω—ã –≤ –ø–µ—Ä–≤—É—é –æ—á–µ—Ä–µ–¥—å:"
-                                                    : simDialogueStep === 4
-                                                      ? "–í—ã –≤—ã–±—Ä–∞–ª–∏ ü©∏ –ö—Ä–æ–≤–∞–≤—ã–µ –ü—É—Å—Ç–æ—à–∏! –ó–¥–µ—Å—å —Å–∏–ª—å–Ω—ã –æ—Ä–¥—ã –¥–µ–º–æ–Ω–æ–≤-–Ω–∞–ª–µ—Ç—á–∏–∫–æ–≤ –∏ –∞–¥—Å–∫–∏–µ –ø–µ—Å—á–∞–Ω—ã–µ –±—É—Ä–∏ –ó–µ–Ω–∏—Ç–∞. –î–∞ –±–ª–∞–≥–æ—Å–ª–æ–≤–∏—Ç –ö—Ä–∏—Å—Ç–∞–ª–ª –Ω–∞—à–∏ –º–µ—á–∏! –í –ø–æ—Ö–æ–¥!"
-                                                      : simDialogueStep === 5
-                                                        ? "–í—ã –≤—ã–±—Ä–∞–ª–∏ ‚ùÑÔ∏è –õ–µ–¥—è–Ω–æ–π –ü–∏–∫! –í–µ—á–Ω–∞—è –º–µ—Ä–∑–ª–æ—Ç–∞ –∏—Å–ø—ã—Ç—ã–≤–∞–µ—Ç –ø–ª–æ—Ç—å –Ω–∞ –ø—Ä–æ—á–Ω–æ—Å—Ç—å, –∞ –õ–µ–¥—è–Ω—ã–µ –ú–∏–º–∏–∫–∏ –æ—Ö—Ä–∞–Ω—è—é—Ç –∑–∞–±—Ä–æ—à–µ–Ω–Ω—ã–µ –∑–∞–ª–µ–∂–∏ —Ä—É–¥—ã. –ì–æ—Ç–æ–≤—å—Ç–µ —â–∏—Ç—ã!"
-                                                        : simDialogueStep === 6
-                                                          ? "–í—ã –≤—ã–±—Ä–∞–ª–∏ üèõÔ∏è –î—Ä–µ–≤–Ω–∏–µ –†—É–∏–Ω—ã! –ó–∞–±—ã—Ç—ã–µ –≥—Ä–æ–±–Ω–∏—Ü—ã —Ç–∞—è—Ç –ø—Ä–∞—Ö –≤–µ–ª–∏–∫–∏—Ö –∏–º–ø–µ—Ä–∞—Ç–æ—Ä–æ–≤ –ó–µ–Ω–∏—Ç–∞, –Ω–æ –±–µ—Ä–µ–≥–∏—Ç–µ—Å—å –æ–∂–∏–≤—à–∏—Ö —Å—Ç–∞—Ç—É–π –∏ –∫–∞–ø–∫–∞–Ω–æ–≤. –®–∞–≥–Ω–µ–º –≤–æ —Ç—å–º—É!"
-                                                          : "–í—ã –≤—ã–±—Ä–∞–ª–∏ üåø –°–≤—è—Ç–∏–ª–∏—â–µ –ó–µ–Ω–∏—Ç–∞! –í–µ–ª–∏—á–µ—Å—Ç–≤–µ–Ω–Ω—ã–π –ª–µ—Å–Ω–æ–π –æ–∞–∑–∏—Å —Å–∫—Ä—ã–≤–∞–µ—Ç –∏—Å—Ç–æ–∫–∏ —Å–≤—è—â–µ–Ω–Ω–æ–≥–æ –ö—Ä–∏—Å—Ç–∞–ª–ª–∞ –ø–æ–¥ –∑–∞—â–∏—Ç–æ–π –¥—É—à –ø—Ä–µ–¥–∫–æ–≤. –î–∞ –ø—Ä–µ–±—É–¥–µ—Ç —Å –Ω–∞–º–∏ –±–ª–∞–≥–æ—Å–ª–æ–≤–µ–Ω–∏–µ –ö—Ä–∏—Å—Ç–∞–ª–ª–∞!"
-                                            : simDialogueLang === "EN"
-                                              ? simDialogueStep === 0
-                                                ? `Greetings, ${simDialogueHero}! Our Fate Continent is sinking into the darkness of ancient timelessness. I will accompany you in this dangerous journey.`
-                                                : simDialogueStep === 1
-                                                  ? "I am the keeper of the sacred Zenith Crystal. My magic will shield your equipment from the lethal corruption."
-                                                  : simDialogueStep === 2
-                                                    ? `Your battle spirit is absolute! Your ${simDialogueHero} focus has been loaded with holy solar flames. We stand prepared.`
-                                                    : simDialogueStep === 3
-                                                      ? "Traveler, the crucial moment is here! Choose a specific sector on the Fate Continent for our tactical squad to cleanse first:"
-                                                      : simDialogueStep === 4
-                                                        ? "You chosen Crimson Wastes! Demon hordes and brutal firestorms rage across this territory. May the Crystal bless us. March!"
-                                                        : simDialogueStep === 5
-                                                          ? "You chosen Ice-Bound Peak! Extreme cold attacks the mind, and ancient Ice Mimics patrol the rich ore caves. Prepare your gear!"
-                                                          : simDialogueStep ===
-                                                              6
-                                                            ? "You chosen Ancient Ruins! Legendary tombs hold relics of the celestial emperors, but ancient traps remain active. Into the shadow!"
-                                                            : "You chosen Zenith Sanctuary! A majestic forest oasis hiding the origin of the Crystal, guarded by ancient spirits. Let us set off!"
-                                              : simDialogueLang === "KR"
-                                                ? simDialogueStep === 0
-                                                  ? `Î∞òÍ∞ëÎã§, ${simDialogueHero === "warrior" ? "Ïö©Í∞êÌïú Ï†ÑÏÇ¨" : simDialogueHero === "archer" ? "Ïã†Í∂Å" : "ÌòÑÎ™ÖÌïú ÎßàÎ≤ïÏÇ¨"}Ïó¨! Ïö∞Î¶¨Ïùò Ïö¥Î™Ö ÎåÄÎ•ôÏù¥ Ïñ¥Îë† ÏÜçÏúºÎ°ú Ïû†Í∏∞Í≥† ÏûàÎã§. ÎÇ¥Í∞Ä Ìï®ÍªòÌïòÍ≤†Îã§.`
-                                                  : simDialogueStep === 1
-                                                    ? "ÎÇòÎäî Ïã†ÏÑ±Ìïú Ï†úÎãàÏä§ ÌÅ¨Î¶¨Ïä§ÌÉàÏùò Ïàò—Ö–æÏûêÎã§. ÎÇòÏùò ÎßàÎ≤ïÏù¥ ÌÅ¨Î¶ºÏä®Ïùò Ïò§ÏóºÏúºÎ°úÎ∂ÄÌÑ∞ ÎãπÏã†ÏùÑ –∑–∞—â–∏—Ç–∏—Ç Ìï†Í≤ÉÏù¥Îã§."
-                                                    : simDialogueStep === 2
-                                                      ? "Ï†ÑÌà¨ Ï†ïÏã†Ïù¥ ÌõåÎ•≠ÌïòÎã§! ÎãπÏã†Ïùò Ïû•ÎπÑÏóê Ï†úÎãàÏä§ ÏóêÎÑàÏßÄÍ∞Ä Í∞ÄÎìù Ï∞ºÎã§. Ï∂úÎ∞ú Ï§ÄÎπÑÍ∞Ä ÎÅùÎÇ¨Îã§."
-                                                      : simDialogueStep === 3
-                                                        ? "Í≤∞Ï†ïÏ†ÅÏù∏ ÏàúÍ∞ÑÏù¥Îã§! Ïö∞Î¶¨ Íµ∞ÎåÄÍ∞Ä Î®ºÏ†Ä Ï†ÑÏà†Ï†ÅÏúºÎ°ú ÏÜåÌÉïÌï† Ï†ïÌôî ÏßÄÏó≠ÏùÑ ÏÑ†ÌÉùÌïòÏã≠ÏãúÏò§:"
-                                                        : simDialogueStep === 4
-                                                          ? "ÌÅ¨Î¶ºÏä® Ìô©Î¨¥ÏßÄÎ•º ÏÑ†ÌÉùÌïòÏÖ®ÏäµÎãàÎã§! ÏïÖÎßà Íµ∞Îã®Í≥º Í±∞Ïπú Ï†úÎãàÏä§ ÎßàÎ†• Ìè≠ÌíçÏù¥ Î™∞ÏïÑÏπòÎäî Ï†ÑÏüÅÌÑ∞ÏûÖÎãàÎã§. ÎèåÍ≤©!"
-                                                          : simDialogueStep ===
-                                                              5
-                                                            ? "ÎπôÏÑ§Ïùò Î¥âÏö∞Î¶¨Î•º ÏÑ†ÌÉùÌïòÏÖ®ÏäµÎãàÎã§! ÌòπÎèÖÌïú ÏòÅÍµ¨ ÎèôÌÜ†Ïóê ÎØ∏ÎØπÎì§Ïù¥ Í≥†ÎåÄ Í¥ëÏÇ∞ÏùÑ Í≤ΩÎπÑÌï©ÎãàÎã§. Ï§ÄÎπÑÎ•º ÎßàÏπ©ÏãúÎã§!"
-                                                            : simDialogueStep ===
-                                                                6
-                                                              ? "Í≥†ÎåÄ Ïú†Ï†ÅÏßÄÎ•º ÏÑ†ÌÉùÌïòÏÖ®ÏäµÎãàÎã§! ÏßÄÌïò Î¨òÏßÄÏóê Í≥†ÎåÄÏùò Í∞ïÎ†•Ìïú Ï†úÎãàÏä§ Í≤∞Ï†ïÏù¥ Ïû†Îì§Ïñ¥ ÏûàÏßÄÎßå, Í≥†ÎåÄÏùò Ìï®Ï†ïÏù¥ Í∞ÄÎìùÌï©ÎãàÎã§."
-                                                              : "Ï†úÎãàÏä§ ÏÑ±ÏÜåÎ•º ÏÑ†ÌÉùÌïòÏÖ®ÏäµÎãàÎã§! Í≥†ÎåÄ ÌÅ¨Î¶¨Ïä§ÌÉà Ï†ïÏàòÍ∞Ä Ïà≤Ïùò Ï†ïÎ†πÎì§Ïùò Î≥¥Ìò∏ ÏïÑÎûò Ïû†Îì§Ïñ¥ ÏûàÏäµÎãàÎã§. ÌÅ¨Î¶¨Ïä§ÌÉàÏùò Ï∂ïÎ≥µÍ≥º Ìï®Íªò ÏÑ±Ïä§Îü¨Ïö¥ ÏÇ¨Î™Ö ÏÜçÏúºÎ°ú!"
-                                                : simDialogueStep === 0
-                                                  ? `‰Ω†Â•Ω, Â∞äÊï¨ÁöÑ${simDialogueHero === "warrior" ? "ÊàòÂ£´" : simDialogueHero === "archer" ? "Â∞ÑÊâã" : "Ê≥ïÂ∏à"}! Êàë‰ª¨ÁöÑÂëΩËøêÂ§ßÈôÜÊ≠£Âú®Ê≤âÂÖ•Êó†Â∞ΩÈªëÊöó„ÄÇÊàëÂ∞ÜÈô™‰º¥‰Ω†ÂæÅÊàò„ÄÇ`
-                                                  : simDialogueStep === 1
-                                                    ? "ÊàëÊòØÁ•ûÂú£Â§©È°∂Ê∞¥Êô∂ÁöÑÂÆàÊä§ËÄÖ„ÄÇÊàëÁöÑÈ≠îÊ≥ïÂ∞Ü‰øùÊä§‰Ω†ÁöÑË£ÖÂ§áÂíåÁÅµÈ≠Ç‰∏çË¢´Ê±°Êüì„ÄÇ"
-                                                    : simDialogueStep === 2
-                                                      ? "ÊñóÂøóÊûÅÂÖ∂È´òÊòÇÔºÅ‰Ω†ÁöÑÂ§©È°∂Ê≠¶Âô®Â∑≤ÁªèÂÖÖËÉΩÂÆåÊØïÔºåÈöèÊó∂ËÉΩÂ§üÂá∫ÂæÅÊñ©ÊùÄÊÅ∂È≠î„ÄÇ"
-                                                      : simDialogueStep === 3
-                                                        ? "ÊóÖ‰∫∫ÔºåÂÜ≥ËÉúÊó∂ÂàªÂ∑≤Âà∞ÔºÅËØ∑Âú®ÂëΩËøêÂ§ßÈôÜ‰∏≠ÈÄâÊã©‰∏Ä‰∏™ÁâπÂÆöÂå∫ÂüüÔºåËøõË°åÈ¶ñËΩÆÂáÄÂåñÈô§È≠îË°åÂä®Ôºö"
-                                                        : simDialogueStep === 4
-                                                          ? "‰Ω†ÈÄâÊã©‰∫ÜÁªØÁ∫¢ËçíÈáéÔºÅËøôÈáåÁõòË∏ûÁùÄÂº∫ÁõóÂå™Â∏ÆÂíåÁãÇÊö¥ÁöÑÂ§©È°∂ÁãÇÈ£é„ÄÇÊÑøÊ∞¥Êô∂Á•ùÁ¶èÊàë‰ª¨ÔºåÂç≥ÂàªÂá∫ÂèëÔºÅ"
-                                                          : simDialogueStep ===
-                                                              5
-                                                            ? "‰Ω†ÈÄâÊã©‰∫ÜÂÜ∞Â∞Å‰πãÂ∑ÖÔºÅÊ∞∏ÊÅíÊûÅÂØíÂú®ËÄÉÈ™å‰Ω†ÁöÑÊÑèÂøóÔºåÂÜ∞Â∑®‰∫∫ÂÆàÂç´ÁùÄÂ∞òÂ∞ÅÁöÑÂÆùËóè„ÄÇÂáÜÂ§áÂæ°ÂØíÂêßÔºÅ"
-                                                            : simDialogueStep ===
-                                                                6
-                                                              ? "‰Ω†ÈÄâÊã©‰∫ÜËøúÂè§ÈÅóËøπÔºÅÂ§±ËêΩÁöÑÂ¢ìÁ©¥ÈáåÂüãËóèÁùÄÂ∏ùÂõΩÂÖÉËÄÅÁöÑÊ≥ïÊúØÔºå‰ΩÜËá¥ÂëΩÊú∫ÂÖ≥‰æùÁÑ∂Âú®ËøêËΩ¨„ÄÇÂ∞èÂøÉÂâçËøõÔºÅ"
-                                                              : "‰Ω†ÈÄâÊã©‰∫ÜÂ§©È°∂Âú£ÊâÄÔºÅÂè§ËÄÅÁöÑÊ∞¥Êô∂ÈÅóËøπÂú®Ê£ÆÊûóÂÆàÊä§ÁÅµÁöÑÂ∫á‰Ωë‰∏ãÂÆâÊÅØ„ÄÇÊÑøÊ∞¥Êô∂Á•ùÁ¶èÊàë‰ª¨ÔºåÂºÄÂêØÁ•ûÂú£Âá∫ÂæÅÔºÅ"}
-                                        </p>
-                                      </div>
-
-                                      {/* BRANCHING BUTTON CONTROLS INSIDE DIALOGUE BOX */}
-                                      <div className="border-t border-white/5 pt-4 mt-6 z-20 flex flex-wrap gap-2.5">
-                                        {simDialogueStep === 0 ? (
-                                          <>
-                                            <button
-                                              onClick={() => {
-                                                setSimDialogueStep(1);
-                                                showNotification(
-                                                  "–†–∞–∑–≤–µ—Ç–≤–ª–µ–Ω–∏–µ: –í–æ–ø—Ä–æ—Å –æ —Å–ø—É—Ç–Ω–∏—Ü–µ",
-                                                  "info",
-                                                );
-                                                try {
-                                                  const ctx = new (
-                                                    window.AudioContext ||
-                                                    (window as any)
-                                                      .webkitAudioContext
-                                                  )();
-                                                  const osc =
-                                                    ctx.createOscillator();
-                                                  osc.frequency.setValueAtTime(
-                                                    440,
-                                                    ctx.currentTime,
-                                                  );
-                                                  osc.frequency.exponentialRampToValueAtTime(
-                                                    800,
-                                                    ctx.currentTime + 0.1,
-                                                  );
-                                                  const g = ctx.createGain();
-                                                  g.gain.setValueAtTime(
-                                                    0.1,
-                                                    ctx.currentTime,
-                                                  );
-                                                  g.gain.linearRampToValueAtTime(
-                                                    0.01,
-                                                    ctx.currentTime + 0.1,
-                                                  );
-                                                  osc.connect(g);
-                                                  g.connect(ctx.destination);
-                                                  osc.start();
-                                                  osc.stop(
-                                                    ctx.currentTime + 0.1,
-                                                  );
-                                                } catch (e) {}
-                                              }}
-                                              className="px-4 py-2 bg-indigo-500/10 hover:bg-indigo-600 border border-indigo-500/20 rounded-xl text-[10px] font-bold text-indigo-300 hover:text-white transition-all text-left flex items-center gap-2 group/btn"
-                                            >
-                                              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 group-hover/btn:scale-125 transition-transform" />
-                                              {simDialogueLang === "RU"
-                                                ? "–ö—Ç–æ —Ç—ã —Ç–∞–∫–∞—è?"
-                                                : simDialogueLang === "KR"
-                                                  ? "ÎãπÏã†ÏùÄ ÎàÑÍµ¨Ïã≠ÎãàÍπå?"
-                                                  : simDialogueLang === "CH"
-                                                    ? "‰Ω†ÊòØË∞ÅÔºü"
-                                                    : "Who are you?"}
-                                            </button>
-                                            <button
-                                              onClick={() => {
-                                                setSimDialogueStep(2);
-                                                showNotification(
-                                                  "–†–∞–∑–≤–µ—Ç–≤–ª–µ–Ω–∏–µ: –ì–æ—Ç–æ–≤–Ω–æ—Å—Ç—å –∫ –±–æ—é",
-                                                  "info",
-                                                );
-                                                try {
-                                                  const ctx = new (
-                                                    window.AudioContext ||
-                                                    (window as any)
-                                                      .webkitAudioContext
-                                                  )();
-                                                  const osc =
-                                                    ctx.createOscillator();
-                                                  osc.frequency.setValueAtTime(
-                                                    500,
-                                                    ctx.currentTime,
-                                                  );
-                                                  osc.frequency.exponentialRampToValueAtTime(
-                                                    900,
-                                                    ctx.currentTime + 0.1,
-                                                  );
-                                                  const g = ctx.createGain();
-                                                  g.gain.setValueAtTime(
-                                                    0.1,
-                                                    ctx.currentTime,
-                                                  );
-                                                  g.gain.linearRampToValueAtTime(
-                                                    0.01,
-                                                    ctx.currentTime + 0.1,
-                                                  );
-                                                  osc.connect(g);
-                                                  g.connect(ctx.destination);
-                                                  osc.start();
-                                                  osc.stop(
-                                                    ctx.currentTime + 0.1,
-                                                  );
-                                                } catch (e) {}
-                                              }}
-                                              className="px-4 py-2 bg-indigo-500/10 hover:bg-purple-600 border border-indigo-500/20 rounded-xl text-[10px] font-bold text-indigo-300 hover:text-white transition-all text-left flex items-center gap-2 group/btn"
-                                            >
-                                              <span className="w-1.5 h-1.5 rounded-full bg-purple-400 group-hover/btn:scale-125 transition-transform" />
-                                              {simDialogueLang === "RU"
-                                                ? "–Ø –≥–æ—Ç–æ–≤ –∫ –±–∏—Ç–≤–µ!"
-                                                : simDialogueLang === "KR"
-                                                  ? "Ï†ÑÌà¨ Ï§ÄÎπÑ ÏôÑÎ£å!"
-                                                  : simDialogueLang === "CH"
-                                                    ? "ÊàëÂáÜÂ§áÂ•ΩÊàòÊñó‰∫ÜÔºÅ"
-                                                    : "I am ready for battle!"}
-                                            </button>
-                                          </>
-                                        ) : simDialogueStep === 1 ||
-                                          simDialogueStep === 2 ? (
-                                          <button
-                                            onClick={() => {
-                                              setSimDialogueStep(3);
-                                              // Play chime
-                                              try {
-                                                const ctx = new (
-                                                  window.AudioContext ||
-                                                  (window as any)
-                                                    .webkitAudioContext
-                                                )();
-                                                const osc =
-                                                  ctx.createOscillator();
-                                                osc.frequency.setValueAtTime(
-                                                  700,
-                                                  ctx.currentTime,
-                                                );
-                                                osc.frequency.exponentialRampToValueAtTime(
-                                                  1200,
-                                                  ctx.currentTime + 0.15,
-                                                );
-                                                const g = ctx.createGain();
-                                                g.gain.setValueAtTime(
-                                                  0.08,
-                                                  ctx.currentTime,
-                                                );
-                                                osc.connect(g);
-                                                g.connect(ctx.destination);
-                                                osc.start();
-                                                osc.stop(
-                                                  ctx.currentTime + 0.15,
-                                                );
-                                              } catch (e) {}
-                                            }}
-                                            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 border border-indigo-400/40 rounded-xl text-[10px] font-black uppercase tracking-widest text-white transition-all flex items-center gap-2"
-                                          >
-                                            {simDialogueLang === "RU"
-                                              ? "–ü–µ—Ä–µ–π—Ç–∏ –∫ –≤—ã–±–æ—Ä—É –æ–±–ª–∞—Å—Ç–∏ –∫–æ–Ω—Ç–∏–Ω–µ–Ω—Ç–∞ ‚ûî"
-                                              : simDialogueLang === "KR"
-                                                ? "ÏßÄÏó≠ ÏÑ†ÌÉù ÎåÄÌôîÎ°ú ÏßÑÏûÖ ‚ûî"
-                                                : simDialogueLang === "CH"
-                                                  ? "ËøõÂÖ•Âå∫ÂüüÈÄâÊã© ‚ûî"
-                                                  : "Select territory ‚ûî"}
-                                          </button>
-                                        ) : simDialogueStep === 3 ? (
-                                          (() => {
-                                            /* THE 12-CELL TACTICAL GRID FOR THE NEW_KONTINENT - v18.11.10 */
-                                            const TACTICAL_TILES = [
-                                              // ROW 0
-                                              {
-                                                index: 0,
-                                                row: 0,
-                                                col: 0,
-                                                type: "neutral",
-                                                color: "#95a5a6",
-                                                emoji: "ü™ô",
-                                                name: {
-                                                  RU: "–°–µ–≤–µ—Ä–Ω–∞—è –ü–æ–ª—è–Ω–∞ (–ù–µ–π—Ç—Ä–∞–ª—ã)",
-                                                  EN: "North Plateau (Neutrals)",
-                                                  CH: "ÂåóÈ´òÂéü (‰∏≠Á´ã)",
-                                                  KR: "Î∂ÅÎ∂Ä Í≥†Ïõê (Ï§ëÎ¶Ω)",
-                                                },
-                                                desc: {
-                                                  RU: "–ú–∏—Ä–Ω–∞—è –Ω–µ–π—Ç—Ä–∞–ª—å–Ω–∞—è —Å—Ç–æ—è–Ω–∫–∞ –≤–æ–ª—å–Ω—ã—Ö —Ç–æ—Ä–≥–æ–≤—Ü–µ–≤ –∏ –∞–ª—Ö–∏–º–∏–∫–æ–≤. –í—ã—Å–∞–¥–∫–∞ –Ω–µ–¥–æ—Å—Ç—É–ø–Ω–∞.",
-                                                  EN: "Peaceful neutral territory of free traders and alchemists. Deployment is locked.",
-                                                  CH: "Ëá™Áî±Ë¥∏ÊòìËÄÖÁöÑÂíåÂπ≥‰∏≠Á´ãÈ¢ÜÂúü„ÄÇÈÉ®ÁΩ≤Â∑≤ÈîÅÂÆö„ÄÇ",
-                                                  KR: "ÏûêÏú† Î¨¥Ïó≠ÏÉÅÎì§Ïùò ÌèâÌôîÎ°úÏö¥ Ï§ëÎ¶Ω ÏòÅÌÜ†ÏûÖÎãàÎã§. Î∞∞Ïπò Î∂àÍ∞Ä.",
-                                                },
-                                                techUid: "TILE_NEUTRAL_NORTH",
-                                                bounds:
-                                                  "LAT 54.3¬∞N | LON 10.2¬∞W",
-                                                buffs: {
-                                                  RU: "–ù–µ–π—Ç—Ä–∞–ª—å–Ω—ã–µ —Ç–æ—Ä–≥–æ–≤—Ü—ã",
-                                                  EN: "Neutral merchants & crafting",
-                                                },
-                                                nerfs: {
-                                                  RU: "–í—ã—Å–∞–¥–∫–∞ –∑–∞–±–ª–æ–∫–∏—Ä–æ–≤–∞–Ω–∞",
-                                                  EN: "Spawn locked",
-                                                },
-                                                feature: {
-                                                  RU: "–ë–µ–∑–æ–ø–∞—Å–Ω–∞—è –≥–∞–≤–∞–Ω—å –±–µ–∑ –±–æ–µ–≤—ã—Ö –¥–µ–π—Å—Ç–≤–∏–π",
-                                                  EN: "Safe zoning without ongoing conflicts",
-                                                },
-                                              },
-                                              {
-                                                index: 1,
-                                                row: 0,
-                                                col: 1,
-                                                type: "bandit",
-                                                color: "#e74c3c",
-                                                emoji: "üíÄ",
-                                                name: {
-                                                  RU: "–ê–≤–∞–Ω–ø–æ—Å—Ç –ú–∞—Ä–æ–¥–µ—Ä–æ–≤ (–†–∞–∑–±–æ–π–Ω–∏–∫–∏)",
-                                                  EN: "Marauders Outpost (Bandits)",
-                                                  CH: "Êé†Â§∫ËÄÖÂâçÂì® (Âº∫Áõó)",
-                                                  KR: "ÏïΩÌÉàÏûê Ï†ÑÏ¥àÍ∏∞ÏßÄ (ÎèÑÏ†Å)",
-                                                },
-                                                desc: {
-                                                  RU: "–£–∫—Ä–µ–ø–ª–µ–Ω–Ω—ã–π –ª–∞–≥–µ—Ä—å –±–∞–Ω–¥–∏—Ç—Å–∫–∏—Ö –≥—Ä—É–ø–ø–∏—Ä–æ–≤–æ–∫. –í—ã—Å–∞–¥–∫–∞ –∑–∞–±–ª–æ–∫–∏—Ä–æ–≤–∞–Ω–∞.",
-                                                  EN: "Fortified bandit camp holding local trade routes. Spawn is locked.",
-                                                  CH: "ÊâºÂÆàÂΩìÂú∞Ë¥∏ÊòìË∑ØÁ∫øÁöÑË¶ÅÂ°ûÂåñÂº∫ÁõóËê•Âú∞„ÄÇÈÉ®ÁΩ≤Â∑≤ÈîÅÂÆö„ÄÇ",
-                                                  KR: "ÏßÄÏó≠ ÍµêÏó≠Î°úÎ•º Ïû•ÏïÖÌïú ÏöîÏÉàÌôîÎêú ÎèÑÏ†Å Ï∫†ÌîÑÏûÖÎãàÎã§. Î∞∞Ïπò Î∂àÍ∞Ä.",
-                                                },
-                                                techUid:
-                                                  "TILE_BANDIT_CAMP_ALPHA",
-                                                bounds:
-                                                  "LAT 58.1¬∞N | LON 04.5¬∞E",
-                                                buffs: {
-                                                  RU: "–ü–æ–≤—ã—à–µ–Ω–Ω—ã–π —à–∞–Ω—Å –≤—ã–ø–∞–¥–µ–Ω–∏—è –∑–æ–ª–æ—Ç–∞",
-                                                  EN: "Increased gold drop-rate multiplier",
-                                                },
-                                                nerfs: {
-                                                  RU: "–í—ã—Å–∞–¥–∫–∞ –∑–∞–±–ª–æ–∫–∏—Ä–æ–≤–∞–Ω–∞",
-                                                  EN: "Spawn locked",
-                                                },
-                                                feature: {
-                                                  RU: "–û–ø–∞—Å–Ω—ã–π –ª–∞–≥–µ—Ä—å —Å –≤—ã—à–∫–∞–º–∏ –∏ —Å–∏–ª—å–Ω—ã–º–∏ –ª—É—á–Ω–∏–∫–∞–º–∏",
-                                                  EN: "Aggressive bandit fort with heavy marksmen",
-                                                },
-                                              },
-                                              {
-                                                index: 2,
-                                                row: 0,
-                                                col: 2,
-                                                type: "neutral",
-                                                color: "#95a5a6",
-                                                emoji: "ü™ô",
-                                                name: {
-                                                  RU: "–ö–∞–º–µ–Ω–Ω—ã–µ –ì–ª—ã–±—ã (–ù–µ–π—Ç—Ä–∞–ª—ã)",
-                                                  EN: "Stone Crags (Neutrals)",
-                                                  CH: "Áü≥Â≥∞ (‰∏≠Á´ã)",
-                                                  KR: "Îèå Î∞îÏúÑ (Ï§ëÎ¶Ω)",
-                                                },
-                                                desc: {
-                                                  RU: "–ó–∞–±—Ä–æ—à–µ–Ω–Ω—ã–µ –∫–∞—Ä—å–µ—Ä—ã –¥—Ä–µ–≤–Ω–∏—Ö –∫–∞–º–µ–Ω—â–∏–∫–æ–≤. –í—ã—Å–∞–¥–∫–∞ –Ω–µ–¥–æ—Å—Ç—É–ø–Ω–∞.",
-                                                  EN: "Abandoned stone quarries of ancient masons. Spawn is locked.",
-                                                  CH: "Âè§‰ª£ËÆ∞ÂΩïËÄÖÁöÑÂ∫üÂºÉÁü≥ÁüøÂú∫„ÄÇÈÉ®ÁΩ≤Â∑≤ÈîÅÂÆö„ÄÇ",
-                                                  KR: "Í≥†ÎåÄ Í∏∞Î°ùÍ∞ÄÎì§Ïùò Î≤ÑÎ†§ÏßÑ Ï±ÑÏÑùÏû•ÏûÖÎãàÎã§. Î∞∞Ïπò Î∂àÍ∞Ä.",
-                                                },
-                                                techUid: "TILE_NEUTRAL_EAST",
-                                                bounds:
-                                                  "LAT 52.8¬∞N | LON 25.4¬∞E",
-                                                buffs: {
-                                                  RU: "–ó–∞–ª–µ–∂–∏ –∫–∞—á–µ—Å—Ç–≤–µ–Ω–Ω–æ–≥–æ —Å—Ç—Ä–æ–∏—Ç–µ–ª—å–Ω–æ–≥–æ –∫–∞–º–Ω—è",
-                                                  EN: "Rich stone quarry deposits",
-                                                },
-                                                nerfs: {
-                                                  RU: "–í—ã—Å–∞–¥–∫–∞ –∑–∞–±–ª–æ–∫–∏—Ä–æ–≤–∞–Ω–∞",
-                                                  EN: "Spawn locked",
-                                                },
-                                                feature: {
-                                                  RU: "–°—Ç–∞—Ä—ã–µ —à–∞—Ö—Ç—ã –ø–æ–¥ –ø–∞—Ç—Ä–æ–Ω–∞–∂–µ–º –≥–Ω–æ–º–æ–≤",
-                                                  EN: "Old excavating structures run by dwarfs",
-                                                },
-                                              },
-                                              // ROW 1
-                                              {
-                                                index: 3,
-                                                row: 1,
-                                                col: 0,
-                                                type: "hero",
-                                                color: "#3498db",
-                                                emoji: "üõ°Ô∏è",
-                                                heroSlot: 0,
-                                                name: {
-                                                  RU: "–°–µ–≤–µ—Ä–Ω—ã–π –®–ø–∏–ª—å ‚Äî –¢–æ—á–∫–∞ –ê (–í—ã—Å–∞–¥–∫–∞ –ì–µ—Ä–æ—è)",
-                                                  EN: "Northern Spire - Sector Alpha",
-                                                  CH: "ÂåóÂ§©È°∂‰πãÂ°î - ÈòøÂ∞îÊ≥ïÂå∫",
-                                                  KR: "Î∂ÅÎ∂Ä Ï≤®ÌÉë - ÏïåÌåå Íµ¨Ïó≠",
-                                                },
-                                                desc: {
-                                                  RU: "–î—Ä–µ–≤–Ω–∏–π —à–ø–∏–ª—å –Ω–∞ —Å–µ–≤–µ—Ä–µ –∫–æ–Ω—Ç–∏–Ω–µ–Ω—Ç–∞. –¢–æ—á–∫–∞ –ø–æ–ª–Ω–æ—Å—Ç—å—é –ø–æ–¥–≥–æ—Ç–æ–≤–ª–µ–Ω–∞ –∫ –≤—ã—Å–∞–¥–∫–µ –≤–∞—à–µ–≥–æ –≥–µ—Ä–æ—è.",
-                                                  EN: "Ancient beacon spire in the far north. Secured and certified for instant vanguard drop.",
-                                                  CH: "ËøúÂåóÁöÑÂè§‰ª£ÁÉΩÁÅ´Â°î„ÄÇÂ∑≤ÂÆâÂÖ®Âπ∂ËÆ§ËØÅÔºåÂèØÁ´ãÂç≥ËøõË°åÂâçÈîãÊäïÊîæ„ÄÇ",
-                                                  KR: "Í∑πÎ∂ÅÏùò Í≥†ÎåÄ Î¥âÌôî Ï≤®ÌÉë. Ï¶âÍ∞ÅÏ†ÅÏù∏ ÏÑ†Î¥âÎåÄ ÌïòÍ∞ïÏùÑ ÏúÑÌï¥ ÌôïÎ≥¥ Î∞è ÏïàÏã¨ Î≥¥Ï¶ù.",
-                                                },
-                                                techUid:
-                                                  "TILE_HERO_SPAWN_ALPHA",
-                                                bounds:
-                                                  "LAT 44.1¬∞N | LON 12.8¬∞W",
-                                                buffs: {
-                                                  RU: "+25% –∫ –ø–∞–¥–µ–Ω–∏—é –±–æ–∂–µ—Å—Ç–≤–µ–Ω–Ω–æ–π —Ä—É–¥—ã",
-                                                  EN: "+25% Divine Ore drop-rate",
-                                                },
-                                                nerfs: {
-                                                  RU: "-15% –∫ –≤–æ—Å—Å—Ç–∞–Ω–æ–≤–ª–µ–Ω–∏—é –∑–¥–æ—Ä–æ–≤—å—è",
-                                                  EN: "-15% Health Regeneration rate",
-                                                },
-                                                feature: {
-                                                  RU: "–Ø—Ä–æ—Å—Ç—å –ó–µ–Ω–∏—Ç–∞: –ö—Ä–∏—Ç —É–≤–µ–ª–∏—á–µ–Ω –Ω–∞ 15%, —É–¥–∞—Ä—ã –ø–æ–¥–∂–∏–≥–∞—é—Ç –≤—Ä–∞–≥–æ–≤",
-                                                  EN: "Zenith Fury: Crit chance +15%, melee hits ignite targets",
-                                                },
-                                              },
-                                              {
-                                                index: 4,
-                                                row: 1,
-                                                col: 1,
-                                                type: "hero",
-                                                color: "#3498db",
-                                                emoji: "üõ°Ô∏è",
-                                                heroSlot: 1,
-                                                name: {
-                                                  RU: "–¶–µ–Ω—Ç—Ä–∞–ª—å–Ω—ã–µ –í—Ä–∞—Ç–∞ ‚Äî –¢–æ—á–∫–∞ –ë (–í—ã—Å–∞–¥–∫–∞ –ì–µ—Ä–æ—è)",
-                                                  EN: "Central Gates - Sector Delta",
-                                                  CH: "‰∏≠Â§ÆÂüéÈó® - Âæ∑Â∞îÂ°îÂå∫",
-                                                  KR: "Ï§ëÏïô ÏÑ±Î¨∏ - Îç∏ÌÉÄ Íµ¨Ïó≠",
-                                                },
-                                                desc: {
-                                                  RU: "–ì–ª–∞–≤–Ω—ã–µ —Å—Ç–≤–æ—Ä—á–∞—Ç—ã–µ –≤—Ä–∞—Ç–∞. –û–ø—Ç–∏–º–∞–ª—å–Ω—ã–π —Å–µ–∫—Ç–æ—Ä –¥–ª—è –Ω–∞—á–∞–ª–∞ —à—Ç—É—Ä–º–∞ –∏ –±–æ–µ–≤–æ–π –∑–∞—á–∏—Å—Ç–∫–∏.",
-                                                  EN: "Immense golden gates leading directly into the heart of the continent. Excellent start point.",
-                                                  CH: "Áõ¥ÈÄöÂ§ßÈôÜËÖπÂú∞ÁöÑÂ∑®Â§ßÈªÑÈáëÂüéÈó®„ÄÇÊûÅ‰Ω≥ÁöÑÂá∫ÂæÅÂàáÂÖ•ÁÇπ„ÄÇ",
-                                                  KR: "ÎåÄÎ•ôÏùò Ïã¨Ïû•Î∂ÄÎ°ú Î∞îÎ°ú Ïó∞Í≤∞ÎêòÎäî Í±∞ÎåÄÌïú Ïã†ÏÑ± ÏÑ±Î¨∏. Îõ∞Ïñ¥ÎÇú ÏßëÍ≤∞ÏßÄÏûÖÎãàÎã§.",
-                                                },
-                                                techUid:
-                                                  "TILE_HERO_SPAWN_DELTA",
-                                                bounds:
-                                                  "LAT 78.3¬∞N | LON 04.1¬∞E",
-                                                buffs: {
-                                                  RU: "–î–≤–æ–π–Ω–æ–π –æ–ø—ã—Ç –∑–∞ –ª–µ–¥—è–Ω—ã—Ö –º–æ–Ω—Å—Ç—Ä–æ–≤",
-                                                  EN: "Double Exp from icy elements",
-                                                },
-                                                nerfs: {
-                                                  RU: "-10% –∫ —Å–∫–æ—Ä–æ—Å—Ç–∏ –±–µ–≥–∞ –∏ –∞—Ç–∞–∫–∏",
-                                                  EN: "-10% Attack & Move speed penalty",
-                                                },
-                                                feature: {
-                                                  RU: "–°–µ—Ä–¥—Ü–µ –°–µ–≤–µ—Ä–∞: –ü–æ–ª–Ω—ã–π –∏–º–º—É–Ω–∏—Ç–µ—Ç –∫ —ç—Ñ—Ñ–µ–∫—Ç–∞–º –∑–∞–º–µ—Ä–∑–∞–Ω–∏—è –∏ –æ–∫–æ—á–µ–Ω–µ–Ω–∏—è",
-                                                  EN: "North Heart: Complete immunity to freeze & slow status effects",
-                                                },
-                                              },
-                                              {
-                                                index: 5,
-                                                row: 1,
-                                                col: 2,
-                                                type: "hero",
-                                                color: "#3498db",
-                                                emoji: "üõ°Ô∏è",
-                                                heroSlot: 2,
-                                                name: {
-                                                  RU: "–í–æ—Å—Ç–æ—á–Ω–∞—è –ì–∞–≤–∞–Ω—å ‚Äî –¢–æ—á–∫–∞ –í (–í—ã—Å–∞–¥–∫–∞ –ì–µ—Ä–æ—è)",
-                                                  EN: "Eastern Harbor - Sector Gamma",
-                                                  CH: "‰∏úÈÉ®Ê∏ØÂè£ - ‰ºΩÈ©¨Âå∫",
-                                                  KR: "ÎèôÎ∂Ä Ìï≠Íµ¨ - Í∞êÎßà Íµ¨Ïó≠",
-                                                },
-                                                desc: {
-                                                  RU: "–ë—ã–≤—à–∏–π –ø—Ä–∏—á–∞–ª –∫–æ—Ä–∞–±–ª–µ–π. –ü–æ–ª–Ω–∞—è –ø–æ–¥–¥–µ—Ä–∂–∫–∞ –∞–≤–∞–Ω–≥–∞—Ä–¥–∞ –∑–∞—â–∏—Ç–Ω—ã–º –ø–æ–∫—Ä–æ–≤–æ–º –ö—Ä–∏—Å—Ç–∞–ª–ª–∞.",
-                                                  EN: "An abandoned naval harbor of ancient high elves. Extremely safe beachhead.",
-                                                  CH: "Âè§È´òÁ≤æÁÅµÂ∫üÂºÉÁöÑÂÜõÊ∏Ø„ÄÇÊûÅÂÖ∂ÂÆâÂÖ®ÁöÑÁôªÈôÜÊª©Â§¥„ÄÇ",
-                                                  KR: "ÏßÄÎ∞∞Ï∏µ Í≥†ÎåÄ Ïóò—ÑÎì§Ïùò Î≤ÑÎ†§ÏßÑ Ìï¥Íµ∞ Ìï≠Íµ¨. Îß§Ïö∞ ÏïàÏ†ÑÌïú ÍµêÎëêÎ≥¥ÏûÖÎãàÎã§.",
-                                                },
-                                                techUid:
-                                                  "TILE_HERO_SPAWN_GAMMA",
-                                                bounds:
-                                                  "LAT 12.9¬∞S | LON 38.6¬∞E",
-                                                buffs: {
-                                                  RU: "+35% –∫ —à–∞–Ω—Å—É –ª–µ–≥–µ–Ω–¥–∞—Ä–Ω–æ–≥–æ —Å–Ω–∞—Ä—è–∂–µ–Ω–∏—è",
-                                                  EN: "+35% Legendary Gear find multiplier",
-                                                },
-                                                nerfs: {
-                                                  RU: "–°—Ç—Ä–µ–ª—ã –¥—Ä–µ–≤–Ω–∏—Ö –ª–æ–≤—É—à–µ–∫ –Ω–∞–Ω–æ—Å—è—Ç —Ä–µ–≥—É–ª—è—Ä–Ω—ã–π —É—Ä–æ–Ω",
-                                                  EN: "Periodic trap arrow bleeding damage",
-                                                },
-                                                feature: {
-                                                  RU: "–ú—É–¥—Ä–æ—Å—Ç—å –í–µ—á–Ω–æ—Å—Ç–∏: +20% –∫ –∏–Ω—Ç–µ–ª–ª–µ–∫—Ç—É, -10% –æ—Ç–∫–∞—Ç–∞ –∞–∫—Ç–∏–≤–Ω—ã—Ö –Ω–∞–≤—ã–∫–æ–≤",
-                                                  EN: "Eternal Wisdom: +20% spell magic pierce & 10% shorter cooldowns",
-                                                },
-                                              },
-                                              // ROW 2
-                                              {
-                                                index: 6,
-                                                row: 2,
-                                                col: 0,
-                                                type: "forest",
-                                                color: "#2ecc71",
-                                                emoji: "üåø",
-                                                name: {
-                                                  RU: "–ò–∑—É–º—Ä—É–¥–Ω–∞—è –ß–∞—â–∞ (–õ–µ—Å–Ω—ã–µ –ñ–∏—Ç–µ–ª–∏)",
-                                                  EN: "Emerald Thicket (Forest Dwellers)",
-                                                  CH: "Áø°Áø†‰∏õÊûó (ÊûóÂú∞ÁßçÊóè)",
-                                                  KR: "ÏóêÎ©îÎûÑÎìú Ïà≤ (Ïà≤ Í±∞Ï£ºÎØº)",
-                                                },
-                                                desc: {
-                                                  RU: "–ì—É—Å—Ç–æ–π –∑–∞–ø–æ–≤–µ–¥–Ω—ã–π –±–æ—Ä –¥—Ä—É–∏–¥–æ–≤ –∏ —ç–ª—å—Ñ–∏–π—Å–∫–∏—Ö –ª–æ–≤—á–∏—Ö. –í—ã—Å–∞–¥–∫–∞ –∑–∞–±–ª–æ–∫–∏—Ä–æ–≤–∞–Ω–∞.",
-                                                  EN: "Millennia-old woods heavily guarded by sentinel druids. Spawn is locked.",
-                                                  CH: "ÂèóÂæ∑È≤Å‰ºäÂç´Â£´‰∏•ÂØÜÂÆàÊä§ÁöÑÂçÉÂπ¥Ê£ÆÊûó„ÄÇÈÉ®ÁΩ≤Â∑≤ÈîÅÂÆö„ÄÇ",
-                                                  KR: "ÏàòÌò∏ ÎìúÎ£®Ïù¥ÎìúÎì§Ïù¥ Ï≤†Ï†ÄÌûà Í≤ΩÎπÑÌïòÎäî ÌÉúÍ≥†Ïùò Ïà≤ÏûÖÎãàÎã§. Î∞∞Ïπò Î∂àÍ∞Ä.",
-                                                },
-                                                techUid: "TILE_FOREST_EMERALD",
-                                                bounds:
-                                                  "LAT 22.4¬∞N | LON 18.2¬∞W",
-                                                buffs: {
-                                                  RU: "–£—Å–∫–æ—Ä–µ–Ω–∏–µ —Ä–µ–≥–µ–Ω–µ—Ä–∞—Ü–∏–∏ –º–∞–Ω—ã –Ω–∞ 20%",
-                                                  EN: "Accelerated mana restoration by 20%",
-                                                },
-                                                nerfs: {
-                                                  RU: "–í—ã—Å–∞–¥–∫–∞ –∑–∞–±–ª–æ–∫–∏—Ä–æ–≤–∞–Ω–∞",
-                                                  EN: "Spawn locked",
-                                                },
-                                                feature: {
-                                                  RU: "–ü–æ–∫—Ä–æ–≤–∏—Ç–µ–ª—å—Å—Ç–≤–æ –¥—É—Ö–æ–≤ –ª–µ—Å–∞ –æ–±–µ—Ä–µ–≥–∞–µ—Ç —ç–ª—å—Ñ–æ–≤",
-                                                  EN: "Sacred protection of nature forces",
-                                                },
-                                              },
-                                              {
-                                                index: 7,
-                                                row: 2,
-                                                col: 1,
-                                                type: "forest",
-                                                color: "#2ecc71",
-                                                emoji: "üåø",
-                                                name: {
-                                                  RU: "–°–≤—è—â–µ–Ω–Ω–∞—è –ü–æ–ª—è–Ω–∞ (–õ–µ—Å–Ω—ã–µ –ñ–∏—Ç–µ–ª–∏)",
-                                                  EN: "Sacred Glade (Forest Dwellers)",
-                                                  CH: "Âú£ÂÖâÂπΩË∞∑ (ÊûóÂú∞ÁßçÊóè)",
-                                                  KR: "ÏÑ±Ïä§Îü¨Ïö¥ Í≥µ—Ç–µ—Ä (Ïà≤ Í±∞Ï£ºÎØº)",
-                                                },
-                                                desc: {
-                                                  RU: "–¢–∞–π–Ω–æ–µ —É–±–µ–∂–∏—â–µ –ª–µ—Å–Ω—ã—Ö –∂–∏—Ç–µ–ª–µ–π –°—Ä–µ–¥–∏–∑–µ–º—å—è, —É–∫—Ä—ã—Ç–æ–µ –ª–µ—á–µ–±–Ω–æ–π –∞—É—Ä–æ–π. –í—ã—Å–∞–¥–∫–∞ —Ä–∞–∑–±–ª–æ–∫–∏—Ä–æ–≤–∞–Ω–∞.",
-                                                  EN: "Mystical clearing filled with pure life energy. Spawn is locked.",
-                                                  CH: "ÂÖÖÊª°Á∫ØÂáÄÁîüÂëΩËÉΩÈáèÁöÑÁ•ûÁßòÊûóÈó¥Á©∫Âú∞„ÄÇÈÉ®ÁΩ≤Â∑≤ÈîÅÂÆö„ÄÇ",
-                                                  KR: "ÏàúÏàòÌïú ÏÉùÎ™ÖÎ†•ÏúºÎ°ú Ï±ÑÏõåÏßÑ Ïã†ÎπÑÌïú ÎπàÌÑ∞ÏûÖÎãàÎã§. Î∞∞Ïπò Î∂àÍ∞Ä.",
-                                                },
-                                                techUid: "TILE_FOREST_SACRED",
-                                                bounds:
-                                                  "LAT 15.5¬∞N | LON 02.1¬∞W",
-                                                buffs: {
-                                                  RU: "+15% –∫ —ç—Ñ—Ñ–µ–∫—Ç–∏–≤–Ω–æ—Å—Ç–∏ –ª–µ—á–µ–Ω–∏—è –æ—Ç—Ä—è–¥–∞",
-                                                  EN: "Amplified target healing",
-                                                },
-                                                nerfs: {
-                                                  RU: "–í—ã—Å–∞–¥–∫–∞ –∑–∞–±–ª–æ–∫–∏—Ä–æ–≤–∞–Ω–∞",
-                                                  EN: "Spawn locked",
-                                                },
-                                                feature: {
-                                                  RU: "–ë—ã—Å—Ç—Ä–æ–µ —Ä–∞—Å—Å–µ–∏–≤–∞–Ω–∏–µ —è–¥–æ–≤ –∏ –ø—Ä–æ–∫–ª—è—Ç–∏–π –≤ –≤–æ–∑–¥—É—Ö–µ",
-                                                  EN: "Instant purification of deadly debuffs",
-                                                },
-                                              },
-                                              {
-                                                index: 8,
-                                                row: 2,
-                                                col: 2,
-                                                type: "bandit",
-                                                color: "#e74c3c",
-                                                emoji: "üíÄ",
-                                                name: {
-                                                  RU: "–¢–µ–Ω–µ–≤–æ–π –õ–∞–≥–µ—Ä—å (–†–∞–∑–±–æ–π–Ω–∏–∫–∏)",
-                                                  EN: "Shadow Camp (Bandits)",
-                                                  CH: "ÊöóÂΩ±Ëê•ÂØ® (Âº∫Áõó)",
-                                                  KR: "Í∑∏Î¶ºÏûê ÏöîÏÉà (ÎèÑÏ†Å)",
-                                                },
-                                                desc: {
-                                                  RU: "–õ–æ–≥–æ–≤–æ –Ω–∞–µ–º–Ω–∏–∫–æ–≤-–æ—Ç—Å—Ç—É–ø–Ω–∏–∫–æ–≤ –¢–µ–Ω–µ–≤–æ–≥–æ –°–∏–Ω–¥–∏–∫–∞—Ç–∞. –í—ã—Å–∞–¥–∫–∞ –∑–∞–±–ª–æ–∫–∏—Ä–æ–≤–∞–Ω–∞.",
-                                                  EN: "Hidden mercenary training den of the shadow syndicate. Spawn is locked.",
-                                                  CH: "ÊöóÂΩ±ËæõËø™Âä†ÁöÑÁßòÂØÜÈõá‰Ω£ÂÖµËÆ≠ÁªÉËê•„ÄÇÈÉ®ÁΩ≤Â∑≤ÈîÅÂÆö„ÄÇ",
-                                                  KR: "Í∑∏Î¶ºÏûê Ïã†ÎîîÏºÄÏù¥Ìä∏ Ïö©Î≥ëÎì§Ïùò ÎπÑÎ∞Ä Í∏∞ÏßÄÏûÖÎãàÎã§. Î∞∞Ïπò Î∂àÍ∞Ä.",
-                                                },
-                                                techUid:
-                                                  "TILE_BANDIT_CAMP_BETA",
-                                                bounds:
-                                                  "LAT 05.2¬∞N | LON 34.8¬∞E",
-                                                buffs: {
-                                                  RU: "–•—Ä–∞–Ω–∏–ª–∏—â–∞ —É–∫—Ä–∞–¥–µ–Ω–Ω—ã—Ö –∫—Ä–∏—Å—Ç–∞–ª–ª–æ–≤",
-                                                  EN: "Premium crystal chests & stolen jewels",
-                                                },
-                                                nerfs: {
-                                                  RU: "–í—ã—Å–∞–¥–∫–∞ –∑–∞–±–ª–æ–∫–∏—Ä–æ–≤–∞–Ω–∞",
-                                                  EN: "Spawn locked",
-                                                },
-                                                feature: {
-                                                  RU: "–¢—è–∂–µ–ª—ã–µ –∫–∞–ø–∫–∞–Ω—ã –ø–æ –≤—Å–µ–º—É –ø–µ—Ä–∏–º–µ—Ç—Ä—É –ª–∞–≥–µ—Ä—è",
-                                                  EN: "Deadly traps scattered along the perimeter",
-                                                },
-                                              },
-                                              // ROW 3
-                                              {
-                                                index: 9,
-                                                row: 3,
-                                                col: 0,
-                                                type: "hero",
-                                                color: "#3498db",
-                                                emoji: "üõ°Ô∏è",
-                                                heroSlot: 3,
-                                                name: {
-                                                  RU: "–Æ–∂–Ω—ã–π –û–∞–∑–∏—Å ‚Äî –¢–æ—á–∫–∞ –ì (–í—ã—Å–∞–¥–∫–∞ –ì–µ—Ä–æ—è)",
-                                                  EN: "Southern Oasis - Sector Beta",
-                                                  CH: "ÂçóÈÉ®ÁªøÊ¥≤ - Ë¥ùÂ°îÂå∫",
-                                                  KR: "ÎÇ®Î∂Ä Ïò§ÏïÑÏãúÏä§ - Î≤†ÌÉÄ Íµ¨Ïó≠",
-                                                },
-                                                desc: {
-                                                  RU: "–°–≤—è—Ç–∏–ª–∏—â–µ –ó–µ–Ω–∏—Ç–∞ –Ω–∞ —é–∂–Ω–æ–π –æ–∫—Ä–∞–∏–Ω–µ, —Å–∫—Ä—ã–≤–∞—é—â–µ–µ –Ω–µ–∏—Å—Å—è–∫–∞–µ–º—ã–π –ö—Ä–∏—Å—Ç–∞–ª—å–Ω—ã–π –∏—Å—Ç–æ—á–Ω–∏–∫.",
-                                                  EN: "A majestic forest oasis and ruins of a sanctuary, hiding the true origins of the Zenith Crystal.",
-                                                  CH: "ÂÆè‰ºüÁöÑÊ£ÆÊûóÁªøÊ¥≤‰∏éÁ•ûÊÆøÂ∫üÂ¢üÔºåÈöêËóèÁùÄÂ§©È°∂Ê∞¥Êô∂Ïùò Ëµ∑Ê∫ê„ÄÇ",
-                                                  KR: "Í≥†ÏñëÎêú ÏÇ¨ÏõêÏùò Íµ¨Î¶Ñ Ïò§ÏïÑÏãúÏä§. Í≥†ÎåÄ ÏòÅÎ†πÎì§Ïù¥ ÏßÄÌÇ§Í≥† ÏûàÎäî ÌÅ¨Î¶¨Ïä§ÌÉà Ï†úÎãàÏä§ Ï†ïÏàò.",
-                                                },
-                                                techUid: "TILE_HERO_SPAWN_BETA",
-                                                bounds:
-                                                  "LAT 08.5¬∞S | LON 14.2¬∞W",
-                                                buffs: {
-                                                  RU: "+15% –∫ –≤–æ—Å—Å—Ç–∞–Ω–æ–≤–ª–µ–Ω–∏—é –º–∞–Ω—ã –≤—Å–µ–≥–æ –æ—Ç—Ä—è–¥–∞",
-                                                  EN: "+15% Mana regeneration for full squad",
-                                                },
-                                                nerfs: {
-                                                  RU: "–≠–ª–∏–∫—Å–∏—Ä—ã –∏—Å—Ü–µ–ª–µ–Ω–∏—è —Å–ª–∞–±–µ–µ –Ω–∞ 20%",
-                                                  EN: "Healing Potions efficacy debuffed by 20%",
-                                                },
-                                                feature: {
-                                                  RU: "–ñ–∏–≤–∞—è –ó–µ–º–ª—è: –í—Ä–µ–º—è –≤–æ—Å—Å—Ç–∞–Ω–æ–≤–ª–µ–Ω–∏—è –≤—Å–ø–æ–º–æ–≥–∞—Ç–µ–ª—å–Ω—ã—Ö —É–º–µ–Ω–∏–π —Å–æ–∫—Ä–∞—â–µ–Ω–æ –Ω–∞ 25%",
-                                                  EN: "Living Soil: Support items and skills cooldown speed +25%",
-                                                },
-                                              },
-                                              {
-                                                index: 10,
-                                                row: 3,
-                                                col: 1,
-                                                type: "forest",
-                                                color: "#2ecc71",
-                                                emoji: "üåø",
-                                                name: {
-                                                  RU: "–õ–µ—Å–Ω–æ–µ –£–±–µ–∂–∏—â–µ (–õ–µ—Å–Ω—ã–µ –ñ–∏—Ç–µ–ª–∏)",
-                                                  EN: "Forest Retreat (Forest Dwellers)",
-                                                  CH: "Ê£ÆÊûóÈöêÊâÄ (ÊûóÂú∞ÁßçÊóè)",
-                                                  KR: "Ïà≤Ïùò Ìú¥ÏñëÏßÄ (Ïà≤ Í±∞Ï£ºÎØº)",
-                                                },
-                                                desc: {
-                                                  RU: "–£–∫—Ä—ã—Ç–∏–µ –ª–µ—Å–Ω–æ–≥–æ –æ–ø–æ–ª—á–µ–Ω–∏—è –≤ –∫—Ä–æ–Ω–∞—Ö –¥—Ä–µ–≤–Ω–∏—Ö –∏—Å–ø–æ–ª–∏–Ω—Å–∫–∏—Ö –¥–µ—Ä–µ–≤—å–µ–≤. –í—ã—Å–∞–¥–∫–∞ –Ω–µ–¥–æ—Å—Ç—É–ø–Ω–∞.",
-                                                  EN: "Concealed base camp built into ancient pine trees canopy. Spawn is locked.",
-                                                  CH: "Âª∫Âú®ËÄÅÊùæÊ†ëÂÜ†‰∏äÁöÑÈöêËîΩÂ§ßÊú¨Ëê•„ÄÇÈÉ®ÁΩ≤Â∑≤ÈîÅÂÆö„ÄÇ",
-                                                  KR: "Í±∞ÎåÄ Í≥†ÎåÄ ÏÜåÎÇòÎ¨¥ Ïà≤ÏÜçÏóê ÏùÄÌèêÎêú Î≤†Ïù¥Ïä§Ï∫†ÌîÑÏûÖÎãàÎã§. Î∞∞Ïπò Î∂àÍ∞Ä.",
-                                                },
-                                                techUid: "TILE_FOREST_RETREAT",
-                                                bounds:
-                                                  "LAT 12.0¬∞S | LON 10.5¬∞E",
-                                                buffs: {
-                                                  RU: "–ú–∞—Å–∫–∏—Ä–æ–≤–∫–∞ –æ—Ç –Ω–∞–ª–µ—Ç–æ–≤ —Å –Ω–µ–±–µ—Å",
-                                                  EN: "Air scouting stealth camouflage",
-                                                },
-                                                nerfs: {
-                                                  RU: "–í—ã—Å–∞–¥–∫–∞ –∑–∞–±–ª–æ–∫–∏—Ä–æ–≤–∞–Ω–∞",
-                                                  EN: "Spawn locked",
-                                                },
-                                                feature: {
-                                                  RU: "–≠–ª—å—Ñ–∏–π—Å–∫–∏–µ —Å–ª–µ–¥–æ–ø—ã—Ç—ã –ø–∞—Ç—Ä—É–ª–∏—Ä—É—é—Ç –≤–µ—Ç–≤–∏",
-                                                  EN: "Hidden woodland scouts watching from trunks",
-                                                },
-                                              },
-                                              {
-                                                index: 11,
-                                                row: 3,
-                                                col: 2,
-                                                type: "forest",
-                                                color: "#2ecc71",
-                                                emoji: "üåø",
-                                                name: {
-                                                  RU: "–®–µ–ø—á—É—â–∏–µ –î–µ—Ä–µ–≤—å—è (–õ–µ—Å–Ω—ã–µ –ñ–∏—Ç–µ–ª–∏)",
-                                                  EN: "Whispering Woods (Forest Dwellers)",
-                                                  CH: "‰ΩéËØ≠Ê†ëÊûó (ÊûóÂú∞ÁßçÊóè)",
-                                                  KR: "ÏÜçÏÇ≠Ïù¥Îäî ÎÇòÎ¨¥Ïà≤ (Ïà≤ Í±∞Ï£ºÎØº)",
-                                                },
-                                                desc: {
-                                                  RU: "–î—Ä–µ–≤–Ω–∏–π –±–æ—Ä, –æ–∫—É—Ç–∞–Ω–Ω—ã–π –≤–µ—á–Ω—ã–º —Ä–µ—á–Ω—ã–º —Ç—É–º–∞–Ω–æ–º –¥—Ä–µ–≤–Ω–æ—Å—Ç–∏. –í—ã—Å–∞–¥–∫–∞ –Ω–µ–¥–æ—Å—Ç—É–ø–Ω–∞.",
-                                                  EN: "Mystical pathway heading into the fog dense riverbanks. Spawn is locked.",
-                                                  CH: "ÈÄöÂæÄÊµìÈõæÁº≠ÁªïÁöÑÊ≤≥Â≤∏ÁöÑÁ•ûÁßòÈÄöÈÅì„ÄÇÈÉ®ÁΩ≤Â∑≤ÈîÅÂÆö„ÄÇ",
-                                                  KR: "Í∞ï ÏïàÍ∞úÍ∞Ä ÎìúÎ¶¨ÏõåÏßÑ Ïã†ÏÑ±Ìïú Í∞ïÏïàÍ∏∏ÏûÖÎãàÎã§. Î∞∞Ïπò Î∂àÍ∞Ä.",
-                                                },
-                                                techUid: "TILE_FOREST_WHISPERS",
-                                                bounds:
-                                                  "LAT 18.4¬∞S | LON 20.8¬∞E",
-                                                buffs: {
-                                                  RU: "–ó–∞—â–∏—Ç–∞ –æ—Ç —Ä–∞–∑–≤–µ–¥–∫–∏ –ø—Ä–æ—Ç–∏–≤–Ω–∏–∫–∞",
-                                                  EN: "Full detection range immunity",
-                                                },
-                                                nerfs: {
-                                                  RU: "–í—ã—Å–∞–¥–∫–∞ –∑–∞–±–ª–æ–∫–∏—Ä–æ–≤–∞–Ω–∞",
-                                                  EN: "Spawn locked",
-                                                },
-                                                feature: {
-                                                  RU: "–ú–∞–≥–∏—á–µ—Å–∫–∏–µ –∫–æ–ª—é—á–∫–∏ –∑–∞–º–µ–¥–ª—è—é—Ç –Ω–µ–∑–≤–∞–Ω—ã—Ö –≥–æ—Å—Ç–µ–π –Ω–∞ 40%",
-                                                  EN: "Ancient thorns slow intruders down by 40%",
-                                                },
-                                              },
-                                            ];
-
-                                            // Parse hovered tile index
-                                            let hoveredTileIndex:
-                                              | number
-                                              | null = null;
-                                            if (
-                                              hoveredRegion &&
-                                              hoveredRegion.startsWith("tile_")
-                                            ) {
-                                              hoveredTileIndex = parseInt(
-                                                hoveredRegion.replace(
-                                                  "tile_",
-                                                  "",
-                                                ),
-                                                10,
-                                              );
-                                            }
-                                            const activeTile =
-                                              TACTICAL_TILES.find(
-                                                (t) =>
-                                                  t.index === hoveredTileIndex,
-                                              );
-
-                                            return (
-                                              <div
-                                                className="flex flex-col space-y-4 w-full font-sans animate-fade-in"
-                                                id="tactical_grid_step3"
-                                              >
-                                                <div className="text-[10px] text-indigo-150 font-bold uppercase tracking-wider text-center border-b border-indigo-500/10 pb-2 flex items-center justify-center gap-2">
-                                                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-ping" />
-                                                  <span>
-                                                    üó∫Ô∏è{" "}
-                                                    {simDialogueLang === "RU"
-                                                      ? "–¢–∞–∫—Ç–∏—á–µ—Å–∫–∞—è —Å–µ—Ç–∫–∞ –ö–æ–Ω—Ç–∏–Ω–µ–Ω—Ç–∞ –°—É–¥—å–±—ã: –ù–∞–≤–µ–¥–∏—Ç–µ –Ω–∞ —Ç–∞–π–ª –∏–ª–∏ –∫–ª–∏–∫–Ω–∏—Ç–µ —Å–∏–Ω—é—é –∑–æ–Ω—É –≤—ã—Å–∞–¥–∫–∏ –≥–µ—Ä–æ—è"
-                                                      : simDialogueLang === "KR"
-                                                        ? "Ïö¥Î™ÖÏùò ÏòÅÌÜ† Ï†ÑÏà† Í≤©Ïûê: Ïª§ÏÑúÎ•º ÎåÄÍ±∞ÎÇò Ï≤≠ÏÉâ Î∂ÄÎåÄÎ•º Î∞∞ÏπòÌïòÏã≠ÏãúÏò§"
-                                                        : simDialogueLang ===
-                                                            "CH"
-                                                          ? "ÂëΩËøêÂ§ßÂπ≥ÂéüÊàòÊúØÁΩëÊ†ºÔºöÊÇ¨ÂÅú or ÁÇπÂáªËìùËâ≤Ëã±ÈõÑÂá∫ÂæÅÂå∫Âüü"
-                                                          : "Tactical Sector Grid: Hover over any tile, or click a BLUE hero deployment zone"}
-                                                  </span>
-                                                </div>
-
-                                                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
-                                                  {/* LEFT: 3x4 GRID (Representing the New_Kontinent 12-cell mesh colors from Blender) */}
-                                                  <div className="lg:col-span-12 xl:col-span-7 relative bg-indigo-950/40 rounded-3xl p-6 border border-indigo-500/20 flex flex-col items-center justify-center min-h-[380px] transition-all">
-                                                    <svg
-                                                      viewBox="0 0 400 300"
-                                                      className="w-full max-h-[340px] drop-shadow-[0_0_20px_rgba(99,102,241,0.25)] transition-all"
-                                                    >
-                                                      {/* Defs for gradients & glowing filters */}
-                                                      <defs>
-                                                        <radialGradient
-                                                          id="oceanGrad"
-                                                          cx="50%"
-                                                          cy="50%"
-                                                          r="50%"
-                                                        >
-                                                          <stop
-                                                            offset="0%"
-                                                            stopColor="#111c38"
-                                                            stopOpacity="0.4"
-                                                          />
-                                                          <stop
-                                                            offset="100%"
-                                                            stopColor="#030712"
-                                                            stopOpacity="0.95"
-                                                          />
-                                                        </radialGradient>
-                                                        <pattern
-                                                          id="gridPattern"
-                                                          width="20"
-                                                          height="20"
-                                                          patternUnits="userSpaceOnUse"
-                                                        >
-                                                          <path
-                                                            d="M 20 0 L 0 0 0 20"
-                                                            fill="none"
-                                                            stroke="#6366f1"
-                                                            strokeWidth="0.5"
-                                                            strokeOpacity="0.08"
-                                                          />
-                                                        </pattern>
-                                                        {/* Premium neon glow */}
-                                                        <filter
-                                                          id="neonGlowNew"
-                                                          x="-20%"
-                                                          y="-20%"
-                                                          width="140%"
-                                                          height="140%"
-                                                        >
-                                                          <feGaussianBlur
-                                                            stdDeviation="5"
-                                                            result="blur"
-                                                          />
-                                                          <feComponentTransfer
-                                                            in="blur"
-                                                            result="brightBlur"
-                                                          >
-                                                            <feFuncA
-                                                              type="linear"
-                                                              slope="1.8"
-                                                            />
-                                                          </feComponentTransfer>
-                                                          <feMerge>
-                                                            <feMergeNode in="brightBlur" />
-                                                            <feMergeNode in="SourceGraphic" />
-                                                          </feMerge>
-                                                        </filter>
-                                                      </defs>
-
-                                                      {/* Ocean Background Grid */}
-                                                      <rect
-                                                        width="400"
-                                                        height="300"
-                                                        rx="20"
-                                                        fill="url(#oceanGrad)"
-                                                      />
-                                                      <rect
-                                                        width="400"
-                                                        height="300"
-                                                        rx="20"
-                                                        fill="url(#gridPattern)"
-                                                      />
-
-                                                      {/* Decorative map island underlay silhouette */}
-                                                      <path
-                                                        d="M 40 130 Q 70 50 180 40 T 350 100 T 360 210 T 130 260 Z"
-                                                        fill="#4f46e5"
-                                                        fillOpacity="0.04"
-                                                        filter="blur(16px)"
-                                                      />
-
-                                                      {/* Render the 12 dynamic interactive tiles in 3x4 grid */}
-                                                      {TACTICAL_TILES.map(
-                                                        (tile) => {
-                                                          const x_rect =
-                                                            20 +
-                                                            tile.col * 120 +
-                                                            4;
-                                                          const y_rect =
-                                                            20 +
-                                                            tile.row * 65 +
-                                                            4;
-                                                          const width_rect = 112;
-                                                          const height_rect = 57;
-                                                          const isHovered =
-                                                            hoveredTileIndex ===
-                                                            tile.index;
-
-                                                          // Dynamically override tile type and colors to show other landing spots as neutral gray (v18.11.16)
-                                                          let finalType =
-                                                            tile.type;
-                                                          let finalColor =
-                                                            tile.color;
-                                                          let finalEmoji =
-                                                            tile.emoji;
-                                                          let finalName =
-                                                            tile.name;
-                                                          let finalDesc =
-                                                            tile.desc;
-
-                                                          if (
-                                                            simDialogueStep >=
-                                                              4 &&
-                                                            tile.type === "hero"
-                                                          ) {
-                                                            const enemySlot =
-                                                              3 -
-                                                              selectedLandingSlot;
-                                                            if (
-                                                              tile.heroSlot ===
-                                                              selectedLandingSlot
-                                                            ) {
-                                                              finalType =
-                                                                "player";
-                                                              finalColor =
-                                                                "#2ecc71";
-                                                              finalEmoji = "üè∞";
-                                                            } else if (
-                                                              tile.heroSlot ===
-                                                              enemySlot
-                                                            ) {
-                                                              finalType =
-                                                                "enemy";
-                                                              finalColor =
-                                                                "#e74c3c";
-                                                              finalEmoji = "üî•";
-                                                              finalName = {
-                                                                RU: `${tile.name.RU.split(" ‚Äî ")[0]} (–í—Ä–∞–≥)`,
-                                                                EN: `${tile.name.EN.split(" - ")[0]} (Enemy)`,
-                                                                CH: `${tile.name.CH.split(" - ")[0]} (Êïå)`,
-                                                                KR: `${tile.name.KR.split(" - ")[0]} (Ï†Å)`,
-                                                              };
-                                                            } else {
-                                                              finalType =
-                                                                "neutral";
-                                                              finalColor =
-                                                                "#95a5a6";
-                                                              finalEmoji = "ü™ô";
-                                                              finalName = {
-                                                                RU: `${tile.name.RU.split(" ‚Äî ")[0]} (–ù–µ–π—Ç—Ä–∞–ª—å)`,
-                                                                EN: `${tile.name.EN.split(" - ")[0]} (Neutral Sector)`,
-                                                                CH: `${tile.name.CH.split(" - ")[0]} (‰∏≠Á´ãÂå∫)`,
-                                                                KR: `${tile.name.KR.split(" - ")[0]} (Ï§ëÎ¶Ω Íµ¨Ïó≠)`,
-                                                              };
-                                                              finalDesc = {
-                                                                RU: "–¢–µ—Ä—Ä–∏—Ç–æ—Ä–∏—è –ø–µ—Ä–µ–¥–∞–Ω–∞ –≤–æ–ª—å–Ω—ã–º –Ω–∞–º–µ—Å—Ç–Ω–∏–∫–∞–º –∏ —Ç–æ—Ä–≥–æ–≤—Ü–∞–º –ê–ª—å—è–Ω—Å–∞ –Ω–∞ –ö–æ–Ω—Ç–∏–Ω–µ–Ω—Ç–µ –°—É–¥—å–±—ã.",
-                                                                EN: "Territory handed over to the Alliance merchant league on the Fate Continent.",
-                                                                CH: "È¢ÜÂú∞Â∑≤Áßª‰∫§ÁªôËÅîÁõüÂïÜ‰∫∫ËÅîÁõü„ÄÇ",
-                                                                KR: "ÎèôÎßπ ÏÉÅÏù∏ Í∏∞ÏßÄÏóê ÏòÅÌÜ†Í∞Ä Ïù¥ÏñëÎêòÏóàÏäµÎãàÎã§.",
-                                                              };
-                                                            }
-                                                          }
-
-                                                          // Color assignments based on user's exact HEX rules
-                                                          const colorMain =
-                                                            finalColor; // #3498db (Blue), #e74c3c (Red), #2ecc71 (Green), #95a5a6 (Gray)
-                                                          let strokeColor =
-                                                            isHovered
-                                                              ? colorMain
-                                                              : colorMain +
-                                                                "bb";
-                                                          let strokeWidth =
-                                                            isHovered
-                                                              ? 3.5
-                                                              : 1.5;
-
-                                                          return (
-                                                            <g
-                                                              key={tile.index}
-                                                              className="transition-all"
-                                                            >
-                                                              {/* Glow behind the active tile */}
-                                                              {isHovered && (
-                                                                <rect
-                                                                  x={x_rect}
-                                                                  y={y_rect}
-                                                                  width={
-                                                                    width_rect
-                                                                  }
-                                                                  height={
-                                                                    height_rect
-                                                                  }
-                                                                  rx="10"
-                                                                  ry="10"
-                                                                  fill={
-                                                                    colorMain
-                                                                  }
-                                                                  fillOpacity="0.25"
-                                                                  filter="url(#neonGlowNew)"
-                                                                  className="pointer-events-none"
-                                                                />
-                                                              )}
-
-                                                              {/* The Main Round Rect Tile */}
-                                                              <rect
-                                                                x={x_rect}
-                                                                y={y_rect}
-                                                                width={
-                                                                  width_rect
-                                                                }
-                                                                height={
-                                                                  height_rect
-                                                                }
-                                                                rx="10"
-                                                                ry="10"
-                                                                fill={colorMain}
-                                                                fillOpacity={
-                                                                  isHovered
-                                                                    ? 0.35
-                                                                    : 0.12
-                                                                }
-                                                                stroke={
-                                                                  strokeColor
-                                                                }
-                                                                strokeWidth={
-                                                                  strokeWidth
-                                                                }
-                                                                className={`transition-all duration-300 ${finalType === "hero" ? "cursor-pointer" : "cursor-default"}`}
-                                                                onMouseEnter={() =>
-                                                                  setHoveredRegion(
-                                                                    "tile_" +
-                                                                      tile.index,
-                                                                  )
-                                                                }
-                                                                onMouseLeave={() =>
-                                                                  setHoveredRegion(
-                                                                    null,
-                                                                  )
-                                                                }
-                                                                onClick={() => {
-                                                                  if (
-                                                                    finalType ===
-                                                                    "hero"
-                                                                  ) {
-                                                                    const nextStep =
-                                                                      tile.heroSlot ===
-                                                                      0
-                                                                        ? 4
-                                                                        : tile.heroSlot ===
-                                                                            1
-                                                                          ? 5
-                                                                          : tile.heroSlot ===
-                                                                              2
-                                                                            ? 6
-                                                                            : 7;
-                                                                    setSelectedLandingSlot(
-                                                                      tile.heroSlot ||
-                                                                        0,
-                                                                    );
-                                                                    setSimDialogueStep(
-                                                                      nextStep,
-                                                                    );
-                                                                    showNotification(
-                                                                      `${simDialogueLang === "RU" ? "–ö–æ–æ—Ä–¥–∏–Ω–∞—Ç—ã –≤—ã—Å–∞–¥–∫–∏ –ø—Ä–∏–Ω—è—Ç—ã: " : "Vanguard landing approved: "} ${tile.name[simDialogueLang]}!`,
-                                                                      "success",
-                                                                    );
-                                                                  } else {
-                                                                    showNotification(
-                                                                      simDialogueLang ===
-                                                                        "RU"
-                                                                        ? `–°–µ–∫—Ç–æ—Ä –∑–∞–±–ª–æ–∫–∏—Ä–æ–≤–∞–Ω! –í—ã—Å–∞–¥–∫–∞ –≤–æ–∑–º–æ–∂–Ω–∞ —Ç–æ–ª—å–∫–æ –≤ —Å–∏–Ω–∏–µ –°–∏–≥–Ω–∞–ª—å–Ω—ã–µ –®–ø–∏–ª–∏ –ê–ª—å—è–Ω—Å–∞.`
-                                                                        : `Deployment locked! Heroes can only teleport to glowing Blue Allied Signal Spires.`,
-                                                                      "error",
-                                                                    );
-                                                                  }
-                                                                }}
-                                                              />
-
-                                                              {/* Central Emoji */}
-                                                              <text
-                                                                x={
-                                                                  x_rect +
-                                                                  width_rect / 2
-                                                                }
-                                                                y={y_rect + 25}
-                                                                fontSize="12"
-                                                                textAnchor="middle"
-                                                                className="pointer-events-none select-none filter drop-shadow"
-                                                              >
-                                                                {finalEmoji}
-                                                              </text>
-
-                                                              {/* Mini short caption inside tile */}
-                                                              <text
-                                                                x={
-                                                                  x_rect +
-                                                                  width_rect / 2
-                                                                }
-                                                                y={y_rect + 43}
-                                                                fontSize="7.5"
-                                                                fontWeight="bold"
-                                                                fill={
-                                                                  isHovered
-                                                                    ? "#ffffff"
-                                                                    : colorMain
-                                                                }
-                                                                textAnchor="middle"
-                                                                className="pointer-events-none select-none font-sans uppercase tracking-widest"
-                                                              >
-                                                                {tile.type ===
-                                                                "hero"
-                                                                  ? `SPAWN [${tile.heroSlot === 0 ? "A" : tile.heroSlot === 1 ? "B" : tile.heroSlot === 2 ? "C" : "D"}]`
-                                                                  : tile.type.toUpperCase()}
-                                                              </text>
-
-                                                              {/* Scan Coordinate Bounds HUD for hovered tile */}
-                                                              {isHovered && (
-                                                                <g className="pointer-events-none opacity-90">
-                                                                  <rect
-                                                                    x={
-                                                                      x_rect - 3
-                                                                    }
-                                                                    y={
-                                                                      y_rect - 3
-                                                                    }
-                                                                    width={
-                                                                      width_rect +
-                                                                      6
-                                                                    }
-                                                                    height={
-                                                                      height_rect +
-                                                                      6
-                                                                    }
-                                                                    fill="none"
-                                                                    stroke={
-                                                                      colorMain
-                                                                    }
-                                                                    strokeWidth="0.75"
-                                                                    strokeDasharray="3 3"
-                                                                  />
-                                                                  <path
-                                                                    d={`M ${x_rect - 3} ${y_rect + 5} L ${x_rect - 3} ${y_rect - 3} L ${x_rect + 5} ${y_rect - 3}`}
-                                                                    fill="none"
-                                                                    stroke={
-                                                                      colorMain
-                                                                    }
-                                                                    strokeWidth="1.5"
-                                                                  />
-                                                                  <path
-                                                                    d={`M ${x_rect + width_rect - 5} ${y_rect - 3} L ${x_rect + width_rect + 3} ${y_rect - 3} L ${x_rect + width_rect + 3} ${y_rect + 5}`}
-                                                                    fill="none"
-                                                                    stroke={
-                                                                      colorMain
-                                                                    }
-                                                                    strokeWidth="1.5"
-                                                                  />
-                                                                  <path
-                                                                    d={`M ${x_rect - 3} ${y_rect + height_rect - 5} L ${x_rect - 3} ${y_rect + height_rect + 3} L ${x_rect + 5} ${y_rect + height_rect + 3}`}
-                                                                    fill="none"
-                                                                    stroke={
-                                                                      colorMain
-                                                                    }
-                                                                    strokeWidth="1.5"
-                                                                  />
-                                                                  <path
-                                                                    d={`M ${x_rect + width_rect - 5} ${y_rect + height_rect + 3} L ${x_rect + width_rect + 3} dots `}
-                                                                    fill="none"
-                                                                    stroke={
-                                                                      colorMain
-                                                                    }
-                                                                    strokeWidth="1.5"
-                                                                  />
-                                                                </g>
-                                                              )}
-                                                            </g>
-                                                          );
-                                                        },
-                                                      )}
-
-                                                      {/* Elegant tactical windrose overlay inside top right space */}
-                                                      <g
-                                                        transform="translate(355, 55)"
-                                                        className="opacity-30"
-                                                      >
-                                                        <circle
-                                                          r="12"
-                                                          fill="none"
-                                                          stroke="#6366f1"
-                                                          strokeWidth="0.75"
-                                                        />
-                                                        <line
-                                                          x1="0"
-                                                          y1="-16"
-                                                          x2="0"
-                                                          y2="16"
-                                                          stroke="#6366f1"
-                                                          strokeWidth="0.75"
-                                                        />
-                                                        <line
-                                                          x1="-16"
-                                                          y1="0"
-                                                          x2="16"
-                                                          y2="0"
-                                                          stroke="#6366f1"
-                                                          strokeWidth="0.75"
-                                                        />
-                                                        <polygon
-                                                          points="0,-16 -3,-3 0,0"
-                                                          fill="#a5f3fc"
-                                                        />
-                                                        <polygon
-                                                          points="0,-16 3,-3 0,0"
-                                                          fill="#4f46e5"
-                                                        />
-                                                        <text
-                                                          x="0"
-                                                          y="-19"
-                                                          fill="#a5f3fc"
-                                                          fontSize="6.5"
-                                                          fontWeight="black"
-                                                          textAnchor="middle"
-                                                        >
-                                                          N
-                                                        </text>
-                                                      </g>
-                                                    </svg>
-
-                                                    <div className="absolute bottom-2 left-3 bg-slate-950/85 px-2.5 py-1 rounded-lg border border-white/5 text-[9px] font-medium text-slate-400 font-sans flex items-center gap-1.5 backdrop-blur-sm">
-                                                      <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-                                                      <span>
-                                                        {simDialogueLang ===
-                                                        "RU"
-                                                          ? "–ö–ª–∏–∫ –Ω–∞ –°–ò–ù–Æ–Æ –∑–æ–Ω—É –ø—Ä–æ–∏–∑–≤–æ–¥–∏—Ç –¥–µ—Å–∞–Ω—Ç –≤–µ—Ä–Ω—ã—Ö –≤–æ–π—Å–∫!"
-                                                          : "Click on any BLUE tile to deploy your landing force!"}
-                                                      </span>
-                                                    </div>
-                                                  </div>
-
-                                                  {/* RIGHT: DYNAMIC HUD SPEC PANEL FITTED TO HIGHLIGHTED TILE */}
-                                                  <div className="lg:col-span-12 xl:col-span-5 flex flex-col justify-between min-h-[380px]">
-                                                    {!activeTile ? (
-                                                      /* Tactical Empty Selection HUD - v18.11.10 */
-                                                      <div className="flex-1 flex flex-col items-center justify-center text-center p-6 rounded-3xl bg-white/5 border border-dashed border-indigo-400/20 backdrop-blur-sm">
-                                                        <Compass className="w-9 h-9 text-indigo-400/30 animate-pulse mb-3" />
-                                                        <h5 className="text-xs font-black text-slate-300 uppercase tracking-widest">
-                                                          {simDialogueLang ===
-                                                          "RU"
-                                                            ? "–°–µ–∫—Ç–æ—Ä –Ω–µ –≤—ã–±—Ä–∞–Ω"
-                                                            : "HUD UNCONNECTED"}
-                                                        </h5>
-                                                        <p className="text-[10px] text-slate-400 max-w-xs mt-2 leading-relaxed font-sans">
-                                                          {simDialogueLang ===
-                                                          "RU"
-                                                            ? "–ù–∞–≤–µ–¥–∏—Ç–µ –∫—É—Ä—Å–æ—Ä –º—ã—à–∏ –Ω–∞ –ª—é–±–æ–π –∫–≤–∞–¥—Ä–∞—Ç –∫–∞—Ä—Ç—ã, —á—Ç–æ–±—ã —Å—á–∏—Ç–∞—Ç—å —Å–µ–Ω—Å–æ—Ä–∞–º–∏ –ø–æ–¥—Ä–æ–±–Ω—ã–µ –ø–æ—Å—Ç—Ä–æ–π–∫–∏, –∫–ª–∏–º–∞—Ç–∏—á–µ—Å–∫–∏–π —Ä–µ–ª—å–µ—Ñ, –±–∞—Ñ—Ñ—ã –ø–æ—á–≤—ã –∏ –æ–≥—Ä–∞–Ω–∏—á–µ–Ω–∏—è –¥–µ—Å–∞–Ω—Ç–∏—Ä–æ–≤–∞–Ω–∏—è."
-                                                            : "Hover your targeting pointer over any 3D grid cell of the New Continent to query planetary architecture, sector climate, or landing constraints."}
-                                                        </p>
-                                                        <div className="mt-4 flex flex-col gap-1.5 w-full max-w-[200px]">
-                                                          <div className="flex items-center gap-2 text-[8px] justify-between text-slate-500 font-mono uppercase bg-black/20 p-1 rounded">
-                                                            <span className="flex items-center gap-1">
-                                                              <span className="w-2 h-2 rounded bg-[#3498db]" />
-                                                              –ì–µ—Ä–æ–π (4)
-                                                            </span>
-                                                            <span className="text-[#3498db] font-bold">
-                                                              –û–¢–ö–†–´–¢–û
-                                                            </span>
-                                                          </div>
-                                                          <div className="flex items-center gap-2 text-[8px] justify-between text-slate-500 font-mono uppercase bg-black/20 p-1 rounded">
-                                                            <span className="flex items-center gap-1">
-                                                              <span className="w-2 h-2 rounded bg-[#2ecc71]" />
-                                                              –õ–µ—Å–Ω—ã–µ (4)
-                                                            </span>
-                                                            <span className="text-[#2ecc71] font-bold">
-                                                              –ë–õ–û–ö
-                                                            </span>
-                                                          </div>
-                                                          <div className="flex items-center gap-2 text-[8px] justify-between text-slate-500 font-mono uppercase bg-black/20 p-1 rounded">
-                                                            <span className="flex items-center gap-1">
-                                                              <span className="w-2 h-2 rounded bg-[#e74c3c]" />
-                                                              –ë–∞–Ω–¥–∏—Ç—ã (2)
-                                                            </span>
-                                                            <span className="text-[#e74c3c] font-bold">
-                                                              –ë–õ–û–ö
-                                                            </span>
-                                                          </div>
-                                                          <div className="flex items-center gap-2 text-[8px] justify-between text-slate-500 font-mono uppercase bg-black/20 p-1 rounded">
-                                                            <span className="flex items-center gap-1">
-                                                              <span className="w-2 h-2 rounded bg-[#95a5a6]" />
-                                                              –ù–µ–π—Ç—Ä–∞–ª (2)
-                                                            </span>
-                                                            <span className="text-[#95a5a6] font-bold">
-                                                              –ë–õ–û–ö
-                                                            </span>
-                                                          </div>
-                                                        </div>
-                                                      </div>
-                                                    ) : (
-                                                      /* ACTIVE SELECTED/HOVERED HUD SECTOR DETAILS */
-                                                      <div
-                                                        className="p-5 rounded-3xl border flex-1 flex flex-col justify-between animate-fade-in font-sans"
-                                                        style={{
-                                                          backgroundColor:
-                                                            `rgba(${activeTile.type === "hero" ? "7, 30, 64, 0.61" : activeTile.type === "bandit" ? "44, 12, 12, 0.61" : activeTile.type === "forest" ? "10, 41, 20, 0.61" : "26, 29, 36, 0.61"},` +
-                                                            (activeTile.type ===
-                                                            "hero"
-                                                              ? " 0.63)"
-                                                              : "0.45)"),
-                                                          borderColor:
-                                                            activeTile.color +
-                                                            "66",
-                                                        }}
-                                                      >
-                                                        <div>
-                                                          <div className="flex items-center justify-between mb-2">
-                                                            <span
-                                                              className="text-xs font-black uppercase tracking-widest flex items-center gap-2"
-                                                              style={{
-                                                                color:
-                                                                  activeTile.color,
-                                                              }}
-                                                            >
-                                                              <span>
-                                                                {
-                                                                  activeTile.emoji
-                                                                }
-                                                              </span>{" "}
-                                                              {
-                                                                activeTile.name[
-                                                                  simDialogueLang
-                                                                ]
-                                                              }
-                                                            </span>
-                                                            <span
-                                                              className="text-[8px] font-black px-2 py-0.5 rounded border uppercase"
-                                                              style={{
-                                                                color:
-                                                                  "#ffffff",
-                                                                backgroundColor:
-                                                                  activeTile.color +
-                                                                  "55",
-                                                                borderColor:
-                                                                  activeTile.color,
-                                                              }}
-                                                            >
-                                                              {activeTile.type ===
-                                                              "hero"
-                                                                ? simDialogueLang ===
-                                                                  "RU"
-                                                                  ? "–í–´–°–ê–î–ö–ê"
-                                                                  : "LANDING"
-                                                                : simDialogueLang ===
-                                                                    "RU"
-                                                                  ? "–ó–ê–ë–õ–û–ö–ò–†–û–í–ê–ù"
-                                                                  : "RESTRICTED"}
-                                                            </span>
-                                                          </div>
-
-                                                          <p className="text-[10px] text-slate-200 leading-relaxed font-sans">
-                                                            {
-                                                              activeTile.desc[
-                                                                simDialogueLang
-                                                              ]
-                                                            }
-                                                          </p>
-
-                                                          <div className="my-1.5 flex items-center justify-between bg-black/30 p-1.5 rounded-lg border border-white/5 font-mono text-[8px] text-slate-400">
-                                                            <span>
-                                                              üõ∞Ô∏è COORDS:{" "}
-                                                              {
-                                                                activeTile.bounds
-                                                              }
-                                                            </span>
-                                                            <span>
-                                                              UID:{" "}
-                                                              {
-                                                                activeTile.techUid
-                                                              }
-                                                            </span>
-                                                          </div>
-                                                        </div>
-
-                                                        <div className="grid grid-cols-2 gap-2 my-2">
-                                                          <div className="p-2 rounded-xl bg-emerald-950/30 border border-emerald-500/20">
-                                                            <span className="text-[7.5px] font-black text-emerald-400 uppercase tracking-wider block">
-                                                              ‚úô –ü–õ–Æ–°–´ –ó–ï–ú–ï–õ–¨
-                                                            </span>
-                                                            <span className="text-[9px] text-slate-200 font-bold leading-tight">
-                                                              {activeTile.buffs[
-                                                                simDialogueLang
-                                                              ] ||
-                                                                activeTile
-                                                                  .buffs["RU"]}
-                                                            </span>
-                                                          </div>
-                                                          <div className="p-2 rounded-xl bg-red-950/30 border border-red-500/20">
-                                                            <span className="text-[7.5px] font-black text-red-400 uppercase tracking-wider block">
-                                                              ‚öîÔ∏è –£–ì–†–û–ó–´ –ò –°–¢–ê–¢–£–°
-                                                            </span>
-                                                            <span className="text-[9px] text-slate-200 font-bold leading-tight">
-                                                              {activeTile.nerfs[
-                                                                simDialogueLang
-                                                              ] ||
-                                                                activeTile
-                                                                  .nerfs["RU"]}
-                                                            </span>
-                                                          </div>
-                                                        </div>
-
-                                                        <div
-                                                          className="p-2.5 border rounded-xl bg-white/5"
-                                                          style={{
-                                                            borderColor:
-                                                              activeTile.color +
-                                                              "33",
-                                                          }}
-                                                        >
-                                                          <span
-                                                            className="text-[8px] font-black uppercase tracking-widest block"
-                                                            style={{
-                                                              color:
-                                                                activeTile.color,
-                                                            }}
-                                                          >
-                                                            ‚ú¶{" "}
-                                                            {simDialogueLang ===
-                                                            "RU"
-                                                              ? "–≠–§–§–ï–ö–¢ –¢–ê–ö–¢–ò–ß–ï–°–ö–û–ì–û –°–ï–ö–¢–û–†–ê"
-                                                              : "TACTICAL SECTOR MODIFIER"}
-                                                          </span>
-                                                          <p className="text-[9px] text-slate-300 font-medium leading-normal mt-0.5">
-                                                            {activeTile.feature[
-                                                              simDialogueLang
-                                                            ] ||
-                                                              activeTile
-                                                                .feature["RU"]}
-                                                          </p>
-                                                        </div>
-
-                                                        {activeTile.type ===
-                                                        "hero" ? (
-                                                          <button
-                                                            onClick={() => {
-                                                              const nextStep =
-                                                                activeTile.heroSlot ===
-                                                                0
-                                                                  ? 4
-                                                                  : activeTile.heroSlot ===
-                                                                      1
-                                                                    ? 5
-                                                                    : activeTile.heroSlot ===
-                                                                        2
-                                                                      ? 6
-                                                                      : 7;
-                                                              setSimDialogueStep(
-                                                                nextStep,
-                                                              );
-                                                              showNotification(
-                                                                `${simDialogueLang === "RU" ? "–ù–∞–≤–µ–¥–µ–Ω–∏–µ –∑–∞–≤–µ—Ä—à–µ–Ω–æ: " : "Lock-on completed: "} ${activeTile.name[simDialogueLang]}!`,
-                                                                "success",
-                                                              );
-                                                            }}
-                                                            className="w-full mt-2.5 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider text-white transition-all text-center flex items-center justify-center gap-1.5 shadow hover:scale-[1.02] active:scale-[0.98]"
-                                                            style={{
-                                                              backgroundColor:
-                                                                activeTile.color,
-                                                            }}
-                                                          >
-                                                            üöÄ{" "}
-                                                            {simDialogueLang ===
-                                                            "RU"
-                                                              ? "–î–ï–ë–Æ–¢–ò–†–û–í–ê–¢–¨ –ì–ï–†–û–Ø –°–Æ–î–ê"
-                                                              : "LOCK & DEPLOY TO THIS SECTOR"}
-                                                          </button>
-                                                        ) : (
-                                                          <div className="w-full mt-2.5 py-1.5 rounded-lg text-[8.5px] font-black text-center text-red-200 uppercase bg-red-950/20 border border-red-500/10">
-                                                            üö´{" "}
-                                                            {simDialogueLang ===
-                                                            "RU"
-                                                              ? "–í—ã—Å–∞–¥–∫–∞ –∑–∞–ø—Ä–µ—â–µ–Ω–∞ —ç—Ç–æ–π —Ñ—Ä–∞–∫—Ü–∏–µ–π"
-                                                              : "SPAWN INTERCEPTED BY SECTOR FORCE"}
-                                                          </div>
-                                                        )}
-                                                      </div>
-                                                    )}
-                                                  </div>
-                                                </div>
-                                              </div>
-                                            );
-                                          })()
-                                        ) : (
-                                          /* Buttons for step 4, 5, 6 (Final / reset) */
-                                          <div className="flex flex-col space-y-4 w-full">
-                                            <div className="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 text-[10px] text-indigo-300 leading-normal font-sans">
-                                              {simDialogueLang === "RU"
-                                                ? "üèÅ –°–∏–º—É–ª—è—Ü–∏—è –¥–∏–∞–ª–æ–≥–æ–≤–æ–π –≤–µ—Ç–∫–∏ –∑–∞–≤–µ—Ä—à–µ–Ω–∞! –°–º–µ–Ω–∞ –ø–æ—Ä—Ç—Ä–µ—Ç–æ–≤, —Å—é–∂–µ—Ç–Ω—ã—Ö —Ä–∞–∑–≤–∏–ª–æ–∫ –∏ –ø–µ—Ä–µ–≤–æ–¥—ã —Å–∏–Ω—Ö—Ä–æ–Ω–∏–∑–∏—Ä–æ–≤–∞–Ω—ã –≤ —Å–æ–æ—Ç–≤–µ—Ç—Å—Ç–≤–∏–∏ —Å –ø—Ä–æ—Ç–æ–∫–æ–ª–∞–º–∏ Fate Continent (v18.9.0)."
-                                                : "üèÅ Dialog simulation tree completed! Adaptive headshots, choice branchings, and localization keys are in perfect sync with Fate Continent protocols."}
-                                            </div>
-                                            <button
-                                              onClick={() => {
-                                                setSimDialogueStep(0);
-                                                // Play reset audio effect on click
-                                                try {
-                                                  const ctx = new (
-                                                    window.AudioContext ||
-                                                    (window as any)
-                                                      .webkitAudioContext
-                                                  )();
-                                                  const osc =
-                                                    ctx.createOscillator();
-                                                  osc.frequency.setValueAtTime(
-                                                    300,
-                                                    ctx.currentTime,
-                                                  );
-                                                  osc.frequency.exponentialRampToValueAtTime(
-                                                    600,
-                                                    ctx.currentTime + 0.1,
-                                                  );
-                                                  const g = ctx.createGain();
-                                                  g.gain.setValueAtTime(
-                                                    0.08,
-                                                    ctx.currentTime,
-                                                  );
-                                                  osc.connect(g);
-                                                  g.connect(ctx.destination);
-                                                  osc.start();
-                                                  osc.stop(
-                                                    ctx.currentTime + 0.1,
-                                                  );
-                                                } catch (e) {}
-                                              }}
-                                              className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md self-start"
-                                            >
-                                              {simDialogueLang === "RU"
-                                                ? "‚Üê –ù–∞—á–∞—Ç—å –¥–∏–∞–ª–æ–≥ –∑–∞–Ω–æ–≤–æ"
-                                                : "‚Üê Reset dialogue tree"}
-                                            </button>
-                                          </div>
-                                        )}
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  {/* RIGHT COLUMN: PLAYER HERO AVATAR IN DUAL LAYOUT */}
-                                  <div className="lg:col-span-1 flex flex-col items-center space-y-3 relative group">
-                                    <div
-                                      className="w-full bg-slate-900/95 border-2 border-amber-500/40 rounded-2xl px-3 py-2 text-center text-[10px] font-black uppercase text-amber-400 tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.25)] relative overflow-hidden group hover:scale-[1.02] transition-transform z-20"
-                                      id="Dialogue_Header_Player_Plaque"
-                                    >
-                                      <span className="text-[6px] text-slate-500 font-mono block mb-0.5">
-                                        GameObject: Dialogue_Header_Prefab_Slot
-                                        (Right)
-                                      </span>
-                                      üõ°Ô∏è{" "}
-                                      {simDialogueHero === "warrior"
-                                        ? simDialogueLang === "RU"
-                                          ? "–†–≠–ì–ù–ê–† (–í–û–ò–ù)"
-                                          : "RAGNAR (WARRIOR)"
-                                        : simDialogueHero === "archer"
-                                          ? simDialogueLang === "RU"
-                                            ? "–ê–õ–ê–†–ò–ö (–°–¢–†–ï–õ–û–ö)"
-                                            : "ALARIC (ARCHER)"
-                                          : simDialogueLang === "RU"
-                                            ? "–≠–õ–ò–ó–ò–£–° (–ú–ê–ì)"
-                                            : "ELYSIUS (MAGE)"}
-                                    </div>
-                                    {/* Dynamic Class Indicator (No overlaps) */}
-
-                                    <div className="w-32 h-32 md:w-40 md:h-40 rounded-[2.5rem] bg-indigo-950/60 border-2 border-amber-500 shadow-[0_0_30px_rgba(245,158,11,0.25)] relative overflow-hidden transition-all duration-300 ring-4 ring-amber-500/10 hover:scale-105">
-                                      {simDialogueHero === "warrior" ? (
-                                        /* Warrior SVG Headshot style */
-                                        <svg
-                                          className="w-full h-full p-2"
-                                          viewBox="0 0 100 100"
-                                          fill="none"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                          <circle
-                                            cx="50"
-                                            cy="50"
-                                            r="45"
-                                            fill="#1e1b4b"
-                                          />
-                                          <path
-                                            d="M25 50C25 30 35 20 50 20C65 20 75 30 75 50C75 60 72 75 70 85H30C28 75 25 60 25 50Z"
-                                            fill="#64748b"
-                                          />
-                                          <path
-                                            d="M48 10L52 10L50 25L48 10Z"
-                                            fill="#ef4444"
-                                          />
-                                          <circle
-                                            cx="50"
-                                            cy="10"
-                                            r="3"
-                                            fill="#ef4444"
-                                          />
-                                          <path
-                                            d="M32 42H68V48H32V42Z"
-                                            fill="#0f172a"
-                                          />
-                                          <path
-                                            d="M50 22V85"
-                                            stroke="#f59e0b"
-                                            strokeWidth="2.5"
-                                          />
-                                          <path
-                                            d="M30 40H70"
-                                            stroke="#f59e0b"
-                                            strokeWidth="2"
-                                          />
-                                          <circle
-                                            cx="40"
-                                            cy="45"
-                                            r="2.5"
-                                            fill="#f87171"
-                                          />
-                                          <circle
-                                            cx="60"
-                                            cy="45"
-                                            r="2.5"
-                                            fill="#f87171"
-                                          />
-                                        </svg>
-                                      ) : simDialogueHero === "archer" ? (
-                                        /* Archer SVG Headshot style */
-                                        <svg
-                                          className="w-full h-full p-2"
-                                          viewBox="0 0 100 100"
-                                          fill="none"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                          <circle
-                                            cx="50"
-                                            cy="50"
-                                            r="45"
-                                            fill="#064e3b"
-                                          />
-                                          <path
-                                            d="M25 55C25 32 35 15 50 15C65 15 75 32 75 55C75 70 70 85 70 90H30C30 85 25 70 25 55Z"
-                                            fill="#0f172a"
-                                          />
-                                          <path
-                                            d="M30 50L50 20L70 50L50 65L30 50Z"
-                                            fill="#10b981"
-                                          />
-                                          <path
-                                            d="M38 46C42 48 46 48 50 46"
-                                            stroke="#34d399"
-                                            strokeWidth="3"
-                                          />
-                                          <path
-                                            d="M62 46C58 48 54 48 50 46"
-                                            stroke="#34d399"
-                                            strokeWidth="3"
-                                          />
-                                          <circle
-                                            cx="44"
-                                            cy="45"
-                                            r="1.5"
-                                            fill="#34d399"
-                                          />
-                                          <circle
-                                            cx="56"
-                                            cy="45"
-                                            r="1.5"
-                                            fill="#34d399"
-                                          />
-                                          <path
-                                            d="M15 25C20 18 30 18 35 25"
-                                            stroke="#fbbf24"
-                                            strokeWidth="2"
-                                          />
-                                        </svg>
-                                      ) : (
-                                        /* Mage SVG Headshot star hat style */
-                                        <svg
-                                          className="w-full h-full p-2"
-                                          viewBox="0 0 100 100"
-                                          fill="none"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                          <circle
-                                            cx="50"
-                                            cy="50"
-                                            r="45"
-                                            fill="#311042"
-                                          />
-                                          {/* Archmage Hat */}
-                                          <path
-                                            d="M15 58L50 5L85 58H15Z"
-                                            fill="#2e1065"
-                                          />
-                                          <ellipse
-                                            cx="50"
-                                            cy="58"
-                                            rx="35"
-                                            ry="6"
-                                            fill="#4c1d95"
-                                          />
-                                          <path
-                                            d="M30 45L50 15L70 45"
-                                            stroke="#f472b6"
-                                            strokeWidth="3.5"
-                                          />
-                                          {/* Glowing cosmic star of archmage hat */}
-                                          <circle
-                                            cx="50"
-                                            cy="18"
-                                            r="4.5"
-                                            fill="#a5f3fc"
-                                          />
-                                          <path
-                                            d="M40 70C42 65 48 65 50 60C52 65 58 65 60 70C58 75 52 75 50 80C48 75 42 75 40 70Z"
-                                            fill="#f472b6"
-                                          />
-                                        </svg>
-                                      )}
-                                      <div className="absolute inset-0 bg-yellow-500/10 group-hover:bg-yellow-500/0 transition-colors pointer-events-none" />
-                                    </div>
-
-                                    <div className="text-center font-sans">
-                                      <span className="text-[10px] font-black text-amber-400 bg-amber-500/20 px-3 py-1 rounded-full border border-amber-500/30 uppercase tracking-widest block font-sans">
-                                        {simDialogueHero === "warrior"
-                                          ? "–í–æ–∏–Ω (–ö–ª–∞—Å—Å)"
-                                          : simDialogueHero === "archer"
-                                            ? "–°—Ç—Ä–µ–ª–æ–∫ (–ö–ª–∞—Å—Å)"
-                                            : "–ú–∞–≥ (–ö–ª–∞—Å—Å)"}
-                                      </span>
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          )}
-
-                          {/* UNITY DETAILED DRAG AND DROP MANUAL CONFIGURATION PANEL */}
-                          <div className="p-8 rounded-[2.5rem] bg-black/60 border border-white/5 space-y-6 relative z-10 font-sans">
-                            <div className="flex items-center gap-3 border-b border-indigo-500/10 pb-4">
-                              <div className="p-2 rounded-xl bg-orange-500/20 border border-orange-500/30">
-                                <Zap className="w-5 h-5 text-orange-400" />
-                              </div>
-                              <div>
-                                <h4 className="text-sm font-black text-white uppercase tracking-wider">
-                                  –ò–Ω—Å—Ç—Ä—É–∫—Ü–∏—è –ø–æ –Ω–∞—Å—Ç—Ä–æ–π–∫–µ DialogueManager –≤
-                                  Unity
-                                </h4>
-                                <p className="text-[10px] text-slate-400">
-                                  –ü–æ—à–∞–≥–æ–≤–æ–µ –ø—Ä–∏–≤—è–∑—ã–≤–∞–Ω–∏–µ –∞—Å—Å–µ—Ç–æ–≤ –¥–∏–∞–ª–æ–≥–æ–≤ –≤ –æ–∫–Ω–µ
-                                  –∏–Ω—Å–ø–µ–∫—Ç–æ—Ä–∞ Unity 6 (6000.3.10f1)
-                                </p>
-                              </div>
-                            </div>
-
-                            <div className="p-4 rounded-2xl bg-indigo-500/5 border border-indigo-500/10 text-[10.5px] text-indigo-400 flex items-center justify-between">
-                              <div className="flex items-center gap-3">
-                                <Info className="w-4 h-4 shrink-0" />
-                                <span>
-                                  –ö–ª–∞—Å—Å —Å–æ—Ö—Ä–∞–Ω–µ–Ω–∏—è{" "}
-                                  <code className="bg-indigo-950/40 px-2 py-0.5 rounded text-white text-[10px]">
-                                    SaveGameSystem.cs
-                                  </code>{" "}
-                                  –∞–≤—Ç–æ–º–∞—Ç–∏—á–µ—Å–∫–∏ —Ö—Ä–∞–Ω–∏—Ç –≤—ã–±—Ä–∞–Ω–Ω—ã–π –∫–ª–∞—Å—Å –ø–µ—Ä–µ–¥
-                                  –∑–∞–ø—É—Å–∫–æ–º –¥–∏–∞–ª–æ–≥–∞, –∏ –ø–µ—Ä–µ–¥–∞–µ—Ç –µ—ë –≤ –º–µ–Ω–µ–¥–∂–µ—Ä –¥–ª—è
-                                  –æ—Ç–æ–±—Ä–∞–∂–µ–Ω–∏—è –ø—Ä–∞–≤–æ–π —Å—Ç–æ—Ä–æ–Ω—ã.
-                                </span>
-                              </div>
-                            </div>
-
-                            {/* Interactive Unity Guide Text */}
-                            <div className="space-y-4 text-[11px] text-slate-300 leading-relaxed font-sans">
-                              <p className="font-bold text-amber-400">
-                                –í—ã–¥–µ–ª–∏—Ç–µ –æ–±—ä–µ–∫—Ç{" "}
-                                <code className="bg-slate-800 text-white px-1.5 py-0.5 rounded font-mono border border-white/10">
-                                  DialogueManager
-                                </code>{" "}
-                                –≤ –∏–µ—Ä–∞—Ä—Ö–∏–∏ –≤–∞—à–µ–π —Å—Ü–µ–Ω—ã –≤ Unity Editor. –í
-                                –ø–æ—è–≤–∏–≤—à–µ–º—Å—è –æ–∫–Ω–µ Inspector –ø—Ä–∏–∫—Ä–µ–ø–∏—Ç–µ –∞–∫—Ç–∏–≤—ã –≤
-                                —Å–æ–æ—Ç–≤–µ—Ç—Å—Ç–≤—É—é—â–∏–µ —Å–ª–æ—Ç—ã:
-                              </p>
-
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                                <div className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-2">
-                                  <div className="flex items-center gap-2">
-                                    <span className="w-2.5 h-2.5 rounded bg-indigo-500 shrink-0" />
-                                    <strong className="text-slate-200">
-                                      1. –ü–æ—Ä—Ç—Ä–µ—Ç-–∫–æ–º–ø–∞–Ω—å–æ–Ω:
-                                    </strong>
-                                  </div>
-                                  <p className="text-[10.5px] text-slate-400 pl-4.5">
-                                    –ü–µ—Ä–µ—Ç–∞—â–∏—Ç–µ —Å–ø—Ä–∞–π—Ç –ê—ç–ª–∏—Å—Å—ã (
-                                    <code className="bg-slate-800 text-slate-300 px-1 font-mono">
-                                      Aelyssa.png
-                                    </code>{" "}
-                                    /{" "}
-                                    <code className="bg-slate-800 text-slate-300 px-1 font-mono">
-                                      companionPortrait
-                                    </code>
-                                    ) –≤ –ø–æ–ª–µ{" "}
-                                    <code className="text-indigo-300 font-mono">
-                                      Companion Portrait
-                                    </code>
-                                    .
-                                  </p>
-                                </div>
-
-                                <div className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-2">
-                                  <div className="flex items-center gap-2">
-                                    <span className="w-2.5 h-2.5 rounded bg-red-500 shrink-0" />
-                                    <strong className="text-slate-200">
-                                      2. –ü–æ—Ä—Ç—Ä–µ—Ç –≤–æ–∏–Ω–∞:
-                                    </strong>
-                                  </div>
-                                  <p className="text-[10.5px] text-slate-400 pl-4.5">
-                                    –ü–µ—Ä–µ—Ç–∞—â–∏—Ç–µ —Å–ø—Ä–∞–π—Ç –≤–æ–∏–Ω–∞ (—Å –∫–æ—Ä–æ–Ω–Ω—ã–º –∑–æ–ª–æ—Ç—ã–º
-                                    —à–ª–µ–º–æ–º) –≤ –ø–æ–ª–µ{" "}
-                                    <code className="text-red-300 font-mono">
-                                      Warrior Portrait
-                                    </code>
-                                    .
-                                  </p>
-                                </div>
-
-                                <div className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-2">
-                                  <div className="flex items-center gap-2">
-                                    <span className="w-2.5 h-2.5 rounded bg-emerald-500 shrink-0" />
-                                    <strong className="text-slate-200">
-                                      3. –ü–æ—Ä—Ç—Ä–µ—Ç –ª—É—á–Ω–∏–∫–∞:
-                                    </strong>
-                                  </div>
-                                  <p className="text-[10.5px] text-slate-400 pl-4.5">
-                                    –ü–µ—Ä–µ—Ç–∞—â–∏—Ç–µ —Å–ø—Ä–∞–π—Ç —Å—Ç—Ä–µ–ª–∫–∞ (–≤ –∫–∞–ø—é—à–æ–Ω–µ –∏–∑
-                                    —Ç–µ–º–Ω–æ–π —Ç–∫–∞–Ω–∏) –≤ –ø–æ–ª–µ{" "}
-                                    <code className="text-emerald-300 font-mono">
-                                      Archer Portrait
-                                    </code>
-                                    .
-                                  </p>
-                                </div>
-
-                                <div className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-2">
-                                  <div className="flex items-center gap-2">
-                                    <span className="w-2.5 h-2.5 rounded bg-purple-500 shrink-0" />
-                                    <strong className="text-slate-200">
-                                      4. –ü–æ—Ä—Ç—Ä–µ—Ç –º–∞–≥–∞:
-                                    </strong>
-                                  </div>
-                                  <p className="text-[10.5px] text-slate-400 pl-4.5">
-                                    –ü–µ—Ä–µ—Ç–∞—â–∏—Ç–µ —Å–ø—Ä–∞–π—Ç –º–∞–≥–∞ (–≤ –∑–≤–µ–∑–¥–Ω–æ–π
-                                    –º–∞–Ω—Ç–∏–∏/–∫–æ—Ä–æ–Ω–µ) –≤ –ø–æ–ª–µ{" "}
-                                    <code className="text-purple-300 font-mono">
-                                      Mage Portrait
-                                    </code>
-                                    .
-                                  </p>
-                                </div>
-
-                                <div className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-2 md:col-span-2">
-                                  <div className="flex items-center gap-2">
-                                    <span className="w-2.5 h-2.5 rounded bg-yellow-500 shrink-0" />
-                                    <strong className="text-slate-200">
-                                      5. –ì–æ–ª–æ—Å–æ–≤–æ–π –∫–ª–∏–ø –∫–æ–º–ø–∞–Ω—å–æ–Ω–∞:
-                                    </strong>
-                                  </div>
-                                  <p className="text-[10.5px] text-slate-400 pl-4.5">
-                                    –ü—Ä–∏–≤—è–∂–∏—Ç–µ –∫–æ—Ä–æ—Ç–∫–∏–π —Ñ–æ–Ω–æ–≤—ã–π –∑–≤—É–∫–æ–≤–æ–π —ç—Ñ—Ñ–µ–∫—Ç
-                                    —Ä–µ–ø–ª–∏–∫–∏ –∏–∑ –≤–∞—à–µ–π –±–∏–±–ª–∏–æ—Ç–µ–∫–∏ Pixabay
-                                    (–Ω–∞–ø—Ä–∏–º–µ—Ä, –∫—Ä–∏—Å—Ç–∞–ª–ª–∏—á–µ—Å–∫–∏–π –∑–≤–æ–Ω –∏–ª–∏
-                                    —ç–ª—å—Ñ–∏–π—Å–∫–∏–π —Ñ–æ–Ω–µ–º–Ω—ã–π –≤–æ–∑–≥–ª–∞—Å) –∫ –ø–µ—Ä–µ–º–µ–Ω–Ω–æ–π{" "}
-                                    <code className="text-yellow-300 font-mono">
-                                      companionVoiceClip
-                                    </code>
-                                    . –í –∏–≥—Ä–µ –ø—Ä–∏ –∫–∞–∂–¥–æ–π —Ä–µ–ø–ª–∏–∫–µ –ê—ç–ª–∏—Å—Å—ã –±—É–¥–µ—Ç
-                                    –ø—Ä–æ–∏–≥—Ä—ã–≤–∞—Ç—å—Å—è —ç—Ç–æ—Ç –∫–ª–∏–ø —á–µ—Ä–µ–∑{" "}
-                                    <code className="bg-slate-800 text-slate-300 px-1 font-mono">
-                                      SettingsManager
-                                    </code>
-                                    .
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="p-4 rounded-2xl bg-indigo-500/5 border border-indigo-500/10 text-[10.5px] text-indigo-400 flex items-center justify-between">
-                              <div className="flex items-center gap-3">
-                                <Info className="w-4 h-4 shrink-0" />
-                                <span>
-                                  –ö–ª–∞—Å—Å —Å–æ—Ö—Ä–∞–Ω–µ–Ω–∏—è{" "}
-                                  <code className="bg-indigo-950/40 px-2 py-0.5 rounded text-white text-[10px]">
-                                    SaveGameSystem.cs
-                                  </code>{" "}
-                                  –∞–≤—Ç–æ–º–∞—Ç–∏—á–µ—Å–∫–∏ —Ö—Ä–∞–Ω–∏—Ç –≤—ã–±—Ä–∞–Ω–Ω—ã–π –∫–ª–∞—Å—Å –ø–µ—Ä–µ–¥
-                                  –∑–∞–ø—É—Å–∫–æ–º –¥–∏–∞–ª–æ–≥–∞, –∏ –ø–µ—Ä–µ–¥–∞–µ—Ç –µ—ë –≤ –º–µ–Ω–µ–¥–∂–µ—Ä –¥–ª—è
-                                  –æ—Ç–æ–±—Ä–∞–∂–µ–Ω–∏—è –ø—Ä–∞–≤–æ–π —Å—Ç–æ—Ä–æ–Ω—ã.
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* AI GENERATOR PROMPTS - COLLAPSIBLE EXPANSION CARDS */}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                            <div className="p-6 bg-black/40 rounded-2xl border border-white/5 space-y-4">
-                              <h4 className="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
-                                <Sparkles className="w-4 h-4 text-cyan-400" />
-                                –ü—Ä–æ–º–ø—Ç –ü–æ–º–æ—â–Ω–∏—Ü—ã (–ê—ç–ª–∏—Å—Å–∞) / Companion Prompt
-                              </h4>
-                              <p className="text-[10.5px] text-slate-400 italic bg-black/50 p-4 rounded-xl font-mono relative group select-all">
-                                Bust portrait of Aelyssa, elven companion guide
-                                from Fate Continent, white background. Glowing
-                                white-silver hair flowing with pure Zenith
-                                particle currents, deep neon-purple eyes.
-                                Slate-blue crystalline collar and glassmorphism
-                                shoulders with gold-etched energy runes. Highly
-                                detailed, 8K, cinematic lighting, Octane Render.
-                                <button
-                                  onClick={() => {
-                                    navigator.clipboard.writeText(
-                                      "Bust portrait of Aelyssa, elven companion guide from Fate Continent, white background. Glowing white-silver hair flowing with pure Zenith particle currents, deep neon-purple eyes. Slate-blue crystalline collar and glassmorphism shoulders with gold-etched energy runes. Highly detailed, 8K, cinematic lighting, Octane Render.",
-                                    );
-                                    showNotification(
-                                      "–ü—Ä–æ–º–ø—Ç –ü–æ–º–æ—â–Ω–∏—Ü—ã —Å–∫–æ–ø–∏—Ä–æ–≤–∞–Ω –≤ –±—É—Ñ–µ—Ä!",
-                                      "success",
-                                    );
-                                  }}
-                                  className="absolute right-2 bottom-2 px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-[9px] font-bold uppercase transition"
-                                >
-                                  –ö–æ–ø–∏—Ä–æ–≤–∞—Ç—å
-                                </button>
-                              </p>
-                            </div>
-
-                            <div className="p-6 bg-black/40 rounded-2xl border border-white/5 space-y-4">
-                              <h4 className="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
-                                <Sparkles className="w-4 h-4 text-amber-400" />
-                                –ü—Ä–æ–º–ø—Ç –®–∞–ø–∫–∏ –∏ –†–∞–º—ã –î–∏–∞–ª–æ–≥–∞ / UI Assets Prompt
-                              </h4>
-                              <p className="text-[10.5px] text-slate-400 italic bg-black/50 p-4 rounded-xl font-mono relative group select-all">
-                                A high-tech RPG game UI dialog panel template
-                                asset, white background. Futuristic diagonal
-                                polygonal dialogue container shape, glowing
-                                cyan-blue neon lines, rich glassmorphism dark
-                                indigo crystalline textures, exquisite glowing
-                                solid orange-amber decorative banner cap at the
-                                top left. Elegant sci-fi HUD frame vector
-                                design.
-                                <button
-                                  onClick={() => {
-                                    navigator.clipboard.writeText(
-                                      "A high-tech RPG game UI dialog panel template asset, white background. Futuristic diagonal polygonal dialogue container shape, glowing cyan-blue neon lines, rich glassmorphism dark indigo crystalline textures, exquisite glowing solid orange-amber decorative banner cap at the top left. Elegant sci-fi HUD frame vector design.",
-                                    );
-                                    showNotification(
-                                      "–ü—Ä–æ–º–ø—Ç –®–∞–ø–∫–∏ –î–∏–∞–ª–æ–≥–∞ —Å–∫–æ–ø–∏—Ä–æ–≤–∞–Ω –≤ –±—É—Ñ–µ—Ä!",
-                                      "success",
-                                    );
-                                  }}
-                                  className="absolute right-2 bottom-2 px-2 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded text-[9px] font-bold uppercase transition"
-                                >
-                                  –ö–æ–ø–∏—Ä–æ–≤–∞—Ç—å
-                                </button>
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="p-5 rounded-2xl bg-indigo-500/5 border border-indigo-500/10 text-[11px] text-indigo-400 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <Info className="w-4 h-4 shrink-0" />
-                              <span>
-                                –ü—Ä–æ–º–ø—Ç—ã –æ—Å—Ç–∞–ª—å–Ω—ã—Ö —Ç—Ä–µ—Ö –∫–ª–∞—Å—Å–æ–≤ –≥–µ—Ä–æ–µ–≤ (–í–æ–∏–Ω,
-                                –°—Ç—Ä–µ–ª–æ–∫, –ú–∞–≥) –∏ –∏—Ö –±–æ–µ–≤—ã—Ö –ø–æ–∑ —Å–æ—Ö—Ä–∞–Ω–µ–Ω—ã –≤ —Ñ–∞–π–ª–µ{" "}
-                                <code className="bg-indigo-950/40 px-2 py-0.5 rounded text-white text-[10px]">
-                                  CHARACTER_PROMPTS.md
-                                </code>
-                                . –ò—Å–ø–æ–ª—å–∑—É–π—Ç–µ –≤ Midjourney –∏–ª–∏ Stable Diffusion!
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                          <div className="lg:col-span-1 space-y-8">
-                            <div className="p-10 rounded-[3rem] bg-gradient-to-br from-indigo-900/40 to-black border border-indigo-500/30 space-y-6 relative overflow-hidden group">
-                              <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-                                <User className="w-32 h-32 text-indigo-400" />
-                              </div>
-                              <div className="relative z-10 space-y-4">
-                                <div className="flex items-center gap-4">
-                                  <div className="p-4 bg-indigo-600 rounded-2xl shadow-xl shadow-indigo-600/20">
-                                    <User className="w-8 h-8 text-white" />
-                                  </div>
-                                  <div>
-                                    <h4 className="text-xl font-black text-white uppercase italic tracking-tighter">
-                                      –•—Ä–∞–Ω–∏—Ç–µ–ª—å –ö–≤–µ—Å—Ç–æ–≤
-                                    </h4>
-                                    <div className="text-[10px] text-indigo-400 font-bold uppercase tracking-widest">
-                                      NPC –ù–∞—Å—Ç–∞–≤–Ω–∏–∫
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="p-6 bg-black/60 rounded-[2rem] border border-white/5 text-[11px] text-slate-300 italic leading-relaxed">
-                                  "–ü—Ä–∏–≤–µ—Ç—Å—Ç–≤—É—é, –ø—É—Ç–Ω–∏–∫. –ö–æ–Ω—Ç–∏–Ω–µ–Ω—Ç –°—É–¥—å–±—ã –ø–æ–ª–æ–Ω
-                                  –æ–ø–∞—Å–Ω–æ—Å—Ç–µ–π. –í—ã–±–µ—Ä–∏ —Å–≤–æ–µ –∏—Å–ø—ã—Ç–∞–Ω–∏–µ, –∏ —è –¥–∞—Ä—É—é
-                                  —Ç–µ–±–µ —Å–∏–ª—É, —Å–æ—Ä–∞–∑–º–µ—Ä–Ω—É—é —Ç–≤–æ–µ–º—É –º—É–∂–µ—Å—Ç–≤—É."
-                                </div>
-                                <div className="space-y-4 pt-4">
-                                  <div className="text-[9px] text-slate-500 font-black uppercase tracking-widest px-2">
-                                    –í—ã–±–µ—Ä–∏—Ç–µ —Å–ª–æ–∂–Ω–æ—Å—Ç—å –∏–≥—Ä—ã
-                                  </div>
-                                  <div className="grid grid-cols-2 gap-2">
-                                    {gameDesign?.logic?.difficulty_settings?.map(
-                                      (d: any) => (
-                                        <button
-                                          key={d.level}
-                                          onClick={() =>
-                                            setSelectedDifficulty(d.level)
-                                          }
-                                          className={`p-3 rounded-xl border text-[10px] font-black uppercase transition-all ${
-                                            selectedDifficulty === d.level
-                                              ? "bg-indigo-600 border-indigo-400 text-white shadow-lg"
-                                              : "bg-white/5 border-white/10 text-slate-500 hover:text-white"
-                                          }`}
-                                        >
-                                          {d.level}
-                                        </button>
-                                      ),
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="p-8 rounded-[2.5rem] bg-black/40 border border-white/10 space-y-6">
-                              <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2 flex items-center gap-2">
-                                <Zap className="w-3 h-3 text-yellow-500" />{" "}
-                                –ê–∫—Ç–∏–≤–Ω—ã–µ –ë–æ–Ω—É—Å—ã
-                              </h4>
-                              <div className="space-y-3">
-                                {activeQuests.length === 0 ? (
-                                  <div className="p-6 text-center text-slate-600 italic text-[10px]">
-                                    –ù–µ—Ç –∞–∫—Ç–∏–≤–Ω—ã—Ö —ç—Ñ—Ñ–µ–∫—Ç–æ–≤. –í—ã–ø–æ–ª–Ω–∏—Ç–µ –∫–≤–µ—Å—Ç
-                                    –•—Ä–∞–Ω–∏—Ç–µ–ª—è.
-                                  </div>
-                                ) : (
-                                  activeQuests.map((q: any, i: number) => (
-                                    <div
-                                      key={i}
-                                      className="p-4 bg-indigo-600/10 border border-indigo-500/20 rounded-2xl flex items-center justify-between"
-                                    >
-                                      <div className="flex flex-col gap-0.5">
-                                        <span className="text-[10px] font-black text-white uppercase italic">
-                                          {q.title}
-                                        </span>
-                                        <span className="text-[9px] text-indigo-400">
-                                          –ú–Ω–æ–∂–∏—Ç–µ–ª—å: x
-                                          {(
-                                            gameDesign?.logic?.difficulty_settings?.find(
-                                              (d: any) =>
-                                                d.level === selectedDifficulty,
-                                            )?.player_bonus_multiplier || 1
-                                          ).toFixed(1)}
-                                        </span>
-                                      </div>
-                                      <Sparkles className="w-4 h-4 text-indigo-400 animate-pulse" />
-                                    </div>
-                                  ))
-                                )}
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="lg:col-span-2 space-y-8">
-                            <div className="flex items-center justify-between px-4">
-                              <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] flex items-center gap-2">
-                                <Scroll className="w-3 h-3" /> –î–æ—Å—Ç—É–ø–Ω—ã–µ –ó–∞–¥–∞–Ω–∏—è
-                              </h3>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                              {gameDesign?.quest_system?.quest_pool?.map(
-                                (quest: any) => (
-                                  <div
-                                    key={quest.id}
-                                    className="p-8 rounded-[3rem] bg-black/40 border border-white/10 space-y-6 group hover:border-indigo-500/30 transition-all flex flex-col"
-                                  >
-                                    <div className="flex items-center justify-between">
-                                      <div className="space-y-1">
-                                        <h4 className="text-lg font-black text-white uppercase italic tracking-tighter leading-none">
-                                          {quest.title}
-                                        </h4>
-                                        <div className="flex gap-1">
-                                          {gameDesign?.quest_system?.difficulties.map(
-                                            (d: string, di: number) => (
-                                              <div
-                                                key={di}
-                                                className={`w-1.5 h-1.5 rounded-full ${di < 2 ? "bg-green-500/30" : di < 4 ? "bg-orange-500/30" : "bg-red-500/30"}`}
-                                              />
-                                            ),
-                                          )}
-                                        </div>
-                                      </div>
-                                      <div className="p-3 bg-white/5 rounded-2xl">
-                                        <Scroll className="w-5 h-5 text-indigo-400" />
-                                      </div>
-                                    </div>
-
-                                    <div className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-2">
-                                      <div className="text-[8px] text-slate-600 uppercase font-black">
-                                        –£—Å–ª–æ–≤–∏–µ –≤—ã–ø–æ–ª–Ω–µ–Ω–∏—è:
-                                      </div>
-                                      <div className="text-[11px] text-white font-bold italic">
-                                        {quest.condition}
-                                      </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-3 mt-auto pt-4">
-                                      <button
-                                        onClick={() => {
-                                          if (
-                                            !activeQuests.find(
-                                              (aq) => aq.id === quest.id,
-                                            )
-                                          ) {
-                                            setActiveQuests([
-                                              ...activeQuests,
-                                              quest,
-                                            ]);
-                                          }
-                                        }}
-                                        className="py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-[10px] font-black text-white uppercase tracking-widest transition-all shadow-lg shadow-indigo-600/20"
-                                      >
-                                        –ü—Ä–∏–Ω—è—Ç—å
-                                      </button>
-                                      <button className="py-3 bg-white/5 hover:bg-white/10 rounded-xl text-[10px] font-black text-slate-400 uppercase tracking-widest transition-all">
-                                        –î–µ—Ç–∞–ª–∏
-                                      </button>
-                                    </div>
-                                  </div>
-                                ),
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </motion.div>
-                    ) : designSubTab === "AI Strategies" ? (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.98 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="space-y-12"
-                      >
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                          <div className="p-10 rounded-[3rem] bg-black/40 border border-white/10 space-y-8">
-                            <div className="flex items-center justify-between">
-                              <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">
-                                –§—Ä–∞–∫—Ü–∏–æ–Ω–Ω—ã–µ –°—Ç—Ä–∞—Ç–µ–≥–∏–∏
-                              </h4>
-                              <Cpu className="w-5 h-5 text-blue-400" />
-                            </div>
-                            <div className="space-y-4">
-                              {Object.entries(
-                                gameDesign?.logic?.ai_strategies || {},
-                              ).map(([race, strategy]: any) => (
-                                <div
-                                  key={race}
-                                  className="p-6 rounded-[2rem] bg-white/5 border border-white/5 space-y-3 group hover:bg-blue-600/5 transition-all"
-                                >
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-[11px] font-black text-white uppercase italic tracking-widest">
-                                      {race}
-                                    </span>
-                                    <div className="flex gap-1">
-                                      <div className="w-1 h-3 bg-blue-500 rounded-full" />
-                                      <div className="w-1 h-3 bg-blue-500/40 rounded-full" />
-                                      <div className="w-1 h-3 bg-blue-500/20 rounded-full" />
-                                    </div>
-                                  </div>
-                                  <p className="text-[10px] text-slate-400 leading-relaxed italic">
-                                    {strategy}
-                                  </p>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-
-                          <div className="space-y-8">
-                            <div className="p-10 rounded-[3rem] bg-gradient-to-br from-red-900/20 to-black border border-red-500/20 space-y-6">
-                              <div className="flex items-center gap-4">
-                                <div className="p-4 bg-red-600 rounded-2xl shadow-xl">
-                                  <AlertCircle className="w-6 h-6 text-white" />
-                                </div>
-                                <div>
-                                  <h4 className="text-[10px] font-black text-red-500 uppercase tracking-widest">
-                                    –ê–¥–∞–ø—Ç–∏–≤–Ω–∞—è –°–ª–æ–∂–Ω–æ—Å—Ç—å
-                                  </h4>
-                                  <div className="text-xl font-black text-white uppercase italic tracking-tighter">
-                                    AI Questing System
-                                  </div>
-                                </div>
-                              </div>
-                              <p className="text-[11px] text-slate-300 leading-relaxed italic">
-                                {gameDesign?.logic?.computer_ai}
-                              </p>
-                              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/10">
-                                <div className="space-y-1">
-                                  <div className="text-[8px] text-slate-500 uppercase font-black">
-                                    AI Bonus Player-Rel
-                                  </div>
-                                  <div className="text-xs text-white font-bold">
-                                    50% –æ—Ç –ò–≥—Ä–æ–∫–∞
-                                  </div>
-                                </div>
-                                <div className="space-y-1 text-right">
-                                  <div className="text-[8px] text-slate-500 uppercase font-black">
-                                    Trigger Threshold
-                                  </div>
-                                  <div className="text-xs text-white font-bold">
-                                    –°–ª–æ–∂–Ω—ã–π / –£–∂–∞—Å–Ω—ã–π
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="p-10 rounded-[3rem] bg-black/40 border border-white/10 space-y-8">
-                              <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                                –¢–∞–±–ª–∏—Ü–∞ –°–ª–æ–∂–Ω–æ—Å—Ç–∏ AI
-                              </h4>
-                              <div className="overflow-hidden rounded-2xl border border-white/5 bg-black/20">
-                                <table className="w-full text-left text-[10px]">
-                                  <thead>
-                                    <tr className="text-slate-600 border-b border-white/5 uppercase tracking-widest">
-                                      <th className="p-4 font-black">
-                                        –£—Ä–æ–≤–µ–Ω—å
-                                      </th>
-                                      <th className="p-4 font-black">
-                                        AI Bonus
-                                      </th>
-                                      <th className="p-4 font-black">
-                                        –ö–≤–µ—Å—Ç—ã AI
-                                      </th>
-                                    </tr>
-                                  </thead>
-                                  <tbody className="divide-y divide-white/5">
-                                    {gameDesign?.logic?.difficulty_settings?.map(
-                                      (d: any, i: number) => (
-                                        <tr
-                                          key={i}
-                                          className="group hover:bg-white/5"
-                                        >
-                                          <td className="p-4 font-black text-white">
-                                            {d.level}
-                                          </td>
-                                          <td className="p-4 text-blue-400 font-bold">
-                                            {Math.round(
-                                              d.ai_bonus_multiplier * 100,
-                                            )}
-                                            %
-                                          </td>
-                                          <td className="p-4">
-                                            {d.quest_access_ai ? (
-                                              <CheckCircle className="w-4 h-4 text-green-500" />
-                                            ) : (
-                                              <X className="w-4 h-4 text-red-500" />
-                                            )}
-                                          </td>
-                                        </tr>
-                                      ),
-                                    )}
-                                  </tbody>
-                                </table>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="p-10 rounded-[4rem] bg-indigo-600/5 border border-indigo-500/20 space-y-6">
-                          <div className="flex items-center justify-between">
-                            <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.4em]">
-                              –õ–æ–≥–∏–∫–∞ –ê—Ç–∞–∫–∏ –ò–ò
-                            </h4>
-                            <ShieldCheck className="w-5 h-5 text-indigo-400" />
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {[
-                              {
-                                t: "–ü—Ä–∏–æ—Ä–∏—Ç–µ—Ç",
-                                d: "–°–∞–º—ã–µ —Å–ª–∞–±—ã–µ —é–Ω–∏—Ç—ã –∏–≥—Ä–æ–∫–∞",
-                              },
-                              {
-                                t: "–ó–∞—â–∏—Ç–∞",
-                                d: "–ö–æ–Ω—Ç—Ä–∞—Ç–∞–∫–∞ –ø—Ä–∏ —É–≥—Ä–æ–∑–µ —Å—Ç–æ–ª–∏—Ü–µ",
-                              },
-                              {
-                                t: "–†–∞–∑–≤–µ–¥–∫–∞",
-                                d: "–ê–∫—Ç–∏–≤–Ω—ã–π –ø–æ–∏—Å–∫ —Ä–µ–¥–∫–∏—Ö –ª–æ–∫–∞—Ü–∏–π",
-                              },
-                              {
-                                t: "–ì—Ä—É–ø–ø–∏—Ä–æ–≤–∫–∞",
-                                d: "–ù–∞—Å—Ç—É–ø–ª–µ–Ω–∏–µ —Ç–æ–ª—å–∫–æ –ø—Ä–∏ 1.5x –ø–µ—Ä–µ–≤–µ—Å–µ",
-                              },
-                            ].map((l, i) => (
-                              <div
-                                key={i}
-                                className="p-6 bg-black/40 rounded-[2rem] border border-white/5 space-y-2"
-                              >
-                                <div className="text-[9px] text-slate-500 uppercase font-black">
-                                  {l.t}
-                                </div>
-                                <div className="text-[10px] text-white font-bold italic leading-tight">
-                                  {l.d}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </motion.div>
-                    ) : designSubTab === "Menu Studio" ? (
-                      <div className="space-y-6">
-                        <div className="flex items-center justify-between px-6">
-                          <div>
-                            <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">
-                              Menu Studio Visuals Mastery
-                            </h3>
-                            <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mt-1">
-                              –ò–Ω—Ç–µ—Ä–∞–∫—Ç–∏–≤–Ω—ã–π –ø—Ä–µ–¥–ø—Ä–æ—Å–º–æ—Ç—Ä UI v18.8.0
-                            </p>
-                          </div>
-                          <button
-                            onClick={() => setShowStudioGuide(true)}
-                            className="flex items-center gap-2 px-6 py-3 bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/30 rounded-2xl transition-all font-black uppercase text-[10px] tracking-widest shadow-xl shadow-blue-500/10"
-                          >
-                            <Info className="w-4 h-4" />
-                            –ü–æ–ª–Ω–æ–µ –æ–ø–∏—Å–∞–Ω–∏–µ –ú–µ–Ω—é
-                          </button>
-                        </div>
-                        <MenuStudioPreview onDownload={downloadBackground} />
-                      </div>
-                    ) : (
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="space-y-12"
-                      >
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                          {gameDesign?.unit_balance?.tiers?.map(
-                            (tier: any, i: number) => (
-                              <div
-                                key={i}
-                                className="p-8 rounded-[2.5rem] bg-white/5 border border-white/10 space-y-6"
-                              >
-                                <div className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em]">
-                                  Tier 0{i + 1}
-                                </div>
-                                <h4 className="text-lg font-black text-white uppercase tracking-tighter">
-                                  {tier.type}
-                                </h4>
-                                <div className="space-y-3 border-t border-white/5 pt-4">
-                                  <div className="flex items-center justify-between text-[10px]">
-                                    <span className="text-slate-500">HP:</span>
-                                    <span className="text-red-400 font-bold">
-                                      {tier.hp[0]}-{tier.hp[1]}
-                                    </span>
-                                  </div>
-                                  <div className="flex items-center justify-between text-[10px]">
-                                    <span className="text-slate-500">ATK:</span>
-                                    <span className="text-orange-400 font-bold">
-                                      {tier.atk[0]}-{tier.atk[1]}
-                                    </span>
-                                  </div>
-                                  <div className="flex items-center justify-between text-[10px]">
-                                    <span className="text-slate-500">DEF:</span>
-                                    <span className="text-blue-400 font-bold">
-                                      {tier.def[0]}-{tier.def[1]}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            ),
-                          )}
-                        </div>
-
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                          <div className="p-10 rounded-[3rem] bg-black/40 border border-white/10 space-y-8">
-                            <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                              –°–∏—Å—Ç–µ–º–∞ –†–µ–¥–∫–æ—Å—Ç–∏
-                            </h4>
-                            <div className="grid grid-cols-1 gap-3">
-                              {gameDesign?.rarity_tiers?.map(
-                                (tier: any, i: number) => (
-                                  <div
-                                    key={i}
-                                    className="p-4 bg-white/5 rounded-2xl border border-white/5 flex items-center justify-between group hover:border-white/20 transition-all"
-                                  >
-                                    <div className="flex items-center gap-4">
-                                      <div
-                                        className={`w-3 h-3 rounded-full ${
-                                          i === 0
-                                            ? "bg-white"
-                                            : i === 1
-                                              ? "bg-green-500"
-                                              : i === 2
-                                                ? "bg-blue-500"
-                                                : i === 3
-                                                  ? "bg-purple-600"
-                                                  : i === 4
-                                                    ? "bg-pink-500"
-                                                    : i === 5
-                                                      ? "bg-red-500"
-                                                      : i === 6
-                                                        ? "bg-yellow-500"
-                                                        : "bg-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.5)]"
-                                        }`}
-                                      />
-                                      <span className="text-[11px] font-black text-white uppercase tracking-widest">
-                                        {tier.name}
-                                      </span>
-                                    </div>
-                                    <div className="text-[10px] text-slate-500 font-mono">
-                                      {tier.bonus}
-                                    </div>
-                                  </div>
-                                ),
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="space-y-8">
-                            <div className="p-10 rounded-[3rem] bg-gradient-to-br from-purple-600/10 to-blue-600/10 border border-purple-500/20 space-y-6">
-                              <h4 className="text-[10px] font-black text-white uppercase tracking-widest">
-                                –§–æ—Ä–º—É–ª–∞ –ú–∞—Å—à—Ç–∞–±–∏—Ä–æ–≤–∞–Ω–∏—è
-                              </h4>
-                              <div className="space-y-4">
-                                {gameDesign?.unit_balance?.scaling_formula &&
-                                  Object.entries(
-                                    gameDesign.unit_balance.scaling_formula,
-                                  ).map(([key, val]: any) => (
-                                    <div
-                                      key={key}
-                                      className="flex items-center justify-between p-4 bg-black/40 rounded-2xl border border-white/5"
-                                    >
-                                      <span className="text-[10px] text-slate-500">
-                                        LVL {key.replace("_", "-")}:
-                                      </span>
-                                      <span className="text-[10px] font-bold text-purple-400">
-                                        {val}
-                                      </span>
-                                    </div>
-                                  ))}
-                              </div>
-                            </div>
-
-                            <div className="p-8 rounded-[2.5rem] bg-white/5 border border-white/10 space-y-6">
-                              <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                                –ü—Ä–æ—Ü–µ—Å—Å –≠–≤–æ–ª—é—Ü–∏–∏
-                              </h4>
-                              <div className="flex items-center justify-between">
-                                {gameDesign?.unit_balance?.evolution?.map(
-                                  (evo: string, i: number) => (
-                                    <div
-                                      key={i}
-                                      className="flex flex-col items-center gap-2 group cursor-help"
-                                    >
-                                      <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-[10px] font-black text-slate-700 group-hover:bg-purple-600 group-hover:text-white transition-all">
-                                        0{i + 1}
-                                      </div>
-                                      <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-                                        {evo}
-                                      </span>
-                                    </div>
-                                  ),
-                                )}
-                              </div>
-                              <p className="text-[9px] text-slate-600 text-center italic">
-                                "–ö–∞–∂–¥–∞—è —Å—Ç–∞–¥–∏—è —ç–≤–æ–ª—é—Ü–∏–∏ –æ—Ç–∫—Ä—ã–≤–∞–µ—Ç –Ω–æ–≤—ã–µ
-                                –ø–∞—Å—Å–∏–≤–Ω—ã–µ —Å–ø–æ—Å–æ–±–Ω–æ—Å—Ç–∏ –∏ —É–≤–µ–ª–∏—á–∏–≤–∞–µ—Ç –±–∞–∑–æ–≤—ã–µ
-                                —Ö–∞—Ä–∞–∫—Ç–µ—Ä–∏—Å—Ç–∏–∫–∏ –Ω–∞ 15%."
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </div>
-                </div>
-              ) : activeTab === "dashboard" ? (
-                <div className="flex-1 overflow-y-auto p-8 scrollbar-thin scrollbar-thumb-white/5 space-y-8 min-h-0 h-full">
-                  <div className="max-w-6xl mx-auto space-y-8">
-                    {/* Quantum Link Integration Block */}
-                    <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-cyan-600/10 border border-blue-500/20 relative overflow-hidden group">
-                      <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-700">
-                        <Zap className="w-32 h-32 text-blue-400" />
-                      </div>
-
-                      <div className="relative z-10">
-                        <div className="flex items-center gap-4 mb-6">
-                          <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-600/20">
-                            <ExternalLink className="w-6 h-6 text-white" />
-                          </div>
-                          <div>
-                            <h2 className="text-xl font-bold text-white uppercase tracking-tighter">
-                              Quantum Link Integration (v18.8.0)
-                            </h2>
-                            <p className="text-xs text-slate-400">
-                              –ü—Ä—è–º–æ–µ —É–ø—Ä–∞–≤–ª–µ–Ω–∏–µ Blender –∏ Unity —á–µ—Ä–µ–∑ –Ω–µ–π—Ä–æ–Ω–Ω—ã–π
-                              –º–æ—Å—Ç.
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                          {/* Blender Card */}
-                          <div className="p-6 rounded-3xl bg-black/40 border border-white/5 hover:border-orange-500/30 transition-all">
-                            <div className="flex items-center gap-3 mb-4 text-orange-400 uppercase font-bold text-xs tracking-widest">
-                              <Cube className="w-4 h-4" /> Blender Addon
-                            </div>
-                            <p className="text-[10px] text-slate-400 mb-6 leading-relaxed">
-                              –°–æ–∑–¥–∞–µ—Ç –ø–∞–Ω–µ–ª—å —É–ø—Ä–∞–≤–ª–µ–Ω–∏—è –≤ Blender. –ü–æ–∑–≤–æ–ª—è–µ—Ç –ò–ò
-                              –Ω–∞–ø—Ä—è–º—É—é –≥–µ–Ω–µ—Ä–∏—Ä–æ–≤–∞—Ç—å –º–µ—à–∏, –º–∞—Ç–µ—Ä–∏–∞–ª—ã –∏ –ª–æ–≥–∏–∫—É
-                              —Å—Ü–µ–Ω—ã.
-                            </p>
-                            <button
-                              onClick={() =>
-                                window.open("/blender_connector.py", "_blank")
-                              }
-                              className="w-full py-3 rounded-xl bg-orange-600/20 border border-orange-500/30 text-[10px] font-bold text-orange-400 uppercase tracking-widest hover:bg-orange-600 hover:text-white transition-all"
-                            >
-                              –û—Ç–∫—Ä—ã—Ç—å blender_connector.py
-                            </button>
-                          </div>
-
-                          {/* Unity Card */}
-                          <div className="p-6 rounded-3xl bg-black/40 border border-white/5 hover:border-cyan-500/30 transition-all">
-                            <div className="flex items-center gap-3 mb-4 text-cyan-400 uppercase font-bold text-xs tracking-widest">
-                              <Gamepad2 className="w-4 h-4" /> Unity Connector
-                            </div>
-                            <p className="text-[10px] text-slate-400 mb-6 leading-relaxed">
-                              –û–∫–Ω–æ —Ä–µ–¥–∞–∫—Ç–æ—Ä–∞ –¥–ª—è Unity. –ì–µ–Ω–µ—Ä–∏—Ä—É–π—Ç–µ C# —Å–∫—Ä–∏–ø—Ç—ã –∏
-                              —É–ø—Ä–∞–≤–ª—è–π—Ç–µ –∏–≥—Ä–æ–≤—ã–º–∏ –æ–±—ä–µ–∫—Ç–∞–º–∏ —Å –ø–æ–º–æ—â—å—é –ò–ò.
-                            </p>
-                            <button
-                              onClick={() =>
-                                window.open("/UnityConnector.cs", "_blank")
-                              }
-                              className="w-full py-3 rounded-xl bg-cyan-600/20 border border-cyan-500/30 text-[10px] font-bold text-cyan-400 uppercase tracking-widest hover:bg-cyan-600 hover:text-white transition-all"
-                            >
-                              –û—Ç–∫—Ä—ã—Ç—å UnityConnector.cs
-                            </button>
-                          </div>
-                        </div>
-
-                        <div className="p-6 rounded-2xl bg-white/5 border border-white/5">
-                          <h4 className="text-[10px] font-bold text-white uppercase tracking-widest mb-4">
-                            –ö—Ä–∞—Ç–∫–∞—è –∏–Ω—Å—Ç—Ä—É–∫—Ü–∏—è –ø–æ —É—Å—Ç–∞–Ω–æ–≤–∫–µ:
-                          </h4>
-                          <div className="space-y-3">
-                            <div className="flex items-start gap-4">
-                              <div className="w-5 h-5 rounded-full bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-[10px] font-bold text-blue-400 shrink-0">
-                                1
-                              </div>
-                              <p className="text-[10px] text-slate-400">
-                                –ù–∞–∂–º–∏—Ç–µ –∫–Ω–æ–ø–∫–∏ –≤—ã—à–µ, —á—Ç–æ–±—ã –æ—Ç–∫—Ä—ã—Ç—å –∫–æ–¥.
-                                –°–∫–æ–ø–∏—Ä—É–π—Ç–µ –µ–≥–æ –∏ —Å–æ—Ö—Ä–∞–Ω–∏—Ç–µ –≤ —Ñ–∞–π–ª —Å —É–∫–∞–∑–∞–Ω–Ω—ã–º
-                                –∏–º–µ–Ω–µ–º –≤ –∫–æ—Ä–Ω–µ –≤–∞—à–µ–≥–æ –ø—Ä–æ–µ–∫—Ç–∞.
-                              </p>
-                            </div>
-                            <div className="flex items-start gap-4">
-                              <div className="w-5 h-5 rounded-full bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-[10px] font-bold text-blue-400 shrink-0">
-                                2
-                              </div>
-                              <p className="text-[10px] text-slate-400">
-                                <span className="text-orange-400 font-bold uppercase">
-                                  Blender:
-                                </span>{" "}
-                                –ó–∞–π–¥–∏—Ç–µ –≤ Edit ‚Üí Preferences ‚Üí Add-ons ‚Üí
-                                Install, –≤—ã–±–µ—Ä–∏—Ç–µ —Ñ–∞–π–ª –∏ –∞–∫—Ç–∏–≤–∏—Ä—É–π—Ç–µ –≥–∞–ª–æ—á–∫—É.
-                              </p>
-                            </div>
-                            <div className="flex items-start gap-4">
-                              <div className="w-5 h-5 rounded-full bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-[10px] font-bold text-blue-400 shrink-0">
-                                3
-                              </div>
-                              <p className="text-[10px] text-slate-400">
-                                <span className="text-cyan-400 font-bold uppercase">
-                                  Unity:
-                                </span>{" "}
-                                –°–æ–∑–¥–∞–π—Ç–µ –≤ –ø–∞–ø–∫–µ Assets –ø–∞–ø–∫—É "Editor" –∏
-                                –ø–æ–º–µ—Å—Ç–∏—Ç–µ —Ñ–∞–π–ª —Ç—É–¥–∞. –û–∫–Ω–æ –ø–æ—è–≤–∏—Ç—Å—è –≤ –º–µ–Ω—é "AI
-                                Assistant".
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Continent of Fate: Procedural Generation */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      className="p-8 rounded-[2.5rem] bg-gradient-to-br from-red-600/10 via-orange-600/10 to-yellow-600/10 border border-red-500/20 relative overflow-hidden group"
-                    >
-                      <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-700">
-                        <MapIcon className="w-32 h-32 text-red-400" />
-                      </div>
-
-                      <div className="relative z-10 space-y-6">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-red-600 rounded-2xl flex items-center justify-center shadow-lg shadow-red-600/20">
-                            <MapIcon className="w-6 h-6 text-white" />
-                          </div>
-                          <div>
-                            <h2 className="text-xl font-bold text-white uppercase tracking-tighter">
-                              Fate Continent: Camera Mastery v18.8.0
-                            </h2>
-                            <p className="text-xs text-slate-400">
-                              –ò—Å–ø—Ä–∞–≤–ª–µ–Ω–∏–µ –∏–µ—Ä–∞—Ä—Ö–∏–∏: —Ç–æ—á–∫–∏ –∫–∞–º–µ—Ä—ã –¥–æ–ª–∂–Ω—ã –±—ã—Ç—å –≤–Ω–µ
-                              Canvas!
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                          {[
-                            "–ì–æ—Ä–Ω–∞—è –∫—Ä–µ–ø–æ—Å—Ç—å",
-                            "–¢–æ—Ä–≥–æ–≤—ã–π —Ñ–æ—Ä—Ç",
-                            "–õ–µ—Å–Ω–æ–π –ª–∞–≥–µ—Ä—å",
-                            "–ü—É—Å—Ç—ã–Ω–Ω—ã–π —Ñ–æ—Ä–ø–æ—Å—Ç",
-                          ].map((type, idx) => (
-                            <button
-                              key={idx}
-                              onClick={async () => {
-                                const res = await fetch(
-                                  "/api/game/generate-levels",
-                                  {
-                                    method: "POST",
-                                    headers: {
-                                      "Content-Type": "application/json",
-                                    },
-                                    body: JSON.stringify({
-                                      continent: "Fate",
-                                      cityType: type,
-                                    }),
-                                  },
-                                );
-                                const data = await res.json();
-                                setMessages((prev) => [
-                                  ...prev,
-                                  {
-                                    role: "assistant",
-                                    content:
-                                      `### –°–≥–µ–Ω–µ—Ä–∏—Ä–æ–≤–∞–Ω—ã —É—Ä–æ–≤–Ω–∏ –¥–ª—è —Ç–∏–ø–∞: ${type}\n\n–Ø –ø–æ–¥–≥–æ—Ç–æ–≤–∏–ª 4 –≤–∞—Ä–∏–∞–Ω—Ç–∞ –ø–ª–∞–Ω–∏—Ä–æ–≤–∫–∏ –¥–ª—è –≤–∞—à–µ–≥–æ –∫–æ–Ω—Ç–∏–Ω–µ–Ω—Ç–∞. –ö–∞–∂–¥–∞—è –ø–ª–∞–Ω–∏—Ä–æ–≤–∫–∞ —É—á–∏—Ç—ã–≤–∞–µ—Ç —Ä–µ–ª—å–µ—Ñ –∏ —Å—Ç—Ä–∞—Ç–µ–≥–∏—á–µ—Å–∫–∏–µ —Ç–æ—á–∫–∏ —Ä–∞–∑–º–µ—â–µ–Ω–∏—è –∑–∞–º–∫–æ–≤.\n\n` +
-                                      data.levels
-                                        .map(
-                                          (l: any) =>
-                                            `- **${l.name}**: –ó–∞–º–∫–æ–≤: ${l.entities.filter((e: any) => e.type === "castle").length}, –õ–∞–≥–µ—Ä–µ–π —Ä–∞–∑–±–æ–π–Ω–∏–∫–æ–≤: ${l.entities.filter((e: any) => e.type === "bandit_camp").length}`,
-                                        )
-                                        .join("\n") +
-                                      `\n\n–í—ã –º–æ–∂–µ—Ç–µ –∏—Å–ø–æ–ª—å–∑–æ–≤–∞—Ç—å —ç—Ç–∏ –¥–∞–Ω–Ω—ã–µ –≤ Blender Connector –¥–ª—è –∞–≤—Ç–æ–º–∞—Ç–∏—á–µ—Å–∫–æ–π —Ä–∞—Å—Å—Ç–∞–Ω–æ–≤–∫–∏ –æ–±—ä–µ–∫—Ç–æ–≤.`,
-                                    timestamp: Date.now(),
-                                  },
-                                ]);
-                                setActiveTab("chat");
-                              }}
-                              className="p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-red-500/40 hover:bg-red-500/5 transition-all text-left group/card"
-                            >
-                              <div className="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center text-orange-400 mb-3 group-hover/card:scale-110 transition-transform">
-                                <Box className="w-4 h-4" />
-                              </div>
-                              <h4 className="text-[10px] font-bold text-white uppercase mb-1">
-                                {type}
-                              </h4>
-                              <p className="text-[9px] text-slate-500">
-                                –ì–µ–Ω–µ—Ä–∞—Ü–∏—è 4-—Ö —É—Ä–æ–≤–Ω–µ–π
-                              </p>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </motion.div>
-
-                    {/* Automatic Unity Scene Audit */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      className="p-8 rounded-[2.5rem] bg-gradient-to-br from-cyan-600/10 via-blue-600/10 to-indigo-600/10 border border-cyan-500/20 relative overflow-hidden group"
-                    >
-                      <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-700">
-                        <Shield className="w-32 h-32 text-cyan-400" />
-                      </div>
-
-                      <div className="relative z-10 space-y-6">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-cyan-600 rounded-2xl flex items-center justify-center shadow-lg shadow-cyan-600/20">
-                            <Shield className="w-6 h-6 text-white" />
-                          </div>
-                          <div>
-                            <h2 className="text-xl font-bold text-white uppercase tracking-tighter">
-                              –ê–≤—Ç–æ–º–∞—Ç–∏—á–µ—Å–∫–∏–π –ê—É–¥–∏—Ç –°—Ü–µ–Ω Unity
-                            </h2>
-                            <p className="text-xs text-slate-400">
-                              –ü—Ä–æ–≤–µ—Ä–∫–∞ –∫–æ–ª–ª–∏–∑–∏–π, —Ç–µ–∫—Å—Ç—É—Ä –∏ –æ–ø—Ç–∏–º–∏–∑–∞—Ü–∏–∏ –º–æ–¥–µ–ª–µ–π.
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div className="space-y-4">
-                            <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-white/5 pb-2">
-                              <span>–¢–µ–∫—É—â–∏–π —Å—Ç–∞—Ç—É—Å –ø—Ä–æ–µ–∫—Ç–∞</span>
-                              <span className="text-cyan-400">
-                                Zenith Stable
-                              </span>
-                            </div>
-                            <div className="grid grid-cols-2 gap-3">
-                              <div className="p-4 rounded-xl bg-black/40 border border-white/5">
-                                <div className="text-white text-lg font-bold">
-                                  {projectScan?.scripts?.length || 0}
-                                </div>
-                                <div className="text-[9px] text-slate-500 uppercase">
-                                  –°–∫—Ä–∏–ø—Ç–æ–≤ –ø—Ä–æ–≤–µ—Ä–µ–Ω–æ
-                                </div>
-                              </div>
-                              <div className="p-4 rounded-xl bg-black/40 border border-white/5">
-                                <div className="text-white text-lg font-bold">
-                                  {projectScan?.prefabs?.length || 0}
-                                </div>
-                                <div className="text-[9px] text-slate-500 uppercase">
-                                  –ü—Ä–µ—Ñ–∞–±–æ–≤ –ø—Ä–æ—Å–∫–∞–Ω–∏—Ä–æ–≤–∞–Ω–æ
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="bg-black/40 rounded-3xl p-6 border border-white/5">
-                            <h4 className="text-[10px] font-bold text-white uppercase mb-4 flex items-center gap-2">
-                              <AlertTriangle className="w-3 h-3 text-yellow-500" />{" "}
-                              –û–±–Ω–∞—Ä—É–∂–µ–Ω–Ω—ã–µ –∫—Ä–∏—Ç–∏—á–µ—Å–∫–∏–µ –º–µ—Å—Ç–∞:
-                            </h4>
-                            <div className="space-y-3 max-h-32 overflow-y-auto scrollbar-none">
-                              {projectScan?.analysis?.audit_issues?.map(
-                                (issue: any, i: number) => (
-                                  <div
-                                    key={i}
-                                    className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-start gap-3"
-                                  >
-                                    <div
-                                      className={`mt-1 w-1.5 h-1.5 rounded-full ${issue.type === "MissingScript" ? "bg-red-500" : "bg-yellow-500"}`}
-                                    />
-                                    <div>
-                                      <p className="text-[10px] text-white font-bold">
-                                        {issue.file}
-                                      </p>
-                                      <p className="text-[9px] text-slate-400">
-                                        {issue.message}
-                                      </p>
-                                    </div>
-                                  </div>
-                                ),
-                              ) || (
-                                <div className="text-[10px] text-slate-500 italic py-4">
-                                  –ü—Ä–æ–±–ª–µ–º –Ω–µ –æ–±–Ω–∞—Ä—É–∂–µ–Ω–æ. –°—Ü–µ–Ω–∞ –≤ –ø–æ—Ä—è–¥–∫–µ.
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-
-                    {/* Top Stats Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <div className="p-6 rounded-3xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
-                        <div className="flex items-center gap-4 mb-4">
-                          <div className="p-3 bg-blue-600/20 rounded-2xl text-blue-400">
-                            <AlertTriangle className="w-5 h-5" />
-                          </div>
-                          <h3 className="text-xs font-bold text-white uppercase tracking-widest">
-                            –ê—É–¥–∏—Ç –∫–æ–¥–∞
-                          </h3>
-                        </div>
-                        <div className="text-2xl font-bold text-white mb-1">
-                          {projectScan?.analysis?.audit_issues?.length || 0}
-                        </div>
-                        <p className="text-[10px] text-slate-500 uppercase">
-                          –ü—Ä–æ–±–ª–µ–º –ø—Ä–æ–∏–∑–≤–æ–¥–∏—Ç–µ–ª—å–Ω–æ—Å—Ç–∏
-                        </p>
-                      </div>
-
-                      <div className="p-6 rounded-3xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
-                        <div className="flex items-center gap-4 mb-4">
-                          <div className="p-3 bg-purple-600/20 rounded-2xl text-purple-400">
-                            <Check className="w-5 h-5" />
-                          </div>
-                          <h3 className="text-xs font-bold text-white uppercase tracking-widest">
-                            –ó–∞–¥–∞—á–∏ (TODO)
-                          </h3>
-                        </div>
-                        <div className="text-2xl font-bold text-white mb-1">
-                          {projectScan?.analysis?.todos?.length || 0}
-                        </div>
-                        <p className="text-[10px] text-slate-500 uppercase">
-                          –ê–∫—Ç–∏–≤–Ω—ã—Ö –∑–∞–¥–∞—á –≤ –∫–æ–¥–µ
-                        </p>
-                      </div>
-
-                      <div className="p-6 rounded-3xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
-                        <div className="flex items-center gap-4 mb-4">
-                          <div className="p-3 bg-green-600/20 rounded-2xl text-green-400">
-                            <Box className="w-5 h-5" />
-                          </div>
-                          <h3 className="text-xs font-bold text-white uppercase tracking-widest">
-                            –û–ø—Ç–∏–º–∏–∑–∞—Ü–∏—è
-                          </h3>
-                        </div>
-                        <div className="text-2xl font-bold text-white mb-1">
-                          {projectScan?.analysis?.asset_stats?.total_size
-                            ? (
-                                projectScan?.analysis?.asset_stats?.total_size /
-                                1024 /
-                                1024
-                              ).toFixed(1)
-                            : 0}{" "}
-                          MB
-                        </div>
-                        <p className="text-[10px] text-slate-500 uppercase">
-                          –û–±—â–∏–π –≤–µ—Å –∞—Å—Å–µ—Ç–æ–≤
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Knowledge Base Section */}
-                    <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-blue-600/10 to-purple-600/10 border border-white/10">
-                      <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                        <div className="flex items-center gap-6">
-                          <div className="w-16 h-16 bg-blue-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-blue-600/40">
-                            <Layers className="w-8 h-8 text-white" />
-                          </div>
-                          <div>
-                            <h3 className="text-lg font-bold text-white uppercase tracking-tighter">
-                              –†–∞—Å—à–∏—Ä–µ–Ω–∏–µ –ë–∞–∑—ã –ó–Ω–∞–Ω–∏–π
-                            </h3>
-                            <p className="text-xs text-slate-400 max-w-md">
-                              –û–±–Ω–æ–≤–∏—Ç–µ –ª–æ–∫–∞–ª—å–Ω—ã–µ —Å–ø—Ä–∞–≤–æ—á–Ω–∏–∫–∏ Unity API, Blender
-                              Python –∏ Troubleshooting –¥–ª—è –±–æ–ª–µ–µ —Ç–æ—á–Ω–æ–π –ø–æ–º–æ—â–∏ –≤
-                              –æ—Ñ–ª–∞–π–Ω-—Ä–µ–∂–∏–º–µ.
-                            </p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={handleUpdateKB}
-                          disabled={isUpdatingKB}
-                          className={`px-8 py-4 rounded-2xl font-bold uppercase tracking-widest text-xs transition-all flex items-center gap-3 ${
-                            isUpdatingKB
-                              ? "bg-white/5 text-slate-500"
-                              : "bg-white text-black hover:bg-blue-500 hover:text-white shadow-xl shadow-white/10"
-                          }`}
-                        >
-                          {isUpdatingKB ? (
-                            <RefreshCw className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <Sparkles className="w-4 h-4" />
-                          )}
-                          {isUpdatingKB ? "–û–±–Ω–æ–≤–ª–µ–Ω–∏–µ..." : "–û–±–Ω–æ–≤–∏—Ç—å –ë–∞–∑—ã"}
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* New Features Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <div className="p-8 rounded-[2.5rem] bg-black/40 border border-white/5 space-y-6">
-                        <div className="flex items-center gap-4">
-                          <div className="p-3 bg-orange-600/20 rounded-2xl text-orange-400">
-                            <RefreshCw className="w-5 h-5" />
-                          </div>
-                          <h3 className="text-sm font-bold text-white uppercase tracking-widest">
-                            Unity Bridge
-                          </h3>
-                        </div>
-                        <p className="text-xs text-slate-400">
-                          –ê–≤—Ç–æ–º–∞—Ç–∏—á–µ—Å–∫–∞—è –Ω–∞—Å—Ç—Ä–æ–π–∫–∞ –º–∞—Ç–µ—Ä–∏–∞–ª–æ–≤ –ø—Ä–∏ –∏–º–ø–æ—Ä—Ç–µ –∏–∑
-                          Blender. –ö–æ–Ω–≤–µ—Ä—Ç–∞—Ü–∏—è Standard –º–∞—Ç–µ—Ä–∏–∞–ª–æ–≤ –≤ URP/HDRP.
-                        </p>
-                        <button
-                          onClick={handleGetMaterialConverter}
-                          className="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-[10px] font-bold text-white uppercase tracking-widest transition-all"
-                        >
-                          –ü–æ–ª—É—á–∏—Ç—å C# –°–∫—Ä–∏–ø—Ç
-                        </button>
-                      </div>
-
-                      <div className="p-8 rounded-[2.5rem] bg-black/40 border border-white/5 space-y-6">
-                        <div className="flex items-center gap-4">
-                          <div className="p-3 bg-blue-600/20 rounded-2xl text-blue-400">
-                            <GitBranch className="w-5 h-5" />
-                          </div>
-                          <h3 className="text-sm font-bold text-white uppercase tracking-widest">
-                            Git LFS Setup
-                          </h3>
-                        </div>
-                        <p className="text-xs text-slate-400">
-                          –ì–µ–Ω–µ—Ä–∞—Ü–∏—è –ø—Ä–∞–≤–∏–ª—å–Ω–æ–≥–æ .gitattributes –¥–ª—è Unity
-                          –ø—Ä–æ–µ–∫—Ç–∞. –ó–∞—â–∏—Ç–∞ –æ—Ç —Ä–∞–∑–¥—É–≤–∞–Ω–∏—è —Ä–µ–ø–æ–∑–∏—Ç–æ—Ä–∏—è —Ç—è–∂–µ–ª—ã–º–∏
-                          –∞—Å—Å–µ—Ç–∞–º–∏.
-                        </p>
-                        <button
-                          onClick={handleGetGitLFS}
-                          className="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-[10px] font-bold text-white uppercase tracking-widest transition-all"
-                        >
-                          –ö–æ–ø–∏—Ä–æ–≤–∞—Ç—å .gitattributes
-                        </button>
-                      </div>
-
-                      <div className="p-8 rounded-[2.5rem] bg-black/40 border border-white/5 space-y-6">
-                        <div className="flex items-center gap-4">
-                          <div className="p-3 bg-green-600/20 rounded-2xl text-green-400">
-                            <Type className="w-5 h-5" />
-                          </div>
-                          <h3 className="text-sm font-bold text-white uppercase tracking-widest">
-                            Naming Standard
-                          </h3>
-                        </div>
-                        <p className="text-xs text-slate-400">
-                          –ì–µ–Ω–µ—Ä–∞—Ç–æ—Ä –∏–º–µ–Ω –ø–æ —Å—Ç–∞–Ω–¥–∞—Ä—Ç—É (T_Texture, M_Material{" "}
-                          <div className="mt-12 p-10 rounded-[3rem] bg-gradient-to-br from-indigo-900/40 to-black border border-indigo-500/30 relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-all duration-700">
-                              <ShieldCheck className="w-32 h-32 text-indigo-400" />
-                            </div>
-                            <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
-                              <div className="flex items-center gap-6">
-                                <div className="p-5 bg-indigo-600 rounded-[2rem] shadow-[0_0_30px_rgba(79,70,229,0.3)]">
-                                  <FileText className="w-8 h-8 text-white" />
-                                </div>
-                                <div className="space-y-1">
-                                  <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter">
-                                    PROJECT MASTER BLUEPRINT
-                                  </h3>
-                                  <div className="flex items-center gap-3">
-                                    <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-[9px] font-bold text-indigo-400">
-                                      v18.8.0
-                                    </span>
-                                    <p className="text-xs text-slate-400 font-medium">
-                                      –î–æ–∫—É–º–µ–Ω—Ç —Å–∏–Ω—Ö—Ä–æ–Ω–∏–∑–∞—Ü–∏–∏ –æ–±–Ω–æ–≤–ª–µ–Ω –∏ –≥–æ—Ç–æ–≤ –∫
-                                      —Ä–∞–±–æ—Ç–µ.
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-4">
-                                <button
-                                  onClick={() => setShowSettings(true)}
-                                  className="px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-indigo-600/20 border border-indigo-400/30"
-                                >
-                                  –ö–æ–Ω–≤–µ–π–µ—Ä –ù–∞—Å—Ç—Ä–æ–µ–∫
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                          ÔøΩ —Ä–µ—à–µ–Ω–∏–π –¥–ª—è Shader Graph –∏ HLSL. –û—Ñ–ª–∞–π–Ω-–ø–æ–¥—Å–∫–∞–∑–∫–∏ –ø–æ
-                          —Å–æ–∑–¥–∞–Ω–∏—é —ç—Ñ—Ñ–µ–∫—Ç–æ–≤.
-                        </p>
-                        <button
-                          onClick={() =>
-                            showNotification(
-                              "–§—É–Ω–∫—Ü–∏—è –≤ —Ä–∞–∑—Ä–∞–±–æ—Ç–∫–µ. –ò—Å–ø–æ–ª—å–∑—É–π—Ç–µ —á–∞—Ç –¥–ª—è –∑–∞–ø—Ä–æ—Å–∞ —à–µ–π–¥–µ—Ä–æ–≤.",
-                              "info",
-                            )
-                          }
-                          className="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-[10px] font-bold text-white uppercase tracking-widest transition-all"
-                        >
-                          –û—Ç–∫—Ä—ã—Ç—å –±–∏–±–ª–∏–æ—Ç–µ–∫—É
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                      {/* Audit & Todos */}
-                      <div className="space-y-8">
-                        <section className="p-8 rounded-[2.5rem] bg-black/40 border border-white/5">
-                          <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6 flex items-center gap-3">
-                            <Terminal className="w-4 h-4 text-blue-400" />{" "}
-                            –†–µ–∑—É–ª—å—Ç–∞—Ç—ã –∞—É–¥–∏—Ç–∞
-                          </h3>
-                          <div className="space-y-4">
-                            {projectScan?.analysis?.audit_issues?.map(
-                              (issue, i) => (
-                                <div
-                                  key={i}
-                                  className="p-4 rounded-2xl bg-red-600/5 border border-red-500/20 space-y-2"
-                                >
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-[10px] font-bold text-red-400 uppercase">
-                                      {issue.type}
-                                    </span>
-                                    <span className="text-[9px] text-slate-500 font-mono">
-                                      {issue.file}
-                                    </span>
-                                  </div>
-                                  <p className="text-xs text-slate-300 leading-relaxed">
-                                    {issue.message}
-                                  </p>
-                                </div>
-                              ),
-                            )}
-                            {!projectScan?.analysis?.audit_issues?.length && (
-                              <p className="text-xs text-slate-600 italic">
-                                –ü—Ä–æ–±–ª–µ–º –Ω–µ –æ–±–Ω–∞—Ä—É–∂–µ–Ω–æ. –í–∞—à –∫–æ–¥ –æ–ø—Ç–∏–º–∏–∑–∏—Ä–æ–≤–∞–Ω!
-                              </p>
-                            )}
-                          </div>
-                        </section>
-
-                        <section className="p-8 rounded-[2.5rem] bg-black/40 border border-white/5">
-                          <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6 flex items-center gap-3">
-                            <Check className="w-4 h-4 text-purple-400" /> –°–ø–∏—Å–æ–∫
-                            –∑–∞–¥–∞—á (AI To-Do)
-                          </h3>
-                          <div className="space-y-3">
-                            {projectScan?.analysis?.todos?.map((todo, i) => (
-                              <div
-                                key={i}
-                                className="flex items-start gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 group hover:bg-white/10 transition-all"
-                              >
-                                <div
-                                  className={`mt-1 w-2 h-2 rounded-full flex-shrink-0 ${todo.type === "FIXME" ? "bg-red-500" : "bg-yellow-500"}`}
-                                />
-                                <div className="flex-1">
-                                  <div className="flex items-center justify-between mb-1">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase">
-                                      {todo.type}
-                                    </span>
-                                    <span className="text-[9px] text-slate-600 font-mono">
-                                      {todo.file}
-                                    </span>
-                                  </div>
-                                  <p className="text-xs text-slate-200">
-                                    {todo.text}
-                                  </p>
-                                </div>
-                              </div>
-                            ))}
-                            {!projectScan?.analysis?.todos?.length && (
-                              <p className="text-xs text-slate-600 italic">
-                                –ó–∞–¥–∞—á TODO –Ω–µ –Ω–∞–π–¥–µ–Ω–æ.
-                              </p>
-                            )}
-                          </div>
-                        </section>
-                      </div>
-
-                      {/* Assets & History */}
-                      <div className="space-y-8">
-                        <section className="p-8 rounded-[2.5rem] bg-black/40 border border-white/5">
-                          <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6 flex items-center gap-3">
-                            <Cube className="w-4 h-4 text-green-400" /> –¢—è–∂–µ–ª—ã–µ
-                            –∞—Å—Å–µ—Ç—ã
-                          </h3>
-                          <div className="space-y-3">
-                            {projectScan?.analysis?.asset_stats?.large_files?.map(
-                              (asset, i) => (
-                                <div
-                                  key={i}
-                                  className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5"
-                                >
-                                  <div className="flex items-center gap-3 overflow-hidden">
-                                    <ImageIcon className="w-4 h-4 text-slate-500 flex-shrink-0" />
-                                    <span className="text-xs text-slate-300 truncate">
-                                      {asset.path}
-                                    </span>
-                                  </div>
-                                  <span className="text-[10px] font-mono text-red-400 font-bold ml-4">
-                                    {asset.size}
-                                  </span>
-                                </div>
-                              ),
-                            )}
-                            {!projectScan?.analysis?.asset_stats?.large_files
-                              ?.length && (
-                              <p className="text-xs text-slate-600 italic">
-                                –í—Å–µ –∞—Å—Å–µ—Ç—ã –≤ –ø—Ä–µ–¥–µ–ª–∞—Ö –Ω–æ—Ä–º—ã (–¥–æ 10MB).
-                              </p>
-                            )}
-                          </div>
-                        </section>
-
-                        <section className="p-8 rounded-[2.5rem] bg-black/40 border border-white/5">
-                          <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6 flex items-center gap-3">
-                            <RefreshCw className="w-4 h-4 text-blue-400" />{" "}
-                            –ò—Å—Ç–æ—Ä–∏—è –∏–∑–º–µ–Ω–µ–Ω–∏–π (Mini-Git)
-                          </h3>
-                          <div className="space-y-4 max-h-[400px] overflow-y-auto scrollbar-none pr-2">
-                            {history.map((item, i) => (
-                              <div
-                                key={i}
-                                className="relative pl-6 border-l border-white/10 pb-4 last:pb-0"
-                              >
-                                <div
-                                  className={`absolute left-[-4px] top-0 w-2 h-2 rounded-full ${
-                                    item.event === "add"
-                                      ? "bg-green-500"
-                                      : item.event === "change"
-                                        ? "bg-blue-500"
-                                        : "bg-red-500"
-                                  }`}
-                                />
-                                <div className="flex items-center justify-between mb-1">
-                                  <span className="text-[10px] font-bold text-white uppercase">
-                                    {item.event}
-                                  </span>
-                                  <span className="text-[9px] text-slate-600">
-                                    {new Date(
-                                      item.timestamp,
-                                    ).toLocaleTimeString()}
-                                  </span>
-                                </div>
-                                <p className="text-[11px] text-slate-400 truncate">
-                                  {item.path}
-                                </p>
-                              </div>
-                            ))}
-                            {history.length === 0 && (
-                              <p className="text-xs text-slate-600 italic">
-                                –ò—Å—Ç–æ—Ä–∏—è –ø—É—Å—Ç–∞. –ù–∞—á–Ω–∏—Ç–µ —Ä–∞–±–æ—Ç—É —Å —Ñ–∞–π–ª–∞–º–∏!
-                              </p>
-                            )}
-                          </div>
-                        </section>
-
-                        {/* Blender Presets */}
-                        <section className="p-8 rounded-[2.5rem] bg-gradient-to-br from-purple-600/10 to-blue-600/10 border border-white/10">
-                          <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6 flex items-center gap-3">
-                            <Cube className="w-4 h-4 text-purple-400" /> –ü—Ä–µ—Å–µ—Ç—ã
-                            Blender
-                          </h3>
-                          <div className="grid grid-cols-1 gap-4">
-                            {blenderPresets.map((preset) => (
-                              <div
-                                key={preset.id}
-                                className="p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-purple-500/30 transition-all group"
-                              >
-                                <div className="flex items-center justify-between mb-2">
-                                  <h4 className="text-xs font-bold text-white uppercase">
-                                    {preset.name}
-                                  </h4>
-                                  <button
-                                    onClick={() =>
-                                      copyToClipboard(preset.code, preset.id)
-                                    }
-                                    className="p-1.5 hover:bg-white/5 rounded-md text-slate-500 hover:text-white transition-all"
-                                  >
-                                    {copiedId === preset.id ? (
-                                      <Check className="w-3 h-3 text-green-500" />
-                                    ) : (
-                                      <Copy className="w-3 h-3" />
-                                    )}
-                                  </button>
-                                </div>
-                                <p className="text-[10px] text-slate-500 mb-3">
-                                  {preset.desc}
-                                </p>
-                                <div className="bg-black/60 rounded-lg p-3 font-mono text-[9px] text-purple-400 overflow-x-auto">
-                                  {preset.code.split("\n")[0]}...
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </section>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : activeTab === "project_info" ? (
-                <div className="flex-1 overflow-y-auto p-8 scrollbar-thin scrollbar-thumb-white/5">
-                  <div className="max-w-4xl mx-auto">
-                    <div className="bg-white/5 border border-white/5 rounded-[2.5rem] p-10 shadow-2xl relative overflow-hidden group">
-                      <div className="absolute top-0 right-0 p-12 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
-                        <Cpu className="w-64 h-64 text-white" />
-                      </div>
-                      <div className="relative z-10">
-                        <div className="markdown-body prose prose-invert prose-sm max-w-none text-slate-300 leading-relaxed">
-                          <Markdown>
-                            {kb?.unity_ai_assistant?.combined_knowledge || ""}
-                          </Markdown>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mt-12 p-8 rounded-[2rem] bg-gradient-to-br from-blue-600/10 to-purple-600/10 border border-white/10 relative overflow-hidden">
-                      <div className="flex items-center justify-between gap-6">
-                        <div className="flex items-center gap-4">
-                          <div className="p-3 bg-blue-600/20 rounded-2xl">
-                            <FileText className="w-6 h-6 text-blue-400" />
-                          </div>
-                          <div>
-                            <h3 className="text-lg font-bold text-white uppercase tracking-tight">
-                              Master Recovery Blueprint
-                            </h3>
-                            <p className="text-xs text-slate-400">
-                              –§–∞–π–ª PROJECT_MASTER_BLUEPRINT.md –æ–±–Ω–æ–≤–ª–µ–Ω –∏ –≥–æ—Ç–æ–≤
-                              –∫ –∏—Å–ø–æ–ª—å–∑–æ–≤–∞–Ω–∏—é.
-                            </p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => setShowSettings(true)}
-                          className="px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-2xl text-[10px] font-bold uppercase tracking-widest transition-all border border-white/10"
-                        >
-                          –ù–∞—Å—Ç—Ä–æ–π–∫–∏
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : activeTab === "project_scripts" ? (
-                <div className="flex-1 overflow-hidden flex flex-col p-8">
-                  <div className="max-w-7xl w-full mx-auto flex-1 flex flex-col min-h-0 space-y-6">
-                    {/* Header Banner */}
-                    <div className="p-6 rounded-3xl bg-gradient-to-r from-amber-600/20 via-yellow-600/10 to-transparent border border-amber-500/20 flex items-center justify-between relative overflow-hidden shrink-0">
-                      <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
-                        <Code2 className="w-48 h-48 text-amber-400" />
-                      </div>
-                      <div className="flex items-center gap-4 relative z-10">
-                        <div className="w-12 h-12 bg-amber-600/30 rounded-2xl flex items-center justify-center border border-amber-500/40 text-amber-400">
-                          <FileCode className="w-6 h-6 animate-pulse" />
-                        </div>
-                        <div>
-                          <h2 className="text-lg font-bold text-white uppercase tracking-tight flex items-center gap-2">
-                            Fate Continent Codesmith ‚Ä¢ –ö–≤–∞–Ω—Ç–æ–≤—ã–π –î–∏—Å—Ç—Ä–∏–±—å—é—Ç–æ—Ä
-                          </h2>
-                          <p className="text-[10px] text-amber-400/80 font-mono uppercase tracking-widest">
-                            Central Script Replication Node ‚Äî No Manual Selection Errors
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right font-mono text-[9px] text-slate-500">
-                        <div>VERSION: {appVersion}</div>
-                        <div>ACTIVE INSTANCE: SERVER NODE 3000</div>
-                      </div>
-                    </div>
-
-                    {/* Main Workspace split panel */}
-                    <div className="flex-1 flex gap-6 min-h-0 w-full">
-                      {/* Left Sidebar - File List */}
-                      <div className="w-80 flex flex-col bg-white/5 border border-white/5 rounded-3xl p-4 min-h-0 shrink-0">
-                        <div className="px-2 pb-3 border-b border-white/5 flex items-center justify-between">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">
-                            –§–∞–π–ª—ã –ü—Ä–æ–µ–∫—Ç–∞ ({projectFiles.length})
-                          </span>
-                          <span className="text-[9px] bg-amber-500/10 border border-amber-500/30 text-amber-400 px-2 py-0.5 rounded-full font-mono uppercase">
-                            –ê–≤—Ç–æ-—Å–∏–Ω—Ö—Ä–æ–Ω–∏–∑–∞—Ü–∏—è
-                          </span>
-                        </div>
-                        <div className="flex-1 overflow-y-auto mt-3 space-y-1.5 pr-1 scrollbar-thin scrollbar-thumb-amber-500/10 hover:scrollbar-thumb-amber-500/20">
-                          {projectFiles.map((file) => {
-                            const isSelected = selectedFile?.path === file.path;
-                            return (
-                              <button
-                                key={file.path}
-                                onClick={() => setSelectedFile(file)}
-                                className={`w-full text-left p-3.5 rounded-2xl border transition-all duration-200 flex items-start gap-3 group relative ${
-                                  isSelected
-                                    ? "bg-amber-600/20 border-amber-500/50 shadow-lg shadow-amber-600/10"
-                                    : "bg-white/[0.02] border-white/5 hover:bg-white/5 hover:border-white/10"
-                                }`}
-                              >
-                                <div className={`p-2 rounded-xl shrink-0 ${isSelected ? "bg-amber-500 text-white" : "bg-black/30 text-slate-400 group-hover:text-white"}`}>
-                                  <FileCode className="w-4 h-4" />
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                  <div className="flex items-center justify-between gap-1.5 min-w-0">
-                                    <div className={`text-xs font-bold truncate ${isSelected ? "text-white" : "text-slate-300 group-hover:text-white"}`}>
-                                      {file.name}
-                                    </div>
-                                    {file.lineCount !== undefined && (
-                                      <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white/5 text-amber-400 font-bold shrink-0">
-                                        {file.lineCount} —Å—Ç—Ä–æ–∫
-                                      </span>
-                                    )}
-                                  </div>
-                                  <div className="text-[9px] text-slate-500 mt-0.5 line-clamp-2">
-                                    {file.desc}
-                                  </div>
-                                </div>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* Right Panel - Massive Code Viewer */}
-                      <div className="flex-1 flex flex-col bg-black/40 border border-white/5 rounded-3xl min-h-0 overflow-hidden relative">
-                        {/* Tab header */}
-                        <div className="h-14 border-b border-white/5 px-6 flex items-center justify-between bg-black/20 shrink-0">
-                          <div className="flex items-center gap-3">
-                            <Terminal className="w-4 h-4 text-amber-400" />
-                            <span className="text-xs font-mono font-bold text-white">
-                              {selectedFile ? selectedFile.name : "–í—ã–±–µ—Ä–∏—Ç–µ —Ñ–∞–π–ª..."}
-                            </span>
-                            {selectedFile && (
-                              <>
-                                <span className="text-[8px] px-2 py-0.5 rounded bg-white/5 border border-white/10 text-slate-400 font-mono">
-                                  {selectedFile.path.endsWith('.cs') ? "C# Script" : "Python Code"}
-                                </span>
-                                {selectedFile.lineCount !== undefined && (
-                                  <span className="text-[8px] px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-400 font-mono font-bold">
-                                    {selectedFile.lineCount} —Å—Ç—Ä–æ–∫
-                                  </span>
-                                )}
-                              </>
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            {selectedFile && (
-                              <>
-                                {/* Refresh/Sync button */}
-                                <button
-                                  onClick={() => {
-                                    reloadProjectFilesAndContent(false);
-                                    showNotification(`–°–æ–¥–µ—Ä–∂–∏–º–æ–µ —Ñ–∞–π–ª–∞ ${selectedFile.name} –∏ —Å–ø–∏—Å–æ–∫ —Å–∫—Ä–∏–ø—Ç–æ–≤ —É—Å–ø–µ—à–Ω–æ –æ–±–Ω–æ–≤–ª–µ–Ω—ã!`, "success");
-                                  }}
-                                  className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white rounded-xl text-[10px] font-bold uppercase transition-all border border-white/10"
-                                  title="–°–∏–Ω—Ö—Ä–æ–Ω–∏–∑–∏—Ä–æ–≤–∞—Ç—å —Å –¥–∏—Å–∫–æ–º –≤—Ä—É—á–Ω—É—é"
-                                >
-                                  <RefreshCw className={`w-3.5 h-3.5 ${isReadingFile ? 'animate-spin text-amber-400' : ''}`} /> 
-                                  –û–ë–ù–û–í–ò–¢–¨
-                                </button>
-
-                                {/* Download button */}
-                                <button
-                                  onClick={() => {
-                                    const element = document.createElement("a");
-                                    const fileBlob = new Blob([selectedFileContent], { type: "text/plain" });
-                                    element.href = URL.createObjectURL(fileBlob);
-                                    element.download = selectedFile.name;
-                                    document.body.appendChild(element);
-                                    element.click();
-                                    document.body.removeChild(element);
-                                    showNotification(`–§–∞–π–ª ${selectedFile.name} —É—Å–ø–µ—à–Ω–æ —Å–∫–∞—á–∞–Ω!`, "success");
-                                  }}
-                                  className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white rounded-xl text-[10px] font-bold uppercase transition-all border border-white/10"
-                                  title="–°–∫–∞—á–∞—Ç—å —Ñ–∞–π–ª –Ω–∞–ø—Ä—è–º—É—é"
-                                >
-                                  <Download className="w-3.5 h-3.5" /> –°–ö–ê–ß–ê–¢–¨
-                                </button>
-
-                                {/* Giant Copy Button with animation state */}
-                                <button
-                                  onClick={() => {
-                                    navigator.clipboard.writeText(selectedFileContent);
-                                    setCopiedFile(true);
-                                    showNotification("–í–ï–°–¨ —Å–∫—Ä–∏–ø—Ç —É—Å–ø–µ—à–Ω–æ —Å–∫–æ–ø–∏—Ä–æ–≤–∞–Ω –≤ –±—É—Ñ–µ—Ä –æ–±–º–µ–Ω–∞! –û—à–∏–±–∫–∏ —Ä—É—á–Ω–æ–≥–æ –≤—ã–¥–µ–ª–µ–Ω–∏—è –∏—Å–∫–ª—é—á–µ–Ω—ã.", "success");
-                                    setTimeout(() => setCopiedFile(false), 3000);
-                                  }}
-                                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold uppercase transition-all shadow-lg shadow-amber-600/10 ${
-                                    copiedFile
-                                      ? "bg-green-600 text-white"
-                                      : "bg-amber-600 hover:bg-amber-500 text-white"
-                                  }`}
-                                >
-                                  {copiedFile ? (
-                                    <>
-                                      <Check className="w-4 h-4 animate-bounce" />
-                                      –°–ö–û–ü–ò–†–û–í–ê–ù–û!
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Copy className="w-4 h-4" />
-                                      –ö–û–ü–ò–†–û–í–ê–¢–¨ –í–ï–°–¨ –°–ö–†–ò–ü–¢
-                                    </>
-                                  )}
-                                </button>
-                              </>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Code Display Area */}
-                        <div className="flex-1 overflow-auto p-6 font-mono text-xs text-slate-300 relative select-text">
-                          {isReadingFile ? (
-                            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/40 backdrop-blur-sm">
-                              <RefreshCw className="w-8 h-8 text-amber-500 animate-spin" />
-                              <span className="text-[10px] uppercase font-mono tracking-widest text-slate-400">
-                                –ö–≤–∞–Ω—Ç–æ–≤–æ–µ —Å—á–∏—Ç—ã–≤–∞–Ω–∏–µ —Å—Ç—Ä–æ–∫ –∫–æ–¥–∞...
-                              </span>
-                            </div>
-                          ) : selectedFileContent ? (
-                            <pre className="text-slate-300 select-text leading-relaxed whitespace-pre font-mono">
-                              {selectedFileContent}
-                            </pre>
-                          ) : (
-                            <div className="h-full flex items-center justify-center text-slate-500 uppercase font-mono text-[10px] tracking-widest">
-                              –í—ã–±–µ—Ä–∏—Ç–µ —Ñ–∞–π–ª –∏–∑ –ª–µ–≤–æ–≥–æ —Å–ø–∏—Å–∫–∞ –¥–ª—è –æ—Ç–æ–±—Ä–∞–∂–µ–Ω–∏—è –∫–æ–¥–∞.
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Bottom Stats Line */}
-                        {selectedFile && !isReadingFile && (
-                          <div className="h-8 border-t border-white/5 bg-black/20 px-6 flex items-center justify-between text-[9px] text-slate-500 font-mono shrink-0">
-                            <div>PATH: {selectedFile.path}</div>
-                            <div className="flex items-center gap-4">
-                              <span>LINES: {selectedFileContent.split('\n').length}</span>
-                              <span>CHARACTERS: {selectedFileContent.length}</span>
-                              <span className="text-green-500 flex items-center gap-1">
-                                <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-500 animate-ping" /> READY
-                              </span>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : null}
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </main>
-
-      {/* Ollama Guide Modal */}
-      <AnimatePresence>
-        {showOllamaGuide && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6"
-          >
-            <motion.div
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className="bg-[#121214] border border-white/10 rounded-3xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col shadow-2xl"
-            >
-              <div className="p-6 border-b border-white/5 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-cyan-600/20 rounded-lg text-cyan-400">
-                    <Cpu className="w-5 h-5" />
-                  </div>
-                  <h2 className="text-lg font-bold text-white uppercase tracking-tight">
-                    Ollama (Offline AI) Guide
-                  </h2>
-                </div>
-                <button
-                  onClick={() => setShowOllamaGuide(false)}
-                  className="p-2 hover:bg-white/5 rounded-lg transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto p-8 space-y-6 scrollbar-thin scrollbar-thumb-white/5">
-                <div className="space-y-4">
-                  <h4 className="text-sm font-bold text-white uppercase">
-                    1. –£—Å—Ç–∞–Ω–æ–≤–∫–∞
-                  </h4>
-                  <p className="text-xs text-slate-400">
-                    –°–∫–∞—á–∞–π—Ç–µ Ollama —Å –æ—Ñ–∏—Ü–∏–∞–ª—å–Ω–æ–≥–æ —Å–∞–π—Ç–∞{" "}
-                    <a
-                      href="https://ollama.com"
-                      target="_blank"
-                      className="text-cyan-400 underline"
-                    >
-                      ollama.com
-                    </a>{" "}
-                    –∏ —É—Å—Ç–∞–Ω–æ–≤–∏—Ç–µ –µ—ë.
-                  </p>
-
-                  <h4 className="text-sm font-bold text-white uppercase">
-                    2. –ó–∞–≥—Ä—É–∑–∫–∞ –º–æ–¥–µ–ª–∏
-                  </h4>
-                  <p className="text-xs text-slate-400">
-                    –û—Ç–∫—Ä–æ–π—Ç–µ —Ç–µ—Ä–º–∏–Ω–∞–ª (CMD) –∏ –≤–≤–µ–¥–∏—Ç–µ –∫–æ–º–∞–Ω–¥—É –¥–ª—è –∑–∞–≥—Ä—É–∑–∫–∏ Llama
-                    3:
-                  </p>
-                  <div className="bg-black/40 rounded-xl p-4 font-mono text-[11px] text-cyan-400 border border-white/5">
-                    ollama run llama3
-                  </div>
-
-                  <h4 className="text-sm font-bold text-white uppercase">
-                    3. –ò–Ω—Ç–µ–≥—Ä–∞—Ü–∏—è —Å –ø—Ä–æ–µ–∫—Ç–æ–º
-                  </h4>
-                  <p className="text-xs text-slate-400">
-                    –ù–∞—à –ø—Ä–æ–µ–∫—Ç –∞–≤—Ç–æ–º–∞—Ç–∏—á–µ—Å–∫–∏ –æ–±–Ω–∞—Ä—É–∂–∏—Ç Ollama –Ω–∞ –ø–æ—Ä—Ç—É 11434.
-                    –ï—Å–ª–∏ –∏–Ω—Ç–µ—Ä–Ω–µ—Ç –ø—Ä–æ–ø–∞–¥–µ—Ç, —á–∞—Ç –ø–µ—Ä–µ–∫–ª—é—á–∏—Ç—Å—è –Ω–∞ –ª–æ–∫–∞–ª—å–Ω—É—é
-                    –º–æ–¥–µ–ª—å.
-                  </p>
-
-                  <div className="p-4 bg-yellow-600/10 border border-yellow-500/20 rounded-xl">
-                    <p className="text-[10px] text-yellow-500 leading-relaxed">
-                      <strong>–í–∞–∂–Ω–æ:</strong> –î–ª—è —Ä–∞–±–æ—Ç—ã Ollama —Ç—Ä–µ–±—É–µ—Ç—Å—è
-                      –º–∏–Ω–∏–º—É–º 8–ì–ë –æ–ø–µ—Ä–∞—Ç–∏–≤–Ω–æ–π –ø–∞–º—è—Ç–∏ (—Ä–µ–∫–æ–º–µ–Ω–¥—É–µ—Ç—Å—è 16–ì–ë+ –∏
-                      –≤–∏–¥–µ–æ–∫–∞—Ä—Ç–∞ NVIDIA).
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Migration Modal */}
-      <AnimatePresence>
-        {showMigrationModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6"
-          >
-            <motion.div
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className="bg-[#121214] border border-white/10 rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl"
-            >
-              <div className="p-6 border-b border-white/5 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-orange-600/20 rounded-lg text-orange-400">
-                    <GitBranch className="w-5 h-5" />
-                  </div>
-                  <h2 className="text-lg font-bold text-white uppercase tracking-tight">
-                    Unity Migration Center
-                  </h2>
-                </div>
-                <button
-                  onClick={() => setShowMigrationModal(false)}
-                  className="p-2 hover:bg-white/5 rounded-lg transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto p-8 space-y-8 scrollbar-thin scrollbar-thumb-white/5">
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                      –¢–µ–∫—É—â–∏–µ –ø–∞–∫–µ—Ç—ã:
-                    </h4>
-                    <div className="space-y-2">
-                      {unityPackages.map((pkg, i) => (
-                        <div
-                          key={i}
-                          className="p-3 rounded-xl bg-white/5 border border-white/5"
-                        >
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-xs font-bold text-white">
-                              {pkg.name}
-                            </span>
-                            <span className="text-[9px] text-slate-500">
-                              {pkg.version}
-                            </span>
-                          </div>
-                          <p className="text-[9px] text-slate-400 italic">
-                            {pkg.action}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                      –î–µ–π—Å—Ç–≤–∏–µ:
-                    </h4>
-                    <button
-                      onClick={handleMigrate}
-                      disabled={isMigrating}
-                      className="w-full py-4 bg-orange-600 hover:bg-orange-500 text-white rounded-2xl text-xs font-bold uppercase tracking-widest transition-all shadow-lg shadow-orange-600/20"
-                    >
-                      {isMigrating
-                        ? "–ì–µ–Ω–µ—Ä–∞—Ü–∏—è..."
-                        : "–°–æ–∑–¥–∞—Ç—å –ø–ª–∞–Ω –º–∏–≥—Ä–∞—Ü–∏–∏ –Ω–∞ Unity 6"}
-                    </button>
-                    {migrationGuide && (
-                      <div className="p-4 rounded-xl bg-black/40 border border-white/5 font-sans text-xs text-slate-300 leading-relaxed">
-                        <Markdown>{migrationGuide}</Markdown>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* GitHub Guide Modal */}
-      <AnimatePresence>
-        {showGithubGuide && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6"
-          >
-            <motion.div
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className="bg-[#121214] border border-white/10 rounded-3xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col shadow-2xl"
-            >
-              <div className="p-6 border-b border-white/5 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white/5 rounded-lg text-blue-400">
-                    <Github className="w-5 h-5" />
-                  </div>
-                  <h2 className="text-lg font-bold text-white uppercase tracking-tight">
-                    GitHub Console Guide
-                  </h2>
-                </div>
-                <button
-                  onClick={() => setShowGithubGuide(false)}
-                  className="p-2 hover:bg-white/5 rounded-lg transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="flex-1 overflow-y-auto p-8 space-y-8 scrollbar-thin scrollbar-thumb-white/5">
-                <div className="bg-blue-600/10 border border-blue-500/20 rounded-2xl p-4 flex gap-4">
-                  <Info className="w-5 h-5 text-blue-400 flex-shrink-0" />
-                  <p className="text-[11px] text-blue-300 leading-relaxed">
-                    –°–ª–µ–¥—É–π—Ç–µ —ç—Ç–∏–º —à–∞–≥–∞–º, —á—Ç–æ–±—ã –ø–µ—Ä–µ–Ω–µ—Å—Ç–∏ –ø—Ä–æ–µ–∫—Ç{" "}
-                    <code className="text-white">
-                      C:\Users\user\Desktop\HelperUnity-main\HelperUnity-main
-                    </code>{" "}
-                    –Ω–∞ GitHub —á–µ—Ä–µ–∑ –∫–æ–Ω—Å–æ–ª—å.
-                  </p>
-                </div>
-
-                <div className="space-y-6">
-                  <div className="relative pl-8 border-l border-white/10">
-                    <div className="absolute left-[-5px] top-0 w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
-                    <h4 className="text-[11px] font-bold text-white uppercase mb-1">
-                      –®–∞–≥ 1: –ò–Ω–∏—Ü–∏–∞–ª–∏–∑–∞—Ü–∏—è
-                    </h4>
-                    <p className="text-[10px] text-slate-500 mb-2">
-                      –û—Ç–∫—Ä–æ–π—Ç–µ —Ç–µ—Ä–º–∏–Ω–∞–ª –≤ –ø–∞–ø–∫–µ –ø—Ä–æ–µ–∫—Ç–∞ –∏ –≤—ã–ø–æ–ª–Ω–∏—Ç–µ:
-                    </p>
-                    <div className="bg-black/40 rounded-xl p-4 font-mono text-[11px] text-blue-400 border border-white/5">
-                      git init
-                    </div>
-                  </div>
-
-                  <div className="relative pl-8 border-l border-white/10">
-                    <div className="absolute left-[-5px] top-0 w-2.5 h-2.5 rounded-full bg-blue-500" />
-                    <h4 className="text-[11px] font-bold text-white uppercase mb-1">
-                      –®–∞–≥ 2: –î–æ–±–∞–≤–ª–µ–Ω–∏–µ —Ñ–∞–π–ª–æ–≤
-                    </h4>
-                    <p className="text-[10px] text-slate-500 mb-2">
-                      –î–æ–±–∞–≤—å—Ç–µ –≤—Å–µ —Ñ–∞–π–ª—ã –ø—Ä–æ–µ–∫—Ç–∞ –≤ –∏–Ω–¥–µ–∫—Å:
-                    </p>
-                    <div className="bg-black/40 rounded-xl p-4 font-mono text-[11px] text-blue-400 border border-white/5">
-                      git add .
-                    </div>
-                  </div>
-
-                  <div className="relative pl-8 border-l border-white/10">
-                    <div className="absolute left-[-5px] top-0 w-2.5 h-2.5 rounded-full bg-blue-500" />
-                    <h4 className="text-[11px] font-bold text-white uppercase mb-1">
-                      –®–∞–≥ 3: –ü–µ—Ä–≤—ã–π –∫–æ–º–º–∏—Ç
-                    </h4>
-                    <p className="text-[10px] text-slate-500 mb-2">
-                      –ó–∞—Ñ–∏–∫—Å–∏—Ä—É–π—Ç–µ –∏–∑–º–µ–Ω–µ–Ω–∏—è:
-                    </p>
-                    <div className="bg-black/40 rounded-xl p-4 font-mono text-[11px] text-blue-400 border border-white/5">
-                      git commit -m "Initial commit: Unity & Blender Assistant"
-                    </div>
-                  </div>
-
-                  <div className="relative pl-8 border-l border-white/10">
-                    <div className="absolute left-[-5px] top-0 w-2.5 h-2.5 rounded-full bg-blue-500" />
-                    <h4 className="text-[11px] font-bold text-white uppercase mb-1">
-                      –®–∞–≥ 4: –ü—Ä–∏–≤—è–∑–∫–∞ —Ä–µ–ø–æ–∑–∏—Ç–æ—Ä–∏—è
-                    </h4>
-                    <p className="text-[10px] text-slate-500 mb-2">
-                      –°–æ–∑–¥–∞–π—Ç–µ —Ä–µ–ø–æ–∑–∏—Ç–æ—Ä–∏–π –Ω–∞ GitHub –∏ –≤—Å—Ç–∞–≤—å—Ç–µ –µ–≥–æ URL:
-                    </p>
-                    <div className="bg-black/40 rounded-xl p-4 font-mono text-[11px] text-blue-400 border border-white/5">
-                      git remote add origin
-                      https://github.com/–í–ê–®_–õ–û–ì–ò–ù/–í–ê–®_–†–ï–ü–û–ó–ò–¢–û–†–ò–ô.git
-                      <br />
-                      git branch -M main
-                    </div>
-                  </div>
-
-                  <div className="relative pl-8 border-l border-white/10">
-                    <div className="absolute left-[-5px] top-0 w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
-                    <h4 className="text-[11px] font-bold text-white uppercase mb-1">
-                      –®–∞–≥ 5: –ü—É–±–ª–∏–∫–∞—Ü–∏—è
-                    </h4>
-                    <p className="text-[10px] text-slate-500 mb-2">
-                      –û—Ç–ø—Ä–∞–≤—å—Ç–µ —Ñ–∞–π–ª—ã –Ω–∞ —Å–µ—Ä–≤–µ—Ä:
-                    </p>
-                    <div className="bg-black/40 rounded-xl p-4 font-mono text-[11px] text-blue-400 border border-white/5">
-                      git push -u origin main
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-yellow-600/10 border border-yellow-500/20 rounded-2xl p-4 flex gap-4">
-                  <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0" />
-                  <div className="space-y-1">
-                    <h5 className="text-[11px] font-bold text-yellow-400 uppercase">
-                      –í–∞–∂–Ω–æ–µ –ø—Ä–∏–º–µ—á–∞–Ω–∏–µ
-                    </h5>
-                    <p className="text-[10px] text-yellow-300/70 leading-relaxed">
-                      –£–±–µ–¥–∏—Ç–µ—Å—å, —á—Ç–æ —É –≤–∞—Å —É—Å—Ç–∞–Ω–æ–≤–ª–µ–Ω Git. –ï—Å–ª–∏ –Ω–µ—Ç, —Å–∫–∞—á–∞–π—Ç–µ
-                      –µ–≥–æ —Å –æ—Ñ–∏—Ü–∏–∞–ª—å–Ω–æ–≥–æ —Å–∞–π—Ç–∞{" "}
-                      <a
-                        href="https://git-scm.com"
-                        target="_blank"
-                        className="text-white underline"
-                      >
-                        git-scm.com
-                      </a>
-                      .
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-6 border-t border-white/5 bg-black/20 flex justify-end">
-                <button
-                  onClick={() => setShowGithubGuide(false)}
-                  className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold uppercase transition-all"
-                >
-                  –ü–æ–Ω—è—Ç–Ω–æ
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Capabilities Modal */}
-      <AnimatePresence>
-        {showCapabilities && capabilities && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl"
-          >
-            <motion.div
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className="bg-[#0a0a0c] border border-white/10 rounded-[3rem] w-full max-w-3xl max-h-[85vh] overflow-hidden shadow-2xl flex flex-col"
-            >
-              <div className="p-8 border-b border-white/5 flex items-center justify-between bg-gradient-to-r from-blue-600/10 to-transparent">
-                <div className="flex items-center gap-4">
-                  <div className="p-4 bg-blue-600 rounded-3xl shadow-xl shadow-blue-600/20">
-                    <Zap className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-white tracking-tighter">
-                      Unity & Blender AI Assistant v{appVersion}
-                    </h2>
-                    <p className="text-xs text-slate-400">
-                      –†–∞—Å—à–∏—Ä–µ–Ω–Ω–∞—è –±–∞–∑–∞ –∑–Ω–∞–Ω–∏–π: 11800+ –≤–∏–¥–µ–æ
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setShowCapabilities(false)}
-                  className="p-3 hover:bg-white/5 rounded-2xl text-slate-500 hover:text-white transition-all"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-
-              <div className="flex-1 overflow-y-auto p-8 space-y-10 scrollbar-thin scrollbar-thumb-white/5">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {capabilities.core_functions.map((func: any, i: number) => (
-                    <div
-                      key={i}
-                      className="p-6 rounded-3xl bg-white/5 border border-white/5 space-y-3"
-                    >
-                      <h4 className="text-xs font-bold text-blue-400 uppercase tracking-widest">
-                        {func.title}
-                      </h4>
-                      <p className="text-xs text-slate-400 leading-relaxed">
-                        {func.desc}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="space-y-6">
-                  <h3 className="text-xs font-bold text-white uppercase tracking-widest flex items-center gap-3">
-                    <FileCode className="w-4 h-4 text-purple-400" />{" "}
-                    –û–±—Ä–∞–±–∞—Ç—ã–≤–∞–µ–º—ã–µ —Ñ–∞–π–ª—ã
-                  </h3>
-                  <div className="grid grid-cols-1 gap-3">
-                    {capabilities.files_handled.map(
-                      (file: string, i: number) => (
-                        <div
-                          key={i}
-                          className="px-5 py-3 rounded-2xl bg-white/5 border border-white/5 text-[11px] text-slate-300 font-mono"
-                        >
-                          {file}
-                        </div>
-                      ),
-                    )}
-                  </div>
-                </div>
-
-                {capabilities.video_knowledge_base && (
-                  <div className="space-y-8">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-xs font-bold text-white uppercase tracking-widest flex items-center gap-3">
-                        <Zap className="w-4 h-4 text-yellow-400" /> –ë–∞–∑–∞ –∑–Ω–∞–Ω–∏–π:
-                        11800+ –≤–∏–¥–µ–æ & Global Synergy
-                      </h3>
-                      <span className="text-[10px] text-slate-500 font-mono uppercase">
-                        –û–±–Ω–æ–≤–ª–µ–Ω–æ:{" "}
-                        {capabilities.video_knowledge_base.update_date}
-                      </span>
-                    </div>
-
-                    {capabilities.video_knowledge_base &&
-                      capabilities.video_knowledge_base.categories && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {capabilities.video_knowledge_base.categories.map(
-                            (cat: any, i: number) => (
-                              <div
-                                key={i}
-                                className="p-6 rounded-3xl bg-white/5 border border-white/5 space-y-4 group hover:bg-white/10 transition-all"
-                              >
-                                <h4 className="text-[11px] font-bold text-blue-400 uppercase tracking-wider border-b border-white/5 pb-2">
-                                  {cat.name}
-                                </h4>
-                                <ul className="space-y-2">
-                                  {cat.items.map((item: string, j: number) => (
-                                    <li
-                                      key={j}
-                                      className="text-[11px] text-slate-400 flex items-start gap-2"
-                                    >
-                                      <span className="text-blue-500 mt-1">
-                                        ‚Ä¢
-                                      </span>
-                                      <span>{item}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            ),
-                          )}
-                        </div>
-                      )}
-                  </div>
-                )}
-
-                {capabilities.ai_limitations?.current_gaps && (
-                  <div className="space-y-6">
-                    <h3 className="text-xs font-bold text-red-400 uppercase tracking-widest flex items-center gap-3">
-                      <AlertTriangle className="w-4 h-4" /> –ß–µ–≥–æ –ò–ò –ø–æ–∫–∞ –ù–ï
-                      –∑–Ω–∞–µ—Ç
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {capabilities.ai_limitations.current_gaps.map(
-                        (limit: string, i: number) => (
-                          <div
-                            key={i}
-                            className="px-5 py-3 rounded-2xl bg-red-500/5 border border-red-500/10 text-[11px] text-slate-400 italic"
-                          >
-                            {limit}
-                          </div>
-                        ),
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {capabilities.game_genres && (
-                  <div className="space-y-6">
-                    <h3 className="text-xs font-bold text-white uppercase tracking-widest flex items-center gap-3">
-                      <Gamepad2 className="w-4 h-4 text-green-400" />{" "}
-                      –ü–æ–¥–¥–µ—Ä–∂–∏–≤–∞–µ–º—ã–µ –∂–∞–Ω—Ä—ã
-                    </h3>
-                    <div className="flex flex-wrap gap-3">
-                      {capabilities.game_genres.map(
-                        (genre: string, i: number) => (
-                          <div
-                            key={i}
-                            className="px-4 py-2 rounded-full bg-green-600/10 border border-green-500/20 text-[10px] font-bold text-green-400 uppercase tracking-widest"
-                          >
-                            {genre}
-                          </div>
-                        ),
-                      )}
-                    </div>
-                  </div>
-                )}
-                {capabilities.inventory_guide && (
-                  <div className="space-y-6">
-                    <h3 className="text-xs font-bold text-white uppercase tracking-widest flex items-center gap-3">
-                      <Box className="w-4 h-4 text-orange-400" /> –°–∏—Å—Ç–µ–º—ã
-                      –∏–Ω–≤–µ–Ω—Ç–∞—Ä—è
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="p-5 rounded-3xl bg-white/5 border border-white/5 space-y-3">
-                        <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                          –¢–∏–ø—ã
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                          {capabilities.inventory_guide.types.map(
-                            (t: string, i: number) => (
-                              <span
-                                key={i}
-                                className="px-3 py-1 rounded-lg bg-black/40 text-[10px] text-slate-300"
-                              >
-                                {t}
-                              </span>
-                            ),
-                          )}
-                        </div>
-                      </div>
-                      <div className="p-5 rounded-3xl bg-white/5 border border-white/5 space-y-3">
-                        <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                          –ö–æ–º–ø–æ–Ω–µ–Ω—Ç—ã
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                          {capabilities.inventory_guide.components.map(
-                            (c: string, i: number) => (
-                              <span
-                                key={i}
-                                className="px-3 py-1 rounded-lg bg-black/40 text-[10px] text-slate-300"
-                              >
-                                {c}
-                              </span>
-                            ),
-                          )}
-                        </div>
-                      </div>
-                      <div className="p-5 rounded-3xl bg-white/5 border border-white/5 space-y-3">
-                        <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                          –û—Å–æ–±–µ–Ω–Ω–æ—Å—Ç–∏
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                          {capabilities.inventory_guide.features.map(
-                            (f: string, i: number) => (
-                              <span
-                                key={i}
-                                className="px-3 py-1 rounded-lg bg-black/40 text-[10px] text-slate-300"
-                              >
-                                {f}
-                              </span>
-                            ),
-                          )}
-                        </div>
-                      </div>
-                      <div className="p-5 rounded-3xl bg-white/5 border border-white/5 space-y-3">
-                        <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                          –†–µ–∞–ª–∏–∑–∞—Ü–∏—è Unity
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                          {capabilities.inventory_guide.unity_implementation.map(
-                            (u: string, i: number) => (
-                              <span
-                                key={i}
-                                className="px-3 py-1 rounded-lg bg-black/40 text-[10px] text-slate-300"
-                              >
-                                {u}
-                              </span>
-                            ),
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {kb?.blender_manuals && (
-                  <div className="space-y-6">
-                    <h3 className="text-xs font-bold text-white uppercase tracking-widest flex items-center gap-3">
-                      <BookOpen className="w-4 h-4 text-blue-400" />{" "}
-                      –î–æ–∫—É–º–µ–Ω—Ç–∞—Ü–∏—è Blender (v2.4 - v5.1.1)
-                    </h3>
-                    <div className="p-6 rounded-3xl bg-blue-600/5 border border-blue-500/20">
-                      <p className="text-[11px] text-slate-400 leading-relaxed mb-4">
-                        –ò–ò –∏–Ω—Ç–µ–≥—Ä–∏—Ä–æ–≤–∞–ª –∑–Ω–∞–Ω–∏—è –∏–∑ –≤—Å–µ—Ö –æ—Ñ–∏—Ü–∏–∞–ª—å–Ω—ã—Ö —Ä—É–∫–æ–≤–æ–¥—Å—Ç–≤
-                        Blender, –≤–∫–ª—é—á–∞—è –Ω–æ–≤–µ–π—à—É—é –≤–µ—Ä—Å–∏—é 5.1.1. –≠—Ç–æ –ø–æ–∑–≤–æ–ª—è–µ—Ç
-                        –∏—Å–ø–æ–ª—å–∑–æ–≤–∞—Ç—å OSL —à–µ–π–¥–µ—Ä—ã, Physically Accurate Glass,
-                        Mask to SDF –∏ –Ω–æ–≤—ã–µ –∏–Ω—Å—Ç—Ä—É–º–µ–Ω—Ç—ã —Ä–∏–≥–≥–∏–Ω–≥–∞.
-                      </p>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                        {kb.blender_manuals
-                          .slice(0, 8)
-                          .map((url: string, i: number) => {
-                            const version = url
-                              .split("/")
-                              .filter(Boolean)
-                              .pop();
-                            return (
-                              <div
-                                key={i}
-                                className="px-3 py-2 rounded-xl bg-black/40 border border-white/5 text-[10px] text-center text-blue-300 font-mono"
-                              >
-                                v{version}
-                              </div>
-                            );
-                          })}
-                        <div className="px-3 py-2 rounded-xl bg-black/40 border border-white/5 text-[10px] text-center text-slate-500 font-mono italic">
-                          + –µ—â–µ {kb.blender_manuals.length - 8}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="p-8 bg-white/5 border-t border-white/5 flex justify-center">
-                <button
-                  onClick={() => setShowCapabilities(false)}
-                  className="px-10 py-4 bg-white text-black rounded-2xl font-bold uppercase tracking-widest text-xs hover:bg-blue-600 hover:text-white transition-all shadow-xl shadow-white/5"
-                >
-                  –ü–æ–Ω—è—Ç–Ω–æ
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Quantum Link Modal */}
-      <AnimatePresence>
-        {showQuantumLink && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[110] bg-black/90 backdrop-blur-xl flex items-center justify-center p-6"
-          >
-            <motion.div
-              initial={{ scale: 0.9, y: 50 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 50 }}
-              className="bg-[#0a0a0c] border border-white/10 rounded-[3.5rem] w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-[0_0_100px_rgba(59,130,246,0.1)] relative"
-            >
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 via-blue-500 to-cyan-500" />
-
-              <div className="p-10 border-b border-white/5 flex items-center justify-between bg-gradient-to-r from-blue-600/10 to-transparent">
-                <div className="flex items-center gap-6">
-                  <div className="p-5 bg-blue-600 rounded-[2rem] shadow-2xl shadow-blue-600/30">
-                    <Zap className="w-8 h-8 text-white animate-pulse" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-bold text-white uppercase tracking-tighter">
-                      Quantum Link Fusion (v{appVersion})
-                    </h2>
-                    <p className="text-xs text-slate-400 font-mono uppercase tracking-[0.2em]">
-                      Neural Integration Bridge
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setShowQuantumLink(false)}
-                  className="p-4 hover:bg-white/5 rounded-3xl text-slate-500 hover:text-white transition-all border border-white/5"
-                >
-                  <X className="w-8 h-8" />
-                </button>
-              </div>
-
-              {/* Navigation Tabs */}
-              <div className="px-10 py-6 bg-black/20 border-b border-white/5 flex items-center gap-4">
-                <button
-                  onClick={() => setGuideTab("blender")}
-                  className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl text-xs font-bold uppercase tracking-widest transition-all border ${
-                    guideTab === "blender"
-                      ? "bg-orange-600/20 border-orange-500/50 text-orange-400 shadow-lg shadow-orange-600/10"
-                      : "bg-white/5 border-white/5 text-slate-500 hover:text-white"
-                  }`}
-                >
-                  <Cube className="w-4 h-4" /> Blender Guide
-                </button>
-                <button
-                  onClick={() => setGuideTab("unity")}
-                  className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl text-xs font-bold uppercase tracking-widest transition-all border ${
-                    guideTab === "unity"
-                      ? "bg-cyan-600/20 border-cyan-500/50 text-cyan-400 shadow-lg shadow-cyan-600/10"
-                      : "bg-white/5 border-white/5 text-slate-500 hover:text-white"
-                  }`}
-                >
-                  <Gamepad2 className="w-4 h-4" /> Unity Guide
-                </button>
-                <button
-                  onClick={() => setGuideTab("manual")}
-                  className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl text-xs font-bold uppercase tracking-widest transition-all border ${
-                    guideTab === "manual"
-                      ? "bg-purple-600/20 border-purple-500/50 text-purple-400 shadow-lg shadow-purple-600/10"
-                      : "bg-white/5 border-white/5 text-slate-500 hover:text-white"
-                  }`}
-                >
-                  <Code2 className="w-4 h-4" /> Quantum Terminal
-                </button>
-              </div>
-
-              <div className="flex-1 overflow-y-auto p-10 space-y-12 scrollbar-thin scrollbar-thumb-white/5">
-                {/* Multi-Modal & Status Aware Banner */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-[2.5rem] bg-gradient-to-r from-blue-600/10 to-purple-600/10 border border-white/10 shadow-2xl relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-                    <BrainCircuit className="w-32 h-32 text-white" />
-                  </div>
-                  <div className="space-y-4 relative z-10">
-                    <h3 className="text-sm font-bold text-white uppercase tracking-[0.2em] flex items-center gap-3">
-                      <ImageIcon className="w-5 h-5 text-blue-400" />{" "}
-                      Multi-Modal Neural Scan
-                    </h3>
-                    <p className="text-[11px] text-slate-400 leading-relaxed">
-                      –ò–ò –≤ —Ä–µ–∂–∏–º–µ —Ä–µ–∞–ª—å–Ω–æ–≥–æ –≤—Ä–µ–º–µ–Ω–∏ –∞–Ω–∞–ª–∏–∑–∏—Ä—É–µ—Ç –≤–∞—à–∏ —Å–∫—Ä–∏–Ω—à–æ—Ç—ã,
-                      GIF –∏ –∏–∑–æ–±—Ä–∞–∂–µ–Ω–∏—è. –û—Ç–ø—Ä–∞–≤—å—Ç–µ –≤–∏–∑—É–∞–ª –≤ —á–∞—Ç, –∏ Quantum Link
-                      –∞–≤—Ç–æ–º–∞—Ç–∏—á–µ—Å–∫–∏ –ø–æ–¥–≥–æ—Ç–æ–≤–∏—Ç —Å–æ–æ—Ç–≤–µ—Ç—Å—Ç–≤—É—é—â–∏–π —Å–∫—Ä–∏–ø—Ç –∏–ª–∏
-                      —Ä–µ—à–µ–Ω–∏–µ.
-                    </p>
-                    <div className="flex gap-2">
-                      <span className="px-3 py-1 rounded-full bg-blue-600/20 text-blue-400 text-[9px] font-bold uppercase tracking-widest border border-blue-500/20">
-                        OCR Active
-                      </span>
-                      <span className="px-3 py-1 rounded-full bg-purple-600/20 text-purple-400 text-[9px] font-bold uppercase tracking-widest border border-purple-500/20">
-                        Vision Logic 3.0
-                      </span>
-                    </div>
-                  </div>
-                  <div className="space-y-4 relative z-10">
-                    <h3 className="text-sm font-bold text-white uppercase tracking-[0.2em] flex items-center gap-3">
-                      <RefreshCw className="w-5 h-5 text-green-400" /> Software
-                      Status Awareness
-                    </h3>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="p-3 rounded-2xl bg-black/40 border border-white/5 flex items-center gap-3">
-                        <div
-                          className={`w-2 h-2 rounded-full ${unityStatus?.is_running ? "bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" : "bg-red-500"}`}
-                        />
-                        <div className="flex flex-col">
-                          <span className="text-[10px] font-bold text-white uppercase">
-                            Unity
-                          </span>
-                          <span className="text-[8px] text-slate-500">
-                            {unityStatus?.version || "Unknown"}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="p-3 rounded-2xl bg-black/40 border border-white/5 flex items-center gap-3">
-                        <div
-                          className={`w-2 h-2 rounded-full ${blenderStatus?.is_running ? "bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" : "bg-red-500"}`}
-                        />
-                        <div className="flex flex-col">
-                          <span className="text-[10px] font-bold text-white uppercase">
-                            Blender
-                          </span>
-                          <span className="text-[8px] text-slate-500">
-                            {blenderStatus?.version || "Unknown"}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="p-3 rounded-2xl bg-black/40 border border-white/5 flex items-center gap-3">
-                        <div className="w-2 h-2 rounded-full bg-slate-500" />
-                        <div className="flex flex-col">
-                          <span className="text-[10px] font-bold text-white uppercase">
-                            GIMP
-                          </span>
-                          <span className="text-[8px] text-slate-500">
-                            v2.10.x
-                          </span>
-                        </div>
-                      </div>
-                      <div className="p-3 rounded-2xl bg-black/40 border border-white/5 flex items-center gap-3">
-                        <div className="w-2 h-2 rounded-full bg-slate-500" />
-                        <div className="flex flex-col">
-                          <span className="text-[10px] font-bold text-white uppercase">
-                            Redot
-                          </span>
-                          <span className="text-[8px] text-slate-500">
-                            v4.x
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {guideTab === "blender" ? (
-                  <motion.div
-                    key="blender"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="space-y-12"
-                  >
-                    {/* Header Info */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                      <div className="space-y-6">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-600/10 border border-orange-500/20 text-[10px] font-bold text-orange-400 uppercase tracking-widest">
-                          <Check className="w-3 h-3" /> –ê–≤—Ç–æ-–æ–ø—Ä–µ–¥–µ–ª–µ–Ω–∏–µ Blender
-                          –∞–∫—Ç–∏–≤–Ω–æ
-                        </div>
-                        <h3 className="text-3xl font-bold text-white tracking-tighter">
-                          –°–≤—è–∑—å —Å Blender
-                        </h3>
-                        <p className="text-slate-400 text-sm leading-relaxed">
-                          –ù–µ–π—Ä–æ–Ω–Ω—ã–π –∞–¥–¥–æ–Ω –ø–æ–∑–≤–æ–ª—è–µ—Ç –ò–ò –º–∞–Ω–∏–ø—É–ª–∏—Ä–æ–≤–∞—Ç—å –º–µ—à–∞–º–∏,
-                          –Ω–∞–∑–Ω–∞—á–∞—Ç—å —à–µ–π–¥–µ—Ä—ã –∏ —Å—Ç—Ä–æ–∏—Ç—å —Å–ª–æ–∂–Ω—ã–µ —Å—Ü–µ–Ω—ã –ø—Ä—è–º–æ –≤–æ
-                          –≤—Ä–µ–º—è –≤–∞—à–µ–≥–æ –¥–∏–∞–ª–æ–≥–∞. –ö–≤–∞–Ω—Ç–æ–≤—ã–π –º–æ—Å—Ç –∞–≤—Ç–æ–º–∞—Ç–∏—á–µ—Å–∫–∏
-                          –ø–µ—Ä–µ–≤–æ–¥–∏—Ç –≤–∞—à–∏ –º—ã—Å–ª–∏ –≤ Python-—Å–∫—Ä–∏–ø—Ç—ã.
-                        </p>
-                        <button
-                          onClick={() =>
-                            window.open("/blender_connector.py", "_blank")
-                          }
-                          className="px-8 py-4 bg-orange-600 text-white rounded-2xl text-xs font-bold uppercase tracking-widest hover:bg-orange-500 transition-all shadow-xl shadow-orange-600/20 flex items-center gap-3"
-                        >
-                          <Cube className="w-5 h-5" /> –°–∫–∞—á–∞—Ç—å
-                          blender_connector.py
-                        </button>
-                      </div>
-                      <div className="relative group">
-                        <div className="absolute inset-0 bg-blue-500/10 blur-[100px] rounded-full group-hover:bg-blue-500/20 transition-all" />
-                        <div className="p-8 rounded-[3rem] bg-black/40 border border-white/5 relative z-10 flex flex-col items-center justify-center text-center gap-4">
-                          <div className="w-20 h-20 bg-orange-600/20 rounded-3xl flex items-center justify-center text-orange-400">
-                            <Cpu className="w-10 h-10 animate-pulse" />
-                          </div>
-                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                            Quantum Engine Processing
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Steps Implementation */}
-                    <div className="space-y-8">
-                      <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest">
-                        –ü–æ—à–∞–≥–æ–≤—ã–π –ø—Ä–æ—Ü–µ—Å—Å —É—Å—Ç–∞–Ω–æ–≤–∫–∏:
-                      </h4>
-                      <div className="grid grid-cols-1 gap-6">
-                        {[
-                          {
-                            title: "–ó–∞–≥—Ä—É–∑–∫–∞",
-                            text: "–°–∫–∞—á–∞–π—Ç–µ .py —Ñ–∞–π–ª –ø–æ –∫–Ω–æ–ø–∫–µ –≤—ã—à–µ –∏ —Å–æ—Ö—Ä–∞–Ω–∏—Ç–µ –µ–≥–æ.",
-                            icon: <Folder className="w-5 h-5" />,
-                          },
-                          {
-                            title: "–ò–Ω—Å—Ç–∞–ª–ª—è—Ü–∏—è",
-                            text: "–í Blender: Edit -> Preferences -> Add-ons -> Install. –í—ã–±–µ—Ä–∏—Ç–µ –≤–∞—à —Ñ–∞–π–ª.",
-                            icon: <Settings className="w-5 h-5" />,
-                          },
-                          {
-                            title: "–ê–∫—Ç–∏–≤–∞—Ü–∏—è",
-                            text: "–ü–æ—Å—Ç–∞–≤—å—Ç–µ –≥–∞–ª–æ—á–∫—É –Ω–∞–ø—Ä–æ—Ç–∏–≤ 'AI Assistant Link'.",
-                            icon: <Check className="w-5 h-5" />,
-                          },
-                          {
-                            title: "–†–∞–±–æ—á–∞—è –ø–∞–Ω–µ–ª—å",
-                            text: "–ù–∞–∂–º–∏—Ç–µ 'N' –≤–æ Viewport. –í–∫–ª–∞–¥–∫–∞ 'AI Assistant' –ø–æ—è–≤–∏—Ç—Å—è –≤ –ø—Ä–∞–≤–æ–π –±–æ–∫–æ–≤–æ–π –ø–∞–Ω–µ–ª–∏ –ø—Ä–∏–ª–æ–∂–µ–Ω–∏—è.",
-                            icon: <Layers className="w-5 h-5" />,
-                          },
-                          {
-                            title: "–¢–≤–æ—Ä—á–µ—Å—Ç–≤–æ",
-                            text: "–í–≤–µ–¥–∏—Ç–µ –∑–∞–ø—Ä–æ—Å (–Ω–∞–ø—Ä–∏–º–µ—Ä: '–°–æ–∑–¥–∞–π –≥–æ—Ä–æ–¥') –∏ –Ω–∞–∂–º–∏—Ç–µ 'Manifest Code'. –ò–ò —Å–≥–µ–Ω–µ—Ä–∏—Ä—É–µ—Ç –º–µ—à–∏ –∏ –º–∞—Ç–µ—Ä–∏–∞–ª—ã. –¢–∞–∫–∂–µ –≤—ã –º–æ–∂–µ—Ç–µ –∏—Å–ø–æ–ª—å–∑–æ–≤–∞—Ç—å –≤–∫–ª–∞–¥–∫—É Quantum Terminal –¥–ª—è —Ä—É—á–Ω–æ–≥–æ –ø–æ–ª—É—á–µ–Ω–∏—è –∫–æ–¥–∞.",
-                            icon: <Sparkles className="w-5 h-5" />,
-                          },
-                        ].map((step, idx) => (
-                          <motion.div
-                            key={idx}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: idx * 0.1 }}
-                            className="flex items-start gap-6 group"
-                          >
-                            <div className="w-12 h-12 flex-shrink-0 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-orange-400 group-hover:bg-orange-600/20 group-hover:border-orange-500 transition-all">
-                              {step.icon}
-                            </div>
-                            <div>
-                              <h5 className="text-sm font-bold text-white uppercase tracking-tight mb-1">
-                                –®–∞–≥ {idx + 1}: {step.title}
-                              </h5>
-                              <p className="text-xs text-slate-500 leading-relaxed">
-                                {step.text}
-                              </p>
-                            </div>
-                          </motion.div>
-                        ))}
-                      </div>
-                    </div>
-                  </motion.div>
-                ) : guideTab === "unity" ? (
-                  <motion.div
-                    key="unity"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="space-y-12"
-                  >
-                    {/* Header Info */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                      <div className="space-y-6">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-600/10 border border-cyan-500/20 text-[10px] font-bold text-cyan-400 uppercase tracking-widest">
-                          <Check className="w-3 h-3" /> Unity 2021+ Engine
-                          Connected
-                        </div>
-                        <h3 className="text-3xl font-bold text-white tracking-tighter">
-                          –°–≤—è–∑—å —Å Unity
-                        </h3>
-                        <p className="text-slate-400 text-sm leading-relaxed">
-                          Quantum Connector —Å–æ–∑–¥–∞–µ—Ç –º–æ—Å—Ç –º–µ–∂–¥—É –Ω–µ–π—Ä–æ—Å–µ—Ç—å—é –∏
-                          Unity Editor. –ò–ò –ø–∏—à–µ—Ç C# —Å–∫—Ä–∏–ø—Ç—ã, –Ω–∞—Å—Ç—Ä–∞–∏–≤–∞–µ—Ç
-                          –∫–æ–º–ø–æ–Ω–µ–Ω—Ç—ã –∏ —É–ø—Ä–∞–≤–ª—è–µ—Ç –∏–µ—Ä–∞—Ä—Ö–∏–µ–π –≤–∞—à–µ–π –∏–≥—Ä—ã –≤ —Ä–µ–∞–ª—å–Ω–æ–º
-                          –≤—Ä–µ–º–µ–Ω–∏.
-                        </p>
-                        <button
-                          onClick={() =>
-                            window.open("/UnityConnector.cs", "_blank")
-                          }
-                          className="px-8 py-4 bg-cyan-600 text-white rounded-2xl text-xs font-bold uppercase tracking-widest hover:bg-cyan-500 transition-all shadow-xl shadow-cyan-600/20 flex items-center gap-3"
-                        >
-                          <Gamepad2 className="w-5 h-5" /> –°–∫–∞—á–∞—Ç—å
-                          UnityConnector.cs
-                        </button>
-                      </div>
-                      <div className="relative group">
-                        <div className="absolute inset-0 bg-cyan-500/10 blur-[100px] rounded-full group-hover:bg-cyan-500/20 transition-all" />
-                        <div className="p-8 rounded-[3rem] bg-black/40 border border-white/5 relative z-10 flex flex-col items-center justify-center text-center gap-4">
-                          <div className="w-20 h-20 bg-cyan-600/20 rounded-3xl flex items-center justify-center text-cyan-400">
-                            <Database className="w-10 h-10 animate-bounce" />
-                          </div>
-                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                            Neural C# Compiler Ready
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Steps Implementation */}
-                    <div className="space-y-8">
-                      <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest">
-                        –ü–æ—à–∞–≥–æ–≤–∞—è –∏–Ω—Å—Ç—Ä—É–∫—Ü–∏—è –¥–ª—è Unity:
-                      </h4>
-                      <div className="grid grid-cols-1 gap-6">
-                        {[
-                          {
-                            title: "–ü–æ–¥–≥–æ—Ç–æ–≤–∫–∞ –ø–∞–ø–æ–∫",
-                            text: "–í –≤–∞—à–µ–º –ø—Ä–æ–µ–∫—Ç–µ Unity (–æ–∫–Ω–æ Project), –∑–∞–π–¥–∏—Ç–µ –≤ Assets –∏ —Å–æ–∑–¥–∞–π—Ç–µ —Ç–∞–º –ø–∞–ø–∫—É —Å –∏–º–µ–Ω–µ–º 'Editor'. –≠—Ç–æ –∫—Ä–∏—Ç–∏—á–µ—Å–∫–∏ –≤–∞–∂–Ω–æ.",
-                            icon: <Folder className="w-5 h-5 text-cyan-400" />,
-                          },
-                          {
-                            title: "–ó–∞–≥—Ä—É–∑–∫–∞ —Å–∫—Ä–∏–ø—Ç–∞",
-                            text: "–°–∫–∞—á–∞–π—Ç–µ UnityConnector.cs –∏ –ø–µ—Ä–µ–º–µ—Å—Ç–∏—Ç–µ –µ–≥–æ –ø—Ä—è–º–æ –≤ —Å–æ–∑–¥–∞–Ω–Ω—É—é –ø–∞–ø–∫—É Assets/Editor.",
-                            icon: <Send className="w-5 h-5 text-cyan-400" />,
-                          },
-                          {
-                            title: "–ö–æ–º–ø–∏–ª—è—Ü–∏—è",
-                            text: "–ü–æ–¥–æ–∂–¥–∏—Ç–µ –Ω–µ—Å–∫–æ–ª—å–∫–æ —Å–µ–∫—É–Ω–¥, –ø–æ–∫–∞ Unity —Å–∫–æ–º–ø–∏–ª–∏—Ä—É–µ—Ç —Å–∫—Ä–∏–ø—Ç. –í –≤–µ—Ä—Ö–Ω–µ–º –º–µ–Ω—é –ø–æ—è–≤–∏—Ç—Å—è –ø—É–Ω–∫—Ç 'AI Assistant'.",
-                            icon: (
-                              <RefreshCw className="w-5 h-5 text-cyan-400" />
-                            ),
-                          },
-                          {
-                            title: "–ó–∞–ø—É—Å–∫ Quantum Window",
-                            text: "–ü–µ—Ä–µ–π–¥–∏—Ç–µ –≤ AI Assistant -> Quantum Singularity Window. –í –æ—Ç–∫—Ä—ã–≤—à–µ–º—Å—è –æ–∫–Ω–µ –≤—ã —É–≤–∏–¥–∏—Ç–µ –ø–æ–ª–µ –≤–≤–æ–¥–∞ –∏ –∫–Ω–æ–ø–∫—É 'Manifest Code'.",
-                            icon: <Zap className="w-5 h-5 text-cyan-400" />,
-                          },
-                          {
-                            title: "–ù–∞–ø–∏—Å–∞–Ω–∏–µ –∑–∞–ø—Ä–æ—Å–æ–≤",
-                            text: "–ü–∏—à–∏—Ç–µ –∑–∞–ø—Ä–æ—Å –ø—Ä—è–º–æ –≤ –æ–∫–Ω–µ Unity. –ù–∞–ø—Ä–∏–º–µ—Ä: '–°–æ–∑–¥–∞–π –∏–≥—Ä–æ–∫–∞ —Å CharacterController'. –ò–ò –æ–±—Ä–∞–±–æ—Ç–∞–µ—Ç —ç—Ç–æ –∏ –≤—ã–≤–µ–¥–µ—Ç C# –∫–æ–¥. –ù—É–∂–µ–Ω —á–∏—Å—Ç—ã–π –∫–æ–¥ –±–µ–∑ –∞–¥–¥–æ–Ω–∞? –ü–µ—Ä–µ–π–¥–∏—Ç–µ –≤–æ –≤–∫–ª–∞–¥–∫—É Quantum Terminal.",
-                            icon: <Code className="w-5 h-5 text-cyan-400" />,
-                          },
-                        ].map((step, idx) => (
-                          <motion.div
-                            key={idx}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: idx * 0.1 }}
-                            className="flex items-start gap-6 group"
-                          >
-                            <div className="w-12 h-12 flex-shrink-0 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-cyan-400 group-hover:bg-cyan-600/20 group-hover:border-cyan-500 transition-all">
-                              {step.icon}
-                            </div>
-                            <div>
-                              <h5 className="text-sm font-bold text-white uppercase tracking-tight mb-1">
-                                –®–∞–≥ {idx + 1}: {step.title}
-                              </h5>
-                              <p className="text-xs text-slate-500 leading-relaxed">
-                                {step.text}
-                              </p>
-                            </div>
-                          </motion.div>
-                        ))}
-                      </div>
-                    </div>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="manual"
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="space-y-8"
-                  >
-                    <div className="p-8 rounded-[2.5rem] bg-purple-600/5 border border-purple-500/20 space-y-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="text-xl font-bold text-white uppercase tracking-tight">
-                            Quantum Terminal (Manual Mode)
-                          </h3>
-                          <p className="text-xs text-purple-400 uppercase tracking-widest font-mono">
-                            Neural Code Manifistation Tool
-                          </p>
-                        </div>
-                        <div className="flex bg-black/40 p-1 rounded-xl border border-white/5">
-                          <button
-                            onClick={() => setManualTarget("blender")}
-                            className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${manualTarget === "blender" ? "bg-orange-600 text-white" : "text-slate-500 hover:text-white"}`}
-                          >
-                            Blender
-                          </button>
-                          <button
-                            onClick={() => setManualTarget("unity")}
-                            className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${manualTarget === "unity" ? "bg-cyan-600 text-white" : "text-slate-500 hover:text-white"}`}
-                          >
-                            Unity
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="space-y-4">
-                        <textarea
-                          value={manualPrompt}
-                          onChange={(e) => setManualPrompt(e.target.value)}
-                          placeholder="–í–≤–µ–¥–∏—Ç–µ –∑–∞–ø—Ä–æ—Å –∏–ª–∏ –ø—Ä–∏–∫—Ä–µ–ø–∏—Ç–µ —Å–∫—Ä–∏–Ω—à–æ—Ç –¥–ª—è –≥–µ–Ω–µ—Ä–∞—Ü–∏–∏ –∫–æ–¥–∞..."
-                          className="w-full h-32 bg-black/40 border border-white/10 rounded-2xl p-6 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500/50 resize-none transition-all"
-                        />
-
-                        {/* Mind Link: AI Suggestions */}
-                        <div className="space-y-3">
-                          <h4 className="text-[10px] font-bold text-purple-400 uppercase tracking-widest flex items-center gap-2">
-                            <Sparkles className="w-3 h-3" /> Mind Link: –ò–ò
-                            –ø—Ä–µ–¥–ª–∞–≥–∞–µ—Ç –≤–∞—Ä–∏–∞–Ω—Ç—ã:
-                          </h4>
-                          <div className="flex flex-wrap gap-2">
-                            {[
-                              "–°–æ–∑–¥–∞—Ç—å —Å–∫—Ä–∏–ø—Ç –ø–æ —Å–∫—Ä–∏–Ω—à–æ—Ç—É –æ—à–∏–±–∫–∏",
-                              "–û–ø—Ç–∏–º–∏–∑–∏—Ä–æ–≤–∞—Ç—å —Ç–µ–∫—É—â—É—é —Å—Ü–µ–Ω—É",
-                              "–î–æ–±–∞–≤–∏—Ç—å –ø—Ä–æ—Ü–µ–¥—É—Ä–Ω—É—é –∞–Ω–∏–º–∞—Ü–∏—é",
-                              "–ì–µ–Ω–µ—Ä–∞—Ü–∏—è UI –ø–æ –Ω–∞–±—Ä–æ—Å–∫—É",
-                              "–ò—Å–ø—Ä–∞–≤–∏—Ç—å –±–∞–≥–∏ –≤ –ø–æ—Å–ª–µ–¥–Ω–µ–º –∏–∑–º–µ–Ω–µ–Ω–∏–∏",
-                            ].map((suggestion, si) => (
-                              <button
-                                key={si}
-                                onClick={() => setManualPrompt(suggestion)}
-                                className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[9px] text-slate-400 hover:text-white hover:bg-white/10 transition-all uppercase tracking-widest"
-                              >
-                                {suggestion}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-
-                        {attachedFiles.length > 0 && (
-                          <div className="flex flex-wrap gap-3">
-                            {attachedFiles.map((file, i) => (
-                              <div key={i} className="relative group w-20 h-20">
-                                <img
-                                  src={file.url}
-                                  className="w-full h-full object-cover rounded-xl border border-white/10"
-                                  alt="attach"
-                                />
-                                <button
-                                  onClick={() =>
-                                    setAttachedFiles((prev) =>
-                                      prev.filter((_, idx) => idx !== i),
-                                    )
-                                  }
-                                  className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all"
-                                >
-                                  <X className="w-3 h-3" />
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-
-                        <div className="flex gap-4">
-                          <button
-                            onClick={() => fileInputRef.current?.click()}
-                            className="px-6 py-4 bg-white/5 hover:bg-white/10 border border-white/5 rounded-2xl text-slate-400 hover:text-white transition-all flex items-center justify-center gap-2"
-                          >
-                            <Paperclip className="w-4 h-4" /> –ü—Ä–∏–∫—Ä–µ–ø–∏—Ç—å
-                          </button>
-                          <button
-                            onClick={handleManualGenerateCode}
-                            disabled={
-                              isManualGenerating ||
-                              (!manualPrompt.trim() &&
-                                attachedFiles.length === 0)
-                            }
-                            className="flex-1 py-4 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl font-bold uppercase tracking-widest text-xs transition-all shadow-xl shadow-purple-600/20 flex items-center justify-center gap-3"
-                          >
-                            {isManualGenerating ? (
-                              <RefreshCw className="w-4 h-4 animate-spin" />
-                            ) : (
-                              <Zap className="w-4 h-4" />
-                            )}
-                            {isManualGenerating
-                              ? "–ù–µ–π—Ä–æ–Ω–Ω—ã–π —Å–∏–Ω—Ç–µ–∑..."
-                              : "–°–≥–µ–Ω–µ—Ä–∏—Ä–æ–≤–∞—Ç—å –∫–æ–¥"}
-                          </button>
-                        </div>
-                      </div>
-
-                      {manualResultCode && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="space-y-4"
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold text-purple-400 uppercase tracking-widest font-mono">
-                              –†–µ–∑—É–ª—å—Ç–∞—Ç: {manualTarget.toUpperCase()}{" "}
-                              {manualTarget === "blender" ? "PYTHON" : "C#"}
-                            </span>
-                            <button
-                              onClick={() => {
-                                navigator.clipboard.writeText(manualResultCode);
-                                showNotification(
-                                  "–ö–æ–¥ —Å–∫–æ–ø–∏—Ä–æ–≤–∞–Ω –≤ –±—É—Ñ–µ—Ä –æ–±–º–µ–Ω–∞!",
-                                  "success",
-                                );
-                              }}
-                              className="flex items-center gap-2 px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[10px] text-white transition-all"
-                            >
-                              <Copy className="w-3 h-3" /> Copy Code
-                            </button>
-                          </div>
-                          <pre className="p-6 bg-black text-xs text-purple-300 font-mono overflow-x-auto rounded-2xl border border-white/5 max-h-72 scrollbar-thin scrollbar-thumb-white/10">
-                            {manualResultCode}
-                          </pre>
-                        </motion.div>
-                      )}
-                    </div>
-
-                    <div className="p-6 rounded-2xl bg-white/5 border border-white/5 flex gap-4">
-                      <HelpCircle className="w-5 h-5 text-slate-500 shrink-0" />
-                      <p className="text-[10px] text-slate-500 leading-relaxed italic">
-                        –†–µ–∂–∏–º Manual Quantum Terminal –≥–µ–Ω–µ—Ä–∏—Ä—É–µ—Ç –∫–æ–¥ –±–µ–∑
-                        –æ—Ç–ø—Ä–∞–≤–∫–∏ –≤ –∞–¥–¥–æ–Ω—ã. –ò—Å–ø–æ–ª—å–∑—É–π—Ç–µ —ç—Ç–æ, —á—Ç–æ–±—ã –≤—Ä—É—á–Ω—É—é
-                        –∫–æ–ø–∏—Ä–æ–≤–∞—Ç—å –∏ –Ω–∞—Å—Ç—Ä–∞–∏–≤–∞—Ç—å —Å–∫—Ä–∏–ø—Ç—ã –ø—Ä—è–º–æ –≤ –≤–∞—à–µ–π —Å—Ä–µ–¥–µ
-                        —Ä–∞–∑—Ä–∞–±–æ—Ç–∫–∏. –ò–ò –≤—Å—ë –µ—â–µ –≤–∏–¥–∏—Ç –∫–æ–Ω—Ç–µ–∫—Å—Ç –Ω–∞—à–µ–≥–æ —á–∞—Ç–∞!
-                      </p>
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* Common Neural Memory Feature */}
-                <div className="p-8 rounded-3xl bg-gradient-to-r from-purple-600/20 to-blue-600/20 border border-purple-500/30 flex gap-6 relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 p-4 opacity-10">
-                    <Sparkles className="w-20 h-20 text-purple-400 group-hover:rotate-12 transition-transform" />
-                  </div>
-                  <div className="w-14 h-14 bg-purple-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-purple-600/20">
-                    <BrainCircuit className="w-8 h-8 text-white" />
-                  </div>
-                  <div className="relative z-10">
-                    <h5 className="text-sm font-bold text-white uppercase tracking-tight mb-2 flex items-center gap-2">
-                      Neural Memory Integration{" "}
-                      <span className="text-[8px] bg-purple-500 px-2 py-0.5 rounded-full text-white">
-                        Advanced
-                      </span>
-                    </h5>
-                    <p className="text-xs text-purple-200/70 leading-relaxed mb-3">
-                      –í–∞—à —á–∞—Ç —Ç–µ–ø–µ—Ä—å –Ω–∞–ø—Ä—è–º—É—é —Å–≤—è–∑–∞–Ω —Å Quantum Link! –ò–ò
-                      –∑–∞–ø–æ–º–∏–Ω–∞–µ—Ç –ø–æ—Å–ª–µ–¥–Ω–∏–µ 5 —Å–æ–æ–±—â–µ–Ω–∏–π –∏–∑ –±—Ä–∞—É–∑–µ—Ä–∞ –∏ –∏—Å–ø–æ–ª—å–∑—É–µ—Ç
-                      –∏—Ö –ø—Ä–∏ –≥–µ–Ω–µ—Ä–∞—Ü–∏–∏ –∫–æ–¥–∞ –≤ Blender –∏–ª–∏ Unity.
-                    </p>
-                    <div className="flex items-center gap-4 text-[10px] text-purple-400/80 font-mono">
-                      <span className="flex items-center gap-1">
-                        <Check className="w-3 h-3" /> –ß–ê–¢
-                      </span>
-                      <ChevronRight className="w-3 h-3 text-white/20" />
-                      <span className="flex items-center gap-1">
-                        <Check className="w-3 h-3" /> –ú–û–ó–ì
-                      </span>
-                      <ChevronRight className="w-3 h-3 text-white/20" />
-                      <span className="flex items-center gap-1">
-                        <Check className="w-3 h-3" /> –ì–ï–ô–ú–î–ï–í
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Common Warning */}
-                <div className="p-8 rounded-3xl bg-blue-600/10 border border-blue-500/20 flex gap-6">
-                  <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center flex-shrink-0 animate-pulse">
-                    <Info className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h5 className="text-sm font-bold text-white uppercase tracking-tight mb-1">
-                      –ó–æ–ª–æ—Ç–æ–µ –ø—Ä–∞–≤–∏–ª–æ –ö–≤–∞–Ω—Ç–æ–≤–æ–π –°–≤—è–∑–∏
-                    </h5>
-                    <p className="text-xs text-blue-300/70 leading-relaxed">
-                      –î–ª—è —Ç–æ–≥–æ —á—Ç–æ–±—ã Quantum Link —Ä–∞–±–æ—Ç–∞–ª, —ç—Ç–æ –æ–∫–Ω–æ –±—Ä–∞—É–∑–µ—Ä–∞
-                      –¥–æ–ª–∂–Ω–æ –æ—Å—Ç–∞–≤–∞—Ç—å—Å—è –æ—Ç–∫—Ä—ã—Ç—ã–º. –û–Ω–æ —Ä–∞–±–æ—Ç–∞–µ—Ç –∫–∞–∫ ¬´–¶–µ–Ω—Ä–∞–ª—å–Ω—ã–π
-                      –ü—Ä–æ—Ü–µ—Å—Å–æ—Ä¬ª –∏ –ø–µ—Ä–µ–¥–∞–µ—Ç –¥–∞–Ω–Ω—ã–µ –º–µ–∂–¥—É –≤–∞—à–∏–º –ò–ò –∏ –∏–≥—Ä–æ–≤—ã–º
-                      –¥–≤–∏–∂–∫–æ–º.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-10 bg-black/40 flex justify-end gap-4 border-t border-white/5">
-                <div className="flex-1 flex items-center gap-4 px-6 text-[10px] text-slate-600 uppercase tracking-widest font-mono">
-                  <span className="flex h-2 w-2 relative">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                  </span>
-                  Neural Bridge v{appVersion} Active
-                </div>
-                <button
-                  onClick={() => setShowQuantumLink(false)}
-                  className="px-10 py-4 bg-white text-black hover:bg-blue-600 hover:text-white rounded-2xl text-xs font-bold uppercase tracking-widest transition-all shadow-xl shadow-white/10"
-                >
-                  –ó–∞–∫—Ä—ã—Ç—å –∏ –Ω–∞—á–∞—Ç—å —Ä–∞–±–æ—Ç—É
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* VK Cover Generator Modal */}
-      <AnimatePresence>
-        {showVKGenerator && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[110] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="bg-[#0f0f12] border border-white/10 rounded-[2.5rem] w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl"
-            >
-              {/* Header */}
-              <div className="p-8 border-b border-white/5 flex items-center justify-between bg-gradient-to-r from-blue-600/10 to-purple-600/10">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-blue-600/20 rounded-2xl text-blue-400 shadow-xl shadow-blue-500/10">
-                    <ImageIcon className="w-8 h-8" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">
-                      –ì–µ–Ω–µ—Ä–∞—Ç–æ—Ä –û–±–ª–æ–∂–µ–∫ VK v18.8.0
-                    </h3>
-                    <p className="text-xs text-slate-500 uppercase tracking-[0.2em] font-bold">
-                      –ö–æ–Ω—Ç–∏–Ω–µ–Ω—Ç –°—É–¥—å–±—ã ‚Ä¢ –£–º–Ω—ã–π –°–∏–Ω—Ç–µ–∑
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setShowVKGenerator(false)}
-                  className="p-3 hover:bg-white/10 rounded-2xl text-slate-400 transition-all hover:rotate-90"
-                >
-                  <X className="w-8 h-8" />
-                </button>
-              </div>
-
-              <div className="flex-1 overflow-hidden flex flex-col lg:flex-row">
-                {/* Left Controls */}
-                <div className="w-full lg:w-[380px] p-8 border-b lg:border-b-0 lg:border-r border-white/5 space-y-10 overflow-y-auto scrollbar-thin scrollbar-thumb-white/5 bg-black/20">
-                  <div className="space-y-6">
-                    <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">
-                      1. –¢–∏–ø –æ–±–ª–æ–∂–∫–∏
-                    </h4>
-                    <div className="grid grid-cols-2 gap-3">
-                      <button
-                        onClick={() => setVkType("static")}
-                        className={`p-5 rounded-2xl border transition-all text-left group ${
-                          vkType === "static"
-                            ? "bg-blue-600 border-blue-500 shadow-lg shadow-blue-900/40"
-                            : "bg-white/5 border-white/10 hover:border-white/20"
-                        }`}
-                      >
-                        <div className="text-[10px] font-black uppercase tracking-wider mb-1">
-                          –°—Ç–∞—Ç–∏—á–Ω–∞—è
-                        </div>
-                        <div className="text-[8px] opacity-60 font-mono tracking-widest">
-                          1590x400 (–ü–ö)
-                        </div>
-                      </button>
-                      <button
-                        onClick={() => setVkType("live")}
-                        className={`p-5 rounded-2xl border transition-all text-left group ${
-                          vkType === "live"
-                            ? "bg-purple-600 border-purple-500 shadow-lg shadow-purple-900/40"
-                            : "bg-white/5 border-white/10 hover:border-white/20"
-                        }`}
-                      >
-                        <div className="text-[10px] font-black uppercase tracking-wider mb-1">
-                          –ñ–∏–≤–∞—è
-                        </div>
-                        <div className="text-[8px] opacity-60 font-mono tracking-widest">
-                          1080x1920 (–ú–æ–±)
-                        </div>
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-6">
-                    <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">
-                      2. –ü—Ä–µ—Å–µ—Ç—ã ¬´–ö–æ–Ω—Ç–∏–Ω–µ–Ω—Ç —Å—É–¥—å–±—ã¬ª
-                    </h4>
-                    <div className="grid grid-cols-1 gap-2">
-                      {[
-                        {
-                          name: "–ó–∞–≥–ª–∞–≤–Ω—ã–π —ç–∫—Ä–∞–Ω",
-                          prompt:
-                            "–ü–∞—Ä—è—â–∏–µ –æ—Å—Ç—Ä–æ–≤–∞ –≤ –Ω–µ–±–µ, –≤–µ–ª–∏—á–µ—Å—Ç–≤–µ–Ω–Ω–∞—è —Å–µ–∫—Ç–∞ –∫—É–ª—å—Ç–∏–≤–∞—Ç–æ—Ä–æ–≤, –∑–æ–ª–æ—Ç–æ–π –∑–∞–º–æ–∫ –ö–æ–Ω—Ç–∏–Ω–µ–Ω—Ç –°—É–¥—å–±—ã, —ç—Ñ–∏—Ä–Ω–∞—è –∞—Ç–º–æ—Å—Ñ–µ—Ä–∞, —Ñ—ç–Ω—Ç–µ–∑–∏ –∂–∏–≤–æ–ø–∏—Å—å, —è—Ä–∫–∏–µ –º–∞–≥–∏—á–µ—Å–∫–∏–µ —á–∞—Å—Ç–∏—Ü—ã",
-                        },
-                        {
-                          name: "–í—ã–±–æ—Ä –≥–µ—Ä–æ—è",
-                          prompt:
-                            "–¢—Ä–∏ –º–∞—Å—Ç–µ—Ä–∞ –∫—É–ª—å—Ç–∏–≤–∞—Ü–∏–∏: –í–æ–∏–Ω (–æ–≥–Ω–µ–Ω–Ω–∞—è —Ü–∏), –õ—É—á–Ω–∏–∫ (–ø—Ä–∏–∑—Ä–∞—á–Ω–∞—è —ç–Ω–µ—Ä–≥–∏—è), –ú–∞–≥ (–ª–∞–∑—É—Ä–Ω–∞—è –∞—É—Ä–∞), —Ä—É–Ω–∏—á–µ—Å–∫–∏–µ –∫—Ä—É–≥–∏ –ø–æ–¥ –Ω–æ–≥–∞–º–∏, —Å—Ç–∏–ª—å –∫–∏—Ç–∞–π—Å–∫–æ–≥–æ —Ñ—ç–Ω—Ç–µ–∑–∏ xianxia",
-                        },
-                        {
-                          name: "–ë–∏—Ç–≤–∞ —Ä–∞—Å",
-                          prompt:
-                            "–≠–ø–∏—á–µ—Å–∫–æ–µ —Å—Ç–æ–ª–∫–Ω–æ–≤–µ–Ω–∏–µ –û—Ä–∫–æ–≤ –∏ –≠–ª—å—Ñ–æ–≤ –≤ –º–∏—Ä–µ –∫—É–ª—å—Ç–∏–≤–∞—Ü–∏–∏, –º–∞–≥–∏—á–µ—Å–∫–∏–µ –º–µ—á–∏ –≤ –≤–æ–∑–¥—É—Ö–µ, –≤—Å–ø–ª–µ—Å–∫–∏ —ç–Ω–µ—Ä–≥–∏–∏, —Å—Ç–∏–ª–∏–∑–æ–≤–∞–Ω–Ω—ã–π 2D –∫–æ–Ω—Ü–µ–ø—Ç-–∞—Ä—Ç",
-                        },
-                        {
-                          name: "–ú–∞–≥–∏—è –∏ —Ä—É–Ω—ã",
-                          prompt:
-                            "–ö—Ä—É–ø–Ω—ã–π –ø–ª–∞–Ω —Ñ–æ—Ä–º–∏—Ä–æ–≤–∞–Ω–∏—è –∑–æ–ª–æ—Ç–æ–≥–æ —è–¥—Ä–∞ –∏–ª–∏ –¥—Ä–µ–≤–Ω–µ–π —Ä—É–Ω—ã, —Å–≤–µ—Ç—è—â–∏–µ—Å—è –∏–µ—Ä–æ–≥–ª–∏—Ñ—ã, –º–∞–≥–∏—á–µ—Å–∫–∏–µ –Ω–∏—Ç–∏ —Å–∏–ª—ã, –≤—ã—Å–æ–∫–æ–µ –∫–∞—á–µ—Å—Ç–≤–æ —Ç–µ–∫—Å—Ç—É—Ä –∫–∏—Å—Ç–∏",
-                        },
-                        {
-                          name: "–§–∏–Ω–∞–ª: –ò–º–ø–µ—Ä–∞—Ç–æ—Ä—ã",
-                          prompt:
-                            "–¢—Ä–æ–Ω–Ω—ã–π –∑–∞–ª –ò–º–ø–µ—Ä–∞—Ç–æ—Ä–∞ –ù–µ–±–µ—Å, –∑–æ–ª–æ—Ç—ã–µ –∏ —á–µ—Ä–Ω—ã–µ —Ç–æ–Ω–∞, –≥–µ—Ä–æ–π –ø—Ä–æ—Ç–∏–≤ –±–æ–∂–µ—Å—Ç–≤–µ–Ω–Ω–æ–π —Å—É—â–Ω–æ—Å—Ç–∏, –Ω–µ–≤–µ—Ä–æ—è—Ç–Ω–∞—è –º–æ—â—å, –∫–æ–Ω—Ü–µ–ø—Ç-–∞—Ä—Ç —Ç–æ–ø-—É—Ä–æ–≤–Ω—è",
-                        },
-                      ].map((preset, i) => (
-                        <button
-                          key={i}
-                          onClick={() => setVkPrompt(preset.prompt)}
-                          className="w-full p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-[10px] font-bold text-slate-400 hover:text-white text-left transition-all flex items-center justify-between group"
-                        >
-                          <span className="uppercase tracking-widest">
-                            {preset.name}
-                          </span>
-                          <ChevronRight className="w-3 h-3 translate-x-[-4px] opacity-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-blue-400" />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-6">
-                    <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">
-                      3. –ò—Å—Ö–æ–¥–Ω–æ–µ –§–æ—Ç–æ (–û–ø—Ü–∏–æ–Ω–∞–ª—å–Ω–æ)
-                    </h4>
-                    <div
-                      className={`relative border-2 border-dashed rounded-3xl p-6 transition-all group flex flex-col items-center justify-center gap-3 ${sourceImage ? "border-blue-500/50 bg-blue-500/5" : "border-white/10 hover:border-white/30 bg-white/5"}`}
-                      onDragOver={(e) => e.preventDefault()}
-                      onDrop={(e) => {
-                        e.preventDefault();
-                        const file = e.dataTransfer.files[0];
-                        if (file) {
-                          const reader = new FileReader();
-                          reader.onloadend = () =>
-                            setSourceImage(reader.result as string);
-                          reader.readAsDataURL(file);
-                        }
-                      }}
-                    >
-                      {sourceImage ? (
-                        <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-2xl">
-                          <img
-                            src={sourceImage}
-                            className="w-full h-full object-cover"
-                            alt="Source"
-                          />
-                          <button
-                            onClick={() => setSourceImage(null)}
-                            className="absolute top-2 right-2 p-2 bg-red-500/80 hover:bg-red-500 text-white rounded-full transition-all backdrop-blur-sm"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-slate-500 group-hover:text-blue-400 transition-colors">
-                            <Upload className="w-6 h-6" />
-                          </div>
-                          <div className="text-center">
-                            <p className="text-[10px] font-bold text-white uppercase tracking-widest">
-                              –ó–∞–≥—Ä—É–∑–∏—Ç—å —Ñ–æ—Ç–æ
-                            </p>
-                            <p className="text-[8px] text-slate-500 mt-1 uppercase">
-                              –õ—é–±–æ–π —Ñ–æ—Ä–º–∞—Ç –¥–æ 50MB
-                            </p>
-                          </div>
-                          <input
-                            type="file"
-                            className="absolute inset-0 opacity-0 cursor-pointer"
-                            accept="image/*"
-                            onChange={handleVKFileUpload}
-                          />
-                        </>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="space-y-6">
-                    <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">
-                      4. –ü—Ä–æ–º–ø—Ç –ú–∞–Ω–∏—Ñ–µ—Å—Ç–∞—Ü–∏–∏
-                    </h4>
-                    <div className="space-y-6">
-                      <textarea
-                        value={vkPrompt}
-                        onChange={(e) => setVkPrompt(e.target.value)}
-                        placeholder="–î–æ–±–∞–≤—å—Ç–µ –∑–∞–º–∫–∏, –≥–µ—Ä–æ–µ–≤ –∏–ª–∏ —Å–º–µ–Ω–∏—Ç–µ –æ–∫—Ä—É–∂–µ–Ω–∏–µ –Ω–∞ –∑–∞–≥—Ä—É–∂–µ–Ω–Ω–æ–º —Ñ–æ—Ç–æ..."
-                        className="w-full bg-black/40 border border-white/10 rounded-3xl p-5 text-sm text-white focus:outline-none focus:border-blue-500/50 min-h-[140px] transition-all resize-none shadow-inner"
-                      />
-                      <button
-                        onClick={handleGenerateVKCovers}
-                        disabled={isGeneratingVK || !vkPrompt.trim()}
-                        className={`w-full py-5 rounded-3xl flex items-center justify-center gap-4 transition-all font-black uppercase text-[11px] tracking-[0.2em] shadow-2xl ${
-                          isGeneratingVK || !vkPrompt.trim()
-                            ? "bg-slate-800/50 text-slate-600 border border-white/5"
-                            : "bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:scale-[1.02] active:scale-[0.98]"
-                        }`}
-                      >
-                        {isGeneratingVK ? (
-                          <>
-                            <RefreshCw className="w-5 h-5 animate-spin" />
-                            –°–∏–Ω—Ç–µ–∑ –ø–æ–¥–æ–∂–¥–∏—Ç–µ...
-                          </>
-                        ) : (
-                          <>
-                            <Sparkles className="w-5 h-5 animate-bounce" />
-                            –ì–µ–Ω–µ—Ä–∏—Ä–æ–≤–∞—Ç—å 10 –≤–∞—Ä–∏–∞–Ω—Ç–æ–≤
-                          </>
-                        )}
-                      </button>
-
-                      {isGeneratingVK && (
-                        <div className="mt-8 space-y-4">
-                          <div className="flex justify-between items-end text-[10px] uppercase font-black tracking-[0.2em]">
-                            <span className="text-blue-400 animate-pulse">
-                              {vkStatus}
-                            </span>
-                            <span className="text-white/40">{vkProgress}%</span>
-                          </div>
-                          <div className="w-full h-3 bg-white/5 rounded-full overflow-hidden p-[2px] border border-white/10 shadow-inner">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${vkProgress}%` }}
-                              className="h-full rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 relative"
-                            >
-                              <div className="absolute inset-0 bg-white/20 animate-pulse" />
-                              <div className="absolute top-0 right-0 h-full w-8 bg-white/40 blur-md translate-x-1" />
-                            </motion.div>
-                          </div>
-                          <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest text-center leading-relaxed">
-                            –ò–ò-—Å–∏–Ω—Ç–µ–∑ –≤—ã–ø–æ–ª–Ω—è–µ—Ç—Å—è –ø–æ—Å–ª–µ–¥–æ–≤–∞—Ç–µ–ª—å–Ω–æ.
-                            <br />
-                            –†–µ–∑—É–ª—å—Ç–∞—Ç—ã –ø–æ—è–≤–ª—è—é—Ç—Å—è –≤ —Ä–µ–∞–ª—å–Ω–æ–º –≤—Ä–µ–º–µ–Ω–∏.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right Results Grid */}
-                <div className="flex-1 p-10 bg-[#0a0a0c] overflow-y-auto scrollbar-thin scrollbar-thumb-white/5 animate-fade-in">
-                  {vkResults.length === 0 && !isGeneratingVK && (
-                    <div className="h-full flex flex-col items-center justify-center text-center space-y-6 opacity-20 group py-16">
-                      <div className="p-10 bg-white/5 rounded-full border border-white/10 group-hover:scale-110 transition-transform duration-1000">
-                        <ImageIcon className="w-20 h-20 text-slate-400" />
-                      </div>
-                      <p className="text-sm uppercase font-black tracking-[0.4em] italic text-slate-400">
-                        Manifestation Hub Empty
-                      </p>
-                    </div>
-                  )}
-
-                  <div
-                    className={`grid gap-6 ${vkType === "live" ? "grid-cols-2 lg:grid-cols-3" : "grid-cols-1"}`}
-                  >
-                    {isGeneratingVK && (
-                      <div
-                        className={`animate-pulse bg-white/5 border border-dashed border-blue-500/30 rounded-3xl flex items-center justify-center shadow-2xl ${vkType === "live" ? "aspect-[9/16]" : "aspect-[15.9/4]"}`}
-                      >
-                        <div className="flex flex-col items-center gap-4">
-                          <div className="relative">
-                            <RefreshCw className="w-10 h-10 text-blue-500 animate-spin" />
-                            <Sparkles className="w-4 h-4 text-purple-400 absolute -top-1 -right-1 animate-bounce" />
-                          </div>
-                          <div className="flex flex-col items-center gap-2">
-                            <span className="text-[9px] text-blue-400 font-black uppercase tracking-[0.2em]">
-                              –°–∏–Ω—Ç–µ–∑–∏—Ä—É—é...
-                            </span>
-                            <div className="h-1 w-16 bg-blue-500/20 rounded-full overflow-hidden">
-                              <motion.div
-                                animate={{ x: [-64, 64] }}
-                                transition={{
-                                  repeat: Infinity,
-                                  duration: 1.5,
-                                  ease: "linear",
-                                }}
-                                className="w-16 h-full bg-blue-500 shadow-[0_0_10px_#3b82f6]"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {vkResults.map((res: any) => (
-                      <VKImageCard
-                        key={res.id}
-                        res={res}
-                        type={vkType}
-                        showNotification={showNotification}
-                        onZoom={(url) => setSelectedImage(url)}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Map Marker Splitter Modal */}
-      <AnimatePresence>
-        {showMarkerSplitter && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[110] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="bg-[#0c0c0e] border border-amber-500/20 rounded-[2.5rem] w-full max-w-6xl h-[90vh] overflow-hidden flex flex-col shadow-2xl shadow-amber-950/10"
-            >
-              {/* Header */}
-              <div className="p-8 border-b border-white/5 flex items-center justify-between bg-gradient-to-r from-amber-600/10 to-blue-600/10">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-amber-600/20 rounded-2xl text-amber-400 shadow-xl shadow-amber-500/10">
-                    <Compass className="w-8 h-8 animate-spin-slow" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic flex items-center gap-2">
-                      –°–ø–ª–∏—Ç—Ç–µ—Ä –ú–∞—Ä–∫–µ—Ä–æ–≤ –ö–∞—Ä—Ç{" "}
-                      <span className="text-amber-400 text-xs px-2.5 py-1 bg-amber-500/10 rounded-full border border-amber-500/20 not-italic tracking-normal">
-                        v18.11.7
-                      </span>
-                    </h3>
-                    <p className="text-xs text-slate-500 uppercase tracking-[0.2em] font-bold">
-                      –ù–∞—Ä–µ–∑–∞–Ω–∏–µ —Ç—Ä–∏–∞–¥—ã –º–∞—Ä–∫–µ—Ä–æ–≤ –Ω–∞ PNG 8K –±–µ–∑ –ø–æ—Ç–µ—Ä–∏ –∫–∞—á–µ—Å—Ç–≤–∞
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setShowMarkerSplitter(false)}
-                  className="p-3 hover:bg-white/10 rounded-2xl text-slate-400 transition-all hover:rotate-90"
-                >
-                  <X className="w-8 h-8" />
-                </button>
-              </div>
-
-              <div className="flex-1 overflow-hidden flex flex-col lg:flex-row">
-                {/* Left Controls */}
-                <div className="w-full lg:w-[380px] p-8 border-b lg:border-b-0 lg:border-r border-white/5 space-y-8 overflow-y-auto scrollbar-thin scrollbar-thumb-white/5 bg-black/20">
-                  {/* Step 1: Upload Source Sprite Sheet */}
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">
-                        1. –ò—Å—Ç–æ—á–Ω–∏–∫ (–¢—Ä–∏–ø—Ç–∏—Ö)
-                      </h4>
-                      <button
-                        onClick={generateDemoMarkerImage}
-                        className="text-[9px] font-black text-amber-400 hover:text-amber-300 uppercase tracking-widest bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-lg transition-transform hover:scale-105"
-                      >
-                        –¢–µ—Å—Ç–æ–≤—ã–π —à–∞–±–ª–æ–Ω
-                      </button>
-                    </div>
-
-                    <div
-                      className="border border-dashed border-white/10 hover:border-amber-500/40 rounded-3xl p-6 text-center transition-all bg-black/40 relative cursor-pointer group flex flex-col items-center justify-center gap-2 aspect-[16/7]"
-                      onDragOver={(e) => e.preventDefault()}
-                      onDrop={(e) => {
-                        e.preventDefault();
-                        const file = e.dataTransfer.files[0];
-                        if (file) {
-                          const reader = new FileReader();
-                          reader.onloadend = () =>
-                            setMarkerImage(reader.result as string);
-                          reader.readAsDataURL(file);
-                        }
-                      }}
-                    >
-                      {markerImage ? (
-                        <div className="relative w-full h-full rounded-2xl overflow-hidden group">
-                          <img
-                            src={markerImage}
-                            className="w-full h-full object-cover rounded-xl"
-                            alt="Marker Source"
-                          />
-                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center flex-col gap-1.5 backdrop-blur-sm">
-                            <Upload className="w-6 h-6 text-amber-400 mb-1" />
-                            <span className="text-[9px] font-bold text-white uppercase tracking-widest">
-                              –ó–∞–º–µ–Ω–∏—Ç—å –∏–∑–æ–±—Ä–∞–∂–µ–Ω–∏–µ
-                            </span>
-                            <span className="text-[8px] text-slate-400 font-mono">
-                              –ú–æ–∂–Ω–æ –≤—Å—Ç–∞–≤–∏—Ç—å —á–µ—Ä–µ–∑ Ctrl + V
-                            </span>
-                          </div>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-slate-500 group-hover:text-amber-400 group-hover:bg-amber-500/10 transition-colors">
-                            <Upload className="w-5 h-5" />
-                          </div>
-                          <p className="text-[10px] font-bold text-white uppercase tracking-widest">
-                            –ü–µ—Ä–µ—Ç–∞—â–∏—Ç–µ —Å—é–¥–∞ –∏–ª–∏ –≤—Å—Ç–∞–≤—å—Ç–µ
-                          </p>
-                          <p className="text-[8px] text-slate-500 uppercase">
-                            –ü–æ–¥–¥–µ—Ä–∂–∫–∞ –±—É—Ñ–µ—Ä–∞ –æ–±–º–µ–Ω–∞ Ctrl+V
-                          </p>
-                        </>
-                      )}
-                      <input
-                        type="file"
-                        className="absolute inset-0 opacity-0 cursor-pointer"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            const reader = new FileReader();
-                            reader.onloadend = () =>
-                              setMarkerImage(reader.result as string);
-                            reader.readAsDataURL(file);
-                          }
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Step 2: Keying options */}
-                  <div className="space-y-5">
-                    <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">
-                      2. –§–∏–ª—å—Ç—Ä –ø—Ä–æ–∑—Ä–∞—á–Ω–æ—Å—Ç–∏ (–ê–ª—å—Ñ–∞)
-                    </h4>
-
-                    <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
-                      <div className="flex flex-col gap-0.5">
-                        <span className="text-[10px] text-white font-bold uppercase tracking-wider">
-                          –û—á–∏—Å—Ç–∫–∞ –¢—ë–º–Ω–æ–≥–æ —Ñ–æ–Ω–∞
-                        </span>
-                        <span className="text-[8px] text-slate-500 uppercase font-mono">
-                          Chroma-key black bg
-                        </span>
-                      </div>
-                      <input
-                        type="checkbox"
-                        checked={markerHasAlpha}
-                        onChange={(e) => setMarkerHasAlpha(e.target.checked)}
-                        className="w-4 h-4 rounded border-slate-700 bg-slate-800 text-amber-500 focus:ring-amber-500 focus:ring-offset-slate-900 cursor-pointer"
-                      />
-                    </div>
-
-                    {markerHasAlpha && (
-                      <div className="space-y-4 p-4 bg-white/5 rounded-2xl border border-white/5">
-                        <div className="space-y-2">
-                          <div className="flex justify-between items-center text-[10px] uppercase font-bold tracking-wider">
-                            <span className="text-slate-400">
-                              –ß—É–≤—Å—Ç–≤–∏—Ç–µ–ª—å–Ω–æ—Å—Ç—å —á—ë—Ä–Ω–æ–≥–æ
-                            </span>
-                            <span className="text-amber-400 font-mono font-black">
-                              {markerTolerance}
-                            </span>
-                          </div>
-                          <input
-                            type="range"
-                            min="5"
-                            max="110"
-                            value={markerTolerance}
-                            onChange={(e) =>
-                              setMarkerTolerance(parseInt(e.target.value))
-                            }
-                            className="w-full accent-amber-500 bg-black/40 h-1.5 rounded-lg cursor-pointer"
-                          />
-                        </div>
-
-                        <div className="flex items-center justify-between pt-2 border-t border-white/5">
-                          <span className="text-[9px] text-slate-400 font-bold uppercase">
-                            –°–º—è–≥—á–µ–Ω–∏–µ –∫—Ä–∞–µ–≤ (Anti-aliasing)
-                          </span>
-                          <input
-                            type="checkbox"
-                            checked={markerSmoothing}
-                            onChange={(e) =>
-                              setMarkerSmoothing(e.target.checked)
-                            }
-                            className="w-4 h-4 rounded border-slate-700 bg-slate-800 text-amber-500 focus:ring-amber-500 cursor-pointer"
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Step 3: Geometry & Cropping Offset Adjustments */}
-                  <div className="space-y-5">
-                    <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">
-                      3. –û–±—Ä–µ–∑–∫–∞ –∏ –°–º–µ—â–µ–Ω–∏–µ –ø–æ –û—Å—è–º
-                    </h4>
-
-                    {/* Dynamic Part Count Selector */}
-                    <div className="space-y-4 p-4 bg-white/5 rounded-2xl border border-white/5">
-                      <div className="space-y-3">
-                        <div className="flex justify-between items-center text-[10px] uppercase font-bold tracking-wider">
-                          <span className="text-slate-400">
-                            –ö–æ–ª–∏—á–µ—Å—Ç–≤–æ —á–∞—Å—Ç–µ–π (–°—Ä–µ–∑–æ–≤)
-                          </span>
-                          <span className="text-amber-400 font-mono font-black">
-                            {markerPartCount}
-                          </span>
-                        </div>
-                        <input
-                          type="range"
-                          min="1"
-                          max="10"
-                          step="1"
-                          value={markerPartCount}
-                          onChange={(e) =>
-                            setMarkerPartCount(parseInt(e.target.value))
-                          }
-                          className="w-full accent-amber-500 bg-black/40 h-1.5 rounded-lg cursor-pointer"
-                        />
-                        <div className="flex gap-1 flex-wrap mt-1">
-                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                            <button
-                              key={num}
-                              onClick={() => setMarkerPartCount(num)}
-                              className={`text-[9px] px-2 py-1 rounded transition-colors uppercase font-mono font-bold ${markerPartCount === num ? "bg-amber-500 text-black" : "bg-white/5 text-slate-400 hover:bg-white/10"}`}
-                            >
-                              {num}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Width / Crop Size slider */}
-                    <div className="space-y-4 p-4 bg-white/5 rounded-2xl border border-white/5">
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center text-[10px] uppercase font-bold tracking-wider">
-                          <span className="text-slate-400">
-                            –®–∏—Ä–∏–Ω–∞ –∫–∞–¥—Ä–∏—Ä–æ–≤–∞–Ω–∏—è (–î–∏–∞–º–µ—Ç—Ä)
-                          </span>
-                          <span className="text-amber-400 font-mono font-black">
-                            {markerCropSize}%
-                          </span>
-                        </div>
-                        <input
-                          type="range"
-                          min="10"
-                          max="95"
-                          value={markerCropSize}
-                          onChange={(e) =>
-                            setMarkerCropSize(parseInt(e.target.value))
-                          }
-                          className="w-full accent-amber-500 bg-black/40 h-1.5 rounded-lg cursor-pointer"
-                        />
-                        <p className="text-[8px] text-slate-500 italic mt-0.5 uppercase">
-                          –†–∞–∑–º–µ—Ä –æ–±–ª–∞—Å—Ç–∏ –æ–±—Ä–µ–∑–∫–∏ (–≤ –ø—Ä–æ—Ü–µ–Ω—Ç–∞—Ö –æ—Ç —à–∏—Ä–∏–Ω—ã –∫–∞–¥—Ä–∞).
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4 p-4 bg-white/5 rounded-2xl border border-white/5">
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center text-[10px] uppercase font-bold tracking-wider">
-                          <span className="text-slate-400">
-                            –í–Ω—É—Ç—Ä–µ–Ω–Ω–∏–π –æ—Ç—Å—Ç—É–ø (Padding / Zoom)
-                          </span>
-                          <span className="text-amber-400 font-mono font-black">
-                            {markerPadding}%
-                          </span>
-                        </div>
-                        <input
-                          type="range"
-                          min="-30"
-                          max="40"
-                          value={markerPadding}
-                          onChange={(e) =>
-                            setMarkerPadding(parseInt(e.target.value))
-                          }
-                          className="w-full accent-amber-500 bg-black/40 h-1.5 rounded-lg cursor-pointer"
-                        />
-                        <p className="text-[8px] text-slate-500 italic mt-0.5 uppercase">
-                          –û—Ç—Ä–∏—Ü–∞—Ç–µ–ª—å–Ω—ã–π –æ—Ç—Å—Ç—É–ø —É–≤–µ–ª–∏—á–∏–≤–∞–µ—Ç –≥—Ä–∞–Ω–∏—Ü—ã –æ–±—Ä–µ–∑–∫–∏.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4 p-4 bg-white/5 rounded-2xl border border-white/5 max-h-[380px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
-                      <div className="text-[10px] font-bold uppercase text-slate-400 tracking-wider mb-2 sticky top-0 bg-[#0e0e11] py-1 z-10 flex justify-between items-center">
-                        <span>–¶–µ–Ω—Ç—Ä—ã –û—Å–µ–π (%)</span>
-                        <div className="flex gap-1.5">
-                          <button
-                            onClick={() => setMarkerPartCount(6)}
-                            className="bg-amber-500/10 text-amber-400 hover:bg-amber-500 hover:text-black hover:scale-105 border border-amber-500/20 text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded transition-all"
-                          >
-                            –°–µ—Ç–∫–∞ 2—Ö3 (6 —à—Ç)
-                          </button>
-                          <button
-                            onClick={() => setMarkerPartCount(3)}
-                            className="bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white hover:scale-105 border border-blue-500/20 text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded transition-all"
-                          >
-                            –†—è–¥ (3 —à—Ç)
-                          </button>
-                        </div>
-                      </div>
-
-                      {markerCenters.map((center, idx) => {
-                        const label =
-                          idx === 0
-                            ? "–°—Ä–µ–∑ 1 (–õ–µ–≤—ã–π –í–≤–µ—Ä—Ö)"
-                            : idx === markerPartCount - 1
-                              ? `–°—Ä–µ–∑ ${markerPartCount} (–ü—Ä–∞–≤—ã–π –ù–∏–∑)`
-                              : `–°—Ä–µ–∑ ${idx + 1}`;
-                        const yCenter =
-                          markerYCenters[idx] !== undefined
-                            ? markerYCenters[idx]
-                            : 50.0;
-                        return (
-                          <div
-                            key={idx}
-                            className="space-y-2 pb-3 mb-2 border-b border-white/5 last:border-0 last:pb-0 last:mb-0"
-                          >
-                            <div className="flex justify-between items-center text-[9px] uppercase font-bold text-amber-400/90">
-                              <span>{label}</span>
-                              <span className="font-mono text-[8px] opacity-60">
-                                X: {center.toFixed(1)}% | Y:{" "}
-                                {yCenter.toFixed(1)}%
-                              </span>
-                            </div>
-
-                            {/* X alignment */}
-                            <div className="space-y-1">
-                              <div className="flex justify-between text-[8px] text-slate-500 font-mono">
-                                <span>–ì–æ—Ä–∏–∑–æ–Ω—Ç–∞–ª—å (X)</span>
-                                <span>{center.toFixed(1)}%</span>
-                              </div>
-                              <input
-                                type="range"
-                                min="0"
-                                max="100"
-                                step="0.1"
-                                value={center || 0}
-                                onChange={(e) => {
-                                  const val = parseFloat(e.target.value);
-                                  const copy = [...markerCenters];
-                                  copy[idx] = val;
-                                  setMarkerCenters(copy);
-                                }}
-                                className="w-full accent-amber-500 bg-black/40 h-1 rounded-lg cursor-pointer"
-                              />
-                            </div>
-
-                            {/* Y alignment */}
-                            <div className="space-y-1">
-                              <div className="flex justify-between text-[8px] text-slate-500 font-mono">
-                                <span>–í–µ—Ä—Ç–∏–∫–∞–ª—å (Y)</span>
-                                <span>{yCenter.toFixed(1)}%</span>
-                              </div>
-                              <input
-                                type="range"
-                                min="0"
-                                max="100"
-                                step="0.1"
-                                value={yCenter}
-                                onChange={(e) => {
-                                  const val = parseFloat(e.target.value);
-                                  const copy = [...markerYCenters];
-                                  copy[idx] = val;
-                                  setMarkerYCenters(copy);
-                                }}
-                                className="w-full accent-blue-500 bg-black/40 h-1 rounded-lg cursor-pointer"
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right Panel: Live Previews */}
-                <div className="flex-1 p-10 bg-[#070709] overflow-y-auto flex flex-col justify-between scrollbar-thin scrollbar-thumb-white/5">
-                  {!markerImage ? (
-                    <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6 opacity-30 group py-16">
-                      <div className="p-10 bg-white/5 rounded-full border border-white/10 group-hover:scale-105 duration-1000">
-                        <Compass className="w-16 h-16 text-amber-500" />
-                      </div>
-                      <div className="space-y-2">
-                        <p className="text-sm uppercase font-black tracking-[0.4em] italic text-white">
-                          Splitter Canvas Offline
-                        </p>
-                        <p className="text-xs text-slate-500 uppercase tracking-widest leading-relaxed">
-                          –ó–∞–≥—Ä—É–∑–∏—Ç–µ –∏–ª–∏ –≤—Å—Ç–∞–≤—å—Ç–µ –∏—Å—Ö–æ–¥–Ω–æ–µ –∏–∑–æ–±—Ä–∞–∂–µ–Ω–∏–µ —Ç—Ä–µ–∑—É–±—Ü–∞
-                          –¥–ª—è –º–∞—Å–∫–∏—Ä–æ–≤–∞–Ω–∏—è
-                        </p>
-                      </div>
-                      <button
-                        onClick={generateDemoMarkerImage}
-                        className="px-6 py-3 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-xl shadow-amber-600/20"
-                      >
-                        –ó–∞–ø—É—Å—Ç–∏—Ç—å —Ç–µ—Å—Ç–æ–≤—ã–π –∏–Ω—Ç–µ—Ä–∞–∫—Ç–∏–≤
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="space-y-10 flex-1">
-                      {/* Original Map Visualization with Cut Markers */}
-                      <div className="space-y-3">
-                        <div className="flex justify-between items-center text-[10px] uppercase font-black text-slate-500 tracking-widest">
-                          <span>
-                            –í–∏–∑—É–∞–ª–∏–∑–∞—Ü–∏—è —Ä–∞—Å–∫–ª–∞–¥–∫–∏ (–ö–∞–ª–∏–±—Ä–æ–≤–æ—á–Ω—ã–µ –æ—Å–∏ –æ–±—Ä–µ–∑–∫–∏)
-                          </span>
-                          <span className="bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 text-amber-400 font-mono text-[9px]">
-                            16:9 Aspect Frame
-                          </span>
-                        </div>
-                        <div className="relative border border-white/10 rounded-2xl overflow-hidden shadow-2xl bg-black/80 aspect-video max-h-[220px] mx-auto">
-                          <img
-                            src={markerImage}
-                            className="w-full h-full object-cover opacity-60 filter blur-[1px]"
-                            alt="Split layout background"
-                          />
-
-                          {/* Centers indicator overlays */}
-                          {markerCenters.map((center, idx) => {
-                            const yCenter =
-                              markerYCenters[idx] !== undefined
-                                ? markerYCenters[idx]
-                                : 50.0;
-                            const sizePercent = markerCropSize || 30; // percentage of image width
-                            return (
-                              <div
-                                key={idx}
-                                style={{
-                                  left: `${center}%`,
-                                  top: `${yCenter}%`,
-                                  width: `${sizePercent}%`,
-                                  aspectRatio: "1 / 1", // square crop shape!
-                                }}
-                                className="absolute border-2 border-dashed border-amber-500 bg-amber-500/10 shadow-[0_0_15px_rgba(245,158,11,0.3)] flex flex-col justify-center items-center transition-all duration-150 transform -translate-x-1/2 -translate-y-1/2 rounded-xl"
-                              >
-                                <div className="absolute top-1 left-2 bg-amber-500 text-black text-[8px] font-mono leading-none px-1 py-0.5 rounded font-black uppercase shadow">
-                                  –°—Ä–µ–∑ #{idx + 1}
-                                </div>
-                                <div className="absolute bottom-1 right-2 bg-black/80 text-amber-400 text-[7px] font-mono leading-none px-1 py-0.5 rounded">
-                                  {center.toFixed(0)}%, {yCenter.toFixed(0)}%
-                                </div>
-                                <div className="h-6 w-6 border border-dashed border-amber-400 rounded-full animate-ping absolute pointer-events-none opacity-40" />
-                                <div className="h-2 w-2 rounded-full bg-amber-400 shadow-[0_0_8px_#f59e0b]" />
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* Dynamic Output Canvases */}
-                      <div className="space-y-4">
-                        <div className="text-[10px] uppercase font-black text-slate-500 tracking-widest">
-                          –†–µ–∑—É–ª—å—Ç–∞—Ç –Ω–∞—Ä–µ–∑–∫–∏ –≤—ã—Å–æ–∫–æ–≥–æ –∫–∞—á–µ—Å—Ç–≤–∞ (PNG —Å
-                          –ø—Ä–æ–∑—Ä–∞—á–Ω–æ—Å—Ç—å—é)
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                          {markerCenters.map((_, idx) => {
-                            const hue =
-                              (idx * (360 / Math.max(1, markerPartCount))) %
-                              360;
-                            const ringGlowColor = `hsla(${hue}, 80%, 50%, 0.3)`;
-                            const dotColor = `hsl(${hue}, 100%, 50%)`;
-
-                            return (
-                              <div
-                                key={idx}
-                                className="bg-black/60 border border-white/5 hover:border-amber-500/30 rounded-3xl p-5 flex flex-col items-center gap-4 transition-all group"
-                              >
-                                <div className="text-[10px] font-black uppercase text-slate-300 tracking-[0.2em] flex items-center gap-1.5">
-                                  <span
-                                    className="h-2 w-2 rounded-full animate-pulse"
-                                    style={{
-                                      backgroundColor: dotColor,
-                                      boxShadow: `0 0 8px ${dotColor}`,
-                                    }}
-                                  />
-                                  –°—Ä–µ–∑ {idx + 1}
-                                </div>
-
-                                {/* Grid alpha background */}
-                                <div className="aspect-square w-full max-w-[160px] bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:12px_12px] bg-black/80 rounded-2xl border border-white/5 flex items-center justify-center overflow-hidden p-2 relative shadow-inner">
-                                  <canvas
-                                    ref={(el) => {
-                                      canvasRefs.current[idx] = el;
-                                    }}
-                                    className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
-                                    style={{
-                                      filter: `drop-shadow(0 0 8px ${ringGlowColor})`,
-                                    }}
-                                  />
-                                </div>
-
-                                <button
-                                  onClick={() => downloadMarker(idx)}
-                                  className="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl transition-all shadow-xl hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
-                                >
-                                  <Download className="w-4 h-4 text-amber-500" />
-                                  –°–∫–∞—á–∞—Ç—å PNG
-                                </button>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Bottom Tip bar */}
-                  <div className="p-6 bg-amber-500/5 border border-amber-500/10 rounded-2xl flex items-center gap-4 text-xs text-amber-400/90 leading-relaxed mt-6">
-                    <Info className="w-5 h-5 flex-shrink-0" />
-                    <p className="text-[10px] uppercase font-bold tracking-wider">
-                      <b>–ü–æ–ª–µ–∑–Ω—ã–π –ª–∞–π—Ñ—Ö–∞–∫:</b> –ï—Å–ª–∏ –≤–∞—à–∏ –∫–æ–ª—å—Ü–∞ –Ω–∞ –∏—Å—Ö–æ–¥–Ω–æ–º
-                      –∏–∑–æ–±—Ä–∞–∂–µ–Ω–∏–∏ —Å–º–µ—â–µ–Ω—ã –≤ —Å—Ç–æ—Ä–æ–Ω—É, –≤—ã –º–æ–∂–µ—Ç–µ –æ—Ç—Ä–µ–≥—É–ª–∏—Ä–æ–≤–∞—Ç—å
-                      –ø–æ–ª–∑—É–Ω–∫–∏ –≤ —Ç—Ä–µ—Ç—å–µ–π —Å–µ–∫—Ü–∏–∏ —Å–ª–µ–≤–∞, —á—Ç–æ–±—ã –≤—ã—Å—Ç–∞–≤–∏—Ç—å —Ü–µ–Ω—Ç—Ä
-                      –æ–±—Ä–µ–∑–∫–∏ –∏–¥–µ–∞–ª—å–Ω–æ –ø–æ–¥ –∫–∞–∂–¥—ã–π –º–∞—Ä–∫–µ—Ä!
-                    </p>
-                  </div>
-
-                  {/* Expandable Unity 6 Import Guide */}
-                  <div className="mt-6 border border-white/5 bg-white/5 rounded-3xl p-6 space-y-4">
-                    <div
-                      className="flex justify-between items-center cursor-pointer select-none"
-                      onClick={() => setShowUnityGuide(!showUnityGuide)}
-                    >
-                      <div className="flex items-center gap-3">
-                        <BookOpen className="w-5 h-5 text-amber-500 animate-pulse" />
-                        <h4 className="text-[11px] font-black uppercase tracking-wider text-slate-300">
-                          üó∫Ô∏è –†—É–∫–æ–≤–æ–¥—Å—Ç–≤–æ –ø–æ –∏–Ω—Ç–µ–≥—Ä–∞—Ü–∏–∏ –∏ –ø–æ—à–∞–≥–æ–≤–æ–º—É –∏–º–ø–æ—Ä—Ç—É –≤
-                          Unity 6
-                        </h4>
-                      </div>
-                      <span className="text-amber-500 text-[10px] font-bold font-mono bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded uppercase">
-                        {showUnityGuide ? "–°–≤–µ—Ä–Ω—É—Ç—å" : "–†–∞–∑–≤–µ—Ä–Ω—É—Ç—å"}
-                      </span>
-                    </div>
-
-                    {showUnityGuide && (
-                      <div className="space-y-4 text-[11px] leading-relaxed text-slate-400 border-t border-white/5 pt-4">
-                        <div className="space-y-1.5 p-3.5 bg-black/40 rounded-2xl border border-white/5">
-                          <h5 className="font-extrabold text-white uppercase tracking-wider text-[10px]">
-                            üõ†Ô∏è –®–ê–ì 1. –û—Ä–≥–∞–Ω–∏–∑–∞—Ü–∏—è –∫–∞—Ç–∞–ª–æ–≥–∞ –ø—Ä–æ–µ–∫—Ç–∞ (Assets)
-                          </h5>
-                          <p className="text-[10px] text-slate-300">
-                            –í –æ–∫–Ω–µ <b>Project</b> –≤–Ω—É—Ç—Ä–∏ Unity 6 —Å–æ–∑–¥–∞–π—Ç–µ —á–∏—Å—Ç—É—é
-                            —Å—Ç—Ä—É–∫—Ç—É—Ä—É –ø–∞–ø–æ–∫:
-                          </p>
-                          <ul className="list-disc list-inside space-y-1 text-slate-300 text-[9.5px] font-mono pl-1">
-                            <li>
-                              <span className="text-amber-400">
-                                Assets/Environment/Maps/
-                              </span>{" "}
-                              ‚Äî —Ç–µ–∫—Å—Ç—É—Ä—ã –∫–∞—Ä—Ç –∫–æ–Ω—Ç–∏–Ω–µ–Ω—Ç–æ–≤ (Midjourney).
-                            </li>
-                            <li>
-                              <span className="text-amber-400">
-                                Assets/Environment/Markers/
-                              </span>{" "}
-                              ‚Äî –Ω–∞—Ä–µ–∑–∞–Ω–Ω—ã–µ –∫–æ–ª—å—Ü–∞ –∏–∑ —ç—Ç–æ–≥–æ —Å–ø–ª–∏—Ç—Ç–µ—Ä–∞.
-                            </li>
-                            <li>
-                              <span className="text-amber-400">
-                                Assets/Scripts/Map/
-                              </span>{" "}
-                              ‚Äî —Å–∫—Ä–∏–ø—Ç{" "}
-                              <span className="text-blue-400">
-                                FactionMapMarker.cs
-                              </span>
-                              .
-                            </li>
-                          </ul>
-                        </div>
-
-                        <div className="space-y-1.5 p-3.5 bg-black/40 rounded-2xl border border-white/5">
-                          <h5 className="font-extrabold text-white uppercase tracking-wider text-[10px]">
-                            üõ°Ô∏è –®–ê–ì 2. –ù–∞—Å—Ç—Ä–æ–π–∫–∞ –∏–º–ø–æ—Ä—Ç–∞ –¢–µ–∫—Å—Ç—É—Ä (8K –ê–ª—å—Ñ–∞)
-                          </h5>
-                          <p className="text-[10px] text-slate-300">
-                            –í –æ–∫–Ω–µ Inspector –ø—Ä–∏–º–µ–Ω–∏—Ç–µ –ø–∞—Ä–∞–º–µ—Ç—Ä—ã –¥–ª—è –≤—ã—Ä–µ–∑–∞–Ω–Ω—ã—Ö
-                            –º–∞—Ä–∫–µ—Ä–æ–≤:
-                          </p>
-                          <ul className="list-disc list-inside space-y-1 text-slate-300 text-[9.5px] pl-1">
-                            <li>
-                              Texture Type:{" "}
-                              <span className="text-amber-400 font-semibold">
-                                Sprite (2D and UI)
-                              </span>
-                            </li>
-                            <li>
-                              Sprite Mode:{" "}
-                              <span className="text-amber-400 font-semibold">
-                                Single
-                              </span>
-                            </li>
-                            <li>
-                              Alpha Source:{" "}
-                              <span className="text-amber-400 font-semibold">
-                                Input Texture Alpha
-                              </span>
-                            </li>
-                            <li>
-                              Alpha Is Transparency:{" "}
-                              <span className="text-emerald-400 font-extrabold">
-                                üü© –í–∫–ª—é—á–µ–Ω–æ (–û–±—è–∑–∞—Ç–µ–ª—å–Ω–æ)
-                              </span>
-                            </li>
-                            <li>
-                              Generate Physics Shapes:{" "}
-                              <span className="text-rose-400 font-semibold">
-                                üü• –í—ã–∫–ª—é—á–µ–Ω–æ
-                              </span>
-                            </li>
-                            <li>
-                              Filter Mode:{" "}
-                              <span className="text-amber-400 font-semibold">
-                                Bilinear / Trilinear
-                              </span>
-                            </li>
-                            <li>
-                              Aniso Level:{" "}
-                              <span className="text-amber-400 font-semibold">
-                                4
-                              </span>
-                            </li>
-                            <li>
-                              Max Size:{" "}
-                              <span className="text-amber-400 font-semibold">
-                                2048 –∏–ª–∏ 4096
-                              </span>
-                            </li>
-                            <li>
-                              Compression:{" "}
-                              <span className="text-amber-400 font-semibold">
-                                High Quality
-                              </span>
-                            </li>
-                          </ul>
-                        </div>
-
-                        <div className="space-y-1.5 p-3.5 bg-black/40 rounded-2xl border border-white/5">
-                          <h5 className="font-extrabold text-white uppercase tracking-wider text-[10px]">
-                            üåü –®–ê–ì 3. –ù–∞—Å—Ç—Ä–æ–π–∫–∞ Bloom-–≠—Ñ—Ñ–µ–∫—Ç–∞ –∏ –ú–∞—Ç–µ—Ä–∏–∞–ª–∞ (HDR)
-                          </h5>
-                          <p className="text-[10px] text-slate-300">
-                            –°–æ–∑–¥–∞–π—Ç–µ —Å–ø—Ä–∞–π—Ç{" "}
-                            <span className="text-amber-400 font-semibold">
-                              Faction_Marker_Aelyssa
-                            </span>
-                            . –ù–∞—Å—Ç—Ä–æ–π—Ç–µ —Å–≤–µ—á–µ–Ω–∏–µ —á–µ—Ä–µ–∑ URP:
-                          </p>
-                          <p className="text-[9.5px] text-slate-400 leading-normal pl-1 border-l-2 border-amber-500/40">
-                            –°–æ–∑–¥–∞–π—Ç–µ –Ω–æ–≤—ã–π –º–∞—Ç–µ—Ä–∏–∞–ª <b>M_Neon_Glow</b> (Shader:{" "}
-                            <span className="text-amber-300 font-mono">
-                              Universal Render Pipeline/2D/Sprite-Lit-Default
-                            </span>
-                            ). –í–∫–ª—é—á–∏—Ç–µ –æ–ø—Ü–∏—é <b>Emission</b> (–°–≤–µ—á–µ–Ω–∏–µ).
-                            –£—Å—Ç–∞–Ω–æ–≤–∏—Ç–µ —Ü–≤–µ—Ç —Å–≤–µ—á–µ–Ω–∏—è —Å HDR-–∏–Ω—Ç–µ–Ω—Å–∏–≤–Ω–æ—Å—Ç—å—é{" "}
-                            <span className="text-amber-400 font-semibold">
-                              +1.5 ... +2.0
-                            </span>
-                            . –í –Ω–∞—Å—Ç—Ä–æ–π–∫–∞—Ö URP Global Volume –∞–∫—Ç–∏–≤–∏—Ä—É–π—Ç–µ{" "}
-                            <b>Bloom</b> (Threshold: 0.9, Intensity: 2.5 - 3.0).
-                          </p>
-                        </div>
-
-                        <div className="space-y-1.5 p-3.5 bg-black/40 rounded-2xl border border-white/5">
-                          <h5 className="font-extrabold text-white uppercase tracking-wider text-[10px]">
-                            üí¨ –®–ê–ì 4. –ò–Ω—Ç–µ–≥—Ä–∞—Ü–∏—è –î–∏–∞–ª–æ–≥–æ–≤ (Aelyssa & –ö–ª–∞—Å—Å—ã)
-                          </h5>
-                          <p className="text-[10px] text-slate-300">
-                            –°–∫—Ä–∏–ø—Ç{" "}
-                            <span className="text-blue-400 font-mono text-[9px]">
-                              DialogueSystem_Manager.cs
-                            </span>{" "}
-                            –∞–¥–∞–ø—Ç–∏—Ä–æ–≤–∞–Ω –ø–æ–¥ –¥–≤—É—Ö-–∞–≤–∞—Ç–∞—Ä–Ω—É—é —Å–µ—Ç–∫—É:
-                          </p>
-                          <p className="text-[9.5px] text-slate-400 leading-normal pl-1 border-l-2 border-purple-500/40">
-                            –õ–µ–≤—ã–π –ø–æ—Ä—Ç—Ä–µ—Ç: <b>–ê—ç–ª–∏—Å—Å–∞</b>. –ü—Ä–∞–≤—ã–π –ø–æ—Ä—Ç—Ä–µ—Ç:
-                            –¥–∏–Ω–∞–º–∏—á–µ—Å–∫–∏ –ø–æ–¥–º–µ–Ω—è–µ—Ç—Å—è –Ω–∞ —Å–ø—Ä–∞–π—Ç –≤—ã–±—Ä–∞–Ω–Ω–æ–≥–æ –∫–ª–∞—Å—Å–∞
-                            –≥–µ—Ä–æ—è –Ω–∞ —Å—Ç–∞—Ä—Ç–µ. –í <b>Translator.cs</b>{" "}
-                            –∑–∞–¥–µ–π—Å—Ç–≤–æ–≤–∞–Ω—ã 3 fallbacks. –í—ã–±–æ—Ä –≤–µ—Ç–æ–∫ –¥–∏–∞–ª–æ–≥–æ–≤ –∏
-                            —Ñ—Ä–∞–∫—Ü–∏–æ–Ω–Ω–æ–π —Ä–µ–ø—É—Ç–∞—Ü–∏–∏ –∞–≤—Ç–æ–º–∞—Ç–∏—á–µ—Å–∫–∏ —à–ª–µ—Ç
-                            —Å–µ–π–≤-—Ç—Ä–∏–≥–≥–µ—Ä –≤{" "}
-                            <span className="text-blue-400 font-semibold">
-                              SaveGameSystem.cs
-                            </span>
-                            .
-                          </p>
-                        </div>
-
-                        <div className="space-y-1.5 p-3.5 bg-black/40 rounded-2xl border border-white/5">
-                          <h5 className="font-extrabold text-white uppercase tracking-wider text-[10px]">
-                            üîä –®–ê–ì 5. –ê—Ä—Ö–∏—Ç–µ–∫—Ç—É—Ä–Ω–∞—è –û—á–∏—Å—Ç–∫–∞ –ê—É–¥–∏–æ (Zenith Mixer)
-                          </h5>
-                          <p className="text-[10px] text-slate-300">
-                            –î–ª—è —á–∏—Å—Ç–æ—Ç—ã –∏ –æ–ø—Ç–∏–º–∏–∑–∞—Ü–∏–∏ –ø—Ä–æ–µ–∫—Ç–∞:
-                          </p>
-                          <p className="text-[9.5px] text-slate-400 leading-normal pl-1 border-l-2 border-blue-500/40">
-                            –ü–æ–ª–Ω–æ—Å—Ç—å—é <b>—É–¥–∞–ª–∏—Ç–µ —É—Å—Ç–∞—Ä–µ–≤—à–∏–µ —Å–∫—Ä–∏–ø—Ç—ã</b>{" "}
-                            <code>AudioHandler</code> –∏{" "}
-                            <code>AudioManager</code>. –ù–∞—Å—Ç—Ä–æ–π–∫–∞ hover-–∫–ª–∏–∫–æ–≤ –∏
-                            –ª—É–ø–æ–≤ (Suno/Udio) –ø—Ä–æ–∏–∑–≤–æ–¥–∏—Ç—Å—è –∏—Å–∫–ª—é—á–∏—Ç–µ–ª—å–Ω–æ —á–µ—Ä–µ–∑
-                            —Ü–µ–Ω—Ç—Ä–∞–ª—å–Ω—ã–π —Å–∏–Ω–≥–ª—Ç–æ–Ω <code>SettingsManager.cs</code>{" "}
-                            –≤ —Å–≤—è–∑–∫–µ —Å <code>UIButtonSfxBinder</code> –¥–ª—è
-                            –º–∞—Ä—à—Ä—É—Ç–∏–∑–∞—Ü–∏–∏ –Ω–∞–ø—Ä—è–º—É—é —á–µ—Ä–µ–∑ AudioMixer.
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Image Zoom Lightbox */}
-      <AnimatePresence>
-        {selectedImage && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedImage(null)}
-            className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 cursor-zoom-out"
-          >
-            <div className="absolute top-8 left-8 right-8 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <Sparkles className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h4 className="text-white font-bold uppercase tracking-tight">
-                    –ü—Ä–æ—Å–º–æ—Ç—Ä –∞—Å—Å–µ—Ç–∞
-                  </h4>
-                  <p className="text-[10px] text-slate-500 uppercase tracking-widest font-black">
-                    –ö–æ–Ω—Ç–∏–Ω–µ–Ω—Ç –°—É–¥—å–±—ã v17.15.0
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedImage(null);
-                }}
-                className="p-4 bg-white/5 hover:bg-red-500 hover:text-white border border-white/10 rounded-2xl text-slate-400 transition-all flex items-center gap-3 uppercase font-black text-[10px] tracking-widest"
-              >
-                <X className="w-5 h-5" />
-                –í–µ—Ä–Ω—É—Ç—å—Å—è –∫ –≤—ã–±–æ—Ä—É
-              </button>
-            </div>
-
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className={`max-w-[90vw] max-h-[75vh] rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl relative ${vkType === "live" ? "aspect-[9/16] h-full" : "aspect-[15.9/4] w-full"}`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <img
-                src={selectedImage}
-                alt="Selected asset"
-                className="w-full h-full object-contain bg-black/50"
-                referrerPolicy="no-referrer"
-              />
-            </motion.div>
-
-            <div className="mt-8 flex gap-4">
-              <a
-                href={selectedImage}
-                download="vk_cover.jpg"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black uppercase text-xs tracking-widest transition-all flex items-center gap-3 shadow-xl shadow-blue-600/20"
-              >
-                <Download className="w-5 h-5" />
-                –°–∫–∞—á–∞—Ç—å –æ—Ä–∏–≥–∏–Ω–∞–ª
-              </a>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedImage(null);
-                }}
-                className="px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-2xl font-black uppercase text-xs tracking-widest transition-all"
-              >
-                –ó–∞–∫—Ä—ã—Ç—å
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Settings Modal */}
-      <AnimatePresence>
-        {showSettings && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6"
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="bg-slate-900 border border-white/10 rounded-[2.5rem] w-full max-w-lg overflow-hidden shadow-2xl"
-            >
-              <div className="p-8 border-b border-white/5 flex items-center justify-between bg-white/5">
-                <div className="flex items-center gap-4">
-                  <button
-                    onClick={() => setShowSettings(false)}
-                    className="p-2 bg-white/5 hover:bg-white/10 rounded-xl text-slate-300 hover:text-white transition-all flex items-center gap-2"
-                  >
-                    <ChevronLeft className="w-5 h-5" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest pr-2 hidden sm:block">
-                      –ù–∞–∑–∞–¥
-                    </span>
-                  </button>
-                  <div className="p-3 bg-blue-600/20 rounded-2xl">
-                    <Settings className="w-6 h-6 text-blue-400" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-white">
-                      –ù–∞—Å—Ç—Ä–æ–π–∫–∏ –ò–ò
-                    </h2>
-                    <p className="text-xs text-slate-500 uppercase tracking-widest mt-1">
-                      –í–µ—Ä—Å–∏—è {appVersion}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setShowSettings(false)}
-                  className="p-2 hover:bg-white/5 rounded-xl transition-colors text-slate-500 hover:text-white"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="p-8 space-y-6">
-                <div className="space-y-3">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                    <Gamepad2 className="w-4 h-4 text-green-400" /> –ü—É—Ç—å –∫
-                    –ø—Ä–æ–µ–∫—Ç—É Unity
-                  </label>
-                  <input
-                    type="text"
-                    value={projectPathInput}
-                    onChange={(e) => setProjectPathInput(e.target.value)}
-                    placeholder="–ù–∞–ø—Ä–∏–º–µ—Ä: C:\MyUnityProject"
-                    className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-green-500/50 transition-all font-mono text-sm"
-                  />
-                </div>
-
-                <div className="space-y-3">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                    <ImageIcon className="w-4 h-4 text-orange-400" /> –ü—É—Ç—å –∫
-                    GIMP (.exe)
-                  </label>
-                  <input
-                    type="text"
-                    value={gimpPathInput}
-                    onChange={(e) => setGimpPathInput(e.target.value)}
-                    placeholder="C:\...\gimp-3.exe"
-                    className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-orange-500/50 transition-all font-mono text-sm"
-                  />
-                </div>
-
-                <div className="space-y-3">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-cyan-400" /> –ü—É—Ç—å –∫ Redot/Godot
-                    (.exe)
-                  </label>
-                  <input
-                    type="text"
-                    value={redotPathInput}
-                    onChange={(e) => setRedotPathInput(e.target.value)}
-                    placeholder="D:\...\Redot.exe"
-                    className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-cyan-500/50 transition-all font-mono text-sm"
-                  />
-                </div>
-
-                <div className="space-y-3">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                    <Box className="w-4 h-4 text-purple-400" /> –í–µ—Ä—Å–∏—è Blender
-                  </label>
-                  <input
-                    type="text"
-                    value={blenderVersionInput}
-                    onChange={(e) => setBlenderVersionInput(e.target.value)}
-                    placeholder="–ù–∞–ø—Ä–∏–º–µ—Ä: 4.1.0"
-                    className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-purple-500/50 transition-all font-mono text-sm"
-                  />
-                </div>
-
-                <div className="space-y-3">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                    <Folder className="w-4 h-4 text-blue-400" /> –ü—É—Ç—å —Å–æ—Ö—Ä–∞–Ω–µ–Ω–∏—è
-                    —Ñ–∞–π–ª–æ–≤
-                  </label>
-                  <input
-                    type="text"
-                    value={localPathInput}
-                    onChange={(e) => setLocalPathInput(e.target.value)}
-                    placeholder="–ù–∞–ø—Ä–∏–º–µ—Ä: C:\AI_Training_Data"
-                    className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-blue-500/50 transition-all font-mono text-sm"
-                  />
-                  <p className="text-[10px] text-slate-500 leading-relaxed italic">
-                    –í—Å–µ —Ñ–∞–π–ª—ã, –∫–æ—Ç–æ—Ä—ã–µ –≤—ã –ø—Ä–∏—Å—ã–ª–∞–µ—Ç–µ –≤ —á–∞—Ç, –±—É–¥—É—Ç —Å–æ—Ö—Ä–∞–Ω—è—Ç—å—Å—è –ø–æ
-                    —ç—Ç–æ–º—É –ø—É—Ç–∏ –¥–ª—è –ª–æ–∫–∞–ª—å–Ω–æ–≥–æ –∏—Å–ø–æ–ª—å–∑–æ–≤–∞–Ω–∏—è –∏ –æ–±—É—á–µ–Ω–∏—è –ò–ò.
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-blue-600/5 border border-blue-500/10 flex gap-4">
-                  <Info className="w-5 h-5 text-blue-400 shrink-0" />
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
-                    –ï—Å–ª–∏ –∏–Ω—Ç–µ—Ä–Ω–µ—Ç –æ—Ç—Å—É—Ç—Å—Ç–≤—É–µ—Ç, –ò–ò –±—É–¥–µ—Ç –∏—Å–ø–æ–ª—å–∑–æ–≤–∞—Ç—å —Ñ–∞–π–ª—ã –∏–∑
-                    —ç—Ç–æ–π –¥–∏—Ä–µ–∫—Ç–æ—Ä–∏–∏ –∫–∞–∫ –ø—Ä–∏–æ—Ä–∏—Ç–µ—Ç–Ω—ã–π –∏—Å—Ç–æ—á–Ω–∏–∫ –∑–Ω–∞–Ω–∏–π.
-                  </p>
-                </div>
-
-                <div className="pt-4 border-t border-white/5">
-                  <button
-                    onClick={handleGenerateBlueprint}
-                    disabled={isGeneratingBlueprint}
-                    className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs uppercase tracking-widest transition-all border border-white/5 disabled:opacity-50"
-                  >
-                    <RefreshCw
-                      className={`w-4 h-4 ${isGeneratingBlueprint ? "animate-spin" : ""}`}
-                    />
-                    {isGeneratingBlueprint
-                      ? "–ì–µ–Ω–µ—Ä–∞—Ü–∏—è..."
-                      : "–û–±–Ω–æ–≤–∏—Ç—å Master Blueprint"}
-                  </button>
-                  <p className="text-[9px] text-slate-600 mt-2 text-center uppercase tracking-tighter">
-                    –°–æ–∑–¥–∞–µ—Ç —Ñ–∞–π–ª PROJECT_MASTER_BLUEPRINT.md —Å–æ –≤—Å–µ–º–∏ –¥–∞–Ω–Ω—ã–º–∏
-                    –ø—Ä–æ–µ–∫—Ç–∞
-                  </p>
-                </div>
-              </div>
-
-              <div className="p-8 bg-black/20 flex gap-4">
-                <button
-                  onClick={() => setShowSettings(false)}
-                  className="flex-1 px-6 py-4 rounded-2xl bg-white/5 text-white font-bold text-sm hover:bg-white/10 transition-all border border-white/5"
-                >
-                  –û—Ç–º–µ–Ω–∞
-                </button>
-                <button
-                  onClick={handleSaveSettings}
-                  className="flex-1 px-6 py-4 rounded-2xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20"
-                >
-                  –°–æ—Ö—Ä–∞–Ω–∏—Ç—å
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Studio Guide Modal */}
-      <AnimatePresence>
-        {showStudioGuide && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-xl"
-          >
-            <motion.div
-              initial={{ scale: 0.9, y: 50 }}
-              animate={{ scale: 1, y: 0 }}
-              className="w-full max-w-4xl bg-slate-900/90 border border-white/10 rounded-[3rem] overflow-hidden shadow-[0_0_100px_rgba(37,99,235,0.2)] flex flex-col max-h-[90vh]"
-            >
-              <div className="p-8 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border-b border-white/10 flex items-center justify-between">
-                <div>
-                  <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic flex items-center gap-3">
-                    <Sparkles className="w-6 h-6 text-blue-400" />
-                    Menu Studio: –ê—Ä—Ö–∏—Ç–µ–∫—Ç—É—Ä–∞ UI v18.8.0
-                  </h3>
-                  <p className="text-[10px] text-slate-400 uppercase font-bold tracking-[0.2em] mt-1">
-                    –û–ø–∏—Å–∞–Ω–æ –Ω–∞ –æ—Å–Ω–æ–≤–µ –≤–∞—à–∏—Ö —Å–∫—Ä–∏–Ω—à–æ—Ç–æ–≤ –¥–ª—è –ø–µ—Ä–µ–Ω–æ—Å–∞ –≤ –¥—Ä—É–≥–∏–µ
-                    –Ω–µ–π—Ä–æ—Å–µ—Ç–∏
-                  </p>
-                </div>
-                <button
-                  onClick={() => setShowStudioGuide(false)}
-                  className="p-3 bg-white/5 hover:bg-red-500/20 text-slate-400 hover:text-red-400 rounded-2xl border border-white/10 transition-all"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-
-              <div className="flex-1 overflow-y-auto p-10 space-y-12 custom-scrollbar">
-                <section className="space-y-6">
-                  <div className="flex items-center gap-3 text-blue-400">
-                    <Layout className="w-5 h-5" />
-                    <h4 className="font-black uppercase tracking-widest text-sm">
-                      –û–±—â–∞—è –ö–æ–Ω—Ü–µ–ø—Ü–∏—è –∏ –°—Ç–∏–ª—å
-                    </h4>
-                  </div>
-                  <div className="bg-white/5 border border-white/10 rounded-3xl p-6 text-sm text-slate-300 leading-relaxed font-medium">
-                    –°—Ç–∏–ª—å <strong>Zenith Glassmorphism</strong> (–¢–µ–º–Ω—ã–π
-                    –ú–∞—Ç–æ–≤—ã–π). –ò–Ω—Ç–µ—Ä—Ñ–µ–π—Å –ø–æ—Å—Ç—Ä–æ–µ–Ω –Ω–∞ –ø—Ä–∏–Ω—Ü–∏–ø–∞—Ö –ø—Ä–æ—Ñ–µ—Å—Å–∏–æ–Ω–∞–ª—å–Ω–æ–≥–æ
-                    UI/UX –¥–ª—è RPG: –≥–ª—É–±–æ–∫–∞—è –ø—Ä–æ–∑—Ä–∞—á–Ω–æ—Å—Ç—å, –º—è–≥–∫–æ–µ —Ä–∞–∑–º—ã—Ç–∏–µ
-                    (Backdrop Blur), –≥—Ä–∞–¥–∏–µ–Ω—Ç—ã –æ—Ç —Ç–µ–º–Ω–æ-—Å–∏–Ω–µ–≥–æ –∫ —á–µ—Ä–Ω–æ–º—É –∏ —è—Ä–∫–∏–µ
-                    —Ü–≤–µ—Ç–æ–≤—ã–µ –∞–∫—Ü–µ–Ω—Ç—ã (–û—Ä–∞–Ω–∂–µ–≤—ã–π, –°–∏–Ω–∏–π, –ö—Ä–∞—Å–Ω—ã–π) –¥–ª—è –∫–ª—é—á–µ–≤—ã—Ö
-                    –¥–µ–π—Å—Ç–≤–∏–π.
-                  </div>
-                </section>
-
-                <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-6">
-                    <div className="flex items-center gap-3 text-orange-400">
-                      <Gamepad2 className="w-5 h-5" />
-                      <h4 className="font-black uppercase tracking-widest text-sm">
-                        –ì–ª–∞–≤–Ω–æ–µ –ú–µ–Ω—é
-                      </h4>
-                    </div>
-                    <ul className="space-y-4">
-                      {[
-                        {
-                          t: "–ö–Ω–æ–ø–∫–∞ –ò–ì–†–ê–¢–¨",
-                          d: "–û—Ä–∞–Ω–∂–µ–≤—ã–π –∫—Ä—É–≥ (#f97316), –∏–∫–æ–Ω–∫–∞ –ü–ª–∞–º–µ–Ω–∏ (Flame), –±–µ–ª—ã–π —Ç–µ–∫—Å—Ç –≤ –ø–ª–∞—à–∫–µ.",
-                        },
-                        {
-                          t: "–ö–Ω–æ–ø–∫–∞ –ù–ê–°–¢–†–û–ô–ö–ò",
-                          d: "–°–∏–Ω–∏–π –∫—Ä—É–≥ (#2563eb), –∏–∫–æ–Ω–∫–∞ –®–µ—Å—Ç–µ—Ä–µ–Ω–∫–∏ (Gear), –±–µ–ª—ã–π —Ç–µ–∫—Å—Ç.",
-                        },
-                        {
-                          t: "–ö–Ω–æ–ø–∫–∞ –í–´–•–û–î",
-                          d: "–ö—Ä–∞—Å–Ω—ã–π –∫—Ä—É–≥ (#dc2626), –∏–∫–æ–Ω–∫–∞ –ö—Ä–µ—Å—Ç–∞ (X), –±–µ–ª—ã–π —Ç–µ–∫—Å—Ç.",
-                        },
-                        {
-                          t: "–ê–Ω–∏–º–∞—Ü–∏—è",
-                          d: "–ü–ª–∞–≤–Ω–æ–µ –ø–æ—è–≤–ª–µ–Ω–∏–µ —Ç–µ–∫—Å—Ç–∞ —Å–ª–µ–≤–∞ –ø—Ä–∏ –Ω–∞–≤–µ–¥–µ–Ω–∏–∏, –ø—É–ª—å—Å–∞—Ü–∏—è –∫–Ω–æ–ø–æ–∫.",
-                        },
-                      ].map((item, i) => (
-                        <li
-                          key={i}
-                          className="flex gap-4 p-4 bg-white/5 rounded-2xl border border-white/5"
-                        >
-                          <div className="w-1.5 h-1.5 rounded-full bg-orange-400 mt-2 shrink-0" />
-                          <div className="text-xs text-slate-400">
-                            <span className="text-white font-bold block mb-1">
-                              {item.t}
-                            </span>
-                            {item.d}
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="space-y-6">
-                    <div className="flex items-center gap-3 text-blue-400">
-                      <Settings className="w-5 h-5" />
-                      <h4 className="font-black uppercase tracking-widest text-sm">
-                        –ü–∞–Ω–µ–ª—å –ù–∞—Å—Ç—Ä–æ–µ–∫
-                      </h4>
-                    </div>
-                    <ul className="space-y-4">
-                      {[
-                        {
-                          t: "–ó–∞–≥–æ–ª–æ–≤–æ–∫",
-                          d: "–ö—Ä—É–ø–Ω—ã–π —Ç–µ–∫—Å—Ç '–ù–ê–°–¢–†–û–ô–ö–ò' –≤ —Ü–µ–Ω—Ç—Ä–µ, —Ä–∞–∑—Ä—è–¥–∫–∞ —Å–∏–º–≤–æ–ª–æ–≤ (tracking-[1em]).",
-                        },
-                        {
-                          t: "–í—ã–±–æ—Ä –ö–∞—á–µ—Å—Ç–≤–∞",
-                          d: "–í—ã–ø–∞–¥–∞—é—â–µ–µ –º–µ–Ω—é: Very Low, Low, Medium, High, Very High, Ultra (8K).",
-                        },
-                        {
-                          t: "–†–∞–∑—Ä–µ—à–µ–Ω–∏–µ",
-                          d: "–û—Ç –º–æ–±–∏–ª—å–Ω—ã—Ö 640x480 –¥–æ 8K (7680x4320). –ê–∫—Ü–µ–Ω—Ç –Ω–∞ Ultra-–∫–∞—á–µ—Å—Ç–≤–æ.",
-                        },
-                        {
-                          t: "–ó–≤—É–∫ –∏ –ú—É–∑—ã–∫–∞",
-                          d: "–°–∏–Ω–∏–µ –ø–æ–ª–∑—É–Ω–∫–∏ (Sliders) —Å –∫—Ä—É–≥–ª—ã–º–∏ —Ö—ç–Ω–¥–ª–∞–º–∏ –∏ %% –∏–Ω–¥–∏–∫–∞—Ü–∏–µ–π.",
-                        },
-                      ].map((item, i) => (
-                        <li
-                          key={i}
-                          className="flex gap-4 p-4 bg-white/5 rounded-2xl border border-white/5"
-                        >
-                          <div className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-2 shrink-0" />
-                          <div className="text-xs text-slate-400">
-                            <span className="text-white font-bold block mb-1">
-                              {item.t}
-                            </span>
-                            {item.d}
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </section>
-
-                <section className="space-y-6">
-                  <div className="flex items-center gap-3 text-purple-400">
-                    <Globe className="w-5 h-5" />
-                    <h4 className="font-black uppercase tracking-widest text-sm">
-                      –õ–æ–∫–∞–ª–∏–∑–∞—Ü–∏—è –∏ –î–æ–ø–æ–ª–Ω–∏—Ç–µ–ª—å–Ω–æ
-                    </h4>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="p-6 bg-white/5 border border-white/10 rounded-3xl space-y-3">
-                      <h5 className="text-[10px] font-black text-white uppercase tracking-widest italic">
-                        –Ø–∑—ã–∫–∏ (8+)
-                      </h5>
-                      <p className="text-[9px] text-slate-400 leading-relaxed">
-                        –ü–æ–ª–Ω–∞—è –ø–æ–¥–¥–µ—Ä–∂–∫–∞ RU, EN, DE, FR, ES, JA, KO, ZH.
-                        –û—Ç–¥–µ–ª—å–Ω–æ–µ –≤—ã–ø–∞–¥–∞—é—â–µ–µ –º–µ–Ω—é —Å–æ —Å–ø–∏—Å–∫–æ–º –∏ –∏–∫–æ–Ω–∫–æ–π –≥–ª–æ–±—É—Å–∞.
-                      </p>
-                    </div>
-                    <div className="p-6 bg-white/5 border border-white/10 rounded-3xl space-y-3">
-                      <h5 className="text-[10px] font-black text-white uppercase tracking-widest italic">
-                        –í–∏–∑—É–∞–ª
-                      </h5>
-                      <p className="text-[9px] text-slate-400 leading-relaxed">
-                        –≠—Ñ—Ñ–µ–∫—Ç—ã —á–∞—Å—Ç–∏—Ü (Atmospheric FX), –¥–∏–Ω–∞–º–∏—á–µ—Å–∫–æ–µ –æ—Å–≤–µ—â–µ–Ω–∏–µ
-                        Castle Silhouette, –ø–æ–¥–¥–µ—Ä–∂–∫–∞ 8K —Ä–∞–∑—Ä–µ—à–µ–Ω–∏–π.
-                      </p>
-                    </div>
-                    <div className="p-6 bg-white/5 border border-white/10 rounded-3xl space-y-3">
-                      <h5 className="text-[10px] font-black text-white uppercase tracking-widest italic">
-                        –ù–∞–≤–∏–≥–∞—Ü–∏—è
-                      </h5>
-                      <p className="text-[9px] text-slate-400 leading-relaxed">
-                        –ö–Ω–æ–ø–∫–∞ '–ù–∞–∑–∞–¥' (Back) - –±–æ–ª—å—à–æ–π —Å–∏–Ω–∏–π –∫—Ä—É–≥ –≤ —É–≥–ª—É —Å
-                        –±–µ–ª–æ–π —Å—Ç—Ä–µ–ª–∫–æ–π, –ø–æ–≤—Ç–æ—Ä—è–µ—Ç —Å—Ç–∏–ª—å –∫–Ω–æ–ø–æ–∫ –≥–ª–∞–≤–Ω–æ–≥–æ –º–µ–Ω—é.
-                      </p>
-                    </div>
-                  </div>
-                </section>
-
-                <section className="p-8 bg-blue-600/10 border border-blue-500/20 rounded-[2.5rem] space-y-4">
-                  <h4 className="text-xs font-black text-blue-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                    <ImageIcon className="w-4 h-4" /> –ü—Ä–æ–º–ø—Ç –¥–ª—è –ù–µ–π—Ä–æ—Å–µ—Ç–∏
-                  </h4>
-                  <div
-                    className="p-6 bg-black/40 rounded-3xl border border-white/5 font-mono text-[10px] text-white leading-relaxed select-all cursor-copy"
-                    title="–ù–∞–∂–º–∏—Ç–µ, —á—Ç–æ–±—ã —Å–∫–æ–ø–∏—Ä–æ–≤–∞—Ç—å"
-                  >
-                    "Modern cinematic RPG game UI, settings menu, high-end
-                    visual style. Background: blurred atmospheric fantasy
-                    landscape with mountains and castles. Theme: dark
-                    semi-transparent glassmorphism (slate background with blur).
-                    Typography: bold uppercase white headings, subtitle
-                    '–ù–ê–°–¢–†–û–ô–ö–ò' with extreme letter spacing. Components: quality
-                    dropdown (Very Low to Ultra 8K), resolution list including
-                    3840x2160 and 7680x4320, circular sliders for volume with
-                    bright blue round handles. Icons: minimalist white gear
-                    (settings), flame (play), cross (exit) inside glowing
-                    color-coded circles (blue, orange, red). Navigation: large
-                    blue back button circle with white arrow icon in bottom
-                    right. Professional UI/UX, 8K resolution, sharp lines,
-                    cinematic bloom, high-quality rendering."
-                  </div>
-                  <p className="text-[9px] text-slate-500 italic">
-                    –ò—Å–ø–æ–ª—å–∑—É–π—Ç–µ —ç—Ç–æ—Ç —Ç–µ–∫—Å—Ç –≤ Midjourney, DALL-E 3 –∏–ª–∏ –¥—Ä—É–≥–∏—Ö –ò–ò
-                    –¥–ª—è –≤–æ—Å—Å–æ–∑–¥–∞–Ω–∏—è —Ç–æ—á–Ω–æ —Ç–∞–∫–æ–≥–æ –∂–µ –¥–∏–∑–∞–π–Ω–∞.
-                  </p>
-                </section>
-              </div>
-
-              <div className="p-8 bg-black/40 border-t border-white/10 flex items-center justify-between">
-                <p className="text-[9px] text-slate-500 uppercase font-black tracking-widest">
-                  ¬© Menu Studio Visuals Mastery ‚Ä¢ v18.8.0
-                </p>
-                <button
-                  onClick={() => setShowStudioGuide(false)}
-                  className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl transition-all shadow-xl shadow-blue-500/20"
-                >
-                  –ó–∞–∫—Ä—ã—Ç—å
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Global CSS for Markdown */}
-      <style>{`
-        .markdown-body pre {
-          background: #121214 !important;
-          padding: 1.25rem !important;
-          border-radius: 1rem !important;
-          border: 1px solid rgba(255, 255, 255, 0.05) !important;
-          overflow-x: auto !important;
-          margin: 1.25rem 0 !important;
-        }
-        .markdown-body code {
-          font-family: 'JetBrains Mono', monospace !important;
-          font-size: 0.85rem !important;
-          color: #60a5fa !important;
-        }
-        .markdown-body p {
-          margin-bottom: 1.25rem !important;
-        }
-        .markdown-body ul {
-          list-style-type: disc !important;
-          padding-left: 1.5rem !important;
-          margin-bottom: 1.25rem !important;
-        }
-        .markdown-body h1, .markdown-body h2, .markdown-body h3 {
-          color: white !important;
-          font-weight: 700 !important;
-          margin-top: 2rem !important;
-          margin-bottom: 1rem !important;
-        }
-        .markdown-body a {
-          color: #3b82f6 !important;
-          text-decoration: underline !important;
-        }
-      `}</style>
-    </div>
-  );
-}
+                      xúÏ}ks€FñË˜˚+⁄öläJDäOâ“Zì+Kä≠∫≤‰+…Œ´\6DB$÷ ¿@Kç´¸òT2ÂLú…xn2…$Œ„ÓNvwˆé‚X±‚g’˛/¯å¬=ß AäíŸ–√;±DB@£˚ÙÈÛ>ß€ﬁ÷m≠rBµÃ7´óÿ KÁí…ˇ—·ÆéÌË†]Uå_vyˇ—¡¢v±Îõ·^V–€ûU*ÍX_9ûfK•∏≠+é…%ôe÷å¢Zå/◊tùôUkY7W‚e≠XT∂dZE’Ú~≈W ö£ÊX5˛N™∫z∂Ø€1àQt}3k/XÀ(a¸%K)j™·ƒ3n±eÀ¨ƒkäœ&ì.iFQ+ôqXfóï"LËù‰π‰πT≤∫zŒ*-)±Lv ùJ§3˘Åd"◊ñ9ñbÿö£ôF\ÅWkñ¬ødí…>âë€ŒöÆé≠ØK<¬ÿäVt £Ï¸KÎ'ßú®hF,ïL∞X£<ÑÍgØ0¯Kˇ•:? ÒÜKó∫æypê–ªµ´{◊_a'Caß,≥d©∂Õé){ô-TU£»&L√±LùΩ2ÿ›å⁄ëø‚ƒ3∂ZAçØ≈S]„o{7À∫∫ ˛•f;⁄ÚZ|IuVTÿ*é∫ÍƒﬂÅ}¡ñaòÒ%])\W9f¶ë$6åA¿∂æ∞8æ∏pnf¸ÿ‘ÃB‚‰¯Ï¯;Ä=ìö¢õ•ö:£•≥›cÅ=ÚF€!Ñ@≈4Lâ)7)(" “–LèÑ∂ébØIhµfUu’'¢UÕ∏∞	Mg≥©¸Àßü â
+G©ü	’
+ñ	†TúöÕ
+Çn⁄LÉı)™ÏƒÈI2-YZë·èxzÑ≠PR™HkñUÒááÈN wOmójéc]C€4&t≠pal=÷œ∆~…d–∆±÷§ÓgI€agïç1C]a1©ßMÿJâÒZQ3ëõ{`ø˘çd'1—Sl¶k˝âuÈÇÊ˚îÍ∞?÷ˇœ òvÄ †H,H·ú]–t†â¶EÎØ‘“€qv∞d?0¢ƒ≤•˛™¶ÖµÑ≠:gΩ¶é;ãZEï]®\:ìHÁd6>˛öeY≈ó =j∂Íj’4‡µ¿ÁïJu—1˜T2;î;wˆ*K&“{
+ÅR¢Xr°ìâî‰(˜ôaÉj¡âï§‰?â#.™ ±ú%∆ ¨ƒr(;“vÃj¨#rHuvâßPf1µü≠_Íéä¯±‡+R±X’R/J3
+üF) “ÅNa'0áL.)mô≈DøÛ4:πag3sQè≈t>ìí\Ë™lÆÃö†≈hé≤[zhU1ÿÿÿÎõ?-#Ì˘Ì5÷˜Ù÷áøcÓ∑ÓWÓóÓ«Óü‹/‹ø1˜ˇÚüÓwx·•ÁQØÁô©3S3ÏÙ©#}≤˚ù±>ªV(Ä:*˝®Ù¢X™S≥”‚I‰∫∏ƒT›VÂÒÍê!√ìˇ˙ˇë{ø~≠˛ûªÈ>t±Wa«1∏ˆ∏~Ω~’›†¢ˆ=ØTÌ"¿ò˜˘&+4cŸ‹_îêƒ+1.	e(†:TW„ÈËækÒ¸‘3”ÅéYFΩy¥yıN_c]’=ÎJæÕ∫R´VU´† ∂ÛøsM£]‡;%‹WLº7Å∂;òÈZAÌ^aÚÂü÷˚X_˜êj5·üû=˜Ê)≤ÁË†–£∫‘˜UÔB6‘ÀÅf•Yaìb∆Œôs{î€,a)`dÙè≥¬õˇ ‹O›ªıÀÓF˝J˝] zw‡ﬂmwÉ¬,ê¡¯π~ù@GΩL≠¢Yh tá@îßÅ
+(π,ÚJzx5="E}õ™N`Waµ{Ç~ﬂ¢·K9
+ã@¥∫<cÈdRûªá“Úl~Ôz∆Ú·Áœu∂î¥YÄà{·≠AŸ∏Ö‡˘@™ô :CAS¡3å©údmˆô	˙Sõ0ÇnÜÁW¯xÚóÔò˚.il0˜1Í`(tÄrµ˛A˝CR~πÇ*˛æﬂÁ
+E!Ô„r`¡¨Tu’Qı5–y ,µHIh™zO*ëi=©$©$W~Æ•í‘PDrâ¥	ˇEKí˘Á}^dπDŒâF,Ÿo„úào…ms‚“p„R¿Í&k´]e0“§[{ùHπ•ÓÈ≠ø˛˘…Âﬂ?˘Û’l›ê¥Ÿm3cI,Èk¨≈‚wzaÍ‹
+'˙I=}V‚Ó—hÑL0›O@pºÔn°<ÈIöıkrΩÄÿ8/DD.:vΩdM≥hwww†”}xŒüûe«é≥„Û„ßNLO∞ÒŸI∂85??=?˜õ;35fzÍfZlb|aqfä-Lü<=3æ8=7€eÿŒz`•µ é≤< æ;&”)‹1ûb<Íë.ò:É≠X±˝}Í«Bz_É[∏œ7".á0@ËÿÛH*≈Q¸ñŒ&e‚‡⁄«∂O±2˛hok˙SIüÑ§;ÿ˛≥I1µ›f§ZÈUµ™°L–ﬁh40ÿ÷!Áaƒy•Ê8˙§√∆à ÛW#-éÏD–¯T≤ç»∑¯t”…ˆI2‡2Œc⁄÷´ìc&«3A∆a¡;4£_—Pêé-çÜv›t7ÎW8…∫
+Ïr√(øÂn2˜.|º7\Æø/\ñ“TÌÃ¯ÏÒ”„ÛìlrÍ‘Ã‹['ßfŸƒ‹…S3SãSìúI:Ü∑ú›∂¿¿Ã€cô∑oÆâÊ(∫Vh.ç£ï ∞c»k√©ÆMVra"2ÄpﬂÀøo1˜≥∆“ﬁÆ_«•ΩUø∆Mè`i∑dªı∫ù∞¥ämÏ≈vT[9:¡)'=¡HME_¸d&Ê~ÿ~ß~É[É~Bø˝ñ{èfNâ:ÜÇùRïÚ–Ó©!¬£pπÒ9◊M@ÆM@.èj|Uø÷Øì√[Dø„F#∫Ÿ|M3$ëKÙıt?xÃ‹Øa›@Z…%æﬂ·|?·¥qÌá‰C◊o´ÜÊîŸÇbúöb≠IQ«rVÇ6V∑ìF;®« k´(´Ò$ôï’∏RsL¶´JI¢•Í ™Zî#âì”„3s«OOù[úü]¬ﬂÇúf–∂$û=˚Zb[‹Å¨ù1Ç	Ñôüƒ¸iå®Óè¸Uçg=\—KÅi$«E—%°t3&›P≤Ö ÷¶P˚,π)ÖK†^rR#~·cwò%˙8Ωª√Â§Ü'Aÿ-œèpΩ–µp˛˛ÆÔV ñ≤Yø †üÀÓ∏˜√#–+à_õ,3…∏åı<ÄÚ÷uËû·R<Ω…?¡´ë”∆h	.∞Ω«≈∑{Óz66˘∏Ó¡{>Ñ?l¿œ´0 –∑ô˚=<Ñ4øÌGË¯AÇπ_Ø»–4ûN}
+πÔ]ò|πœü›¿ûNïZcÚMÒFú˘#>¶Ô1∫˙›¿IÚ`¿ê5|é?∏èCƒÜ‚¢Ë
+N\Ù4¿oÑ…l· |ÓxxÚó∆2ÎÍáçºe÷@%Z≤MΩ≤†nÆ):L(ûSVA¬Y≥ôVÇi´6ø∂§8éÆ.k™^<¬∆AﬁœƒãZE5lÕ4‡VÃ/R-õôÀ¸ÓYuÖg˙ihhfHJA˜“
+äÆØ1•®T¶≤ÇYÅ~yäãöcZ÷M∏ê÷À{¡Ö¡éYç√˚·Aõ°æ˝Ì¢öê0ÑŸÚM’y≈R™<c&€Æb∂®ü+\-íQ–$É∑BÖo˘ÓŒ iéÂ{4ôˆ3u†EÁEâ÷óÕ˛Ã]qQ¯"ÖCdÔ#Ñzq=›∂Á¿∂oq=á+∆§ÿÎBTC[‚O;æÇ≤·maF| B›=wøÉœ?∞<J≤˜∏p{;hvî‡D1nR≠Çÿ¶QhõPlŒé0n'…7$£√v#·Ÿl˜mÊ—ÍúŸ!Ô]≠®ñ¢y“\uTE$%¥‹ím:?Ω˘CM”h´xl.µ≥ü4hÓ∂⁄˝§¡§¸tŒO O§ÚπÅTzd ô»Ùüı∆jÉÙ¨∆S…Æùß2Ó”çÎOo›ÿ‡Y?\CD$˜|ÑBUªj—áÃ˝Wã¬«òø;˙•ÌÏ¸U«jö^dØk%ãÊ
+@9&∂Aﬂ%9G0Ê{‹î06H&g	ˇyitøÆÍ1⁄Ä‡¢˝Hxhhãˇª¨îïA¸_¬⁄/ñ
+‡:Ñ…!ËÂPÉ^Ó“fzÍ∞ë⁄Ÿp%Oˆˆà~µƒaÃO-L-Ü™û#b@©ÚÏ˚Kª€oÉØ∞Ÿ©7ëo-,Nùd”≥ãSÛ„ã”g¡sÛÇ6⁄,O•˚Ÿ+É—¥§≥w˚≤RT„ö·ôCÍ†ßk√[L*klqJ≈BRkË»ıPtÓŸ/≤)¯∑àñû≠àUCÌæ ‘ˆI6´€…Ì x˛m¥˘$É◊–Tä£¸≥eÆtéPÎO	£RK©ûŒRA*◊/[whõ-´e$¸ÕRﬁçm&ÒU,≥&Í*Ì"üç‰3,º¥3\≥àé¥-úµs‰Cæaw
+Üç≤Wr∂§õ@ﬁöîNÚ˝å„ÔÃ∆.7r… Äùgªc ≠Ã6˜¶óﬂø^Ç˜¿˘Â‘9˘	Jï˝‚Hﬁèaπù‚dö8ÑfkLã«ëN3™z∂CdÓ∂T¢˚rJçÅ…c∂ß∑n˛?YIX¥hî—PÇ˚Ã˝0Ê^‚s¯ÔOÓWË\∆BÂ»Ù©˚wt-ãèﬂ∏]ÀoOÕN/û`'∆'ßÊŸƒ‹Ï‚¸‹ÃÃ‘º4Hp∞úãÑ@ç¥9ë<HëBï4
+E∑¢∏ûﬂrØ‡ÜÁÂ˚	˝cÃÛ“°Æ∑≈}Ç‹]≈Nœüjqˆ°Ò√7í‹C'˙µ†7ËÁ™à4°~±f®l‚û;ä©ÕFª®Xö≤§´6+ÆJEx¢∫wâ∂ÁƒJŒC%D£SÄ4⁄Eï?Òc@ôäÏ∏	
+Ò¥Q0+*/†ÿ-!u+-dBI´-å3ãÜóÔ∏UxÉ|H}W‰‡}ÍÍeÙüèí0{$êÅU≈ÆYÍËûcÓNê^jÁ}xQ©,ÅÏ÷"=I√˝È≠è7ÿzUW÷TX⁄vÉ-⁄≈ªÀ≥&—Bú`…J0ç√Fb(F®êf(–OëY f °ñVT÷d-I™s< f ªä⁄äãº §=G“^ò˜§⁄ò∑•h6T–éTP`=Ã[ò±≤Ëu9·u¿	QuUYç%¸,©˛=ÃÂ≈≤4”z!¶k>^,6ÿ≤&ÿp˝]∏¯Ó©a∫zQ’I~wØCyÁ?êF·&ö¡ws ò2óŒ©ŒVÌTÉVG∞≈¥´#ø<Z•ÜBüÊû2”8BX„i–—Ã"%Áâ¶≈ ö• Ód±®E≠xZÙFXXéÁñbÕ
+êÁ£L—ºæNYÊ-∏∆3Ñ´¶9ëå«Îã2]u†É√M˙˙dü∆"UMÿ jdçwü«ú˜a˝ˆRãπ˘»•—Ütáôpõ†}‡˛¿„Ô∞®∫èy/†±üa` ˜ÜΩœÎ@’Øâ˙xòì‡ﬁgpˇ˜<Æö˜É⁄}Ô¿ùi|Ùr‚ÍÃ?¯kÆe5=…"˝{%¯àG˛ƒ¯{·ÌâÛ≤–Û™hx@ÙëDÅTéeöUõÄPJ-Î¶i…ìö∆Ûî|Ö…ç†=˛UñëÖa˜tã;¥Dp Ê‹„e;∏uCÑﬁ≥ÄD˙àaÙÎCû√t˛ÙÍKÎæóxi≈»◊ªÃSFx..|X
+»x±wõ©(8í?ˆÚw¢û⁄Ä ¬=4`¯è∑Ω—
+©ÿ´^EyÅACI¿ E
+Ú…öÓÙ_
+ﬁø—OÄà<˜◊Ñj±ÖÔd£Î=† „s"ë¿ó&lÏUër“≤—YyˆKâç"f4≤®—(‚F£à%≈éÜãç*~40äÙ!FÁ@VÈŒ¢çee,ì!sÜém$(<{” ÿ•æLÁ∏÷åt\+ÈHqÅŸ|`∏êﬁCd Ö8Gä“œDÈL-t0h‡M:ÍÂ‚Ω;Øvñ?\∑∑°¬t]¸x®ro&aûﬁ9=KÙx†%˜ ˝láÏ|ÄÛÓø¢
+TÓ~«„9y~¶üˇË“∫∞rem#_ü8O
+8œ√≈∞≤ãZ<8J†˘å[Ú∂	©s∆D€ØÛ&§"D€cDyµ∞¥®∂K‘÷êà⁄*Y™jÏVüÜ’ã;€‚Í;≈ê&r›EërRKÙ|0,˛ùT"ô9Î%>¯◊íâë¸Ÿ÷ ˚‰NAˆ2,Á⁄|r„yWfTéLtcﬁ‚·6∑‹o›Ø›oxXÕﬂÏº/›õÑ
+(SXÊÍÙ¸¨‘|d£iewî
+õ‡Ò§hŸ1sïMãıÑsÑù—‘ï»¬F∑≠jÑÖ√ﬂI[jÂ,´¬nƒBà√€Œ†Ïú+“rÓûDÖ¶Ye	~TóösX¢»ﬂ⁄V∞¬ãñ˘œˆ`Õ ∫÷Í]›◊ŸÍ¯ ‚◊€‚ˆ¢)Z≈K~¡K^ñ.Mà-JRQ˝˜^é⁄d°çÑ
+¨[ÉÆÇ?∫[ÓUüöykaaú-,ŒÕø≈∞ﬁ’‹º|ˆ– Àﬂ¯…rÌ•‰Ëçd›,…0≠gïíI€k´„UÙêBôÖËõ	9Èb32Î≥gÖiêôyåãÁ¡aà¡ÕÆ):[p¨Z¡©Y*{ô˘Œe[ï|∆—±)¶óF_≈Q≤Cú]»úïçÛò¡Í96ç≤„ñR-køûà6´òVµªiâ:¬Lx K°˚=ÕV∞îî˙i´ñ±˚C≈>¬Ï`bq$'Ò\Îâ—ùÖfÅ ?Ô¢‚¶ü˝Q—åx9˛N&'UM≥”®É≈;•ÀêwÀòhì õ	
+òÛcó0U-7¯©tl‡ÈŸÈ≈∑ÿ©˘πâ©…”Û„3ÏÿÈÈåÏﬁíΩaaV9hP¢';‰ ìxV)∆÷åx"s˜G‹˚mΩS§è¥ˆ∫uÛ60∂·éÁöæ'¸¥ü£±ÆÚÚsø≠_N∞îd*∞hçÑ`≈¬± Ëo≠±πöS5Kc3uRø—‘C8|, Nâ"N0˝€‹ ·Iaü¯ñç@ï=4ÈP†Y@≠B’JÜ_woƒí"‡Ù-≠*óÈ ﬂ.¯¬4“1°Ÿ≥Ö3«}~'C÷;Ê:Ü(‚ˆNZ‘3.7>5‘∞ Z<˚Ã⁄¬“‘ı¢\Öo÷a‰eA◊%˚π⁄-Ëºc}Iñd) “©t◊«&˙mµ¢ˆX_Ÿq™£ÉÉ+++âïL¬¥JÉ ª‰ ÃMÆCiÚ(±paçŸµ%DÉ% ò:'ñBCnäX#≥¢˝ZëŒÄÌhA≥
+∫*ÔVÊ§°
+œ≠—û≥∆˙∫?˚≤Ÿñ5][∑´ö•Ç»eZÚŸafU)hå:ôH¶€DÈVÂ^ﬁ(Ì¨ÈÍÿ∫|\	ÏﬂQv~IØY±ó8éÎÊ
+Hœ™Qr ó™´˝€Ø§Mñ…4∞-1≠8÷'à·I’.KÀ	û‘≠Eª†TUêÍ± yâK∞ÑÌÇz±‚î	ã ”8ôRˇfFºﬂ˘¸Œ±ôî¯˝6ÖÎqÔ˚EJMèdñ‰;ê^_çâ'Äàí$<‰¿nhd$ËZ†º† ‘(ìßÄ…ëD±ôf≈¿)èı•≥îáÀ*sÍ´Ω%œd≤)Z∞FÊ Iø»ÁrC#Ù.ﬁÄ∞ox'ÕN€gÀl(ÇÖ¡ØaeÄ◊‚n
+Åò…Â‘pZŸ7úxC`C	Y-VË∞.HŒ¢Qe!∫4$‰°aÇ`¡%"LØß.S(°hPJøç≥ç©3S3,Õ¶ﬁ\ƒ™-Sìlbzq|Æùúõ?ubÅÕÕ≤3„3ßßÿƒâÒŸ„S§el7¸rﬁ¯ÚÀ§Ä⁄£Ú(…á‡[˙–NdaÂ`tæ≠†·2Vˇ-·˛A§>»YÓZÜF§dÿ ]S$vâ1ñÑÎÿ|∂IÓ¿'mYr!%&—,îŒÖõ›–Ÿ®h¥å%p5√YŸMT“…ö≈è≤æ¨|êàﬂ§5—€—™©Øï$≥áõ≠jjÜc„N≤t~ óc¸a©lU¥Hñ
+P]3(l€j
+6ùV¡”9í‹∆ﬂùınx‘ºêäO{ÚàI÷¿0Ñ–±áÃMÁπık;;= Ó9D¶’=Ó…z‹Û-bÓÏP’ï5Ë-ı3„≈Ci‰≈√i‰≈˘tèSûºxòN˘BÛ‚ÔÓÒ‚÷ÜønôÜ√Ã˙ãÍ2èsQeñR©*ñc≥ò{è'c?’±1uŸ?0˝ºßÚí◊ =ñiÁC3m:€èÑjêéd2∆và?ë~‚8∆èâ¬ÇGÏ‚o˝±ç]pP8NÜ),lû‰Ã¿Ê„xX'Yª±±î ó√≠{¶∑Ó?Àuß”–ﬁ∫?œÎ>‹[˜Áq›èûÍóNÅıBÊ16C—ô√}ÊKô≈2ÕeV∞∞.#-Ü¨ì˚˙x&ãöx.9êI≤°°ÅPqt\à:Ç‰è•˙RÁM«;CïRXNqúi≥#èÑø™jëüQ@Ωï∂‡≤ëúÿf5”“Jö·«ëí†¬¢∆3jALØÃÒaåâF¶,0ÃJ$öŒF∏Qv÷Ã`^$ûXH”X¿ï∫d34–(”åeO¶%Êëåtr∆√T9˙9ZïúïMë†SR+Dàn°B˚-CXß(¶¸ΩÈÔM”ï∂˝ZŒç®I";l’•iˆ$/»É·:à/≥*hœ«i¸sô^Òl'èî5
+›ÛPh™ä ¢ÏÛ/‡\¿æÜRúâ•s,õ†Æb¯plM\‡-\ Z'Cz?¡ EÀ¨∆E∏{˘Û@}_
+Çâ≤åç‰¿ `¯—¡ítº≥Ï#G1ARÄ‡≤·¬˚_Í⁄≤¸ƒA¡ÄXS∂ñj∞¡$§˜ŸQéíS/*FIµÃö≠Ø-®Œ¥a®÷â≈ì3D:wÆÏTt@!â'ˇÁBºYÓ≠ºà zS“0Uc…¢ZÍˇg…“ôéŸ±ØÃ°∑ÓÔïﬁMí˚HÆö)âÍ§J[π±®R‡5YÜ±C6ï\ÜU≈πÉ<”qp®ı Øéâ≥QÈUXSå∂Ûº⁄≤P[Y√úÓıÙ÷Õø±IA∞‘∞ji»§9¨%ª¬≥**Ù WG‹œPï'v\Ò9•Òìı™¸Ly·°|4êO]ÌXí§=OZ,ı∞(‘vÊK3ÁòûmÏü≥5ÂÀTHî$‡F_!Ù:°õé≤&wﬂ7&JûÛÍUF°…>Ø±>~ncl\◊5≈(®§DVûè€>,u9çjÒÇÅÕ◊ñ÷XlÆ*ä÷qhJ>ó[&;ˆ˘‡∆ÅîAÓßwÇeõDç.¬p4ºó>ïÜ?‘i˜ÛDî=L8ÊF¥÷√nhÇæÍ,4P!÷ÿ8îb—âº	√ıÛ+¿âÀØΩ¥RÉA∂UU{i«mè»h!øL3˛K‘.é%OÁ˙œ˙.ù'•L»>r®V◊£?áiu-U‘„{ˆ‚zÉÔ-Æ◊⁄◊£‡áiq´5´™´]ÆØ7˛ﬁ˙z≠}}S…•ë|ÍP≠o∞†Ê≥ÿõ¿·Y`Ôó◊iÉé—πÉ¿Whô≠ÛcÁ£“cíî£zì&C¿SYïùQAi÷êéTÄn—ñﬂ'°ß∂öÚT|›¶ÕΩt®ecÕ®÷‰É"úµ*@ŒB¢º˛P—í©ª¢#JmG≠w/ba˘±NÀ*›0ô2∏åJd3>ìi	ÌË™™bŸÍÎ∫©815·(VIu|≤“«ı`ìﬂæÚÎT´(’¨ùóO6ÕÅzâ)@›q‘oV®Y∂i≈π7	h∏R@◊x≥*´,fHr/*#:¶õfÖ·êë[Ø±ínÆ†Àà◊êÈ1"ü	0a}∂†˝Z=ƒ¨°≠Pè5¥6Œdö≥JÜù`fd-ãzê|!8êla⁄Ë1Ö˝c
+{ˆÄ,”	˝≠öB9ƒ0ëóŸî°V÷h⁄m>ªò 'R)¨™ nxO5Õ¥UÀUÌ∂#Gk©÷∏KÒ˙î,ì†x˜ƒÁxcCææzt’‰E=˘Ø¯â¢‹MqpãªÂn˙ÂKÔÒ„G_fÓßÓßÃ˝O1≈3q)XΩ"wÏ@Jú•ﬁDuÈä•ÑRæÌ+^]ÂáTπ@Ê#<nÕ(j%ìWáÊ®‡}oEÅ/Cà/MºhY“à–ÿ◊{bÿÅ	hæ†Íj¡ë∞›ŸD'¿;FZyG$·$•ê®ƒ£≤xﬁjŸ$úë
+¢≈¥-6JcüúTåö¢SåeE∑˜Á§∏gREz*ï†k˘∫_ˇÀ3Û√ß∞<5%Ádl≈ª€§xTßvﬂx∞∆¨ò5€/v_mê;Q¸ò[›ßÀ&·I˘ì…d9Q–Œ‰ßê¢¶Ù¥E'Ì@)∑õ∆èhù7 .©ÔÒlúH’,‰‡¬∏mÍØw¢U£Xª¥]û≥ˇﬂˇsú˝#ÅºT˚¸Ib‹à‘“Zˆ¨(˛‘œù`;V≠GØÙ∫~π~æ Ún≤N4õL¶=äRÿÆ~©Ü≤§´≈ï~ïﬁùH+ï%ê⁄û*}ÛØO•øh^øéR»£˙wã≈ﬁxk‡m“A>rœ-/cË>n‚ÅÀ¨"FZAıB≥=iÄ'~^P÷ﬂ°E≠Ç&y”ú¬≤—≠;¢´t’‘ùå˙x¯f’AÖFh,N8’EÄ(ï@myÙ “iù∆ãzW §¡|SÌZmZÑ“;X}ºØÅÿy€Kßa=€˙≥›π!'m:7Zœ%y»éˆ(IÇhHæqoÔk9K&Ê~…˘‡V˝Jà◊æ¥"ƒì“ûÌ˜iû=ÂY¯öì÷ì±7iŸ∞ÎÇ4yD√ìÏDïÉ-±öpÃ◊µU™3ò1“ÒÁò(OaV¢ΩµÄX{Òˆ^ ‚◊à}‹∫$øÊ3Ãpk öbõ6UÒ&çé?Ÿ—–†CD“C&>t“Jv#ã ô,w)«ÈÖ‹∏kô˛xàÿ#—<G3Òi∆:R	roå5X±j«‹‰¢År≤L®Ñ[¨j©π¡&F_)lâDª¢◊ù≈&Vhî`<Í8o≈√çâ±’—`–Y»ŒkP;8RÄC≥]
+Û¯•/ßƒóÛwüÎo·N4Ùü}-ÔDd≤áè9‚Áü9”´ƒíCÇE{aôÛZè97[è9?ª≠ıòÛ˜ò3o?wÊL4“<ˇÃπß9GÕú›cŒÕ÷cŒœnøÓ1ÁÓ1gﬁˆì9”râ˘o¬„úNx1ŸßTÂ¬aÛ:{Â0Œ„Ï◊„xQ˝ÕüªõÓù˙qısoπ[ÓΩ0Nfƒ°πöS5mßÁcﬁ÷vÚ(‘zfÜûôÉ°Á]ﬁÂ±ûwYr8=πß#{Õc6=πŸôÜÎ°~Ωı¸ ;∑ûvå⁄1j9œÖn|ôrœ´,ˇ|œ´‹“<’ß«îõ≠«îwo=ÚN˜ò2Î1Âû7Y˛˘û¶‹“<C\è)7[è)Ôﬁz~‰ùÓ1eˆB{ë3æyæ¶ˆas#7Ôú'Ÿ√ãúº|≥~Ÿ›to˚’ïæ™_ÉÎ◊C8î«çÇÜïî8Zı< €⁄>D¡’s){pË˘îzNÂ]Î9ï%á”Sï{™≤◊|~””ïõÌpÈ |Å¢Sñyw=øÚŒ≠ß-£∂‹‘yø¬|Ysœµ,ˇ|œµ‹“|®«öõ≠«öü’zﬁÂùÓ±f—~Ó¨πÁ`ñæß5∑4ﬂ*◊cÕÕ÷cÕœj=ÛN˜X≥hœãõyOÈø$[ù\¯Ø=œu„,6Ÿ∫„;UOâj·È™Öß:î¬è‰|≥†Z‘ËﬂÈà≥%›,\h=ËÃ7¬≥ñ¬®.≈SÑ#œ√¡(∑‹~†'qµ~π~ù’Ø¬◊{sÀΩÁnEr‡ô¿°E,k_∞Ÿ« ‚IgrÌÓΩJ{«oÖÚSGy∏mó!mÁR ¬Üàì8]-YJë|xÌN[Ã	
+qúhÎTfÆhﬁÃNYÊ{Ö•íIöõ∂·Ní<∂å˝”s‡Á•*Q!(Æ<ë∫∞hRûÙ5¶$IeÚ‘•Ï¢†E$˙Ë„¡ÅP˜J¢s4"3QZ•H™îUÎ$°ítoiiî&R>ÔÃi^-ÄzËºÄÃ…õYè9uÒXè9uŸÃ)Ä]ÀúÈ1'â÷cNíÌ ò”‘ØjZıdM|^=∆‘≈c=∆‘ek0¶n,[j£«î$Zè)I∂`J«ÅeZû§h”F¡¨®'k∫”`È˛KîÈü≠O%Ë‘>C{6"zﬂ\ÔÉ%¯ÕqÙ(æD{·)>%∑w¡*¡ÿõz©ÇôñHò£a!ÇÅ, ä:x¸zMµl2°}F¢h4\hå?‚SÊäj…c,m~4ÈÇ∆DB±Œ@ªœ'0¡:Ølpçê+€‡L£e4™œπ∆¥·ƒZI?âÑÀpy–=≥ÃCN#$È∏ÙŒí|@ñ‰cÃºV*;lòMò∫=äH¡jäŒ0¶¡4ÿíπ äjU5äH9·Ó©ôv†óF¶G“fú#‡å\ÿ∆|îï¢†8ØÖ≈©S,? OL±”ßéœèON±ì„≥ì„ãSí>¡∞îú<Ü•‰ŸÀ/3πç”áfô`≠Â,4Äv…‰ı+“Õ˙ôUùU„¿âã£’¯ê Zjw í6Å!ñá∂©V´v∞ÓE[<Rì≠∑ƒŸ´,≈”$v˘Ù÷Á_ˇcÎs?q?ro¬ø/‹O›?1¯ıûs•˚±˚üÓwÓüƒu¬x«_ªﬂ¿OËä¿åÀC»V∑áx•RmÇR ™´
+ÓP†d∫∫'¬Qn”¯Õ˝®˛{˜æªUøRø‚n0˜q˝≤˚>n’Ø2˜∂ªQø¬Í◊‹˚ıkı˜ÍÔ„’˙î∑‹≈ûxD÷Ì˙5ÊﬁqQk'µÀ⁄‘'JP]cxﬂ‚¨±¥I˝K”tx>* Îè “n p˙è 2[¸¥é{pÈ√ÖpÄ∞‡Ô˙
+¯o◊Ø√Ó·+bÌ¯o⁄ÑYˇ»W∫˛>¨Õ#¯˙¿›HP^mE6˝˙0è†À{ÆõàKü¡ÓÚ ΩıÎ©¡˝≤~PÒGx√O∞P◊Í2Î˚Œ}Ô{WÆ`úsÚ1ﬂyFEÇ◊cæ?9 ^ ¬{∏>ﬂs0=B0 ÍË`U∫¸í‡o&Kå2◊‘¶EV®YVŒ)a‹¶Ì ]®‡W˘íLªq*Qê©œ6òR∫ã™Lï5"MóPSIz-û›rÜ≤!rÜ‹Ø9∂l¡&‚¯WˇÄŒ?v‡uì~Ñ⁄8Ä¨¢g(ØmA√ú}ì!êŒ%ë‘?ÜÇ;gcüg*ˇÏyFºè}˛qèŸáÜhƒ	4A≤~æâüyÚ•uq :ÿ/«8¢Ω∆¸ögøaàv–"”wÈ<ÕeK]àß∑>ﬁ`Å°^z.wC÷G9®•ïü∆⁄6ñÿC#m)XcMs]+–∑¿x“ô†ª∞PòyÂ®ñ†¸m¥‰∂õ\ @ôˆËÂ™∆¨_£æÊÅê.P~AIÍGä†Åçº˛Ñ8á},Gπì—:É˘7(2t?∫TsìFMc–ˇ¬ÿzågGRSm’9’ò›Ω”L”ƒÏU;îÏ‰˘g‚Ééµ"5≥` 1úU6∆êô√§RÆhF—\Iå◊äöÈôÃÿo~¢√òËë)6»Úk‘ÏD—+Í“Õ	é‹_åºZ>ƒMª¿∆BLV,Q∞TâÊÏÇ¶ÉldZ·GUähL«Õ3ÄNbŸRUSç¬ZvÎ4¢è;ãZEÉ°CπëD:&ΩñœQËî8òπ∂á:#˘·ƒpÑ–äòL´eb£R¢8!píâd˛E@ÿËÜZpb•P¿ı{		¥mkÜÇ.ïàçNø∞ƒ vÃjX`¥lúPº.ä»ëAqâßPfËÑ]ß÷∞ÀÊ ¨ÈhÀZÅ„™}\ÕD£1(\◊aˇ˝üM]DÈzƒﬂg±WQ«j’ÖÇ∫Jˇë>:\˚ÏZ°†⁄6π‚¬\¢-≈vœpuMî°⁄ËP29òÒÛı[ÆÊíA≠5≥Õè◊–f≥-eÏZoß⁄ÌI˘’µV‚äÆS¢÷hZÙ”[ˇÒg∂	,¢9XòGwè
+›J~brÖ"º∑ëπH‘8m∞vsWˇ!”	„8®}◊	a.ZEÒòQ/™z,≤Ø†´?6“SV∑∑û≤∫s/{¢¨¬®“ápX/∫ùKg^8Z]≠öà‹ºR©.ö¡*ïÃ%¢Ñ◊®≥±tœ(≥ckœûaT&ïO‰BÿTJÌÅë&ï~ﬁ… ^!P2ëå{BZ*≤a©àŒ∆∑}œ¶hQŸ‘“/¶eÓ@˝YÊ>¸sˇ¿√q0ñ¥~≠~≈}Ïn‚W˜Q0í√$y@¬£∂Ë”#ŒsÓ˚∞˛ûª¡´^ÅÎ<®Ïr˝∑<<ÙñôÜô;–—}åHH<è<¶Í∂J7lD∑nOæ¯`óí«<xCqoÛÿ‹⁄‚Jé¯∆ÿh3√8ê]åh–À}å&ΩÀˇº	k˙æ˜T˝]\–˙ıPK©ZñiÌ˚Bû"Yo;⁄n3âZo±x&wÃ∏≈ñ-≥/¨)Zn\Úí,õ0Ì6Ô»5Æ5Ôkú˚»£Z[‚_ÅÄ]ÿsAsn5Ëﬁ*Es%˛NÚ\Ú\:W]=gïñîÿ–@*üHÉúóLd˙œz≤äÆ¬À@∏9+o	¶%V‹¸.œÌ!∞O”>ÏD≥Øâµ«ä ñ®F·√Yüòg0çå≤≈˘ÒŸÖÈ≈ÈπŸÒ6?˜˛ú:3ø"»cŸ”<&µ¢Zä^|·ô¸yÌQ*”ìœnÚL¶o›ØxﬁÊ,˝≠-âiîπˇÊ~ ≥ën¬˜œ›ø^√ÉÓﬂ°ˇØ›è‚Ó'^zÙJÿ|œI~”-Ô‘b‰Îú¡"é˝\}Ã˘Ôå'÷ºOä–Â).õ~ 	ˆÖúﬂcÓ@€Pr¯¿O´zèKF)ÅÚ¢ÔyV–#ûª]0êÔÛÏ†Mj≈Kå(B⁄‹rﬁÇ2'ÄƒªÄ6ªº∞Y1â-úp˝:ñ’¶•÷<‚Âπo A4Ã„}û¡ÉRÏæÓJøü·‡º≥˚ﬁ¿ﬂVÕ)'0óœØŒuIÈGË,øá‚€]ÏäCX‰Õ¡Ún÷ˇ¿Er\bD)ƒC*Ñ∂Dæñ»√ªœìÚZPLÉ¸»≈’áﬁë‹ƒƒ0±§ﬂJ›áy‘ØDùï ùƒÿÓW”9!rº:úkã`∏Kå©ª~^„9cày Åü<	¸…AMM §ÂÑQs∂Rª‰lµ∂≠ÙxüœB~ÚówÈGkwŒ≤·Ç~µüx"‚U~å¿˜›ál‚Ã˝KPAßç<D˙Õ(„ñd;[xE˝]¸∫!L$Ãﬁ˜CΩ˘Úˇ◊€Ø"¿Ò√{3¯È ÷úß	v˝Äs¶-O-C§Y¨»¸¯ ÎW{´¡Í
+2‹Uû:Ìü.rõKuõ»èÓÑ‡˚°q!z.{C:ÂŸöàÙÔFNs˝:çwb4`˛OêªF„ñ˚~ëÏSƒ∞¿:ƒ%•í$√\4“>aÕD¬"H è\¬ÊTFh<\√/\£ÜîÜ≤F‡D0DJö!}!ÿ≥D6¨í;d¿t“4E6åì˚aàL˙Ü»Z"s©Ùà∞D öÂ˜ı”[ü˝z=π?!AÂ°…ˇ∆ç‚¬¡Åxµ’BwÑ.'˝&Æ£Ûíùåπﬂ·yPv{ÚÂMi⁄B±@Óó11ï`©¸Kã∫H”≥≥SÛlbzq|rjÜ;==39={úõüük\¸ÂºnOçã˛fËdY<L&≈N•º),µk]’%–∫*KÒΩNn{ZóÙ¿bëîxzÎ„èqÛ˙‚Ó¨áıºxçêPLÇ?^¶jÎ-§ Ë¿ìÀﬂ†u}eóπµ≈/öÙ-,Äæd&÷îÔ@ï€ÇtÖ‘Ò≈T>ëJ%R√¥h˜PÅÂü’Ø+MÓ†íNΩıb	Z∫Z[Ôxô$€É\4—˘;˝ÖÙ«2M¨®^≤@[o˘J˜bküÌWH›ÄºôïÈäRRmsÛ∫¡€.ê:’Ï3ñRYP@û/8⁄Eul}€%Íhß∑˜›È*≠˚ñÉ±ı÷Ô§.õ	c¡!ƒ…ü
+Ù÷Úï÷aõû }∂]!Ó$E3‘‚	’2g.Í∏ïÇﬂÈ{©µ◊mó¬éıÕjÀPﬂ¨F0RÏ≥˝
+©€2< {.>a¬Çõ+∆§4pá?P«~bß˜Ï¸∑0pC±,Õ¥Ï ûÆÖ\Åñﬁ;^ébÏºi^äh‰≠¯≤˚Òx«Â›˘o‘ôº±À€v˝3ÈÖ*ûáRUã”éZ&÷Úï:É©÷>€Ø∫$i\ØüfZ•¶s¢ÃfÃíÕìÈ*®ˆe’„1B g@¡ôY±÷6ˇ[)cç›0t,ÓÎ‘,Cˆ¯k—⁄uúäœ≤†
+î≤Lã•¢≥”©QH0Jı«;;†ˇ¥UºkVõGbÔ†ë’°?~¡‹Â°[Ò÷£˝‘ï[¸\|ÉÅºR-MgÅ.°˚o‹?Å∂Ú5º‚/Ó∑ÓÁÓﬂyÄ»ﬂÒ›_∫7≈+>u?›O˝£f(´Ò2¨	_4k-ÎÊ
+¨∏R¥m˙$≈ Â+«óÀ.X¶Æ/)V‹)kÚ
+ºhÎä6Œk[„nITr–tL7KL„v]z®)Bà¸0cT õ5“[ÁÚÉÕdˆ∏ﬁ)ú+{Zèßq9÷ß§¶ãFıæ`[áu†ÄÏ–¬F=∞ÑQq¯}$›TÕ‘êE∆±Í>–<¶>ÀÎ¥·˘"~˝ÿ∏”∆"8†™Ω–`8+◊6sÁQñJ≥◊®EÈ^>‰/¯›ÓEª±(9éGå/˙
+€ÿxl◊èæ”àß?lÒ(ÖáÓΩ˙5v‚Ù$ΩÎ€^,˝ª–èö¬®(öΩ1\5ol¨˛w≤~_øŒ∏œ¬s¿ìjßcÉN0ƒ„Ê~Ù+lS´BR±Øüç¬cJö{ÔrÉ/F∏`º„¶˚‡JVﬂcú∫™S√7ﬂGGwk>¬"‚^≈znb˛I o∏6©ØŸÍ∞ê€≤Ñ®ùJ∞ÁG˚é ‰∫°—xYêª–TâàÈ{à:†ëUÌGBÍ⁄VÙ` ﬂÖ´≥m•ï=®µmµïhÎ≠Ñ¨∏UÕïËÀõÏ]I∆r˘·D&&/=¬‰˝P;o/°îœìKIâm23W›3$ò£®∂eΩù=(gæÍË·⁄Q‘Ià®RBÑµ" LËJ—‘:ÿ™KàDRÚÄX:≥≈zX]E[ŒZ<µèÈ◊ç†«¸˛”§[+Éj≈åbîx
+nﬂ¸i∫›Ù5çª¡Ìõ∞HÔjîıÕ¢ºäùcÌ…E9C≠vE“ntÁ˜%‚V
+™ä«.+∫}0Öû¢´À¡#q⁄wP( j˜a√xãõ[ﬂÂ°wöﬁm3¿AÕw›€h∑∫àCö0E¥~-n(∞É'îJU—Jçï™Æ:jÒõW—≥À=º&´(’0ÂD"®¶∫œæp©jÕ–ÌŒßº{zú™ÎÜ˚‰ì÷7hıˇåõP{yJ≤ß∑n\	≈√&<ƒgç≠¿ª< é∂øß&ÌÈ#sëÍ[‚ÊÆoÌb¨]ı’ùD“nx.YZë·L9∞„)¶óFõ_≥‹&=‘Í≠¢ÁÎZ õÔ \çë?3SØ/≤âπô”'gG·˜…S„≥”s≥,6>5Û÷¬¬x?õû]òûúb'«gfÿÎÛ„'ª=¯z∑ª€s*Z&“<yÀü@¬¨Uª4¡„¨&◊•¢ÿIË—¥ÿ4ê‘öÛXl÷‰Ò"∫Rµ˚˘D∫Ô”£cIÉb`†‘	UA
+{ Róï%vL)ñT∂†õéDÍ;˜#˜ñ”πÈ~ K§|È˛—˝®ØÎ–(âêéÌâc¡åó¡ëúÔ	Ow8<p® ∆TgÀà£Dé´XîgÁÄ¥$ƒ∂Ò†Œa##©dz ùMaFXÆˇls¡1=e≠XTÅ €jW•œπˇ∏lZïn	øVÎÛWıúXÀsç≈=wJW~USªÎ´kB’9∂l®-û ÁßÛp%NVYä'2!«·sKˇ¢úQ÷>KÅ±ÁWªÓ/6£.;›:‰º}¿Z7d"¬ã(F|‰˛l O›Ø±jãa‡\„`vb◊ﬂ} 1xì≈NNÕ.ŒÕ˜w9We;I]âg“¨å?*≈—ÿx¯ªlËw“âú•VŒ"=∂<VÚJÓBZvkfá›∫€fmK-÷,ÆØÒ`0âBV¸
+–†T≤esßí›c∫8∆⁄'…«-•Z ª∑†ñM©O—RVPoÈ>&ı®}±‘ı⁄o'æe/y7ûÓÉÓcÊÍX_í%Y*…ˇuˇÙ≤¶Îc}ÜitI∞∞≠Vt√Î+;Nutppee%±íIòVi0ùÑt€U˜4ÈhA≥
+∫*!2 "9	@¿k≤OXc}ŸúÃ⁄øH.ßÜ”J˜J ™™8eâ';ôN≤·‰¸Ñ˝ü¸…±˛úÊüÛ¸zûﬂ3úc¯?ˇ
+˜‰”˛9ÕØÛ~ﬁ&¿CM´˘e	»Ô1<R8πâüwöOÊöÊ≥áœ#¸˙ø~EÃÛŸ#<r)˛9≈ØÛ~(XN-ÁñG<r,ìõÄiñCÄ‰©4~LÂc *ô‹âTé4◊•¬≤ö?4sÕÛπé…éŸé§q∫˘<üyö	ÑáÈÊ_ÑÈf8gpB,√◊2á4`bàOtò_Ê˜¿œ°ÉÎﬁ÷áßÚ¸zÜåÍáié€é€Ò⁄É–ê s€á•®>o^P	˚⁄Ù≠Ëî«˙@$;4ÄÊªbàÔä!(¯Ï°I≤…$^0@©∫ÆUmY1$+-Üd%và!éå‘(È6´íœÂñáház†}f£…ŒŸî4dá$eg©7¯¸Ç∑Cß°üú(rä≈ 7ÁY6◊î!r¸Ûø>î£≤ã|*_Xñ⁄◊-ÏBbÉw¶£®wHﬁnüQñlSØ9*”[u‚…Ä∆3zpªfºq&l‡è…†•`Í¶e≥™©°16Æ^ƒ‰€8W˜ªùK;”Œ∆˙Æ≠4›‚ó=0\⁄†ÄÃÊõßSó∞w∑d…ÏR[]¬ö⁄ñsˇËnπw˙Ÿ”[˝‚…Âﬂ?˘ÛÂlu[ùQŒ8*ò"epê-¨NYµµ_´‹˜/åj6BZ¢˘h˙∞ÒÛëDÃ∑≈»árók≤GåÓE¸*ö—“!%p£%ùµ™
+ı9ñ¶%]ÌìÔ"™0oB¯˚ˇ  ˇˇÏ}{WŸ∂Ôˇ˜S,Ÿ˚Óãª	&·!rÙÙ@§ï±ΩÄ›wü=Ï")H∂I*ªíàlOè
+äÇ¢≠4®àÿbkw˚à^2∆˘·+Ïcx%åﬁ·Œ9WU<l™V)Ë°z4BíZ©µ÷\s˝Ê\s˛&Ì51`Ôß∫°√±∑∏∞¥T∞ÛT≈–‡
+Ó∂ ¬€Lë¬9’ô~Z9ÕfÍÆ;«ÎßôêÛtò:åÅô±”Ô_an‚IL≈Öß#¡◊>C≠ôé¢nÃ˚◊Ωõó©ˆÊñ≤/ØKf Ç9∏eÆõÒÇ%Z°$ˆ•j„Òô]ƒQ»+çEÁ.PiPÉÿﬁnÉÒzyﬁ@ìbË√m é/óUF/I∞NøáóâºJ–„$“@ùæÃNx‘ôãG}Õ“d =Y√a‡ÿº√kÛ»ïã∆ÖãbJ3“uÁüx√≠$!õ?—7√∂È0´Õõ%tŒ[U€PU«ú±T_Œj*ÍW±C’5«ü®Çk*™ëå÷™8%ÉU¸!<2´ëTäí`n›¨Ó¯aˆÖ
+≠kÅÏ†rm¬†WÖw[Y$ ™´EQOä ~ıŒ¸≥„Rµ¿‘L ¶ÆÊ≈ÕDË¡<X˜#'$ ][Æ®∏¿Èp8ã 
+ÏÖŒw4¬
+r´J÷RDÂqF∂R^∫´Ï›ªÃÔ Ÿèáæ1–†Y≥‚s≥NÖ.{√>X“í
+∫û¥ulá∞á5À~ÜªÀÙè&`e9 Z9ÃÏOÃπ€HÙ¿Fn ÿdlXÉ™IÛ¨5,˘aËKx–∞
+£ôáØ¶˙M+~C±∆•sUãJ÷≈°Q≈X).Î´#…ÌkÏ¯0«=Z.Ï$'<5l~Ø`rÆ˝v}™sÇÃ “Z9ãgã~5îÑˇœ¡ü6ﬂ+É‰Üº|±¬	±Aı=ª°-ôá>›∞0@ÅN◊ê‹k8ﬁb,d∫ú≠˜4EA+>÷£ª{‘0nTè‡¡~÷J»=7ƒ]≠›èﬂÅ€o∆ƒüACÒ[å¢1oàﬁ6Ë¢1D7°ì6+…«é+æV˛[=H´T‘Ä¨ÜÿóﬁP^ì\.¢Ÿ≥L˜®»Øˇ∂Ä÷ı¿ˇ:SRFÎØ∑dîÖULAqDæ„@˛åä\ıîçôGÛΩ˚)}ÔzJìèItÑzp≤ë™Åƒúî•S†‚∞)Êìe  Ü%cQ%ÆœG≈KÆ÷;Èù·]≈%√6áid>£ÉtP∂C’®‚…´ê}≠°êdhI„Ñ…â˘ˆÀeÄËº·êÏkBÏÜ´ C¿-©Ä/¬≠>cÜ‘¨trÆB¿E‹,Ògõ'étX∞ÏˆF¸käYz√íœÎ⁄íÈﬂñ∞ïo„˝:UüÉ%>Q¿˛ò˝î»ÃüR„îÕ#i¬ÍC£ƒF¨˝<C.ü…À›•2wK™À#k7S	G‰b¬ÔkÂ∞Õdm(”cXûﬂD>ßºÔxqÓπ.Ã=zC‹˛1*ö8É˘x˜ÈÜ"Í¢⁄6/©`¡´Ï¬Î£X∏˝|Zg‘m^qqú◊øøqNÙ5◊3◊[»p≥~A≠!ŸÕî’í9	ÄO·ó∞π+ºå•zèTj|ösSÒ¬•„Öﬂﬁe◊õpá¡V∏xŒ˛ŸvìÕu“ºœöÂXöÖ~ø ∆*÷CõÎùªƒK@Ëu“W◊Âåf$ãGy›<™oèÙ[Tª
+©∑.—˚HhGÛ,_P·˛«zåhT\T#\£"úH-˜F…	F≈)eœDÚÂ˙£i¶˙5.°…«√å◊Wù·Ödµ ´ Xƒï ÀibIùú‘  ‚˘÷fñúë∂Œ¢“÷ßÔõ’jqÃp—GaÁ*@+¸—"KLÑΩ|N‚”8≈∏º≤*èÒ±*50-ÁÜ•|„π1äqıŸ¡ﬂÛ¥ÿÖ…^XaFıB∫‡Ö´(§®i∞ÙﬁKLˆÖﬁø ˘¢≈¡¥:"¸œ7ÙÔU-xç.¬âÕ“F8Õo¯m$Wµ≈\X‡&íe˙Út=]™í
+GÀÅ/¢ã⁄ ”FW	¨3æ6PÔ‰¨
+™Ωƒã¢åÚÔ’J⁄¢˚qÆß‹\ÆÊ˙ìSl™-Õ°G≈Ò&uÑea˛uÔÁW7º ‚(/ áIQ“v°Ú#ëÌ!1Â
+√˘√_∆Hëk√c#©ü¢›‡¢FWIUã±ç6	„|ƒ⁄±v≤^
+ºâ≠÷u7qÓ_‡˙•Â–Æ’Q#ﬁŒUäR/Jc§Œ.“√üµLvôÕõ]6JL∂∂·|¸Ûnï5øC¢”´)·¯=E å«Ni’åIaÉ»¶K˚∆»˘›£ﬁMìâı6°ÎÙ~ö=4]T[/æ´&öıÖ|*Iã∆8Ö„}ˇÇçÍ*∂âI˚T€NK⁄Oór‰$Øê≥±ç÷e7Ãﬂç¥Î·+ú∂©πn”s±—lîönÔÎ£˜M»Õ4Ñ!ŸÜﬁ°FÈﬁ≈Îdø–Üﬁz©X¬’69Ù“T£A'”™ú”Ë‚ü1 ÓÁ|¥¶hΩd≠“¶7—sº‰ í◊—~C{‹(m
+ùå/dJ@¡âÒ‹≥Ùìg!„’€HáNÁ"5Å·ŒâuG∞g¥4°úsZ˘ÔK8NY›„íMo]\≥5Nê˙M¯•ö≠Ì§Ö	∏¶Ö=ñ.√€<≤“*æf }`P‹:fπÁ:LWF¸EB™ZQ[æ—cÖ˘u4Ui≠˘rÉ^æµÀ´™5:o÷ÿ4…´≤åﬁÁ–:¶ÿ«"*˚BB™ù‘r Ãº!¯ˆ Í`jÜ™¬ ÜÊ© ò°LibR¿Ö~cˆ˙eºÜØ≤j÷‚ıë”àŒÌZY´A/CÿÌπ—ï¨*ë˚õQr´	8dÏ']RÕ$?uÏî,eªÖÖ$ä¸á@∑|•⁄
+F∂Øême~©ŸÎ‚]yº≤œç˝Syi?é:–©üˆH>ÊRT5ƒÛ6Så(÷¡ríÇø‚√6Ja<Ä¿ì/M≥Ó˚⁄≈Ë˝µÚø&Õ#ÖX#ûÜ¯	›Ïth·Q|≠ÓóT÷‰ì¸2»¿WöWÈTÉå§)‘k-Ó•ÈnP•” ´jÕêKç∏†qÊW¸öºÉ© ÉPÈQîêÃ$!ŸÖá·,$ª0q_	–}´÷Iæ√ñ\aØ⁄˝="πë†∆Âì• û9x’Pÿ$º¥`“8¿43ó: ·ˆ˙C–±Ø§PXÌbád?¸ÂA∑&F†πY£·«>»!à©ËÑÇ¢Ä†eñ¡"É˜ZaâH≠4F⁄öaç®X$ÑÔÄ)f9ñ0èÏVDµK∂D◊-;.Kßv±™3aUˆc",rX1íÎTà∫Ê˜‹44∫Ñ[ŸQØﬂÎ
+±†V}Nı∫<LQ°:Ä„|1pÖ—,K™‡6æŒp¥áó0[=ú⁄ÿ‘Eº´πYF7%Há‚o°÷p„A-éô¶t]∏ã`ÿì˝†ã∂™∆H8≥œ®RÑOˆc,°DDb∞›Ë;?R¬FY]–‘=<@8èæãUÄ˛ˇ>§W=˙Æ)Ñz√Î¶É]xEı6√Ûi}“ñAkÜ‹¸ú]Ô◊ø 5rV“§¡mMÜª∞⁄¯KùÒ±∞
+o–^ìå,GØ'ªG6Â<M›˛y9zm•oê•Ü;RÁûl∆£ìÍ^~’NûúïÅé‰/ùx{ÚQWr¥[¯.’ˇdK›é&zí∫; øç¡gX≤ß-˘VÍÓK˝0ñº>ÃRÆ§ßì˜·´áÜóc—Âó⁄P<y!Kû[é∂±ïæ«ÀS+}À£√¯∫u^3¿Ö÷ZÚ‹@ÚÚMcêÍx¡«m0Ÿ›ï∫<¬V⁄ü`ó/è¨úÔ¢éw†Yù∫¶ıi _’
+∆Å>?ù∫¸ò><0íÍüÊí|’∂“e…Ó	¸öª´›ó+}√À£Á°	l◊J˜â9ÄC„‚≥“ıF£èûzwß'˘)Ã<‰Æt_†£Cì©˛kY#%;∫Rè⁄p“·ˇ‰çª,ù¶aKΩLFaòG⁄‡6|?Ÿ~7yÓâ˘Æ[p®˚À£QÏ˙p{Ín&~p9⁄¡ÁG_	ly<
+KÄ:x:5‹FÆko—V¡ÖûïÛ}0∑8à+∑@∆µ•˙ü‚¸ß:ÜWŒﬂÖ±Lu?MuÇ¨òÜ5÷ÍZñŸ ≠üìO∆‡Ÿìß≥ºÛqÍÚ8L7íæNX4$›èó_N≥Â—‘DˆZ¬U2¸ê≠Ù>]˘˛
+äSÚóh™Ø#5¡W›ΩvX#©°Nﬁ&,ØﬁûÂ—ü∑›Ê.Çî∏¬ô∏ïÍ!Õ1vâÀ“;Fve`"ŸK
+95–æ<˛ÜÂ÷ Öa\n…Á±‰Ûâ‰çNP∂ çlyÏzÍ\Elyt÷◊Jﬂœ˙xÚá_sëö¯‰øAtß∑~ÑE_ø|<RÉ¥ ﬂ-ºè⁄‡5ñ|2@Ùö6ñ8CÀ—>ê⁄‹]A”∏Ô„ËˇÄø°≤K>Í)»∫6;ÌÉ\fÊBlÃ	_eÈ⁄é†iﬁ—?m(≤w3RÎ]®ºR]£§≈á°ß\ò`(^é≠Ä⁄ÎÎH¨Í¶ﬁn·⁄ÌÒU_ÚÂ8Æ~æÕ”ì]Iﬁ{àÅí@‘ê	&o}EgVΩùN<ú)`âËÂ˘æ'∑;6ÆÊª~›§JD;Ê/u§öŸóàu·!Û|◊ı∑S¯UâÎ3ã≥◊#èñn]ò˙ 1¯x~ÙR¢Û·|ˇp":≥4u}˛vˇ∑ùÉœ'¢ñn˝Úvz˜M;< ºæP<⁄¸¿ÛÖáCâ¡âëüóÓøöèéÕﬂzÖù{÷5yd±≠ì˜ ^Yzz!z·ÌÏ]x∫/.>ËLå\L|ﬂ≥–>æÙÙ‹€ÿï≈ùq˛ﬁ∏qõÄ†˘˙≥˝ÛCÌâŒWKøÃú˚m∫ù?ø÷Îß?%n=Nº]òÍMtv.ûüI<Îôﬁ˜€tœ“Ìﬁ˘˛W¯ »Ωƒ≈IúΩ~ûø€6ﬂ˛
+ƒtﬂ⁄ôÔÔ|;9	ù∏rÒ¸ <w¢k
+zïËäBáüøÕ⁄∑±ßKmóÊª~k{˚e·“D‚ŸÌDœd‚ﬁ=hdqˆŒ‚˝û•ü~Xúyñ∏ÿñË˘aÈ÷Ù^L\~¸€ÙÌmÜu`BµﬁL^Xòzæ0˘„‚ïÔó.^≈ÆœﬁZ∫ÿ≥pg`16¥p∑-1=πpß?—ÛK"ˆE∑˚‹¸Ì±¥0¿üKÆ¢ÿwÃjÀ··›Öüz˘∫«—ΩÚ«Ñ°˜:4˛…AõÏÅL\à&¢Ìo'∫Ø;°ØÛ—ÿ|˚˜∏íû¬¥ÿv~ÈóæíÊ;zaëëEØÉ Ç
+I\˘«;: çêRπªÿﬂCõ∏x’∆õ˚ÿŒµGÇ£∏çLˆX.Œ&zGñ⁄˚g'†«âëã◊fpT~º±Ûh‚^7XÏn‚ŒL¢Û¸b®›˘¡Á0¥og.,^É%<?8ôË|˘ˆÕ›ÖéW8≥◊gû‡∏FaŒ'.]Å≈+<®ÑPrÑÅ÷ÏÛó⁄∞Ω#⁄Û—*·√]¡≥˘°~æÅ¿∂Ä=úº¯vÊ˙€Xw‚Ÿ•˘ˆÁÔZ[”mâk˙éDÍªa$§0¯˛BÑ÷U‘V©Æ=Ãûhh8VKÈ-u«jÍuJﬁtﬁÀ¡cˇO BxÉb©Èr™•Ï6ß=+G£EïÇ<o¿È˙°Î´·Ì7»Pm™®Ép1áuä88L∞’[Q />Lá¡£‚8J¡t‘ZŒC$µØè∏14BãNöª7EÕo<·è_&Ü«lÕ>kjıYX£œö⁄|÷‘‰3YãO¥üuµ˜¨Ø&W\l≤äú•ƒ,+ì“˘Uf∑f@(¡⁄TA<mÊ¬‡óÖ≈ÎLW‹*”˙ÓÛdIµH®Ãkk•JºN_≥EôÁ(è'Vo+ßB®Äù·í@ÎîrÆ•˜ZMÏï…‰]á© i_[Â';£èÌ≥È±ä÷c+X≈ΩNÔ`6›F©øúÅlOc8`Ã|3\^fmﬁ0&){rRïı È2YÙh¯à:;º≥d˝∫FËÔ¯e]Å"åéΩçëë* CZ©"WÔÁÇNk±∞~|§º∂±dW«Ú¯ìT˜”dw◊ÚDèâg€È*èòs pø≈¸¿Û≈(òﬂ˜ÃzqÛæÚ(LãÒ˘‹`ù&sıô∂èqÈ‹Ü∆e:§=Fœ‚ìî‹3wu«¥|◊µcZf_ü≤iYbë%ı…òñ˚vLÀ”r«¥‰◊éiôuÌòñòñYufwLÀﬂ5-µ—˙çÀÁY©ÓíéÒ,@—∞(,L=Úó‚YÍVGÚAè©0AÎçKåà‚ gÊªÊË;y¡Ùquπñ∏[ºªïÚèxJ◊Æ`rÓ7 Åª7äﬁ2fI¨eÙÃ÷Ñù,h%Øc#÷˚{ˆ`¡VÊÚ¿~c^s§Ê£e∆£¶£Ü£)≥QÃh¥ d¥⁄`‹kŒ:∆Ú¬]∑⁄Pt8-	"d„eZ"≠1-3¡2*˚ò$Jƒ≤“≤ÑDÏ†-`»†îk˛îê˘@>˜mùä9Î[?´à!◊µ~VW2_≈ë∏±	¥ùÆÅ˛≥)¨≤(àâJ#Jô¿ÑB2(àïÑ3C1‚gô“Ë©à"e5±Tî˝sËÊñ&ÃÊÒ‰8-áìKWn›§,∫G©°N3œg±œ∏8{'—˘ê«πÛÿVsœE¶GΩÏñI˙ß¶å,/„f«FÜDëA+ ﬂíGÔ#U∞›€*´jjXCEeCueE;\W}à}q¨éﬁ≠≠˙Í‰_é’6T◊V’60;Ì(+t8
+vˆÁ=∆4m—˙óúl®Æ©™á˝˙k„vC›±ØÁ7@≈…g ô	$§*-¶Ós)>S˜aÈ ﬂÄÍ3qÜG–†Ö?Ï+ëJ§R-»~Âoﬁr¨îÒÀ-∑`C*7u&XwÇsRèÎlxúöÏgg$∆±¸¯]Æà9%‘\∑—2¸™™Öo™U‘∞◊∞,EX~-Úêπ+è@ãâû˛•_WÔ±¸∑±ßøö|∫ø‘A[…WÌ…Wmò^ò∫sçÂßFÆ'ö1”ﬁw∆oÅÕ‹%2ÖÉÒXf˙fr&¨G{YcƒY≈2'1"Ôg.{IDoP 4∆ø©πŒ4ôÁ–˙nhG.@ﬁŒlÒcÙÛÒY¸∂BÛ"r\ñ\rSƒ«¥ıòµü(M¨6:n‰!'™üÀ#˚Ω!‰À8$}J´ŒŸ„S\ßd∑π'!—Zº¯À¬Õãc±˘ÅãmùòºÒ}Ob‚%ó≥•/$Ô˝w€π•ÛèfFØGón∂'û›∆<8”ò∫ñfòûﬁˇ4uæ]K_]ÈΩƒ¡ÂùíXbˆ4¶Mg•óG£©âñ|’µm3”mRñ]û^7<9ÓG'k´N4‘¡ÊT{¨Æ·àâ'hD *7~QS—¿Jäã˛+ZÀ˛ì’´e{°Ûø¢_ôyåHSSHd1ﬁ]Ω˛àY0wÖÕu®Qmi¯¡(H»¡ˇ'ÊR•&‰q˚0êU±!Z•Càëíí"„l¶†IÃR}Pj	hZ‡√Jì,Ö#™–N|ùàµ3dÿ§Œ_"±+Òwˆh‘€iZhR›ƒﬁ:°—.∆‚c&5…ÏJ IãêƒMâÑôhVo †M>Ø+˙Éi¯” ’ƒ1≠@5Ò}@mÑ˝Œ¡ßÚﬁbWëKü~ﬂ∂¯Ùö¶f9  ö{RcZÒÃ1_ãˆ√u1¡)¨„1§zTR•°åcëpP”+ˇ çøXùø:úô,ë∏t%q„1ÀÁÈ◊ê5’7ÉdC◊àqf¨k9M=jc˘…ﬁé‘p˚GÇ] ,—¿OÂ≤∆"+íâì⁄C#Ê·vùxó.ò%ÇvΩ–¿‰ZÄ∫·Ê" Sø K∆€‰EÊ6Êí¸AbØC]	ª"Wƒ©Ë›#Õﬂè¨ ¶Ûó¶1°|ÊFb0™¡”◊œ&gëÑ‚ßˆƒ˝°Dœ\≤Ø=ÑœXRπcky¸¸Éd`»‘2Ù0’«Y}nﬂLùÔB∏zmêq1d©…·ïõ€´öAóÑnV‘™n8YYqÙ¯…äö„G*∂ ·ñ:2◊^\XÚ_—™≠@∏˜xMÉ,˛	Üıê§ü˚jgi˝qäh*oÒF':7øË™x4ÇEGÖÛ®düä§´˛à/Ï˙º≤∫?f¯;§ﬂµ;Ä&W dì:Sw,ßömä àÚ˝ü>f~+öõU9¬Çëöéo•ØëÀ“i$}VOÖ¸r‡”BƒÜÎY"bﬂ∑„≤ΩM“ùUº·∫f©¶ìï€˙∞@∂Z©9dâªv·ﬁÀƒÀ®æ⁄ﬁ@7SÉô£∂˝⁄ìT◊©áî]wv≈-∫ì˙lSıù‚á≠@ùìèı„P˛Aﬁ89á·ﬂ/ÖîÄ•–6—;ÚvÍ¡‚≥hb¶OÛπNﬁKLüπY∏7õú¥ÀÍ,ì±hÚ˛]b5‰|Å£…·ë‘£ñz—ëÍ∏ãv{†◊Uû÷™ä˙Ü-Ä°Œ¬≤uñoÌœ™XCKhU˘≠j-	**üUøM+(¬ó÷Ã\Ø˘•RáÑÓY´§îDP	y?å´lçÆ{YÄFÔS%û6Óº«‚gùî=≠úô•2=mT5+J»¶’ÂyC•¥FÕè÷10n‰3.È¥Du¡Ca5‚¬ŒÑò	 UºªEÇ)ﬂñ∞S00Jƒi≠ôD´&¸∞ÇY5ì!úÜ™E≈˚ ‹çBPıŒ˝ﬂbf>zΩO	õÍæÖ—	‹,|å?‘‚Tú3˛#’C#Õu¿Ô*evÉªàÁzE√d5 @«´ Ã∆Íy›ó
+_–#	≈.pA$ïº⁄]òMDâ[∂gR8é!5˙xÂ¸uh5’◊≥“”√ê[°ˇÈ«Åí≥ÀµëgIüq
+IÅ˘’Eb|›Ëø¬©ò%ﬂS:”<í
+œ§,iéÁ®iò†qìàT'¥Ró&d≠°ÁFYr)*˜!ÛJX2kíT@i+Dã`±)årp…∫∑ìzº¨¢fß• ï!GòH†√Ï à"bmBﬂÁg⁄ÅDÕ◊£âgóùèØüç,>oGf ﬁÁ`º%Æº‰º∏âKWñnvœ_Óõø˘Fåøû —%örÀìcó®Ã 	r!K˝ti9⁄Æó0ËÜ∑âºo`9⁄GU;V˙∆ÿ ≠æ‰À1ÄÈΩ ˙]©Ó'»ˇù˙ÈÓ«‚h>RUwÏd˝ÒäØj∑ œ\\úÌgv‹ﬂäHäœú%ˇõ÷d∂7˘Í∫Exyµc≠j•˘≈Iﬂx»{⁄`˛¨À¥è˘„ÄÚ6á6`£§Ì⁄ı∫≈˛æ◊‰'h”jz
+X>ÙuGd…ˆ∞:¨‰$´îµ¿>‹àYÄÛüsöQŒìU÷≤\Ø¯xéÅXçf*\b©a‹-†˜å™HFπ€Üo+XŒÛ%’J>«®Hzî˝òg≠‚‘µµ+≥Ö∆˝∏dˆ=÷YîôNÊmP.Ä§6ÀüZ®FÒÜ˙ÊC5>	®o¢˚¢Pˇ'‡VŒ§Á•u£k ˇı˜¯+üaÄ›aPc°ﬁ?$˚¬xˇmÏib‰Y‚ﬁ’•˛«–h‚Õk ˚Ä≥Ñ¿~j‰z™Ôñ&I>âA´…+±ïÛmÿøA}£zò$ﬂ‘1”Á"yXHFu h?ü%∏?ù%%‹(ò‰Añ7≈#°£T°œu°c⁄ô¶b€È:^/8ªt¸d<&ÄÔ´˝~´{‚µ`Õ$C>Y¢»7Ä}Wÿ◊ö)ùÎë%5úÆu®W-dUg\≤œG1ôè∏E Â/‹[jªÕÀ],vN$£à¯_?∆W¶:ñ.^ÁÇâåÙCÌog^‚ªD;üË∫òË|∏pnB‹Î’ı r,±ˆ™≥°íQû’]ç&ØQÒ¨ÂXàåÇI®àù&‹Ö,y'ä•˘Œa’u,[Ù®-„ñˇ¯¿˝°™öÜ- ˜{À≤√§Ìı∑ƒ{ìØΩLaY¨¬NKëjÜÎÌÒlöå|›è/ •)ëFü´+»K2{]≠‡f|$Ózõ√Nü‚‡ﬁËÿï+4tSpÂ’H> Ëã*®¬-˚;™ú∆⁄–≤ÏfA9 êøı£¯˜	åaZÀr'"¿ø«}C‹±à[ 4‡yéˇ©"=Ûïπéπmoâ¢èˇ5?çÖ^ìuEN1FÁ%o∏}†>â¶J¡Õ ø‚˙d¿ı^ø? ´ÂR.Ã?dòôêOi¡M"	1π©I˛‰b¥M‰êÛ)ü7—}Q‡ˇΩ¶ƒﬁPe=‹» zX˚ø?∞ø
+kù´vDRÓßqˇa…Ô¬˝ÉKÁœ«û'z@£oßgñ~~"Ê·ÔΩÖ˛ïæßXA”∆ñ£◊xπ“èÙ_ï;:◊E˛}*Ù„@ùiõ?ÇèO¶ï4óÓc·ëˇØ¯‹kÇBNó6Ù∆d◊#¶–@~€d:J|ZwÌpŸB.}&•„e“i0=\Ü≤¢e<ﬁf@™˘Æë; Ñ)7x‡C@0tfÈ◊ÅÖ—7Ì„Z– ¯w@Ó8¶Otæ‚æ|x}·÷ñjú˙912&é·0±q›güÍòÎXF≥“7∂<’Ä¸£ë‘Ì(yÁá;Ë/è_K^øÜn˙èœÆ8ztº√Y∏Ôø¢ıû/*+,›<ˇY˜=Îq‡H‘1EàtúR7¢î†¨G‰–rnÄˇJ+—7◊†ˇŸ-©≠Ï0Ä&÷ÿ·„ãøOÜ(≠ú"˝y:åú$◊Üv¶Ÿãj¸ËK¿ÆSß~RNﬁ∞õD≤±UØ‚ˆ∫0ó%»$`ÛIÊæ…/5<n˛A: rı{»E˝\8+gü9πeÖG…<Råx˝Få€]o»?ƒΩëh`ë'jT7SqR0˚aRÃH≠Bõ»Wﬁê[Òk∂óœ«`»a:Ç “.ƒ˛¯L!ÿ
+≤
+(RÒπïñ¿ˆDˇZ`ê—‚µ¶çÜRìFÉ	Ù+‘§®rH(±”)ª\{BfCœÏD±ƒ_√¢úÊ«∂:¿{D–âGÓ‡Ø~ÉΩ)î◊YÂóU…ÁfØÎîf˘_–‡≥C-ËlUÖb€gÔ/Ãøç›ôÍg˘X˜s0∫Ë |øIìÑ„´˛k…üo&á Rbisñè?ñ_DS¶ìœß?í†˜∞ëyßy⁄	çèRº∫Êzy°πÌIbx>Õ	HÊÆ†ãÆÌÑL‚'ﬂ
+—]ﬂ˘a“=èz—J6L<kQwàrÄºÄ‡)AÃÀ‰æ˜1∑Ò∫-éåÔOºyΩ4⁄˛v˙r‚ Øâøæç=L<ø†ó®Â|bbåWúµ:„≥k`e ∆@ìßÓé·/à«Xjt85‹∂2∂ÁËLr∞<yWŒ"ã:˚ªF∑W‰¸«Í™ÍNV≠™´®9Ù·—∫”â—ÚÈ–ö≤-#)yêˆkuq4…›ót‹v^é1:gõA@ä1ÄDÏdóKˆaå,øêÍ^EãÅıcÆÒùê˘uÆ≠¡ÿ˜≤º,Èd˝D’˚˘πNÆ⁄ßhoèr.«qMÙ¢‰tOÎ|!]/π0|2®*†H¿î& ,ÿCå¢t…€&õ∆ª{?0ﬁ5Û?Ôﬁ‘“‡ñG,ÆCµ˜Ø∂˚êå¬B∏ãeÈ;/%&f£Ø≠Éª/RóGí˜û ”ŸÚÀq:Ük˚8AÔè†Œ¯·ˆ8	æ‡yj8˚∫ˆ”úØ“Û<éP¯>)√1ÿ{_cNFhRî·$∆à÷¿ì∆˙ÈyTsˆL¨ƒ‰Lm=$nÖΩHs‚Ú…íä˛†&…nû D5ÎÛ6…ÉBõ[-Ö¬ùùÛS˜&ü'.∂-‹ºó∏>≥x~fÈb/˙µ-< a\Í[¯yÚ=êüt"∆ÿîÛwìøt&á¶ß)ÑÂEGÍNÂåvd…âÆïéË∂¿ıïuU[Ä%HZíé>qbÙ…ñÑñkë“9«˚±LEH"ì–ôvƒˇù≥†™«D`]Ö?Ë„©<FÕHﬂo]/ÓΩé√¢'ë!Ö‹‰ê”ÑÏ´ﬁå_Éé<q‘–_éüÇérN÷◊L! ·B†Ö”5T˛∫e…Ì√ÙdZ=ü˛5Q+Bˇö˘üK‰˜£•≈‹ﬁ…‚˜±ö¿Øﬁ#aÅ†J§e≥Ç∫ÔvbÊÚ©=∑Ç∑o˘u,˘”4Òˆ_⁄G∆ÿwá„r£œº∆ëCAß&±—Nô°!—^f9”OÈî˜)iså≥5i—›¿õ{ƒÎ∆»l§œïxbV%/ëû‚ÀZ(vàP®D4®l)Éó¶7wgI\F‡˙h Ò¸¬“ùãog¿¨_|ˆtaÍ<àõ’|'πêzÛfj∫-uwlÂr‰Á‰ÀÎz‡∆DG2J¥(9!÷?oﬂ¡™≠à∏∂ó†óW«ºE≈òNπ%◊…ƒ9EñhT≥+”ŸïöE:π*6J»w\ï˝ﬁàüπT∞—^Ù»!¢¨Ö¨∑ø…-≤Ô#âΩﬁ¡ø´/mc◊y¶“lV†˘'ısÉY‘ı£Ñáß1*hñæ1
+¢>«+˙d®˛‚Äqxã±*!•ñ)ÉﬁßÄjGùîUØ_òp ≥E
+1Ô3âòMPÆÏPßò6Qº˝•v¿>DËî˙ö`ÍÔ'ò∫^âp“îcR»õïDyP…°L\ÈG<45;?6
+m.é›M†Lû{Ll)#©æéT˜`ÍÚ¶Qéliî¸p·\zsœIf◊òSÆ¢DË˘V|Á'ﬁîJ'"≤´QJ]«CäqN*#&Å^“Á®¡Iûr¬ß”Iò⁄KotVëòjÊó˛ÜÖ]å1Ö	˘P‘à7¿ôYH
+∏¬ ÒÃ„•∞DTÙa5"3Eı6kü√◊¥$˙JCD¸œœzﬂNﬂ–ŒÉ-∏0æç]]x84ˇlcØº˜€tœ“Ìkã˝Ωw€8…œ|tl˛÷+D◊ã„ØÁ'ØâÚ¶~∏é€©sORwÆi ¯ì‰O9Ç\òé hOOËAè⁄VŒç¿;,5‘E·ÌpÁ¯¸
+X¢©·AÄ˚∏
+R√}©ÆÅ≠ÒRgÖUof/C?µUÌ(ﬁ™8çœ6≈Ëë—‡(ãåkK‹’ÙıGy®Fø“Q’˙–ﬂ#“Ç©¬ÿ˝)*FPrÌ’q∞PY]–ﬁ∏èﬁõ"HØ)?¡xó#‹∑œé+8jîùÁuI.›ÀÉ∆>X–ã8ˇÓ–∆”ê~r˙LÕıñsÇ‹zﬂ%¶Ω\:g5~ƒó‰Òœ.Av^£4éÒt~mÉ“ŒÀﬂhÛQ"05HÏ”ÃÍ/¿—˙H0àÑﬁT#ï∂ï–)ØœJ«QkŸÆüô˚ mÏ*wò≠ h˘Ôƒäπt+Ö„˛9·Ô%NDã©ì√X˛€ Hì Õ_j≥.R§kîJ„é¢ö7cå»ÉtTG,+,Dwèø·‘ÖŸg–£LãØ√°Œ59B1M¡NQ
+K:^zLã∞EÜÒ˜œ^©\∞ÛQqúêÃK„4Fºæ0g=—"ÉH≤“&É ïJ–⁄ ë©…ƒ‡„≈∂ˆ˘ªoÊáØ'.øç]Ãé®¸ÊLb‰—¸‡ì˜‡_'Íí4Íæ–ì<7ê|2Fa–Æ§˙Ø±‘›∂ïﬁkTgt–8 ÌmU'7J§Æ™°Æ™b(∆ŒB{¸∂oY•õA*HíÒÓ“ryÉ‘3ú|ú3àR}í
+»Ç%,`ızUr)ç¯ôSÎ¡R"Mæñl∑„%_Á≤ =?]ùÀBtWúÍFßø·˛Ú(˜ãì'˛’®IÿFE(]¥ìOL`Ò‚EQ±)ÏÚPR‚Ñ’H‡‘'‚0[Á—,‰5Ú?Ú>∆"ÄsAﬁ/q<t3É[ ¸ºÿ˚ï«¬c!˛Ø(≠ÀB‡˚vÊÍ‚ÛßÄ>,ÕqÓ)fa]æ…8º¯hÛsiæy`˜Lü◊<ö_yîÁjóﬁî˘„π∏≥a:kaúÔÏ¶„†ÉRÿ”"µb@'˘°”M
+ñ VΩßeµQÌj%‘EZø7mÛ„7ñÓºYò~∫0’áæÈ—óâ—X:$>≥‘~√j¥ÌCèÂË ‡TJ¸ÈI&:’ÒÇ®=¢}¯ôXl[‹ØéT◊Ø™´ﬂÑ[ÜâÄ:¬u⁄∑,(§?Mï£![-aÄÁÁN¶ÉU”Ò—≠%‡h@ø±[÷≥≤T)–ú!6€∏3¿§(é/√§\
+˛õ{ëÀí∆û«Z9∞ù°™ÁúÏã‚è^j õÚa–Î[,îu™˘¬EÑ8](gï◊w&Ooc´…Øxﬂê˜õ˚_Ü>øg;.©∞’xî”¸ˆ˙dÇµ„√ÃﬁD¥PM(⁄`Wˇì"˛FY5qhàÙœø∫Ÿ€ƒÚ~õ÷…:πï—ü˛$r{!1ıÜæÚÜ=˘y8'Ûvjo∑·µ∑zé`ÿÇ8ˇ’Å∞—ëX›U˙$ólºÿ‡xÁÕ¨ÿ<wÌ6~ãÒ#ê›∆DÒ;Cüv)09$ÿOÀ8óÏÄ¡ßk®®l®Æ¨®9â‡¶æŸØåO\~x7;Ô&&-\ËÂ¬w‡¿â41ŒÜÓPeÿµÜ◊˝~∑˜¥q€'ÖBµ`Â»kÚAÒáÃn
+¬J±µ⁄äYãçŒ≈õî@ÿíx∞ËıKaŸ÷$πeõ7êg‹É·>êF— #„d≥ÍuüÖÂ`ë—Üåœ+Qvó√Úô∞Ìká=xÊFø√§{õõ£ƒŒ˚€à‰(ë ò”.Ù˚áU…u
+,![ãvZ~ã6b¯ΩQQ·%[£˛ã÷Râ›æ«ag¡Fõì∆ñüÕÍ7˝-ñVS´˛g≥¥9ÛÃàÎ~òÆ@vœZlé¬Ê°ü*¬zŸÕß±±Y¥bª==ïAÃ◊c{Lµô˚◊Ω˛…ﬂbΩgÛXû1Â¢_gC^ˇ!Ø‰Sö#r†nZÆyu'åã$ø>◊íú)s2ç˘¢<åbúÛ§±¯ÌµÂπ0«πÿz∞^q9ãﬂ%O yF–ßÖ™ù£¸È)∆⁄GR¯ÜŒŒÃãœ Çº ÀÀœ`qvÒÆXVΩ.≥},gÎ⁄_ÍÃ6H√ñ∫=ñ¸•ì¯q⁄W.≥‘pG™kò-è˛ú∫VŒRS#©é¡‰√iñÏi√3•s…—ß©ÛóÚÊ#ï˛¥fDØÙ§∫üb∏◊¿à˘gZ∑õ¶[√+ØÚà˘«°A¬ºÓŸkâëGââóâ´˜ÊªÊü/Ã\üû˛m˙ˆ¸π'âˆA¶®l·‹D‚‚‘‚çªãóFª_,›—ÎÙL&Ó›yÙhä7M¨¢·Óqå~HÅV¬ÿ¯(.ü◊uäIÏ`Õâ*ä¸≈J∞>•ŸÂŸ?îÄljÂÓﬂcNiÏﬂ
+¸ﬂçÌ¶tﬂ*Ωè{√∏’ÖlÊk.œ˙”Iö∏X”’°0l».è)Ω|vœüYM’Â¨ËL1;\W}àÂ◊…AUÊºZ<¥≥Vn9˘ΩLs8m.¢EîCÓ ÒCåÉ>‘∏∫õ˝yè©1_5–eh›ÜÅ=>„À¸π àOB‰ñµ]Ï+±Ô)∂ß7ì¢3>¥ïj€›:ªû”Œr≈ªv>ø7`Ûÿæ.*„[±
+0√ãæõ‰Ûôx‹óN7õ\)ßΩrÀAÂÃÅ<;≥3‹&ãÏv≥´.gO¶ÿ/ù°æS_©œÃ≥}m?i?ÈÑóO™ÕçR˛æ}ª≥¿YÏ(∞:KvØSèdn4π(íõB)Ÿ¨JnÙ@`“S≥Oi—»2¬Ë~0'ûxÌwC˚fün«áí|áµgPìPó,∞-}Î!*±ˇo°&ZÖõP[0?%∏√JPhﬂUööBr£–0LŒV¢>=ê˜á√·**oÔXIﬁ0ÃêΩ∞X§5S»[ø¨bá› A∂Ÿ˜:úñÚæí-Â˝{rïã@KA ‚™'Ñ+«yK"CÜlÿs œiz√À#{õ=a—V¥q9ÜCÚ"!Y≠Gƒ±¿âêºE∫@Öƒ&Í(s"å®av˙OlåQR» Ú\X™r
+@…JãJKõV4ˆó%{°–"’[ÀZıv!M-¥Í5°4ﬂ¬&=_< +ÇK	ä-A˝Åœråë¡|csäm≠‚MhZÃQ,÷åÆ«ƒ⁄“8MÚa)
+y•¿A_Ddéqπ…ßΩîﬁ PlMÇ≈Ò¡–4¬Sm–ií±nòÇvröBMBÀ CÈƒ{î56*äœA¡ˆDàÜËãH¿U!‘‹;êÁÛdIppûNccéBAº-&:{÷ëAY<*´Õ≤tQ+µä[Ê“òë!±Ø”vΩQ]2 ÿ†«Îl«S∞ˇ–mdf[ÿøáª¸«–∆g%◊©fÚkë3TƒÅÅ•pMà∂ãõw6e∂0è(¥3bXûc‘àÍÀˇC⁄ã≤€ls¶≈tg2Ë öå,õQd:Ñà."«?-3ødﬁ≈Ï£GYıI≠,‰ıyîàO(≤Ö¨6≤ÿäÌÃQdgˇóÌµ≥¯Ω›¿¨Å·v˙≠L9˛Üt¬_ˇ!:E(n*.ïp6ìm5	x§∏fÊ‡(ﬂQ<≥EÚRGGtJ‚p2wk@Ú{]Í&´<¥ÑN™B
+∞4ã©Ô≥´bN@DÕƒ
+Ò+ü£OLEÍ£9suô·ö‹Àigü	5Ä*ƒìú?√dà6Vl,¯(˜‚£“∫}F´»˝ôïñl˝†–æ•s8ú‚-Ú]Lo≤dØxãﬁ–-ñSlÓ÷Ü
+
+Ò”\R‡ó¡ê≠‹kœvà´*…Ák•SuPL\WëiE‹⁄ŸnX¡rw-LAn)Ü˚!%JïpàI!ê#aUÚ·â[+À?Ì(+t8
+•∆¢0s/åÑmÚ$_>ä#Ü]ëäÙ—…ÅODck…#UaôèDôhñ<û&[ÒDò‹f…íC.+ìØÑûâhÈ‹++f®>,Ÿøãı
+4∫Ò Ï‹+Ω¿xòÒ
+4h<;˜‚
+\»˛V‰ úu∆äòM‘Ω$˚`gí›5\s‚SâµB§MöŒì(º+≠€G°E•ÄY∂‡ï€OVÛƒ¶çY∑Ö–CÈ9«ñ<ï∂ã`roT∞…ÔòÏ…€QL”j·SNÍ‘vìM≠\Ç’≤yÛ°5MrÑ"<è<	Ô€?ûM√ï¬∫Ö°†œŒœ#÷◊º›_€ø˘éË^1≈ÛÂÓoÕdË‰^òaóÛùUµÈÔ¥•ø±
+≈¬äØ√ÑÁúØ´<≤Œ◊Õ˜ıXÒeò‰úÛe©[ÁÀ∞lÉó}gâñ€V™@≥≈∂õ2ÿW"ïH•ñ+É_n}¨ ‡.¶ŸRÌ"bÚ˝pJ°V3÷yh˝á”ocO~ÌNÙL~@1r=˘”åF'ΩÂ⁄Çe¢â˜ôk#VËsTVò¯Íf5ó1ûœ+\È|—”úDÀ `∂∑∆,Ä/«ò÷Uôôª¿_ΩF¸IΩƒlßZØì^4ûì^déW#˜¢,ÚtKÅú∂2èÑ1˝<˝C£¯®˘ºR¿%SMñﬁÚ…R3rPË˝/§∞Ã*ı¨+ûâ3¸x!1Mº]x4ıvrdaÍ÷b˚ÕÖ;˜}ﬁNNÚﬂÕ2|‰^ú*Ω˜VÚ—KùoO›çÈ’aê”éíòê	Ìêóz ’ﬂï∫<ÆÒ}øËÓ(p˜wÇÆMæqI°ê∑9‡ß ‰Dt£``–Êˇ	1˘å‰
+≥#Uˇè©üˆì7Ô®‰nóô}˜ﬂ∞#Zñ–ëw0UcÜéˇ‰ À?¨ r _‡-æ µä:`yê£  ÌM…œ3„,ÿRy÷åâà‡ï◊ÿ(D2£M™€f¥ã
+KÑ«ŸQX"‰05ôjû{Ì7õg•_ß‰÷g3g/" ØÏo¶ÙK,ãügcƒ-kî=–O⁄E≥±ÖbÇµo»¨˝ÈO¬ﬁ!—öÃuÊ¿Y~Ç-⁄Aº@TZ-kåG˘à„≈t['-2+:ßÖY”ª¨S‡m“=årfSh-µZ’EÚX3‡Vm∆xY1‹´¢ãúÇÂÈF)Œà¬”≤RLáe_Y˚@P°ò!õ|´M<}/¡¯\∆vAqºpOiÄ}Ñ†VÖ∞÷aúFÉ5ä5ÄÖÍﬂBÂoùÍ∑PÒãwÀB•o• ÔòUÍﬁ*eœU}ZKãw0[¡Z1}VY*¸˙úŸãD~ïCSÁ6)-“ä¡Œ2Á∑M«æ≤L√eµ∑zóŸ◊œ~õk‡1wÑóÛ≤ŸÌÏèg≥N“¡3Hƒ„ä®!Eµi® iq¥ó‹rìÒÖÛæ˚V¸9ï¿Q%í´;úÕ7…D∑˙
+…·#Ÿ¨Ü‚f^ø°Ó~e¨yqO- •m u⁄l÷»“iyªœ&Úå~:„^âT⁄ê[p∂cIÑørÙã5ÎP4¿Oøƒ£h¯≈=˘Lò"≠È•ı°G˙e∑®<≈ñµU˛ﬁ˙À/áÖ≠}Œ¨Ay¸zﬂ=gLHf_ü≥RK€+gB˘ô6ä˙µQ†÷®±’ÀÒ?ˇ”≤10QóqΩÀ UÒFbnÑ∑U®+»Ì’]è“R´ÑΩX¢5l∏`≤Ò*Q®bÜ:åQCîóÄZ≈cäêÏ¥ﬂ¸ç¸Kh)"©Ótå™Äé∞ƒ≈w,+$ÂÎU_ˇÕwª,|·W^(‚r…!3’¢÷ª,ôJãÇ·¯ıæ§¬jæ’ÏKÄ”wÌı9˚6~?>N,ø ¶ªÿµ¶ŒÜ˙º¶ZøØtF_˚3â≈-G5_^$‚>¸Ûíó‘”ÇÉ‡≈«ÒYù¸7'Ùß[±∆∑á2≠º‹∆.vt;ØJ	Ä⁄◊ ¬∞óP≠‡∞í&pƒ0ä˚ë›¨ﬁ€¿@∂†WïCÖ÷-.YUu[--qG¥	Û)“˙Ö« ï0›{»#8-˝#ªπæ+êyˆ©Œâ¨¸ÿ=`Gè4ÿgÃYbÅY	 »˘2Ór/‚ÖBPpyê–—Ôuª}úõΩ˚\NKv‚øÛÛ¡lí\—Øw⁄úÕJØ±=8æñ,ˇ£ﬁÄ∑vPÈ.)Hu®ºÅP:ÎxGlpmk}P\d•>ÿ+JÃ®7˜ï∆kÉ’1¨:H€Ü^yh¢À‰YnaDá∏Tlµ^OìŸ†∏J(º}NÓµpsñπv¡~©?^ÒU-˚Z3â≥ΩkÃéí[ë∑ûÁç9ΩÉÎøÁƒ˜*…?î˜›7V$ÂôÏı¬∞rg∫f:˜6⁄7Î—$™T’ªzXf©&;r‚›Áù€ÜöÕø∑ÍQ`€g7YGa’Z h†ñ¯vicEñ4hE∞m„uØu;vœ ¿Ÿf’¥5n|kÀ“@‹ú∏¨Or∏¨¢8◊/√|≤20◊™![E¿æ◊í‡\ΩŸCòﬁ™*µ»+bÜ´Ù≠w	GŒ‚%ŒŒØ_Ógø= ˛x6≥ë‡iC⁄
++˘é’lÙ.˝ïı.}:Á]â⁄YÜØúE·∞¬¯›Óí˚YˆNj[#äπÇöΩÈ˛éLo¯Q˜7~Ì¯&ØﬂQÕŸP»ˆNEù˚Ÿœﬁ©∂◊~vG∆ç_;2æ…kÛJ¸˜Ñxµûv#âËéÏø>iŸ›øßŸÇÃµ-|ÅÉˇÔÃÜòœ’C/cïOnFΩÍ9¨‘Ä[UB2qÆ ıΩ~Xßï ·ÿEhÕgÂSREì¢˙µzüñÛãJJ
+XIâ@ffñßR˜JôNƒ®;‚Ú™.ü, ™ËŸ∫5∫‘¬n˙D ≠a¡!Å^úq¿√ï"ÉléR°ÇhN—gÄƒaG.V]gƒßµUT¥ŒOk´®d}zrT|≠Õä‰£#≥Ù° ÑŸä
+lEÃ^ 4ÃZ5©§©®…ıiåãÖ√"Z‰FdX#òŒàjv‘B˚∂Åheïäô%9·@>…uJ§1+ÉRDÏãZÛ"¶&òΩ€§Y¥OËt≥…pà˝nÔÈlh.5Ü_$,≥F%V¸6'Û…MaXˇçÕ6≤l˚JÏ{ JXåÕYˇ¥⁄å™Á…nõØnS±dˇ«÷‚ÒÜÂ=%4µ∂Ø˜œ|√c¸≤+‚“Àº’bª=+,®…'üap´?ds…‘¿ö•†lh÷BFÒ†Xõ ÚõkÿV ªÁ-‘æá~Íjä¯|ÿs¯2zDÅ≤âÙ}ÖÑ≠ÃØÃß‡I>S»n™ëñﬁèƒÔ∆ü≈üa6ÚóûÁ)>o‡3Ø)obiT¸3N3¯«(q©ŒÃuœuÚ‰ä	xoró»£ï≥< F:J)– ÷ú®“
+Ô(ÃMâ¨Uâd*ÌÄùÎíwÂô6≥˜òü÷˝{`ÌôπUª—ƒùTT≠˙ëÜrvËØµG´+)‘©˛xU%;^Q[U√æ®nh®:ƒé±#π¸,˛Y]Se“±Z¡¯öÀ]äœÜ√fs8Ÿ_ÊœæÓÒáç˝-
+{õZmçr∏EñÃÔÿ<∂Øã Ï†HL.¸≥ª8ÈQ$}n:âótgNï?ne<=ØqDmLØ’dáq3+\´Üé∆±jêr¥§>b⁄ü§_µﬂÉ∂“¥Z+:CZM◊Œπ:€-Ö<≤[ˇÀÀ§YA›∑«i∑N˚BÁ∞/t-WÔºè?w÷7Ÿa1{˝∏O#ò
+Áo¥	ï∞›Ô)…!äƒ/<‚;ôÏΩ	ŸD6TÅñjuÚ‰P≥Á‰∆Õ`⁄⁄Ë\w¸—©œà5⁄«â⁄ cµµUï†YL+^‘Çû#iÕ¸Ì@Ω≤î¯•3∂îò¿êÑ€ÜMï}“X%i»Ú…â¡]òÓQ":èqÚ…πÛsm∞Aì\L√¶›Öyå¥˝OÕ]çø¿˝>E…ìc(-∏≈O¬?mò„[¿Ê.Ræ‰ãπn6◊>wëö≈‰‡ÃõßD»7$d”î åòÅƒ={^BZuzqs5∞}Ñ!”ÿ4xë–ºOB,Ìò{9>◊|ÈÄˇ∫y;Q®ëñ⁄z…EõﬂOˇˆÊ ïÏ§P|≥P|’:·ê∞§6ÀaD"Z¯.ßaGÏRtàW4u… Bï&bå≠ï[2¥Îài˛ë’V8#CS≠LR]®’]·à*∞U" I'ÂY¿î!fUB;øPh·™ñXÒ™ÌM«˝-ãÛ’¯µ”. ÷ˇÓıMßf∫î°fXçG≤4Eânæ¯ïÄíµYêÌ ˚nû¡å•$åΩ∆vŸ¿^é˘^«Hr¬Ì‘˚Å˝˚Z#RˇF∏d=cÒd†&…/£AÊÈ6VwüÉﬁa.`îp«á‚?ÇM5ˇ˛⁄‚éõ6L“Ï¨-_¥Ó⁄‚U,Y[whK„õÈv^]Zó≠\]◊°ÛCÒ€;Îjg]iÎä˚∞d]]'`H80eæs˚Æ,≠”;+km;+Àƒ≠ª≤xôKVVN%∑mΩ≤¥NÔ¨,+o∏y7òŸæ›ä ÜÍ/´X}Uy©ˆ9ˆeU]’!Ó,áóé’±CU’5ıbﬁ]+ÇÈÇ∂í\«.˜ÊÆÎ,^≠≥tØjì‰ñmﬁ@ñ;ÀÙìÖ¬≠>˘¿Yë¿^Ù27SóàQª\h	|´67J˘<õq˚ØÆßéÓÆΩ¨»^¿JãòΩ∞‘ÅyÎﬁ–àﬁì0›Rüu8˘ˇÔºßIQ—Oå˜8‡;äÃiœ‹ìÁ,Öˆ¡îj/~W≠`fg˛:"‘†%Ï0 ÿ¡"·Ú0hˆ¬‚í›yªE®ƒ¯B±@ƒ≤õ‚–'/Ø¥TÄ"Õ4ôòÔ˝ÇØ5'Åç6ß®IPﬂ}Ç¥·ë—·¬|]®^≠_‚kÇ_´WÜp›L±ƒK ∞Ã2÷é¨å\d¬Mäì≤–‡úÕcß	¸ü¨—!¬X|’ùpãﬂà.ÖÌaY¨Aπiù•D1ÃÉÃÏô®,·¶ıÎßß7”‹c‚T©ñÇi~Yåw¯ïWRbEo≠¬t¸˙ƒˆØıå ¡&-¢5˚¸=ÒG[ƒçﬂ«çﬂè_ãﬂåﬂé_≥¢Q∞bj*jU◊o≠¸ΩÒo[8Ç˝0zöW+>ÜøáWÓZ4ñuUıu’ÇAExYÊ4ia3·INª˝=$âc∞,M&èKÅYãøƒ–óà|Q¿åÖ∆≤øï‚c~ﬂfN>—·CVî˚Üa˚ô3å,pñgÖ.∫≠˝ÎﬁùËo±^VyÏX›°˙ÚmgÇ4©‰ßÅ˜EÁÍDı°Ì7AaŸÂ9·%ﬁÍ≤Ê®∆≤`>ä]ƒxÚ+éü†Çæs›≠˛û`Ê “∆„⁄eø¨J>7e*Å≤À’m˙õ%—nı—+◊ì{KVô±Ù∫˛’≈«ì√cbÕ·”√ﬁbÒ{Äµûf˝ïÙÍã¬ˇw‚O∂áY;h˚÷A7È„‘4Œ	c≤°dBçë¶¶–∂√'VT· t“Ñ≠çöﬂ|‰ön3:Dï7–¯∆Ë¸⁄°7nﬂD$øAZ?*èL˚Lµ·ı˚;˙#WduG¸˛•ç”ß†?¨@JOü´∑
+”˘{π
+L≥·ƒh>,ã[Ëëµ‹ÔúWT$‰spÁ
+âØ¡ÀÔªl|vÕ˜°o∑Ëº≈¢”k}¸B~±mÈüÉ?â[÷ß"Z‚?FﬂÒ”¯¸◊øˇëÅ_‚ÒG“}¯} ¬˙¸9,Ó£/gyXYQ£˝=v®˙ãÍ™:°A∂`ˇZ«;º˛•cê9◊ÜÄäÍó|òÕj/,ug≠ù&Y¬úCQ d%≤ YÅ“#$Åƒr.¡ã•gàÈ LëZ8˚#·∞›cJÄhCúÕﬂÕ¸ª∞wëík”U°ô¯I\÷†[ZL›n…—^±%'xÔ´è¸rX“ŒÁ¨ƒívﬁwoô≈˘ıπE≈a∞œ{EKˆæè
+ÓV’nÆGl}eÓﬂ´‘û·x◊ÎVøÊ/ÕµÕu—ão¥‚Ï5Ä˙mJ 4õ?Ëì√È¢Ï´#ÌﬁKivÀä≤Œë`¯NNÊß3ßI‘rœcW¶Ω”*”à~»‚ÁÏÕ^îõﬂêM¥ÒÒ*í5^kóWø+π$ül˚⁄Qhw~£i-˝5{·æ≤o∂Ö-hyî€'c˛ÎﬁÌ∂O◊,º	ﬂı¯3≤ıÄ¢„OêH¢è^xéF·3¯úÊ`Õ± ø∞?±CU«ké˝9“éT◊k∂°†I»1¨˘©Ix£'Xu"≤9U∂˛aE6˝\8s.≤NWúùÆ8DOW@Ï˝t≈˛˚πnb'CÇ%æi#›‚¯‹%⁄¥£lÓ
+ë-M∞π ûùúªÄ˚{|¬ÇU¿´œV◊6T’UVGz¿É’$_É◊óÇêoﬁti
+ëdSSºàÊæœ‘m&n2Ñîæ€ùø˘‘l£öjœüŸARé!*…BÉ∫∏Äï∞RñˇÖ7 ˘ÿ¶ `Ï6ñåªn⁄Y:Uñ
+pÿZm≈ıîA}¥ˆÑπ8≠>ù¸ÑF#8‰ÍnïÃzØ»Œ÷ƒjoeÄj~=ÛÒüö
+Üe4‘øÓı∂„ŒãOœùèOÕı¢˛·ºj1LÊG⁄5‚T#“848Œ!o€Z˚#∫õô÷‘q∑µ#¿8)∏—$ìªEs*YRx»:£ÔôdúOnú·àãñ(Ë‡ÌôπNbõö!ö⁄,ö7‰Ü≈œºÅÔ;«üπÁ®—º°—€“3L¬ˇSo›XD:C–ñè,†˚
+ÌªMp∆ïk£»Á£ŸÖ Òe9càÌbn)àhïy@¿äá
+òÀ£x]∞◊Ç5‡ÚÄ|¿KR¿Õ|
+ wÔ?x;ß‰÷ìTôy6Á&,j∏Xã7ÏY›ï†™Ñå‰2 gB˘òÛË	˚÷Ò.ÿMXå{ˆ∞„X”átì"nØ¬‰&]4†Ò∑V[M9%π#“>√∞Ä‹b"bπ"••∞ªÇ*»¨k=ü∑≈§rö%Ù(lëOy√Ÿd¢%ÿµÃ¯¯ò*!óIø.ÃF°Kïayπº>X‘äjÓI‡
+õT˘Ô9‡j-i˚RÚE‰äpÉ◊/õõiÿQÃY∫‘©à™Ç™¿o7”àC ü	*®≠`	◊I˛`É"< •˚åŸlX∏å¬û%má%o¿úú56√ΩñòΩ–^ˆÒIg Ùw~≥…·”Ô«>`†V‹ÅM?O(,©aÛ:#VL:Œ∑R™øc.)ÏÚ∞|y7;k‘‰2ÏÅÀ∆Ógl•Ë) BÌ†4ˇhíœˆƒf≈ce¯M˘ssù∏‹kÛª¢¯öl4˚∆ Âñˇºpπº¢s5¬Ál+ÄC˛nòB…ÿ|a-∑ˆƒÑê√T„.8É–v”~Ìn˙£õ?˜Oâ`ï«jN≠-g«k*˛ZU«éT’c_V4T‘±ÍZvËDEÉwéùhÿdmàw÷ÇxW]›/bòÁH∂z˚Éõ4r\ÆuÅf
+ﬂÄ1æOè∂¥9ı_$#¸DKΩÿûc‚É⁄(Bµ·\Î}ß*¿F1‡{ïf–T¡◊ˆìˆìNh‰$—[9ãK
+%eGÅΩ–Y≤˚õÃ8°éjÚ¡-Ø€-¯∏≠w¥ì•s“@Ÿ?lŒMΩÚ∫‰È:„‰0Eeı$B¸@hõkh≥ÎiÉ0“UqPπ\åΩàÙA∆Çü√k¸l·ÂlMUπIj<â¯õn/ø√–7k˝˚◊Ω;˜ãıq~gk˚#≤™pmﬂ"©™WQ7Øì◊M‚7∫k†{{8˛4~våkÒañˇ>>ÑÂÖ±Üa>x≈·ZPT˘_U‘’U´3p{N2}f<êZ_60íkÒ;80∑aH0cò“πÜ‚∑“©¡–T‘T‘UW≤¸ä∫J–È÷≤.=Ö«à˜√ˇ‚˜°SÉ–¡∆;SUÛ◊˙Íı,ˇh≈·™›õîy;,nááZíﬂÎbï®mX5¿=ZÌ,øV—J8Cªi‹Ù~îª”!ë*¸ªÀ[@Ì„ø[÷~Úµ≥∞Dï˝ﬂd!P<?+µoºÂlEf∂äU(‘Q…j!∑≥ä[R1ˇ'≥:Ï9;ã√æy%˚nd(D&Ï+~´ˇÚ0;¢yEy¨Åë3Ç˝°”F"P◊bˇ« ∑€iØ‹rP¡zìÃŒv˙ﬂ»˝ÊÍKüÒ˚°yûp8XægOKKKaKQ°¢6Ôq⁄afa$6ﬂò!m¢∑∆¶ƒ`1NW´Ò{‘y≈3h¥ùŸ—X‹h‰VCl…˚ÉRÿcËπ õuñ∞{%¸,≤≥¢Ê¥√ü≥≤î~ﬂKØÔ•œ¿OP-{ù¯Á^;++9R7ñ·üNzãö˙SCSZº∑∏lªMq,≤ö'˝ƒÓ’–+Êz(7√ı˛z¯Wå√¯ä)⁄ñcfJ*`C.v)-˚≤∏ÏHëÛÀbß9y∞79ˆ:•m÷7îrÁóe’[∫àxS…>ŸnhØ*Ó4Vy¯CÃ∂ù€èÏ5(Òé»∂”≈&4Ü—S5,
+Èu’T∂◊±◊P!˚2j•ˇÉGM+EΩπÔ˛K€(ËØ†€v0ˇÊÔ⁄¡¸k.Ûòﬂ^Z,m7`ã@ΩÑ0ø1øq;¸DÃøÔ•◊˜“g8‘'¥è?˜ŸÛ—üNzÖö˙ÑP⁄?ÑˆÌ5{ıﬂKKjËus˝tÿ˜ïΩ«…\?ÀXqie1`Y¸B?ãKM¬ú¢bw—æ}0«ê}Üß‘â√SRFS¸)èYh»,#≠˚ˇ  ˇˇÏ}Îr◊ïÓ´l3õJà‡-4è<.äíeNtëˆd"ªË&–$:hH‚0Æ≤$'NFéï€T|2€qrÍÃè9u(Y¥®©W ^a^‡º¬YkÌ›Wt˜^ªRî-∏Lë ˙∂/Î˙≠oÂ±gJ9ÌÛ?o€p}√F-◊V,°™Yò 5ã±(¸âÔ‰u»VW◊&◊Ó°8d∆F≤ë|ŒZ∑„6∞’UÎÖ1ú˝za˜ΩÚ√ì•“¯‘¡E4∂îª∑Åã˝MX⁄< ä˜ -û¶g—Hú>;ãøæY iOÿ•ÒôŸµö”l“íö5\RpùIS=◊1Tßj§ß • ´G1–8}ñ¸0t<LwX†‡¶~0±öÀPılÕå¡‚=Sk\sÍÎ¢‹hcˆúÙPcMXﬁ∆≠öo‹√Ã}òÆlñ9≠1kzmr≠|ƒñÈF–oúôFØhÜB3„”ÙŒ4Ω3Cﬂô¶Ã‡¥å$åãY8äﬁô¢wË<˘•˘
+?03åç›åa;¨’v£÷q±»™mªÖqDplÇÄn\ÛÑ»+¯`‚–á„a—¥E≥· é∞`_µÎnª@F˜©M∏ü‚œ!í0.2LÎı¡ c‡«’0∏õ&+H•ﬂ:YA4#µì¡ì©|πëaÆz…!¡Âº∂2˚Xâ(Fª¬*¬ﬁçﬁç¸Ä¨A¿jÚv˛"ã+UÂdﬁõ"`V˜?∫€›Ø¢Á‡#†˘êGSÙPæ¶ë⁄sÀÑä°Ú|Î¸‚Ú?´6√ßOâSóÊœà˘Û¯ÀÖã‚‹¸yD_/\8ˇ∆‚ô∑.Õ//^8/.Œü?}V£P˚ÎígAf≤U»Lº.ŸÎ‚≤gÙÿøJ„ÏÌƒÎ∑>È]v5°.Æ÷\-Li˜≠ûÎªBv›ˆdLÙÅCüMr8)N¸ÿjF˝‡ipÇß•`S'√∂)zëÕZÜº÷´'™S}≤∑Ω—'weŸJZQ
+K@v?ÌÓa°tÔÉﬁ-I:ÅEﬂOª˚Î∑Â'XÛ›}‘›Òë‘Á¨:XÉ-—Ω«∏¬[u«›dÏ·Íc\8]ñ∏Mn∫üw˜{øDëß
+€wdë¯n˜^ÔN˜AÔ∂,-ó4[$Ωˆæ™x,>ß¬ÚΩÓÁ X…~K‹a»obÖ|w[éR$Ãåèè'ã•ÒµípŒ†ñd¨KéùaFê0ùŒèP
+¯$Mò!çmk$cí"≠8‚a±æ÷à á)êS¢]m9ı+é`0Ëƒ®^"3 ∫\ÉD˜÷c◊ú(7*v¯Æ£(‰©Òƒ6ùaR≤`k1Ì¨%Î™çUKõmÁbô”>ÈƒqºOvZdö†¯À“`<>ÇyÉh(¸Å⁄Ì›ÑÕ{˜Æzc~(‡Kﬁ∏˙Ã˜9óîL=∑Ë2p·ËŒﬂãPU‹áv˙;ΩﬂíDê,¯“]|Ä?Ó›·\VU»g¯⁄õ})û∂	—[ÏK:åﬁÌ"CRp·êÑ⁄Cã∏—$-õng:†óƒ2≤Ë¢Ò∞ª®•YJ†OŒﬂ[/™XÇ.Q˜Ü±êÈâË„RDÕÅ”¯ØR“Ûz“Êïœ8≠WÖ=\í\_·]™ùJ∞ô<]1MœX\;∑∆.Ìôm0;~N-®kâAÜˆ/p…KNπrNW∑—*¬Íœéî3wà¯ÂùÒ	úéØûaY∂õvãAî∂Dõ˜©7_€§ìÒ‡€'âs‰≈'Ω_ë· ?∆è{∑uáú>Éöñ]%,CâwöMó’¡+K¡GZTh\^∑0ûäÊvÎW\#º*˝Ù€PG
+øç∏ºÜ€j`p4nò{›kÿâRQü>1RAjXÑ»eÙ1ät#&u∫©!z”iVv»VÛÌl—¨¶ÿÖôÃ;äj∑Ì7¥ÉI´=DÕ˘õﬁØIrÇ¢ÜÌ«K£2‰e†"Pf"í=cÛvm≥›∂äM&√Ω°e#ƒq˛W„yë¨ ™;ç˙≈FºJáW)´ûöı›c§û◊Œ ßW3÷ÔY≈Å=¨ﬁ:c6	‡Ñø≤\Qè>KA>‰ÇåÛ]åù|;∏ˇ¯b}≠GûáB~ÿÙßˆ=É®˚ÑuQ∞·£á
+r®B◊O>â·´æêœìº5í}ñ2c≤_f<á·#ä4>˙ñ hF∑	íGqõ?¢–À'∞ˇ˜…qCŒOûƒ∏IÚbOÜIn“â`pá*<º≈îOÄ®¬óÚ„yíÕN´Y≥üµ¯òÍO(áÒÌﬁ√KëÒÄ∫£<Ëﬁóõüwç'‰tc»g˜x»`Ÿ™ºPã'ü∏ Ña—',0‹ÂÛëe—@Ñû•Ëò.bõiﬂ»º15≤€}*˙cPﬂPô‚Áxøˆbæj◊KNsj¬@èøOô§á$W0=ÓèYÔ◊Ω·;‘Áô$2ƒ¸òLº]2e¬!ÔÓ]xÁ.}ºO÷~È¢s›ZµÙ©s|ç‚d©xˆîôcÇ‚⁄ªê∆|’„pæL=>§ ÷ı]ﬁS¸L’è·¡·˛â‘Xë≈%Gœ˚ Ñ2e‹@ä>
+Rd2#F¬yPâ™ˆT>âÍ«∑ﬁF÷ıÖö”æX›ﬂ·‡~ÖÆr“®˝Ù≠¢¢ÿâ?ªwa…›G›«[÷ƒo/Ø'°»‹I©Ÿ[ï•∑’i%‡’≠∞„íÌ∫»}œM;—}=CU7ó^ /RœÙxÒxÒxaÙΩ4°2¨EqÊÙ˘”óÊ±ˇ”≈KŒ]\^‰>;qiÒ‰Ÿ”‚Ùè.Œü_BàÍ¬¸•SKÜUvVZáÌó|3‘5FﬁõÌ*0Pß	êÀÎmC»eÇÂ∫'ñöVÎJÕn'…<âÂﬂ/áEUV.ôÛ∏/>ß_˜¡Ö∆ı¸L≠Ü≠çÓˆ1q<úk¡Ø:GìÉÿ4∞·◊™9Â`zßATF˝¬ ÿÂîFéuªÏ"Â%cúOÇFMÂKcqìJÌé	ªv’Æñ°XG¥íˆ|k0V±÷;cBÆí†«e—´¨“ûéé,¥∏,vpI…ö,ÍÒ”Ï¥lÒcªÓ0 É`=πNπÍHÚˇ∑«D≈∂õ¢n7Í*!ÏMª≠ó`K4K´µú´jFÜ™V≥Z‘¶hgy£—jVùˆÜˆ|Ìj£SÉÌ“ñµﬁ®U
+∂[ÆÇ*¥Îvk}S¥:u∏1Ò¶≥^≠È=†äÌZNÕÆåâŸéâ2‹€¨è≤®!i3å›ò∏Pv-∏„K6,¶Cd≥˚ÂÍaT∑Æ:Î»G[,ÉÁ±⁄∞Zï‚µL<B„∏µ„#Ü+Ÿp•¨D˛J3]I¶+≈x%03õ_‰m=¢ì÷ 
+znyFÜ¯àáË}ª’≤aof÷£≥öu$’ÿµp^àˆ€Z∆ <.Âj›—ﬂÜAúm≠™ÛÙ≈QLØ!2+Ër3ÏA^„
+≠#öœy¸6õPí◊‹Ü˙OtHTÙNtø¿˛Å•˘Cÿ-+Í≠E1ﬂn€n˚mEÕã*Ï‹Çkó´‚“≈30E6>∫lË
+°ncùç&ﬁôˆlXí.z£„vZN%8úyΩQ∑jz≥ßQ€§o›e ÃËÍ∆—¥«@…¨12πI[°*®´@∑µxÍ®û™¿¬”ûMäÆà‚√ÈE
+'µØˇ¥„¥q ∏7"¸,U¢F+‘_π—íì∫j’ÒÅÀVSXÆp´˙YpMQ≥◊‹¢8]≥◊≠∫+⁄eß∞Êà7ﬂ:∆ŒUN3Ï±∂≥^ˇÜòYFK›h)õ,U≥•h∏‘Ló©xK·H⁄Y!âï‚ﬂRsKj«àµ4ßxal|Î∑≈¶‰ó"å?¨ ˛0B¯Ã ~xc£U∂ÔÂ={{M¶%\ÊÁ°à¥¨‹˝äÇ»˚ÿjöz~UøY£ƒcBí'#„p/sWûì.N(í}ô’µ˙Cƒ≤A&áûcXxs˛“¸¬ÚÈK+*Z\‹®06/-W›O©zü&ÎAÔ‚z0zOús*?itZu{Se©≈ík≠÷lq Y[Î¥A≤º§›÷˙ı√›Ÿöè”?◊Ö«kÎ°¯$mÆŸÃâ…nÀÁ9lŸÁHG•Pˇ¢IèXbΩeUÿˆ∑QXmQ…_n≤á~@Ó]™¿öO"†HÏtgúbÙï%Öq•‚–Ìô∏¶„nbú=ﬁ€∫ı.«œ|´çÊPR;®ò(&kD¯ÇQæáŒïÌú3%'¶£Qõ∞vS›≠ÇﬂÇÔü‡ÇòÜ~F~6$ﬁò¿*>âﬂ⁄3)˛Q”∆?îœÓáA\\¡L˙|uˇWêÇE}Ñ˝ZˇDÂ®7$]F¡!‡†o&MÖi8¬¶H≤]Êub?Á˘ã≤+≠TÌ˜$`û˘pœÄqH|õ	7ãì¬61˛ñQÔÆVN¨Ïù5†#.Zµ<&(È~SémQ⁄‹+-ñõh¯‹ÍﬁU}Õ	èÖÔ∞íÎ.eøßÏ≥ùÓ√¢¨òøKFÿ.ZHäâeó`æ∑i™âÉÖR˛òãøOe„p≥åK“EÓJ–.÷YåI#7ÃâîÉáÇs	™‡ﬁßrÒ[t@LQÔ¡‰\Ø#û|äêñ‘F5≥s5fêÆ≥·Æ·©Ú†ÿ8˘_{3ä¢G!–Ü-Ç3,®	#ÃÓpNQX‚ıb≠±Óî_/V¿ût ùöªπ“V¥◊ãªÁ˙heNXıMäMÒπü˘·/Ôu≈ﬁ|m´R¨ŸWÌö	g4|fp†0K∂+ß¸QU˜¿màã/ì˚ÊzÎ=d£√•ê‰4h˜¬¸./d<u¸ëâ•O=∂—©à¶/jE‰©htEYG5ˆj˘ö£ÀD°Û>ÎG\4HK8d5ôÃ‰{¸π4YlÊ+€¥¸1féı¢©p`H—,Æ¿©dÆ¿êC1ì+ÂóB¨Ωl]4H∞èÀo›2∆ãOKØå…TÛèÜ‡å`ñ¸ñÏ°[à–Ff/≈‡ d∑$µ“?v`‡⁄∞qÍÎnïÑ‘8≥Wíu⁄◊¯^Œ⁄L`löT¡f'pÊvx,1"*¢@7EôÇ“¢‹J3î'√ªV‹∫√É|≥∂2∑≥Cdb–ä˝)ôc¬ôıÜ‘,ú&¶x#Û¿·äœ,œ•@j4g"ÍÿÎ√Õ¨‚ ƒ˛@cêD≈8ªàŒg¬túÏª\ˆÌOãÆ„÷l-«Á÷Õx¢Wt£;Ô˛UÓ|Êƒuì'Áõ∆¯‚⁄Èk8fgéÏÜG
+œ$Y€o'rÛÇÚuÏıb≥fm⁄≠ï’FΩ”^ŸÄS8ÕöõËg?%És+∫ç7pˇGKlÍs”•≈vÿËÀZ4N»˛µÍŒ*öfß÷6¶G◊ÒòﬁQ—⁄· Ù≥B˚πC˚Zçñ‡59kÔÚxq
+M—A†^ÂV‹∫~cÊÛe<‚ò r˚#ÿ˜ïm†+€mr¯Ê8ß.BorG‚?E#c•M•?ﬁ_ÕF£∆å^å“f±∂=B÷]†ËTx")Õwô4ˆ\®MíR± Aƒå‡X,˘ÇÂÉóÿ•ùŸ{ÙíâÌì‡æ’÷Ûf,¸@4ı∏0≥âhô€E‹î};i&pÀôXÊˆÛ≠«nõDÂMí∂€"êz%è£}Tc≥F∆ŸﬁC
+ÎÆ#mï~F:~|N-Nà	[o¡R˜H˙¡≠¢ß‘áQ
+◊Rlo¯éI¸IæåöÔ∞√DÍÀ&÷ƒ~2˙rü/?Ê—πk&“!I…Ü∫#Âπs<÷ ›oîGõ0 Ca J∫§4áfcyòôà	HVÉyË˛UÂYÓ…^˜BQU° „ÈpQıe"•^rº∆ﬁ∞í˚Â¨$‘ƒ¸n3á≤àÛLìb√-X∑¡œÿ—πì=πœÚÂ¨jåó"´\˛¥ıS∫MÎß`ÎëgÏ~Ü˛∞â‡5 dÕáûsÙ≤·3ã≈8ô=òêbv–ªL<¥|Òı?,_aë∫)ïä¶*+î´3â§≈S1Û‹œä%£áòœc s%<bØwá3ñ/”tîí	IÉÏ©%Ñ}á9æAMwåM4“$'õ9»tlÜÿ—ZtÉ∂„aD”>‹h‡$SøÉôYI±‘Y]∂VeÀ∏˘E±SË⁄Î‡pådd}NÁOΩCß¡™Ω∂µÂ¡&Áƒ¯òhó≠öø_ùÕ*~9∫‰] :4…ÖMÌCú1¬F(€â(€|,7$1Ùò›°%gU∏é”˝‰oî~£>b>ÎÛéáïﬂ¶¥¡WH¥8å‹ÈB≥ìÍö`°À1·Du” [˙P›Ö’üÿe∑”◊Ç-™7™Rñ≥“ˆ79&∂ﬁ◊ 2ôtºÛgè	uÙÊª&a>fÅbx√Ç$L5«¡è\÷«…hho]ŒıUÃƒöˆ¶ÚÄœÜ¡KÀ;ñ¯y«‹PZˆúôeàÜbãü‚HÓ™4âhû√&ñL"˙Sá+‚‡Ï9œ>lk(≠§<°†<ﬁRÀ»≈ﬂÚdO5,ﬁΩcC2ÊlÉC®π¡ Ë´r•‹x!“	#◊–
+BRBpxW©µ <¿Û|Õnπ‘H>∫≈f`ãÕò÷~ µYw«∑≤ºé%É÷BtCôÃßú
+,´;`d≈±ÿ¨M«K°$Üº∂äµ`â∫§7û.3Eñr⁄≤eidŸù:0î+ñ6e√ÈÀâ| O⁄∏9ñ≥‰‹ß∏√ö;âPqëp9ÖK,∏wÓRè$')ûŒº„ÈÒøíﬁ˜S"∆Fá€áºQ2¶Vâ>‹¯Ggñó·~∞Éırµe∑´0÷G|é·N¨™«E˜Ø’R·GO,ÊÉ´hÄeÿhuN<‰KP”ƒÎﬁ˚EwªOEwwA‹#»xaµ>˚È3´˜Ñ¨¬èòbîÂó {Õ5Üâüp´†ôÓê€Íõ∆ Ÿ™ûl5˛àÉ†¬=∆Ì€º˘\IaÇï¸‹Ç[=Ïıt·æ≈†“πw[øôÃÔæŸ‚yﬁÏ|¬]mT6√O€VbaS®_‘í}ˆç˘*‰CÚÿ˚ÂÀ¨p_[5Ùè}2l–	∑íæl√é®‡(OM'¨8¶ºLΩıH®‹ÿ&Òo˛úÂVã§cLao˜!ﬂø'J„„Ü∏3DÿﬂÍ8õ/â+¥à8<fAW‰.™v˘JRÃ$¿˜QxqN˘‚ñBEnÈG©7¢#Ê∑qpÜ+¯È6ÜZVJÍÅc©ì6<[=˜L	ê¢v˛îgÁá‹gÏ‡Ê∞Û6ŒC®∞eÄtj˜ﬂâéêöÇbs ƒ[Y·ß›O5Û©sN,UªV!18ºSø~!"©˙)V]ƒñÕ•«äπs>+ æ«p—ª…‡m¨‡ÅëÑ¿)∆6“£‡ü»bT‰JŸ¬3⁄≥jìºÃÁ˘£ﬂ8QMı$äÚE%Ï∑ÂÚìÌ´z∑‘#<†Á§∫]È‹Ó⁄}A‘-˜®ªg$’SE+πJÊ$ôy$TôGí∑Ô±ú!Ç0<<¥ß˙=R⁄¿=¸ñœ¶HëËè%$ÁÁ¶‚‘{‘›˜&∞TúæÙÕ!œi©{W‚j‡-∞º∏ÄÎ0∏Õ3Èï‹∑ÊRÊ!–tbû‹ëÀ≠Z—e0DÊŸˆ•ÅìÒ›~√e«t·∂`√ä=fÁüRÔú]Ôà%∑Sqô8ΩîzñÚÀUÍ©∑út∂P!(#ÿW0∆ÃÄÖÜOºÌ¥;V≠-ŒYm8CvoF'ë¥cq;ƒ·¥.#ë÷€YD	1H%)MD≠A2c–√»6~µ4[ú-ék73œß7”%
+±≤dá™6Æ…π9ÉmfF›V«÷x:˙˛ª¥HÖÜˆ^„˝∞ØX#Nl˚>g2äHàWÉ&RJÖóGlÓ˚ÿ-˝ï2—ÈöÂô¬†¨uî©áÃc¢kÿä6˚Ü«§áDzŒ"–”√µur7≠\[ˆU«ækÁT„ZΩ÷∞*ØmU‘o'}ä¸˜”ü)„RYÅà`œ÷ö9‡è>
+`ÁA™HLπc¥≤j’¨zŸ~ΩË:vãL≈/Êä"ú}òLáïÖ;ç∞aêÖòïÅúIç!LÚ ŸB,cLu|Àﬂ•·Ÿé˘*«sÅ∂p%›Õ&≤ 4•Ún•Ä[¶Û≥sÍÌ1sF≠dË∞o¨å¸˝õÁåpªâÁ√†læºÄú∞jÛÚ¯ªÔ¸?JÔqúëÒL&e~˘áCòU?»ƒXÓï–Ã‡_ﬂˆ©9u˙ç!LÕ ô49{-41¯◊3õò°˘‚Y°£7a∏Mébπ◊·bë∫°VøXÄı„π_®êß¬!öO–ÕØaLƒÍlY-∞™W∏Ê&æÚõúﬁC∞6õ	ZaJ
+Ω(L 9íOƒ˘çì—àﬂA¬;;+ÂöëÏÆ1ûˆπ¿˘ì|©GxdŒ∆ú…Hœ,/gBÍ\0H’Ó]v¬8Ô¬^√Ù∫¡ï'çèÙÆ-[£d~ı‡˙S9éıÔ ˚TÂz˙LÁ:⁄ªëÛ$ﬁMÃ‰<ﬁªçrÓ3I*'ØëΩ*ª<æ2æRön^_i≠ØZ£ìSc•“ÿƒ‰Ïÿxq˙ÿª¸ÀÒâ°¯e}ÉTiÊözˆ`Æ»ßƒ10_Ëst9¢X∑	Ï,khı˛ãkÊ>ü¥fÁ!Tbï4Ç¯zÎ≥˙™yU!ﬂ∫|”tˇFÄÏŸÚm€ˇ†t¯/	ºp7‹√ì«¸ôõµùcÛdVë,û{e≠—⁄Ë‘,ÒÚÀåÖn 0ÄØ‡"wø®Õ£ ìxL\µjF$¯2e7á9¯ÕIQiúÛ˚¢ô‘<ãÑ<≠`kë≥oü8b≈ñ›Ñ≥GGVF∆ƒHa‰ÿ˚|¬8#Çh=ó:%NÒ]%ZÃH»∑`ç=Sç®´-?¿‚®ìGØ8äz∂"võ±äÓˇ°\è{üÙj(1@›ë!¿Ì´ÿànv©≈(∞æ’Ó—	…zÜ(wZÌF´PµkÕÉÌ¯pMùjÿﬁ!◊_ø“Á?‹Ú$s—ˇ`<⁄K4‚•F>	7‹ÕÀ≥∆Œ⁄©Å2b˜Lñ’≥∆πHÖÄ∫™&˜Z-çÁl∂ÍΩ∂`´<[…Ø∑áÜ°í1Iq°è{QóM%ÄﬁÌÓ◊‘DÒéP≠4Ô£a,zøé
+`**Ô>¬f~d>SDî ˇÏé^º?U]∂ÉÓI≤œ35ﬁæ™Åï¿‚{‘K{∑˜†.wó¿æ‹Kˆ~é≠!ÆJv)§+Hÿ¸¯•Èø”ˆrZ+¯\3 ÜI´,Âúâo#fF2ô˙ ≈ä’ÆÆ6¨V%ûò§H•†ÅÛ¶"ƒ•Mú—´V´‡Vùz‰O–m}∞€Y±·‘’
+t‚DJzÊ¯Â7¨ÎÖkÖ0Õ7ÆÀ+ÎºÊ≠„ﬂˇÿ±ÍngCúuÍWƒ"lçq§≈…Z›˜é'Ô^Æ!ñ‰iáÎ´é’ÔyS(,—ÛéêFÂÎò=xßl‚o,îJŸMø¢è(*9Ç®≥ ™˝mŸ¬Ì≤\}ŸsfwÏÅ†≥íıñ≠Y©(¯Ä#åS‰ıÃRˆÒ›Ü0ê∫»–ÈÎpÜ∫U£Ö>_´∞GóÊúHG
+˚æ‡¿0°‘Ω=™Ä≥Ÿƒ“‡LLÖ=Fü,MüÑèßwaΩ®oŒY5'kvÖ Ë´∑¿∑ÿ†e≠∆AlÔ)öµ«¢˝ ¸0(¿ÏxÉ°ÜŒ”'ı¿¡óˇDyÓç’®≠TÈù|a˛……Î5m^:öcç4®0≥Óy2gG@’∆Ü ?â to)˙ﬂ':´Iï¡‘?…⁄˘JEÉÁD;∏\É(gçõôwˇBÂh˜=ãÒ)z©;]¬Cû¥{ﬁ„%L˙Å2{Ô»Ë™+Yíxb‹ ‘;º˚ù]Zú*⁄,õacáÒ_vw«∑mœ(Eﬁl™î≈fT‚Ÿª•π(l‰_j˚ˆ@€ôáÚ7Ó}Õ©Éí*6öv}t‰¯™ﬂïr£^∑Àn£Ulnb‡q6Y˝ àé‰_ÁEıÛŒP°@∏I¥ﬂDFUD7ulˇ¶«(˜^‹Òı¡%˚´L–⁄%ˇôÁó—"KmÕ—S±ÎCî(Ç•é:|LfÛ·à_?Y=T·{Æﬁ¥*iX¨7£G\6∏Û^!≠Ùø1%∑-‡Oê¨Úy@ﬁ˛>,(A<?§&øﬂ¡–¿#íçOU≠¥NÜD;»ayø¬√O(Ç—Ω€˚W’bxõﬁ¬H3ñ˛¢mÙ´ﬁ«(ΩA‚}ôJ#Ë/àbπ}ÿ’wU˚ƒid7¶”Ñùî*JΩã™ Ì‚aIQÕ«l„9,5'Æk#ﬁŸR⁄|èﬁ;ÛÍWµ©ÔÓüù¿#…UãùU∞be u¿7ü¢π•bí{™~'+S©KÂÌØû°&⁄Æ’rô«˛∏Ä§◊àß-¬ıçÈÂä9≤˛˙–ÙvµÖê6NŒUTÃOéõ†y8˘¬?S‰˙I–~è*)∏Ìù1pòâ˜‡.*ë˝»ˆF¥s˜ææ<xèT…d†¢®q≈>Ö™o¿yn3è.EÔC¯˚a˜1Í\”∑ﬁVé˙˝5w—U «Â	ûéêŸ‡ﬂÇúâ_z◊ß“`O°ÈûeHˆã≠@/xˆ∞∑ø4(€¨\õÚåıËïb€#˙¨ı^~Hi&µ]NWW¸˜/~'.∂Ï5ªe◊Àvõ˛ûØT
+ç:˝Æ=ÌbV`≠6&;"ﬁUf%^¡ﬂç(Ç2˚»Ü˛ä⁄WÌ˜>BÁ˚≈N:§ù§Éçù‰õ™y˜ôí√ﬁEA§Î°∑è(‹Ö*pGÃ∑€∂€ˆﬂÈ›#∏À≠Ω7%<ühG&L£õàòÖ‡≤≈¿”£<Ó⁄R7·ä™I’ÉáÓ÷ÅU_wG~ÎñéM˝0Àz«‡xÆSá]$k‚Xís Ìe≥f5q∆Æ€*Gëöy‘Ú‰c/ {æf/÷ﬂvÏkf¸»‚–l¥\:
+Dˆú@≤èÙÔÁÃö™é!^“4…ìISUâêò6ı@—dMÔ˘»ßRœYÕ≈r¥ed,ù™ ∂&õ ¬£B,3•ö‘R∆<£Í-3}B5q–ø±πTUÅöpµñÂ.1ôà'ü˙)"ä˙í®¯É¬Ù~é@¶9¢¬CCÕ¡G‹A∑£ìHìCm˙å“Qƒñ::¥—ÇUøjµ_znR´SåMß!—È˛^y•√yD·ﬁß^∑!ã‡H˜K:¯+û}àˆº°eÿÈ˛;—¢≥ˇPµÊW4}˙+~.£Ip5ï0W◊Ùn:Ûä’iG∆ÑSπŒ ÂÚ¬¿á[πÆ≥¯¸p±’ﬁ¨ó∑8™∂ Ø-^÷5¸¨5€-W9p‚ë„V”9é Á„Î“<±ƒKﬁf0Qr®.Òµaª’“V^º∞¥Ã:ØH≠o∑⁄sÏéﬂ#(ø–¨XÜÈÅãYÕ&&©ÿ„?i7ÍÃkÈ=ÂõÁƒ?,]8_î`n–;£‹{-¢ve/Û÷‡@03˘¿√E { W5„±≠…ÂJ¨XÆÂ/EXñE˛Q∆·‡Œú≥€mk›nèé6[ˆU⁄ úÆÌ≈bø?º5€j`„ÀwZxÉ]ñãê[kÛﬁwæÛÙÚ–§†@ö…?˜Pè…ƒE6¿Âõﬂ›"Ü§wÍÔ‘ªˇW˙s˜Q⁄R85p‰¶d0QBêÖâ}I¢ÓÖhg˝sG#èè$-0ÜÓ…œªIaMúpÆmºÈè$≤èÍ%ΩÅƒ¥;ΩeD5⁄ò0O7Nã≠R›§ËêÚ˛U Áx@˙ÔÓ^˛=Ò}Êx„ î}∏N`i4—¿◊hÕØà38
+÷BA|Ô{ﬂ›™…‡Ô}oN—‘É‚l◊∞Ë‹ÿQkNL≥—Q;®æ≥â/KÇ{¡tkˆ»1x÷˙∫[}©≈ïEHô7∞wQ√íï„"´VΩ‚∏+ek£\È=~]3x“pÍ£#Ô‘Gé±ß˙=⁄øC+Ô	u`⁄Q	c	Iß’¯ ‹È˝Z"”Ô˚1¸ùp(HÃ˚[,P⁄hÊ,·}5ºàÑè‰µb…i\ΩÃ—rù§–FsNúuQ¨7ÆçK™øÀìÀÛz|t§\µ‹ÌQîàÚ„Iâe9M∞!^`*ƒÍΩÔjXEæ˙Ò2B‡ )˜;Æ≥‡(¡?®êäTÇ∞°˛∆™◊[FËæ5!N0Ùd„z∂Qnÿ6w∆ûó”"rã√»*dî‡JqCàómïÁû*Ù~÷Â;Z /#™«"dUÆÊÅÜãUR#°Û∑±∂wY·öñ`Y€.&Å^?£¡œpEF?√%$µPìîæÿßè√˘¶?e◊íåÿßó∑˘&?}h‘`—œúK˛LˆolÙ≥˚õKn£Oø°Lÿ.‚ƒˇ"ÒÿR§âhËÁ^[I¯óö∂<¢ËÊc∏ıx˚cÇ<¨G≤WHÔ!çPŸF¸	}k€+˝|BÓ„EU>w$FªãKﬂ2Si|ùê€t\]Z'”ÊjaB†Ãr˜Kö[ÿ=ÚAhˆoƒ∞DºöÈÏt9√˙±€•*ñ®wô÷Ï—ﬂR‹Ebos=9e?s*ÜêÕˆRr¥G√^#€\jŸ≠f´Å¸@Ke´éC-ßÈ∂_Wﬁπ¯Ÿœƒ¯7ì…l~√zD„y¿pînﬁ≤Ωß¢‡OÁx_zÓA≥eØÅ˜ú-Tm;HπZ§ó√«ÌC]¿˛ñDAÖı1‘⁄*«Ç»ÂûJ0+âE/+ÁkvÀ]n9V}=ﬁTí∂“5Cîí`>rPP›œà9bõÄ|_”ˆW¡πG
+¸ç˚ê¶ÌÏ º9≈q–2 Ÿ»â”!‹ıF]ø–£˚‘™[µÕ∂’B?y≈i∑;6õôæ}Ñôê„≈%ôe")99\JcnŒ-D@å˝û¯fE`‚œ1MB(D~ﬁ Ûnâ‘Hå›Uq£Ü∂óÕî…e™˜∞BﬂÕX∆˙¬ô∞¯»1Ysjƒ¶ö‡Wˆm«ïè!ﬂúºﬂôá˙->ü)Í{Ω0`}U=õ<˙KﬂKΩKûÂ!Kˆ˚§˙~—˜∞—ìΩ'ßXrç¨ı;˙*÷àâﬁ5◊«ÉáUóMt§‹∂8É.ó¿&€Éû‘x–åJﬁlaÓ'e|Z6vØaãYÄ≠Ÿﬂg.“.BS£±2LÍ)KÍΩÿ6¨Ÿ”ïÎÖ‚\T5’›ŒºÂ¨6ã∫=í$j&“{⁄Dœàb˘>∫7nôy„qπ(Ω‹]≈N°Jg(OΩßm⁄ë°Ã¬ﬂﬂ§Õ‚ﬁJ⁄ﬁl:⁄i]”üãç˝G¢˚€FLé]æpÍBÓ‚yÿÿn£“8¢;:“r[ã?ﬂ+Òƒ˚ã]Ã|àI·˜AI€ƒÚS∆Ó:<?;¯≥˛ÑM&´˝Û∞â-¨][i£-ã;\äï∂Û/Ÿ˘ÅÙ6⁄¡ÀÏr‚∏ˆÑ•Òâ)Ê◊tÆ\¯Á∫]-eCﬂÊ@¢ÈBcÁNô˜Y˜Æ 5QÑ˛ÜP$∞;2z?Ä∞À¯(’C˙aΩq≠fW÷mqw⁄¨ÖÃÇª!Q}¬€Q¶œd>j∂è%‡wç~o5Æi∫ÉiR°<YmL}â– ¯ëD}9i Uòàı“û!LüN∞üµ6ÌV;	Äw∏XÖ~EŒ€´ÖÏtB˘ø˙È∑ÊE§Îâ®ﬂÕòek˙ü $+Ôã/ÍÆ¬¡*B §¡{D¥xá®¢Ua¬ø˜â≥ƒèÕ_\Û∞∏ök]‹t´∞„·–eXÑ´5ª]m4\dπ{ó@;‘\˘$QD/¢{§˝ﬁá~ÿ›+–d|-)=:ë˙±∂…Ø0™ZıJÕ~´YÅπ¸·…,MSq⁄òπØº∂Â¥È˚0îŸGÑ#ÊÕÎ∞1T/ıŸ˜a!BLka¸nõ¶`¯ﬁ53Í˜á·(˛SsÏ\p¨CBJ}ﬂºˆà˙YÆî‡D†Ø32.ôï0»¥ ¬√°µ´N\≤◊Z∞çÆ%@ÖÖUw6pt⁄MßÆë≥HCÆπ‘R”j]Å=kJŒåÏ∆x$$ë¸2“b±HIô®¥¬ÚP%`3,2w ìÊº}Mºa[n+¸Ü˜’µ»Â⁄F®˛≥ÇP*˜1 
+⁄Á?{ùùë≤	Ãçlo◊çîäÙ$Lˇzñõ5òÛ8(™1ãI’f{d¸‹§8ÈC	xåëÏPë]…∞%sHä*ÚA∆ïÜ‡?›6°ç;'1¸K.hL§=Mæ‰=Ò÷•ã«ﬂ<uÈb∫˛œ‘˝∆∫˚åÌûÉ!m9Vm°QmøÛ¥rÑÚ1§Í˙É@)]uBô¸HπºéŸ1t*ÂÚ*?Fb—0~lPy˝ççCI~ùq‹ì0ëÂÍs*·˛≈Ÿ7ñƒíÌvöGW.ˆ˘ﬁ“Æó#¢™›‚∫„ZÆ€r`}ÉΩf„Õ:îeê≤Ë…ä·}Y¬ã£˜©oèÍ¨)<>Dõ+`z˚fÔeıKVﬁ¨¡"bÎ=DÈ	3ˇÌôÚ®.C’Ø—UÛBj&ﬂÓ0ÛH„úäL85ÜS<ãË˘ö$ù|÷UE=Ïhﬂ'$“Õﬁ-1∫º≤W _kLú[Ò,]4æØ]ïã•[öUëﬂ´≤äô4c‹ ∫‘óècŒQ…7l^‡ÁΩ=Ork˚‘ç»R≥Ñ{§ÃO=zv°ü:cN^Œ|—ˆY¡Ì=ïqi√|Úôö @`uÂ¢!ŸJKO≈ï.èØåØLÇˆYi≠ØZ£?xuÏ„cØéç'èΩÀBÙùx√©Ÿ∏Mä∫´sÂ´3î ßH<Y*q»ÙŒ‰
+Íh¶óØãó.¸√ÈÖeqn~i˘Ù%qÚÏ[ß/^Z<øÃπamÄ^}èµúÙ•NÍlÒZØÊı¬⁄<„q®s∞–¶ì¯f£í*ÀçÈ°–∂Ê"t9dt˛ÛòtÂ$<Ëˆ7Ïä”·ê+»W˜òÍ ≥Yí•ﬁ‘ sè≈˜)*¬‹èF%©^”gÙ›GÃkí±~óéc gÈÒy fÓn=∞Ú´<Üú:ã™_—Æ»~≤Tm\√«ÌQ$–ˆ}≈Wt#©4HTD˚˛C∞c¬í®œºÏÔTÃu˙!bÅ¥<EX_v¡ÇÅ˚qµÓC¥…à›ﬂÁÌ0÷6áÛB~ohÖ\È_¯O˜»˝%∫¨=âêæˆR©Îƒôñ’¨‚~ÛÏ“Y$RÂ%Wó*f{ πÅûf÷±Q›äùh∑˜	Ú}g∏Ñ‹q÷˜∞i√69ﬂ IÒÓÈ‡:#›øÅ\‹˙Å‹SaÜê¸BËø¢˝ÙXõ|F˜ﬁGhÿ˚y›≤IU	nö§†ﬂëûnQK·6‚‘◊öoe!wæ}°Ñh7ò±]Ç3ÔJÕìŸ„ÓÄf⁄Xm› &©lê¥Êe±å∞”å¶gijV[ÀmÖO8*¢i¸3Ñ†ÄÏñœ¿<±l∑6ú∫UKJ G√Õ¨≤–Óÿ‰ »≈opCâ™ÑaÄ⁄ÖÙy‘ŸC+Êî•úc¬aVo2k˘ïõŸÃlâvJ‚a˜Ülb8ñÉ1G^w'Cú*éu√*v|ÖäBy’ÑF^KÚ#$’ﬂKﬂ•Qoòﬁ9øtìÁ¸2Hù[6	èf⁄æPæÃ+=YNØQcedﬂÕ÷K&5O/ø¨"⁄QûÒÎ>9x¸Çœﬂ!ﬂ¨*åà3Ö(≤I◊ì9†Z–ù““YúEﬂEû®iÒPIˆ4Ì˛ÖMË∫d{w°:ô—˘E0µ
+ß˘Àî“u∏ÓÒ4%Gí~Á*gñjÊ*Êdj$%¥uvŸÙı≈?ö[„Eoçüjì —ÿ#ÁΩTHÇ‚\xcÒGÁNákÅæN∞M∏Aicv1&)*ù‹¿∂I`&„€˛Ë?3„f&üqC7~¥mõ	v\\Mz∏v„KY,¥¯J5f¢uûáo≈¯Ö≥´fï≥ß˙JÊàò%ô«gÖ6dπó≈õN€m¥6_D7rEùU;’&
+!d}ÇFew
+†QΩ€G»äîR÷¨÷∫ΩÇRî€†£èFlCØoMÌ©√
+w»äóÓÉk,nÄ∑€ﬂ‹,¥bC1É∞©≈JÁ”%ıvø€Ó∂:ı2∂øaÎlZ=≈¶ÂVüù“÷VhÜDÉFÅ(⁄®1Iì¸á≈2eûNÁ=Í3O§àÕ›<C‡w(Ä#íXx;ä-yyˆ˚˙>≈s¢4~Ó‰±£bºP–ôlyÚüt–√;S∏ ÎÊ.s¡£Áú∫S8„∏∆òRîó·ÜQÏd”PäfKK‡πUï†q‡ ?Îá´k÷|&‘B≠/⁄D“R8 ùÉﬂ¥HÖâT¯ÿIÏ*S∏\ò"ˇîpîâÒM•™˜¬I(⁄W±õ0≈5¨ä¶OMí±ix2äVΩ◊\ﬂ5ÀU¨é„Ô]ÿ+rÂ7	÷0;¿ËÕêB0&òòËcÁ/¸Ÿ¶Å`w·ﬁi›æFù´∏}‘Ë…¸ÆWº&YHØr∂ÅmGñ·¿%j 8 ¬i’tJ4A.óJ˝§§fˆØúmûÈÀàÔ#p„Èeù°ƒ6ZL?ï-`©äÈœƒ{∂Áµ∑˜QEΩ[¢w√ow/+èé|é	#6^;∫ã`Œ`Ë&=`cf›%’$D	m®&°ìóﬂÜÓÁôõÅôqöxÓJ–Î„/Ç¡KbjËı°ñ8 ◊≠UyjmHSÆIŸíì'-:#ãn¿.j~<Ly‹ö—„*xê=†'«ßS'Úkô‚∏˙UMHNÕSx˙ÜxÙ=6d⁄&º çÊÊrlÆ6¨VE≠÷bπQ±«Ñø xçBsp“è{4˘‘9lT‚—∞>Œ≥4)æòÛ	„‚ÿï≈
+ÈTXxÚïîßµa\nLOO›æ8Lk¬µ˘„-b|0ª-â{qr˚∞–‘Å‚*≈jÎóPæù	Ä¡µuÅÒ·X02dø™.\ß–Å—c·6-∂õ5«ïΩy/èø˚~±8$¢ˆÅ‘!•œå>J˘ Òm‹Qñ◊UW∫€*l∫B8Ùƒ›û7Ë °ôÅ‹™Sè¸ŸÅú∏Î+g%û∑)–ŸôÀ$aqf„O˙LQ*ô—Ê,reó∑ñ&¸˙÷ÈƒÚ÷(FΩ+ö≠Å9ﬂm]≥óÕNTŒ†›93≈´ïÃÓ){Rn5jˇ∑Æ¿†◊¡©l"ãj€ñ?qÀ®?¿^óãÅã¿0OúS‘ÿ¥WV_/vêºb≈rV‡n¡Â¥ÍÓÎ {6Vù∫]Yπ‚~˛Ïgb$ªJ˚∏˛¢˘8kºÍŸxÖÓàFS7éÈ!êçìπFÁˇ%ó-áõÜ≥ ˘Uã8$æP≠≤>gµqò/Ÿe\õ‡®vÏfDWˆ≠ÖTœ	˙7}Ò §WdôÙä_&]<ª VwÖGÇ–ß~·òﬂ1n∑˜…ÛA”ô≥5Zy:√®5cùjH;£nyJî(ıŒ3ãÕ˛cÀÍÜ1hm˚S”Nu‰Ãg›)€'JWëVøñlƒ˝ &U *[N®´ƒH0úz°Z–7¿∆†‰õ6ºû¥Íu¯áOµ›◊£ ¨¸îÓ≥∞çù'Í±;∫ÇÍêñ\”ja“*∫ﬁ‰±™&IØœRmM 3∞π9≤6MmHp∂&b¡K$‹òRåÚaYù–yë÷«!ØÖiiLÎ§a[Û¥)ûèèC¶ GS á4…mõùZ;õƒÑ—K!;"ﬁﬂ‡‹‘»Ÿ±Ûx@± #6E{˚4ˇ˜_b©>ÈI©e{∑±∂˝®JI˙ÓvÔˆ>Ó}"s.ŸAÔÃ&Ëöxã?ë«gC¯Ó‹§Uò-´&d/F∞âö5U•.Œ„:¯Ô˛ øÄ…TÔ‡∑ÏöJûúnµ≠,ÑRvy}Nw¢˚H@ôúÒ‘¿N¿S≠Yîoüæ¥¥x·¸úÿ≤öÕ∑ÌVı}Œjû_X^|˚¥X<ø¥<~·ÙúX:}	N&Œ_8uZÄ8~*ôsñSˇ‘h]!ç$(Ï$öV›Æ±5NX—ëÛ‚k9©3À¿œ⁄kÆXÇï∂jµDA†¸g¡5¿L_+Ãé«‘,;B"[OzYßì.ë˘¨¢%ò“f~∞¬⁄KN¢˚π≈.È¸ÑÊ}f±£Ñ'´≠“‘Ôg≤tHÄ,lÑØ◊¶ì\Û‡£…∏™©<K	rO€»O2(“hÜ4≠É≤¿∞yPJxr√ÖEË3x¡37[-M¿22¥“ÅIˇ D∂˙è.Jî"ïú≠ltVπQá=Ô¥•Ç∞+‚5Œ‰Øx≤◊	°A&?ûê˛˙ô'lŸnßU◊'gô©8 œ˙ó÷'<Õ–„»Q1…ÚnΩßºiÃ†–l&CÀö2ørc§ÒNåèß4ÄVãæ	 Ç“ì≈J>I[ƒÔË€¡”~êÃ5ı[pDvœÜ‡jq¸Úxq|‚]M[∂XFú”!BæÙp9„Ã”÷{Õ∞ëX•¸äÃ–ˆèfî‹ ´…îÈ+O&ä!çè¬J]'¯úFÍ˘x	Q?_+® âÉ™≈ΩÄbS]å[˘ü¿ÇB§ıÕal⁄bÅˇ¡¶
+_RdqÒÂﬁ©k‡Á,¿bu≈K õq—Æa˙ÄWÛØô°˙=™ú4ZDôáÌºòÍüa“iûÌ}·»∏LÅ&ı∏Ã¥<∑ê&…¡Id.s«≥ lËΩ[Ô%«áó~Áoy^˙öÉN8ñeºü1ﬁ/+√ôπD~‰EÚû
+ò&h£6%q˘∂c_Àà‚e{UaøFÉÌ
+;6ûSºyz>c∂©+∫µ*™2ôâáå›xµPöJuÖ(lÆóƒ˛sN∞\2nîmp>-N8Pù+≠Z/êiI)Ì‹
+€≈†C¬í§ßVKøÎ›ÓﬁïÕT$FWar±SˆûÂHÆË=p†…åÌü¨fQp%¯q:ø‘g¯òqDëå˛¢]Ø¥ˇ…q´£ØÀÌWé°˛^¯é
+|ë˙V-Úpøkôò©"¢w2†¬Õ1 ,ﬂ{¢œ˜NXÊ\Ìí¸¿ÜZò;ºZÌ{B≥—9h©Å%ó∂–Ï v$i4Y·w|i≥^Rıf*ˇÙyYÅyE\†¡VÂb(⁄0_Ø`ÿFltÕ™µÌL xıQ´æ◊˝ãÏ&Mvû‹âœÓ6ò}˜}LüSB\ë2·~Ø$¢ò∆‚	¯im˜∫˚}˘˜ﬁÌóﬁ#ÌNπl∑€#¨õ‡∫|ZX∏Ì'q€£y≠œeﬁIlWK†âIíœ^Æ„÷‡Ÿ`“‚Aπh#Ïü|ü¶9—ûàÓ=dL√"¯˘…êí a1pÉqö*˝DˇÔíÑs)ı˝J∏œcLÜæJÂïW¿›√¬	∆t?Î˛∂˚g¯˘ªÓß›/ªˇ≈PAû5Õß◊Í∏Ôéê êqCÿêT\)*çr-ñ[6åÍi˘¡Ëà≈€Sﬁ	—ø9Yk¨¬±∆Ωﬁ˜J÷º;&∂≤4)Á˝x≥faªŒ˜ôWS7^¨∂Ï5∏÷[óŒ™ø∞äí˛ın≈åoÆ^Î∑ygÚá°ãEˆ.àÿ™S´å™kﬁQgwîyPÙ‚-{ÑMûã'»wï(»crZıH¸à»_HË¡$¥I)èïBïÃOOAﬂÈ>¢(ˆEU¥\¬ƒç‚ü∫øÈ˛o¯ˇ ÑÂ«" @sSúî‚Ú‚ §∏«8ÚuÿGAÜ÷≠´Œ∫Â6Z∏Ee≈PÒZf1ù£	Rèª˜lwÅ
+n(ÂA‡∫úõ¸ŸÓø¡t˝Wƒ∞J‹¨ëllº'∫w·ã ﬁhwIFâÌóêg˝óD≠éç<{@ı˚#|Üd"ŸQ]˘î˘∏˜	∂OE£≠8b*hT∞ê∫—qG˝‹Phò§Ò:F9ˇÉ2[ÔeHäØNÑ≤Jû†àD≥SÖDfÓÜÀœPˆ«Çj≥2ÃDS!Ã3ÃESSÅ`MÃØpÊÑA£¿
+BÉ¡.Rc8vÍã©ú≥ûI∫
+´†Ãk7%_$Q?Î~ÊÁdÜ˛ÕQ]∏∫÷U¯ır„–WV«Og…WﬂSÉ>æÃ¢Q˘>˝º˚Â0áÇb‚vv9»¸ÏÍJäêür⁄`=oäy0ÄçŒq4Ñ*’öâ∫˙ô“¸Ñ∑Tr¸8‡wﬂ≤◊b*Ä’©É‘/ƒQKY¯Lôßèƒˇ·ﬂJ´—ƒÍäV°≠ÔúïF◊Í/º∞[ ÿ	ô •@aÑf$ép7´r10•å“‹P˝™o{ıÚM4T|Ë›m}1%'x®ÕW°¨J∞ûÙ´¶Ÿ≤˚Ü2X¥°µ/§°$O¬yo%‹®.O W–=æŸˆ®D‘ô{!ñ«L\^aÿ´†ïÿÈíì'DH&»"ºßÃD?Í˜:´ÜI≤åÊ.Ò¢|òèﬁÍpUi≥óô¢ˆd¬6ôu€‚¨Sœˆ@˙¬ /E†&–‹?¡≥ûÈ∆3É·î3K»h ¡Õ˛˜‚¸Úõs	ôÇ7ÈQÛ6‘#A˙˜gœü^öK‹ï™2¸ïwÍØÛ∞óº\á<ı¬õÛóÊñO_J;ø˘9˚ÑïœÉêÇ¢Á x˙ŒÏ‘	©∞ZkÄ’zMíL–œxÕ‡Í~≈¨Wr˘/ùû?ıœá!˚5_H›ƒáQBUáqä^ˇƒÒçzq≈ÿ'éœÀ$ÓÇ#gá„-'å†úπP´Yñ8”ô+Œ5*VO~"ı¥[Ë˚ÀcÂ°1	s"∏—»8upC≠⁄k[[^)–úè˚∆j9DæTä…æÓ∏Ÿß	ÔrµÆgÕ˝júÒ≠Áløï¶◊nX˝∫^t”û?2mdkÉ/æ:&‡&˙û 2Í€%˙n¬WΩaú5 Qp˘;•	¯oÍ›¥}´‚œQ5ÇYÁÏ¯’ÍªöRΩÄÿ Íú«R©‹01˚ÉÄP˙Ôç
+∫ õV=^ë][óÍé>K7ñ˚ÈP`NßÛÈ“e≈T)w®dƒËÖµ5Ìb~Òòâ˜óTıî&˙R¶…¿!Å£pIÚ96;©G8?A`h£’Óè%éıè∏ñÊŸ'à	ªâWóöüÁƒ¨—_óñΩ.e=ïä¢˚WIR®íÎè[¶ÒtP§7TUµ∂1Ôº˛√.u¢ﬁ¶z˘Ω¿wêﬂﬁNgF>a•
+ò1É⁄uõÌπ„«t5dÔHO∫HÓæ6≤ö©~%Ì[Ò«˜DçZ∏IìèL≥tÇ˚J1i¨Vh ﬂäLßt«¿3˚míEÉºƒ&ä≤Å…W‘pÌÅt˚ûHƒvh=§’¶ƒb≈æÙPoíªäﬁ0üˆXå.ú;uåXÓQkË˚ﬁÿ¸ÅÙ~ÔV§≈oHª‚,N[‚•'Á“F>·Ì4R≠©H∑]¨øÎÛ‹bWö0§ÀÖ'Zù∫†ﬂ&”UﬁØòIl≥La™bØXå$√”P]LÀ!-û?ÀÊÄ°ãò˛{Ú0?˜˜qtRÌháAXFûl√w©ø6|Ñ‘Ø•“‘‰Trt£˚op∂«x∂]9pÌ=§ ın„)5Ç7∆¸Ó”OÈ[;~∆{7p±“ecDœ®ò8NæÆø5{âå>kå:ÃGI¢Î1ËÅ∂’R…s4U⁄¡ŸÿÙO'⁄n´Q_ˇ{l˛s\Y˘÷ô„FQıﬁˆU‘MÊª0Ω;ràS.†ƒÀ.&ÍªOƒl˜˜›ﬂRsIö(Z7 kPR?4°OzwM1™Êq_•^Ôó•<Õ˜E*Ìä}öBöo\j0˝Áﬂ^<µ8ü“	"M∏…	o¶˚»IÔ˚dÇÚíœ9Î≤8œ‘Eˆî«ΩíøÖ^Úd‡%ø˙Ìˆí-ÏßêÊ'´O3<Â3é{æTÆm˘-$Ï…åÆ√vñ£¢ÁÖø,˚ıœ_éëîOdöπ⁄…vmëƒt:ëDF≠˚%Yï∑zø¢,ôè$ﬂ{íÛên‰¶?`z9ƒ±Z^Ñ;µ÷=ÇÊïu}€Mªæ’NåN1‰‡‰Ôo7X…[é&+ŸUk∆µj0ÚåÍcV∆Ö◊<%õ£'tWW9œÄ7¶O%ÿ˘Òõû‚ˆÂ†;∑à@)ëìó:)ç˙Ÿ4˜tdE”@4=§ò∫;∆Ú(âÎÎÀ™UØ‘l©(S◊~≈i[´5ªb•≠tj}=ÌÀ5G6`sS˙§ÅÌhXı^∏ÿO@ôéÍÃ"üÏCyF¨/≥¯`¯—SWÏÎb|DÍƒO∞ê5ı¨Ä≈2Æ‘hÒÊ†ÑK<0:±~#Nêñ’LZ6F∑µ·DâÀ»â¬
+Q=°©Ó¶Èj√t§!⁄¯\—StÏﬁ◊Û9g»êDr]o∞˘ﬂÏ¨ÊKP√±’ŒÍã5ΩæçÆ˜ãµÁz'9s Ôtó∂–—ˆ∑ïàXh‘€çö˝lR”!QÛÕpµèîØÊºÔãË{˝6cl¯2_Âë]¶dµÎkçÑãÓVpM€C:_ÛÉYÑUå¿´Ã·Ø)nˇDÙ~â9@å⁄c
+F!Xoi¥ænP8?ú9 »\óc,aøqaÓù∑⁄‡òΩ”ÅüÔú≤€W‹FÛù7Ìl[2—
+à3Î{#≈h√»J/£·ß∂8Âª)»È’Òg%ç˙ﬂLN&¶˘AºÄN∏[ØùÌÎ÷Àlo®;i®Kp â8•∑<-vy|e|e∂y}•µæjçNø:Vöõòö/N{7µV Ÿ¡+È€∂fá-∫ˇâÀVîÊ(À‡,¥ƒúNûA√™Ù@î>GOœ±˙£c—d∂L›˜nÀ&^´Õ4w5≈›N˛›óVf ◊óLæ\ÒÑÁlk<£E?1áÃœo{D"≤‰≈c+IÎÂq‡kﬂø´ﬁ«vr;~˙7Fz%∫‹Ô4ÄΩèz7û∑ÖnU*"-˝b•æ“'a•N‚S—ÊK0¡ãœfÖˇîÀá∞d!4ac§î'Ω#a™Áy[ÀÂ∆∆¸Sÿ#ã“eWoÕ©0ŸÀ~ª‰yØqXr(Ó≈⁄∆⁄üöìÏª∞ˆÔ(»!Ÿ™O)¬π4È~6;¡¥zvN¬Ω·ñô€“∏ë»N_EÏ(ˆ≠Kgü∑ÉÏ40´®-g=≈¬ÎÆìKè†ÿ„T,˛ü+›Ô~÷˝=∞ˆﬂ˘¢˚o Ò>9ÉTNüQ˝¯ˇ,ÆßÿSWh•WÈ‚]ÆJÄC·ú»pôæ˚5®ˇJÙX&ß∆JØ˛`Ï’©gÍ∞L”ÆæV∫*èûΩ´Úî∞Åﬁn[j∏q©a˚%Ó}ºÌœfßÎæ£6g˛ÂüÚ6'»dÂöÊkvÀ]n9V}ΩfßFú‘5ÿ1ßî†E⁄™>Qùfnï–çË;oHVœ?F>∆I«ÖûN⁄nôs;	Ò~&≠˚W¨˜ ˆ†‘>ˆ‚gˆH@x#^« {.Ç2,Üê—{
+˛|#ZIívŸUC2X}âHØ0â◊ò¿V*¥ÀYE&‹2ì˛B%B≥´L≤0°ªK{–„V⁄·ç#Êßy2À‚IxY∞¿ì‹û^P}/'¬˝bÉÑÉ,Ã`ùcëIÒ≤`"a∞aÊ∞ÍMS—∑ «º`5≠Uße∑MsÃëc_~Yîc?OIÁIL:3Ú SôÈhÓÙyN:è[_Yõtæ<IÕ´” ﬂ≥”IyÁPè˜H
+⁄4ÔÏ€ÓÊyÁîé£±n€°ˆ¢π’)&QrÌé/´¬I}5\¡o°ÿi∂Œè≠f‘Œ
+5∫ŒÍ9ü	ïK≥´˙s€◊k…ÓG4£m∑Rñæ Œb«W√ç”Ã´îˆìµØ€ˇí»1rÜ%gwEë`Ä¯eM–Ï{€≤4;>˛˝Pm–A)psçñ€‹å˝dz∆ﬁÎæ\≠kÕœÁ”"~6˘|û/âç KøV∞`F∂ÏïµNù∞∂^+;¯stƒÊòpêEπ“2@ÂÄÚl0yÃ2å5sŒÓkÈçÈ§3)÷—˙ˆ}<Õb∑p¯äƒúN~ìÁ‡	Ù£ºõ¨FÈÒå49ûû,†:…≈‰g‡xÕz‚duzì◊kvZÕöÌ5√… Z|¶∏–ÓWíÛÌtü¿o·@S¢§ÆNrT|ﬂÆœz∞ËFGzıˆälWhüß¨"büm∑C ì ﬁ≠¶~hZV¢z'#⁄A+˙bi\8 LΩÉÙ=§˙ÄÂÏ¶ul,ÒÉ¯·æ˜£3|VcÂJΩqfx›^Y≈Ωë“N€ñ≥Ãàu˛Nøœbã”u˚ÃŸ–¢uí0˝∑I∆XÍ©˚å40:œ‘´ÿ|≥n∑÷7”ı@‚∂ßœ≤àFSY 9]~QLÖ„s›˝π¨∏Y 2˚ˇ   ˇˇÏ}âv«ôÓ´îi;Üb¿≈$G≤è[÷X≤5Z<Itudlíà 4¶P§iù£≈rÏ´ƒrœç«â◊ŸœLŒ•(—¶(ë:'O ºB^‡Ên˝UuWw◊î(è:32	¢∑Z˛˝ˇæÿ2Àµ≥Ùa.Ã⁄@L=FFÚnóEÆ≥0¨lïÛ~†à5$ûp`ˆW£=úI`≥#Cø‹É—3ÀW\ƒ7;a“çqñ^ÌÉ≈˛è¶¡ÁØÓú˘≤YÑÅ6å–0%§‰ÉÆáñ#É©…~îæ’Æ™D|OÉñ˘cd¸≤ß∆ßZq˙_løt#rMGÿ”Ä»•¯†ãn¿˘.„áZdáë‚ZÀë–óπ‚¢nñ¨öß|y∆¬˚T‹•Zq˘¶Æµ2~≠v’v-,Zçi≈ˇÿØΩ÷ÉaFøk1 Jï’J≠“¬∂≥Ê+πr;ÄP‡∫¸¥ß7ü…’§
+®6˙¥=U¶úl»,@:ˇŒSxùœ;ü#å˚≤Ûè∫≥∫÷ı%o´©%≠=”D∆Ê—¨ú3xZÔïÉfv— .n,§•OhfÒπ`\RãVﬁ—mx
+Û.^¡⁄ÛÇV®…€æÀÁÈ¯^ò˜ÍÅﬁå‹ùM=h?iˇQz∑Fi∂®uïX—ë5¬Sñw%ÜI9B? JÉ+ hH/[<J˛\
+®É◊Àéñ&Õ≤ÉÒK{dè±§¥∫LYwñâÖ‰µjºÅpfaœ˛79é·ﬁﬁ‰©gé-óJ}ëÓ ?Xæ0ojBˆ˘!Iª≈%)N∑ÅU=∏yuªö÷ê-Ï¢◊i+¸®ªı,È‹Ëxø˘CHÈë@y‡Ë~áLp∫¡∑yÑB”ÏwBxA]"}A¯¸‡•ÏJåBN ç√r›¶&Ë6ö∑RB⁄]•Òåõc∑+>ê˘è?≤Ωı∂ÿ<DBeî_{uüï˝Z√Ø”èú¬ÅO7õ|¨hÛü‚x∫Ÿ≈f˚
+ŒoÛ óm÷iø7∑€úWjµ≠ŒôπßõM>VÊûn∂Ω∞Ÿæ°€,¿™‚ˆÊÜCDÀïZÉ1üc§ÕaÛµün>˘Xi?âõo 1πã3Ø‰fXµÁÖZ©ﬁ.UüÙp‹!ﬂø¯V√´k}ı~ ç§ÇM¿≥}t&Dulf±ò#√dq<W»ˆÌ–{W$√ä„§î‡áÙa“V∆A?†âãêÂ$6$⁄äàS˝æT˛Å¨Ë öÉ¯›äf§ÓM˙16»or¢÷ªS{s>ÙYÇ>å¸aï?lc,Â^˜C`| ¨?&8?9“˘∂^Ò‰5DÒπ•Õô‡ªn â'¬˝–S%3Ú≠”«âﬁèEkª7≥‰‰¬r≥R.U´À‰`π‹|Orf@/NîöIÀ'ßèºFXü◊6¢¨≥Fz⁄hvoÏsªCˇ±£;z¬PÃ´S∫Yì¢FcVEEHRÇ‰`ÆY≠îΩL>K&’Ü3ËÌ†™STf¬¯≤_ß¢É„¯íÑ^»"‡9uÊ–»êÈ±õsï*C*gËŒ©[øﬁô}c¸V‡Q´π˛¯ N∏Ó- ÌXv¿—îFñ)xCÏ1á2Bvÿ’Ù‚ä2≥[‹4#óM⁄:)∂waTej –/˝’GTx(∂$ßn•⁄jrOX" Ô%?Uµ%˝ât[d¨íÎ ∫!˚Ë›XÇˆÅ≈Ã€1ÿﬁ†K#ñPvÇZÊˆSºür¬ﬁÙëÓd“bÀ´Êpè˜Q˛]ªToµk¿W}±◊>J~.û˙ÑµM
+2VÔT∫#Ú1`ıéÔJ€§Í™}∑MÊ∆”çìc}qÂ pH!üWÇˆù'Ó§∑ˆ ◊Ñaô ∫I^<Ôuè’î™˚b•$µZ˚å#O@Y%lò
+ﬂ”›ùnôãRuwû+‚"ê˙aìû£ÓûìòÎ%·ã∑©éÿ›~œ¢Æ·Sflh˝å…—◊⁄h8gb-üZw=ü™:¸ËôœÂsE:S⁄g~”£^Vï£ÎB¢ûÀº
+âYÎÌnÀß§b\;>«Ùü£=w|∫≤ ∏ÙÅ‚R@(®Ì7Kãïy6eg®Ãìtvxn⁄–fÊ‘D¯¬]ZÈ zôRD√†ú‚ˆıêe>Wﬁ·]ÆVuåa-f.àçÉO˝sj_yûø
+9p‡ 	_G≥”^!C).5>‡ëÍœ'´aåå mËvoó0ÙcÆì~®Æy˘ùÙ,)W¸·ˆå∂*WÑ˝‘XÔz"ê˛÷Fˆ,´ãΩåqm…lˆ|¬ÖÂÆ´êÓ7µ™¬≥˜‡ö2‘á‚∫b†èfU±h¿èeYÒ∑1Æ+ﬁâ_Y¸CymEÀÈ’%]cÆ/hƒ÷..a÷ùÒÇZ•^JáAw	¬ÄÜC±$¬mW[ïaNfKN∑J≠vìºD=r®TØ”≈í6˙Ï>$rÊ\ë{ãNnMlçËQ…Â—0ìﬁ&vÚ9˘7	_1 ü˛¬d<®@ º‹0[p‚”x_ ˇTÁÒ
+Jï˙·JPn ∞º Fãtô—vo£J)éE√ÛÓ∞Të`¥R±ßºãﬁ3å«j•yÔXŸO§,∂£º¥π3s∫¨I∞2â}f˙ÙÄ;ò‚[cpΩﬂ3dEˆKE∞≥Ü2HÎÇy?Q<¡ÄØë∆íf“ø|!&∞∂ËØ»3ÆÀå=∆Úaòtcﬂ–Ïú
+î;…†w‰Ï	å)>Wë=[›8ÓbO∆x`L À=Vdm#S #+ß?A⁄iMÔE/˙^FDsc?Ã#"feOXÉöXâ9]óÍ∑L◊]ƒ†≠'§à∞°ó≠∞©x˘ç^¡˜û∫&‰≠√ß»¡2 m6¬Tê—√k∆ÌÉ§)∞£Wï¨„Àæ]¡hÀqæR&£π|Ø<@Œ=-zOysÅ◊\8|I+zcÕV‰¥?◊KAs=Ÿò®{Mu‚∫Ô[∑d:^ôj3¥q>ˆéÈaŒ!À>¿%`KˆM=«HîŸ¿Ωí´4/ÌzùŒ)7∑’ €ÖºaõôÕºmrHeÙäCan™≤|CSŒ‘àb^Œñ∆ts’†KIôÊŸ&{Ê5éœô(ãxÔ=2t∂¯uíâ˝AY<˙$l *{∫¨[ÄGÃˆ»&HÃ€”m◊°äµNoçÓì∂¯é;qro¨º≈bÆêœ-=][?öµu õıul+xÁG∏∏∆À !∆ä:EU©≤][ï¬(~4ß≤îı;Y≤4MÜU¯‹ÏP÷Û‡I⁄SûUAâù§^à{æÓï`;"]¨*¬â“Gîs2∂õùΩ[πøÍúJÜ’"§HÙÿ±,aB0I	G3:ÉîÜÏØhˇ·Ø|1ÙÑò'kÚˇÑçÜ;€åZG$√àj—n˝tVë‚p>T•u·còÀYUæ¯Ëé°¿Ò˘æeºb›_ôàÌ}L–å  eòÒwê^hHPÓõê∑ıﬂ*¢ß–E˛<™˘ÄÉS>Ï^á∏úh]¿™~dêÆ„ùS3Ü9±—ÅÖa|bÕ £ùPΩOØæ¡æpI7ø«G]áø~ÄU˝åÓí>‚®ñ	„≠–¿Ç™&Í.'∂›∆û Ëœ^C∞òkºü‡ºvéBù¶¶gÏ—¿h’Ñ¡S≥FN.∑¸˙∞Ìﬁ‘u)˚L)NqƒSùF=y©RßæXŒoxıÃ–à®é.˚ı∫Wn˘AÆ±<î%Çõ∆T‘Ô»;ˇF‚LE~“k∆4,í™˛l%øÒ“ùMß}5≥îLMÑ B6£mb∏äjFÀFóÔ¡$„ù˙Ãõ˙ƒ0ˇ&Ír%íT[Pâ{kDœ«5úúîìO*¶ ;{±åAµ'BÏÊ},⁄õ(u5e˛Â¶3∞åÍQ/Åµµ ˇ§ ä‰Z7k˝A|«,ˆn¥„OQÄß†ˇ∏mÜW±uóÙ‚wÏ¥a9*‹|µ>Om-r2À^≥IO|^Å÷§=›ÚMr,÷ÆÏl€⁄ ∑â#U¡ŒÜ⁄!–F∏ÈV‰´}N5lä–çjV∂ë‘¿«ﬁdãØú3, s˚21Lì!`2ÜOj*!∑Ïê…("8∫p÷∑qñ:B%yàÂèÜp4√‡pv{:ä` 0£â‰ÃÏr^{Œfó≥‹ªBı∆4Ÿˇùe*‘ »tÖÀ¶?:é÷Á¨e-1jt≤na«1˚Tò◊”‰’Y†X~ôÓdoŒ†m•	øúùˆÎ¯„±z≥Eï5Ù>•6⁄f"N≠≤p¥GÌ¥◊j—≈ﬂ|L„ˆIË≠ˆ4f_s0©
+‡3ÉÈ‚€ÜE∞”ŸÊƒÎìbÑFPÇ„)<¡G6>ﬂ ?∆∂hu~àõc*1ÍK,üx¿◊»oæÄéyª‚]j¯0M~
+›‘Ë>–llò^¿-K,}†ŒÂtﬂ&¶Ì∞Ö˚ûÙÑX?Å~ Û}Dá€ò/-{¡„Zîﬂ¡ÀP—áÓVzlªnelDø+v‰·ºJ2·ädl•W¶…2I6¡:pÔæ∞èwÑ«¶Ó5TÊ¿Ä¢ørÃß•BÛcïgÕ¯¢ÓÜy≥xÊÌ·∞àÁfÚVÈ¨}œE0∫àÁ™◊tæ≥∆{∂TËK÷Ç/Jevı”±+Öÿ•‡£u∞âæ‰™´åjîÇãUo¿À·<k4oRª$K*≥KvxRKR¨{v…‹™¨âFBxQYá&(©Ó≠ãëègœRÄûEñ¸î‰s©F≈‰°ÓŒä ‚'∏#e∏à≈LO9H –b≈6l°Bú1πW_"È§≈Ωîÿìq…§gkm_ÅıóÉÖnyáæv}ôÙ%s≈;94ôGß4á≠@^$ÖÀ”¸eçd_—˚ÍËö•Ôÿ∫Ã∆{"ˇJz˚CBXÏ6Q”?Ù$˝•iL˜‹G¶ï;IÀz@ÙIôß9„•iNFÍ±I»€∞Q«úè	€wv#√∫hä˘b·E
+1\Í02z≥{=ÁbÖû{îaÎ!ZVÕlWnqÚ$√,øÀ|0û¶A(jB:ì)Ÿ¿fº`?»Ö"†ó>¸,â'≤h$ÛlÀ™ Õ7Ä:fz&k1˙p=tk¬§—Õ œ}~]§^Ó¡_Ô∞|œZ≤>˛ÅCáŸ¬{/;Ç3ŒrÆ‹‹≈‘àê*MåÅdMã»]áÉMä®ª˛˙Hå§&„	ÃäÑ
+¢ó¨HL´¸œÀä»K≥˜úà–µ∂å»ëR´ÑÑÄ∆¥»Ω˘	Àã~*™/˚µF•JGÊUv;)…~öqLã∞@•a∏…±3yxÖ⁄õ˘:—Ü‰\ÙD¶.ÁàhH<‡)$˙„&Fﬂò	î¡®*5& ©˜K*˛˜eY8Ò^]\É@≠◊jä‰âà$‚_16˛@<ÑÎ®I…Bèh¯< /03ÎÖsìÁb=pkÖ‹⁄y&!úA7ë¬äè}g¥R:ô∞N¡ua◊1êv)ØÚëß
+äó±4ö%6•#‹vÕ·‘g˜ƒÄnàçûs`l[A:\ﬁ[|≤84˝/å‹:¢ÚnuÓf#n<∂c¯w˘Ì•X∏<ÎêÓ¯∞7¯>‡´+rÒ^t_&“"nÛb≈Ù¥w¥…ìgºöÄzP{È!§∑;õ°3¯˜Ë98œ0€!q&Á‰Ü#»Ç”TÒ¥´• &ñ›ÖÕH›M∫®Ö“ìÕìï<óAÁåQKÛª`˙ÅÂGY	€*Óÿ0M7]2∑‚∂ÌRx`èi◊}â¬í6´º¸TN<Åñrû"¥π´∏ á7^é∞0$∂–SÊõï^ÌBâ⁄‘\•R¥h^ “Ya«˜mújZË˛Ü©ßú_ûa„Ò ñIÇg†”éIFhˇF.VüÅ'H°ÒÉT$⁄Y}Ö(ó$´ƒ4•π\≥∆t%ÌÊÚxöæzöæR∫}J_Zü∫“ƒKû&Æû&ÆûºƒUﬂ*úîF‘EXµ„=&™n…™I˜\ï1&·IËI)CØ ˆLìπ5kâ)ûäZ§G,T«≤⁄∞∞%só`L{¶ ∏9)c‹˜àÅ%‘wãÅ	Ç¶-Xÿp”˜MtÊ¨É%/¶Zr∏µ!A∞,È–Iç√gM{®ÿ‹ù)Û^ÀÇ›2@:-Zù◊‰:ù°Óû[©IèïjÄ“5é bÄQŒ#`≥`\˙ˆÕ©¸Œ f ÄÇècû¬zà!uk◊Á»/bõ!óhvèu¶t«~xÒR‡ïΩX™∂È,≤·>¯µÜ—ä°´gˆ]>^|˝∞s3^ÆÖsñ√óQÉJ(o„ñå5ú,≤$ÍZ7—y|»øòD8·n©>KúYÏÅï?Êr&W#ÊGp¯—¢5Éïp¿´÷≤§•wûñ÷Í‚ró€Õiø›¬bë∫_˜¯GJÕ¿kVﬁÂ_K∏⁄wK£—G¬>VÍ≥X¢=¢”Ì˘y∫5+PØÀå¿°[ô&ºuÜDùórS—Í⁄[.N]‚ï∏H#Å„≈¬é‰˚òìYçê¯X0÷<Ë0¯4FZC,É#±°%«PB=¥ÆﬁCéC
+^'òá⁄Ë‹ÜÃÖ%Jw¯
+µ‚®ÖR≠32úmvØw?¬}ÿ≥{›·∫ü!gÎ*è$ˇZjÇ≤˙3è˙≥p›ﬁ˙±√ïó%êM;∆€j†Z¸6˘m:=ÊÁPÊÕk^¯Éﬁ∆≥¡™¸ÒR˜q%ÒH9ìH ¡£€Yƒ®¬L}üäŸ§É´öúW:kÉkãË-*p¡‹∏luÿ„;∫`¢<+ÖÍü†(§J[ÙI[À´∏Ñ¬Å±«Ïv°)"¿Æav1åñ	}⁄R´U*/x≥ØU®,ºW/ìºé◊2º∞]¢ôµHÍﬁ∏ÁËèY‚∏‚·8ÉõæáÑu"Ò†˝ïö©TÕ†|`5◊™ˆ’Ø6L?˛§™áÀ∞`mÆûM[>J’÷Å!6≤ˆØ[rdp∏ ïû*ËƒAÖ Ayd2ç¿[t>ù¢ÙÎÇc0s!
+ÎC ÚÍzTåiæË∞¬—„Dá•]√Ä8]$√r∫à^}aß*ÂcKÉ„OÁ5®‘©¯≥ıÒ\5IcTˆÖ‚$Õú¬€;y*ÊﬁT∞•Ù¨wÁ§√±z£›:ÂÕÂ Ì ú^…ï·+gîÂDúèÍ«¥v”îÂ%C3°ù®î› ‚∞XÔ'K†Ä´ïD>8Ç‚Ô|ùÙçuü±PWy∂Í1ãÁ®W˜Ä†¢ÉÊ©õ≠4K3UoˆÄ9MH•ª4‡aæ˜ûÂúÃ3≤´ükï]k?˘âug*u<fÚf±◊Sjê
+5±P£8y¥V#8§PñçKü—≠“ÙÍ∑`!˙óºY]≠s/4ê∂ Ê8ÆµëGˇ´E1˚Í^!˘–ø0≤nQ|⁄lTÍˆ⁄M‚'vªT±F∏9Õ◊6Ø≈ª[‰,ÿH¢WY5g’˛¡ÇÉ’•≈Â6]/Y Mw1B»cxßºfª⁄¬Ñ—˙v´KËøﬁ†ÔjeêS˚˝û&}Ê«z=TS4±DHÁX£ †Ü∏t≈MìXå<◊Úœ¬}”˚P€¿DÅ!K.‰‰œœº˛÷õU?¸¨ÂbvÙMW aŸT !uFk5°‘òÒK¡lÓR@g˘ùÜLrOXh¡· ö⁄7Èﬁò´î1ygìqp∞Ãª¢Úa$ oçtnwØwﬂ°ÅµV<ö≥˙å5\Ño∂À 0‰eÎÎY*utµ:…~EŒÏ–≥=)…I"≠i V?·∞ﬂX÷EwÒo∞*,k€¡*¥÷mP3^q*UF:F‰1-1∂ßû∞“ngÙ∫/9AiY'ƒëR.f5Gﬂ÷§„Ï5,¿§”I‹eSpê√.õ˝∏˝Ø{’03UıEÜQˆQ‘ùÃ%ëP>Iú,K≤ì”£∆@&!¬À(“¿!JπtSıÌàà7,HeûàuÚπgB/Œ$∞™4K∫ø¬Né€ÿ…)†K >ØøeB≤2£kC—ãö \$!?ÂÜRz*í’ﬁØ¸ÉT K_XTŒÆ—ÛKË»}$(ë8XÁ&Kg`ÉÓñ ö©–Zz:¢>ã¥·»¯ˆkTæà¬ï^Õñ…k^©’¶‚ Ö„MÆreõLA‹ñ`¸ÒcLG⁄®—|¥%'vïΩmåD1˝é:U(∫ì6üm¸Ï‚BQ÷l¯„ú‘vJ‡vi∏ >U!È4˜T…/ì5±1j#‡÷∫$a˜N_Ÿç.i0Ö´≈ûSÀÒÕ$1eõlr8}<A≠Ø"X_y)ıÖ°^i|ıZ·‡Ïb©^÷¢0ò	Øt∂ˆ˙∫"]9/•ï_}~ßÛ)÷CQ…√ÿÓRüczÅ@Áyb·Äˆv˜jåÄÓSÍû’ô`”^uùÁπ•,¥vås:™∞>‚YXÏ∞¯Å∞Œ	lv√1c—KË>=8˝Í^Ÿb™Y•%ÿêy9k—LU/¸ui Ó¥eâ∂ë…ºÉﬂöZœÍ;ô ¬-Pˇﬁ˘§Û]Àò]x1ÎßpèßØ/Ì$w„m◊_ÚèùØ:øÔ¸Ó«˛öøÎ¸cÁüËÀ~Fˇ˚i_¢i@‘ëIÙ˜• 	¶˙4Çd™Z-£dﬁ8Ÿ/Q[ãtáù(˙8≥fly)ˆÙ!&v®œwWkÎ◊"›N€àW
+ﬁ«z™âxô	≠…—Å4 :}iEúªQ•N‘?¯gÂÒ«wî(Y€ëXﬂ˝lÿ∆'€ì˙Jwªª8Nﬂ≥sB‘WÊ\ÒˆO—äMÄ$øùÍ$ÑƒŒ&˘Ûu˛ãπÆ–¬ÎÓˇµåùæk˘êDG7p<»(Hú-
+®–S€à:"°üQáDØ´·{÷÷‹ì~5KÂá…OSí•êèUû‚{˙œôæÊ≤•E¨e˝:qù!ÄπcMXbb±mµN *†ÆæN$%OÂHl	'Ç]„ï2ºn&â≥2òÜ~‡KtÏå'˘°O"ﬂ5vÒr2_°È&˙øp„PPôù˜»‚J©—xõQÎ]÷Q¯Íñ¶6&ü.‹;Ω‡_‚íMfÆDïÜ2NØ=†+8V| D D>„|™¢Ç~ë©lŸZ}9îj»±_ª(Ïr—Ñ"Ø{]1ˆÍ ≤bNtQıÁ·‡Ô9»v¿…¿k|y(X¿¢y˚j‘@iœñ˙a¸Áëm≥?uæ∏«
+§Cﬁ~#:5ëT‘•ïâ√d˙Aô#L~…[™¥Ãóë≈HÉ£Î]`eœ´HèfQ(bß®∏•ˇù¸∆0¬fa),ˇòò1mU©g1õÃ£™6•qMãYá,™©^o'çàsœÊÁÚsÖ‚y['Ïj‰RR‘8\™Ú‰√π©¸‚¬˘Tº.Ì≈w#››Òçò‹,h⁄$W‰¬‹∂ì+&í¿ö¶l—”O•êò2ÂËi;Ÿ˝¿ ô†áOI≈ê*>%Ë$~≠â_+Õ{« ~]∑§qün!çjp¢LòŸºß#g…}ƒ ıØÅÈñÈÌ$‚ba27©!~7–èªtêõÿ◊Ö‚“?¸<o∞!Ä2©B≠ıª‘^[ˇ/Wæ#ù¶v.Á_˚6™`Ÿ-Sµw3A“éfDRdCÌaBª«ÌSé:=Y•™_ÓnëF‹ƒ6À¡Í¸4˛¯ók§ﬂqoÄrªE›ëïé†\¶óæ4|ntÌ˜òh§?Sm˝ñJçÜ‡Õ˘Ë5ñY*⁄)ø<iXM°WúekˇX$Ol;sîÓLÌ~, k√FÁ!+‹`2DG›ßÔ‡≤ÄË-Ω∂⁄ôÙ6|˚‚ôÂÜó¬Ù≤©ü7÷À;<Æ™-HÏ6’*,G÷Òú©JgÑïÒá1|õ˛ﬁ–HDÕ“π)¸ÀUocñŒ∆˘/àdMú%äj/®Ô#vÔ‘◊¨YçKÿaT®¢∏RLÇ{rKˇ,ΩÅ
+HŸ(·!O»ı)Ω‡Ñ∆ßÚK √3ùØ;_Ëãá-•ê‡›æ7L‚{cª‡£8l)Îõ ¢kìπO∑ùˇ√KFˆÊV…OÊó
+SEÿ+˝≥+ª≈ñ=yÇ¥u1««Î˘˛&ù”u˜jdQˇ˘˛`Uy¡R`h¡6…Ö:ΩWÆä-Êk¢à˝7XË¥⁄Ÿ2à6∞·√‘Nãp˜ou?bÄÜ€!•ÚÀA„ﬁÓ¨gŒ?#∫.∫PÌ»–kp“fXµÃã≥8ﬂ÷BÎF…ò{,îXõ67”Ôc-ª!^óq!ºœ<?˙ï˜È–pﬂvﬂ„∞≤´›_”/‹¢_‹do˙Äµ`GºP´ˆ+VYF?˛†{”0∫º@ó9eîÇËßﬁ¡áﬂ∂ ∏∫ÕÂw¨®‡	^ùêú¨3òÜjãmlÑ@æ√[Õ˘d“Ø Ú8øÿùü„¿™8am¿Rd~7å‰-8ÁèÈñ¡˚k¬Ûø¨“Ô`Â·VbË1÷zù5≈?dâåÿå1Ö6-"ê]⁄¿T”=^}çŸ±¯‹/UJu˙ˇª7Öø≈gÄMÇru ”˜'\®bP∂É˘5‹0õúËTﬁwæ¬ÖºîÿüpÇﬂgøØ‰≤ª¬U1˜Yı‚GP—_Ò Œ5
+AÁÏ€˚Xﬂr?Ñ´ñ'^ûÑ.‡u\\èà⁄H fxÿΩ6å"Á⁄ÓÕÕ˘€›Bƒn\m∆›Ï:A_‡µäHÃC\‰[¿
+ÓÅ‹¿Ó.K;\§∑Ëê≤í!psó3æo± T˛®Y,oB}∆3Àø2ûîmTt¡ﬂ‘Õ$„u›`ÌN˜Ò{k» øÕ«⁄iˇÎ ñ6∂´ybá≥Ù/º Î>B≠<‡y^Æ.2_ﬂ≈zøPŸ‹W‹Ê„K¶Â∫We≈2ÃGÍ
+œ8„dnÅ∫≤;¢'f®H’˘}BIn≥ „Ît>∑xv}#À¥ÎöPÙ3.,A±}Kπsÿ3<Fâ∫çvÅI}hÁâ√Ü4 ‘≤„'ÿ˚y8¨Ç·*7åCÉ∞«»±©5ˆ¶#^ç~zùUGSÜ∫:Ùıúõ°E⁄¡ÇÅkÏ.If£˚eX·£õ“‹·aÎ˜≤Wü¡¯‡@.üì˝%=XÅ¸π|ÅT@8ñ1ì◊X"	:Åë◊4 ∫5®nﬂ∆ÇWT	ˇ¬µ› Ø	,Öm&ü€ñ⁄5{Mö€Àï∞åÇoÕ¢¯a∂‘\fcev±üv`q'¬®+yn•È∑É≤ái0å©$Jı∆Ûa˛≈¶Háp»®9m¿ÙÎGÇ“¸[Ù¸WœÀ*	} #ﬁ\©]mÈÒ‡døû®◊µÈKÍªÀ~jx*Uè†'ŒñZ•3ÿ±‡Äî‚5œÂœÎœÆÃ·Ÿg‘¸ÏKÍ uÔpÅS¯ÅÈ·?)Á◊´>˝°>KO∑„≈@r*öÁøFÄ-m§‘$ÕV@wãÀ}·?õ@‰tˆ‘qˆ¶˙≥tÛ¶i≈‘∆‚k‘†óu›\9ñö@Z§˙¿ó—Çí˘))3oÙ6¥#ƒ9íﬁBrdéZ"xõi”ÕÃZ}!© À´N⁄£%÷öT$ OQB˘Å“˚–ñ±!ˇ$$cº™•Y€ÏJ"mÍÇË∞C‡3‘ƒ˛^0 ¢jMo®Í§oc&I¨Cö™á¸†iÉ8€ q¶®µﬁ1ú*Fm!æÂgj˚S]k≤ùÏN^`'X£,":“‘1?†R_Òìä€Zk∏=ø˝yˇ–˝=ª{ë√ø  ë∑…x˛ƒ°ù<µ}B+Ä
+eºEkπÅıpUK
+…ƒ#‰Qß·Wp—òÂoπÏ5®ÆÄ˘©˘À†0Kz˚∞ÿN0IO£Eﬂ_WπˆOê)?∆ »»ÀÒè<¸Ù>@†ﬂs‹VÏié<Ωx—Ü:≠¬ú√Œx”q¥È+£°Î"ı∞âQ»Y«x*ÜÊ∫Ww0˚˙6P≈`∑ pÙC(≈æ#=BIfƒJ[>=@N3H ƒ ßm∏“≤óS´‘°p≥0∆j˝„&Ñ9Õç√JΩÆó˙Ü2◊‰<	9ÌÌ7∞åπ©ü„9≠“å†°ﬁ~Éº˜yF,4éyÊñ·•e)”ÔD	À˚(A e ö…ÇÒx¡`dÑõÀÏÔkî¬¨éÄIûI∂çj⁄„EYıÄ°î6^G+ØYfNa3ö\æxûjpbƒg˘‹‘‰˘¡÷$◊åLÕht…`O8krâ'OÜ…åçT¶-	˝≈m n∂WT#"ƒﬂ–â∆8V≤«˜†".°Î˜}ı§H¬;—˘ﬁâ•aVKËJjXN∫M—x2NÃ§=d+"í'≤=ë'}·õÖ˛åK∑®4fãO∑J≠∂A\„=]ê√îœ≈d–X~ËefCÃ”˝÷º¸ºCh∫Ww)¢Åê≈8Œn"x“>WDÏµ⁄é©OÀÀ;Ú∆N®”’Zp‡ıãµöìﬁy.6ûÔÙÑ∂†k∞”+Å≈JâƒleﬁWËÑ∞–¯∂µ®ÇéN8≠≈‰2∑É;¢ÃÑàì—›¿ÆÉpLm6ñ)XÔÍFÁ≤‘ﬁq\@ëπ‡§rÛß7=h–ñ¡8Â(£ê›Íﬁ¬‹7£ñê9∏ñÄ2$ñì0)B∞:´J°,"rÁ'rÂè≈É¨Ã’á˘h3^\‘‡òµrø|_}z∞öèSüCüÀÿ1§∑&9
+’m.Õæów,ü{6_¢ˇ+üÔ∑a@l√π“¨GÂÉrQA≈ü3H˙˘Wïù|æO›sHÚ≤˝‚0t"ÿ?0—ù O£RŸhîäâdfr!NZbNëŸ6É$Ç§™	˙O◊ÉΩ
+”·&cyjZQ÷j—åÅÉƒz¡í¢#A9Õx˘^oœêW©è§£ıÍáMØÕ~ æ&+$E∞3P¡â:p—‰ÜëÍ¸tÙÎ(f$•"TM≤Q˝2=ò∑Ü4n¸ebZTèΩ»”∫…Pƒhæ7o;Ê&+áégΩŒMç&Œ„hâO
+„π©ë±ÛÜÙ¨{Ò∑Aj8hw6Q„jBJzXPﬁÑ˝3=πûèÅÖ'!Ô‚TAUQËÕÏŸ8∑πïLºŸ@°˚cÓ7pÛ∞‚ﬁ<C›Ï~lv·}§î+P[≥0+\êáU^ãı·›}ëòc±4MŒOåe…ƒÿyª7ë`∑~≤ÚØ‘ö&«Ís‡-ªÄ*8M
+πqó<:›” PÍ^)pÄbvxœ¯vù.Ç4cB∞ùÀ_»_ Gˇ¬≥£3ì≈π	CÏãVbgûÉNΩÍO:^…í√"D*–¶ÈZ6÷ Ó˚¥Oó†!/B§óÀU˘$˙w¸í˛òN„™Eˇ≠$v¯Åï‰'¶4«/|øv`%”™aAÅW•: õe%›˘ö˘VWØıTˇhPJNîÙˇÉãTnünT+-‡=¬î∞”√≥ü"ïƒgÌ«àTR¶ˇÛía∂RmÜ˛õPxz¥íûëJƒèÏ>S„˘åPr=vÙˆ®|âÑfÚh¿K¢P°ó∞ø*·K¢…‘„óˆkzCÍ∞lÔR—ø¥gÒLz¶¶‰Cl˝∏∆∫ª0Ÿèç@,}Ω]tÿ!–;Úp4!‰pás„!ÔÉ<-¶ËDl/!ìpÿ≈ ‘˝†V2ïRK°ê{Ikl!ãêÀó8Îîòı^„y¨ªV|êú,( 8˘ÊQ2˘Gﬂg°G÷π∑ël“Q7>∏ó∏ﬁ}ä¯ÚcB|ô‹-¿x¡”-ØA
+”Ñ>≤ÚYj˛}9Ω‡y-Û∏ÆI`È!±j)ã|TÖ\yÊs÷Ú)µ›~'8- 8\W‘abw.æôÁe7Gºöœv∏•|[DIéJ§Y§öYˆ·®P4©tzF÷U2ﬂê*ãóÁµ%-˙yÍ|«e2√ïΩG∫"$@mi'»êAªí5ïçcCêU›∞çﬂX≤™l"ñ‚H÷ïK5jaßAºZ¥ØÆú"	„≥#/i√O;gQÁå$û∏ŒôZÙÏ;ÍúI7M3z2ö&N˝25ÅáSøå‘Ê„–:#¢0;Ï†q®π`íc"ﬂM5ˇÿÏÑ“PÖêjÇÈ∑!#© g»s5§v£õ",XF¿bÏcGÏ˜®hyÁYmM¬~ÔÅÎÚèXﬂà¿Ûk!<Ô	˘áˇÅnUÚ"y{á/±ì@˜`˚íxæNj…d[R¥XÂ?%ç™ÅÙ,a	ËéÛ|è¶Û®Û5[PXÓÛ/ÔßãÓc∆∫√Å9¬e»⁄åÔeÓÏqÏFrmD¢èøç¨{ Lπ*qç¬/€(ÓòM˚≈Ró‘cQíµM…•Ei∞ÌIŒ≠I©ûª9ö|º!çΩWrFsœ’‡€ë…◊ß—7≥Ø?√œƒØÕ´jñgÕ]ah¢8MﬁñÅT¬oÄLTaÙ·~ˇ¬·˝É…Çÿ#«•ë@ª8Ú…t>·òQ´&`˜ÿä1EëÄg±íŸ:WÕ≈]L∞˙Ú9˝ŸZÛ%≈Hl≠~5qwæ -j–ﬂu ﬁ!TC÷0^≥„hÑ≈◊êõ9vx!k•·ãﬁ2akrFÔªXÿ»å.z¢b3˛íAW¿7†˚ãyOØóö´çÖRoùÖ'bÁF˝Ö¸‚N}caç_⁄b=≥âx)èŒOÿm%;¨÷∫Û@¥™?ÙÁÊ@ˇ±ÛßÚÆ⁄œ,ïK§≠0Pë‹n◊ﬂƒ\‰’s◊ÿXÉvß˚ﬁ◊mOóZUvt˛Ω{ù†kÃ>5Áàœ>Q˜∑¨àÚdó|∫»}à†l#]eÔb+Èå_ı  ›iS–‡:‰ Ê®H≠R?0div¨ïñTtBÚ¡{û{å§êr5⁄¬Àg•†È´ßö•Õ=°Ω∆ù¿∂ÆÀrL/`¸Eä≈ª
+;˝ı≤ˇﬁªi“ä ßÿ‘§[ŸÍHëê∏5aÛÚæÌ<ËﬁÍ‹ÅËáh7gòø–¢û9XoUÜK’J©	Ê∏q◊X˜ïÎ∂±kc8˘tÕ˜!i8ø;+>º|Zkj•Z≠rÙ¸GSm†…-ù&G=øÊµÇeÚr8Hº˜⁄%‰‡,l™›_Oöª4äñ∑y’∆&Ár˛ëp?ävﬁCL~m`IÉ≥cxdπ^™U ‰d)ÄÙ~ªﬁ"¨Œ”WUáôálÄÊïÓzVí«lZÌÃ∞BÑÒ8~˘vÑ¯¯ªôŒ∑|)lw÷v(VoSqë
+ã◊–N‡:m1põRp¥§–é*øÅVî—àjR	dπJÃ r†û4N®o¬K˜eaıiª;÷ïI©®∂6&“XÑÂRPj hñqùÆú+dI1KF≥d,K∆≥d"K^ í…,ô íBûC◊€5ÿ0>ë&Ø˜ß¥µ_§KŸíì
+OÂﬁ˙æÚédÒAJ¨¸$ùXQ≈b$9¯\r˘b?}$é’-ÑàNu(Aÿ¢+ñ Ì-oÏ∞zu÷q∂ˇÈvŸ˘˝ô6∆®’¡Xdçr∫ÚÆGö’ä∫<õ_Ò)`St„IV¿ˇÅX/8kÀbØ§@Û3ùœ∞dˆb \Ÿ´j÷,£Àœ?)jÿ®dQOC1%æ˛¿u¨∏ÚèR≈:&Éy…<U∂y˙nAÉŒ7¿∏Ç€Êä†.‰d6ÑÇ0'í?kÇ±‡∆µCøy»ÆA-#ﬂ§P≤.6ÈÍ>}√™!á‹ßº~*z7ﬂôË˝îŒÁulG` Ö@Z±çÿ&◊Ä”ÑdNñf¿Ö™HËJ‹´bó?Â#uáGÌb◊L ómÿÎÔÇgÉ~*t{∫_±*G%`"F7#Ô.HËÑÏiH≈÷‰Pn¯| ‚6&¶üLâ+®‡y/J_Ω$⁄æøÙÉ™ÀƒXõ±û¢[dëP˘]æ∏Ã¡ªXì©ó˜
+ÖÛÃü{JÙ˙o·¬ÂŒø1M‘FLdßÁ˜Y•ï÷-7V:∏yœvüx¬“>UZ®Í˛ày≤1uÈ&z3L-“Fv!z>í/âŒÜ˛Ú;ﬂb9!ƒèã›£$3AÕ®Ó5≥µª…Éô¿—û&0Dâ·»ƒ¶/Ñ™Hq!ôgO%ŸKì˜∞≤ëÃË ÊÃ%x°˘´´PöpL&Z≤§2ªd)Id≈Ç’“åW%Ø@Øƒ”åCÚ
+ëpR†ﬁ¬ Î»î⁄ßå≠¨{cü
+X‹*’&KêÈÚNx˚TTÏ2∞H£÷‰OÙ%T∫Ô{«rÕÈÿ5·Ÿ^$ÖÀÔÿ∫zñŸ|«î=‡œ˘Ãù£◊>Oû°/ÀtÆR˜ÙH%ÏeÁ[Üv<üÀÎü<ZÌ†n˙µ·˘0"∑Ÿ%g—˙O§13< ´“Äû’]hyˆ[cF¸Dœ4ö√ñRñ>]¥)≠á”a#SˆÍ¶ÓWp/^v)øQ∏Ky¥ä\⁄˙Ñ¸lö¨∞7Ãµ¸◊ y$Sÿw˘yÚ˘˘¥	 :V¯⁄èùo{ój#K	ﬁ{‰ß‰gÑö„ÛuH+kc¥·55Ê´9U°:Sπ`Ù>É{èKh˛πCXwF^ê”6Û3´!øéjvWõ≠í
+ød/Å√π¢
+tà-ıR¯=ñt¯&KÊs∆‰ ;∏Õw˝{Ôëº}Ù‘ ¶8ËÌ»ÇﬁÙkUøîÚßÕ%ÙÚï ~cô^Í\.óãô∆&ÉËçe¶ë¿#πúbŸ}2páÁÌ˛Ã)–_nphV)ÙÛ©˙≠8‡´›ËÁΩJ ïÇx*ÇÙA|ÿûTÒÛÛG%~˛PË”>b˘”˜¥„q˘ëÜü,’ΩÍ49˝Ú'o±‚]r√¨IáøDˇ7ï∆ª{íÚ–ñFEÛåBÄÊπ>˙XÅ¬Û„Óò‡J¥5Ñ/-L$ä^˚FÔ'7 q&£Í&óÍã•&æ,l?zÂc;!ëqTú^àíãHgØlp&ÿÆ„ÉVûCŒÑ€êı0›˝.0(0‹≥´ê—àWz8ΩaèóË®±D∑0›±qåCUp[¡”*@ŒË|;Òkƒëw4Hâb±#Xª◊Yç k,∫ñ@6–’∏6—^‘ë19!•ˇ†GT–ö”,c0´AGΩTÊ+ujÃÏ€ïfõÓ˜w¿•JkÅn∑8˙¨Æh›ÙèÆDZUÈﬁ‡¡~ª=NùÅ‹–´  æ(#ÈŒ≈Æaÿπ˜°Ñóé|¡øvõÔfƒ*£ã8Å—%ë≈p!A2«§ ÿíF™:Ñ(hÒ°
+”S‰ "Uë◊˙L;x?[!Çù»B©Ç)í∞lCw2ßÁô€bbm	ç∞Ωm≈AÅ!í‹Á)∫ÑÉ.'’“≤O% ‡Õ„∏Y:qi√]¥VÂÙu¿£“õòÑûº£¥ös¢éù%+‡Ë=aá-iΩ	Péû§""."{$j!n7öˇ22BÏ+`ø˚s·=üôÒπ8¨˘8‹r$p4[ÀUœçŸ†ÍÕµêëç-ÇÀœø„BU–Úxí-∏ù—øIcÓx.ß@°Nì°!Ö°,ÃKÛ⁄•¿#e(≥¶Bß·=3`«=Ö·‚/Ã3≈Ac!≈ò à1,å7ñ.Û3•Lql<[üÃ
+Ÿ|ntﬂyçÛ…5v\}«Õ¥»≠ÁJ;9#|) ,„Æòmˆ2˝¥Óàq‘pô¡»©€
+RÈyTë¬Ò@:‡zqΩ´Ã‰≥—vLBO–>&hÌÔÈI4«åOm÷zêª¶”é*`Ïs/ı6*NoûLÊ‰˜]~>õŒ¿ÂÌ∏æG0Ó ÎŒ$E,Ë2?A˘h8≤<N6å0öM6>Buèô‚¶g,“g,&BÛ“s…{{»SÊ∆ßº¸ÃyVG˚∏ôåvÿ‘beDˇË[ÌVÉ-,·ı„∑ò¯®L•uÉˆJ“ºãàÜ.’®ÉJ›âm˙CÕI¢°ì@ßwØöÓ¢D?¢w¸XÔïÙhì3
+∑àÜç4k”z“6FˆfÓüSÑz≥⁄û’ÃÄÑ˝)…åR+zÑ:¬≠z´•L!õ¨◊Ÿ∑o±	zÀ:·èRü‰0¥√Q€Óù∫x2œ≠–ÁΩú%ìy*Ú∆·–øÜ úËÇ≥~KæVx©Bû_.≥Ì¡d…«DU◊”j@õGì†Õ„¶¿¥íúûA◊‹‘–tÎ+krGeπR-(i1lÂÆ·„ÄœÌ=b’,q^`ßKˆ`È√πü∏éß√ÌbÇ„¸•”®Ú®ü'yBuynE\Â≤ì)ÔdÄ[ZÏM∏û-8Î˜@"7m	ë©¢°≥ÊÂÒ.Iê>∏∑c:Wò¿µ©)‡’)UC~ùÃ≥Ø85:s°–X ‚nj–”Î-¯ù∫Á¢áój∫P§6H°»Ø⁄ïˆ"z+¯kö~º°±˜@6ŒGßå&Ö”b	º9HHWù3“p∞ÎüÚÊöπr;Ä!Yaœ))Ï∏F]BHıV©R∑ê‰&Òt≠dÒ£G)¿¢Xt#R5õºL¥õcjÛÚæGºß]∑ß[Ø>âíu˙≤àR ÇÒ`óX{·HO¥H $ßD6£âõ¶pU˙J`D&R41˛]∫F^DÁ
+π|Ò<)ïaßäœÚπ©I*8∆eßÑªñË’%•+ùoπÖæä©$jú;¨-{˚ﬁ„uÕz˙ìö¥◊!å5ê3ï’^:‡Åt∫"¡“7≈$R 7À8À•Õ…‘2¥¬Èúï˝«ÍsæúŸüÕ*¥.ÎóéÎ{m≤˚g^FtÏ˚ËDÚ.<H]›ÎæﬂΩ	Ãi∫‚^&ù§é%KÇ”≈˙!c⁄⁄FWÙ@&@xÇx:\˚D‘IÚÍïFR–ÓµF8≠œ,˙ΩûE˜2„Ä{øŒ€<µ~‹‚(YªIw˜á¯∂‡GoqßôÁÁ·$l0√>≥M»Á±«Ç±°ÕÜ‰5|Úõ‹’é£Ó ∫’t∑éwî”Àﬂ•ø¨
+†JˆhwY˘˜@s!†©£¬f23Õ∂zuâ¸≥•ô™GŒ0ô «j?hë£m∫^˜¨uç1¶(∂<9.4TöÏ)Cú‡◊i"z∆‘Ù<9*‚6 ñÃ3ÕÿÔÈZØ£6∆4˘!ﬂø¯V√´´§HI/Óâõ}ï»q◊F≥∏kj¥ùˇ˙ıÔ7ˇﬂ∆-ËªéÚcV|,∆@„Û7ˆ˘Ú]ˇ4@uáü˜†{æ¸ ˇpöÜâ∂–æ–ZÕ¿f‘xÜŒ˝0IêÍ∑ç¬·=rv%S.]◊+ÒÖÀ∫’X[9¯5‚"q@å¯¥S#©§Z(Ò0}&À´4©ÉÃ§RÄ1Ì%∂÷“ i⁄hn<V¯∫ƒfÿÇ„©^&˙A…ë¡#Vcq_ˇ˙ıæ¡M¯ùO:øCΩØËlﬂ·úQ)⁄¶ÿlÉ·‰U^«™¶Uí9ÿ§"≤iÆVY7æ∑÷¶ÈA™@5¡®˜µ	®Es2¡qeÜÀZà‚±Í:íˇ ‰%‘ŒA.=Oø˘±ÒN¯%®‹ƒ/_°Ûj¬‡˛”∆ë0Sû¥´ÚHT+Õ÷l•Y&¯SÖ˙Ht£Ñ+0dï8πÒxû≠QµˆQÏØVzÓ¥ã¡¡∂NF^≠/V˚BFNîÕ´√z&ZÔ˛rÂ3,ƒ£”rïOC‚≈¿L’-¨ƒ€‚ÿ=¿%õ9Qô˝•ﬂÍﬁ≤™á=âmòﬂ8b9ﬁÄáR +ÅP‡•j1Éü
+
+“˝é$Ú3\ç”,wVü§=]*˙_∫*Ω(Ø"5íë∫ú£~%(‡FØAîƒØ”7aK#W∂Ö(›⁄èv6ù˚G⁄UkMﬂˇDM¸≠§âÅàÊKÜ?ÜzˆGWéL\‰Eë•… ∂ÖñFÚ#W≈«Íò1f9lDd{!zC ¥6/~ﬂ:&}∫7Ã˜L∞ÑÔ=<Ì{Ü^≤x‰Ãr√sÍBw¬kzµäëò=:8—t¶xÑ∫î≥‰Ï13LºkC˚ ƒ?≤˛Ïc∫Á´¶ZfºÈ£F>√¯HÀpÉ÷”pΩ‚„Ï≠±9÷$g¬¸cyyÉ‰’º†TùçÜ)‘„Ù◊Øø˛OËÿ§¬ÓcNV±M2™›/âΩfœl∂£ºˇáú\XnV Mr
+Uõ;ƒ¿oz}-4:ÄˇJê•±!‹+#ı+∞lbÈP˙ÏJ°ÀùˇºW∆Ê`Ω“Ù…qo—´>ñ±€+q¢¥Ñà⁄èeä˘±I—‘8ñü“áD˘Ì’†@œl‡5õ‘y,„Úze~Å¸tΩµñ¡ò<uäT«_ø˛ı◊¬#UzDá™æ_Ó¸©˚>0¯Ú`$d˛»t'∫µ\%ô◊èú⁄N—∑…x„UÙàW˚JÏ:ÁÇ,>p·†W]n6Õ¶öÀjONïxO»%Då\5˘ŸS'w‚®)fÜ;^â‘m‘JUtÀƒ⁄ØFù0Qöe¨ÁŸƒt˜ZîØï÷ Ñ£O\x”£„ıHíŒ@˘°8à8”ƒèˆbs∂^YÙÇ&}ˇS^6‰…J√€`§xdÑ9R√«+≠·#ﬁ\©]5#»∏¨Ü}9ŸƒÂˇ6]ÙêZ¯FÂ’Z%=ûç
+ä% €˘gû|«ëÑ‰‡5Æ%V4Â^%Tá©≈-h∫ÖÃ@T›˛®w·ã ßsπy±ò3#K:næOY‘6&*ª7`ó∫ÚfËÃøÌW€5èD]ÈP0—ΩŒ±√˚œºåíóMÿô™©ËõNì|n*KΩøñï\À”§Hﬂlò Óºq-4ÍˇSïﬂßˇ-îﬂù‘œìπpè}∆’€6KÖì·‰'¿◊≈ÆvoÓΩ◊CÙ€˚ÓßÒúê#ïR’üo{ßóõ-ØFu^Ω4oä;˘±«!Æ…Ha%œ]™ÆwocïÊRyZ˝c,2¸„Óı=§Ì†Qıµ†Ñp+*0∞äjã >È˛ÛAt)vVAd–’√†çücæ’]FÄCï+g¢cT8 ,®‹ΩÖQ‰´∞?†M6∞0†ÃÎÕ∂BFq—¿ûœ|˜;,Æ]öM$lLîªÙuœ∂Tñº≠√“˘œ:}B^ˇ¬O˜&%s%Äe*_lÊX†„6aÍ¬ÎlHd!–Ÿ0ﬁç⁄ éÍi∂˘0‹#häû…µ®‘fn¬,y¿ªB-\˜ö˘Nà“ﬁYf9w˙xwΩ ⁄`$Ä≥Ü=]ZÙé“´∞≠Ô∏ÂÕZˆ©:ÎUù}ˆøÖ:ßK˘@¡ÊÙ‹ºÄçñ[PÇ¬K0X“Îjó¿ﬂ&ô_xu ü9QYÚÇΩ†”>√$U¯∏PÇzì0‘ •DJ)πhf	˚[ﬁ.ÍYÖ∞d-ÉÃ√ZeI∞æØ¡àz·CÊÓIÈÔÓM7¡∏øÏœz/lœV¸◊KıŸ™Ï¡èË ˜t6Wˆ¸le(ªÜQl∞ÇDõ •ìµªN∑Î˛»Yzß}bñ7∞x¥“Ü–F(ÚÉ¬zﬂ»6‘∞ÆX‘
+£Efã
+◊˚(≠∑¯õüˆZ-:˜Õ»“·ÔÔ†ë÷–s¬$ƒ&NøÊŸcá∞Á‡Ù‹“°
+xè·Ñ`¬÷!7€˝<‹“ŒÿB”È
+P3õ(
+∞	Ñ-øS°€ÛMÑœN+>‹?RÛ!ËíK¸E˝y¯˚G≤*ﬁì‘ŸÚÍe/‘!PƒÕêÅyä$ÜI*‹ﬁü:U\~ÖïB{≥ÏâÚÀ˝—≈^°B•05¶¨¨HÍ˘%[¶x—qÏKÖ‰óº•JÀ|E!∂¸»ôzªZMLì¨“ ¯Å>/=m8Oﬁ>WÃÁ•f¬©qlÑƒ∆1DA}N¯î–¬+ÀﬂÖ0§ﬂn…Â‰âi7!äL2DëI£1iËe‚ıÌ)1›EyÚÃK ∑¿a2Q3LHê Œòƒ¿÷≠ÍºRôÏ?›(´^S™\gàí™:u›ﬁ”Å≥* ŸÂN5~`fA£—sŸ∆Ï8!‹q k\Â<ËJ…ùL3î•ï¸)ªc≈é–aLu5’–π≤Xx)WW∆úî‚‘Uƒm;c¥õıêÃ^ÆI˜ƒI∫'KÛÿOöQvß©%A˙õäNŒXÿò≤È1†K]I“„ ó&Õí˚5”Ä¢ÓùLvÆ(¶Îgä¶‹Vœ\T˘3ceì˚ Ëõ_OM∫™ıPÂ€ËtHLã`'èÍUALßS
+YÉvâÙãÎdzjﬁŒ>ï_ºt^Ä˚Ω4æ∏p>úÏs≈  íÕ‰ö%"aÜ≠Êœ≠,^Ñr.§˙™“èÜ†!É∑◊üõ)LúÁ-ÿÿî!˛@wÌ‘»ÿyﬁyØ‡•Nn4≈¶äüí⁄¡*lBƒ#åôÈÕ≈P˘wH	™j”MVÆ}Ê°¶W ¥ﬁú^p“ßØ∫|`®Óãèí_1Ÿ`F=]’1∂¶ın:]∂Ä=˛ña}€Ü/^@d∆‹/ÛÈód∏ÛÜ.–q®_TBﬁ‹o@Q°nûf˙Xpƒ°{'°·h,f§yÕ¿ΩÿO´ÌáfZ3tØNf¶ }≈c)}ÚQ›ƒmìÒmŒDsáG$ÔßddÈ…UãÚ\Ô`@+¿>ô«º	µ√äé_£∫í?ÿÅ&ºm®ˆ*UΩØˇRxﬁtæLûT!ÊIMÊûT≥f˜ ÃKÔ0ıo8d	§{∑<≈if+B{∑8N3ßÚ⁄]Yπq¥+b∞:’y(q|{ÿ\C7u‰rV«Sæ§DAÌ P‘ÌÿbÎdÊJ’¶Æ;ˆ‚E≥<KÕGÂ¸)?¿IC)—F‘æ⁄˛√ﬁb‡◊è{s-W}ÑÁ)Û$&JﬂÑ†m ¨XQµÈô™o á∏)ÀV©Fõ91aï§◊Á®lb@≥≥§FtP°ç∞lLƒ©X5C©gx—Éò,”\Uy√ŒèëäDo@™ˇsÕ.5O≤3Rj‰Í˚S8Ÿ’U¨8X)5o{TÎËàrLÆkEAﬂÇ !{<∂ı£≠]–®‘@&ÖAzó+á¿Ÿ◊muÓP%ﬁC∫m&eÿœXq´+±Ã£Äá6[®íö5€Fi∂6	ci>†
+IliàÃ]gv˘¶:&eﬂ∫◊Y∏r•‚+«BO©∆h‘‡©‘à"úº¨¡⁄—OñZÿ#£ﬁC)Ê2∫ÃO&ŒLRí©Ø‘†∆ô•Y^p`Öwÿ}◊Ω2MOˇØÀ8¸ÚÍáO{Îr⁄!"F›âqÊNHTz∂iiΩÑŸ˝rª9Ì∑[Pñ»∞èŸG¸&l‚Œ)_ã◊5k™w“áñü‹ÌÇÓﬁ±≤_◊Ói˛ú7Ã—c'NíLŒ[ÚTπˆ]›'ÛïZ£èMrT>≠èB˜C.ó˚_p˜·QxÒ'd?â}∫!bw˛E©°›
+ÂÂíRsêSﬁ¨ﬂ9Í”ïW}<˚!ÄßÍcCúäù◊«é8¬v^Á	⁄8ΩO∑CÏŒá¸%Ìv‡’û·ÜêM˛CUlx‘K~Ü›ñ;=Æ˚CÈìb0çÂ
+9W‹û€RÔ”]ﬁ˘5KÌFêÉë^ ê®Ó^5ºn‡_‰Í≈C-Æ
+nW7L’/ó™}Ëà„±ÛÂW<v·LP™‘ÈD]8RjïûêMVBnÀÙPÎëDØc4´∫ÍéO°Ï$\r›õYƒeb@©¶	QRqf†¡\9ZÍai,zŒm¨πŒö•¬eﬁΩï<‘t‘s–'D_dï„!pÀ}Ñ~	MYù˝bC!tøÜd¶D^óZµ ¶*˘3’¶X|ƒ™¶•@c8\ú3”º÷˙∆À÷-»æ ÖR0îıöYl#§ﬁàát€‚∞vÈ*J7Ï8†K`ræ"ÿ˜3∆$b∏ÍˇÀ¥<Óaásnrﬂº
+E&Lp‡ß¯à◊Ù∞®©˛∂nBóƒ&º7¯e—Ç\ß≤ˇl≈-ºåCt4Ë¸kdÛl•	(º≥V*M~
+ùbÀIiÍÉ>Joj7∞E6)ßˆ#Ò©¨†∫€ôâWç,ﬁZ–\©j>¥ÈìSﬁt!æ§âbÀï=B„?ßi¨¿·êπÕF•éï7ävhÚ2ÍKk0Xáro=ÍÓ£~óù‡YøÍ‹éZ^Èé<Qj¬ÏÜ∑RVx”0™¶ÇÑÏÅäèº1'ö-(]•k\Íö∆].K»…So˝Ì´áœ\8qÙôWO]8t¸Ï´'O{ÛLÆ6ã∫	i∑È0=`zF‡>–‘È«€-zî ]´¬~)Zt∆ÓÊ8≈≥~óãMßﬂ–Õö"AÍ≤ë›≤!ùØË§0∏Ù‘Ëó©√®1°-_b»v8Va≠ì€`EÖPJBãÍºC±ífÃæï‹ê%≤Ω%uˇhN∑†[ÉC«˜Z	ÉÁ*Å†üàbózC≈Lºåcá≈0À¿ÏX c+Öä¢å…f¬cæ∞U¥å*ÎdcL≤˘º†í});5ï-éégÛπbäIñ‚NÂŒ˜Qˆ2íQ∑¸·ÄÃ~-Vi@?ÂÅ˛Å∫RFx=ıhòFS 7Q2gn«‰
+ó{å∫ÇImÌÑ≤#√ΩvÇê^ΩÕ7ˇ¥∫πsïú=FìπIM√¡¬hﬂæs<@§`>‹xÜBjP=Dwgï1p ç	4z0#k=§;Èﬁàz∑Ë€CZxæyÁˆH¬E‡OàÆï¢ÎÍõoa˜7Î,He—∏õ+}XëÏu-¢P≥EÒ∆	‹JÒ	í™&‡K2ÆÆ}9eqÙWiÅy*-∏· µÂ·RªÂS1’˛¢oªH T,P)”,>¥Ú´¨‚˝MëòT!T5áêcøWb˚jˆˇÒ“≤ﬂÓ≠Ï,ﬁYe'/êáÕ¥ÖF {˘ÎgùK $¡aÑË[Ïe∫ØaÙ—∂Zô*ªUö!içY£	a¸%™ìq<:Ùf+m›€GØF◊B+ÎÛ/Ûf˜£|5?h,Töµ˝#¸è$ÉËœX∞D}IÜÅ∆·®ˆE2TΩœ¿&ÙÜ®>[∏í-AÓ∞Å„øÅÿÃ7∏/Áa∑éàE˜îœpˆÿ»Ÿü	…xÍ‰—iÇ] ◊°≠kÈoiYÜ≥§Û†{ã~z±◊	ZΩ?–èn‚@©≈hÊ∑®¿ˆ—K Z¬∞∆Èõ˙b‡f√ºyzù#ÅàŒ„≠êVÜto!¢¥Ó¶käèÙ:·‡‚Ü‰‘ ≠ÚΩÄI…Ç)ø¡BYÙÁ/›Ø≤π‹*í“tMã{É—∆4µw\Ë®¬c
+yî‚jÆÕ∆∏öAﬁL:…*≥dÎQ∂IE-⁄ou%ôY¬Ìéå£3ˆ;å√#‚,ñ?‚B—QçËôàL‰zq‰r;{˘ 9Ì„öX8[á˙_‰!√Í¯úæ›7ùO®l˙Ô!—Ê,F∞í€Ç`µìHÊŸπ©óF∞Ö√ª¡◊8x<ûd^´“7Ñ/›F0Cπ?–Úzà–>äAŒHóıÍmæ§oˇ-}ˇo®6˚'˙ßœÌ„ä˘˝ã„£ﬁLÍ˝ˇÉ3∏ÍÖ3GΩR†ÑGÚ“üv˛´ÛØÙÖ?≥ølL÷…/<[.N”˛¢B]e,C?{‘o˘	NÃíµøﬁ◊ÒÕÍı˝ı~Ñz>3É¶‚åÇ\Á2 ™NPÆ#bskHÎpUÊcb√Oµh_Ô~>W+52™YRAO@œ‚æøZ1º7#n7·â$E9#“L¥^€°å¥w–€¥.πÑHJ¯oåÆú>J§JXê€ √©æÖ¢¸ﬁNÿ¢Ó„H±;É‘f¨têÄ ®+M⁄(º´‘ª–¨ÈBÜY˙Ò>MÖÅYèüµ´VÜïvG”ÚòlåØy•
+¯±ìuM≠Ôì`i¸û3>ﬁÁ¨èõN⁄1ö∂í¶¡iE˝VEDKÎYÓt ,—]TGË,<¿ªﬂg¿OQà©‡’ŒÔ€-E$!ˇ}Å~“:∑˘WÌÉ Á>dî‘ü V›u¬°?û&o{¡29Ó_ ≤N†óöE Ù,˚#˚Òlïæ*êÌ⁄;~√õæ⁄áB]∫ë◊mÊ>3é 21ñ_õÃÉ¥M&ﬂ ôó&&È'£≈<8¬üDÛxÒÂÜyw∑⁄Ì›z—ﬂc¡≈&*ß?˝Ä¸3),≈ı4wqÊt ·ö˚ ´KòUh'A∂¥{£˚˙≈ª‹zF’Áü«∫té79ı%üöÉ2'¬™üß∆D‚B{ÃòH‹[ddÄëZ©[◊Wıgº«™˝É(Ôã”ƒn &Ê6N[qê√›âŸö£R£8∂Æ œœˆ6ó9≥—OmƒXw∂CrèOä±gÂˇrUB’¡‰ã:ÄT8™Kê{˝!>ì ]Âï§Tﬂ‹≈≈˜hQù:õ%Øæô%G^Õí◊N—üOg…ﬂÃí7ﬁ í_ºÆG|ƒ˙ëª—Í‚ÂÆZCáa5#É·‹Ó< ¨4RD∞TÒvPàzUO\™õ4ô ?∂≈ˆ)l}je§ëo¢—x§+MbÅÈﬁdıÕW∂˙í9ÿ™˘Õ∆ÇT ‰5#©ÄƒqmsŒàèÑ™Ω„·R≥Uı»ÈJu¡oS˜œÀ™V8µ>Ö!ô∂ H=¥ßk;
+÷[â´ñΩ±¬‰†Á∆,Ò¥èLlA¨ÓC™~5€/ìŸÊ◊Èﬂı7√8'ø
+sHÈØ(•¯2[„•˛∑8”IòAî£ÉL¢âê$Ê∏∏D‹êñOÚjú¿TXè_T†Âòc*$–∞›(Zπ°…ÆXº¢ÜdÄmŸ¢ÀË
+bÏ?oîÁ˛æt™—ÿNÈ*1v§%D
+H~TÁ.•87§"∂ﬂìIoÄá•è%∑Ï7ñ’nW´B)Ô$˙EÚ5åø¸
+”™ÄU ÂÛ√à\íƒÓ‚C@¬–I®‘ΩZ©E’¿©ìGÈÃ’<rˆX `XÙÆÊ’€Y≤Pô_ˆÍ≥ K-VöÌô≠Â™ó#∞ÛÁq¯¶	‘ÒÄz(iõπRΩUj™I‰™•˙l≥\jx‰§˙kÙ* {ÿDz›2jóféúYjﬁ4ô-ïWÑ·VHg⁄"Ûr… …†®√bCˆúÏf¨Vû3À>(5ñÈ+≈—ÉÿT/∞©n“qkœ‡‹)Ø£≤·ÕÅeÄæ]3-Ü¢À˙|iˇ¸:}áÊ4˘˚‰¯AëdD¯ä¥|¢ö|É™˜¿Cxeê0@◊L*ırµœ¨º‹Ë‰X~©Xò»„¿á°¢,]-Aπ]-—'d—∫≤»»ì‡EîWõAg`éGXI2ùJêÙ’j®√ƒc:Ø#ÊÃàÖIﬂiíù$”®ññÈoÂ¿o6IÍV˜ŒF=_ı/Èﬁ°lÜ¨}_ ˝2åY¬Ú0h≥˚r‰Õ“bÖ!N”Ã´Áﬂ÷aT¸ölzŸKïÇÄŒKD@y˙Ùk5Âµpºr‰d‡œ1 G∫ª∞r$∆S4ïY(z˜öÍPT¥ΩgÄ†äÔdæîË•†+VöJpËıõÉ%ﬂÊvΩœÂV*¡µ≈õ§DIJò∑>Qô˝•ﬂÍﬁ2uç?>¸*<ùQ5!ÊË¿¢Bu,®πv\p4—YµMê<mSﬂÉ	|óyıù{`!˜–kÍ{Â¿&?5uOÑ›ü…n¨~oßPç¬ú@^VMüˇSÆÅ%o£éhÚÆúeÚó+ﬂiã_’ÉπÎú‚3Üµˆˇ  ˇˇ ‹§xú¨TMk€@Ω˚WLÎCÍ`Y≤R•A1Ü∂áB!P»±≤“é‰%´›ew€5Ü–k{œﬂ»πø¬˛G]˘+Òá‹*ÉdfﬁŒº˜v»;‘qí{	/—ãÇ ,é¨70ãêIa]Ç§∑P*Ö:%ó˘Ø›@çæÅ’.«DÓEcAÀRP§^8‚UNfô·ÃÄP9ÙFõÎÜ~ºn¿Œ”ﬂã Ãfè≥ﬂÛ˚˘œ˘è˘Ø=@œOJk•ÿ=⁄Û)ª€ˆ¸BVƒ:;ô√Ò÷¥±Nø¨ øh4(RÏ7Vôâ
+ü∏Láè◊◊Œ7WDﬂ:ôN˝Õyc«˚ìõMÈN±Byâ§cPaÚåO‚‹Õû∆–ÏÜÓ˜^±BImâ∞óœêäPÍÓ!Ün'å45∞Djä⁄”Ñ≤“8ﬂê¢F`$gtûê7aµ·ÈtÇ®US°¨åWW)≠¨Å9r&ûàq”:ÀRI∑=[ÃlF
+∆«1ú|F˚A&\I!O⁄P∏èQ$≈:ã„Ü}«ÿâª8be*πt˛4œe‰e§’„•.„¶∑8~ÉµKæUí3„TT”ÊŸ±rZ(3ÈÒ—Ò8f∂Í~DÛˇ`:Ë∂˜B·~ËlKœ ÏÂV:rqCd˘¿©x£ç+U·ø+}±LràÛ,π≥Ûöûã≈J1ïöTK(ÜjójŒƒa…Î÷7”ûø\,ã¿f›µ.”∆   ˇˇ ÒÎ´

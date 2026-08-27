@@ -2,6 +2,246 @@
   {
     "event": "change",
     "path": "/app/applet/history.json",
+    "timestamp": "2026-08-27T16:23:19.957Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/App.tsx",
+    "timestamp": "2026-08-27T16:23:19.953Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-08-27T16:22:48.278Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/server.ts",
+    "timestamp": "2026-08-27T16:22:48.274Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-08-27T16:22:42.716Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/server.ts",
+    "timestamp": "2026-08-27T16:22:42.711Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-08-27T16:22:22.633Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/server.ts",
+    "timestamp": "2026-08-27T16:22:22.629Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-08-27T16:22:18.858Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/server.ts",
+    "timestamp": "2026-08-27T16:22:18.853Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-08-27T16:21:56.715Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/blender_connector.py",
+    "timestamp": "2026-08-27T16:21:56.707Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-08-27T16:21:51.908Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/UnityConnector.cs",
+    "timestamp": "2026-08-27T16:21:51.904Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-08-27T16:21:35.170Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/AI_ASSISTANT_RECOVERY_GUIDE.md",
+    "timestamp": "2026-08-27T16:21:35.165Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-08-27T16:21:26.396Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/DEVELOPMENT_LOG.md",
+    "timestamp": "2026-08-27T16:21:26.392Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-08-27T16:21:24.297Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/DEVELOPMENT_LOG.md",
+    "timestamp": "2026-08-27T16:21:24.291Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-08-27T16:21:18.507Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/AGENTS.md",
+    "timestamp": "2026-08-27T16:21:18.503Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-08-27T16:21:15.772Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/AGENTS.md",
+    "timestamp": "2026-08-27T16:21:15.765Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-08-27T16:21:12.205Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/AGENTS.md",
+    "timestamp": "2026-08-27T16:21:12.199Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-08-27T16:20:47.420Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/package.json",
+    "timestamp": "2026-08-27T16:20:47.414Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-08-27T13:57:25.612Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/metadata.json",
+    "timestamp": "2026-08-27T13:57:25.609Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-08-27T13:57:15.260Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/AlchemistCat_Core/DialogueSystem_Manager.cs",
+    "timestamp": "2026-08-27T13:57:15.256Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-08-27T13:56:55.791Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/AlchemistCat_Core/DialogueSystem_Manager.cs",
+    "timestamp": "2026-08-27T13:56:55.787Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-08-27T13:56:31.131Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/AlchemistCat_Core/DialogueSystem_Manager.cs",
+    "timestamp": "2026-08-27T13:56:31.127Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-08-27T13:56:18.675Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/AlchemistCat_Core/DialogueSystem_Manager.cs",
+    "timestamp": "2026-08-27T13:56:18.667Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-08-27T13:55:56.035Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/AlchemistCat_Core/DialogueSystem_Manager.cs",
+    "timestamp": "2026-08-27T13:55:56.029Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-08-27T13:55:25.854Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/AlchemistCat_Core/DialogueSystem_Manager.cs",
+    "timestamp": "2026-08-27T13:55:25.850Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-08-27T13:54:50.759Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/AlchemistCat_Core/Knowledge_Manager.cs",
+    "timestamp": "2026-08-27T13:54:50.751Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-08-27T13:54:25.196Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/src/AlchemistCat_Core/Knowledge_Manager.cs",
+    "timestamp": "2026-08-27T13:54:25.188Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
+    "timestamp": "2026-08-27T12:14:23.861Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/DEVELOPMENT_LOG.md",
+    "timestamp": "2026-08-27T12:14:23.857Z"
+  },
+  {
+    "event": "change",
+    "path": "/app/applet/history.json",
     "timestamp": "2026-08-07T14:27:26.228Z"
   },
   {
@@ -258,245 +498,5 @@
     "event": "change",
     "path": "/app/applet/history.json",
     "timestamp": "2026-07-19T17:16:31.103Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/FateCastleManager.cs",
-    "timestamp": "2026-07-19T17:16:31.097Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-07-19T17:16:28.769Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/patch.py",
-    "timestamp": "2026-07-19T17:16:28.765Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-07-19T17:16:27.264Z"
-  },
-  {
-    "event": "add",
-    "path": "/app/applet/patch.py",
-    "timestamp": "2026-07-19T17:16:27.253Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-07-19T17:16:03.444Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/FateCastleManager.cs",
-    "timestamp": "2026-07-19T17:16:03.437Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-07-19T17:14:10.741Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/FateCastleManager.cs",
-    "timestamp": "2026-07-19T17:14:10.735Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-07-19T17:13:52.410Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/FateCastleManager.cs",
-    "timestamp": "2026-07-19T17:13:52.397Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-07-19T17:04:47.619Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/FateCastleManager.cs",
-    "timestamp": "2026-07-19T17:04:47.609Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-07-19T17:02:41.634Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/FateCastleManager.cs",
-    "timestamp": "2026-07-19T17:02:41.627Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-07-19T17:02:05.598Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/FateCastleManager.cs",
-    "timestamp": "2026-07-19T17:02:05.591Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-07-19T16:43:07.706Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/FateCastleManager.cs",
-    "timestamp": "2026-07-19T16:43:07.688Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-07-19T16:42:56.182Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/FateCastleManager.cs",
-    "timestamp": "2026-07-19T16:42:56.176Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-07-19T16:42:39.339Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/FateCastleManager.cs",
-    "timestamp": "2026-07-19T16:42:39.333Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-07-19T16:38:04.013Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/FateCastleManager.cs",
-    "timestamp": "2026-07-19T16:38:04.007Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-07-19T16:37:03.401Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/FateCastleManager.cs",
-    "timestamp": "2026-07-19T16:37:03.392Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-07-19T16:23:36.290Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/FateCastleManager.cs",
-    "timestamp": "2026-07-19T16:23:36.284Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-07-19T16:23:10.739Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/FateCastleManager.cs",
-    "timestamp": "2026-07-19T16:23:10.731Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-07-19T14:07:41.053Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/FateCastleManager.cs",
-    "timestamp": "2026-07-19T14:07:41.042Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-07-19T14:07:28.490Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/FateCastleManager.cs",
-    "timestamp": "2026-07-19T14:07:28.484Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-07-19T14:06:41.908Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/FateCastleManager.cs",
-    "timestamp": "2026-07-19T14:06:41.902Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-07-19T14:06:28.375Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/FateCastleManager.cs",
-    "timestamp": "2026-07-19T14:06:28.368Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-07-19T14:06:05.437Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/FateCastleManager.cs",
-    "timestamp": "2026-07-19T14:06:05.431Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-07-19T14:05:48.099Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/FateCastleManager.cs",
-    "timestamp": "2026-07-19T14:05:48.092Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-07-19T13:50:17.028Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/FateCastleManager.cs",
-    "timestamp": "2026-07-19T13:50:17.019Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-07-19T13:15:57.384Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/src/FateCastleManager.cs",
-    "timestamp": "2026-07-19T13:15:57.378Z"
-  },
-  {
-    "event": "change",
-    "path": "/app/applet/history.json",
-    "timestamp": "2026-07-19T11:53:33.693Z"
   }
 ]

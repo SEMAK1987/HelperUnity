@@ -1,9 +1,11 @@
-# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.12.42)
+# 🤖 Unity & Blender AI Assistant • Core Knowledge Base (v18.12.44)
 
 ## 📌 Project Identity
 - **Name:** Fate Continent (Континент Судьбы)
-- **Version:** v18.12.42
+- **Version:** v18.12.44
 - **Engine:** Unity 6 (6000.3.10f1)
+- **v18.12.44 Update:** Knowledge Tree Scroll-To-Bottom Unlock, Minigames Wheel Top-UI Icon Integration & Catch The Mouse Narrative Phase - Implemented 21-rank hierarchical Knowledge Tree with bottom-scroll condition unlock requirement. Connected Minigames Wheel button to TopPanel with automatic alignment and integrated the 'Catch the Mouse' narrative phase in `DialogueSystem_Manager.cs`.
+- **v18.12.43 Update:** 100-Slot Scrollable Hex Grid, Mastery Potion +100 XP & Dual Experience Bar - Expanded the Inventory to a full 100-slot scrollable hex grid, integrated the Mastery Potion granting +100 XP, and established a dual experience bar for both Player Level and Alchemy Mastery.
 - **v18.12.42 Update:** Inventory 16-Slot Hex Grid Setup, Small Scroll TopPanel Binding & Table Mini-Cat Hint Interaction - Configured 16 inventory hex slots inside `Inventory_Panel` with `Inventory_Frame_Bg` (900x900) and `Inventory_Slot_Hex` (135x145 Cell Size, Spacing 20x15). Linked `Small_Scroll_Button` inside `TopPanel` via `HorizontalLayoutGroup` hierarchy ordering and bound it in `_GameSystems` under `DialogueSystem_Manager.cs`. Connected interactive table cat hints with `miniCatBubblePanel` and sanitized `Floating_XP_Badge` state transitions in `RecipeCrafting_Manager.cs`.
 - **v18.12.41 Update:** Avatar Ring Display Binding, Recipe Scroll UI Isolation & Interactive Table Cat - Fixed profile avatar sprite rendering in `Avatar_Manager.cs` to ensure `currentAvatarDisplayImage` is enabled and correctly colored white. Scaled dialogue text sizes in `DialogueSystem_Manager.cs` (from 68-72% to 84-86%) for comfortable reading without clipping. Implemented UI isolation when opening the Recipe Scroll (auto-hiding background resources, calendar icon, and avatar ring, restoring them cleanly on exit). Connected the table Mini Cat click interaction in `RecipeCrafting_Manager.cs` so clicking the small cat toggles his dialogue bubble hint, and ensured `Floating_XP_Badge` is cleanly hidden until the potion is claimed.
 - **v18.12.14 Update:** Alchemist Cat Extended Dialogue & Daily/Monthly/Quarterly/Annual Calendar Reward System - Extended the narrative dialogue in `DialogueSystem_Manager.cs` so after claiming the 5k gold/10 stones/3 scrolls starter bonus, the Cat does not disappear. Instead, the dialogue continues to introduce the Magic Calendar, detailing daily rewards, monthly complete rewards (30k gold, 10 stones, 5 scrolls, 3 crystals), quarterly super-bonuses (3rd, 6th, 9th, 12th month scaling up to 90k gold, 20 stones, 15 scrolls, 20 crystals), and the ultimate 365-day annual streak mega-bonus (500k gold, 200 stones, 100 scrolls, 200 crystals).
@@ -59,7 +61,7 @@
 - **Audio Rule (CRITICAL):** Используйте только `SettingsManager.cs` для управления звуком и музыкой (включая hover-эффекты и списки воспроизведения). Скрипты `AudioHandler` и `AudioManager` должны быть полностью удалены для чистоты проекта. Музыкальные клипы продлеваются через Suno/Udio и настраиваются на бесшовное зацикливание (`loop = true`). Звуковые файлы берем с Pixabay/Freesound по CC0-лицензии и подключаем напрямую к SettingsManager или через AudioMixer.
 
 ## 🚀 Протокол «Пошаговое Мастерство» (Step-by-Step Mastery)
-1. **Отслеживание прогресса:** Текущая версия v18.12.13 (Loading Panel Responsive Scaling & Kitten Progress Opacity).
+1. **Отслеживание прогресса:** Текущая версия v18.12.44 (Knowledge Tree Scroll-To-Bottom Unlock, Minigames Wheel Top-UI Icon Integration & Catch The Mouse Narrative Phase).
 2. **Инструкции Настройки Компонентов (Verified Inspector Settings):**
    - **FateMapManager (FATE_WORLD_MAP):**
      - *Maps List:* [+] Слот для глобальной карты (Map Name = "Континент Судьбы", Map Background = фоновый спрайт карты).
@@ -79,4 +81,4 @@
 5. **ОЧИСТКА:** Используйте только `SettingsManager.cs` для аудио. Удалите `AudioHandler` и `AudioManager` скрипты. Не использовать ElevenLabs.
 
 ---
-*Ядро AI пересинхронизировано (v18.12.12). Авто-апдейтер активен.*
+*Ядро AI пересинхронизировано (v18.12.44). Авто-апдейтер активен.*

@@ -1,6 +1,6 @@
-// [ALCHEMIST CAT & RECIPE SCROLL SYNC v18.12.16]
+// [ALCHEMIST CAT & RECIPE SCROLL SYNC v18.12.44]
 // Unity Connector for Quantum AI Assistant
-// Updated: 2026-08-21 (Synced with Stable v18.12.16)
+// Updated: 2026-08-27 (Synced with Stable v18.12.44)
 
 #if UNITY_EDITOR
 using UnityEngine;
@@ -16,7 +16,7 @@ namespace AI_Assistant_Quantum
         private string prompt = "";
         private string serverUrl = "http://localhost:3000";
         private Mode mode = Mode.Online;
-        private string status = "Ready for Quantum Manifestation v18.12.16";
+        private string status = "Ready for Quantum Manifestation v18.12.44";
         private bool isProcessing = false;
 
         public enum Mode { Online, Offline, NoInternet }
@@ -29,7 +29,7 @@ namespace AI_Assistant_Quantum
 
         private void OnGUI()
         {
-            GUILayout.Label("v18.12.16 - Alchemist Cat Calendar Auto-Open & Exception Prevention", EditorStyles.boldLabel);
+            GUILayout.Label("v18.12.44 - Alchemist Cat Knowledge Tree & Catch the Mouse", EditorStyles.boldLabel);
             
             serverUrl = EditorGUILayout.TextField("Server URL", serverUrl);
             mode = (Mode)EditorGUILayout.EnumPopup("Mode", mode);
