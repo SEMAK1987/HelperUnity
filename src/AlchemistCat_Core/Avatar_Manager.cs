@@ -248,6 +248,11 @@ public class Avatar_Manager : MonoBehaviour
         UpdateProfileUI();
     }
 
+    public void GainPlayerExperience(int amount)
+    {
+        AddExperience(amount);
+    }
+
     public void AddMasteryExperience(int amount)
     {
         currentMasteryExp += amount;

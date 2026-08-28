@@ -1453,6 +1453,11 @@ public class DialogueSystem_Manager : MonoBehaviour
         UpdateResourceTextsInstant();
     }
 
+    public void RefreshResourceDisplay()
+    {
+        SyncPlayerPrefsResources();
+    }
+
     // -------------------------------------------------------------
     // ФАЗА 1: СТАРТОВЫЙ ДИАЛОГ И КАЛЕНДАРЬ
     // -------------------------------------------------------------

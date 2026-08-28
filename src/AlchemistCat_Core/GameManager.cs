@@ -1,19 +1,22 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
 /// Разработчик: Алхимический Кот (Alchemist Cat Core)
-/// Центральное ядро управления игрой "Алхимический Кот".
-/// Хранит ресурсы, уровни, котел, и координирует все системы.
+/// Глобальный игровой менеджер (GameManager) — синглтон для сохранения, загрузки и учета ресурсов.
 /// </summary>
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
     [Header("Экономика и Прогресс")]
-    public int gold = 100;
-    public int crystals = 0;
+    public int gold = 0;
+    public int crystals = 10;
+    public int stones = 10;
+    public int scrolls = 3;
     public int vipXP = 0;
     public int daysActive = 1;
     public int catLevel = 1;
@@ -29,162 +32,115 @@ public class GameManager : MonoBehaviour
     [Header("UI Ссылки на Ресурсы (Опционально)")]
     public TextMeshProUGUI goldText;
     public TextMeshProUGUI crystalsText;
+    public TextMeshProUGUI stonesText;
+    public TextMeshProUGUI scrollsText;
     public TextMeshProUGUI levelText;
     public TextMeshProUGUI xpText;
     public TextMeshProUGUI cauldronText;
     public Slider xpSlider;
 
-    private int activeSaveSlot = 0;
-
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
             return;
         }
-
-        // Загрузка активного слота
-        activeSaveSlot = PlayerPrefs.GetInt("Alchemist_Active_Slot", 0);
-        LoadGameOnStartup();
+        Instance = this;
     }
 
     private void Start()
     {
-        SyncUI();
+        LoadResourcesFromPlayerPrefs();
+        UpdateUI();
     }
 
-    private void LoadGameOnStartup()
+    public void LoadResourcesFromPlayerPrefs()
     {
-        if (PlayerPrefs.HasKey("Alchemist_Slot_Used_" + activeSaveSlot))
-        {
-            // Загружаем данные без смены сцены, так как мы уже в игре
-            SaveGameSystem.Load(activeSaveSlot, false);
-        }
-        else
-        {
-            // Создаем новый файл
-            SaveGameSystem.CurrentData = new SaveGameSystem.SaveData();
-            SaveGameSystem.Save(activeSaveSlot);
-        }
+        gold = PlayerPrefs.GetInt("Player_Gold", 5000);
+        crystals = PlayerPrefs.GetInt("Player_Crystals", 0);
+        stones = PlayerPrefs.GetInt("Player_Stones", 10);
+        scrolls = PlayerPrefs.GetInt("Player_Scrolls", 3);
+        currentXP = PlayerPrefs.GetInt("Player_XP", 0);
+        catLevel = PlayerPrefs.GetInt("Player_Level", 1);
+    }
+
+    public void SaveResourcesToPlayerPrefs()
+    {
+        PlayerPrefs.SetInt("Player_Gold", gold);
+        PlayerPrefs.SetInt("Player_Crystals", crystals);
+        PlayerPrefs.SetInt("Player_Stones", stones);
+        PlayerPrefs.SetInt("Player_Scrolls", scrolls);
+        PlayerPrefs.SetInt("Player_XP", currentXP);
+        PlayerPrefs.SetInt("Player_Level", catLevel);
+        PlayerPrefs.Save();
     }
 
     public void AddGold(int amount)
     {
         gold += amount;
-        Debug.Log($"[ALCHEMIST GAME] Начислено золота: {amount}. Всего: {gold}");
-        SyncUI();
-        AutoSave();
-    }
-
-    public void AddCrystals(int amount)
-    {
-        crystals += amount;
-        Debug.Log($"[ALCHEMIST GAME] Начислены кристаллы: {amount}. Всего: {crystals}");
-        SyncUI();
-        AutoSave();
-    }
-
-    public void AddResources(int addGold, int addStones, int addScrolls, int addCrystals)
-    {
-        if (addGold != 0) gold += addGold;
-        if (addCrystals != 0) crystals += addCrystals;
-        SyncUI();
-        AutoSave();
+        SaveResourcesToPlayerPrefs();
+        UpdateUI();
         if (DialogueSystem_Manager.Instance != null)
         {
             DialogueSystem_Manager.Instance.SyncPlayerPrefsResources();
         }
     }
 
-    public void AddVipXP(int amount)
+    public void AddCrystals(int amount)
     {
-        vipXP += amount;
-        Debug.Log($"[ALCHEMIST GAME] Начислено VIP XP: {amount}. Всего: {vipXP}");
-        AutoSave();
+        crystals += amount;
+        SaveResourcesToPlayerPrefs();
+        UpdateUI();
+        if (DialogueSystem_Manager.Instance != null)
+        {
+            DialogueSystem_Manager.Instance.SyncPlayerPrefsResources();
+        }
+    }
+
+    public void AddResources(int addGold, int addStones, int addScrolls, int addCrystals)
+    {
+        gold += addGold;
+        stones += addStones;
+        scrolls += addScrolls;
+        crystals += addCrystals;
+        SaveResourcesToPlayerPrefs();
+        UpdateUI();
+        if (DialogueSystem_Manager.Instance != null)
+        {
+            DialogueSystem_Manager.Instance.SyncPlayerPrefsResources();
+        }
     }
 
     public void AddXP(int amount)
     {
         currentXP += amount;
-        xpToNextLevel = catLevel * 100;
-
-        while (currentXP >= xpToNextLevel)
+        if (Avatar_Manager.Instance != null)
         {
-            currentXP -= xpToNextLevel;
-            catLevel++;
-            xpToNextLevel = catLevel * 100;
-            OnCatLevelUp();
+            Avatar_Manager.Instance.GainPlayerExperience(amount);
         }
-
-        Debug.Log($"[ALCHEMIST GAME] Получен опыт: {amount}. Всего: {currentXP}/{xpToNextLevel}");
-        SyncUI();
-        AutoSave();
+        SaveResourcesToPlayerPrefs();
+        UpdateUI();
     }
 
-    private void OnCatLevelUp()
-    {
-        Debug.Log($"[ALCHEMIST GAME] МЯУ! Ура! Наш Кот поднялся на уровень {catLevel}!");
-        AddCrystals(2); // Подарок за уровень
-        
-        // Показ диалога или эффекта уровня
-        if (DialogueSystem_Manager.Instance != null)
-        {
-            // Можем запустить кастомный диалог наставника
-        }
-    }
-
-    public void UpgradeCauldron()
-    {
-        int cost = cauldronLevel * 150;
-        if (gold >= cost)
-        {
-            gold -= cost;
-            cauldronLevel++;
-            Debug.Log($"[ALCHEMIST GAME] Котел улучшен до уровня {cauldronLevel}!");
-            SyncUI();
-            AutoSave();
-        }
-        else
-        {
-            Debug.LogWarning($"[ALCHEMIST GAME] Недостаточно золота для улучшения котла! Требуется: {cost}");
-        }
-    }
-
-    public void SyncUI()
+    public void UpdateUI()
     {
         if (goldText != null) goldText.text = gold.ToString();
         if (crystalsText != null) crystalsText.text = crystals.ToString();
-        
-        string lvlPrefix = Translator.GetText(52); // "Уровень Кота: "
-        if (levelText != null) levelText.text = $"{lvlPrefix}{catLevel}";
-        
-        xpToNextLevel = catLevel * 100;
-        if (xpText != null) xpText.text = $"{currentXP} / {xpToNextLevel}";
+        if (stonesText != null) stonesText.text = stones.ToString();
+        if (scrollsText != null) scrollsText.text = scrolls.ToString();
+        if (levelText != null) levelText.text = catLevel.ToString();
+        if (xpText != null) xpText.text = $"{currentXP}/{xpToNextLevel}";
         if (xpSlider != null)
         {
             xpSlider.maxValue = xpToNextLevel;
             xpSlider.value = currentXP;
         }
-
-        if (cauldronText != null)
-        {
-            cauldronText.text = $"{Translator.GetText(30)}: Lvl {cauldronLevel}"; // Улучшить котел
-        }
+        if (cauldronText != null) cauldronText.text = $"Ур. {cauldronLevel}";
     }
 
-    public void AutoSave()
+    public void SyncUI()
     {
-        SaveGameSystem.Save(activeSaveSlot);
-    }
-
-    private void OnApplicationQuit()
-    {
-        AutoSave();
+        UpdateUI();
     }
 }

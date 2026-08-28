@@ -568,4 +568,16 @@ public class RecipeCrafting_Manager : MonoBehaviour
             DialogueSystem_Manager.Instance.StartPostMasteryKnowledgeDialogue();
         }
     }
+
+    /// <summary>
+    /// Добавление зелья или предмета в первый свободный слот инвентаря
+    /// </summary>
+    public void AddPotionToFirstEmptySlot(string potionId, string potionTitle)
+    {
+        int currentCount = PlayerPrefs.GetInt($"Item_Count_{potionId}", 0);
+        PlayerPrefs.SetInt($"Item_Count_{potionId}", currentCount + 1);
+        PlayerPrefs.SetString($"Item_Name_{potionId}", potionTitle);
+        PlayerPrefs.Save();
+        Debug.Log($"[INVENTORY] Награда {potionTitle} ({potionId}) успешно добавлена в инвентарь (Количество: {currentCount + 1}).");
+    }
 }

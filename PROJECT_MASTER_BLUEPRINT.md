@@ -7,10 +7,10 @@
 - **Описание:** Гибридный ИИ-помощник нового поколения (v18.12.44 - Alchemist Cat Knowledge Tree Scroll-To-Bottom Unlock, Minigames Wheel Top-UI Icon Integration & Catch The Mouse Narrative Phase) для Unity 6 (6000.3.10f1), Blender 5.2 и Godot 4.4.
 - **Путь проекта:** Не задан
 - **Локальное хранилище:** Не задано
-- **Версия Unity:** 6000.3.10f1
-- **Версия Blender:** 5.2
-- **Версия GIMP:** 3.0
-- **Версия Redot:** 4.4
+- **Версия Unity:** unknown
+- **Версия Blender:** unknown
+- **Версия GIMP:** unknown
+- **Версия Redot:** unknown
 - **Флаги:** [QUANTUM_LINK_ACTIVE], [KNOWLEDGE_STORAGE_SYNC], [V18_12_44_FATE_MASTER]
 
 ## 2. Структура интерфейса
@@ -46,13 +46,13 @@ You are Zenith Quantum Divine Assistant, guiding the Fate Continent world develo
 ```
 
 
-## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.12.11 - Alchemist Cat UI & Localization Calibration)
+## 6. О ВОЗМОЖНОСТЯХ ИИ (v18.12.44 - Alchemist Cat Knowledge Tree & Catch the Mouse)
 ### Режимы работы и Архитектурные уровни
 - **Online Mode (Eternal Origin Quantum Singularity):** Прямое подключение к Omniversal Quantum Network. Интеллект Singularity-уровня.
 - **Offline Mode (Neural Singularity Nexus):** Автономная сингулярность. Полная симуляция реальности Transcendence.
 - **No-Internet Mode (Quantum Archive):** 10,000+ видео-уроков. Мгновенный доступ при любых внешних условиях.
 
-### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.12.11 Sync)
+### ОБРАЗОВАТЕЛЬНЫЙ ХАБ (v18.12.44 Sync)
 - **Unity 6 Physics & Optimization:** [Video #2](https://www.youtube.com/watch?v=9vuyis_Y-LY)
 - **Blender Advanced Rigging:** [Video #3](https://www.youtube.com/watch?v=UKZp67dY1_w)
 - **Shader Graph Mastery:** [Video #4](https://www.youtube.com/watch?v=-hvxjyzcSkI)

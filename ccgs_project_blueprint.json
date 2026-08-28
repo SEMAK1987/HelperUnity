@@ -12,10 +12,10 @@
   },
   "agents_count": 52,
   "project_assets": {
-    "scripts_count": 66,
+    "scripts_count": 67,
     "prefabs_count": 0,
     "videos_count": 0,
-    "total_files": 133,
+    "total_files": 135,
     "video_list": [],
     "script_list": [
       "FactionMapMarker.cs",
@@ -29,6 +29,7 @@
       "src/AlchemistCat_Core/Avatar_Manager.cs",
       "src/AlchemistCat_Core/Calendar_Manager.cs",
       "src/AlchemistCat_Core/CatController.cs",
+      "src/AlchemistCat_Core/CatchMouse_Minigame.cs",
       "src/AlchemistCat_Core/DailyRewardSystem.cs",
       "src/AlchemistCat_Core/DialogueSystem_Manager.cs",
       "src/AlchemistCat_Core/GameManager.cs",
@@ -86,5 +87,5 @@
       "src/FateContinent_Core/UnitMovementController.cs"
     ]
   },
-  "last_scan": "2026-08-27T16:23:22.003Z"
+  "last_scan": "2026-08-28T15:46:05.179Z"
 }

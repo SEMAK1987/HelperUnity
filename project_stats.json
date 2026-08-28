@@ -1,39 +1,72 @@
 {
   "scripts": [
     "FactionMapMarker.cs",
+    "FateBoneWeightFixer.cs",
+    "FateMixamoExporter.cs",
     "MenuBackgroundCamera_Fate.cs",
     "UnityConnector.cs",
     "UnityRaceData.cs",
     "UnitySystems.cs",
     "UnityWorldSync.cs",
-    "src/BalanceConfig.cs",
-    "src/CastleFacilitiesHUD.cs",
-    "src/CharacterSelectionController.cs",
-    "src/DialogueSystem_Manager.cs",
-    "src/EventHub.cs",
-    "src/FateCastleManager.cs",
-    "src/FateDialogueBackgroundController.cs",
-    "src/FateGameplayIntro_Manager.cs",
-    "src/FateMapManager.cs",
-    "src/GamePause_Manager.cs",
-    "src/LandingPositionManager.cs",
-    "src/LanguageSelector.cs",
-    "src/LoadingScreenManager.cs",
-    "src/MainMenuController.cs",
-    "src/Menu_Game.cs",
-    "src/PhaseCombatSystem.cs",
-    "src/SaveGameSystem.cs",
-    "src/SettingsManager.cs",
-    "src/SimpleFloatAnimation.cs",
-    "src/StrategicCameraController.cs",
-    "src/Translator.cs",
-    "src/Transtable_Dropdown.cs",
-    "src/Transtable_Text.cs",
-    "src/UIButtonHoverEffect.cs",
-    "src/UIButtonPauseHover.cs",
-    "src/UIButtonSelectionHover.cs",
-    "src/UIButtonSfxBinder.cs",
-    "src/UnitBase.cs"
+    "src/AlchemistCat_Core/Avatar_Manager.cs",
+    "src/AlchemistCat_Core/Calendar_Manager.cs",
+    "src/AlchemistCat_Core/CatController.cs",
+    "src/AlchemistCat_Core/CatchMouse_Minigame.cs",
+    "src/AlchemistCat_Core/DailyRewardSystem.cs",
+    "src/AlchemistCat_Core/DialogueSystem_Manager.cs",
+    "src/AlchemistCat_Core/GameManager.cs",
+    "src/AlchemistCat_Core/Knowledge_Manager.cs",
+    "src/AlchemistCat_Core/LoadingScreenManager.cs",
+    "src/AlchemistCat_Core/MainMenuController.cs",
+    "src/AlchemistCat_Core/MarketAndProfiles.cs",
+    "src/AlchemistCat_Core/Menu_Game.cs",
+    "src/AlchemistCat_Core/MinigamesManager.cs",
+    "src/AlchemistCat_Core/RecipeCrafting_Manager.cs",
+    "src/AlchemistCat_Core/SaveGameSystem.cs",
+    "src/AlchemistCat_Core/SettingsManager.cs",
+    "src/AlchemistCat_Core/TimeOfDaySystem.cs",
+    "src/AlchemistCat_Core/Translator.cs",
+    "src/AlchemistCat_Core/Transtable_Dropdown.cs",
+    "src/AlchemistCat_Core/Transtable_Text.cs",
+    "src/AlchemistCat_Core/UIButtonHoverEffect.cs",
+    "src/AlchemistCat_Core/UIButtonSfxBinder.cs",
+    "src/AlchemistCat_Core/UpgradeManager.cs",
+    "src/AlchemistCat_Core/YandexAdsManager.cs",
+    "src/FateContinent_Core/BalanceConfig.cs",
+    "src/FateContinent_Core/BattleGridGenerator.cs",
+    "src/FateContinent_Core/BattleGridNode.cs",
+    "src/FateContinent_Core/CastleFacilitiesHUD.cs",
+    "src/FateContinent_Core/CharacterSelectionController.cs",
+    "src/FateContinent_Core/DialogueSystem_Manager.cs",
+    "src/FateContinent_Core/EventHub.cs",
+    "src/FateContinent_Core/FateButtonAnimator.cs",
+    "src/FateContinent_Core/FateCastleManager.cs",
+    "src/FateContinent_Core/FateDialogueBackgroundController.cs",
+    "src/FateContinent_Core/FateGameplayIntro_Manager.cs",
+    "src/FateContinent_Core/FateMainMenuTitleAnimator.cs",
+    "src/FateContinent_Core/FateMapManager.cs",
+    "src/FateContinent_Core/GamePause_Manager.cs",
+    "src/FateContinent_Core/LandingPositionManager.cs",
+    "src/FateContinent_Core/LanguageSelector.cs",
+    "src/FateContinent_Core/LoadingScreenManager.cs",
+    "src/FateContinent_Core/MainMenuController.cs",
+    "src/FateContinent_Core/Menu_Game.cs",
+    "src/FateContinent_Core/PhaseCombatSystem.cs",
+    "src/FateContinent_Core/SaveGameSystem.cs",
+    "src/FateContinent_Core/SettingsManager.cs",
+    "src/FateContinent_Core/SimpleFloatAnimation.cs",
+    "src/FateContinent_Core/StrategicCameraController.cs",
+    "src/FateContinent_Core/TacticalBattleGrid.cs",
+    "src/FateContinent_Core/TacticalUnitAnimator.cs",
+    "src/FateContinent_Core/Translator.cs",
+    "src/FateContinent_Core/Transtable_Dropdown.cs",
+    "src/FateContinent_Core/Transtable_Text.cs",
+    "src/FateContinent_Core/UIButtonHoverEffect.cs",
+    "src/FateContinent_Core/UIButtonPauseHover.cs",
+    "src/FateContinent_Core/UIButtonSelectionHover.cs",
+    "src/FateContinent_Core/UIButtonSfxBinder.cs",
+    "src/FateContinent_Core/UnitBase.cs",
+    "src/FateContinent_Core/UnitMovementController.cs"
   ],
   "prefabs": [],
   "scenes": [],
@@ -48,18 +81,28 @@
     "src/assets/images/avatar_hero_warrior_1781946102639.jpg",
     "src/assets/images/warrior_miniature_3d_1783529396804.jpg"
   ],
-  "total_files": 93,
+  "total_files": 135,
   "analysis": {
     "audit_issues": [],
     "todos": [],
     "asset_stats": {
-      "total_size": 8590287,
+      "total_size": 9810480,
       "large_files": []
     },
     "dependencies": {
       "FactionMapMarker": [
         "UnityEngine",
         "UnityEngine.EventSystems"
+      ],
+      "FateBoneWeightFixer": [
+        "UnityEngine",
+        "UnityEditor"
+      ],
+      "FateMixamoExporter": [
+        "UnityEngine",
+        "UnityEditor",
+        "System.IO",
+        "System.Text"
       ],
       "MenuBackgroundCamera_Fate": [
         "UnityEngine"
@@ -83,9 +126,161 @@
         "System.IO",
         "GameStudio.Core"
       ],
+      "Avatar_Manager": [
+        "System",
+        "System.Collections.Generic",
+        "UnityEngine",
+        "UnityEngine.UI",
+        "TMPro"
+      ],
+      "Calendar_Manager": [
+        "System",
+        "System.Collections.Generic",
+        "UnityEngine",
+        "UnityEngine.UI",
+        "TMPro"
+      ],
+      "CatController": [
+        "UnityEngine",
+        "UnityEngine.UI",
+        "System.Collections",
+        "TMPro"
+      ],
+      "CatchMouse_Minigame": [
+        "System.Collections",
+        "System.Collections.Generic",
+        "UnityEngine",
+        "UnityEngine.UI",
+        "TMPro"
+      ],
+      "DailyRewardSystem": [
+        "UnityEngine",
+        "UnityEngine.UI",
+        "System"
+      ],
+      "DialogueSystem_Manager": [
+        "System.Collections",
+        "System.Collections.Generic",
+        "UnityEngine",
+        "UnityEngine.UI",
+        "TMPro",
+        "UnityEngine.SceneManagement"
+      ],
+      "GameManager": [
+        "UnityEngine",
+        "UnityEngine.UI",
+        "TMPro"
+      ],
+      "Knowledge_Manager": [
+        "System",
+        "System.Collections.Generic",
+        "UnityEngine",
+        "UnityEngine.UI",
+        "TMPro"
+      ],
+      "LoadingScreenManager": [
+        "UnityEngine",
+        "UnityEngine.UI",
+        "UnityEngine.SceneManagement",
+        "System.Collections",
+        "TMPro"
+      ],
+      "MainMenuController": [
+        "UnityEngine",
+        "UnityEngine.UI",
+        "UnityEngine.SceneManagement",
+        "System.Collections",
+        "UnityEngine.InputSystem"
+      ],
+      "MarketAndProfiles": [
+        "UnityEngine",
+        "UnityEngine.UI",
+        "System.Collections.Generic",
+        "TMPro"
+      ],
+      "Menu_Game": [
+        "UnityEngine",
+        "UnityEngine.SceneManagement",
+        "UnityEngine.UI",
+        "TMPro"
+      ],
+      "MinigamesManager": [
+        "UnityEngine",
+        "UnityEngine.UI",
+        "System.Collections",
+        "TMPro"
+      ],
+      "RecipeCrafting_Manager": [
+        "System.Collections",
+        "System.Collections.Generic",
+        "UnityEngine",
+        "UnityEngine.UI",
+        "TMPro"
+      ],
+      "SaveGameSystem": [
+        "System",
+        "UnityEngine",
+        "UnityEngine.SceneManagement"
+      ],
+      "SettingsManager": [
+        "UnityEngine",
+        "UnityEngine.UI",
+        "UnityEngine.Audio",
+        "UnityEngine.SceneManagement",
+        "TMPro",
+        "System.Collections.Generic"
+      ],
+      "TimeOfDaySystem": [
+        "UnityEngine",
+        "UnityEngine.UI"
+      ],
+      "Translator": [
+        "System.Collections",
+        "System.Collections.Generic",
+        "UnityEngine",
+        "UnityEngine.UI",
+        "TMPro"
+      ],
+      "Transtable_Dropdown": [
+        "System.Collections.Generic",
+        "UnityEngine",
+        "TMPro"
+      ],
+      "Transtable_Text": [
+        "UnityEngine",
+        "TMPro"
+      ],
+      "UIButtonHoverEffect": [
+        "UnityEngine",
+        "UnityEngine.EventSystems",
+        "UnityEngine.UI"
+      ],
+      "UIButtonSfxBinder": [
+        "UnityEngine",
+        "UnityEngine.UI",
+        "UnityEngine.EventSystems"
+      ],
+      "UpgradeManager": [
+        "UnityEngine",
+        "UnityEngine.UI",
+        "TMPro"
+      ],
+      "YandexAdsManager": [
+        "UnityEngine",
+        "System",
+        "System.Runtime.InteropServices"
+      ],
       "BalanceConfig": [
         "UnityEngine",
         "System",
+        "System.Collections.Generic"
+      ],
+      "BattleGridGenerator": [
+        "UnityEngine",
+        "UnityEditor"
+      ],
+      "BattleGridNode": [
+        "UnityEngine",
         "System.Collections.Generic"
       ],
       "CastleFacilitiesHUD": [
@@ -102,18 +297,15 @@
         "System.Linq",
         "TMPro"
       ],
-      "DialogueSystem_Manager": [
-        "System.Collections",
-        "System.Collections.Generic",
-        "UnityEngine",
-        "UnityEngine.UI",
-        "TMPro",
-        "UnityEngine.SceneManagement"
-      ],
       "EventHub": [
         "UnityEngine",
         "System",
         "System.Collections.Generic"
+      ],
+      "FateButtonAnimator": [
+        "UnityEngine",
+        "UnityEngine.EventSystems",
+        "UnityEngine.UI"
       ],
       "FateCastleManager": [
         "System",
@@ -133,6 +325,10 @@
         "UnityEngine",
         "UnityEngine.UI",
         "System.Collections",
+        "TMPro"
+      ],
+      "FateMainMenuTitleAnimator": [
+        "UnityEngine",
         "TMPro"
       ],
       "FateMapManager": [
@@ -157,40 +353,10 @@
         "TMPro",
         "System.Collections.Generic"
       ],
-      "LoadingScreenManager": [
-        "UnityEngine",
-        "UnityEngine.UI",
-        "UnityEngine.SceneManagement",
-        "System.Collections",
-        "TMPro"
-      ],
-      "MainMenuController": [
-        "UnityEngine",
-        "UnityEngine.SceneManagement"
-      ],
-      "Menu_Game": [
-        "UnityEngine",
-        "UnityEngine.SceneManagement",
-        "UnityEngine.UI",
-        "TMPro"
-      ],
       "PhaseCombatSystem": [
         "UnityEngine",
         "System.Collections.Generic",
         "System.Linq"
-      ],
-      "SaveGameSystem": [
-        "System",
-        "UnityEngine",
-        "UnityEngine.SceneManagement"
-      ],
-      "SettingsManager": [
-        "UnityEngine",
-        "UnityEngine.UI",
-        "UnityEngine.Audio",
-        "UnityEngine.SceneManagement",
-        "TMPro",
-        "System.Collections.Generic"
       ],
       "SimpleFloatAnimation": [
         "UnityEngine",
@@ -200,26 +366,12 @@
         "UnityEngine",
         "UnityEngine.InputSystem"
       ],
-      "Translator": [
-        "System.Collections",
-        "System.Collections.Generic",
+      "TacticalBattleGrid": [
         "UnityEngine",
-        "UnityEngine.UI",
-        "TMPro"
+        "System.Collections.Generic"
       ],
-      "Transtable_Dropdown": [
-        "System.Collections.Generic",
-        "UnityEngine",
-        "TMPro"
-      ],
-      "Transtable_Text": [
-        "UnityEngine",
-        "TMPro"
-      ],
-      "UIButtonHoverEffect": [
-        "UnityEngine",
-        "UnityEngine.EventSystems",
-        "UnityEngine.UI"
+      "TacticalUnitAnimator": [
+        "UnityEngine"
       ],
       "UIButtonPauseHover": [
         "UnityEngine",
@@ -231,15 +383,14 @@
         "UnityEngine.EventSystems",
         "UnityEngine.UI"
       ],
-      "UIButtonSfxBinder": [
-        "UnityEngine",
-        "UnityEngine.UI",
-        "UnityEngine.EventSystems"
-      ],
       "UnitBase": [
         "UnityEngine"
+      ],
+      "UnitMovementController": [
+        "UnityEngine",
+        "System.Collections.Generic"
       ]
     }
   },
-  "last_updated": "2026-07-12T12:26:55.018Z"
+  "last_updated": "2026-08-28T15:46:05.179Z"
 }
